@@ -9,8 +9,8 @@
 
 #include <string>
 #include <iostream>
+#include <iomanip>
 #include <fstream>
-#include <regex>
 #include <map>
 #include <vector>
 #include <QMetaType>
@@ -109,113 +109,96 @@ const double PRECURSOR_ION_CYCLIC = Hplus;
 
 
 /**
-	\brief The types of peptides supported by the application.
-*/
-enum peptideType {
-	linear = 0,
-	cyclic = 1,
-	branched = 2,
-	lasso = 3,
-	linearpolysaccharide = 4,
-	other = 5
-};
-
-
-/**
-	\brief Convert a string to peptide type.
-	\param s string
-	\retval peptideType type of peptide
-*/
-peptideType getPeptideTypeFromString(string s);
-
-
-/**
-	\brief Convert the peptide type to a string.
-	\param peptidetype type of peptide
-	\retval string string
-*/
-string getStringFromPeptideType(peptideType peptidetype);
-
-
-/**
 	\brief Register peptideType by Qt.
 */
 Q_DECLARE_METATYPE(peptideType);
 
 
 /**
-	\brief Convert single charged mz ratio to multiple charged mz ratio.
-	\param mass single charged mz ratio
-	\param charge new charge
-	\retval double multiple charged mzratio
+	\brief Get mzratio from neutral mass.
+	\param neutralmass neutral mass
+	\param charge charge
+	\retval double mzratio
 */ 
-double charge(double mass, int charge);
+double charge(double neutralmass, int charge);
 
 
 /**
-	\brief Convert multiple charged mz ratio to single charged mz ratio.
-	\param mass multiple charged mz ratio
-	\param charge old charge
-	\retval double single charged mzratio
+	\brief Get neutral mass from mzratio.
+	\param mzratio mzratio
+	\param charge charge
+	\retval double neutral mass
 */ 
-double uncharge(double mass, int charge);
+double uncharge(double mzratio, int charge);
 
 
 /**
 	\brief The types of supported fragment ions.
 */
 enum fragmentIonType {
-	b_ion = 0,
-	b_ion_water_loss = 1,
-	b_ion_ammonia_loss = 2,
-	b_ion_water_and_ammonia_loss = 3,
-	a_ion = 4,
-	a_ion_water_loss = 5,
-	a_ion_ammonia_loss = 6,
-	a_ion_water_and_ammonia_loss = 7,
-	y_ion = 8,
-	y_ion_water_loss = 9,
-	y_ion_ammonia_loss = 10,
-	y_ion_water_and_ammonia_loss = 11,
-	precursor_ion = 12,
-	precursor_ion_water_loss = 13,
-	precursor_ion_ammonia_loss = 14,
-	precursor_ion_water_and_ammonia_loss = 15,
-	precursor_ion_co_loss = 16,
-	precursor_ion_co_loss_water_loss = 17,
-	precursor_ion_co_loss_ammonia_loss = 18,
-	precursor_ion_co_loss_water_and_ammonia_loss = 19,
-	cyclic_precursor_ion = 20,
-	cyclic_precursor_ion_water_loss = 21,
-	cyclic_precursor_ion_ammonia_loss = 22,
-	cyclic_precursor_ion_water_and_ammonia_loss = 23,
-	cyclic_precursor_ion_co_loss = 24,
-	cyclic_precursor_ion_co_loss_water_loss = 25,
-	cyclic_precursor_ion_co_loss_ammonia_loss = 26,
-	cyclic_precursor_ion_co_loss_water_and_ammonia_loss = 27,
-	ms_nterminal_ion_hplus = 28,
-	ms_nterminal_ion_naplus = 29,
-	ms_nterminal_ion_kplus = 30,
-	ms_cterminal_ion_hplus = 31,
-	ms_cterminal_ion_naplus = 32,
-	ms_cterminal_ion_kplus = 33,
-	ms_hplus = 34,
-	ms_naplus = 35,
-	ms_kplus = 36,
-	ms_hminus = 37,
-	ms_3M2Fe5H = 38,
-	ms_2MFe2H = 39,
-	ms_3MFe2H = 40,
-	ms_MFe2H = 41,
-	ms_3M2Fe6HNa = 42,
-	ms_2MFe3HNa = 43,
-	ms_3MFe3HNa = 44,
-	ms_MFe3HNa = 45,
-	ms_3M2Fe7H = 46,
-	ms_2MFe4H = 47,
-	ms_3MFe4H = 48,
-	ms_MFe4H = 49,
-	//b_ion_2H_loss = 34,
+	a_ion = 1,
+	a_ion_dehydrated = 2,
+	a_ion_deamidated = 3,
+	a_ion_dehydrated_and_deamidated = 4,
+	b_ion = 5,
+	b_ion_dehydrated = 6,
+	b_ion_deamidated = 7,
+	b_ion_dehydrated_and_deamidated = 8,
+	c_ion = 9,
+	c_ion_dehydrated = 10,
+	c_ion_deamidated = 11,
+	c_ion_dehydrated_and_deamidated = 12,
+	x_ion = 13,
+	x_ion_dehydrated = 14,
+	x_ion_deamidated = 15,
+	x_ion_dehydrated_and_deamidated = 16,
+	y_ion = 17,
+	y_ion_dehydrated = 18,
+	y_ion_deamidated = 19,
+	y_ion_dehydrated_and_deamidated = 20,
+	z_ion = 21,
+	z_ion_dehydrated = 22,
+	z_ion_deamidated = 23,
+	z_ion_dehydrated_and_deamidated = 24,
+	precursor_ion = 25,
+	precursor_ion_dehydrated = 26,
+	precursor_ion_deamidated = 27,
+	precursor_ion_dehydrated_and_deamidated = 28,
+	precursor_ion_co_loss = 29,
+	precursor_ion_co_loss_and_dehydrated = 30,
+	precursor_ion_co_loss_and_deamidated = 31,
+	precursor_ion_co_loss_and_dehydrated_and_deamidated = 32,
+	cyclic_precursor_ion = 33,
+	cyclic_precursor_ion_dehydrated = 34,
+	cyclic_precursor_ion_deamidated = 35,
+	cyclic_precursor_ion_dehydrated_and_deamidated = 36,
+	cyclic_precursor_ion_co_loss = 37,
+	cyclic_precursor_ion_co_loss_and_dehydrated = 38,
+	cyclic_precursor_ion_co_loss_and_deamidated = 39,
+	cyclic_precursor_ion_co_loss_and_dehydrated_and_deamidated = 40,
+	ms_nterminal_ion_hplus = 41,
+	ms_nterminal_ion_naplus = 42,
+	ms_nterminal_ion_kplus = 43,
+	ms_cterminal_ion_hplus = 44,
+	ms_cterminal_ion_naplus = 45,
+	ms_cterminal_ion_kplus = 46,
+	ms_hplus = 47,
+	ms_naplus = 48,
+	ms_kplus = 49,
+	ms_hminus = 50,
+	ms_3M2Fe5H = 51,
+	ms_2MFe2H = 52,
+	ms_3MFe2H = 53,
+	ms_MFe2H = 54,
+	ms_3M2Fe6HNa = 55,
+	ms_2MFe3HNa = 56,
+	ms_3MFe3HNa = 57,
+	ms_MFe3HNa = 58,
+	ms_3M2Fe7H = 59,
+	ms_2MFe4H = 60,
+	ms_3MFe4H = 61,
+	ms_MFe4H = 62,
+	//b_ion_2H_loss = 63,
 	fragmentIonTypeEnd
 };
 
@@ -283,6 +266,14 @@ struct fragmentDescription {
 		\brief The default constructor.
 	*/ 
 	fragmentDescription() {
+		clear();
+	}
+
+
+	/**
+		\brief Clear the structure.
+	*/ 
+	void clear() {
 		name = "";
 		summary = "";
 		massdifference = 0;
@@ -359,8 +350,9 @@ public:
 		\brief The constructor.
 		\param cyclicnterminus true when the N-terminus of a linear peptide is cyclized
 		\param cycliccterminus true when the C-terminus of a linear peptide is cyclized
+		\param precursoradduct an adduct of a precursor ion
 	*/ 
-	cFragmentIons(bool cyclicnterminus, bool cycliccterminus);
+	cFragmentIons(bool cyclicnterminus, bool cycliccterminus, string& precursoradduct);
 
 
 	/**
@@ -375,8 +367,9 @@ public:
 		\brief Recalculate all fragment ion types.
 		\param cyclicnterminus true when the N-terminus of a linear peptide is cyclized
 		\param cycliccterminus true when the C-terminus of a linear peptide is cyclized
+		\param precursoradduct an adduct of a precursor ion
 	*/ 
-	void recalculateFragments(bool cyclicnterminus, bool cycliccterminus);
+	void recalculateFragments(bool cyclicnterminus, bool cycliccterminus, string& precursoradduct);
 
 
 	/**
@@ -423,7 +416,7 @@ void initializeFragmentIonsForDeNovoGraphOfTPeptides(vector<fragmentIonType>& fr
 
 
 /**
-	\brief Initialize fragment ion types for the de novo graph of lasso peptides.
+	\brief Initialize fragment ion types for the de novo graph of branch-cyclic peptides.
 	\param fragmentions reference to a vector of fragment ion types
 */ 
 void initializeFragmentIonsForDeNovoGraphOfLassoPeptides(vector<fragmentIonType>& fragmentions);
@@ -436,4 +429,24 @@ void initializeFragmentIonsForDeNovoGraphOfLassoPeptides(vector<fragmentIonType>
 void initializeFragmentIonsForDeNovoGraphOfLinearPolysaccharide(vector<fragmentIonType>& fragmentions);
 
 
+/**
+	\brief Load modifications from a plain text stream.
+	\param stream reference to an input file stream
+	\param modifications reference to a vector where modifications will be placed
+	\param errormessage reference to a string where an error message might be stored
+	\param ignoreerrors if true errors are ignored
+	\retval int 0 when modifications were successfully loaded, -1 when an error occurred (\a errormessage is filled up)
+*/ 
+int loadModificationsFromPlainTextStream(ifstream &stream, vector<fragmentDescription>& modifications, string& errormessage, bool ignoreerrors);
+
+
+/**
+	\brief Store modifications into a plain text stream.
+	\param stream reference to an output file stream
+	\param modifications reference to a vector of modifications which will be stored
+*/ 
+void storeModificationsToPlainTextStream(ofstream &stream, vector<fragmentDescription>& modifications);
+
+
 #endif
+

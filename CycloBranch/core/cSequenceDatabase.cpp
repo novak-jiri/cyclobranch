@@ -38,7 +38,7 @@ void cSequenceDatabase::loadFromPlainTextStream(ifstream &stream) {
 			if (type.compare("branched") == 0) {
 				sequence.setPeptideType(branched);
 			}
-			if (type.compare("lasso") == 0) {
+			if (type.compare("branch-cyclic") == 0) {
 				sequence.setPeptideType(lasso);
 			}
 			if (type.compare("linearpolysaccharide") == 0) {
@@ -124,6 +124,11 @@ void cSequenceDatabase::loadFromPlainTextStream(ifstream &stream) {
 		}
 
 		// load reference
+		#if OS_TYPE == UNX
+			if ((s.size() > 0) && (s.back() == '\r')) {
+				s = s.substr(0, s.size() - 1);
+			}
+		#endif
 		sequence.setReference(s);
 
 		sequences.push_back(sequence);

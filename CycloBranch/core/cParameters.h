@@ -9,6 +9,7 @@
 
 #include <iostream>
 #include <fstream>
+#include "core/utilities.h"
 #include "core/cPeaksList.h"
 #include "core/cBricksDatabase.h"
 #include "core/cSequenceDatabase.h"
@@ -16,6 +17,7 @@
 class cMainThread;
 
 using namespace std;
+using namespace boost;
 
 
 /**
@@ -79,6 +81,12 @@ public:
 		\brief Precursor mass of the peptide.
     */
     double precursormass;
+
+
+	/**
+		\brief An adduct of a precursor ion.
+    */
+    string precursoradduct;
 
 
 	/**
@@ -163,6 +171,12 @@ public:
 		\brief True when permutations of bricks are generated.
     */
     bool generatebrickspermutations;
+
+
+	/**
+		\brief A file with modifications.
+    */
+    string modificationsfilename;
 
 
 	/**
@@ -331,7 +345,7 @@ public:
 
 
 	/**
-		\brief Update definitions of fragment ions when \a cyclicnterminus or \a cycliccterminus have been changed.
+		\brief Update definitions of fragment ions when \a cyclicnterminus, \a cycliccterminus or \a precursoradduct have been changed.
 	*/ 
 	void updateFragmentDefinitions();
 

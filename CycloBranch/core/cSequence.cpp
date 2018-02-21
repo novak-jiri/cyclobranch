@@ -67,32 +67,32 @@ void cSequence::setPeptideType(peptideType peptidetype) {
 }
 
 
-void cSequence::setSequence(string& sequence) {
+void cSequence::setSequence(const string& sequence) {
 	this->sequence = sequence;
 }
 
 
-void cSequence::setName(string& name) {
+void cSequence::setName(const string& name) {
 	this->name = name;
 }
 
 
-void cSequence::setReference(string& reference) {
+void cSequence::setReference(const string& reference) {
 	this->reference = reference;
 }
 
 
-void cSequence::setNTterminalModification(string& modification) {
+void cSequence::setNTterminalModification(const string& modification) {
 	nterminalmodification = modification;
 }
 
 
-void cSequence::setCTterminalModification(string& modification) {
+void cSequence::setCTterminalModification(const string& modification) {
 	cterminalmodification = modification;
 }
 
 
-void cSequence::setBranchModification(string& modification) {
+void cSequence::setBranchModification(const string& modification) {
 	branchmodification = modification;
 }
 
@@ -165,8 +165,7 @@ string cSequence::getNameWithReferenceAsHTMLString() {
 		}
 
 	}
-	catch (std::regex_error& e) {
-		e;
+	catch (regex_error& /*e*/) {
 		// nothing to do
 	}
 
@@ -178,7 +177,7 @@ string cSequence::getNameWithReferenceAsHTMLString() {
 }
 
 
-void cSequence::setSummaryFormula(string& formula) {
+void cSequence::setSummaryFormula(const string& formula) {
 	summary.setFormula(formula);
 }
 

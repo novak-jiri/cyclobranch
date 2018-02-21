@@ -46,6 +46,16 @@ public:
 	void closeEvent(QCloseEvent *event);
 
 
+protected:
+
+
+	/**
+		\brief Handle a key press event.
+		\param event pointer to QKeyEvent
+	*/ 
+	void keyPressEvent(QKeyEvent *event);
+
+
 private:
 	QWidget* parent;
 	QVBoxLayout* layout;

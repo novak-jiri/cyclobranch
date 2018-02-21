@@ -11,7 +11,6 @@
 #include <set>
 #include <string>
 #include <map>
-#include <regex>
 #include <QMetaType>
 
 #include "core/cParameters.h"
@@ -113,30 +112,26 @@ class cTheoreticalSpectrum {
 	int reversevalidposition;
 	int seriescompleted;
 
-	string realpeptidename;
-	string acronympeptidename;
-	vector<string> acronyms;
-	vector<string> backboneacronyms;
-	vector<string> branchacronyms;
-	string path;
-
 	// remove false hits, i.e., b-H2O without existing b-ion
 	void clearFalseHits(map<fragmentIonType, vector<int> >& series, vector<fragmentIonType>& fragmentions);
 
 	// search for matches of experimental and theoretical peaks
 	void searchForPeakPairs(cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks, vector<set<int> >& experimentalpeakmatches, double fragmentmasserrortolerance);
 
-	// compute some scores, etc.
-	void computeSomeStatistics(bool writedescription);
+	// compute additional scores
+	void computeStatistics(bool writedescription);
+
+	// generate precursor ion and its variants
+	void generatePrecursorIon(vector<int>& intcomposition, cBricksDatabase& bricksdatabasewithcombinations, int& theoreticalpeaksrealsize, bool writedescription);
 
 	// generate scrambled sequences
 	void generateScrambledIons(cBricksDatabase& bricksdatabase, bool writedescription, int& theoreticalpeaksrealsize);
 
-	// normalize scrambled sequences
-	void normalizeScrambledSequences(unordered_set<string>& scrambledsequences);
+	// select and normalize scrambled sequences
+	void selectAndNormalizeScrambledSequences(unordered_set<string>& scrambledsequences);
 
 	// select a proper fragment ion type for an experimental peak when masses of more theoretical fragment ions collide
-	fragmentIonType selectHigherPriorityIonType(fragmentIonType experimentalpeakiontype, fragmentIonType theoreticalpeakiontype);
+	fragmentIonType selectHigherPriorityIonTypeCID(fragmentIonType experimentalpeakiontype, fragmentIonType theoreticalpeakiontype);
 
 public:
 
@@ -166,14 +161,14 @@ public:
 		\brief Get the peptide spectrum candidate.
 		\retval cCandidate reference to the peptide sequence candidate
 	*/ 
-	cCandidate& cTheoreticalSpectrum::getCandidate();
+	cCandidate& getCandidate();
 	
 
 	/**
 		\brief Set a peptide spectrum candidate.
 		\param candidate reference to the peptide sequence candidate
 	*/ 
-	void cTheoreticalSpectrum::setCandidate(cCandidate& candidate);
+	void setCandidate(cCandidate& candidate);
 
 
 	/**
@@ -220,7 +215,7 @@ public:
 
 
 	/**
-		\brief Compare the theoretical spectrum of a lasso peptide with an experimental spectrum.
+		\brief Compare the theoretical spectrum of a branch-cyclic peptide with an experimental spectrum.
 		\param sortedpeaklist reference to a peak list of an experimental spectrum
 		\param bricksdatabasewithcombinations reference to a database of bricks with combinations of bricks
 		\param writedescription if true then string descriptions of peaks are filled
@@ -254,7 +249,7 @@ public:
 		\brief Get the number of matched peaks between an experimental and a theoretical spectrum.
 		\retval int number of matched peaks
 	*/ 
-	int getNumberOfMatchedPeaks();
+	int getNumberOfMatchedPeaks() const;
 
 
 	/**
@@ -269,14 +264,14 @@ public:
 		\param iontype a fragment ion type
 		\retval int number of matched peaks
 	*/ 
-	int getNumberOfMatchedPeaks(fragmentIonType iontype);
+	int getNumberOfMatchedPeaks(fragmentIonType iontype) const;
 
 
 	/**
 		\brief Get the number of matched Y and B ions between an experimental and a theoretical spectrum.
 		\retval int number of matched peaks
 	*/ 
-	int getNumberOfMatchedPeaksYB();
+	int getNumberOfMatchedPeaksYB() const;
 
 
 	/**
@@ -298,7 +293,6 @@ public:
 		\brief Generate a N-terminal fragment ion series.
 		\param maxcharge a charge of precursor ion
 		\param peaklistrealsize real size of the peak list
-		\param stringcomposition reference to a vector of ids of bricks as strings
 		\param intcomposition reference to a vector of ids of bricks as integers
 		\param fragmentiontype fragment ion type which will be generated
 		\param bricksdatabase reference to a database of building blocks
@@ -309,14 +303,13 @@ public:
 		\param peptidetype the type of searched peptide
 		\param trotation a pointer to a T-permutation of a branched peptide
 	*/ 
-	void generateNTerminalFragmentIons(int maxcharge, int& peaklistrealsize, vector<string>& stringcomposition, vector<int>& intcomposition, fragmentIonType fragmentiontype, cBricksDatabase& bricksdatabase, bool writedescription, int rotationid, vector<splitSite>& splittingsites, vector<fragmentDescription>& searchedmodifications, peptideType peptidetype, TRotationInfo* trotation = 0);
+	void generateNTerminalFragmentIons(int maxcharge, int& peaklistrealsize, vector<int>& intcomposition, fragmentIonType fragmentiontype, cBricksDatabase& bricksdatabase, bool writedescription, int rotationid, vector<splitSite>& splittingsites, vector<fragmentDescription>& searchedmodifications, peptideType peptidetype, TRotationInfo* trotation = 0);
 	
 
 	/**
 		\brief Generate a C-terminal fragment ion series.
 		\param maxcharge a charge of precursor ion
 		\param peaklistrealsize real size of the peak list
-		\param stringcomposition reference to a vector of ids of bricks as strings
 		\param intcomposition reference to a vector of ids of bricks as integers
 		\param fragmentiontype fragment ion type which will be generated
 		\param bricksdatabase reference to a database of building blocks
@@ -327,7 +320,7 @@ public:
 		\param peptidetype the type of searched peptide
 		\param trotation a pointer to a T-permutation of a branched peptide
 	*/ 
-	void generateCTerminalFragmentIons(int maxcharge, int& peaklistrealsize, vector<string>& stringcomposition, vector<int>& intcomposition, fragmentIonType fragmentiontype, cBricksDatabase& bricksdatabase, bool writedescription, int rotationid, vector<splitSite>& splittingsites, vector<fragmentDescription>& searchedmodifications, peptideType peptidetype, TRotationInfo* trotation = 0);
+	void generateCTerminalFragmentIons(int maxcharge, int& peaklistrealsize, vector<int>& intcomposition, fragmentIonType fragmentiontype, cBricksDatabase& bricksdatabase, bool writedescription, int rotationid, vector<splitSite>& splittingsites, vector<fragmentDescription>& searchedmodifications, peptideType peptidetype, TRotationInfo* trotation = 0);
 
 
 	/**
@@ -356,37 +349,7 @@ public:
 		\brief Get the sum of relative intensities of matched peaks.
 		\retval double sum of relative intensities of matched peaks
 	*/ 
-	double getWeightedIntensityScore();
-
-
-	/**
-		\brief Set a real peptide name.
-		\param bricksdatabase the database of building blocks
-		\param peptidetype the type of peptide
-	*/ 
-	void setRealPeptideName(cBricksDatabase& bricksdatabase, peptideType peptidetype);
-
-
-	/**
-		\brief Set an acronym peptide name.
-		\param bricksdatabase the database of building blocks
-		\param peptidetype the type of peptide
-	*/ 
-	void setAcronymPeptideNameWithHTMLReferences(cBricksDatabase& bricksdatabase, peptideType peptidetype);
-
-
-	/**
-		\brief Get a real peptide name.
-		\retval string reference to the real peptide name
-	*/ 
-	string& getRealPeptideName();
-
-
-	/**
-		\brief Get an acronym peptide name.
-		\retval string reference to the acronym peptide name
-	*/ 
-	string& getAcronymPeptideNameWithHTMLReferences();
+	double getWeightedIntensityScore() const;
 
 
 	/**
@@ -450,7 +413,7 @@ public:
 		\brief Get the number of matched bricks.
 		\retval int number of matched bricks
 	*/ 
-	int getNumberOfMatchedBricks();
+	int getNumberOfMatchedBricks() const;
 
 
 	/**
@@ -458,62 +421,6 @@ public:
 		\retval vector<visualSeries> vector of fragment ion series for visualisation
 	*/ 
 	vector<visualSeries>& getVisualCoverage();
-
-
-	/**
-		\brief Set a vector of acronyms corresponding to a peptide sequence candidate.
-		\param bricksdatabase a database of building blocks
-	*/ 
-	void setAcronyms(cBricksDatabase& bricksdatabase);
-
-
-	/**
-		\brief Set a vector of acronyms corresponding to a backbone of a peptide sequence candidate.
-		\param bricksdatabase a database of building blocks
-	*/ 
-	void setBackboneAcronyms(cBricksDatabase& bricksdatabase);
-
-
-	/**
-		\brief Set a vector of acronyms corresponding to a branch of a peptide sequence candidate.
-		\param bricksdatabase a database of building blocks
-	*/ 
-	void setBranchAcronyms(cBricksDatabase& bricksdatabase);
-
-
-	/**
-		\brief Get a vector of acronyms corresponding to a peptide sequence candidate.
-		\retval vector<string> a vector of acronyms
-	*/ 
-	vector<string>& getAcronyms();
-
-
-	/**
-		\brief Get a vector of acronyms corresponding to a backbone of a peptide sequence candidate.
-		\retval vector<string> a vector of acronyms
-	*/ 
-	vector<string>& getBackboneAcronyms();
-
-
-	/**
-		\brief Get a vector of acronyms corresponding to a branch of a peptide sequence candidate.
-		\retval vector<string> a vector of acronyms
-	*/ 
-	vector<string>& getBranchAcronyms();
-
-
-	/**
-		\brief Set a path in the de novo graph corresponding to the spectrum.
-		\param graph reference to the de novo graph
-	*/ 
-	void setPath(cDeNovoGraph& graph);
-
-
-	/**
-		\brief Get a path in the de novo graph corresponding to the spectrum.
-		\retval string reference to a path corresponding to the spectrum
-	*/ 
-	string& getPath();
 
 
 	/**
@@ -551,12 +458,6 @@ public:
 	void load(ifstream& is);
 
 };
-
-
-/**
-	\brief Register cTheoreticalSpectrum by Qt.
-*/
-Q_DECLARE_METATYPE(cTheoreticalSpectrum);
 
 
 #endif

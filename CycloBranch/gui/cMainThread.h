@@ -12,23 +12,12 @@
 #include <QThreadPool>
 #include <QTime>
 
+#include "core/utilities.h"
 #include "core/cParameters.h"
 #include "core/cDeNovoGraph.h"
 #include "core/cTheoreticalSpectrum.h"
 
 using namespace std;
-
-
-/**
-	\brief The name of the application.
-*/
-extern QString appname;
-
-
-/**
-	\brief The version of the application.
-*/
-extern QString appversion;
 
 
 /**
@@ -46,14 +35,10 @@ private:
 	bool graphreaderisworking;
 
 	cDeNovoGraph graph;
-	cTheoreticalSpectrumList theoreticalspectra;
+	cTheoreticalSpectrumList* theoreticalspectrumlist;
 	cParameters parameters;
 
 	bool checkModifications(cParameters& parameters, cSequence& sequence, int& startmodifid, int& endmodifid, int& middlemodifid, string& errormessage);
-
-	void parseBranch(peptideType peptidetype, string& composition, vector<string>& vectorcomposition, int& branchstart, int& branchend);
-
-	bool checkRegex(cParameters& parameters, string& sequence, string& errormessage);
 
 public:
 
@@ -61,10 +46,11 @@ public:
 	/**
 		\brief The constructor.
 		\param parameters reference to input paramaters
+		\param theoreticalspectrumlist a list of theoretical spectra
 		\param enablelogwindow if true then messages are logged into the log window
 		\param enablestdout if true then messages are logged into the standard output
 	*/ 
-	cMainThread(cParameters& parameters, bool enablelogwindow = true, bool enablestdout = true);
+	cMainThread(cParameters& parameters, cTheoreticalSpectrumList& theoreticalspectrumlist, bool enablelogwindow = true, bool enablestdout = true);
 
 
 	/**
@@ -137,21 +123,9 @@ protected:
 
 
 	/**
-		\brief The signals emitted when the thread has launched.
-	*/ 
-	void emitStartSignals();
-
-
-	/**
 		\brief The signals emitted when the thread has successfully finished.
 	*/ 
 	void emitEndSignals();
-
-
-	/**
-		\brief The signals emitted when the thread was forced to stop.
-	*/ 
-	void endNow();
 
 
 signals:
@@ -186,13 +160,6 @@ signals:
 
 
 	/**
-		\brief Send a theoretical spectrum to cMainWindow when the thread has finished.
-		\param theoreticalspectrum a theoretical spectrum
-	*/ 
-	void sendTheoreticalSpectrum(cTheoreticalSpectrum theoreticalspectrum);
-
-
-	/**
 		\brief Send parameters to cMainWindow when the thread has finished.
 		\param parameters parameters
 	*/ 
@@ -200,15 +167,9 @@ signals:
 
 
 	/**
-		\brief Prepare columns in cMainWindow when the thread has finished.
+		\brief Report results.
 	*/ 
-	void prepareColumns();
-
-
-	/**
-		\brief Fit the width of columns in cMainWindow.
-	*/ 
-	void fitColumns();
+	void reportSpectra();
 
 
 	/**
@@ -216,12 +177,6 @@ signals:
 		\param s graph printed as a string
 	*/ 
 	void setGraph(string s);
-
-
-	/**
-		\brief Safely exit when the thread was forced to stop.
-	*/ 
-	void safeExit();
 
 
 private slots:

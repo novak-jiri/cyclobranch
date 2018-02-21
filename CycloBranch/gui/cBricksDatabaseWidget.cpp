@@ -1,5 +1,6 @@
 #include "gui/cBricksDatabaseWidget.h"
 #include "gui/cMainThread.h"
+#include "gui/cEventFilter.h"
 
 #include <QTableWidget>
 #include <QTableWidgetItem>
@@ -12,9 +13,11 @@
 #include <QLabel>
 #include <QProgressDialog>
 #include <QCheckBox>
+#include <QKeyEvent>
+#include <QIcon>
 
 
-int numberOfOccurrences(string& s, char c) {
+int numberOfOccurrences(const string& s, char c) {
 	int count = 0;
 	for (int i = 0; i < (int)s.size(); i++) {
 		if (s[i] == c) {
@@ -29,6 +32,7 @@ cBricksDatabaseWidget::cBricksDatabaseWidget(QWidget* parent) {
 	this->parent = parent;
 
 	setWindowTitle("Building Blocks Editor");
+	setWindowIcon(QIcon(":/images/icons/68.png"));
 
 	insertrow = new QPushButton(tr("Add Row"));
 	insertrow->setToolTip("Add a new row.");
@@ -56,13 +60,20 @@ cBricksDatabaseWidget::cBricksDatabaseWidget(QWidget* parent) {
 
 	database = new QTableWidget(0, 0, this);
 	database->setColumnCount(7);
-	database->setHorizontalHeaderItem(0, new QTableWidgetItem(""));
-	database->setHorizontalHeaderItem(1, new QTableWidgetItem("Name(s)"));
-	database->setHorizontalHeaderItem(2, new QTableWidgetItem("Acronym(s)"));
-	database->setHorizontalHeaderItem(3, new QTableWidgetItem("Residue Summary"));
-	database->setHorizontalHeaderItem(4, new QTableWidgetItem("Monoisotopic Residue Mass"));
-	database->setHorizontalHeaderItem(5, new QTableWidgetItem("Reference(s)"));
-	database->setHorizontalHeaderItem(6, new QTableWidgetItem("Preview"));
+	database->setHorizontalHeaderItem(0, new QTableWidgetItem());
+	database->setHorizontalHeaderItem(1, new QTableWidgetItem());
+	database->horizontalHeaderItem(1)->setText("Name(s)");
+	database->setHorizontalHeaderItem(2, new QTableWidgetItem());
+	database->horizontalHeaderItem(2)->setText("Acronym(s)");
+	database->setHorizontalHeaderItem(3, new QTableWidgetItem());
+	database->horizontalHeaderItem(3)->setText("Residue Summary");
+	database->setHorizontalHeaderItem(4, new QTableWidgetItem());
+	database->horizontalHeaderItem(4)->setText("Monoisotopic Residue Mass");
+	database->setHorizontalHeaderItem(5, new QTableWidgetItem());
+	database->horizontalHeaderItem(5)->setText("Reference(s)");
+	database->setHorizontalHeaderItem(6, new QTableWidgetItem());
+	database->horizontalHeaderItem(6)->setText("Preview");
+
 	database->horizontalHeader()->setStretchLastSection(true);
 	for (int i = 0; i < database->columnCount(); i++) {
 		database->resizeColumnToContents(i);
@@ -76,11 +87,6 @@ cBricksDatabaseWidget::cBricksDatabaseWidget(QWidget* parent) {
 	mainlayout = new QVBoxLayout();
 	mainlayout->addWidget(database);
 	mainlayout->addLayout(buttons);
-
-	progress = new QProgressDialog(this);
-	progress->setCancelButton(0);
-	progress->setMinimumDuration(1000);
-	progress->setWindowModality(Qt::WindowModal);
 
 	connect(database->horizontalHeader(), SIGNAL(sectionDoubleClicked(int)), this, SLOT(headerItemDoubleClicked(int)));
 	connect(database, SIGNAL(itemChanged(QTableWidgetItem *)), this, SLOT(itemChanged(QTableWidgetItem *)));
@@ -96,7 +102,13 @@ cBricksDatabaseWidget::cBricksDatabaseWidget(QWidget* parent) {
 	resize(1280, 700);
 
 	databasefile = "";
-	lastdir = "./BrickDatabases/";
+
+	#if OS_TYPE == WIN
+		lastdir = "./BrickDatabases/";
+	#else
+		lastdir = linuxinstalldir + "BrickDatabases/";
+	#endif
+	
 	bricks.clear();
 }
 
@@ -119,7 +131,6 @@ cBricksDatabaseWidget::~cBricksDatabaseWidget() {
 	delete database;
 	delete buttons;
 	delete mainlayout;
-	delete progress;
 }
 
 
@@ -129,47 +140,51 @@ void cBricksDatabaseWidget::closeEvent(QCloseEvent *event) {
 
 
 void cBricksDatabaseWidget::deleteTable(bool enableprogress) {
-	if (enableprogress) {
-		progress->setLabelText("Clearing the table...");
-		progress->setMinimum(0);
-		progress->setValue(1);
-		progress->setMaximum(database->rowCount());
-		progress->show();
-	}
-
-	for (int i = 0; i < database->rowCount(); i++) {
-		for (int j = 0; j < database->columnCount(); j++) {
-			if ((j == 0) || (j == 6)) {
-				delete database->cellWidget(i, j);
-			}
-			else {
-				delete database->item(i, j);
-			}
-		}
-
-		if (enableprogress && ((i == 0) || ((i - 1)/100 != i/100))) {
-			progress->setValue(i);
-		}
-	}
+	QProgressDialog* progress;
+	cEventFilter filter;
+	int rowcount = database->rowCount();
 
 	if (enableprogress) {
-		progress->setValue(database->rowCount());
-		progress->hide();
+		progress = new QProgressDialog("Clearing the table...", /*"Cancel"*/0, 0, rowcount, this);
+		progress->installEventFilter(&filter);
+		progress->setMinimumDuration(0);
+		progress->setWindowModality(Qt::WindowModal);
+		progress->setValue(0);
 	}
+
+	widgetitemallocator.reset();
+
+	for (int i = 0; i < rowcount; i++) {
+		delete database->cellWidget(rowcount - i - 1, 0);
+		delete database->cellWidget(rowcount - i - 1, 6);
+
+        if (enableprogress) {
+            progress->setValue(i);
+            //if (progress->wasCanceled()) {
+            //    break;
+            //}
+        }
+    }
+	
 	database->setRowCount(0);
+
+	if (enableprogress) {
+		progress->setValue(rowcount);
+		delete progress;
+	}
 }
 
 
 void cBricksDatabaseWidget::removeRow(int row) {
-	for (int i = 0; i < database->columnCount(); i++) {
-		if ((i == 0) || (i == 6)) {
-			delete database->cellWidget(row, i);
-		}
-		else {
-			delete database->item(row, i);
-		}
-	}
-	database->removeRow(row);
+   for (int i = 0; i < database->columnCount(); i++) {
+        if ((i == 0) || (i == 6)) {
+            delete database->cellWidget(row, i);
+        }
+        else {
+			database->takeItem(row, i);
+        }
+    }
+    database->removeRow(row);
 }
 
 
@@ -200,7 +215,7 @@ bool cBricksDatabaseWidget::checkTable() {
 }
 
 
-bool cBricksDatabaseWidget::checkFormula(int row, string& summary) {
+bool cBricksDatabaseWidget::checkFormula(int row, const string& summary) {
 	cSummaryFormula formula;
 	string errmsg;
 	formula.setFormula(summary);
@@ -221,6 +236,13 @@ bool cBricksDatabaseWidget::checkFormula(int row, string& summary) {
 }
 
 
+void cBricksDatabaseWidget::keyPressEvent(QKeyEvent *event) {
+    if(event->key() == Qt::Key_Escape) {
+		hide();
+    }
+}
+
+
 void cBricksDatabaseWidget::closeWindow() {
 	hide();
 }
@@ -228,11 +250,11 @@ void cBricksDatabaseWidget::closeWindow() {
 
 void cBricksDatabaseWidget::loadDatabase() {
 	QString filename = QFileDialog::getOpenFileName(this, tr("Load the Database of Building Blocks"), lastdir, tr("Database of Building Blocks (*.txt)"));
-	lastdir = filename;
-	string errormessage;
 
-	if (filename.toStdString().compare("") != 0) {
-
+	if (!filename.isEmpty()) {
+		lastdir = filename;
+		string errormessage;
+		
 		databasefile = filename;
 		save->setText(QString("  Save '") + QString(databasefile.toStdString().substr(databasefile.toStdString().rfind('/') + 1, databasefile.toStdString().size()).c_str()) + QString("'  "));
 		
@@ -246,46 +268,52 @@ void cBricksDatabaseWidget::loadDatabase() {
 		else {
 
 			bricks.clear();
-			bricks.loadFromPlainTextStream(inputstream, errormessage);
+			bricks.loadFromPlainTextStream(inputstream, errormessage, true);
 
 			deleteTable(true);
 
-			progress->setLabelText("Loading the Databatase of Building Blocks...");
-			progress->setMinimum(0);
-			progress->setValue(1);
-			progress->setMaximum(bricks.size());
-			progress->show();
+			QProgressDialog progress("Loading the Databatase of Building Blocks...", /*"Cancel"*/0, 0, bricks.size(), this);
+			cEventFilter filter;
+			progress.installEventFilter(&filter);
+			progress.setMinimumDuration(0);
+			progress.setWindowModality(Qt::WindowModal);
 
 			database->setRowCount(bricks.size());
 			for (int i = 0; i < bricks.size(); i++) {
 				QCheckBox* checkbox = new QCheckBox();
 				database->setCellWidget(i, 0, checkbox);
 
-				database->setItem(i, 1, new QTableWidgetItem(bricks[i].getName().c_str()));
-				database->setItem(i, 2, new QTableWidgetItem(bricks[i].getAcronymsAsString().c_str()));
-				database->setItem(i, 3, new QTableWidgetItem(bricks[i].getSummary().c_str()));
+				database->setItem(i, 1, widgetitemallocator.getNewItem());
+				database->item(i, 1)->setText(bricks[i].getName().c_str());
 
-				database->setItem(i, 4, new QTableWidgetItem());
+				database->setItem(i, 2, widgetitemallocator.getNewItem());
+				database->item(i, 2)->setText(bricks[i].getAcronymsAsString().c_str());
+
+				database->setItem(i, 3, widgetitemallocator.getNewItem());
+				database->item(i, 3)->setText(bricks[i].getSummary().c_str());
+
+				database->setItem(i, 4, widgetitemallocator.getNewItem());
 				database->item(i, 4)->setData(Qt::DisplayRole, bricks[i].getMass());
 				
-				database->setItem(i, 5, new QTableWidgetItem(bricks[i].getReferencesAsString().c_str()));
+				database->setItem(i, 5, widgetitemallocator.getNewItem());
+				database->item(i, 5)->setText(bricks[i].getReferencesAsString().c_str());
 				
 				database->setCellWidget(i, 6, new QLabel(bricks[i].getAcronymsWithReferencesAsHTMLString().c_str()));
 				((QLabel *)database->cellWidget(i, 6))->setTextFormat(Qt::RichText);
 				((QLabel *)database->cellWidget(i, 6))->setTextInteractionFlags(Qt::TextBrowserInteraction);
 				((QLabel *)database->cellWidget(i, 6))->setOpenExternalLinks(true);
 
-				if ((i == 0) || ((i - 1)/100 != i/100)) {
-					progress->setValue(i);
-				}
+				progress.setValue(i);
+				//if (progress.wasCanceled()) {
+				//	break;
+				//}
 			}
 
 			for (int i = 0; i < database->columnCount(); i++) {
 				database->resizeColumnToContents(i);
 			}
 
-			progress->setValue(bricks.size());
-			progress->hide();
+			progress.setValue(bricks.size());
 
 		}
 
@@ -314,18 +342,17 @@ void cBricksDatabaseWidget::saveDatabase() {
 	}
 	else {
 
-		progress->setLabelText("Saving the Databatase of Building Blocks...");
-		progress->setMinimum(0);
-		progress->setMaximum(100);
-		progress->setValue(1);
-		progress->show();
+		QProgressDialog progress("Saving the Databatase of Building Blocks...", /*"Cancel"*/0, 0, database->rowCount(), this);
+		cEventFilter filter;
+		progress.installEventFilter(&filter);
+		progress.setMinimumDuration(0);
+		progress.setWindowModality(Qt::WindowModal);
 
 		cBrick b;
 		bricks.clear();
+		string s;
 
 		removeEmptyRows();
-
-		progress->setMaximum(database->rowCount());
 
 		for (int i = 0; i < database->rowCount(); i++) {
 			b.clear();
@@ -336,19 +363,23 @@ void cBricksDatabaseWidget::saveDatabase() {
 					// nothing to do
 					break;
 				case 1:
-					b.setName(database->item(i,j)->text().toStdString());
+					s = database->item(i,j)->text().toStdString();
+					b.setName(removeWhiteSpacesExceptSpaces(s));
 					break;
 				case 2:
-					b.setAcronyms(database->item(i,j)->text().toStdString());
+					s = database->item(i,j)->text().toStdString();
+					b.setAcronyms(removeWhiteSpacesExceptSpaces(s));
 					break;
 				case 3:
-					b.setSummary(database->item(i,j)->text().toStdString());
+					s = database->item(i,j)->text().toStdString();
+					b.setSummary(removeWhiteSpacesExceptSpaces(s));
 					break;
 				case 4:
 					b.setMass(database->item(i,j)->data(Qt::DisplayRole).toDouble());
 					break;
 				case 5:
-					b.setReferences(database->item(i,j)->text().toStdString());
+					s = database->item(i,j)->text().toStdString();
+					b.setReferences(removeWhiteSpacesExceptSpaces(s));
 					break;
 				default:
 					break;
@@ -356,15 +387,15 @@ void cBricksDatabaseWidget::saveDatabase() {
 			}
 			bricks.push_back(b);
 
-			if ((i == 0) || ((i - 1)/100 != i/100)) {
-				progress->setValue(i);
-			}
+			progress.setValue(i);
+			//if (progress.wasCanceled()) {
+			//	break;
+			//}
 		}
 
 		bricks.storeToPlainTextStream(outputstream);
 
-		progress->setValue(database->rowCount());
-		progress->hide();
+		progress.setValue(progress.maximum());
 
 	}
 	outputstream.close();
@@ -377,10 +408,11 @@ void cBricksDatabaseWidget::saveDatabaseAs() {
 		return;
 	}
 
-	QString filename = QFileDialog::getSaveFileName(this, tr("Save Settings As..."), lastdir, tr("Database of Building Blocks (*.txt)"));
-	lastdir = filename;
+	QString filename = QFileDialog::getSaveFileName(this, tr("Save the Database of Building Blocks As..."), lastdir, tr("Database of Building Blocks (*.txt)"));
 
-	if (filename.toStdString().compare("") != 0) {
+	if (!filename.isEmpty()) {
+		lastdir = filename;
+	
 		databasefile = filename;
 		save->setText(QString("  Save '") + QString(databasefile.toStdString().substr(databasefile.toStdString().rfind('/') + 1, databasefile.toStdString().size()).c_str()) + QString("'  "));
 		saveDatabase();
@@ -395,11 +427,11 @@ void cBricksDatabaseWidget::addRow() {
 	QCheckBox* checkbox = new QCheckBox();
 	database->setCellWidget(row, 0, checkbox);
 
-	database->setItem(row, 1, new QTableWidgetItem());
-	database->setItem(row, 2, new QTableWidgetItem());
-	database->setItem(row, 3, new QTableWidgetItem());
-	database->setItem(row, 4, new QTableWidgetItem());
-	database->setItem(row, 5, new QTableWidgetItem());
+	database->setItem(row, 1, widgetitemallocator.getNewItem());
+	database->setItem(row, 2, widgetitemallocator.getNewItem());
+	database->setItem(row, 3, widgetitemallocator.getNewItem());
+	database->setItem(row, 4, widgetitemallocator.getNewItem());
+	database->setItem(row, 5, widgetitemallocator.getNewItem());
 
 	database->setCellWidget(row, 6, new QLabel());
 	((QLabel *)database->cellWidget(row, 6))->setTextFormat(Qt::RichText);

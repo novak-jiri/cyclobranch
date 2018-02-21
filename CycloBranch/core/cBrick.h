@@ -12,7 +12,6 @@
 #include <string>
 #include <vector>
 #include <algorithm>
-#include <regex>
 #include "core/utilities.h"
 
 using namespace std;
@@ -23,7 +22,7 @@ using namespace std;
 	\param composition string containing ids of bricks separated by '-'
 	\retval number number of bricks
 */ 
-int getNumberOfBricks(string& composition);
+int getNumberOfBricks(const string& composition);
 
 
 /**
@@ -78,7 +77,7 @@ public:
 		\brief Set a full name of the brick.
 		\param name reference to a string
 	*/ 
-	void setName(string& name);
+	void setName(const string& name);
 
 	
 	/**
@@ -120,7 +119,7 @@ public:
 		\brief Get the mass of the brick.
 		\retval double mass
 	*/ 
-	double getMass();
+	double getMass() const;
 
 
 	/**
@@ -135,28 +134,28 @@ public:
 		\param composition reference to a string with composition (ids of bricks separated by '-')
 		\param normalize if true then ids of bricks are sorted in ascending order
 	*/ 
-	void setComposition(string& composition, bool normalize);
+	void setComposition(const string& composition, bool normalize);
 
 
 	/**
 		\brief Set the summary molecular formula of the brick.
 		\param summary reference to a string
 	*/ 
-	void setSummary(string& summary);
+	void setSummary(const string& summary);
 
 
 	/**
 		\brief Set acronyms of all izomers corresponding to the brick.
 		\param acronyms reference to a string where the acronyms are separated by '/'
 	*/ 
-	void setAcronyms(string& acronyms);
+	void setAcronyms(const string& acronyms);
 
 
 	/**
 		\brief Set references (e.g., to ChemSpider) of all izomers corresponding to the brick.
 		\param references reference to a string where references to izomers are separated by '/'
 	*/ 
-	void setReferences(string& references);
+	void setReferences(const string& references);
 
 
 	/**

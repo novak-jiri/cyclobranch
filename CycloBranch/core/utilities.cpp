@@ -1,5 +1,12 @@
 #include "core/utilities.h"
 
+#include "core/cBrick.h"
+
+
+QString appname = "CycloBranch";
+QString appversion = "v. 1.0.1106 (64-bit)";
+QString linuxinstalldir = "/usr/share/cyclobranch/";
+
 
 void storeString(string& s, ofstream& os) {
 	int size = (int)s.size();
@@ -32,5 +39,175 @@ void loadStringVector(vector<string>& v, ifstream& is) {
 	for (int i = 0; i < (int)v.size(); i++) {
 		loadString(v[i], is);
 	}
+}
+
+
+bool isWhiteSpaceExceptSpace(char c) {
+	return isspace(c) && (c != ' ');
+}
+
+
+string& removeWhiteSpacesExceptSpaces(string& s) {
+	s.erase(remove_if(begin(s), end(s), isWhiteSpaceExceptSpace), end(s));
+	return s;
+}
+
+
+bool checkRegex(peptideType peptidetype, string& sequence, string& errormessage) {
+	errormessage = "";
+
+	if (sequence.compare("") == 0) {
+		errormessage = "The sequence is empty.";
+		return false;
+	}
+
+	regex rx;
+	// [^\\[\\]]+ is used instead of .+ to prevent from a too complex regex error
+	switch (peptidetype)
+	{
+	case linear:
+	case linearpolysaccharide:
+		rx = "^\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])*$";
+		break;
+	case cyclic:
+		rx = "^\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])+$";
+		break;
+	case branched:
+		rx = "^\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])*\\\\\\(\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])+\\\\\\)\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])*$";
+		break;
+	case lasso:
+		rx = "(^(\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])*)?\\\\\\(\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])+\\\\\\)\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])*$|^\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])*\\\\\\(\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])+\\\\\\)(\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])*)?$)";
+		break;
+	case other:
+	default:
+		rx = ".*";
+		break;
+	}
+
+	try {
+		if (!(regex_search(sequence, rx))) {
+			errormessage = "The format of sequence '" + sequence + "' does not correspond to the sequence type '" + getStringFromPeptideType(peptidetype) + "'.";
+			return false;
+		}
+	}
+	catch (regex_error& e) {
+		errormessage = "checkRegex: regex_search failed, error no. " + to_string(e.code());
+		return false;
+	}
+
+	return true;
+}
+
+
+void parseBranch(peptideType peptidetype, string& composition, vector<string>& vectorcomposition, int& branchstart, int& branchend) {
+	string s = composition;
+	cBrick b;
+	branchstart = -1;
+	branchend = -1;
+
+	if ((peptidetype == branched) || (peptidetype == lasso)) {
+		int i = 0;
+		while (i < (int)s.size()) {
+			if (s[i] == '\\') {
+				s.erase(s.begin() + i);
+			}
+			else {
+				i++;
+			}
+		}
+
+		for (int i = 0; i < (int)s.size(); i++) {
+			if (s[i] == '(') {
+				if (i > 0) {
+					b.clear();
+					b.setComposition(s.substr(0, i - 1), false);
+					branchstart = getNumberOfBricks(b.getComposition());
+					s[i] = '-';
+				}
+				else {
+					s.erase(s.begin());
+					branchstart = 0;
+				}
+				break;
+			}
+		}
+
+		for (int i = 0; i < (int)s.size(); i++) {
+			if (s[i] == ')') {
+				b.clear();
+				b.setComposition(s.substr(0, i - 1), false);
+				branchend = getNumberOfBricks(b.getComposition()) - 1;
+				if (i < (int)s.size() - 1) {
+					s[i] = '-';
+				}
+				else {
+					s.erase(s.begin() + i);
+				}
+				break;
+			}
+		}
+
+		if (branchend <= branchstart) {
+			branchstart = -1;
+			branchend = -1;
+		}
+	}
+
+	b.clear();
+	b.setComposition(s, false);
+	b.explodeToStringComposition(vectorcomposition);
+}
+
+
+peptideType getPeptideTypeFromString(string s) {
+	if (s.compare("linear") == 0) {
+		return linear;
+	}
+	if (s.compare("cyclic") == 0) {
+		return cyclic;
+	}
+	if (s.compare("branched") == 0) {
+		return branched;
+	}
+	if (s.compare("branch-cyclic") == 0) {
+		return lasso;
+	}
+	if (s.compare("linearpolysaccharide") == 0) {
+		return linearpolysaccharide;
+	}
+	if (s.compare("other") == 0) {
+		return other;
+	}
+
+	return other;
+}
+
+
+string getStringFromPeptideType(peptideType peptidetype) {
+	switch (peptidetype)
+	{
+	case linear:
+		return "linear";
+		break;
+	case cyclic:
+		return "cyclic";
+		break;
+	case branched:
+		return "branched";
+		break;
+	case lasso:
+		return "branch-cyclic";
+		break;
+	case linearpolysaccharide:
+		return "linearpolysaccharide";
+		break;
+	case other:
+		return "other";
+		break;
+	default:
+		break;
+	}
+
+	return "other";
 }
 

@@ -83,6 +83,17 @@ private:
 	QTextBrowser* textbrowser;
 	string htmlstring;
 
+
+protected:
+
+
+	/**
+		\brief Handle a key press event.
+		\param event pointer to QKeyEvent
+	*/ 
+	void keyPressEvent(QKeyEvent *event);
+
+
 };
 
 #endif

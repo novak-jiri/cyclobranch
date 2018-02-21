@@ -9,7 +9,9 @@
 
 #include <QWidget>
 #include <fstream>
+#include "core/utilities.h"
 #include "core/cBricksDatabase.h"
+#include "core/cAllocator.h"
 
 using namespace std;
 
@@ -19,10 +21,7 @@ class QHBoxLayout;
 class QVBoxLayout;
 class QTableWidget;
 class QTableWidgetItem;
-class QDialogButtonBox;
 class QPushButton;
-class QLabel;
-class QProgressDialog;
 
 
 /**
@@ -31,11 +30,11 @@ class QProgressDialog;
 	\param c char
 	\retval int number of occurrences of \a c in \a s
 */
-int numberOfOccurrences(string& s, char c);
+int numberOfOccurrences(const string& s, char c);
 
 
 /**
-	\brief The widget representing the dialog 'About'.
+	\brief Visualization of the database of building blocks.
 */
 class cBricksDatabaseWidget : public QWidget
 {
@@ -75,7 +74,6 @@ private:
 	QTableWidget* database;
 	QHBoxLayout* buttons;
 	QVBoxLayout* mainlayout;
-	QProgressDialog* progress;
 
 	QString databasefile;
 	QString lastdir;
@@ -85,13 +83,26 @@ private:
 
 	vector<int> headersort;
 
+	cAllocator<QTableWidgetItem> widgetitemallocator;
+
 	void deleteTable(bool enableprogress);
 
 	void removeRow(int row);
 
 	bool checkTable();
 
-	bool checkFormula(int row, string& summary);
+	bool checkFormula(int row, const string& summary);
+
+
+protected:
+
+
+	/**
+		\brief Handle a key press event.
+		\param event pointer to QKeyEvent
+	*/ 
+	void keyPressEvent(QKeyEvent *event);
+
 
 private slots:
 

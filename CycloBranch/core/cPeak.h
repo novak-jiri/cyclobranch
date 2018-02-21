@@ -20,8 +20,8 @@ using namespace std;
 */
 enum scoreType {
 	b_ions = 0,
-	b_ions_and_b_water_loss_ions = 1,
-	b_ions_and_b_ammonia_loss_ions = 2,
+	b_ions_and_b_dehydrated_ions = 1,
+	b_ions_and_b_deamidated_ions = 2,
 	y_ions_and_b_ions = 3,
 	y_ions = 4,
 	weighted_intensity = 5,

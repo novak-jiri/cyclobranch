@@ -5,28 +5,34 @@
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QFormLayout>
-#include <QScrollArea>
 #include <QScrollBar>
 #include <QCheckBox>
 #include <QPushButton>
 #include <QSplitter>
 #include <QComboBox>
 #include <QDoubleSpinBox>
+#include <QKeyEvent>
+#include <QToolBar>
+#include <QAction>
+#include <QLabel>
+#include <QList>
+#include <QFileDialog>
+#include <QMessageBox>
 
 
 cSpectrumDetailWidget::cSpectrumDetailWidget() {
-	rotation = 0;
-	trotation = 0;
 	parameters = 0;
-
 	preparedToShow = false;
 	theoreticalspectrum = new cTheoreticalSpectrum();
 }
 
 
 cSpectrumDetailWidget::cSpectrumDetailWidget(const cSpectrumDetailWidget& sd) {
-	rotation = 0;
-	trotation = 0;
+	*this = sd;
+}
+
+
+cSpectrumDetailWidget& cSpectrumDetailWidget::operator=(const cSpectrumDetailWidget& sd) {
 	parameters = sd.parameters;
 
 	preparedToShow = false;
@@ -41,6 +47,8 @@ cSpectrumDetailWidget::cSpectrumDetailWidget(const cSpectrumDetailWidget& sd) {
 	}
 
 	setWindowTitle(sd.windowTitle());
+
+	return *this;
 }
 
 
@@ -63,15 +71,15 @@ string cSpectrumDetailWidget::getDetailsAsHTMLString() {
 		if (parameters && ((parameters->mode == denovoengine) || (parameters->mode == singlecomparison) || (parameters->mode == databasesearch))) {
 
 			s += "Acronym Peptide Name:<br/>";
-			s += theoreticalspectrum->getAcronymPeptideNameWithHTMLReferences();
+			s += theoreticalspectrum->getCandidate().getAcronymPeptideNameWithHTMLReferences();
 			s += "<br/><br/>";
 			s += "Full Peptide Name:<br/>";
-			s += theoreticalspectrum->getRealPeptideName() + "<br/>";
+			s += theoreticalspectrum->getCandidate().getRealPeptideName() + "<br/>";
 
-			if ((int)theoreticalspectrum->getPath().size() > 0) {
+			if ((int)theoreticalspectrum->getCandidate().getPathAsString().size() > 0) {
 				s += "<br/>";
 				s += "Path in the De Novo Graph:<br/>";
-				s += theoreticalspectrum->getPath();
+				s += theoreticalspectrum->getCandidate().getPathAsString();
 			}
 			
 			s += "<br/>";
@@ -80,6 +88,7 @@ string cSpectrumDetailWidget::getDetailsAsHTMLString() {
 
 		s += "Unmatched Measured Peaks:<br/>" + theoreticalspectrum->getUnmatchedPeaks() + "<br/><br/>";
 		s += "Theoretical Peaks:<br/>" + theoreticalspectrum->getTheoreticalPeaks()->print(true);
+
 	}
 
 	return s;
@@ -92,39 +101,28 @@ cSpectrumDetailWidget::~cSpectrumDetailWidget() {
 
 	if (preparedToShow) {
 	
-		delete graphicalspectrum;
-		delete graphicalspectrumscroll;
+		delete spectrumscene;
 
-		if (parameters && ((parameters->mode == denovoengine) || (parameters->mode == singlecomparison) || (parameters->mode == databasesearch))) {
-			delete textedit;
-		}
-
+		delete textedit;
 		delete textbrowser;
 
-		delete zoomin;
-		delete zoomout;
-		delete normalsize;
-		delete zoom;
-
+		delete labelmz;
 		delete minmz;
 		delete maxmz;
 		delete setmzinterval;
 		delete resetmzinterval;
-		delete mzinterval;
+		delete hboxmz;
+		delete widgetmz;
 
-		delete hideunmatched;
-		delete hidematched;
+		delete labelrotation;
+		delete rotation;
+		delete hboxrotation;
+		delete widgetrotation;
 
-		if (rotation) {
-			delete rotation;
-		}
-
-		if (trotation) {
-			delete trotation;
-		}
-
-		delete formlayout;
-		delete formwidget;
+		delete labeltrotation;
+		delete trotation;
+		delete hboxtrotation;
+		delete widgettrotation;
 
 		if (parameters && ((parameters->mode == denovoengine) || (parameters->mode == singlecomparison) || (parameters->mode == databasesearch))) {
 
@@ -150,14 +148,24 @@ cSpectrumDetailWidget::~cSpectrumDetailWidget() {
 				break;
 			}
 
+			delete actionExportPeptide;
+
 		}
 		
-		delete vsplitter1;
-		delete vsplitter2;
+		delete hsplitter1;
+		delete hsplitter2;
+		
+		delete vsplitter;
 
-		delete hsplitter;
+		delete actionExportSpectrum;
+		delete actionZoomIn;
+		delete actionZoomOut;
+		delete actionZoomReset;
+		delete actionHideMatched;
+		delete actionHideUnmatched;
+		delete actionHideScrambled;
+		delete actionMouseMzSelection;
 
-		delete mainbox;
 	}
 }
 
@@ -171,14 +179,15 @@ void cSpectrumDetailWidget::prepareToShow(peptideType peptidetype) {
 
 	if (!preparedToShow) {
 
-		hsplitter = new QSplitter();
-		hsplitter->setOrientation(Qt::Horizontal);
+		vsplitter = new QSplitter();
+		vsplitter->setOrientation(Qt::Vertical);
 
-		vsplitter1 = new QSplitter();
-		vsplitter1->setOrientation(Qt::Vertical);
+		hsplitter1 = new QSplitter();
+		hsplitter1->setOrientation(Qt::Horizontal);
 
-		vsplitter2 = new QSplitter();
-		vsplitter2->setOrientation(Qt::Vertical);
+		hsplitter2 = new QSplitter();
+		hsplitter2->setOrientation(Qt::Horizontal);
+
 
 		if (parameters && ((parameters->mode == denovoengine) || (parameters->mode == singlecomparison) || (parameters->mode == databasesearch))) {
 			switch (peptidetype)
@@ -204,18 +213,89 @@ void cSpectrumDetailWidget::prepareToShow(peptideType peptidetype) {
 			}
 		}
 
-		graphicalspectrumscroll = new QScrollArea();
-		graphicalspectrum = new cGraphicalSpectrumWidget(graphicalspectrumscroll);
-		graphicalspectrumscroll->setWidget(graphicalspectrum);
-		//graphicalspectrumscroll->setWidgetResizable(true);
+		spectrumscene = new cSpectrumSceneWidget(this);
+
+		toolbarExport = addToolBar(tr("Export"));
+		toolbarExport->setMovable(false);
+		toolbarExport->setFloatable(false);
+
+		actionExportSpectrum = new QAction(QIcon(":/images/icons/54.png"), tr("Export Spectrum"), this);
+		actionExportSpectrum->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_E));
+		actionExportSpectrum->setToolTip("Export Spectrum (Ctrl + E)");
+		toolbarExport->addAction(actionExportSpectrum);
+		connect(actionExportSpectrum, SIGNAL(triggered()), this, SLOT(exportSpectrum()));
 
 		if (parameters && ((parameters->mode == denovoengine) || (parameters->mode == singlecomparison) || (parameters->mode == databasesearch))) {
-			textedit = new QTextEdit();
-			textedit->setReadOnly(true);
-			textedit->setFont(QFont("Courier", 9));
-			textedit->setLineWrapMode(QTextEdit::NoWrap);
+			actionExportPeptide = new QAction(QIcon(":/images/icons/57.png"), tr("Export Peptide"), this);
+			actionExportPeptide->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_P));
+			actionExportPeptide->setToolTip("Export Peptide (Ctrl + P)");
+			toolbarExport->addAction(actionExportPeptide);
+			connect(actionExportPeptide, SIGNAL(triggered()), this, SLOT(exportPeptide()));
 		}
 
+		toolbarZoom = addToolBar(tr("Zoom"));
+		toolbarZoom->setMovable(false);
+		toolbarZoom->setFloatable(false);
+				
+		actionZoomIn = new QAction(QIcon(":/images/icons/83.png"), tr("Zoom In"), this);
+		actionZoomIn->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_Plus));
+		actionZoomIn->setToolTip("Zoom In (Ctrl +)");
+		toolbarZoom->addAction(actionZoomIn);
+		connect(actionZoomIn, SIGNAL(triggered()), spectrumscene, SLOT(zoomIn()));
+
+		actionZoomOut = new QAction(QIcon(":/images/icons/82.png"), tr("Zoom Out"), this);
+		actionZoomOut->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_Minus));
+		actionZoomOut->setToolTip("Zoom Out (Ctrl -)");
+		toolbarZoom->addAction(actionZoomOut);
+		connect(actionZoomOut, SIGNAL(triggered()), spectrumscene, SLOT(zoomOut()));
+
+		actionZoomReset = new QAction(QIcon(":/images/icons/84.png"), tr("Reset Zoom"), this);
+		actionZoomReset->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_R));
+		actionZoomReset->setToolTip("Zoom Reset (Ctrl + R)");
+		toolbarZoom->addAction(actionZoomReset);
+		connect(actionZoomReset, SIGNAL(triggered()), spectrumscene, SLOT(normalSize()));
+
+
+		toolbarHide = addToolBar(tr("Show/Hide Peaks"));
+		toolbarHide->setMovable(false);
+		toolbarHide->setFloatable(false);
+
+		actionHideMatched = new QAction(QIcon(":/images/icons/20.png"), tr("Hide Matched Peaks"), this);
+		actionHideMatched->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_M));
+		actionHideMatched->setToolTip("Hide Matched Peaks (Ctrl + M)");
+		actionHideMatched->setCheckable(true);
+		toolbarHide->addAction(actionHideMatched);
+		connect(actionHideMatched, SIGNAL(toggled(bool)), spectrumscene, SLOT(hideMatchedPeaks(bool)));
+
+		actionHideUnmatched = new QAction(QIcon(":/images/icons/81.png"), tr("Hide Unmatched Peaks"), this);
+		actionHideUnmatched->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_U));
+		actionHideUnmatched->setToolTip("Hide Unmatched Peaks (Ctrl + U)");
+		actionHideUnmatched->setCheckable(true);
+		toolbarHide->addAction(actionHideUnmatched);
+		connect(actionHideUnmatched, SIGNAL(toggled(bool)), spectrumscene, SLOT(hideUnmatchedPeaks(bool)));
+
+		actionHideScrambled = new QAction(QIcon(":/images/icons/80.png"), tr("Hide Scrambled Peaks"), this);
+		actionHideScrambled->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_S));
+		actionHideScrambled->setToolTip("Hide Scrambled Peaks (Ctrl + S)");
+		actionHideScrambled->setCheckable(true);
+		actionHideScrambled->setEnabled(false);
+		toolbarHide->addAction(actionHideScrambled);
+
+
+		if (parameters && ((parameters->mode == denovoengine) || (parameters->mode == singlecomparison) || (parameters->mode == databasesearch))) {
+
+			if ((parameters->peptidetype == cyclic) && parameters->enablescrambling) {
+				actionHideScrambled->setEnabled(true);
+				connect(actionHideScrambled, SIGNAL(toggled(bool)), spectrumscene, SLOT(hideScrambledPeaks(bool)));
+			}
+
+		}
+
+		textedit = new QTextEdit();
+		textedit->setReadOnly(true);
+		textedit->setFont(QFont("Courier", 9));
+		textedit->setLineWrapMode(QTextEdit::NoWrap);
+		
 		textbrowser = new QTextBrowser();
 		textbrowser->setReadOnly(true);
 		textbrowser->setFont(QFont("Courier", 9));
@@ -223,22 +303,8 @@ void cSpectrumDetailWidget::prepareToShow(peptideType peptidetype) {
 		textbrowser->setAcceptRichText(true);
 		textbrowser->setOpenExternalLinks(true);
 
-		zoomin = new QPushButton("In");
-		zoomin->setMaximumWidth(50);
-		connect(zoomin, SIGNAL(released()), graphicalspectrum, SLOT(zoomIn()));
 
-		zoomout = new QPushButton("Out");
-		zoomout->setMaximumWidth(50);
-		connect(zoomout, SIGNAL(released()), graphicalspectrum, SLOT(zoomOut()));
-
-		normalsize = new QPushButton("Reset");
-		normalsize->setMaximumWidth(50);
-		connect(normalsize, SIGNAL(released()), graphicalspectrum, SLOT(normalSize()));
-
-		zoom = new QHBoxLayout();
-		zoom->addWidget(zoomin);
-		zoom->addWidget(zoomout);
-		zoom->addWidget(normalsize);
+		labelmz = new QLabel(tr("View m/z (from - to): "));
 
 		minmz = new QDoubleSpinBox();
 		minmz->setDecimals(6);
@@ -253,39 +319,80 @@ void cSpectrumDetailWidget::prepareToShow(peptideType peptidetype) {
 		setmzinterval = new QPushButton("Set");
 		setmzinterval->setMaximumWidth(50);
 		connect(setmzinterval, SIGNAL(released()), this, SLOT(setMZInterval()));
-		connect(this, SIGNAL(emitMZInterval(double, double)), graphicalspectrum, SLOT(setMZInterval(double, double)));
+		connect(this, SIGNAL(emitMZInterval(double, double)), spectrumscene, SLOT(setMZInterval(double, double)));
 
 		resetmzinterval = new QPushButton("Reset");
 		resetmzinterval->setMaximumWidth(50);
-		connect(resetmzinterval, SIGNAL(released()), graphicalspectrum, SLOT(resetMZInterval()));
+		connect(resetmzinterval, SIGNAL(released()), spectrumscene, SLOT(resetMZInterval()));
+		connect(spectrumscene, SIGNAL(updateMZInterval(double, double)), this, SLOT(updateMZInterval(double, double)));
 
-		mzinterval = new QHBoxLayout();
-		mzinterval->addWidget(minmz);
-		mzinterval->addWidget(maxmz);
-		mzinterval->addWidget(setmzinterval);
-		mzinterval->addWidget(resetmzinterval);
-		connect(graphicalspectrum, SIGNAL(updateMZInterval(double, double)), this, SLOT(updateMZInterval(double, double)));
+		hboxmz = new QHBoxLayout();
+		hboxmz->addSpacing(1);
+		hboxmz->addWidget(labelmz);
+		hboxmz->addSpacing(1);
+		hboxmz->addWidget(minmz);
+		hboxmz->addSpacing(1);
+		hboxmz->addWidget(maxmz);
+		hboxmz->addSpacing(1);
+		hboxmz->addWidget(setmzinterval);
+		hboxmz->addSpacing(1);
+		hboxmz->addWidget(resetmzinterval);
+		hboxmz->addSpacing(1);
 
-		hideunmatched = new QCheckBox();
-		connect(hideunmatched, SIGNAL(stateChanged(int)), graphicalspectrum, SLOT(hideUnmatchedPeaks(int)));
+		widgetmz = new QWidget();
+		widgetmz->setLayout(hboxmz);
 
-		hidematched = new QCheckBox();
-		connect(hidematched, SIGNAL(stateChanged(int)), graphicalspectrum, SLOT(hideMatchedPeaks(int)));
+		toolbarMz = addToolBar(tr("Range of m/z"));
+		toolbarMz->setMovable(false);
+		toolbarMz->setFloatable(false);
 
-		formlayout = new QFormLayout();
-		formlayout->addRow(tr("Zoom: "), zoom);
-		formlayout->addRow(tr("View m/z (from - to): "), mzinterval);
-		formlayout->addRow(tr("Hide matched peaks: "), hidematched);
-		formlayout->addRow(tr("Hide unmatched peaks: "), hideunmatched);
+		actionMouseMzSelection = new QAction(QIcon(":/images/icons/64.png"), tr("Mouse m/z Selection Tool"), this);
+		actionMouseMzSelection->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_T));
+		actionMouseMzSelection->setToolTip("Mouse m/z Selection Tool (Ctrl + T)");
+		actionMouseMzSelection->setCheckable(true);
+		actionMouseMzSelection->setChecked(true);
+		actionMouseMzSelection->setEnabled(true);
+		toolbarMz->addAction(actionMouseMzSelection);
+		connect(actionMouseMzSelection, SIGNAL(toggled(bool)), spectrumscene, SLOT(enableMouseMzSelectionTool(bool)));
+
+		toolbarMz->addWidget(widgetmz);
+
+
+		labelrotation = new QLabel(tr("Ring break up point: "));
+		rotation = new QComboBox();
+
+		hboxrotation = new QHBoxLayout();
+		hboxrotation->addSpacing(1);
+		hboxrotation->addWidget(labelrotation);
+		hboxrotation->addSpacing(1);
+		hboxrotation->addWidget(rotation);
+		hboxrotation->addSpacing(1);
+
+		widgetrotation = new QWidget();
+		widgetrotation->setLayout(hboxrotation);
+
+
+		labeltrotation = new QLabel(tr("Linearized sequence: "));
+		trotation = new QComboBox();
+
+		hboxtrotation = new QHBoxLayout();
+		hboxtrotation->addSpacing(1);
+		hboxtrotation->addWidget(labeltrotation);
+		hboxtrotation->addSpacing(1);
+		hboxtrotation->addWidget(trotation);
+		hboxtrotation->addSpacing(1);
+
+		widgettrotation = new QWidget();
+		widgettrotation->setLayout(hboxtrotation);
+
 
 		if (parameters && ((parameters->mode == denovoengine) || (parameters->mode == singlecomparison) || (parameters->mode == databasesearch))) {
 
 			// cyclic
-			if (parameters && theoreticalspectrum && (parameters->peptidetype == cyclic)) {
-				int r = (int)theoreticalspectrum->getAcronyms().size();
+			if (theoreticalspectrum && (parameters->peptidetype == cyclic)) {
+				int r = (int)theoreticalspectrum->getCandidate().getAcronyms().size();
 				int hint = (int)theoreticalspectrum->getVisualCoverage().size()/(2*r);
-
-				rotation = new QComboBox();
+				
 				rotation->addItem(tr("all"));
 
 				string s;
@@ -296,15 +403,18 @@ void cSpectrumDetailWidget::prepareToShow(peptideType peptidetype) {
 					}
 				}
 
-				connect(rotation, SIGNAL(currentIndexChanged(int)), graphicalspectrum, SLOT(rotationChanged(int)));
-				connect(rotation, SIGNAL(currentIndexChanged(QString)), graphicalspectrum, SLOT(rotationChanged(QString)));
+				connect(rotation, SIGNAL(currentIndexChanged(int)), spectrumscene, SLOT(rotationChanged(int)));
+				connect(rotation, SIGNAL(currentIndexChanged(QString)), spectrumscene, SLOT(rotationChanged(QString)));
 				connect(rotation, SIGNAL(currentIndexChanged(int)), cyclicwidget, SLOT(rotationChanged(int)));
-				formlayout->addRow(tr("Ring break up point: "), rotation);
+
+				toolbarRotation = addToolBar(tr("Ring break up point"));
+				toolbarRotation->addWidget(widgetrotation);
+				toolbarRotation->setMovable(false);
+				toolbarRotation->setFloatable(false);
 			}
 
 			// branched
-			if (parameters && (parameters->peptidetype == branched)) {
-				trotation = new QComboBox();
+			if (parameters->peptidetype == branched) {
 				trotation->addItem(tr("all"));
 				trotation->addItem(tr("1 (left-to-right)"));
 				trotation->addItem(tr("2 (top-to-right)"));
@@ -313,17 +423,20 @@ void cSpectrumDetailWidget::prepareToShow(peptideType peptidetype) {
 				trotation->addItem(tr("5 (top-to-left)"));
 				trotation->addItem(tr("6 (right-to-top)"));
 
-				connect(trotation, SIGNAL(currentIndexChanged(int)), graphicalspectrum, SLOT(trotationChanged(int)));
+				connect(trotation, SIGNAL(currentIndexChanged(int)), spectrumscene, SLOT(trotationChanged(int)));
 				connect(trotation, SIGNAL(currentIndexChanged(int)), branchedwidget, SLOT(trotationChanged(int)));
-				formlayout->addRow(tr("Linearized sequence: "), trotation);
+
+				toolbarTrotation = addToolBar(tr("Linearized sequence"));
+				toolbarTrotation->addWidget(widgettrotation);
+				toolbarTrotation->setMovable(false);
+				toolbarTrotation->setFloatable(false);
 			}
 
-			// lasso
+			// branch-cyclic
 			if (parameters && theoreticalspectrum && (parameters->peptidetype == lasso)) {
-				int r = (int)theoreticalspectrum->getAcronyms().size() - (int)theoreticalspectrum->getCandidate().getBranchSize();
+				int r = (int)theoreticalspectrum->getCandidate().getAcronyms().size() - (int)theoreticalspectrum->getCandidate().getBranchSize();
 				int hint = (int)theoreticalspectrum->getVisualCoverage().size()/(2*r);
 
-				rotation = new QComboBox();
 				rotation->addItem(tr("all"));
 
 				string s;
@@ -334,12 +447,15 @@ void cSpectrumDetailWidget::prepareToShow(peptideType peptidetype) {
 					}
 				}
 
-				connect(rotation, SIGNAL(currentIndexChanged(int)), graphicalspectrum, SLOT(rotationChanged(int)));
-				connect(rotation, SIGNAL(currentIndexChanged(QString)), graphicalspectrum, SLOT(rotationChanged(QString)));
+				connect(rotation, SIGNAL(currentIndexChanged(int)), spectrumscene, SLOT(rotationChanged(int)));
+				connect(rotation, SIGNAL(currentIndexChanged(QString)), spectrumscene, SLOT(rotationChanged(QString)));
 				connect(rotation, SIGNAL(currentIndexChanged(int)), lassowidget, SLOT(rotationChanged(int)));
-				formlayout->addRow(tr("Ring break up point: "), rotation);
 
-				trotation = new QComboBox();
+				toolbarRotation = addToolBar(tr("Ring break up point"));
+				toolbarRotation->addWidget(widgetrotation);
+				toolbarRotation->setMovable(false);
+				toolbarRotation->setFloatable(false);
+
 				trotation->addItem(tr("all"));
 				trotation->addItem(tr("1 (left-to-right)"));
 				trotation->addItem(tr("2 (top-to-right)"));
@@ -348,62 +464,41 @@ void cSpectrumDetailWidget::prepareToShow(peptideType peptidetype) {
 				trotation->addItem(tr("5 (top-to-left)"));
 				trotation->addItem(tr("6 (right-to-top)"));
 
-				connect(trotation, SIGNAL(currentIndexChanged(int)), graphicalspectrum, SLOT(trotationChanged(int)));
+				connect(trotation, SIGNAL(currentIndexChanged(int)), spectrumscene, SLOT(trotationChanged(int)));
 				connect(trotation, SIGNAL(currentIndexChanged(int)), lassowidget, SLOT(trotationChanged(int)));
-				formlayout->addRow(tr("Linearized sequence: "), trotation);
+				
+				toolbarTrotation = addToolBar(tr("Linearized sequence"));
+				toolbarTrotation->addWidget(widgettrotation);
+				toolbarTrotation->setMovable(false);
+				toolbarTrotation->setFloatable(false);
 			}
 
 		}
 
-		formwidget = new QWidget();
-		formwidget->setLayout(formlayout);
+		hsplitter1->addWidget(spectrumscene);
+		hsplitter2->addWidget(textbrowser);
 
-		vsplitter1->addWidget(graphicalspectrumscroll);
-		vsplitter1->addWidget(textbrowser);
-		vsplitter1->setStretchFactor(0, 7);
-		vsplitter1->setStretchFactor(1, 3);
+		QList<int> sizes;
+		sizes.push_back(100);
+		sizes.push_back(100);
 
-		if (parameters && ((parameters->mode == denovoengine) || (parameters->mode == singlecomparison) || (parameters->mode == databasesearch))) {
+		if ((parameters->mode == denovoengine) || (parameters->mode == singlecomparison) || (parameters->mode == databasesearch)) {
 
 			switch (peptidetype)
 			{
 			case linear:
-				vsplitter2->addWidget(formwidget);
-				vsplitter2->addWidget(linearwidget);
-				vsplitter2->addWidget(textedit);
-				vsplitter2->setStretchFactor(0, 2);
-				vsplitter2->setStretchFactor(1, 3);
-				vsplitter2->setStretchFactor(2, 5);
+				hsplitter1->addWidget(linearwidget);
 				break;
 			case cyclic:
-				vsplitter2->addWidget(formwidget);
-				vsplitter2->addWidget(cyclicwidget);
-				vsplitter2->addWidget(textedit);
-				vsplitter2->setStretchFactor(0, 2);
-				vsplitter2->setStretchFactor(1, 3);
-				vsplitter2->setStretchFactor(2, 5);
+				hsplitter1->addWidget(cyclicwidget);
 				break;
 			case branched:
-				vsplitter2->addWidget(formwidget);
-				vsplitter2->addWidget(branchedwidget);
-				vsplitter2->addWidget(textedit);
-				vsplitter2->setStretchFactor(0, 2);
-				vsplitter2->setStretchFactor(1, 3);
-				vsplitter2->setStretchFactor(2, 5);
+				hsplitter1->addWidget(branchedwidget);
 				break;
 			case lasso:
-				vsplitter2->addWidget(formwidget);
-				vsplitter2->addWidget(lassowidget);
-				vsplitter2->addWidget(textedit);
-				vsplitter2->setStretchFactor(0, 2);
-				vsplitter2->setStretchFactor(1, 3);
-				vsplitter2->setStretchFactor(2, 5);
+				hsplitter1->addWidget(lassowidget);
 				break;
 			case linearpolysaccharide:
-				vsplitter2->addWidget(formwidget);
-				vsplitter2->addWidget(textedit);
-				vsplitter2->setStretchFactor(0, 2);
-				vsplitter2->setStretchFactor(1, 8);
 				break;
 			case other:
 				break;
@@ -411,20 +506,20 @@ void cSpectrumDetailWidget::prepareToShow(peptideType peptidetype) {
 				break;
 			}
 
+			hsplitter2->addWidget(textedit);
+
+			hsplitter1->setSizes(sizes);
+			hsplitter2->setSizes(sizes);
+
 		}
 
-		if (parameters && (parameters->mode == dereplication)) {
-			vsplitter2->addWidget(formwidget);
-		}
+		vsplitter->addWidget(hsplitter1);
+		vsplitter->addWidget(hsplitter2);
 
-		hsplitter->addWidget(vsplitter1);
-		hsplitter->addWidget(vsplitter2);
-		hsplitter->setStretchFactor(0, 6);
-		hsplitter->setStretchFactor(1, 4);
-		
-		mainbox = new QHBoxLayout();
-		mainbox->addWidget(hsplitter);
-		setLayout(mainbox);
+		vsplitter->setSizes(sizes);
+
+		setCentralWidget(vsplitter);
+		centralWidget()->setContentsMargins(10, 10, 10, 10);
 
 		resize(1280, 700);
 
@@ -453,18 +548,29 @@ void cSpectrumDetailWidget::prepareToShow(peptideType peptidetype) {
 				default:
 					break;
 				}
-			
-				textedit->setHtml(theoreticalspectrum->getCoverageBySeries().c_str());
 
+				textedit->setHtml(theoreticalspectrum->getCoverageBySeries().c_str());
+			
 			}
 
-			graphicalspectrum->initialize(parameters, theoreticalspectrum);
+			spectrumscene->initialize(parameters, theoreticalspectrum);
 			textbrowser->setHtml(getDetailsAsHTMLString().c_str());
 		}
 
 		preparedToShow = true;
 	}
 
+}
+
+
+void cSpectrumDetailWidget::keyPressEvent(QKeyEvent *event) {
+	if(event->key() == Qt::Key_Escape) {
+		hide();
+    }
+	
+	if(event->key() == Qt::Key_Enter) {
+		setMZInterval();
+    }
 }
 
 
@@ -476,5 +582,191 @@ void cSpectrumDetailWidget::updateMZInterval(double minmz, double maxmz) {
 
 void cSpectrumDetailWidget::setMZInterval() {
 	emit emitMZInterval(minmz->value(), maxmz->value());
+}
+
+
+void cSpectrumDetailWidget::exportSpectrum() {
+	#if OS_TYPE == UNX
+		QString filename = QFileDialog::getSaveFileName(this, tr("Export Spectrum..."), "./", "PDF Files (*.pdf);; PS Files (*.ps);; PNG Files (*.png);; SVG Files (*.svg)");
+	#else
+		QString filename = QFileDialog::getSaveFileName(this, tr("Export Spectrum..."), "./", "PDF Files (*.pdf);; PS Files (*.ps);; PNG Files (*.png)");
+	#endif
+	if (!filename.isEmpty()) {
+		regex rx;
+		bool selected = false;
+
+		rx = ".+\\.pdf$";
+		if (!selected && (regex_search(filename.toStdString(), rx))) {
+			spectrumscene->exportToPDF(filename, false);
+			selected = true;
+		}
+
+		rx = ".+\\.ps$";
+		if (!selected && (regex_search(filename.toStdString(), rx))) {
+			spectrumscene->exportToPDF(filename, true);
+			selected = true;
+		}
+
+		rx = ".+\\.png$";
+		if (!selected && (regex_search(filename.toStdString(), rx))) {
+			spectrumscene->exportToPNG(filename);
+			selected = true;
+		}
+
+		#if OS_TYPE == UNX
+			rx = ".+\\.svg$";
+			if (!selected && (regex_search(filename.toStdString(), rx))) {
+				spectrumscene->exportToSVG(filename);
+				selected = true;
+			}
+		#endif
+
+		if (!selected) {
+			QMessageBox msgBox;
+			QString errstr = "Unsupported file format.";
+			msgBox.setText(errstr);
+			msgBox.exec();
+		}
+	}
+}
+
+
+void cSpectrumDetailWidget::exportPeptide() {
+	#if OS_TYPE == UNX
+		QString filename = QFileDialog::getSaveFileName(this, tr("Export Peptide..."), "./", "PDF Files (*.pdf);; PS Files (*.ps);; PNG Files (*.png);; SVG Files (*.svg)");
+	#else
+		QString filename = QFileDialog::getSaveFileName(this, tr("Export Peptide..."), "./", "PDF Files (*.pdf);; PS Files (*.ps);; PNG Files (*.png)");
+	#endif
+	if (!filename.isEmpty() && parameters) {
+		regex rx;
+		bool selected = false;
+
+		switch ((peptideType)parameters->peptidetype) {
+			case linear:
+				rx = ".+\\.pdf$";
+				if (!selected && (regex_search(filename.toStdString(), rx))) {
+					linearwidget->exportToPDF(filename, false);
+					selected = true;
+				}
+
+				rx = ".+\\.ps$";
+				if (!selected && (regex_search(filename.toStdString(), rx))) {
+					linearwidget->exportToPDF(filename, true);
+					selected = true;
+				}
+
+				rx = ".+\\.png$";
+				if (!selected && (regex_search(filename.toStdString(), rx))) {
+					linearwidget->exportToPNG(filename);
+					selected = true;
+				}
+
+				#if OS_TYPE == UNX
+					rx = ".+\\.svg$";
+					if (!selected && (regex_search(filename.toStdString(), rx))) {
+						linearwidget->exportToSVG(filename);
+						selected = true;
+					}
+				#endif
+				break;
+			case cyclic:
+				rx = ".+\\.pdf$";
+				if (!selected && (regex_search(filename.toStdString(), rx))) {
+					cyclicwidget->exportToPDF(filename, false);
+					selected = true;
+				}
+
+				rx = ".+\\.ps$";
+				if (!selected && (regex_search(filename.toStdString(), rx))) {
+					cyclicwidget->exportToPDF(filename, true);
+					selected = true;
+				}
+
+
+				rx = ".+\\.png$";
+				if (!selected && (regex_search(filename.toStdString(), rx))) {
+					cyclicwidget->exportToPNG(filename);
+					selected = true;
+				}
+
+				#if OS_TYPE == UNX
+					rx = ".+\\.svg$";
+					if (!selected && (regex_search(filename.toStdString(), rx))) {
+						cyclicwidget->exportToSVG(filename);
+						selected = true;
+					}
+				#endif
+				break;
+			case branched:
+				rx = ".+\\.pdf$";
+				if (!selected && (regex_search(filename.toStdString(), rx))) {
+					branchedwidget->exportToPDF(filename, false);
+					selected = true;
+				}
+
+				rx = ".+\\.ps$";
+				if (!selected && (regex_search(filename.toStdString(), rx))) {
+					branchedwidget->exportToPDF(filename, true);
+					selected = true;
+				}
+
+
+				rx = ".+\\.png$";
+				if (!selected && (regex_search(filename.toStdString(), rx))) {
+					branchedwidget->exportToPNG(filename);
+					selected = true;
+				}
+
+				#if OS_TYPE == UNX
+					rx = ".+\\.svg$";
+					if (!selected && (regex_search(filename.toStdString(), rx))) {
+						branchedwidget->exportToSVG(filename);
+						selected = true;
+					}
+				#endif
+				break;
+			case lasso:
+				rx = ".+\\.pdf$";
+				if (!selected && (regex_search(filename.toStdString(), rx))) {
+					lassowidget->exportToPDF(filename, false);
+					selected = true;
+				}
+
+				rx = ".+\\.ps$";
+				if (!selected && (regex_search(filename.toStdString(), rx))) {
+					lassowidget->exportToPDF(filename, true);
+					selected = true;
+				}
+
+
+				rx = ".+\\.png$";
+				if (!selected && (regex_search(filename.toStdString(), rx))) {
+					lassowidget->exportToPNG(filename);
+					selected = true;
+				}
+
+				#if OS_TYPE == UNX
+					rx = ".+\\.svg$";
+					if (!selected && (regex_search(filename.toStdString(), rx))) {
+						lassowidget->exportToSVG(filename);
+						selected = true;
+					}
+				#endif
+				break;
+			case linearpolysaccharide:
+				break;
+			case other:
+				break;
+			default:
+				break;
+		}
+
+		if (!selected) {
+			QMessageBox msgBox;
+			QString errstr = "Unsupported file format.";
+			msgBox.setText(errstr);
+			msgBox.exec();
+		}
+	}
 }
 

@@ -2,12 +2,15 @@
 
 #include <QTextBrowser>
 #include <QVBoxLayout>
+#include <QKeyEvent>
+#include <QIcon>
 
 
 cGraphWidget::cGraphWidget() {
 	htmlstring = "";
 
-	setWindowTitle("Graph");
+	setWindowTitle("De Novo Graph");
+	setWindowIcon(QIcon(":/images/icons/32.png"));
 
 	layout = new QVBoxLayout();
 
@@ -57,5 +60,12 @@ void cGraphWidget::store(ofstream& os) {
 void cGraphWidget::load(ifstream& is) {
 	loadString(htmlstring, is);
 	textbrowser->setHtml(htmlstring.c_str());
+}
+
+
+void cGraphWidget::keyPressEvent(QKeyEvent *event) {
+    if(event->key() == Qt::Key_Escape) {
+		hide();
+    }
 }
 

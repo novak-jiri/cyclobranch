@@ -153,7 +153,7 @@ struct hash_cEdge {
 		\retval size_t hashed edge
 	*/
 	size_t operator()(const cEdge& e) const {
-		return hash<int>()(e.targetnode) ^ hash<int>()(e.brickid);
+		return std::hash<int>()(e.targetnode) ^ std::hash<int>()(e.brickid);
 	}
 
 };
@@ -174,7 +174,7 @@ bool operator == (cEdge const& a, cEdge const& b);
 	\param b second edge
 	\retval bool true when \a a has smaller ppm error than \a b
 */
-bool compareEdgesByPPMError(cEdge& a, cEdge& b);
+bool compareEdgesByPPMError(const cEdge& a, const cEdge& b);
 
 
 /**
@@ -183,7 +183,7 @@ bool compareEdgesByPPMError(cEdge& a, cEdge& b);
 	\param b second edge
 	\retval bool true when the target node of \a a has bigger intensity than the target node of \a b
 */
-bool compareEdgesByTargetNodeIntensityDesc(cEdge& a, cEdge& b);
+bool compareEdgesByTargetNodeIntensityDesc(const cEdge& a, const cEdge& b);
 
 
 /**

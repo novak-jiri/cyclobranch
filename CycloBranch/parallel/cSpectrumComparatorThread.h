@@ -22,7 +22,7 @@ class cTheoreticalSpectrumList;
 	\param b second theoretical spectrum
 	\retval bool true if the score of \a a is greater than the score of \a b
 */ 
-bool compareBandAllIonsDesc(cTheoreticalSpectrum& a, cTheoreticalSpectrum& b);
+bool compareBandAllIonsDesc(const cTheoreticalSpectrum& a, const cTheoreticalSpectrum& b);
 
 
 /**
@@ -31,7 +31,7 @@ bool compareBandAllIonsDesc(cTheoreticalSpectrum& a, cTheoreticalSpectrum& b);
 	\param b second theoretical spectrum
 	\retval bool true if the score of \a a is greater than the score of \a b
 */ 
-bool compareBBwaterLossAndAllIonsDesc(cTheoreticalSpectrum& a, cTheoreticalSpectrum& b);
+bool compareBBwaterLossAndAllIonsDesc(const cTheoreticalSpectrum& a, const cTheoreticalSpectrum& b);
 
 
 /**
@@ -40,7 +40,7 @@ bool compareBBwaterLossAndAllIonsDesc(cTheoreticalSpectrum& a, cTheoreticalSpect
 	\param b second theoretical spectrum
 	\retval bool true if the score of \a a is greater than the score of \a b
 */ 
-bool compareBBammoniaLossAndAllIonsDesc(cTheoreticalSpectrum& a, cTheoreticalSpectrum& b);
+bool compareBBammoniaLossAndAllIonsDesc(const cTheoreticalSpectrum& a, const cTheoreticalSpectrum& b);
 
 
 /**
@@ -49,7 +49,7 @@ bool compareBBammoniaLossAndAllIonsDesc(cTheoreticalSpectrum& a, cTheoreticalSpe
 	\param b second theoretical spectrum
 	\retval bool true if the score of \a a is greater than the score of \a b
 */ 
-bool compareYBandAllIonsDesc(cTheoreticalSpectrum& a, cTheoreticalSpectrum& b);
+bool compareYBandAllIonsDesc(const cTheoreticalSpectrum& a, const cTheoreticalSpectrum& b);
 
 
 /**
@@ -58,7 +58,7 @@ bool compareYBandAllIonsDesc(cTheoreticalSpectrum& a, cTheoreticalSpectrum& b);
 	\param b second theoretical spectrum
 	\retval bool true if the score of \a a is greater than the score of \a b
 */ 
-bool compareYandAllIonsDesc(cTheoreticalSpectrum& a, cTheoreticalSpectrum& b);
+bool compareYandAllIonsDesc(const cTheoreticalSpectrum& a, const cTheoreticalSpectrum& b);
 
 
 /**
@@ -67,7 +67,7 @@ bool compareYandAllIonsDesc(cTheoreticalSpectrum& a, cTheoreticalSpectrum& b);
 	\param b second theoretical spectrum
 	\retval bool true if the score of \a a is greater than the score of \a b
 */ 
-bool compareWeightedIntensityDesc(cTheoreticalSpectrum& a, cTheoreticalSpectrum& b);
+bool compareWeightedIntensityDesc(const cTheoreticalSpectrum& a, const cTheoreticalSpectrum& b);
 
 
 /**
@@ -76,7 +76,7 @@ bool compareWeightedIntensityDesc(cTheoreticalSpectrum& a, cTheoreticalSpectrum&
 	\param b second theoretical spectrum
 	\retval bool true if the score of \a a is greater than the score of \a b
 */ 
-bool compareNumberOfMatchedPeaksDesc(cTheoreticalSpectrum& a, cTheoreticalSpectrum& b);
+bool compareNumberOfMatchedPeaksDesc(const cTheoreticalSpectrum& a, const cTheoreticalSpectrum& b);
 
 
 /**
@@ -85,7 +85,7 @@ bool compareNumberOfMatchedPeaksDesc(cTheoreticalSpectrum& a, cTheoreticalSpectr
 	\param b second theoretical spectrum
 	\retval bool true if the score of \a a is greater than the score of \a b
 */ 
-bool compareNumberOfMatchedBricksDesc(cTheoreticalSpectrum& a, cTheoreticalSpectrum& b);
+bool compareNumberOfMatchedBricksDesc(const cTheoreticalSpectrum& a, const cTheoreticalSpectrum& b);
 
 
 /**

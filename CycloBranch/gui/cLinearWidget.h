@@ -77,7 +77,7 @@ struct hash_cIonLabel {
 		\retval size_t hashed ion label
 	*/
 	size_t operator()(const cIonLabel& label) const {
-		return hash<string>()(to_string(label.x) + to_string(label.y));
+		return std::hash<string>()(to_string(label.x) + to_string(label.y));
 	}
 
 };
@@ -127,6 +127,28 @@ public:
 	void initialize(cParameters* parameters, cTheoreticalSpectrum* theoreticalspectrum);
 
 
+	/**
+		\brief Export peptide into a PDF or a PS file.
+		\param filename filename
+		\param postscript if true then PS file is generated instead of PDF
+	*/ 
+	void exportToPDF(QString filename, bool postscript);
+
+
+	/**
+		\brief Export peptide scene into a PNG file.
+		\param filename filename
+	*/ 
+	void exportToPNG(QString filename);
+
+
+	/**
+		\brief Export peptide scene into a SVG file.
+		\param filename filename
+	*/ 
+	void exportToSVG(QString filename);
+
+
 protected:
 
 
@@ -138,6 +160,8 @@ protected:
 
 
 private:
+
+	void paint(QPainter& painter);
 
 	cParameters* parameters;
 	cTheoreticalSpectrum* theoreticalspectrum;

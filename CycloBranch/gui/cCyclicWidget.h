@@ -23,9 +23,8 @@ const double pi = 3.141592653589793;
 
 
 /**
-	\brief Paint the circle of a cyclic or a lasso peptide.
+	\brief Paint the circle of a cyclic or a branch-cyclic peptide.
 	\param painter a reference to current QPainter
-	\param brushcolor a background color for rectangles with the acronyms of building blocks
 	\param acronymsofblocks acronyms of building blocks
 	\param centerx x coordinate of a center of the ring
 	\param centery y coordinate of a center of the ring
@@ -34,8 +33,11 @@ const double pi = 3.141592653589793;
 	\param horizontalstep determine width of rectangles with the acronyms of building blocks
 	\param linesize length of separators between building blocks
 	\param cornerlinesize length of endings of separators between building blocks
+	\param drawdashlines true when dashed lines between blocks and numbers of blocks are painted, false otherwise
+	\param visiblerotationid an identifier of a rotation of a cyclic peptide
+	\param labels labels of fragment ions
 */ 
-void paintCircle(QPainter& painter, QColor& brushcolor, vector<string>& acronymsofblocks, int centerx, int centery, int radius, double angle, int horizontalstep, int linesize, int cornerlinesize);
+void paintCircle(QPainter& painter, vector<string>& acronymsofblocks, int centerx, int centery, int radius, double angle, int horizontalstep, int linesize, int cornerlinesize, bool drawdashlines, int visiblerotationid, unordered_set<cIonLabel, hash_cIonLabel>& labels);
 
 
 /**
@@ -110,6 +112,28 @@ public:
 	void initialize(cParameters* parameters, cTheoreticalSpectrum* theoreticalspectrum);
 
 
+	/**
+		\brief Export peptide into a PDF or a PS file.
+		\param filename filename
+		\param postscript if true then PS file is generated instead of PDF
+	*/ 
+	void exportToPDF(QString filename, bool postscript);
+
+
+	/**
+		\brief Export peptide scene into a PNG file.
+		\param filename filename
+	*/ 
+	void exportToPNG(QString filename);
+
+
+	/**
+		\brief Export peptide scene into a SVG file.
+		\param filename filename
+	*/ 
+	void exportToSVG(QString filename);
+
+
 protected:
 
 
@@ -121,6 +145,8 @@ protected:
 
 
 private:
+
+	void paint(QPainter& painter);
 
 	cParameters* parameters;
 	cTheoreticalSpectrum* theoreticalspectrum;

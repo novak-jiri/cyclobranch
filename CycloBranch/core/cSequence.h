@@ -17,6 +17,7 @@
 
 
 using namespace std;
+using namespace boost;
 
 
 /**
@@ -101,42 +102,42 @@ public:
 		\brief Set sequence.
 		\param sequence sequence
 	*/ 
-	void setSequence(string& sequence);
+	void setSequence(const string& sequence);
 
 
 	/**
 		\brief Set name.
 		\param name name
 	*/ 
-	void setName(string& name);
+	void setName(const string& name);
 
 
 	/**
 		\brief Set reference.
 		\param reference reference
 	*/ 
-	void setReference(string& reference);
+	void setReference(const string& reference);
 
 
 	/**
 		\brief Set N-terminal modification.
 		\param modification name of an N-terminal modification
 	*/ 
-	void setNTterminalModification(string& modification);
+	void setNTterminalModification(const string& modification);
 
 
 	/**
 		\brief Set C-terminal modification.
 		\param modification name of a C-terminal modification
 	*/ 
-	void setCTterminalModification(string& modification);
+	void setCTterminalModification(const string& modification);
 
 
 	/**
 		\brief Set branch modification.
 		\param modification name of a branch modification
 	*/ 
-	void setBranchModification(string& modification);
+	void setBranchModification(const string& modification);
 
 
 	/**
@@ -171,7 +172,7 @@ public:
 		\brief Set the summary formula.
 		\param formula summary formula
 	*/ 
-	void setSummaryFormula(string& formula);
+	void setSummaryFormula(const string& formula);
 
 
 	/**

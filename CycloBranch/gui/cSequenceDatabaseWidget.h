@@ -9,9 +9,12 @@
 
 #include <QWidget>
 #include <fstream>
+#include "core/utilities.h"
 #include "core/cSequenceDatabase.h"
+#include "core/cAllocator.h"
 
 using namespace std;
+using namespace boost;
 
 
 // forward declaration
@@ -19,15 +22,11 @@ class QHBoxLayout;
 class QVBoxLayout;
 class QTableWidget;
 class QTableWidgetItem;
-class QDialogButtonBox;
 class QPushButton;
-class QLabel;
-class QComboBox;
-class QProgressDialog;
 
 
 /**
-	\brief The widget representing the dialog 'About'.
+	\brief Visualization of the database of sequences.
 */
 class cSequenceDatabaseWidget : public QWidget
 {
@@ -56,6 +55,14 @@ public:
 	void closeEvent(QCloseEvent *event);
 
 
+	/**
+		\brief Insert a new row, set its peptide type and sequence.
+		\param peptidetypeindex an index of current peptide type
+		\param sequence sequence
+	*/ 
+	void insertRow(int peptidetypeindex, QString sequence);
+
+
 private:
 	QWidget* parent;
 	QPushButton* insertrow;
@@ -67,7 +74,6 @@ private:
 	QTableWidget* database;
 	QHBoxLayout* buttons;
 	QVBoxLayout* mainlayout;
-	QProgressDialog* progress;
 
 	QString databasefile;
 	QString lastdir;
@@ -77,15 +83,28 @@ private:
 
 	vector<int> headersort;
 
+	cAllocator<QTableWidgetItem> widgetitemallocator;
+
 	void deleteTable(bool enableprogress);
 
 	void removeRow(int row);
 
 	bool checkTable();
 
-	bool checkFormula(int row, string& summary);
+	bool checkFormula(int row, const string& summary);
 
 	bool checkSequence(int row);
+
+
+protected:
+
+
+	/**
+		\brief Handle a key press event.
+		\param event pointer to QKeyEvent
+	*/ 
+	void keyPressEvent(QKeyEvent *event);
+
 
 private slots:
 

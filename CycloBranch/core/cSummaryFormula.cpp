@@ -94,7 +94,7 @@ void cSummaryFormula::clear() {
 }
 
 
-void cSummaryFormula::setFormula(string& formula) {
+void cSummaryFormula::setFormula(const string& formula) {
 	this->formula = formula;
 }
 
@@ -140,7 +140,7 @@ bool cSummaryFormula::isValid(string& errormessage) {
 			return false;
 		}
 	}
-	catch (std::regex_error& e) {
+	catch (regex_error& e) {
 		errormessage = "getMassFromResidueSummary: regex_search failed, error no. " + to_string((int)e.code()) + "\n";
 		return false;
 	}

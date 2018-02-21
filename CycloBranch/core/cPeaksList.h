@@ -27,7 +27,7 @@ class cMainThread;
 	\param b second peak
 	\retval bool true when the mz ratio of the peak \a a is lower than the mz ratio of the peak \a b
 */
-bool comparePeakMasses(cPeak& a, cPeak& b);
+bool comparePeakMasses(const cPeak& a, const cPeak& b);
 
 
 /**
@@ -36,7 +36,16 @@ bool comparePeakMasses(cPeak& a, cPeak& b);
 	\param b second peak
 	\retval bool true when the intensity of the peak \a a is bigger than the intensity of the peak \a b
 */
-bool comparePeakIntensitiesDesc(cPeak& a, cPeak& b);
+bool comparePeakIntensitiesDesc(const cPeak& a, const cPeak& b);
+
+
+/**
+	\brief Compare two peaks by \a removeme flag.
+	\param a first peak
+	\param b second peak
+	\retval bool true when the \a removeme flag of the peak \a a is lower than the \a removeme flag of the peak \a b
+*/
+bool comparePeakRemoveMeFlag(const cPeak& a, const cPeak& b);
 
 
 /**
@@ -72,6 +81,20 @@ public:
 		\brief The constructor.
 	*/ 
 	cPeaksList();
+
+
+	/**
+		\brief The copy constructor.
+		\param peakslist reference to a cPeaksList
+	*/ 
+	cPeaksList(const cPeaksList& peakslist);
+
+
+	/**
+		\brief Overloaded operator=.
+		\param peakslist reference to a cPeaksList
+	*/ 
+	cPeaksList& operator=(const cPeaksList& peakslist);
 
 
 	/**
@@ -138,6 +161,12 @@ public:
 
 
 	/**
+		\brief Sort the peaks by intensity in the descending order.
+	*/ 
+	void sortbyIntensityDesc();
+
+
+	/**
 		\brief Normalize intensities of peaks.
 		\retval int 0 == success, -1 == maximum intensity <= 0
 	*/ 
@@ -154,15 +183,17 @@ public:
 	/**
 		\brief Crop mz ratio lower than a threshold.
 		\param minimummz minimum threshold of mz ratio
+		\param errortolerance mz error tolerance in ppm
 	*/ 
-	void cropMinimumMZRatio(double minimummz);
+	void cropMinimumMZRatio(double minimummz, double errortolerance);
 
 
 	/**
 		\brief Crop mz ratio bigger than a threshold.
 		\param maximummz maximum threshold of mz ratio
+		\param errortolerance mz error tolerance in ppm
 	*/ 
-	void cropMaximumMZRatio(double maximummz);
+	void cropMaximumMZRatio(double maximummz, double errortolerance);
 
 
 	/**
@@ -213,10 +244,10 @@ public:
 
 
 	/**
-		\brief Erase all peaks having specified m/z ratio.
-		\param mzratio mz ratio of peaks which will be erased
+		\brief Find all peaks having a specified \a mzratio and mark them with the flag \a removeme == true.
+		\param mzratio mz ratio of peaks which will be marked
 	*/ 
-	void eraseAll(double mzratio);
+	void findObsolete(double mzratio);
 
 
 	/**

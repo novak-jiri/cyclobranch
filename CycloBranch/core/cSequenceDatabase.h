@@ -11,6 +11,7 @@
 #include <fstream>
 #include <vector>
 #include <string>
+#include "core/utilities.h"
 #include "core/cSequence.h"
 
 

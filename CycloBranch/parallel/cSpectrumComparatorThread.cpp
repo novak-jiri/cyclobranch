@@ -3,7 +3,7 @@
 #include "core/cTheoreticalSpectrumList.h"
 
 
-bool compareBandAllIonsDesc(cTheoreticalSpectrum& a, cTheoreticalSpectrum& b) {
+bool compareBandAllIonsDesc(const cTheoreticalSpectrum& a, const cTheoreticalSpectrum& b) {
 	if (a.getNumberOfMatchedPeaks(b_ion) > b.getNumberOfMatchedPeaks(b_ion)) {
 		return true;
 	}
@@ -17,11 +17,11 @@ bool compareBandAllIonsDesc(cTheoreticalSpectrum& a, cTheoreticalSpectrum& b) {
 }
 
 
-bool compareBBwaterLossAndAllIonsDesc(cTheoreticalSpectrum& a, cTheoreticalSpectrum& b) {
-	if (a.getNumberOfMatchedPeaks(b_ion) + a.getNumberOfMatchedPeaks(b_ion_water_loss) > b.getNumberOfMatchedPeaks(b_ion) + b.getNumberOfMatchedPeaks(b_ion_water_loss)) {
+bool compareBBwaterLossAndAllIonsDesc(const cTheoreticalSpectrum& a, const cTheoreticalSpectrum& b) {
+	if (a.getNumberOfMatchedPeaks(b_ion) + a.getNumberOfMatchedPeaks(b_ion_dehydrated) > b.getNumberOfMatchedPeaks(b_ion) + b.getNumberOfMatchedPeaks(b_ion_dehydrated)) {
 		return true;
 	}
-	if (a.getNumberOfMatchedPeaks(b_ion) + a.getNumberOfMatchedPeaks(b_ion_water_loss) < b.getNumberOfMatchedPeaks(b_ion) + b.getNumberOfMatchedPeaks(b_ion_water_loss)) {
+	if (a.getNumberOfMatchedPeaks(b_ion) + a.getNumberOfMatchedPeaks(b_ion_dehydrated) < b.getNumberOfMatchedPeaks(b_ion) + b.getNumberOfMatchedPeaks(b_ion_dehydrated)) {
 		return false;
 	}
 	if (a.getNumberOfMatchedPeaks() > b.getNumberOfMatchedPeaks()) {
@@ -31,11 +31,11 @@ bool compareBBwaterLossAndAllIonsDesc(cTheoreticalSpectrum& a, cTheoreticalSpect
 }
 
 
-bool compareBBammoniaLossAndAllIonsDesc(cTheoreticalSpectrum& a, cTheoreticalSpectrum& b) {
-	if (a.getNumberOfMatchedPeaks(b_ion) + a.getNumberOfMatchedPeaks(b_ion_ammonia_loss) > b.getNumberOfMatchedPeaks(b_ion) + b.getNumberOfMatchedPeaks(b_ion_ammonia_loss)) {
+bool compareBBammoniaLossAndAllIonsDesc(const cTheoreticalSpectrum& a, const cTheoreticalSpectrum& b) {
+	if (a.getNumberOfMatchedPeaks(b_ion) + a.getNumberOfMatchedPeaks(b_ion_deamidated) > b.getNumberOfMatchedPeaks(b_ion) + b.getNumberOfMatchedPeaks(b_ion_deamidated)) {
 		return true;
 	}
-	if (a.getNumberOfMatchedPeaks(b_ion) + a.getNumberOfMatchedPeaks(b_ion_ammonia_loss) < b.getNumberOfMatchedPeaks(b_ion) + b.getNumberOfMatchedPeaks(b_ion_ammonia_loss)) {
+	if (a.getNumberOfMatchedPeaks(b_ion) + a.getNumberOfMatchedPeaks(b_ion_deamidated) < b.getNumberOfMatchedPeaks(b_ion) + b.getNumberOfMatchedPeaks(b_ion_deamidated)) {
 		return false;
 	}
 	if (a.getNumberOfMatchedPeaks() > b.getNumberOfMatchedPeaks()) {
@@ -45,7 +45,7 @@ bool compareBBammoniaLossAndAllIonsDesc(cTheoreticalSpectrum& a, cTheoreticalSpe
 }
 
 
-bool compareYBandAllIonsDesc(cTheoreticalSpectrum& a, cTheoreticalSpectrum& b) {
+bool compareYBandAllIonsDesc(const cTheoreticalSpectrum& a, const cTheoreticalSpectrum& b) {
 	if (a.getNumberOfMatchedPeaksYB() > b.getNumberOfMatchedPeaksYB()) {
 		return true;
 	}
@@ -59,7 +59,7 @@ bool compareYBandAllIonsDesc(cTheoreticalSpectrum& a, cTheoreticalSpectrum& b) {
 }
 
 
-bool compareYandAllIonsDesc(cTheoreticalSpectrum& a, cTheoreticalSpectrum& b) {
+bool compareYandAllIonsDesc(const cTheoreticalSpectrum& a, const cTheoreticalSpectrum& b) {
 	if (a.getNumberOfMatchedPeaks(y_ion) > b.getNumberOfMatchedPeaks(y_ion)) {
 		return true;
 	}
@@ -73,17 +73,17 @@ bool compareYandAllIonsDesc(cTheoreticalSpectrum& a, cTheoreticalSpectrum& b) {
 }
 
 
-bool compareWeightedIntensityDesc(cTheoreticalSpectrum& a, cTheoreticalSpectrum& b) {
+bool compareWeightedIntensityDesc(const cTheoreticalSpectrum& a, const cTheoreticalSpectrum& b) {
 	return (a.getWeightedIntensityScore() > b.getWeightedIntensityScore());
 }
 
 
-bool compareNumberOfMatchedPeaksDesc(cTheoreticalSpectrum& a, cTheoreticalSpectrum& b) {
+bool compareNumberOfMatchedPeaksDesc(const cTheoreticalSpectrum& a, const cTheoreticalSpectrum& b) {
 	return (a.getNumberOfMatchedPeaks() > b.getNumberOfMatchedPeaks());
 }
 
 
-bool compareNumberOfMatchedBricksDesc(cTheoreticalSpectrum& a, cTheoreticalSpectrum& b) {
+bool compareNumberOfMatchedBricksDesc(const cTheoreticalSpectrum& a, const cTheoreticalSpectrum& b) {
 	return (a.getNumberOfMatchedBricks() > b.getNumberOfMatchedBricks());
 }
 
@@ -161,11 +161,11 @@ void cSpectrumComparatorThread::run() {
 		case b_ions:
 			score = tsp.getNumberOfMatchedPeaks(b_ion);
 			break;
-		case b_ions_and_b_water_loss_ions:
-			score = tsp.getNumberOfMatchedPeaks(b_ion) + tsp.getNumberOfMatchedPeaks(b_ion_water_loss);
+		case b_ions_and_b_dehydrated_ions:
+			score = tsp.getNumberOfMatchedPeaks(b_ion) + tsp.getNumberOfMatchedPeaks(b_ion_dehydrated);
 			break;
-		case b_ions_and_b_ammonia_loss_ions:
-			score = tsp.getNumberOfMatchedPeaks(b_ion) + tsp.getNumberOfMatchedPeaks(b_ion_ammonia_loss);
+		case b_ions_and_b_deamidated_ions:
+			score = tsp.getNumberOfMatchedPeaks(b_ion) + tsp.getNumberOfMatchedPeaks(b_ion_deamidated);
 			break;
 		case y_ions_and_b_ions:
 			score = tsp.getNumberOfMatchedPeaksYB();

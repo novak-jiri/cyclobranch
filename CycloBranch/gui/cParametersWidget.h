@@ -14,6 +14,7 @@
 #include <QLineEdit>
 #include <QPushButton>
 
+#include "core/utilities.h"
 #include "core/cSummaryFormula.h"
 #include "core/cParameters.h"
 #include "gui/cFragmentIonsListWidget.h"
@@ -50,8 +51,9 @@ public:
 
 	/**
 		\brief The constructor.
+		\param parent pointer to a parent widget
 	*/ 
-	cParametersWidget();
+	cParametersWidget(QWidget* parent = (QWidget *)0);
 
 
 	/**
@@ -81,7 +83,26 @@ public:
 	void closeEvent(QCloseEvent *event);
 
 
+	/**
+		\brief Set peptide type and searched sequence.
+		\param peptidetypeindex an index of current peptide type
+		\param sequence searched sequence
+	*/ 
+	void setSequence(int peptidetypeindex, QString sequence);
+
+
+	/**
+		\brief Set peptide type and sequence tag.
+		\param peptidetypeindex an index of current peptide type
+		\param tag sequence tag
+	*/ 
+	void setTag(int peptidetypeindex, QString tag);
+
+
 private:
+
+	QWidget* parent;
+
 	cParameters parameters;
 
 	QVBoxLayout* vlayout1;
@@ -104,8 +125,8 @@ private:
 	QLineEdit* peaklistline;
 	QPushButton* peaklistbutton;
 	QHBoxLayout* peaklistlayout;
-	string peaklistfilename;
 	QDoubleSpinBox* precursormass;
+	QLineEdit* precursoradduct;
 	QSpinBox* precursorcharge;
 	QDoubleSpinBox* precursormasserrortolerance;
 	QDoubleSpinBox* fragmentmasserrortolerance;
@@ -118,47 +139,40 @@ private:
 	QLineEdit* brickdatabaseline;
 	QPushButton* brickdatabasebutton;
 	QHBoxLayout* brickdatabaselayout;
-	string brickdatabasefilename;
 	QSpinBox* maximumbricksincombinationbegin;
 	QSpinBox* maximumbricksincombinationmiddle;
 	QSpinBox* maximumbricksincombinationend;
 	QDoubleSpinBox* maximumcumulativemass;
 	QCheckBox* generatebrickspermutations;
+	QLineEdit* modificationsline;
+	QPushButton* modificationsbutton;
+	QHBoxLayout* modificationslayout;
 
-	QGroupBox* modificationsgroupbox;
-	QVBoxLayout* modificationslayout;
-	QTableWidget* modificationstable;
-	QHBoxLayout* modificationsbuttonslayout;
-	QPushButton* modificationsbuttoninsert;
-	QPushButton* modificationsbuttonremove;
+	QGroupBox* miscgroupbox;
+	QFormLayout* miscformlayout;
+	QComboBox* blindedges;
+	QCheckBox* cyclicnterminus;
+	QCheckBox* cycliccterminus;
+	QCheckBox* enablescrambling;
 
 	QFormLayout* applicationformlayout;
 	QGroupBox* applicationgroupbox;
 	QComboBox* mode;
+	QLineEdit* sequencedatabaseline;
+	QPushButton* sequencedatabasebutton;
+	QHBoxLayout* sequencedatabaselayout;
 	QSpinBox* maximumnumberofthreads;
 	QComboBox* scoretype;
 	QSpinBox* hitsreported;
 	QLineEdit* sequencetag;
 	cFragmentIonsListWidget* fragmentiontypes;
 	QCheckBox* clearhitswithoutparent;
-	QCheckBox* cyclicnterminus;
-	QCheckBox* cycliccterminus;
-	QCheckBox* enablescrambling;
 
-	QGroupBox* denovographgroupbox;
-	QFormLayout* denovographformlayout;
-	QComboBox* blindedges;
-
-	QGroupBox* databasesearchgroupbox;
-	QFormLayout* databasesearchformlayout;
-	QLineEdit* sequencedatabaseline;
-	QPushButton* sequencedatabasebutton;
-	QHBoxLayout* sequencedatabaselayout;
-	string sequencedatabasefilename;
-	
 	QGroupBox* searchedsequencegroupbox;
 	QFormLayout* searchedsequenceformlayout;
-	QLineEdit* searchedsequence;
+	QLineEdit* searchedsequenceline;
+	QPushButton* searchedsequencebutton;
+	QHBoxLayout* searchedsequencelayout;
 	QLineEdit* searchedsequenceNtermmodif;
 	QLineEdit* searchedsequenceCtermmodif;
 	QLineEdit* searchedsequenceTmodif;
@@ -167,15 +181,18 @@ private:
 	QString lastdirsavesettings;
 	QString lastdirselectpeaklist;
 	QString lastdirselectbricksdatabase;
+	QString lastdirselectmodifications;
 	QString lastdirselectsequencedatabase;
 
-	void deleteRow(int number);
 
-	void deleteModificationsTableBody();
+protected:
 
-	void modificationsTableInsertRow();
 
-	void modificationsTableRemoveEmptyRows();
+	/**
+		\brief Handle a key press event.
+		\param event pointer to QKeyEvent
+	*/ 
+	void keyPressEvent(QKeyEvent *event);
 
 
 private slots:
@@ -190,11 +207,9 @@ private slots:
 
 	void brickDatabaseButtonReleased();
 
+	void modificationsButtonReleased();
+
 	void sequenceDatabaseButtonReleased();
-
-	void modificationsInsertButtonReleased();
-
-	void modificationsRemoveButtonReleased();
 
 	bool updateParameters();
 
@@ -207,6 +222,18 @@ private slots:
 	void updateSettingsWhenModeChanged(int index);
 
 	void resetFragmentIonTypes();
+
+	void drawPeptideButtonReleased();
+
+
+signals:
+
+	/**
+		\brief Send index of peptide type and searched sequence.
+		\param peptidetypeindex an index of current peptide type
+		\param sequence searched sequence
+	*/ 
+	void sendSequenceLine(int peptidetypeindex, QString sequence);
 
 };
 

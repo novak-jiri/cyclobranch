@@ -13,6 +13,7 @@
 
 
 using namespace std;
+using namespace boost;
 
 
 /**
@@ -50,7 +51,7 @@ public:
 		\brief Set the formula.
 		\param formula a chemical formula
 	*/
-	void setFormula(string& formula);
+	void setFormula(const string& formula);
 
 
 	/**

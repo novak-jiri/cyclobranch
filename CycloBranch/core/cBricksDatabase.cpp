@@ -4,7 +4,7 @@
 #include "gui/cMainThread.h"
 
 
-bool compareBrickMasses(cBrick& a, cBrick& b) {
+bool compareBrickMasses(const cBrick& a, const cBrick& b) {
 	return (a.getMass() < b.getMass());
 }
 
@@ -109,7 +109,7 @@ cBricksDatabase::cBricksDatabase() {
 }
 
 
-int cBricksDatabase::loadFromPlainTextStream(ifstream &stream, string& errormessage) {
+int cBricksDatabase::loadFromPlainTextStream(ifstream &stream, string& errormessage, bool ignoreerrors) {
 	string s;
 	cBrick b;
 	size_t pos;
@@ -178,10 +178,15 @@ int cBricksDatabase::loadFromPlainTextStream(ifstream &stream, string& errormess
 		}
 
 		// load references
+		#if OS_TYPE == UNX
+			if ((s.size() > 0) && (s.back() == '\r')) {
+				s = s.substr(0, s.size() - 1);
+			}
+		#endif
 		b.setReferences(s);
 
 		// store brick
-		if (!b.empty()) {
+		if (ignoreerrors || (!ignoreerrors && !b.empty())) {
 
 			// calculate mass from the summary
 			formula.clear();
@@ -190,11 +195,13 @@ int cBricksDatabase::loadFromPlainTextStream(ifstream &stream, string& errormess
 				b.setMass(formula.getMass());
 			}
 			else {
-				error = true;
-				break;
+				if (!ignoreerrors) {
+					error = true;
+					break;
+				}
 			}
 
-			if (b.getMass() == 0) {
+			if (!ignoreerrors && (b.getMass() == 0)) {
 				error = true;
 				errormessage = "Invalid brick no. " + to_string(size() + 1) + ".\n\n";
 				break;
@@ -204,7 +211,7 @@ int cBricksDatabase::loadFromPlainTextStream(ifstream &stream, string& errormess
 		}
 	}
 
-	if (error) {
+	if (!ignoreerrors && error) {
 		return -1;
 	}
 
@@ -213,7 +220,7 @@ int cBricksDatabase::loadFromPlainTextStream(ifstream &stream, string& errormess
 
 
 void cBricksDatabase::storeToPlainTextStream(ofstream &stream) {
-	for (int i = 0; i < bricks.size(); i++) {
+	for (int i = 0; i < (int)bricks.size(); i++) {
 		stream << bricks[i].getName() << "\t";
 		stream << bricks[i].getAcronymsAsString() << "\t";
 		stream << bricks[i].getSummary() << "\t";
@@ -322,7 +329,7 @@ string cBricksDatabase::getTagName(string& composition) {
 }
 
 
-string cBricksDatabase::getAcronymNameOfTPeptide(string& tcomposition, bool useHTMLReferences) {
+string cBricksDatabase::getAcronymNameOfTPeptide(const string& tcomposition, bool useHTMLReferences) {
 	string comp = tcomposition;
 
 	int leftbracket = getNumberOfBricks(comp.substr(0, comp.find('(')));

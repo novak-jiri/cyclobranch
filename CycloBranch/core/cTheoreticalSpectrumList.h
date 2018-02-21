@@ -47,6 +47,12 @@ public:
 
 
 	/**
+		\brief Clear the class.
+	*/ 
+	void clear();
+
+
+	/**
 		\brief Initialize the list.
 		\param os reference to the main thread of the application
 		\param parameters reference to the parameters of the application

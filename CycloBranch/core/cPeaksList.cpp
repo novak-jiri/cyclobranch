@@ -2,13 +2,18 @@
 #include "gui/cMainThread.h"
 
 
-bool comparePeakMasses(cPeak& a, cPeak& b) {
+bool comparePeakMasses(const cPeak& a, const cPeak& b) {
 	return (a.mzratio < b.mzratio);
 }
 
 
-bool comparePeakIntensitiesDesc(cPeak& a, cPeak& b) {
+bool comparePeakIntensitiesDesc(const cPeak& a, const cPeak& b) {
 	return (a.intensity > b.intensity);
+}
+
+
+bool comparePeakRemoveMeFlag(const cPeak& a, const cPeak& b) {
+	return (a.removeme < b.removeme);
 }
 
 
@@ -25,6 +30,17 @@ double ppmError(double experimentalmass, double theoreticalmass) {
 
 cPeaksList::cPeaksList() {
 	clear();
+}
+
+
+cPeaksList::cPeaksList(const cPeaksList& peakslist) {
+	*this = peakslist;
+}
+
+
+cPeaksList& cPeaksList::operator=(const cPeaksList& peakslist) {
+	peaks = peakslist.peaks;
+	return *this;
 }
 
 
@@ -201,6 +217,11 @@ void cPeaksList::sortbyMass(int limit) {
 }
 
 
+void cPeaksList::sortbyIntensityDesc() {
+	sort(peaks.begin(), peaks.end(), comparePeakIntensitiesDesc);
+}
+
+
 int cPeaksList::normalizeIntenzity() {
 	double maximum = 0.0f;
 	for (int i = 0; i < (int)peaks.size(); i++) {
@@ -234,9 +255,9 @@ void cPeaksList::cropIntenzity(double minimumrelativeintensitythreshold) {
 }
 
 
-void cPeaksList::cropMinimumMZRatio(double minimummz) {
+void cPeaksList::cropMinimumMZRatio(double minimummz, double errortolerance) {
 	while ((int)peaks.size() > 0) {
-		if (peaks[0].mzratio < minimummz) {
+		if ((peaks[0].mzratio < minimummz) && (!isInPpmMassErrorTolerance(peaks[0].mzratio, minimummz, errortolerance))) {
 			peaks.erase(peaks.begin());
 		}
 		else {
@@ -246,9 +267,9 @@ void cPeaksList::cropMinimumMZRatio(double minimummz) {
 }
 
 
-void cPeaksList::cropMaximumMZRatio(double maximummz) {
+void cPeaksList::cropMaximumMZRatio(double maximummz, double errortolerance) {
 	while ((int)peaks.size() > 0) {
-		if (peaks.back().mzratio > maximummz) {
+		if ((peaks.back().mzratio > maximummz) && (!isInPpmMassErrorTolerance(peaks.back().mzratio, maximummz, errortolerance))) {
 			peaks.erase(peaks.begin() + peaks.size() - 1);
 		}
 		else {
@@ -269,8 +290,12 @@ void cPeaksList::resize(int size) {
 
 
 double cPeaksList::getMinimumMZRatio() {
-	double minimum = DBL_MAX;
-	for (int i = 0; i < (int)peaks.size(); i++) {
+	if (peaks.size() == 0) {
+		return 0;	
+	}
+
+	double minimum = peaks[0].mzratio;
+	for (int i = 1; i < (int)peaks.size(); i++) {
 		if (peaks[i].mzratio < minimum) {
 			minimum = peaks[i].mzratio;
 		}
@@ -301,8 +326,8 @@ void cPeaksList::removeIsotopes(int maximumcharge, double fragmentmasserrortoler
 		peaks[i].isotope = false;
 	}
 	for (i = 0; i < (int)peaks.size(); i++) {
-		for (int j = 1; j <= maximumcharge; j++) {
-			pos = find(charge(peaks[i].mzratio + Hplus, j), fragmentmasserrortolerance);
+		for (int j = 1; j <= abs(maximumcharge); j++) {
+			pos = find(charge(peaks[i].mzratio, (maximumcharge > 0)?j:-j), fragmentmasserrortolerance);
 			if (pos != -1) {
 				if (peaks[pos].intensity < peaks[i].intensity) {
 					peaks[pos].isotope = true;
@@ -355,31 +380,31 @@ int cPeaksList::find(double mzratio, double fragmentmasserrortolerance) {
 }
 
 
-void cPeaksList::eraseAll(double mzratio) {
+void cPeaksList::findObsolete(double mzratio) {
 	int left, right, middle;
-	for (int i = 0; i < (int)peaks.size(); i++) {
-		left = 0;
-		right = (int)peaks.size() - 1;
-		while (left <= right) {
-			middle = (left + right) / 2;
-			if (abs(mzratio - peaks[middle].mzratio) < 0.00000001) {
-				while ((middle > 0) && (abs(mzratio - peaks[middle - 1].mzratio) < 0.00000001)) {
-					middle--;
-				}
-				while ((peaks.size() > 0) && (middle < (int)peaks.size()) && (abs(mzratio - peaks[middle].mzratio) < 0.00000001)) {
-					peaks.erase(peaks.begin()+middle);
-				}
-				return;
+
+	left = 0;
+	right = (int)peaks.size() - 1;
+	while (left <= right) {
+		middle = (left + right) / 2;
+		if (abs(mzratio - peaks[middle].mzratio) < 0.00000001) {
+			while ((middle > 0) && (abs(mzratio - peaks[middle - 1].mzratio) < 0.00000001)) {
+				middle--;
 			}
-			if (mzratio < peaks[middle].mzratio) {
-				right = middle - 1;
+			while ((middle < (int)peaks.size()) && (abs(mzratio - peaks[middle].mzratio) < 0.00000001)) {
+				peaks[middle].removeme = true;
+				middle++;
 			}
-			else {
-				left = middle + 1;
-			}
+			return;
+		}
+		if (mzratio < peaks[middle].mzratio) {
+			right = middle - 1;
+		}
+		else {
+			left = middle + 1;
 		}
 	}
-	return;
+
 }
 
 
@@ -391,22 +416,21 @@ void cPeaksList::remove(int position) {
 
 
 void cPeaksList::removeChargeVariants(int maximumcharge, double fragmentmasserrortolerance) {
-	if (maximumcharge == 1) {
+	if (abs(maximumcharge) == 1) {
 		return;
 	}
 
 	sortbyMass();
 
-	double uncharged, charged;
-	for (int i = maximumcharge; i > 1; i--) {
+	double charged;
+	for (int i = abs(maximumcharge); i > 1; i--) {
 		for (int j = i - 1; j >= 1; j--) {
 			for (int k = 0; k < (int)peaks.size(); k++) {
 				if (peaks[k].removeme) {
 					continue;
 				}
 
-				uncharged = uncharge(peaks[k].mzratio, i);
-				charged = charge(uncharged, j);
+				charged = charge(uncharge(peaks[k].mzratio, (maximumcharge > 0)?i:-i), (maximumcharge > 0)?j:-j);
 
 				for (int m = k + 1; m < (int)peaks.size(); m++) {
 					if (peaks[m].removeme) {
@@ -428,37 +452,36 @@ void cPeaksList::removeChargeVariants(int maximumcharge, double fragmentmasserro
 
 
 void cPeaksList::removeNeutralLoss(double loss, int maximumcharge, double fragmentmasserrortolerance) {
-
 	sortbyMass();
 
 	int found = -1;
-	for (int i = 1; i <= maximumcharge; i++) {
+	//for (int i = 1; i <= maximumcharge; i++) {
 		for (int j = 0; j < (int)peaks.size(); j++) {
 			found = find(peaks[j].mzratio + loss, fragmentmasserrortolerance);
 			if ((found != -1) && (peaks[found].intensity < peaks[j].intensity)) {
 				peaks[found].removeme = true;
 			}
 		}
-	}
+	//}
 
 	removeObsolete();
-
 }
 
 
 void cPeaksList::removeObsolete() {
+	sort(peaks.begin(), peaks.end(), comparePeakRemoveMeFlag);
 
-	int i = 0;
-	while (i < (int)peaks.size()) {
-		if (peaks[i].removeme) {
-			//cout << peaks[i].mzratio << endl;
-			peaks.erase(peaks.begin()+i);
-		}
-		else {
-			i++;
-		}
+	int items = 0;
+	int size = (int)peaks.size();
+	while ((items < size) && (peaks[size - items - 1].removeme)) {
+		items++;
 	}
 
+	if (items > 0) {
+		peaks.erase(peaks.begin() + size - items, peaks.end());
+	}
+
+	sortbyMass();
 }
 
 

@@ -18,12 +18,12 @@ bool operator == (cEdge const& a, cEdge const& b) {
 }
 
 
-bool compareEdgesByPPMError(cEdge& a, cEdge& b) {
+bool compareEdgesByPPMError(const cEdge& a, const cEdge& b) {
 	return (a.ppmerror < b.ppmerror);
 }
 
 
-bool compareEdgesByTargetNodeIntensityDesc(cEdge& a, cEdge& b) {
+bool compareEdgesByTargetNodeIntensityDesc(const cEdge& a, const cEdge& b) {
 	return (a.targetintensity > b.targetintensity);
 }
 

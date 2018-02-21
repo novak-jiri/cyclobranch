@@ -44,9 +44,7 @@ private:
 	int scanmode;
 	bool* terminatecomputation;
 
-	int getTheoreticalSpectraIter(bool cterminalstartingnode, cCandidateSet* candidates, int nodeid, vector<string>& composition, double precursormass, int startmodifID, int endmodifID, int middlemodifID, int middlepos, vector<nodeEdge>& perspectivepath, double cummass, bool* terminatecomputation);
-
-	int reverseCTerminalCandidates(int nodeid, cCandidateSet* candidates, double precursormass, int startmodifID, bool* terminatecomputation);
+	int getCandidatesIter(bool cterminalstartingnode, cCandidateSet* candidates, int nodeid, vector<string>& composition, double precursormass, int startmodifID, int endmodifID, int middlemodifID, int middlepos, vector<nodeEdge>& perspectivepath, double cummass, bool* terminatecomputation);
 
 public:
 

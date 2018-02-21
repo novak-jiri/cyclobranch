@@ -48,6 +48,11 @@ void cTheoreticalSpectrumList::fixRegularExpression(string& s) {
 
 
 cTheoreticalSpectrumList::cTheoreticalSpectrumList() {
+	clear();
+}
+
+
+void cTheoreticalSpectrumList::clear() {
 	theoreticalspectra.clear();
 	os = 0;
 	parameters = 0;
@@ -55,6 +60,7 @@ cTheoreticalSpectrumList::cTheoreticalSpectrumList() {
 
 	worstScore = 0;
 	worstNumberOfMatchedPeaks = 0;
+	refreshlimit = 0;
 }
 
 
@@ -132,7 +138,7 @@ int cTheoreticalSpectrumList::parallelCompareAndStore(cCandidateSet& candidates,
 	try {
 		rxsequencetag = stmp;
 	}
-	catch (const std::regex_error& e) {
+	catch (regex_error& e) {
 		*os << endl << endl << "Error: Bad Regular Expression in Peptide Sequence Tag." << endl << e.what() << endl;
 		return -1;
 	}
@@ -154,7 +160,7 @@ int cTheoreticalSpectrumList::parallelCompareAndStore(cCandidateSet& candidates,
 	try {
 		rxsearchedsequence = stmp;
 	}
-	catch (const std::regex_error& e) {
+	catch (regex_error& e) {
 		*os << endl << endl << "Error: Bad Regular Expression in Searched Peptide Sequence." << endl << e.what() << endl;
 		return -1;
 	}
@@ -273,15 +279,15 @@ int cTheoreticalSpectrumList::parallelCompareAndStore(cCandidateSet& candidates,
 	// sort peaks in theoretical spectra by mass and set real names of peptides
 	for (int i = 0; i < (int)theoreticalspectra.size(); i++) {
 		theoreticalspectra[i].sortByMass();
-		theoreticalspectra[i].setRealPeptideName(*bricksdb, parameters->peptidetype);
-		theoreticalspectra[i].setAcronymPeptideNameWithHTMLReferences(*bricksdb, parameters->peptidetype);
-		theoreticalspectra[i].setAcronyms(*bricksdb);
+		theoreticalspectra[i].getCandidate().setRealPeptideName(*bricksdb, parameters->peptidetype);
+		theoreticalspectra[i].getCandidate().setAcronymPeptideNameWithHTMLReferences(*bricksdb, parameters->peptidetype);
+		theoreticalspectra[i].getCandidate().setAcronyms(*bricksdb);
 		if ((parameters->peptidetype == branched) || (parameters->peptidetype == lasso)) {
-			theoreticalspectra[i].setBackboneAcronyms(*bricksdb);
-			theoreticalspectra[i].setBranchAcronyms(*bricksdb);
+			theoreticalspectra[i].getCandidate().setBackboneAcronyms(*bricksdb);
+			theoreticalspectra[i].getCandidate().setBranchAcronyms(*bricksdb);
 		}
 		if (parameters->mode == denovoengine) {
-			theoreticalspectra[i].setPath(*graph);
+			theoreticalspectra[i].getCandidate().setPath(*graph, parameters);
 		}
 		// parameters must not be used by viewer, they are not stored/loaded
 		theoreticalspectra[i].setParameters(0);
@@ -316,13 +322,13 @@ void cTheoreticalSpectrumList::addButDoNotFitSize(cTheoreticalSpectrum& theoreti
 				sort(theoreticalspectra.begin(), theoreticalspectra.end(), compareBandAllIonsDesc);
 				worstScore = theoreticalspectra.back().getNumberOfMatchedPeaks(b_ion);
 				break;
-			case b_ions_and_b_water_loss_ions:
+			case b_ions_and_b_dehydrated_ions:
 				sort(theoreticalspectra.begin(), theoreticalspectra.end(), compareBBwaterLossAndAllIonsDesc);
-				worstScore = theoreticalspectra.back().getNumberOfMatchedPeaks(b_ion) + theoreticalspectra.back().getNumberOfMatchedPeaks(b_ion_water_loss);
+				worstScore = theoreticalspectra.back().getNumberOfMatchedPeaks(b_ion) + theoreticalspectra.back().getNumberOfMatchedPeaks(b_ion_dehydrated);
 				break;
-			case b_ions_and_b_ammonia_loss_ions:
+			case b_ions_and_b_deamidated_ions:
 				sort(theoreticalspectra.begin(), theoreticalspectra.end(), compareBBammoniaLossAndAllIonsDesc);
-				worstScore = theoreticalspectra.back().getNumberOfMatchedPeaks(b_ion) + theoreticalspectra.back().getNumberOfMatchedPeaks(b_ion_ammonia_loss);
+				worstScore = theoreticalspectra.back().getNumberOfMatchedPeaks(b_ion) + theoreticalspectra.back().getNumberOfMatchedPeaks(b_ion_deamidated);
 				break;
 			case y_ions_and_b_ions:
 				sort(theoreticalspectra.begin(), theoreticalspectra.end(), compareYBandAllIonsDesc);
@@ -358,14 +364,14 @@ void cTheoreticalSpectrumList::addButDoNotFitSize(cTheoreticalSpectrum& theoreti
 				theoreticalspectra.back().resizePeakList(theoreticalpeaksrealsize);
 			}
 			break;
-		case b_ions_and_b_water_loss_ions:
-			if ((worstScore < theoreticalspectrum.getNumberOfMatchedPeaks(b_ion) + theoreticalspectrum.getNumberOfMatchedPeaks(b_ion_water_loss)) || ((worstScore == theoreticalspectrum.getNumberOfMatchedPeaks(b_ion) + theoreticalspectrum.getNumberOfMatchedPeaks(b_ion_water_loss)) && (worstNumberOfMatchedPeaks < theoreticalspectrum.getNumberOfMatchedPeaks()))) {
+		case b_ions_and_b_dehydrated_ions:
+			if ((worstScore < theoreticalspectrum.getNumberOfMatchedPeaks(b_ion) + theoreticalspectrum.getNumberOfMatchedPeaks(b_ion_dehydrated)) || ((worstScore == theoreticalspectrum.getNumberOfMatchedPeaks(b_ion) + theoreticalspectrum.getNumberOfMatchedPeaks(b_ion_dehydrated)) && (worstNumberOfMatchedPeaks < theoreticalspectrum.getNumberOfMatchedPeaks()))) {
 				theoreticalspectra.push_back(theoreticalspectrum);
 				theoreticalspectra.back().resizePeakList(theoreticalpeaksrealsize);
 			}
 			break;
-		case b_ions_and_b_ammonia_loss_ions:
-			if ((worstScore < theoreticalspectrum.getNumberOfMatchedPeaks(b_ion) + theoreticalspectrum.getNumberOfMatchedPeaks(b_ion_ammonia_loss)) || ((worstScore == theoreticalspectrum.getNumberOfMatchedPeaks(b_ion) + theoreticalspectrum.getNumberOfMatchedPeaks(b_ion_ammonia_loss)) && (worstNumberOfMatchedPeaks < theoreticalspectrum.getNumberOfMatchedPeaks()))) {
+		case b_ions_and_b_deamidated_ions:
+			if ((worstScore < theoreticalspectrum.getNumberOfMatchedPeaks(b_ion) + theoreticalspectrum.getNumberOfMatchedPeaks(b_ion_deamidated)) || ((worstScore == theoreticalspectrum.getNumberOfMatchedPeaks(b_ion) + theoreticalspectrum.getNumberOfMatchedPeaks(b_ion_deamidated)) && (worstNumberOfMatchedPeaks < theoreticalspectrum.getNumberOfMatchedPeaks()))) {
 				theoreticalspectra.push_back(theoreticalspectrum);
 				theoreticalspectra.back().resizePeakList(theoreticalpeaksrealsize);
 			}
@@ -410,15 +416,15 @@ void cTheoreticalSpectrumList::addButDoNotFitSize(cTheoreticalSpectrum& theoreti
 				theoreticalspectra.resize(parameters->hitsreported);
 				worstScore = theoreticalspectra.back().getNumberOfMatchedPeaks(b_ion);
 				break;
-			case b_ions_and_b_water_loss_ions:
+			case b_ions_and_b_dehydrated_ions:
 				sort(theoreticalspectra.begin(), theoreticalspectra.end(), compareBBwaterLossAndAllIonsDesc);
 				theoreticalspectra.resize(parameters->hitsreported);
-				worstScore = theoreticalspectra.back().getNumberOfMatchedPeaks(b_ion) + theoreticalspectra.back().getNumberOfMatchedPeaks(b_ion_water_loss);
+				worstScore = theoreticalspectra.back().getNumberOfMatchedPeaks(b_ion) + theoreticalspectra.back().getNumberOfMatchedPeaks(b_ion_dehydrated);
 				break;
-			case b_ions_and_b_ammonia_loss_ions:
+			case b_ions_and_b_deamidated_ions:
 				sort(theoreticalspectra.begin(), theoreticalspectra.end(), compareBBammoniaLossAndAllIonsDesc);
 				theoreticalspectra.resize(parameters->hitsreported);
-				worstScore = theoreticalspectra.back().getNumberOfMatchedPeaks(b_ion) + theoreticalspectra.back().getNumberOfMatchedPeaks(b_ion_ammonia_loss);
+				worstScore = theoreticalspectra.back().getNumberOfMatchedPeaks(b_ion) + theoreticalspectra.back().getNumberOfMatchedPeaks(b_ion_deamidated);
 				break;
 			case y_ions_and_b_ions:
 				sort(theoreticalspectra.begin(), theoreticalspectra.end(), compareYBandAllIonsDesc);
@@ -461,10 +467,10 @@ void cTheoreticalSpectrumList::sortAndFitSize() {
 	case b_ions:
 		sort(theoreticalspectra.begin(), theoreticalspectra.end(), compareBandAllIonsDesc);
 		break;
-	case b_ions_and_b_water_loss_ions:
+	case b_ions_and_b_dehydrated_ions:
 		sort(theoreticalspectra.begin(), theoreticalspectra.end(), compareBBwaterLossAndAllIonsDesc);
 		break;
-	case b_ions_and_b_ammonia_loss_ions:
+	case b_ions_and_b_deamidated_ions:
 		sort(theoreticalspectra.begin(), theoreticalspectra.end(), compareBBammoniaLossAndAllIonsDesc);
 		break;
 	case y_ions_and_b_ions:

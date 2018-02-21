@@ -11,6 +11,7 @@
 #include <QDesktopServices>
 #include <QUrl>
 #include <QFileInfo>
+#include "core/utilities.h"
 #include "core/cTheoreticalSpectrum.h"
 #include "gui/cAboutWidget.h"
 #include "gui/cGraphWidget.h"
@@ -18,7 +19,11 @@
 #include "gui/cSpectrumDetailWidget.h"
 #include "gui/cBricksDatabaseWidget.h"
 #include "gui/cSequenceDatabaseWidget.h"
+#include "gui/cModificationsWidget.h"
+#include "gui/cDrawPeptideWidget.h"
 #include "gui/cMainThread.h"
+#include "core/cAllocator.h"
+
 
 // forward declaration
 class QTextEdit;
@@ -60,6 +65,13 @@ private:
 	QMenu* menuView;
 	QMenu* menuHelp;
 	
+	// toolbars
+	QToolBar* toolbarFile;
+	QToolBar* toolbarSearch;
+	QToolBar* toolbarTools;
+	QToolBar* toolbarView;
+	QToolBar* toolbarHelp;
+
 	// subitems in the menu
 	QAction* actionOpenResults;
 	QAction* actionSaveResults;
@@ -71,6 +83,8 @@ private:
 	QAction* actionProperties;
 	QAction* actionBricksDatabase;
 	QAction* actionSequenceDatabase;
+	QAction* actionModifications;
+	QAction *actionDrawPeptide;
 	QAction* actionGraph;
 	QAction* actionLog;
 	QAction* actionHTMLDocumentation;
@@ -78,8 +92,9 @@ private:
 	QAction* actionAbout;
 
 	QTableWidget* results;
+	cTheoreticalSpectrumList theoreticalspectrumlist;
+	vector<cSpectrumDetailWidget> spectradetails;
 
-	vector<cSpectrumDetailWidget> resultsDetails;
 	cParameters parameters;
 
 	QTextEdit* logWindow;
@@ -89,6 +104,8 @@ private:
 	cGraphWidget* graph;
 	cBricksDatabaseWidget* bricksdatabasewidget;
 	cSequenceDatabaseWidget* sequencedatabasewidget;
+	cModificationsWidget* modificationswidget;
+	cDrawPeptideWidget* drawpeptidewidget;
 	cParametersWidget* parameterswidget;
 
 	int resultsbasecolumncount;
@@ -102,9 +119,17 @@ private:
 	QString lastdirsaveresults;
 	QString lastdiropenresults;
 
+	cAllocator<QTableWidgetItem> widgetitemallocator;
+
+	bool quitapp;
+
 	void closeEvent(QCloseEvent *event);
 
+	void reportSpectrum(int id, cTheoreticalSpectrum& theoreticalspectrum);
 
+	void deleteResults();
+
+	
 private slots:
 
 	void showHideLog();
@@ -115,6 +140,12 @@ private slots:
 
 	void showSequenceDatabase();
 
+	void showModifications();
+
+	void showDrawPeptideWidget();
+
+	void setAndShowDrawPeptideWidget(int peptidetypeindex, QString sequence);
+	
 	void showGraph();
 
 	void showProperties();
@@ -131,23 +162,15 @@ private slots:
 
 	void enableButtonsHandlingResults(bool enable);
 
-	void sendTheoreticalSpectrum(cTheoreticalSpectrum theoreticalspectrum);
-
 	void sendParameters(cParameters parameters);
 
-	void prepareColumns();
-
-	void fitColumns();
-
-	void deleteResults();
+	void reportSpectra();
 
 	void resultsCellClicked(int row, int column);
 
 	void setGraph(string s);
 
 	void headerItemDoubleClicked(int);
-
-	void safeExit();
 
 	void exportToCsv();
 
@@ -160,6 +183,14 @@ private slots:
 	void saveResultsFile();
 
 	void openResultsFile();
+
+	void setSequence(int peptidetypeindex, QString sequence);
+
+	void setTag(int peptidetypeindex, QString tag);
+
+	void insertSequence(int peptidetypeindex, QString tag);
+
+	void quitApplication();
 
 	//void showContextMenu(const QPoint &pt);
 

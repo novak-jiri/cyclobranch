@@ -14,7 +14,7 @@
 #include <algorithm>
 #include <iomanip>
 
-
+#include "core/utilities.h"
 #include "core/cBrick.h"
 #include "core/cSummaryFormula.h"
 
@@ -31,7 +31,7 @@ class cMainThread;
 	\param b second brick
 	\retval bool true if the mass of \a a is less than the mass of \a b
 */ 
-bool compareBrickMasses(cBrick& a, cBrick& b);
+bool compareBrickMasses(const cBrick& a, const cBrick& b);
 
 
 /**
@@ -90,9 +90,10 @@ public:
 		\brief Load the database of bricks from a plain text stream.
 		\param stream reference to an input file stream
 		\param errormessage reference to a string where an error message might be stored
+		\param ignoreerrors if true errors are ignored
 		\retval int 0 when the database was successfully loaded, -1 when an error occurred (\a errormessage is filled up)
 	*/ 
-	int loadFromPlainTextStream(ifstream &stream, string& errormessage);
+	int loadFromPlainTextStream(ifstream &stream, string& errormessage, bool ignoreerrors);
 
 
 	/**
@@ -169,7 +170,7 @@ public:
 		\param useHTMLReferences if true then each acronym is converted to a link to its reference (e.g., in ChemSpider)
 		\retval string name of the peptide
 	*/ 
-	string getAcronymNameOfTPeptide(string& tcomposition, bool useHTMLReferences);
+	string getAcronymNameOfTPeptide(const string& tcomposition, bool useHTMLReferences);
 
 
 	/**

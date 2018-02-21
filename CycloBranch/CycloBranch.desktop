@@ -1,0 +1,9 @@
+[Desktop Entry]
+Comment=A tool for de novo sequencing of nonribosomal peptides from accurate product ion mass spectra. 
+Exec=CycloBranch
+Icon=/usr/share/cyclobranch/images/cb.png
+Name=CycloBranch
+NoDisplay=false
+StartupNotify=false
+Terminal=false
+Type=Application

@@ -22,11 +22,12 @@ cDeNovoGraph::cDeNovoGraph() {
 }
 
 
-bool cDeNovoGraph::findPath(int sourcenodeid, int edgeid, int targetnodeid, string& composition, string brickspath, int maximumbricksincombination, vector<int>& path) {
+bool cDeNovoGraph::findPath(int sourcenodeid, int edgeid, int targetnodeid, string& composition, string brickspath, int maximumbricksincombination, vector<nodeEdge>& path) {
 	string localbrickpath;
 	bool found;
 	bool badpath;
 	int count = getNumberOfBricks(brickspath);
+	nodeEdge ne;
 
 	if ((path.size() > 1) && (sourcenodeid == targetnodeid)) {
 		cBrick b;
@@ -42,9 +43,15 @@ bool cDeNovoGraph::findPath(int sourcenodeid, int edgeid, int targetnodeid, stri
 			if ((i == edgeid) && (path.size() == 0)) {
 				continue;
 			}
+
+			// target charge of an edge must be equal to the source charge of a following edge
+			if ((path.size() > 0) && (graph[sourcenodeid][i].sourcecharge != graph[path.back().nodeid][path.back().edgeid].targetcharge)) {
+				continue;
+			}
+
 			badpath = false;
 			for (int j = 0; j < (int)path.size(); j++) {
-				if (path[j] == sourcenodeid) {
+				if (path[j].nodeid == sourcenodeid) {
 					badpath = true;
 					break;
 				}
@@ -52,14 +59,21 @@ bool cDeNovoGraph::findPath(int sourcenodeid, int edgeid, int targetnodeid, stri
 			if (badpath) {
 				continue;
 			}
+
 			localbrickpath = brickspath;
 			if (localbrickpath.size() > 0) {
 				localbrickpath += '-';
 			}
 			localbrickpath += graph[sourcenodeid][i].composition;
-			path.push_back(sourcenodeid);
+
+			ne.nodeid = sourcenodeid;
+			ne.edgeid = i;
+			path.push_back(ne);
+
 			found = findPath(graph[sourcenodeid][i].targetnode, i, targetnodeid, composition, localbrickpath, maximumbricksincombination, path);
+			
 			path.pop_back();
+			
 			if (found) {
 				//*os << graph[sourcenodeid].getMZRatio() << " ";
 				return true;
@@ -118,14 +132,14 @@ int cDeNovoGraph::createGraph(bool& terminatecomputation) {
 	double termmass;
 	int left, right, middle;
 	cEdge e, e1, e2;
-	double unchargedprecursormass = uncharge(parameters->precursormass, parameters->precursorcharge);
+	double unchargedprecursormass = charge(uncharge(parameters->precursormass, parameters->precursorcharge), (parameters->precursorcharge > 0)?1:-1);
 	double unchargedmz;
 	int i;
 	
 	sortedpeaklist = parameters->peaklist;
 	// insert the single charged precursor, if neccessary
 	sortedpeaklist.sortbyMass();
-	sortedpeaklist.cropMaximumMZRatio(unchargedprecursormass);
+	sortedpeaklist.cropMaximumMZRatio(unchargedprecursormass, parameters->precursormasserrortolerance);
 	if ((sortedpeaklist.size() > 0) && (!isInPpmMassErrorTolerance(sortedpeaklist[sortedpeaklist.size() - 1].mzratio, unchargedprecursormass, parameters->precursormasserrortolerance))) { 
 		cPeak p;
 		p.mzratio = unchargedprecursormass;
@@ -146,12 +160,14 @@ int cDeNovoGraph::createGraph(bool& terminatecomputation) {
 	sortedpeaklist.removeNeutralLoss(- NH3, parameters->precursorcharge, parameters->fragmentmasserrortolerance);
 	*os << "Number of nodes when deamidated ions are removed: " << sortedpeaklist.size() << endl;	
 
+	double negativeshift = (parameters->precursorcharge > 0)?0:-2*Hplus;
+
 	// insert system nodes
 	switch (parameters->peptidetype)
 	{
 	case cyclic:
 		node.clear();
-		node.setMZRatio(parameters->fragmentdefinitions[b_ion].massdifference);
+		node.setMZRatio(parameters->fragmentdefinitions[b_ion].massdifference + negativeshift);
 		node.setIntensity(0);
 		node.addIonAnnotation(b_ion);
 		graph.push_back(node);
@@ -166,13 +182,13 @@ int cDeNovoGraph::createGraph(bool& terminatecomputation) {
 		graph.push_back(node);
 
 		node.clear();
-		node.setMZRatio(parameters->fragmentdefinitions[b_ion].massdifference);
+		node.setMZRatio(parameters->fragmentdefinitions[b_ion].massdifference + negativeshift);
 		node.setIntensity(0);
 		node.addIonAnnotation(b_ion);
 		graph.push_back(node);
 
 		node.clear();
-		node.setMZRatio(parameters->fragmentdefinitions[y_ion].massdifference);
+		node.setMZRatio(parameters->fragmentdefinitions[y_ion].massdifference + negativeshift);
 		node.setIntensity(0);
 		node.addIonAnnotation(y_ion);
 		graph.push_back(node);
@@ -195,13 +211,13 @@ int cDeNovoGraph::createGraph(bool& terminatecomputation) {
 			e.targetnode = i + 2;
 
 			if (parameters->searchedmodifications[i].nterminal) {
-				node.setMZRatio(parameters->fragmentdefinitions[b_ion].massdifference + parameters->searchedmodifications[i].massdifference);
+				node.setMZRatio(parameters->fragmentdefinitions[b_ion].massdifference + parameters->searchedmodifications[i].massdifference + negativeshift);
 				node.setIntensity(0);
 				node.addIonAnnotation(b_ion);
 			}
 
 			if (parameters->searchedmodifications[i].cterminal) {
-				node.setMZRatio(parameters->fragmentdefinitions[y_ion].massdifference + parameters->searchedmodifications[i].massdifference);
+				node.setMZRatio(parameters->fragmentdefinitions[y_ion].massdifference + parameters->searchedmodifications[i].massdifference + negativeshift);
 				node.setIntensity(0);
 				node.addIonAnnotation(y_ion);
 			}
@@ -226,13 +242,13 @@ int cDeNovoGraph::createGraph(bool& terminatecomputation) {
 		graph.push_back(node);
 
 		node.clear();
-		node.setMZRatio(parameters->fragmentdefinitions[b_ion].massdifference);
+		node.setMZRatio(parameters->fragmentdefinitions[b_ion].massdifference + negativeshift);
 		node.setIntensity(0);
 		node.addIonAnnotation(b_ion);
 		graph.push_back(node);
 
 		//node.clear();
-		//node.setMZRatio(parameters->fragmentdefinitions[y_ion].massdifference);
+		//node.setMZRatio(parameters->fragmentdefinitions[y_ion].massdifference + negativeshift);
 		//node.setIntensity(0);
 		//node.addIonAnnotation(y_ion);
 		//graph.push_back(node);
@@ -256,13 +272,13 @@ int cDeNovoGraph::createGraph(bool& terminatecomputation) {
 			e.targetnode = i + 2;
 
 			if (parameters->searchedmodifications[i].nterminal) {
-				node.setMZRatio(parameters->fragmentdefinitions[b_ion].massdifference + parameters->searchedmodifications[i].massdifference);
+				node.setMZRatio(parameters->fragmentdefinitions[b_ion].massdifference + parameters->searchedmodifications[i].massdifference + negativeshift);
 				node.setIntensity(0);
 				node.addIonAnnotation(b_ion);
 			}
 
 			if (parameters->searchedmodifications[i].cterminal) {
-				node.setMZRatio(parameters->fragmentdefinitions[y_ion].massdifference + parameters->searchedmodifications[i].massdifference);
+				node.setMZRatio(parameters->fragmentdefinitions[y_ion].massdifference + parameters->searchedmodifications[i].massdifference + negativeshift);
 				node.setIntensity(0);
 				node.addIonAnnotation(y_ion);
 			}
@@ -284,13 +300,13 @@ int cDeNovoGraph::createGraph(bool& terminatecomputation) {
 		graph.push_back(node);
 
 		node.clear();
-		node.setMZRatio(H2O + Hplus);
+		node.setMZRatio(H2O + Hplus + negativeshift);
 		node.setIntensity(0);
 		node.addIonAnnotation(ms_nterminal_ion_hplus);
 		graph.push_back(node);
 
 		//node.clear();
-		//node.setMZRatio(H2O + Hplus);
+		//node.setMZRatio(H2O + Hplus + negativeshift);
 		//node.setIntensity(0);
 		//node.addIonAnnotation(ms_cterminal_ion_hplus);
 		//graph.push_back(node);
@@ -313,13 +329,13 @@ int cDeNovoGraph::createGraph(bool& terminatecomputation) {
 			e.targetnode = i + 1;//2;
 
 			//if (parameters->searchedmodifications[i].nterminal) {
-				node.setMZRatio(H2O + Hplus + parameters->searchedmodifications[i].massdifference);
+				node.setMZRatio(H2O + Hplus + parameters->searchedmodifications[i].massdifference + negativeshift);
 				node.setIntensity(0);
 				node.addIonAnnotation(ms_nterminal_ion_hplus);
 			//}
 
 			//if (parameters->searchedmodifications[i].cterminal) {
-			//	node.setMZRatio(H2O + Hplus +parameters->searchedmodifications[i].massdifference);
+			//	node.setMZRatio(H2O + Hplus + parameters->searchedmodifications[i].massdifference + negativeshift);
 			//	node.setIntensity(0);
 			//	node.addIonAnnotation(ms_cterminal_ion_hplus);
 			//}
@@ -461,7 +477,7 @@ int cDeNovoGraph::createGraph(bool& terminatecomputation) {
 							continue;
 						}
 
-						// middle modifications for branched and lasso peptides
+						// middle modifications for branched and branch-cyclic peptides
 						for (int p = 0; p < (int)parameters->searchedmodifications.size(); p++) {
 
 							if ((p > 0) && ((parameters->peptidetype == linear) || (parameters->peptidetype == cyclic) || (parameters->peptidetype == linearpolysaccharide))) {
@@ -488,11 +504,11 @@ int cDeNovoGraph::createGraph(bool& terminatecomputation) {
 
 							}
 
-							for (int z1 = 1; z1 <= parameters->precursorcharge; z1++) {
+							for (int z1 = 1; z1 <= abs(parameters->precursorcharge); z1++) {
 
-								for (int z2 = 1; z2 <= parameters->precursorcharge; z2++) {
+								for (int z2 = 1; z2 <= abs(parameters->precursorcharge); z2++) {
 
-									unchargedmz = uncharge(graph[i].getMZRatio(), z1);
+									unchargedmz = charge(uncharge(graph[i].getMZRatio(), (parameters->precursorcharge > 0)?z1:-z1), (parameters->precursorcharge > 0)?1:-1);
 									if ((!isInPpmMassErrorTolerance(unchargedmz, unchargedprecursormass, parameters->fragmentmasserrortolerance)) && (unchargedmz > unchargedprecursormass)) {
 										continue;
 									}
@@ -521,12 +537,12 @@ int cDeNovoGraph::createGraph(bool& terminatecomputation) {
 									while (left <= right) {
 
 										middle = (left + right) / 2;
-										if (isInPpmMassErrorTolerance(uncharge(graph[middle].getMZRatio(), z2), mass, parameters->fragmentmasserrortolerance)) {
+										if (isInPpmMassErrorTolerance(charge(uncharge(graph[middle].getMZRatio(), (parameters->precursorcharge > 0)?z2:-z2), (parameters->precursorcharge > 0)?1:-1), mass, parameters->fragmentmasserrortolerance)) {
 											// found
-											while ((middle > lastsystemnode + 1) && isInPpmMassErrorTolerance(uncharge(graph[middle - 1].getMZRatio(), z2), mass, parameters->fragmentmasserrortolerance)) {
+											while ((middle > lastsystemnode + 1) && isInPpmMassErrorTolerance(charge(uncharge(graph[middle - 1].getMZRatio(), (parameters->precursorcharge > 0)?z2:-z2), (parameters->precursorcharge > 0)?1:-1), mass, parameters->fragmentmasserrortolerance)) {
 												middle--;
 											}
-											while ((middle < (int)graph.size()) && (isInPpmMassErrorTolerance(uncharge(graph[middle].getMZRatio(), z2), mass, parameters->fragmentmasserrortolerance))) {
+											while ((middle < (int)graph.size()) && (isInPpmMassErrorTolerance(charge(uncharge(graph[middle].getMZRatio(), (parameters->precursorcharge > 0)?z2:-z2), (parameters->precursorcharge > 0)?1:-1), mass, parameters->fragmentmasserrortolerance))) {
 
 												// target node cannot be a system node
 												if (middle <= lastsystemnode) {
@@ -541,7 +557,7 @@ int cDeNovoGraph::createGraph(bool& terminatecomputation) {
 												}
 
 												// mass corresponding to the target node must be <= uncharged precursor mass
-												if (uncharge(graph[middle].getMZRatio(), z2) > unchargedprecursormass) {
+												if (charge(uncharge(graph[middle].getMZRatio(), (parameters->precursorcharge > 0)?z2:-z2), (parameters->precursorcharge > 0)?1:-1) > unchargedprecursormass) {
 													middle++;
 													continue;
 												}
@@ -558,10 +574,10 @@ int cDeNovoGraph::createGraph(bool& terminatecomputation) {
 												if (i == (int)graph.size() - 1) {
 													e.targetnode = i;
 													e.brickid = j;
-													e.ppmerror = ppmError(uncharge(graph[middle].getMZRatio(), z2), mass);
-													e.massdifference = abs(unchargedmz - uncharge(graph[middle].getMZRatio(), z2));
-													e.sourcecharge = z2;
-													e.targetcharge = z1;
+													e.ppmerror = ppmError(charge(uncharge(graph[middle].getMZRatio(), (parameters->precursorcharge > 0)?z2:-z2), (parameters->precursorcharge > 0)?1:-1), mass);
+													e.massdifference = abs(unchargedmz - charge(uncharge(graph[middle].getMZRatio(), (parameters->precursorcharge > 0)?z2:-z2), (parameters->precursorcharge > 0)?1:-1));
+													e.sourcecharge = (parameters->precursorcharge > 0)?z2:-z2;
+													e.targetcharge = (parameters->precursorcharge > 0)?z1:-z1;
 													e.targetintensity = graph[i].getIntensity();
 													e.composition = bricksdatabasewithcombinations[j].getComposition();
 													e.endmodifID = n;
@@ -573,10 +589,10 @@ int cDeNovoGraph::createGraph(bool& terminatecomputation) {
 												else {
 													e.targetnode = middle;
 													e.brickid = j;
-													e.ppmerror = ppmError(uncharge(graph[middle].getMZRatio(), z2), mass);
-													e.massdifference = abs(uncharge(graph[middle].getMZRatio(), z2) - unchargedmz);
-													e.sourcecharge = z1;
-													e.targetcharge = z2;
+													e.ppmerror = ppmError(charge(uncharge(graph[middle].getMZRatio(), (parameters->precursorcharge > 0)?z2:-z2), (parameters->precursorcharge > 0)?1:-1), mass);
+													e.massdifference = abs(charge(uncharge(graph[middle].getMZRatio(), (parameters->precursorcharge > 0)?z2:-z2), (parameters->precursorcharge > 0)?1:-1) - unchargedmz);
+													e.sourcecharge = (parameters->precursorcharge > 0)?z1:-z1;
+													e.targetcharge = (parameters->precursorcharge > 0)?z2:-z2;
 													e.targetintensity = graph[middle].getIntensity();
 													e.composition = bricksdatabasewithcombinations[j].getComposition();
 													e.endmodifID = n;
@@ -593,7 +609,7 @@ int cDeNovoGraph::createGraph(bool& terminatecomputation) {
 											}
 											break;
 										}
-										if (mass < uncharge(graph[middle].getMZRatio(), z2)) {
+										if (mass < charge(uncharge(graph[middle].getMZRatio(), (parameters->precursorcharge > 0)?z2:-z2), (parameters->precursorcharge > 0)?1:-1)) {
 											right = middle - 1;
 										}
 										else {
@@ -640,7 +656,7 @@ int cDeNovoGraph::createGraph(bool& terminatecomputation) {
 
 int cDeNovoGraph::removeEdgesFormingPathsNotFinishingInPrecursor(bool& terminatecomputation) {
 	*os << "Removing edges forming blind paths (not finishing in the precursor)... ";
-	double unchargedprecursormass = uncharge(parameters->precursormass, parameters->precursorcharge);
+	double neutralprecursormass = uncharge(parameters->precursormass, parameters->precursorcharge);
 	bool removed = true;
 	bool isprecursor;
 	int edgesremoved = 0;
@@ -658,8 +674,8 @@ int cDeNovoGraph::removeEdgesFormingPathsNotFinishingInPrecursor(bool& terminate
 
 				// Is the target precursor ?
 				isprecursor = false;
-				for (int k = 1; k <= parameters->precursorcharge; k++) {
-					if (isInPpmMassErrorTolerance(graph[graph[i][j].targetnode].getMZRatio(), charge(unchargedprecursormass, k), parameters->precursormasserrortolerance)) {
+				for (int k = 1; k <= abs(parameters->precursorcharge); k++) {
+					if (isInPpmMassErrorTolerance(graph[graph[i][j].targetnode].getMZRatio(), charge(neutralprecursormass, (parameters->precursorcharge > 0)?k:-k), parameters->precursormasserrortolerance)) {
 						isprecursor = true;
 						break;
 					}
@@ -748,8 +764,8 @@ int cDeNovoGraph::connectEdgesFormingPathsNotFinishingInPrecursor(bool& terminat
 			e.brickid = (int)bricksdatabasewithcombinations.size() + 1;
 			e.ppmerror = 0;
 			e.massdifference = abs(graph[precursorposition].getMZRatio() - graph[i].getMZRatio());
-			e.sourcecharge = 1;
-			e.targetcharge = 1;
+			e.sourcecharge = (parameters->precursorcharge > 0)?1:-1;
+			e.targetcharge = (parameters->precursorcharge > 0)?1:-1;
 			e.targetintensity = graph[e.targetnode].getIntensity();
 			e.composition = to_string(e.brickid);
 			e.endmodifID = 0;
@@ -813,8 +829,8 @@ int cDeNovoGraph::connectEdgesFormingPathsNotStartingFromFirstNode(bool& termina
 				e.brickid = (int)bricksdatabasewithcombinations.size() + 1;
 				e.ppmerror = 0;
 				e.massdifference = abs(graph[i].getMZRatio() - graph[j].getMZRatio());
-				e.sourcecharge = 1;
-				e.targetcharge = 1;
+				e.sourcecharge = (parameters->precursorcharge > 0)?1:-1;
+				e.targetcharge = (parameters->precursorcharge > 0)?1:-1;
 				e.targetintensity = graph[i].getIntensity();
 				e.composition = to_string(e.brickid);
 				e.endmodifID = 0;
@@ -849,7 +865,7 @@ int cDeNovoGraph::removePathsWhichCanBeSubstitutedByLongerPath(bool& terminateco
 	*os << "Removing edges forming paths which can be substituted by longer paths... ";
 	int edgesremoved = 0;
 	int j;
-	vector<int> path;
+	vector<nodeEdge> path;
 	
 	for (int i = startnode; i < (int)graph.size(); i++) {
 

@@ -17,9 +17,11 @@
 #include "core/cSummaryFormula.h"
 
 class cCandidateSet;
+class cDeNovoGraph;
 
 
 using namespace std;
+using namespace boost;
 
 
 /**
@@ -140,6 +142,13 @@ class cCandidate {
 	string internalcomposition;
 	int numberofinternalbricks;
 
+	string realpeptidename;
+	string acronympeptidename;
+	vector<string> acronyms;
+	vector<string> backboneacronyms;
+	vector<string> branchacronyms;
+	string stringpath;
+
 	void updateInternalComposition();
 
 	void getPermutationsIter(cCandidateSet& permutations, vector<string>& currentcandidate, int position, bool* terminatecomputation);
@@ -148,9 +157,9 @@ class cCandidate {
 
 	void attachAllBranches(cCandidate& candidate, cCandidateSet& result, peptideType peptidetype, bool* terminatecomputation);
 
-	void getPartialRotations(string& composition, vector<string>& rotations);
+	void getPartialRotations(const string& composition, vector<string>& rotations);
 
-	void getPartialLassoRotations(string& composition, vector<cCandidate>& lassorotations, int branchstart, int branchend);
+	void getPartialLassoRotations(const string& composition, vector<cCandidate>& lassorotations, int branchstart, int branchend);
 
 public:
 
@@ -230,12 +239,12 @@ public:
 
 
 	/**
-		\brief Prepare candidates of a branched or a lasso peptide.
+		\brief Prepare candidates of a branched or a branch-cyclic peptide.
 		\param result reference to an output set of possible peptide sequence candidates
 		\param peptidetype a type of an analyzed peptide
 		\param terminatecomputation pointer to a variable determining that the computation must be stopped
 	*/ 
-	void prepareBranchedCandidate(cCandidateSet& result, peptideType peptidetype, bool* terminatecomputation);
+	void prepareBranchedCandidates(cCandidateSet& result, peptideType peptidetype, bool* terminatecomputation);
 
 
 	/**
@@ -404,9 +413,9 @@ public:
 
 
 	/**
-		\brief Get lasso rotations of a lasso peptide sequence.
-		\param lassorotations reference to an output vector containing lasso rotations of a sequence
-		\param includerevertedrotations if true then reverted lasso rotations are also included
+		\brief Get branch-cyclic rotations of a branch-cyclic peptide sequence.
+		\param lassorotations reference to an output vector containing branch-cyclic rotations of a sequence
+		\param includerevertedrotations if true then reverted branch-cyclic rotations are also included
 	*/ 
 	void getLassoRotations(vector<cCandidate>& lassorotations, bool includerevertedrotations);
 
@@ -447,6 +456,93 @@ public:
 	*/ 
 	string& getName();
 
+
+	/**
+		\brief Set a vector of acronyms corresponding to a peptide sequence candidate.
+		\param bricksdatabase a database of building blocks
+	*/ 
+	void setAcronyms(cBricksDatabase& bricksdatabase);
+
+
+	/**
+		\brief Set a vector of acronyms corresponding to a backbone of a peptide sequence candidate.
+		\param bricksdatabase a database of building blocks
+	*/ 
+	void setBackboneAcronyms(cBricksDatabase& bricksdatabase);
+
+
+	/**
+		\brief Set a vector of acronyms corresponding to a branch of a peptide sequence candidate.
+		\param bricksdatabase a database of building blocks
+	*/ 
+	void setBranchAcronyms(cBricksDatabase& bricksdatabase);
+
+
+	/**
+		\brief Get a vector of acronyms corresponding to a peptide sequence candidate.
+		\retval vector<string> a vector of acronyms
+	*/ 
+	vector<string>& getAcronyms();
+
+
+	/**
+		\brief Get a vector of acronyms corresponding to a backbone of a peptide sequence candidate.
+		\retval vector<string> a vector of acronyms
+	*/ 
+	vector<string>& getBackboneAcronyms();
+
+
+	/**
+		\brief Get a vector of acronyms corresponding to a branch of a peptide sequence candidate.
+		\retval vector<string> a vector of acronyms
+	*/ 
+	vector<string>& getBranchAcronyms();
+
+
+	/**
+		\brief Set a path in the de novo graph corresponding to the candidate.
+		\param graph reference to the de novo graph
+		\param parameters parameters of the application
+	*/ 
+	void setPath(cDeNovoGraph& graph, cParameters* parameters);
+
+
+	/**
+		\brief Get a path in the de novo graph corresponding to the candidate as a string.
+		\retval string reference to a path corresponding to the spectrum
+	*/ 
+	string& getPathAsString();
+
+
+	/**
+		\brief Set a real peptide name.
+		\param bricksdatabase the database of building blocks
+		\param peptidetype the type of peptide
+	*/ 
+	void setRealPeptideName(cBricksDatabase& bricksdatabase, peptideType peptidetype);
+
+
+	/**
+		\brief Set an acronym peptide name.
+		\param bricksdatabase the database of building blocks
+		\param peptidetype the type of peptide
+	*/ 
+	void setAcronymPeptideNameWithHTMLReferences(cBricksDatabase& bricksdatabase, peptideType peptidetype);
+
+
+	/**
+		\brief Get a real peptide name.
+		\retval string reference to the real peptide name
+	*/ 
+	string& getRealPeptideName();
+
+
+	/**
+		\brief Get an acronym peptide name.
+		\retval string reference to the acronym peptide name
+	*/ 
+	string& getAcronymPeptideNameWithHTMLReferences();
+
 };
 
 
@@ -461,7 +557,7 @@ struct hash_cCandidate {
 		\retval size_t hashed candidate
 	*/
 	size_t operator()(const cCandidate& candidate) const {
-		return hash<string>()(((cCandidate&)candidate).getComposition());
+		return std::hash<string>()(((cCandidate&)candidate).getComposition());
 	}
 
 };

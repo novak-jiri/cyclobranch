@@ -8,12 +8,13 @@
 #define _CSPECTRUMDETAILWIDGET_H
 
 #include <QWidget>
+#include <QMainWindow>
 #include "core/cTheoreticalSpectrum.h"
 #include "gui/cLinearWidget.h"
 #include "gui/cCyclicWidget.h"
 #include "gui/cBranchedWidget.h"
 #include "gui/cLassoWidget.h"
-#include "gui/cGraphicalSpectrumWidget.h"
+#include "gui/cSpectrumSceneWidget.h"
 
 
 // forward declaration
@@ -22,18 +23,20 @@ class QTextBrowser;
 class QHBoxLayout;
 class QVBoxLayout;
 class QFormLayout;
-class QScrollArea;
 class QCheckBox;
 class QPushButton;
 class QSplitter;
 class QComboBox;
 class QDoubleSpinBox;
+class QToolBar;
+class QAction;
+class QLabel;
 
 
 /**
 	\brief The class representing a widget for visualisation of a detail of a spectrum (opened after doubleclick on a row when results are reported).
 */
-class cSpectrumDetailWidget : public QWidget
+class cSpectrumDetailWidget : public QMainWindow
 {
 	Q_OBJECT
 
@@ -51,6 +54,13 @@ public:
 		\param sd reference to a cSpectrumDetailWidget
 	*/ 
 	cSpectrumDetailWidget(const cSpectrumDetailWidget& sd);
+
+
+	/**
+		\brief Overloaded operator=.
+		\param sd reference to a cSpectrumDetailWidget
+	*/ 
+	cSpectrumDetailWidget& operator=(const cSpectrumDetailWidget& sd);
 
 
 	/**
@@ -95,26 +105,54 @@ public:
 	void prepareToShow(peptideType peptidetype);
 
 
+protected:
+
+
+	/**
+		\brief Handle a key press event.
+		\param event pointer to QKeyEvent
+	*/ 
+	void keyPressEvent(QKeyEvent *event);
+
+
 private:
-	QHBoxLayout* zoom;
-	QHBoxLayout* mzinterval;
+	QToolBar* toolbarExport;
+	QToolBar* toolbarZoom;
+	QToolBar* toolbarHide;
+	QToolBar* toolbarMz;
+	QToolBar* toolbarRotation;
+	QToolBar* toolbarTrotation;
 
-	QSplitter* hsplitter;
-	QSplitter* vsplitter1;
-	QSplitter* vsplitter2;
+	QAction* actionExportSpectrum;
+	QAction* actionExportPeptide;
+	QAction* actionZoomIn;
+	QAction* actionZoomOut;
+	QAction* actionZoomReset;
+	QAction* actionHideMatched;
+	QAction* actionHideUnmatched;
+	QAction* actionHideScrambled;
+	QAction* actionMouseMzSelection;
 
-	QWidget* formwidget;
-	QFormLayout* formlayout;
-	QPushButton* zoomin;
-	QPushButton* zoomout;
-	QPushButton* normalsize;
+	QSplitter* hsplitter1;
+	QSplitter* hsplitter2;
+	QSplitter* vsplitter;
+
+	QWidget* widgetmz;
+	QHBoxLayout* hboxmz;
+	QLabel* labelmz;
 	QDoubleSpinBox* minmz;
 	QDoubleSpinBox* maxmz;
 	QPushButton* setmzinterval;
 	QPushButton* resetmzinterval;
-	QCheckBox* hideunmatched;
-	QCheckBox* hidematched;
+
+	QWidget* widgetrotation;
+	QHBoxLayout* hboxrotation;
+	QLabel* labelrotation;
 	QComboBox* rotation;
+
+	QWidget* widgettrotation;
+	QHBoxLayout* hboxtrotation;
+	QLabel* labeltrotation;
 	QComboBox* trotation;
 
 	QTextEdit* textedit;
@@ -124,15 +162,13 @@ private:
 	cBranchedWidget* branchedwidget;
 	cLassoWidget* lassowidget;
 
-	QScrollArea* graphicalspectrumscroll;
-	cGraphicalSpectrumWidget* graphicalspectrum;
+	cSpectrumSceneWidget* spectrumscene;
 
 	cTheoreticalSpectrum* theoreticalspectrum;
 
-	QHBoxLayout* mainbox;
-
 	bool preparedToShow;
 	cParameters* parameters;
+
 
 signals:
 
@@ -143,11 +179,16 @@ signals:
 	*/ 
 	void emitMZInterval(double minmz, double maxmz);
 
+
 private slots:
 
 	void updateMZInterval(double minmz, double maxmz);
 
 	void setMZInterval();
+
+	void exportSpectrum();
+
+	void exportPeptide();
 
 };
 

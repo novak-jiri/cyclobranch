@@ -9,14 +9,14 @@
     <QTDIR>C:\Qt\5.1.1\msvc2012_64\</QTDIR>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <QTDIR>C:\Qt\5.1.1\msvc2012_64</QTDIR>
+    <QTDIR>C:\Qt\Qt5.2.1\5.2.1\msvc2012_64</QTDIR>
     <LocalDebuggerEnvironment>PATH=$(QTDIR)\bin%3b"$(QTDIR)\bin%3b$(PATH)</LocalDebuggerEnvironment>
     <LocalDebuggerCommandArguments>
     </LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <QTDIR>C:\Qt\5.1.1\msvc2012_64</QTDIR>
+    <QTDIR>C:\Qt\Qt5.2.1\5.2.1\msvc2012_64</QTDIR>
     <LocalDebuggerEnvironment>PATH=$(QTDIR)\bin%3b%PATH%%3b"$(PATH)</LocalDebuggerEnvironment>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
     <LocalDebuggerCommandArguments>

@@ -9,12 +9,14 @@ cParameters::cParameters() {
 
 
 void cParameters::clear() {
+	string s = "";
 	os = 0;
-	fragmentdefinitions.recalculateFragments(false, false);
+	fragmentdefinitions.recalculateFragments(false, false, s);
 	peptidetype = linear;
 	peaklistfilename = "";
 	peaklist.clear();
 	precursormass = 0;
+	precursoradduct = "";
 	precursormasserrortolerance = 5;
 	precursorcharge = 1;
 	fragmentmasserrortolerance = 5;
@@ -29,6 +31,8 @@ void cParameters::clear() {
 	maximumbricksincombination = max(max(maximumbricksincombinationbegin, maximumbricksincombinationmiddle), maximumbricksincombinationend);
 	maximumcumulativemass = 0;
 	generatebrickspermutations = true;
+	modificationsfilename = "";
+	searchedmodifications.clear();
 	maximumnumberofthreads = 1;
 	mode = denovoengine;
 	scoretype = b_ions;
@@ -49,9 +53,6 @@ void cParameters::clear() {
 	sequencedatabase.clear();
 	sequencedatabasefilename = "";
 
-	searchedmodifications.clear();
-	searchedmodifications.push_back(fragmentDescription("", 0, "", true, true));
-
 	fragmentionsfordenovograph.clear();
 	fragmentionsfortheoreticalspectra.clear();
 }
@@ -63,11 +64,17 @@ int cParameters::checkAndPrepare() {
 	string errormessage = "";
 	ifstream peakliststream;
 	ifstream bricksdatabasestream;
+	ifstream modificationsstream;
 	ifstream sequencedatabasestream;
 	regex rx;
 	ePeakListFileFormat peaklistfileformat;
 	string s;
+	int i;
 
+	if (peaklistfilename.empty()) {
+		error = true;
+		errormessage = "A peaklist is not specified. Have you configured the engine (Search -> Settings...) ?\n";
+	}
 
 	// peaklist check
 	if (!error) {
@@ -94,14 +101,16 @@ int cParameters::checkAndPrepare() {
 				peaklistfileformat = mzXML;
 			}
 			
-			rx = "\\.[bB][aA][fF]$";
-			// Bruker Analysis File
-			if (regex_search(peaklistfilename, rx)) {
-				peaklistfileformat = baf;
-			}
+			#if OS_TYPE == WIN
+				rx = "\\.[bB][aA][fF]$";
+				// Bruker Analysis File
+				if (regex_search(peaklistfilename, rx)) {
+					peaklistfileformat = baf;
+				}
+			#endif
 
 		}
-		catch (std::regex_error& e) {
+		catch (regex_error& e) {
 			error = true;
 			errormessage = "cParameters::checkAndPrepare: regex_search failed, error no. " + to_string((int)e.code()) + "\n";
 		}
@@ -118,17 +127,31 @@ int cParameters::checkAndPrepare() {
 				break;
 			case mzML:
 			case mzXML:
-				*os << "Converting the file " + peaklistfilename + " to .mgf ... ";
-				s = "External\\any2mgf.bat \"" + peaklistfilename + "\"";
-				if (system(s.c_str()) != 0) {
-					error = true;
-					errormessage = "The file cannot be converted.\n";
-					errormessage += "Does the file '" + peaklistfilename + "' exist ?\n";
-					errormessage += "Do you have OpenMS installed ?\n";
-					errormessage += "Do you have path to the OpenMS/bin/FileConverter.exe in your PATH variable ?\n";
-					errormessage += "Is the directory with the file '" + peaklistfilename + "' writable ?\n";
-					errormessage += "Do you have 'any2mgf.bat' file located in the 'External' folder ?\n";
-				}
+				*os << "Converting the file " + peaklistfilename + " to mgf ... ";
+				
+				#if OS_TYPE == UNX
+					s = linuxinstalldir.toStdString() + "External/linux/any2mgf.sh " + peaklistfilename;
+					if (system(s.c_str()) != 0) {
+						error = true;
+						errormessage = "The file cannot be converted.\n";
+						errormessage += "Does the file '" + peaklistfilename + "' exist ?\n";
+						errormessage += "Is the directory with the file '" + peaklistfilename + "' writable ?\n";
+						errormessage += "Do you have FileConverter installed (sudo apt-get install topp) ?\n";
+						errormessage += "Do you have 'any2mgf.sh' file located in '" + linuxinstalldir.toStdString() + "External/linux' folder ?\n";
+						errormessage += "Is the file 'any2mgf.sh' executable (sudo chmod +x " + linuxinstalldir.toStdString() + "External/linux/any2mgf.sh) ? \n";
+					}
+				#else
+					s = "External\\windows\\any2mgf.bat \"" + peaklistfilename + "\"";
+					if (system(s.c_str()) != 0) {
+						error = true;
+						errormessage = "The file cannot be converted.\n";
+						errormessage += "Does the file '" + peaklistfilename + "' exist ?\n";
+						errormessage += "Is the directory with the file '" + peaklistfilename + "' writable ?\n";
+						errormessage += "Do you have FileConverter installed (OpenMS 1.11) ?\n";
+						errormessage += "Do you have a path to FileConverter in your PATH variable (e.g., 'C:/Program Files/OpenMS-1.11/bin') ?\n";
+						errormessage += "Do you have 'any2mgf.bat' file located in the '" + appname.toStdString() + "/External/windows' folder ?\n";
+					}
+				#endif
 
 				if (!error) {
 					*os << "ok" << endl << endl;
@@ -136,22 +159,24 @@ int cParameters::checkAndPrepare() {
 				}
 				break;
 			case baf:
-				*os << "Converting the file " + peaklistfilename + " ... ";
-				s = "External\\baf2csv.bat \"" + peaklistfilename + "\"";
-				if (system(s.c_str()) != 0) {
-					error = true;
-					errormessage = "The file cannot be converted.\n";
-					errormessage += "Does the file '" + peaklistfilename + "' exist ?\n";
-					errormessage += "Do you have Bruker Daltonik's CompassXport installed ?\n";
-					errormessage += "Do you have path to the CompassXport.exe in your PATH variable ?\n";
-					errormessage += "Is the directory with the file '" + peaklistfilename + "' writable ?\n";
-					errormessage += "Do you have 'baf2csv.bat' file located in the 'External' folder ?\n";
-				}
+				#if OS_TYPE == WIN
+					*os << "Converting the file " + peaklistfilename + " ... ";
+					s = "External\\windows\\baf2csv.bat \"" + peaklistfilename + "\"";
+					if (system(s.c_str()) != 0) {
+						error = true;
+						errormessage = "The file cannot be converted.\n";
+						errormessage += "Does the file '" + peaklistfilename + "' exist ?\n";
+						errormessage += "Do you have Bruker Daltonik's CompassXport installed ?\n";
+						errormessage += "Do you have path to the CompassXport.exe in your PATH variable ?\n";
+						errormessage += "Is the directory with the file '" + peaklistfilename + "' writable ?\n";
+						errormessage += "Do you have 'baf2csv.bat' file located in the 'External/windows' folder ?\n";
+					}
 
-				if (!error) {
-					*os << "ok" << endl << endl;
-					peakliststream.open(peaklistfilename + ".csv");
-				}
+					if (!error) {
+						*os << "ok" << endl << endl;
+						peakliststream.open(peaklistfilename + ".csv");
+					}
+				#endif
 				break;
 			default:
 				break;
@@ -179,7 +204,9 @@ int cParameters::checkAndPrepare() {
 					peaklist.loadFromMGFStream(peakliststream);
 					break;
 				case baf:
-					peaklist.loadFromBAFStream(peakliststream);
+					#if OS_TYPE == WIN
+						peaklist.loadFromBAFStream(peakliststream);
+					#endif
 					break;
 				default:
 					break;
@@ -206,7 +233,7 @@ int cParameters::checkAndPrepare() {
 			if (os) {
 				*os << "Loading the database of bricks... ";
 			}
-			if (bricksdatabase.loadFromPlainTextStream(bricksdatabasestream, errormessage) == -1) {
+			if (bricksdatabase.loadFromPlainTextStream(bricksdatabasestream, errormessage, false) == -1) {
 				error = true;
 			}
 			else {
@@ -242,6 +269,53 @@ int cParameters::checkAndPrepare() {
 			}
 		}
 
+	}
+
+
+	// modifications check
+	if (!error && ((mode == denovoengine) || (mode == singlecomparison) || (mode == databasesearch))) {
+
+		searchedmodifications.clear();
+
+		if ((peptidetype != cyclic) && (modificationsfilename.compare("") != 0)) {
+			modificationsstream.open(modificationsfilename);
+			if (!modificationsstream.good()) {
+				error = true;
+				errormessage = "Cannot open the file '" + modificationsfilename + "'.";
+			}
+			else {
+				if (os) {
+					*os << "Loading modifications... ";
+				}
+				if (loadModificationsFromPlainTextStream(modificationsstream, searchedmodifications, errormessage, false) == -1) {
+					error = true;
+				}
+				else {
+					if (os) {
+						*os << "ok" << endl << endl;
+					}
+				}
+			}
+			modificationsstream.close();
+		}
+
+		fragmentDescription fd;
+		fd.nterminal = true;
+		fd.cterminal = true;
+		searchedmodifications.insert(searchedmodifications.begin(), fd);
+
+	}
+
+
+	// precursor adduct check
+	if (!error && ((mode == denovoengine) || (mode == singlecomparison) || (mode == databasesearch))) {
+		cSummaryFormula formula;
+		formula.clear();
+		formula.setFormula(precursoradduct);
+		if (!formula.isValid(errormessage)) {
+			error = true;
+			errormessage = "Precursor Ion Adduct: " + errormessage;
+		}
 	}
 
 
@@ -298,6 +372,20 @@ int cParameters::checkAndPrepare() {
 		}
 	}
 
+
+	// check theoretical fragments in positive/negative mode
+	if (!error && (mode == dereplication)) {
+		i = 0;
+		while (i < (int)fragmentionsfortheoreticalspectra.size()) {
+			if (fragmentdefinitions[fragmentionsfortheoreticalspectra[i]].positive != (precursorcharge > 0)) {
+				fragmentionsfortheoreticalspectra.erase(fragmentionsfortheoreticalspectra.begin() + i);
+			}
+			else {
+				i++;
+			}
+		}
+	}
+
 	
 	// report errors and return
 	if (error) {
@@ -329,7 +417,7 @@ string cParameters::printToString() {
 		s += "Branched\n";
 		break;
 	case lasso:
-		s += "Lasso\n";
+		s += "Branch-cyclic\n";
 		break;
 	case linearpolysaccharide:
 		s += "Linear polysaccharide (beta version)\n";
@@ -342,7 +430,8 @@ string cParameters::printToString() {
 	}
 	s += "Peaklist File: " + peaklistfilename + "\n";
 	s += "Precursor Mass: " + to_string(precursormass) + "\n";
-	s += "Precursor Charge: " + to_string(precursorcharge) + "\n";
+	s += "Precursor Ion Adduct: " + precursoradduct + "\n";
+	s += "Charge: " + to_string(precursorcharge) + "\n";
 	s += "Precursor Mass Error Tolerance: " + to_string(precursormasserrortolerance) + "\n";
 	s += "Fragment Mass Error Tolerance: " + to_string(fragmentmasserrortolerance) + "\n";
 	s += "Fragment Mass Error Tolerance for Deisotoping: " + to_string(masserrortolerancefordeisotoping) + "\n";
@@ -356,13 +445,35 @@ string cParameters::printToString() {
 	s += generatebrickspermutations ? "on" : "off";
 	s += "\n";
 
-	s += "N-terminal and C-terminal Modifications:\n";
-	for (int i = 1; i < (int)searchedmodifications.size(); i++) {
-		s += searchedmodifications[i].name + ", " + to_string(searchedmodifications[i].massdifference) + ", ";
-		s += searchedmodifications[i].nterminal ? "N-terminal, " : "-, ";
-		s += searchedmodifications[i].cterminal ? "C-terminal" : "-";
-		s += "\n";
+	s += "N-/C-terminal Modifications File: " + modificationsfilename + "\n";
+
+	s += "Action with Blind Paths in De Novo Graph: ";
+	switch (blindedges) {
+	case 0:
+		s += "none (you can see a complete de novo graph)";
+		break;
+	case 1:
+		s += "remove (speed up the search)";
+		break;
+	case 2:
+		s += "connect (allow detection of sequence tags)";
+		break;
+	default:
+		break;
 	}
+	s += "\n";
+
+	s += "Cyclic N-terminus: ";
+	s += cyclicnterminus ? "on" : "off";
+	s += "\n";
+
+	s += "Cyclic C-terminus: ";
+	s += cycliccterminus ? "on" : "off";
+	s += "\n";
+
+	s += "Enable Scrambling: ";
+	s += enablescrambling ? "on" : "off";
+	s += "\n";
 
 	s += "Mode: ";
 	switch ((modeType)mode) {
@@ -383,6 +494,8 @@ string cParameters::printToString() {
 	}
 	s += "\n";
 
+	s += "Sequence Database File: " + sequencedatabasefilename + "\n";
+
 	s += "Maximum Number of Threads: " + to_string(maximumnumberofthreads) + "\n";
 
 	s += "Score Type: ";
@@ -390,10 +503,10 @@ string cParameters::printToString() {
 	case b_ions:
 		s += "Number of b-ions";
 		break;
-	case b_ions_and_b_water_loss_ions:
+	case b_ions_and_b_dehydrated_ions:
 		s += "Number of b-ions + dehydrated b-ions";
 		break;
-	case b_ions_and_b_ammonia_loss_ions:
+	case b_ions_and_b_deamidated_ions:
 		s += "Number of b-ions + deamidated b-ions";
 		break;
 	case y_ions_and_b_ions:
@@ -433,36 +546,6 @@ string cParameters::printToString() {
 	s += clearhitswithoutparent ? "on" : "off";
 	s += "\n";
 
-	s += "Cyclic N-terminus: ";
-	s += cyclicnterminus ? "on" : "off";
-	s += "\n";
-
-	s += "Cyclic C-terminus: ";
-	s += cycliccterminus ? "on" : "off";
-	s += "\n";
-
-	s += "Enable Scrambling: ";
-	s += enablescrambling ? "on" : "off";
-	s += "\n";
-
-	s += "Action with Edges Forming Blind Paths: ";
-	switch (blindedges) {
-	case 0:
-		s += "none (you can see a complete de novo graph)";
-		break;
-	case 1:
-		s += "remove (speed up the search)";
-		break;
-	case 2:
-		s += "connect (allow detection of sequence tags)";
-		break;
-	default:
-		break;
-	}
-	s += "\n";
-
-	s += "Sequence Database File: " + sequencedatabasefilename + "\n";
-
 	s += "Searched Peptide Sequence: " + originalsearchedsequence + "\n";
 	s += "N-terminal Modification of Searched Peptide Sequence: " + searchedsequenceNtermmodif + "\n";
 	s += "C-terminal Modification of Searched Peptide Sequence: " + searchedsequenceCtermmodif + "\n";
@@ -481,10 +564,10 @@ void cParameters::setOutputStream(cMainThread& os) {
 
 void cParameters::updateFragmentDefinitions() {
 	if (peptidetype == linear) {
-		fragmentdefinitions.recalculateFragments(cyclicnterminus, cycliccterminus);
+		fragmentdefinitions.recalculateFragments(cyclicnterminus, cycliccterminus, precursoradduct);
 	}
 	else {
-		fragmentdefinitions.recalculateFragments(false, false);
+		fragmentdefinitions.recalculateFragments(false, false, precursoradduct);
 	}
 }
 
@@ -500,6 +583,9 @@ void cParameters::store(ofstream& os) {
 	peaklist.store(os);
 
 	os.write((char *)&precursormass, sizeof(double));
+
+	storeString(precursoradduct, os);
+
 	os.write((char *)&precursormasserrortolerance, sizeof(double));
 	os.write((char *)&precursorcharge, sizeof(int));
 	os.write((char *)&fragmentmasserrortolerance, sizeof(double));
@@ -516,6 +602,14 @@ void cParameters::store(ofstream& os) {
 	os.write((char *)&maximumbricksincombination, sizeof(int));
 	os.write((char *)&maximumcumulativemass, sizeof(double));
 	os.write((char *)&generatebrickspermutations, sizeof(bool));
+	storeString(modificationsfilename, os);
+
+	size = (int)searchedmodifications.size();
+	os.write((char *)&size, sizeof(int));
+	for (int i = 0; i < (int)searchedmodifications.size(); i++) {
+		searchedmodifications[i].store(os);
+	}
+
 	os.write((char *)&maximumnumberofthreads, sizeof(int));
 	os.write((char *)&mode, sizeof(modeType));
 	os.write((char *)&scoretype, sizeof(scoreType));
@@ -538,12 +632,6 @@ void cParameters::store(ofstream& os) {
 
 	storeString(sequencedatabasefilename, os);
 	sequencedatabase.store(os);
-
-	size = (int)searchedmodifications.size();
-	os.write((char *)&size, sizeof(int));
-	for (int i = 0; i < (int)searchedmodifications.size(); i++) {
-		searchedmodifications[i].store(os);
-	}
 
 	size = (int)fragmentionsfordenovograph.size();
 	os.write((char *)&size, sizeof(int));
@@ -572,6 +660,9 @@ void cParameters::load(ifstream& is) {
 	peaklist.load(is);
 
 	is.read((char *)&precursormass, sizeof(double));
+
+	loadString(precursoradduct, is);
+
 	is.read((char *)&precursormasserrortolerance, sizeof(double));
 	is.read((char *)&precursorcharge, sizeof(int));
 	is.read((char *)&fragmentmasserrortolerance, sizeof(double));
@@ -588,6 +679,14 @@ void cParameters::load(ifstream& is) {
 	is.read((char *)&maximumbricksincombination, sizeof(int));
 	is.read((char *)&maximumcumulativemass, sizeof(double));
 	is.read((char *)&generatebrickspermutations, sizeof(bool));
+	loadString(modificationsfilename, is);
+
+	is.read((char *)&size, sizeof(int));
+	searchedmodifications.resize(size);
+	for (int i = 0; i < (int)searchedmodifications.size(); i++) {
+		searchedmodifications[i].load(is);
+	}
+
 	is.read((char *)&maximumnumberofthreads, sizeof(int));
 	is.read((char *)&mode, sizeof(modeType));
 	is.read((char *)&scoretype, sizeof(scoreType));
@@ -610,12 +709,6 @@ void cParameters::load(ifstream& is) {
 
 	loadString(sequencedatabasefilename, is);
 	sequencedatabase.load(is);
-
-	is.read((char *)&size, sizeof(int));
-	searchedmodifications.resize(size);
-	for (int i = 0; i < (int)searchedmodifications.size(); i++) {
-		searchedmodifications[i].load(is);
-	}
 
 	is.read((char *)&size, sizeof(int));
 	fragmentionsfordenovograph.resize(size);

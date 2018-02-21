@@ -1,6 +1,6 @@
 /**
 	\file cLassoWidget.h
-	\brief Visualization of a lasso peptide.
+	\brief Visualization of a branch-cyclic peptide.
 */
 
 
@@ -21,7 +21,7 @@ class QPaintEvent;
 
 
 /**
-	\brief Generate labels of fragment ions on a branch of a lasso peptide (direction down).
+	\brief Generate labels of fragment ions on a branch of a branch-cyclic peptide (direction down).
 	\param nterminal if true only nterminal fragment ions are drawn, if false only cterminal fragment ions are drawn
 	\param rotationid id of a sequence rotation
 	\param labels labels of fragment ions
@@ -38,7 +38,7 @@ void generateBranchLabelsDown(bool nterminal, int rotationid, unordered_set<cIon
 
 
 /**
-	\brief Generate labels of fragment ions on a branch of a lasso peptide (direction up).
+	\brief Generate labels of fragment ions on a branch of a branch-cyclic peptide (direction up).
 	\param nterminal if true only nterminal fragment ions are drawn, if false only cterminal fragment ions are drawn
 	\param rotationid id of a sequence rotation
 	\param labels labels of fragment ions
@@ -55,7 +55,7 @@ void generateBranchLabelsUp(bool nterminal, int rotationid, unordered_set<cIonLa
 
 
 /**
-	\brief Visualization of a lasso peptide.
+	\brief Visualization of a branch-cyclic peptide.
 */
 class cLassoWidget : public QWidget
 {
@@ -78,6 +78,28 @@ public:
 	void initialize(cParameters* parameters, cTheoreticalSpectrum* theoreticalspectrum);
 
 
+	/**
+		\brief Export peptide into a PDF or a PS file.
+		\param filename filename
+		\param postscript if true then PS file is generated instead of PDF
+	*/ 
+	void exportToPDF(QString filename, bool postscript);
+
+
+	/**
+		\brief Export peptide scene into a PNG file.
+		\param filename filename
+	*/ 
+	void exportToPNG(QString filename);
+
+
+	/**
+		\brief Export peptide scene into a SVG file.
+		\param filename filename
+	*/ 
+	void exportToSVG(QString filename);
+
+
 protected:
 
 
@@ -89,6 +111,8 @@ protected:
 
 
 private:
+
+	void paint(QPainter& painter);
 
 	cParameters* parameters;
 	cTheoreticalSpectrum* theoreticalspectrum;

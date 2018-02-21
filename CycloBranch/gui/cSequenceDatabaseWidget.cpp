@@ -1,5 +1,6 @@
 #include "gui/cSequenceDatabaseWidget.h"
 #include "gui/cMainThread.h"
+#include "gui/cEventFilter.h"
 
 #include <QTableWidget>
 #include <QTableWidgetItem>
@@ -13,12 +14,15 @@
 #include <QComboBox>
 #include <QProgressDialog>
 #include <QCheckBox>
+#include <QKeyEvent>
+#include <QIcon>
 
 
 cSequenceDatabaseWidget::cSequenceDatabaseWidget(QWidget* parent) {
 	this->parent = parent;
 
 	setWindowTitle("Sequence Database Editor");
+	setWindowIcon(QIcon(":/images/icons/26.png"));
 
 	insertrow = new QPushButton(tr("Add Row"));
 	insertrow->setToolTip("Add a new row.");
@@ -71,11 +75,6 @@ cSequenceDatabaseWidget::cSequenceDatabaseWidget(QWidget* parent) {
 	mainlayout->addWidget(database);
 	mainlayout->addLayout(buttons);
 
-	progress = new QProgressDialog(this);
-	progress->setCancelButton(0);
-	progress->setMinimumDuration(1000);
-	progress->setWindowModality(Qt::WindowModal);
-
 	connect(database->horizontalHeader(), SIGNAL(sectionDoubleClicked(int)), this, SLOT(headerItemDoubleClicked(int)));
 	connect(database, SIGNAL(itemChanged(QTableWidgetItem *)), this, SLOT(itemChanged(QTableWidgetItem *)));
 	connect(insertrow, SIGNAL(released()), this, SLOT(addRow()));
@@ -90,7 +89,13 @@ cSequenceDatabaseWidget::cSequenceDatabaseWidget(QWidget* parent) {
 	resize(1280, 700);
 
 	databasefile = "";
-	lastdir = "./SequenceDatabases/";
+
+	#if OS_TYPE == WIN
+		lastdir = "./SequenceDatabases/";
+	#else
+		lastdir = linuxinstalldir + "SequenceDatabases/";
+	#endif
+
 	sequences.clear();
 }
 
@@ -113,7 +118,6 @@ cSequenceDatabaseWidget::~cSequenceDatabaseWidget() {
 	delete database;
 	delete buttons;
 	delete mainlayout;
-	delete progress;
 }
 
 
@@ -122,35 +126,51 @@ void cSequenceDatabaseWidget::closeEvent(QCloseEvent *event) {
 }
 
 
+void cSequenceDatabaseWidget::insertRow(int peptidetypeindex, QString sequence) {
+	addRow();
+	((QComboBox *)(database->cellWidget(database->rowCount() - 1, 1)))->setCurrentIndex(peptidetypeindex);
+	database->item(database->rowCount() - 1, 5)->setText(sequence);
+
+	for (int i = 0; i < database->columnCount(); i++) {
+		database->resizeColumnToContents(i);
+	}
+}
+
+
 void cSequenceDatabaseWidget::deleteTable(bool enableprogress) {
+	QProgressDialog* progress;
+	cEventFilter filter;
+	int rowcount = database->rowCount();
+
 	if (enableprogress) {
-		progress->setLabelText("Clearing the table...");
-		progress->setMinimum(0);
-		progress->setValue(1);
-		progress->setMaximum(database->rowCount());
-		progress->show();
+		progress = new QProgressDialog("Clearing the table...", /*"Cancel"*/0, 0, rowcount, this);
+		progress->installEventFilter(&filter);
+		progress->setMinimumDuration(0);
+		progress->setWindowModality(Qt::WindowModal);
+		progress->setValue(0);
 	}
 
-	for (int i = 0; i < database->rowCount(); i++) {
-		for (int j = 0; j < database->columnCount(); j++) {
-			if ((j == 0) || (j == 1) || (j == 10)) {
-				delete database->cellWidget(i, j);
-			}
-			else {
-				delete database->item(i, j);
-			}		
-		}
+	widgetitemallocator.reset();
 
-		if (enableprogress && ((i == 0) || ((i - 1)/100 != i/100))) {
+	for (int i = 0; i < rowcount; i++) {
+		delete database->cellWidget(rowcount - i - 1, 0);
+		delete database->cellWidget(rowcount - i - 1, 1);
+		delete database->cellWidget(rowcount - i - 1, 10);
+
+		if (enableprogress) {
 			progress->setValue(i);
+			//if (progress->wasCanceled()) {
+			//	break;
+			//}
 		}
 	}
 
-	if (enableprogress) {
-		progress->setValue(database->rowCount());
-		progress->hide();
-	}
 	database->setRowCount(0);
+
+	if (enableprogress) {
+		progress->setValue(rowcount);
+		delete progress;
+	}
 }
 
 
@@ -160,7 +180,7 @@ void cSequenceDatabaseWidget::removeRow(int row) {
 			delete database->cellWidget(row, i);
 		}
 		else {
-			delete database->item(row, i);
+			database->takeItem(row, i);
 		}
 	}
 	database->removeRow(row);
@@ -187,7 +207,7 @@ bool cSequenceDatabaseWidget::checkTable() {
 }
 
 
-bool cSequenceDatabaseWidget::checkFormula(int row, string& summary) {
+bool cSequenceDatabaseWidget::checkFormula(int row, const string& summary) {
 	cSummaryFormula formula;
 	string errmsg;
 	formula.setFormula(summary);
@@ -209,20 +229,27 @@ bool cSequenceDatabaseWidget::checkFormula(int row, string& summary) {
 
 
 bool cSequenceDatabaseWidget::checkSequence(int row) {
+
+	if (database->item(row, 5)->text().toStdString().compare("") == 0) {
+		return true;
+	}
+
 	regex rx;
 	// [^\\[\\]]+ is used instead of .+ to prevent from a too complex regex error
 	switch ((peptideType)((QComboBox *)database->cellWidget(row, 1))->currentIndex())
 	{
 	case linear:
-	case cyclic:
 	case linearpolysaccharide:
 		rx = "^\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])*$";
 		break;
+	case cyclic:
+		rx = "^\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])+$";
+		break;
 	case branched:
-		rx = "^\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])*\\\\\\(\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])*\\\\\\)\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])*$";
+		rx = "^\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])*\\\\\\(\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])+\\\\\\)\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])*$";
 		break;
 	case lasso:
-		rx = "(^(\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])*)?\\\\\\(\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])*\\\\\\)\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])*$|^\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])*\\\\\\(\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])*\\\\\\)(\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])*)?$)";
+		rx = "(^(\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])*)?\\\\\\(\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])+\\\\\\)\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])*$|^\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])*\\\\\\(\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])+\\\\\\)(\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])*)?$)";
 		break;
 	case other:
 	default:
@@ -245,7 +272,7 @@ bool cSequenceDatabaseWidget::checkSequence(int row) {
 			return false;
 		}
 	}
-	catch (std::regex_error& e) {
+	catch (regex_error& e) {
 		QMessageBox msgBox;
 		QString errstr = "Row no. ";
 		errstr += to_string(row + 1).c_str();
@@ -263,6 +290,13 @@ bool cSequenceDatabaseWidget::checkSequence(int row) {
 }
 
 
+void cSequenceDatabaseWidget::keyPressEvent(QKeyEvent *event) {
+    if(event->key() == Qt::Key_Escape) {
+		hide();
+    }
+}
+
+
 void cSequenceDatabaseWidget::closeWindow() {
 	hide();
 }
@@ -270,9 +304,9 @@ void cSequenceDatabaseWidget::closeWindow() {
 
 void cSequenceDatabaseWidget::loadDatabase() {
 	QString filename = QFileDialog::getOpenFileName(this, tr("Load the Database of Sequences"), lastdir, tr("Database of Sequences (*.txt)"));
-	lastdir = filename;
 
-	if (filename.toStdString().compare("") != 0) {
+	if (!filename.isEmpty()) {
+		lastdir = filename;
 
 		databasefile = filename;
 		save->setText(QString("  Save '") + QString(databasefile.toStdString().substr(databasefile.toStdString().rfind('/') + 1, databasefile.toStdString().size()).c_str()) + QString("'  "));
@@ -291,11 +325,11 @@ void cSequenceDatabaseWidget::loadDatabase() {
 			sequences.clear();
 			sequences.loadFromPlainTextStream(inputstream);
 
-			progress->setLabelText("Loading the Sequence Databatase...");
-			progress->setMinimum(0);
-			progress->setValue(1);
-			progress->setMaximum(sequences.size());
-			progress->show();
+			QProgressDialog progress("Loading the Sequence Databatase...", /*"Cancel"*/0, 0, sequences.size(), this);
+			cEventFilter filter;
+			progress.installEventFilter(&filter);
+			progress.setMinimumDuration(0);
+			progress.setWindowModality(Qt::WindowModal);
 
             cSummaryFormula formula;
             database->setRowCount(sequences.size());
@@ -310,34 +344,48 @@ void cSequenceDatabaseWidget::loadDatabase() {
                 combo->setCurrentIndex((int)sequences[i].getPeptideType());
                 database->setCellWidget(i, 1, combo);
 
-                database->setItem(i, 2, new QTableWidgetItem(sequences[i].getName().c_str()));
-                database->setItem(i, 3, new QTableWidgetItem(sequences[i].getSummaryFormula().c_str()));
-                formula.setFormula(sequences[i].getSummaryFormula());
-                database->setItem(i, 4, new QTableWidgetItem());
+                database->setItem(i, 2, widgetitemallocator.getNewItem());
+				database->item(i, 2)->setText(sequences[i].getName().c_str());
+
+                database->setItem(i, 3, widgetitemallocator.getNewItem());
+				database->item(i, 3)->setText(sequences[i].getSummaryFormula().c_str());
+
+				formula.setFormula(sequences[i].getSummaryFormula());
+                database->setItem(i, 4, widgetitemallocator.getNewItem());
                 database->item(i, 4)->setData(Qt::DisplayRole, formula.getMass());
-                database->setItem(i, 5, new QTableWidgetItem(sequences[i].getSequence().c_str()));
-                database->setItem(i, 6, new QTableWidgetItem(sequences[i].getNTterminalModification().c_str()));
-                database->setItem(i, 7, new QTableWidgetItem(sequences[i].getCTterminalModification().c_str()));
-                database->setItem(i, 8, new QTableWidgetItem(sequences[i].getBranchModification().c_str()));
-                database->setItem(i, 9, new QTableWidgetItem(sequences[i].getReference().c_str()));
+
+				database->setItem(i, 5, widgetitemallocator.getNewItem());
+				database->item(i, 5)->setText(sequences[i].getSequence().c_str());
+
+				database->setItem(i, 6, widgetitemallocator.getNewItem());
+				database->item(i, 6)->setText(sequences[i].getNTterminalModification().c_str());
+
+				database->setItem(i, 7, widgetitemallocator.getNewItem());
+				database->item(i, 7)->setText(sequences[i].getCTterminalModification().c_str());
+
+				database->setItem(i, 8, widgetitemallocator.getNewItem());
+				database->item(i, 8)->setText(sequences[i].getBranchModification().c_str());
+
+				database->setItem(i, 9, widgetitemallocator.getNewItem());
+				database->item(i, 9)->setText(sequences[i].getReference().c_str());
 
                 database->setCellWidget(i, 10, new QLabel(sequences[i].getNameWithReferenceAsHTMLString().c_str()));
                 ((QLabel *)database->cellWidget(i, 10))->setTextFormat(Qt::RichText);
                 ((QLabel *)database->cellWidget(i, 10))->setTextInteractionFlags(Qt::TextBrowserInteraction);
                 ((QLabel *)database->cellWidget(i, 10))->setOpenExternalLinks(true);
 
-                if ((i == 0) || ((i - 1)/100 != i/100)) {
-                    progress->setValue(i);
-                }
-            }
+				progress.setValue(i);
+				//if (progress.wasCanceled()) {
+				//	break;
+				//}
+			}
 
 			for (int i = 0; i < database->columnCount(); i++) {
 				database->resizeColumnToContents(i);
 			}
 
-			progress->setValue(sequences.size());
-			progress->hide();
-			
+			progress.setValue(sequences.size());
+						
 		}
 
 		inputstream.close();
@@ -365,18 +413,17 @@ void cSequenceDatabaseWidget::saveDatabase() {
 	}
 	else {
 
-		progress->setLabelText("Saving the Sequence Databatase...");
-		progress->setMinimum(0);
-		progress->setMaximum(100);
-		progress->setValue(1);
-		progress->show();
+		QProgressDialog progress("Saving the Sequence Databatase...", /*"Cancel"*/0, 0, database->rowCount(), this);
+		cEventFilter filter;
+		progress.installEventFilter(&filter);
+		progress.setMinimumDuration(0);
+		progress.setWindowModality(Qt::WindowModal);
 
 		cSequence seq;
 		sequences.clear();
+		string s;
 
 		removeEmptyRows();
-
-		progress->setMaximum(database->rowCount());
 
 		for (int i = 0; i < database->rowCount(); i++) {
 			seq.clear();
@@ -390,28 +437,35 @@ void cSequenceDatabaseWidget::saveDatabase() {
 					seq.setPeptideType((peptideType)(((QComboBox *)database->cellWidget(i,j))->currentIndex()));
 					break;
 				case 2:
-					seq.setName(database->item(i,j)->text().toStdString());
+					s = database->item(i,j)->text().toStdString();
+					seq.setName(removeWhiteSpacesExceptSpaces(s));
 					break;
 				case 3:
-					seq.setSummaryFormula(database->item(i,j)->text().toStdString());
+					s = database->item(i,j)->text().toStdString();
+					seq.setSummaryFormula(removeWhiteSpacesExceptSpaces(s));
 					break;
 				case 4:
 					// nothing to do
 					break;
 				case 5:
-					seq.setSequence(database->item(i,j)->text().toStdString());
+					s = database->item(i,j)->text().toStdString();
+					seq.setSequence(removeWhiteSpacesExceptSpaces(s));
 					break;
 				case 6:
-					seq.setNTterminalModification(database->item(i,j)->text().toStdString());
+					s = database->item(i,j)->text().toStdString();
+					seq.setNTterminalModification(removeWhiteSpacesExceptSpaces(s));
 					break;
 				case 7:
-					seq.setCTterminalModification(database->item(i,j)->text().toStdString());
+					s = database->item(i,j)->text().toStdString();
+					seq.setCTterminalModification(removeWhiteSpacesExceptSpaces(s));
 					break;
 				case 8:
-					seq.setBranchModification(database->item(i,j)->text().toStdString());
+					s = database->item(i,j)->text().toStdString();
+					seq.setBranchModification(removeWhiteSpacesExceptSpaces(s));
 					break;
 				case 9:
-					seq.setReference(database->item(i,j)->text().toStdString());
+					s = database->item(i,j)->text().toStdString();
+					seq.setReference(removeWhiteSpacesExceptSpaces(s));
 					break;
 				default:
 					break;
@@ -419,15 +473,15 @@ void cSequenceDatabaseWidget::saveDatabase() {
 			}
 			sequences.push_back(seq);
 			
-			if ((i == 0) || ((i - 1)/100 != i/100)) {
-				progress->setValue(i);
-			}
+			progress.setValue(i);
+			//if (progress.wasCanceled()) {
+			//	break;
+			//}
 		}
 
 		sequences.storeToPlainTextStream(outputstream);
 
-		progress->setValue(database->rowCount());
-		progress->hide();
+		progress.setValue(progress.maximum());
 		
 	}
 	outputstream.close();
@@ -440,10 +494,11 @@ void cSequenceDatabaseWidget::saveDatabaseAs() {
 		return;
 	}
 
-	QString filename = QFileDialog::getSaveFileName(this, tr("Save Settings As..."), lastdir, tr("Database of Sequences (*.txt)"));
-	lastdir = filename;
+	QString filename = QFileDialog::getSaveFileName(this, tr("Save the Database of Sequences As..."), lastdir, tr("Database of Sequences (*.txt)"));
 
-	if (filename.toStdString().compare("") != 0) {
+	if (!filename.isEmpty()) {
+		lastdir = filename;
+	
 		databasefile = filename;
 		save->setText(QString("  Save '") + QString(databasefile.toStdString().substr(databasefile.toStdString().rfind('/') + 1, databasefile.toStdString().size()).c_str()) + QString("'  "));
 		saveDatabase();
@@ -465,14 +520,14 @@ void cSequenceDatabaseWidget::addRow() {
 	combo->setCurrentIndex((int)other);
 	database->setCellWidget(row, 1, combo);
 
-	database->setItem(row, 2, new QTableWidgetItem());
-	database->setItem(row, 3, new QTableWidgetItem());
-	database->setItem(row, 4, new QTableWidgetItem());
-	database->setItem(row, 5, new QTableWidgetItem());
-	database->setItem(row, 6, new QTableWidgetItem());
-	database->setItem(row, 7, new QTableWidgetItem());
-	database->setItem(row, 8, new QTableWidgetItem());
-	database->setItem(row, 9, new QTableWidgetItem());
+	database->setItem(row, 2, widgetitemallocator.getNewItem());
+	database->setItem(row, 3, widgetitemallocator.getNewItem());
+	database->setItem(row, 4, widgetitemallocator.getNewItem());
+	database->setItem(row, 5, widgetitemallocator.getNewItem());
+	database->setItem(row, 6, widgetitemallocator.getNewItem());
+	database->setItem(row, 7, widgetitemallocator.getNewItem());
+	database->setItem(row, 8, widgetitemallocator.getNewItem());
+	database->setItem(row, 9, widgetitemallocator.getNewItem());
 
 	database->setCellWidget(row, 10, new QLabel());
 	((QLabel *)database->cellWidget(row, 10))->setTextFormat(Qt::RichText);

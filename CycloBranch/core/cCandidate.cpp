@@ -1,6 +1,7 @@
 #include "core/cCandidate.h"
 
 #include "core/cCandidateSet.h"
+#include "core/cDeNovoGraph.h"
 
 
 void cCandidate::updateInternalComposition() {
@@ -96,7 +97,7 @@ void cCandidate::attachAllBranches(cCandidate& candidate, cCandidateSet& result,
 }
 
 
-void cCandidate::getPartialRotations(string& composition, vector<string>& rotations) {
+void cCandidate::getPartialRotations(const string& composition, vector<string>& rotations) {
 	cBrick b;
 	string s;
 	vector<string> bricks;
@@ -134,7 +135,7 @@ void cCandidate::getPartialRotations(string& composition, vector<string>& rotati
 }
 
 
-void cCandidate::getPartialLassoRotations(string& composition, vector<cCandidate>& lassorotations, int branchstart, int branchend) {
+void cCandidate::getPartialLassoRotations(const string& composition, vector<cCandidate>& lassorotations, int branchstart, int branchend) {
 	cBrick b;
 	string s;
 	bool leftbracketput;
@@ -188,16 +189,20 @@ cCandidate::cCandidate() {
 
 
 cCandidate::cCandidate(vector<string>& composition, vector<nodeEdge>& path, int startmodifID, int endmodifID, int middlemodifID, int middlepos) {
+	clear();
 	setCandidate(composition, path, startmodifID, endmodifID, middlemodifID, middlepos);
 }
 
 
 cCandidate::cCandidate(vector<string>& composition, vector<nodeEdge>& path, int startmodifID, int endmodifID, int middlemodifID, int branchstart, int branchend) {
+	clear();
 	setCandidate(composition, path, startmodifID, endmodifID, middlemodifID, branchstart, branchend);
 }
 
 
 void cCandidate::setCandidate(vector<string>& composition, vector<nodeEdge>& path, int startmodifID, int endmodifID, int middlemodifID, int middlepos) {
+	clear();
+
 	this->composition = composition;
 	updateInternalComposition();
 
@@ -222,6 +227,8 @@ void cCandidate::setCandidate(vector<string>& composition, vector<nodeEdge>& pat
 
 
 void cCandidate::setCandidate(vector<string>& composition, vector<nodeEdge>& path, int startmodifID, int endmodifID, int middlemodifID, int branchstart, int branchend) {
+	clear();
+
 	this->composition = composition;
 	updateInternalComposition();
 
@@ -245,6 +252,13 @@ void cCandidate::clear() {
 	branchend = -1;
 	path.clear();
 	name = "";
+
+	realpeptidename = "";
+	acronympeptidename = "";
+	acronyms.clear();
+	backboneacronyms.clear();
+	branchacronyms.clear();
+	stringpath = "";
 }
 
 
@@ -284,22 +298,53 @@ void cCandidate::revertComposition() {
 }
 
 
-void cCandidate::prepareBranchedCandidate(cCandidateSet& result, peptideType peptidetype, bool* terminatecomputation) {
+void cCandidate::prepareBranchedCandidates(cCandidateSet& result, peptideType peptidetype, bool* terminatecomputation) {
 	cCandidate c;
 	result.getSet().clear();
 
-	// branching is unknown
-	if ((branchstart == -1) && (branchend == -1)) {
-		attachAllBranches(*this, result, peptidetype, terminatecomputation);
-	}
-	// branching is determined by a modification of the T-branch
-	else {
-		attachSubBranchCandidates(*this, result, peptidetype, terminatecomputation);
+	if (peptidetype == lasso) {
+
+		// just one from startmodifid and middlemodifid may be > 0 (checked in getCandidatesIter)
+		// endmodifid is always 0 because precursor_ion is not used in initializeFragmentIonsForDeNovoGraphOfLassoPeptides
+		// startmodifid is always N-terminal because only b-ions are used in the de novo graph
+
+		if ((startmodifID > 0) && (composition.size() > 0)) {
+			middlemodifID = startmodifID;
+			startmodifID = 0;
+			branchstart = 0;
+			
+			cBrick b;
+			vector<int> intvector;
+			b.setComposition(composition[0], false);
+			b.explodeToIntComposition(intvector);
+			branchend = (int)intvector.size() - 1;
+		}
+
+		// branch-cyclic series types D,H
+		if ((branchstart == -1) || (branchstart == 0)) {
+			for (int i = 1; i < numberofinternalbricks - 1; i++) {
+				c = *this;
+				c.branchstart = 0;
+				c.branchend = i;
+				result.getSet().insert(c);
+			}
+		}
+
+		// branch-cyclic series types B,C,F,G
+		if ((branchend == -1) || (branchend == numberofinternalbricks - 1)) {
+			for (int i = 1; i < numberofinternalbricks - 1; i++) {
+				c = *this;
+				c.branchstart = i;
+				c.branchend = numberofinternalbricks - 1;
+				result.getSet().insert(c);
+			}
+		}
+
 	}
 
 	if (peptidetype == branched) {
 
-		// below, middlemodifID is always > 0 because branchstart == 0 (or branchend == 0)
+		// below, middlemodifID is always > 0 because branchstart == 0 (or branchend == numberofinternalbricks - 1)
 
 		// startmodifID and middlemodifID collide on the first detected combination of bricks
 		if (branchstart == 0) {
@@ -337,6 +382,15 @@ void cCandidate::prepareBranchedCandidate(cCandidateSet& result, peptideType pep
 			}
 		}
 
+	}
+
+	// branching is unknown
+	if ((branchstart == -1) && (branchend == -1)) {
+		attachAllBranches(*this, result, peptidetype, terminatecomputation);
+	}
+	// branching is determined by a modification of the T-branch
+	else {
+		attachSubBranchCandidates(*this, result, peptidetype, terminatecomputation);
 	}
 
 }
@@ -710,7 +764,7 @@ double cCandidate::getPrecursorMass(cBricksDatabase& brickdatabasewithcombinatio
 		mass += brickdatabasewithcombinations[bricks[i] - 1].getMass();
 	}
 	
-	return mass;
+	return (parameters->precursorcharge > 0)?mass:mass-2*Hplus;
 }
 
 
@@ -948,6 +1002,13 @@ void cCandidate::store(ofstream& os) {
 	storeString(internalcomposition, os);
 
 	os.write((char *)&numberofinternalbricks, sizeof(int));
+
+	storeString(realpeptidename, os);
+	storeString(acronympeptidename, os);
+	storeStringVector(acronyms, os);
+	storeStringVector(backboneacronyms, os);
+	storeStringVector(branchacronyms, os);
+	storeString(stringpath, os);
 }
 
 
@@ -971,6 +1032,13 @@ void cCandidate::load(ifstream& is) {
 	loadString(internalcomposition, is);
 
 	is.read((char *)&numberofinternalbricks, sizeof(int));
+
+	loadString(realpeptidename, is);
+	loadString(acronympeptidename, is);
+	loadStringVector(acronyms, is);
+	loadStringVector(backboneacronyms, is);
+	loadStringVector(branchacronyms, is);
+	loadString(stringpath, is);
 }
 
 
@@ -984,6 +1052,166 @@ string& cCandidate::getName() {
 }
 
 
+void cCandidate::setAcronyms(cBricksDatabase& bricksdatabase) {
+	vector<int> bricks;
+	cBrick b;
+	b.clear();
+	b.setComposition(internalcomposition, false);
+	b.explodeToIntComposition(bricks);
+
+	acronyms.clear();
+	for (int i = 0; i < (int)bricks.size(); i++) {
+		acronyms.push_back(bricksdatabase[bricks[i] - 1].getAcronymsAsString());
+	}
+}
+
+
+void cCandidate::setBackboneAcronyms(cBricksDatabase& bricksdatabase) {
+	vector<int> bricks;
+	cBrick b;
+	b.clear();
+	b.setComposition(internalcomposition, false);
+	b.explodeToIntComposition(bricks);
+
+	backboneacronyms.clear();
+	for (int i = 0; i < (int)bricks.size(); i++) {
+		if ((branchstart >= 0) && (branchend >= 0) && ((i <= branchstart) || (i > branchend))) {
+			backboneacronyms.push_back(bricksdatabase[bricks[i] - 1].getAcronymsAsString());
+		}
+	}
+}
+
+
+void cCandidate::setBranchAcronyms(cBricksDatabase& bricksdatabase) {
+	vector<int> bricks;
+	cBrick b;
+	b.clear();
+	b.setComposition(internalcomposition, false);
+	b.explodeToIntComposition(bricks);
+
+	branchacronyms.clear();
+	for (int i = 0; i < (int)bricks.size(); i++) {
+		if ((branchstart >= 0) && (branchend >= 0) && (i > branchstart) && (i <= branchend)) {
+			branchacronyms.push_back(bricksdatabase[bricks[i] - 1].getAcronymsAsString());
+		}
+	}
+}
+
+
+vector<string>& cCandidate::getAcronyms() {
+	return acronyms;
+}
+
+
+vector<string>& cCandidate::getBackboneAcronyms() {
+	return backboneacronyms;
+}
+
+
+vector<string>& cCandidate::getBranchAcronyms() {
+	return branchacronyms;
+}
+
+
+void cCandidate::setPath(cDeNovoGraph& graph, cParameters* parameters) {
+	cDeNovoGraphNode* currentnode;
+	cDeNovoGraphNode* targetnode;
+	cEdge* currentedge;
+	stringpath = "";
+	for (int i = 0; i < (int)path.size(); i++) {
+		currentnode = &graph[path[i].nodeid];
+		currentedge = &((*currentnode)[path[i].edgeid]);
+		targetnode = &graph[currentedge->targetnode];
+
+		stringpath += to_string(currentnode->getMZRatio());
+		stringpath += " -> ";
+		stringpath += to_string(targetnode->getMZRatio());
+		stringpath += " using brick(s): ";
+		if (currentedge->composition.compare("0") == 0) {
+			stringpath += "none";
+		}
+		else {
+			stringpath += graph.getBrickDatabaseWithCombinations()->getAcronymName(currentedge->composition, true);
+		}
+
+		stringpath += " (mass difference: " + to_string(currentedge->massdifference) + ", ";
+		stringpath += "source intensity: " + to_string(currentnode->getIntensity()) + ", ";
+		stringpath += "target intensity: " + to_string(targetnode->getIntensity()) + ", ";
+		stringpath += "ppm error: " + to_string(currentedge->ppmerror) + ", ";
+		stringpath += "source charge: " + to_string(currentedge->sourcecharge) + ", ";
+		stringpath += "target charge: " + to_string(currentedge->targetcharge);
+		if ((parameters->peptidetype == branched) || (parameters->peptidetype == lasso)) {
+			if (currentedge->middlemodifID > 0) {
+				stringpath += ", branch modification: " + parameters->searchedmodifications[currentedge->middlemodifID].name;
+			}
+		}
+		if (currentedge->endmodifID > 0) {
+			stringpath += ", terminal modification: " + parameters->searchedmodifications[currentedge->endmodifID].name;
+		}
+		//path += currentedge->printSourceAnnotation(fragmentdefinitions);
+		//path += "->";
+		//path += currentedge->printTargetAnnotation(fragmentdefinitions);
+		stringpath += ")<br/>";
+	}	
+}
+
+
+string& cCandidate::getPathAsString() {
+	return stringpath;
+}
+
+
+void cCandidate::setRealPeptideName(cBricksDatabase& bricksdatabase, peptideType peptidetype) {
+	switch (peptidetype)
+	{
+	case linear:
+	case cyclic:
+	case linearpolysaccharide:
+		realpeptidename = bricksdatabase.getRealName(internalcomposition);
+		break;
+	case branched:
+	case lasso:
+		realpeptidename = getRealNameTComposition(bricksdatabase);
+		break;
+	case other:
+	default:
+		realpeptidename = "";
+		break;
+	}
+}
+
+
+void cCandidate::setAcronymPeptideNameWithHTMLReferences(cBricksDatabase& bricksdatabase, peptideType peptidetype) {
+	switch (peptidetype)
+	{
+	case linear:
+	case cyclic:
+	case linearpolysaccharide:
+		acronympeptidename = bricksdatabase.getAcronymName(internalcomposition, true);
+		break;
+	case branched:
+	case lasso:
+		acronympeptidename = getAcronymsTComposition(bricksdatabase);
+		break;
+	case other:
+	default:
+		acronympeptidename = "";
+		break;
+	}
+}
+
+
+string& cCandidate::getRealPeptideName() {
+	return realpeptidename;
+}
+
+
+string& cCandidate::getAcronymPeptideNameWithHTMLReferences() {
+	return acronympeptidename;
+}
+
+
 bool operator == (cCandidate const& a, cCandidate const& b) {
 	return ((cCandidate &)a).isEqualTo((cCandidate &)b); 
 }
+

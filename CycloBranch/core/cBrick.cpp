@@ -1,7 +1,7 @@
 #include "core/cBrick.h"
 
 
-int getNumberOfBricks(string& composition) {
+int getNumberOfBricks(const string& composition) {
 	if (composition.size() == 0) {
 		return 0;
 	}
@@ -64,7 +64,7 @@ string& cBrick::getName() {
 }
 
 
-void cBrick::setName(string& name) {
+void cBrick::setName(const string& name) {
 	this->name = name;
 }
 
@@ -103,7 +103,7 @@ string cBrick::getReverseComposition() {
 }
 
 
-double cBrick::getMass() {
+double cBrick::getMass() const {
 	return mass;
 }
 
@@ -113,7 +113,7 @@ void cBrick::setMass(double mass) {
 }
 
 
-void cBrick::setComposition(string& composition, bool normalize) {
+void cBrick::setComposition(const string& composition, bool normalize) {
 	this->composition = composition;
 	if (normalize) {
 		normalizeComposition();
@@ -121,12 +121,12 @@ void cBrick::setComposition(string& composition, bool normalize) {
 }
 
 
-void cBrick::setSummary(string& summary) {
+void cBrick::setSummary(const string& summary) {
 	this->summary = summary;
 }
 
 
-void cBrick::setAcronyms(string& acronyms) {
+void cBrick::setAcronyms(const string& acronyms) {
 	this->acronyms.clear();
 	string s = "";
 	int i = 0;
@@ -148,7 +148,7 @@ void cBrick::setAcronyms(string& acronyms) {
 }
 
 
-void cBrick::setReferences(string& references) {
+void cBrick::setReferences(const string& references) {
 	this->references.clear();
 	string s = "";
 	int i = 0;
@@ -194,7 +194,7 @@ void cBrick::explodeToIntComposition(vector<int>& bricks) {
 	int item;
 	int first = 0;
 	int last = (int)composition.find('-');
-	while (last != string::npos) {
+	while (last != (int)string::npos) {
 		item = atoi(composition.substr(first, last - first).c_str());
 		bricks.push_back(item);
 		first = last+1;
@@ -214,7 +214,7 @@ void cBrick::explodeToStringComposition(vector<string>& bricks) {
 	string item;
 	int first = 0;
 	int last = (int)composition.find('-');
-	while (last != string::npos) {
+	while (last != (int)string::npos) {
 		item = composition.substr(first, last - first);
 		bricks.push_back(item);
 		first = last+1;
@@ -259,7 +259,7 @@ string cBrick::getFirstAcronymAsString() {
 
 string cBrick::getAcronymsWithReferencesAsHTMLString() {
 	if (acronyms.size() != references.size()) {
-		return "";
+		return getAcronymsAsString();
 	}
 
 	string s = "";
@@ -339,8 +339,7 @@ string cBrick::getAcronymsWithReferencesAsHTMLString() {
 			}
 
 		}
-		catch (std::regex_error& e) {
-			e;
+		catch (regex_error& /*e*/) {
 			// nothing to do
 		}
 
