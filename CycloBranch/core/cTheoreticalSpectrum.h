@@ -244,11 +244,11 @@ public:
 	int compareBranchCyclic(cPeaksList& sortedpeaklist, cBricksDatabase& bricksdatabasewithcombinations, bool writedescription, regex& sequencetag, regex& searchedsequence);
 
 
-#if POLYKETIDE_SIDEROPHORES == 1
+#if OLIGOKETIDES == 1
 
 
 	/**
-		\brief Compare the theoretical spectrum of a linear polyketide siderophore with an experimental spectrum.
+		\brief Compare the theoretical spectrum of a linear oligoketide with an experimental spectrum.
 		\param sortedpeaklist reference to an experimental peaklist
 		\param bricksdatabasewithcombinations reference to a database of bricks with combinations of bricks
 		\param writedescription if true then string descriptions of peaks are filled
@@ -256,11 +256,11 @@ public:
 		\param searchedsequence reference to a regex of a searched sequence
 		\retval int number theoretical peaks generated; -2 when the sequence tag does not match the peptide sequence candidate
 	*/ 
-	int compareLinearPolyketideSiderophore(cPeaksList& sortedpeaklist, cBricksDatabase& bricksdatabasewithcombinations, bool writedescription, regex& sequencetag, regex& searchedsequence);
+	int compareLinearOligoketide(cPeaksList& sortedpeaklist, cBricksDatabase& bricksdatabasewithcombinations, bool writedescription, regex& sequencetag, regex& searchedsequence);
 
 
 	/**
-		\brief Compare the theoretical spectrum of a cyclic polyketide siderophore with an experimental spectrum.
+		\brief Compare the theoretical spectrum of a cyclic oligoketide with an experimental spectrum.
 		\param sortedpeaklist reference to an experimental peaklist
 		\param bricksdatabasewithcombinations reference to a database of bricks with combinations of bricks
 		\param writedescription if true then string descriptions of peaks are filled
@@ -268,7 +268,7 @@ public:
 		\param searchedsequence reference to a regex of a searched sequence
 		\retval int number theoretical peaks generated; -2 when the sequence tag does not match the peptide sequence candidate
 	*/ 
-	int compareCyclicPolyketideSiderophore(cPeaksList& sortedpeaklist, cBricksDatabase& bricksdatabasewithcombinations, bool writedescription, regex& sequencetag, regex& searchedsequence);
+	int compareCyclicOligoketide(cPeaksList& sortedpeaklist, cBricksDatabase& bricksdatabasewithcombinations, bool writedescription, regex& sequencetag, regex& searchedsequence);
 
 
 #endif
@@ -351,7 +351,7 @@ public:
 		\param leftresiduelosstype a residue type of the leftmost building block
 		\param hasfirstblockartificial true when the first block is artificial, false otherwise
 	*/ 
-	void generateNTerminalFragmentIons(int maxcharge, int& peaklistrealsize, vector<int>& intcomposition, eFragmentIonType fragmentiontype, cBricksDatabase& bricksdatabase, bool writedescription, int rotationid, vector<splitSite>& splittingsites, vector<fragmentDescription>& searchedmodifications, ePeptideType peptidetype, TRotationInfo* trotation = 0, eResidueLossType leftresiduelosstype = water, bool hasfirstblockartificial = false);
+	void generateNTerminalFragmentIons(int maxcharge, int& peaklistrealsize, vector<int>& intcomposition, eFragmentIonType fragmentiontype, cBricksDatabase& bricksdatabase, bool writedescription, int rotationid, vector<splitSite>& splittingsites, vector<fragmentDescription>& searchedmodifications, ePeptideType peptidetype, TRotationInfo* trotation = 0, eResidueLossType leftresiduelosstype = h2o_loss, bool hasfirstblockartificial = false);
 	
 
 	/**
@@ -370,7 +370,7 @@ public:
 		\param rightresiduelosstype a residue type of the rightmost building block
 		\param haslastblockartificial true when the last block is artificial, false otherwise
 	*/ 
-	void generateCTerminalFragmentIons(int maxcharge, int& peaklistrealsize, vector<int>& intcomposition, eFragmentIonType fragmentiontype, cBricksDatabase& bricksdatabase, bool writedescription, int rotationid, vector<splitSite>& splittingsites, vector<fragmentDescription>& searchedmodifications, ePeptideType peptidetype, TRotationInfo* trotation = 0, eResidueLossType rightresiduelosstype = water, bool haslastblockartificial = false);
+	void generateCTerminalFragmentIons(int maxcharge, int& peaklistrealsize, vector<int>& intcomposition, eFragmentIonType fragmentiontype, cBricksDatabase& bricksdatabase, bool writedescription, int rotationid, vector<splitSite>& splittingsites, vector<fragmentDescription>& searchedmodifications, ePeptideType peptidetype, TRotationInfo* trotation = 0, eResidueLossType rightresiduelosstype = h2o_loss, bool haslastblockartificial = false);
 
 
 	/**

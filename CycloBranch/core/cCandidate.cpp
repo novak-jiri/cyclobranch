@@ -326,6 +326,7 @@ void cCandidate::prepareBranchedCandidates(cCandidateSet& result, ePeptideType p
 				c = *this;
 				c.branchstart = 0;
 				c.branchend = i;
+				c.revertComposition();
 				result.getSet().insert(c);
 			}
 		}
@@ -754,18 +755,18 @@ double cCandidate::getPrecursorMass(cBricksDatabase& brickdatabasewithcombinatio
 	case branchcyclic:
 		mass = parameters->fragmentdefinitions[cyclic_precursor_ion].massdifference + parameters->searchedmodifications[middlemodifID].massdifference;
 		break;
-#if POLYKETIDE_SIDEROPHORES == 1
-	case linearpolyketide:
-		switch (getResidueLossType(brickdatabasewithcombinations))
+#if OLIGOKETIDES == 1
+	case linearoligoketide:
+		switch (getKetidePrecursorType(brickdatabasewithcombinations))
 		{
-		case water:
-			mass = parameters->fragmentdefinitions[linear_polyketide_precursor_ion_h_oh].massdifference;
+		case ketide_precursor_h2o:
+			mass = parameters->fragmentdefinitions[linear_oligoketide_precursor_ion_h_oh].massdifference;
 			break;
-		case h2:
-			mass = parameters->fragmentdefinitions[linear_polyketide_precursor_ion_h_h].massdifference;
+		case ketide_precursor_h2:
+			mass = parameters->fragmentdefinitions[linear_oligoketide_precursor_ion_h_h].massdifference;
 			break;
-		case h2o2:
-			mass = parameters->fragmentdefinitions[linear_polyketide_precursor_ion_oh_oh].massdifference;
+		case ketide_precursor_h2o2:
+			mass = parameters->fragmentdefinitions[linear_oligoketide_precursor_ion_oh_oh].massdifference;
 			break;
 		default:
 			mass = 0;
@@ -773,8 +774,8 @@ double cCandidate::getPrecursorMass(cBricksDatabase& brickdatabasewithcombinatio
 		}
 		mass += parameters->searchedmodifications[startmodifID].massdifference + parameters->searchedmodifications[endmodifID].massdifference;
 		break;
-	case cyclicpolyketide:
-		mass = parameters->fragmentdefinitions[cyclic_polyketide_precursor_ion].massdifference;
+	case cyclicoligoketide:
+		mass = parameters->fragmentdefinitions[cyclic_oligoketide_precursor_ion].massdifference;
 		break;
 #endif
 	case other:
@@ -1021,17 +1022,17 @@ cSummaryFormula cCandidate::getSummaryFormula(cParameters& parameters, ePeptideT
 	case branchcyclic:
 		formula.addFormula(parameters.searchedmodifications[middlemodifID].summary);
 		break;
-#if POLYKETIDE_SIDEROPHORES == 1
-	case linearpolyketide:
-		switch (getResidueLossType(parameters.bricksdatabase))
+#if OLIGOKETIDES == 1
+	case linearoligoketide:
+		switch (getKetidePrecursorType(parameters.bricksdatabase))
 		{
-		case water:
+		case ketide_precursor_h2o:
 			summary = "H2O";
 			break;
-		case h2:
+		case ketide_precursor_h2:
 			summary = "H2";
 			break;
-		case h2o2:
+		case ketide_precursor_h2o2:
 			summary = "H2O2";
 			break;
 		default:
@@ -1046,7 +1047,7 @@ cSummaryFormula cCandidate::getSummaryFormula(cParameters& parameters, ePeptideT
 		formula.addFormula(parameters.searchedmodifications[startmodifID].summary);
 		formula.addFormula(parameters.searchedmodifications[endmodifID].summary);
 		break;
-	case cyclicpolyketide:
+	case cyclicoligoketide:
 		break;
 #endif
 	case other:
@@ -1255,9 +1256,9 @@ void cCandidate::setRealPeptideName(cBricksDatabase& bricksdatabase, ePeptideTyp
 	{
 	case linear:
 	case cyclic:
-#if POLYKETIDE_SIDEROPHORES == 1
-	case linearpolyketide:
-	case cyclicpolyketide:
+#if OLIGOKETIDES == 1
+	case linearoligoketide:
+	case cyclicoligoketide:
 #endif
 	case linearpolysaccharide:
 		realpeptidename = bricksdatabase.getRealName(internalcomposition);
@@ -1279,9 +1280,9 @@ void cCandidate::setAcronymPeptideNameWithHTMLReferences(cBricksDatabase& bricks
 	{
 	case linear:
 	case cyclic:
-#if POLYKETIDE_SIDEROPHORES == 1
-	case linearpolyketide:
-	case cyclicpolyketide:
+#if OLIGOKETIDES == 1
+	case linearoligoketide:
+	case cyclicoligoketide:
 #endif
 	case linearpolysaccharide:
 		acronympeptidename = bricksdatabase.getAcronymName(internalcomposition, true);
@@ -1308,39 +1309,56 @@ string& cCandidate::getAcronymPeptideNameWithHTMLReferences() {
 }
 
 
-eResidueLossType cCandidate::getResidueLossType(cBricksDatabase& bricksdatabase) {
+eKetidePrecursorType cCandidate::getKetidePrecursorType(cBricksDatabase& bricksdatabase) {
 	cBrick b;
 	b.setComposition(internalcomposition, false);
 	vector<int> intcomposition;
 	b.explodeToIntComposition(intcomposition);
 
-	int hydrogens = 0;
-	int hydroxyls = 0;
+	/*
+	if (intcomposition.size() == 0) {
+		return ketide_precursor_h2o;
+	}
+
+	if ((bricksdatabase[intcomposition[0] - 1].getResidueLossType() == h2_loss) && (bricksdatabase[intcomposition.back() - 1].getResidueLossType() == h2_loss)) {
+		return ketide_precursor_h2;
+	}
+
+	if ((bricksdatabase[intcomposition[0] - 1].getResidueLossType() == h2o_loss) && (bricksdatabase[intcomposition.back() - 1].getResidueLossType() == h2o_loss)) {
+		return ketide_precursor_h2o2;
+	}
+
+	return ketide_precursor_h2o;
+	*/
+
+	int h2_blocks = 0;
+	int h2o_blocks = 0;
 	for (int i = 0; i < (int)intcomposition.size(); i++) {
-		if (bricksdatabase[intcomposition[i] - 1].getResidueLossType() == h2) {
-			hydrogens++;
+		if (bricksdatabase[intcomposition[i] - 1].getResidueLossType() == h2_loss) {
+			h2_blocks++;
 		}
-		if (bricksdatabase[intcomposition[i] - 1].getResidueLossType() == h2o2) {
-			hydroxyls++;
+		if (bricksdatabase[intcomposition[i] - 1].getResidueLossType() == h2o_loss) {
+			h2o_blocks++;
 		}
 	}
 
-	if (hydrogens == hydroxyls) {
-		return water;
+	if (h2_blocks == h2o_blocks) {
+		return ketide_precursor_h2o;
 	}
 
-	if (hydrogens > hydroxyls) {
-		return h2;
+	if (h2_blocks > h2o_blocks) {
+		return ketide_precursor_h2;
 	}
 
-	return h2o2;
+	return ketide_precursor_h2o2;
 }
 
 
-#if POLYKETIDE_SIDEROPHORES == 1
+#if OLIGOKETIDES == 1
 
 
-bool cCandidate::checkPolyketideSequence(cBricksDatabase& bricksdatabase, ePeptideType peptidetype) {
+bool cCandidate::checkKetideSequence(cBricksDatabase& bricksdatabase, ePeptideType peptidetype) {
+	
 	cBrick b;
 	b.setComposition(internalcomposition, false);
 	vector<int> intcomposition;
@@ -1350,17 +1368,31 @@ bool cCandidate::checkPolyketideSequence(cBricksDatabase& bricksdatabase, ePepti
 		return false;
 	}
 
+	/*
+	// all blocks are water loss
+	int h2o_blocks = 0;
+	for (int i = 0; i < (int)intcomposition.size(); i++) {
+		if (bricksdatabase[intcomposition[i] - 1].getResidueLossType() == h2o_loss) {
+			h2o_blocks++;
+		}
+	}
+	if (h2o_blocks == (int)intcomposition.size()) {
+		return true;
+	}
+	*/
+
 	bool hasfirstblockartificial = hasFirstBrickArtificial(bricksdatabase);
 	bool haslastblockartificial = hasLastBrickArtificial(bricksdatabase);
 
-	// cyclic polyketide has always an even number of blocks
-	if ((peptidetype == cyclicpolyketide) && !hasfirstblockartificial && !haslastblockartificial && ((int)intcomposition.size() % 2 == 1)) {
+	// cyclic oligoketide has always an even number of blocks
+	if ((peptidetype == cyclicoligoketide) && !hasfirstblockartificial && !haslastblockartificial && ((int)intcomposition.size() % 2 == 1)) {
 		return false;
 	}
 
+	// even blocks are water loss and odd blocks are h2 loss, or vice versa
 	for (int i = (hasfirstblockartificial?2:1); i < (haslastblockartificial?(int)intcomposition.size()-1:(int)intcomposition.size()); i++) {
-		if (!(((bricksdatabase[intcomposition[i] - 1].getResidueLossType() == h2) && (bricksdatabase[intcomposition[i - 1] - 1].getResidueLossType() == h2o2))
-			|| ((bricksdatabase[intcomposition[i] - 1].getResidueLossType() == h2o2) && (bricksdatabase[intcomposition[i - 1] - 1].getResidueLossType() == h2)))) {
+		if (!(((bricksdatabase[intcomposition[i] - 1].getResidueLossType() == h2_loss) && (bricksdatabase[intcomposition[i - 1] - 1].getResidueLossType() == h2o_loss))
+			|| ((bricksdatabase[intcomposition[i] - 1].getResidueLossType() == h2o_loss) && (bricksdatabase[intcomposition[i - 1] - 1].getResidueLossType() == h2_loss)))) {
 				return false;
 		}
 	}
@@ -1376,7 +1408,7 @@ eResidueLossType cCandidate::getLeftResidueType(cBricksDatabase& bricksdatabase)
 	b.explodeToIntComposition(intcomposition);
 
 	if (intcomposition.size() == 0) {
-		return water;
+		return h2o_loss;
 	}
 
 	return bricksdatabase[intcomposition[0] - 1].getResidueLossType();
@@ -1390,14 +1422,14 @@ eResidueLossType cCandidate::getRightResidueType(cBricksDatabase& bricksdatabase
 	b.explodeToIntComposition(intcomposition);
 
 	if (intcomposition.size() == 0) {
-		return water;
+		return h2o_loss;
 	}
 
 	return bricksdatabase[intcomposition.back() - 1].getResidueLossType();
 }
 
 
-bool cCandidate::checkPolyketideBlocks(cBricksDatabase& bricksdatabase, ePeptideType peptidetype) {
+bool cCandidate::checkKetideBlocks(cBricksDatabase& bricksdatabase, ePeptideType peptidetype) {
 	cBrick b;
 	b.setComposition(internalcomposition, false);
 	vector<int> intcomposition;
@@ -1410,25 +1442,31 @@ bool cCandidate::checkPolyketideBlocks(cBricksDatabase& bricksdatabase, ePeptide
 	bool hasfirstblockartificial = hasFirstBrickArtificial(bricksdatabase);
 	bool haslastblockartificial = hasLastBrickArtificial(bricksdatabase);
 
-	// cyclic polyketide has always an even number of blocks
-	if ((peptidetype == cyclicpolyketide) && !hasfirstblockartificial && !haslastblockartificial && ((int)intcomposition.size() % 2 == 1)) {
+	// cyclic oligoketide has always an even number of blocks
+	if ((peptidetype == cyclicoligoketide) && !hasfirstblockartificial && !haslastblockartificial && ((int)intcomposition.size() % 2 == 1)) {
 		return false;
 	}
 
-	int hydrogens = 0;
-	int hydroxyls = 0;
+	int h2_blocks = 0;
+	int h2o_blocks = 0;
 	for (int i = (hasfirstblockartificial?1:0); i < (haslastblockartificial?(int)intcomposition.size()-1:(int)intcomposition.size()); i++) {
-		if (bricksdatabase[intcomposition[i] - 1].getResidueLossType() == h2) {
-			hydrogens++;
+		if (bricksdatabase[intcomposition[i] - 1].getResidueLossType() == h2_loss) {
+			h2_blocks++;
 		}
-		if (bricksdatabase[intcomposition[i] - 1].getResidueLossType() == h2o2) {
-			hydroxyls++;
+		if (bricksdatabase[intcomposition[i] - 1].getResidueLossType() == h2o_loss) {
+			h2o_blocks++;
 		}
 	}
 
-	if ((hydrogens == hydroxyls) || (hydrogens == hydroxyls + 1) || (hydrogens + 1 == hydroxyls)) {
+	if ((h2_blocks == h2o_blocks) || (h2_blocks == h2o_blocks + 1) || (h2_blocks + 1 == h2o_blocks)) {
 		return true;
 	}
+
+	/*
+	if ((h2_blocks == 0) && (h2o_blocks == (int)intcomposition.size())) {
+		return true;
+	}
+	*/
 
 	return false;
 }

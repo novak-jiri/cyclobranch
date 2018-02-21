@@ -129,13 +129,11 @@ void cPeaksList::loadFromBAFStream(ifstream &stream) {
 
 void cPeaksList::loadFromIBDStream(cImzMLItem& imzmlitem, ifstream &ibdstream) {
 	unsigned long long start;
-	unsigned long long end;
 	double value;
 
 	peaks.resize(imzmlitem.mzlength/8);
 
 	start = imzmlitem.mzstart;
-	end = imzmlitem.mzstart + imzmlitem.mzlength;
 	ibdstream.seekg(start, ibdstream.beg);
 	for (int i = 0; i < (int)imzmlitem.mzlength/8; i++) {
 		if (ibdstream.good()) {
@@ -149,7 +147,6 @@ void cPeaksList::loadFromIBDStream(cImzMLItem& imzmlitem, ifstream &ibdstream) {
 	}
 
 	start = imzmlitem.intensitystart;
-	end = imzmlitem.intensitystart + imzmlitem.intensitylength;
 	ibdstream.seekg(start, ibdstream.beg);
 	for (int i = 0; i < (int)imzmlitem.intensitylength/8; i++) {
 		if (ibdstream.good()) {
@@ -160,6 +157,19 @@ void cPeaksList::loadFromIBDStream(cImzMLItem& imzmlitem, ifstream &ibdstream) {
 
 	x = imzmlitem.x;
 	y = imzmlitem.y;
+}
+
+
+void cPeaksList::storeToIBDStream(ofstream &ibdstream) {
+	// store m/z values
+	for (int i = 0; i < (int)peaks.size(); i++) {
+		ibdstream.write((char *)&(peaks[i].mzratio), 8);
+	}
+
+	// store intensities
+	for (int i = 0; i < (int)peaks.size(); i++) {
+		ibdstream.write((char *)&(peaks[i].intensity), 8);
+	}
 }
 
 
@@ -559,12 +569,30 @@ void cPeaksList::maxHighestPeaksInWindow(int maximumnumberofpeaksinwindow, doubl
 }
 
 
-double cPeaksList::getMaximumIntensityFromMZInterval(double minmz, double maxmz) {
+double cPeaksList::getMaximumIntensityFromMZInterval(double minmz, double maxmz, bool hidematched, bool hideunmatched, ePeptideType peptidetype, bool hidescrambled) {
 	double intensity = 0;
 	for (int i = 0; i < (int)peaks.size(); i++) {
+
+		// skip peaks which are out of range
 		if ((peaks[i].mzratio < minmz) || (peaks[i].mzratio > maxmz)) {
 			continue;
 		}
+
+		// skip unmatched peaks if selected
+		if (hideunmatched && (peaks[i].matched <= 0)) {
+			continue;
+		}
+
+		// skip matched peaks if selected
+		if (hidematched && (peaks[i].matched > 0)) {
+			continue;
+		}
+
+		// skip scrambled peaks if selected
+		if ((peptidetype == cyclic) && hidescrambled && peaks[i].scrambled) {
+			continue;
+		}
+
 		if (peaks[i].intensity > intensity) {
 			intensity = peaks[i].intensity;
 		}

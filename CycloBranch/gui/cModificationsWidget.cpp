@@ -56,8 +56,8 @@ cModificationsWidget::cModificationsWidget(QWidget* parent) {
 	rowsfilterbutton->setToolTip("Filter Search Results");
 	rowsfilterbutton->setMinimumWidth(50);
 
-	rowsfilterclearbutton = new QPushButton("Clear");
-	rowsfilterclearbutton->setToolTip("Clear Form and Reset Search Results");
+	rowsfilterclearbutton = new QPushButton("Reset");
+	rowsfilterclearbutton->setToolTip("Reset Search Results");
 	rowsfilterclearbutton->setMinimumWidth(50);
 	rowsfilterclearbutton->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_R));
 
@@ -178,7 +178,8 @@ void cModificationsWidget::deleteTable(bool enableprogress) {
 	int rowcount = database->rowCount();
 
 	if (enableprogress) {
-		progress = new QProgressDialog("Clearing the table...", /*"Cancel"*/0, 0, rowcount, this);
+		progress = new QProgressDialog("Clearing the table...", 0, 0, rowcount, this);
+		progress->setMinimumWidth(250);
 		progress->installEventFilter(&filter);
 		progress->setMinimumDuration(0);
 		progress->setWindowModality(Qt::WindowModal);
@@ -193,9 +194,6 @@ void cModificationsWidget::deleteTable(bool enableprogress) {
 
 		if (enableprogress) {
 			progress->setValue(i);
-			//if (progress->wasCanceled()) {
-			//	break;
-			//}
 		}
 	}
 	
@@ -345,7 +343,8 @@ void cModificationsWidget::loadDatabase() {
 
 			deleteTable(true);
 
-			QProgressDialog progress("Loading Modifications...", /*"Cancel"*/0, 0, (int)modifications.size(), this);
+			QProgressDialog progress("Loading Modifications...", "Cancel", 0, (int)modifications.size(), this);
+			progress.setMinimumWidth(250);
 			cEventFilter filter;
 			progress.installEventFilter(&filter);
 			progress.setMinimumDuration(0);
@@ -380,9 +379,13 @@ void cModificationsWidget::loadDatabase() {
 				database->setCellWidget(i, 5, checkbox);
 
 				progress.setValue(i);
-				//if (progress.wasCanceled()) {
-				//	break;
-				//}
+				if (progress.wasCanceled()) {
+					deleteTable(true);
+					modifications.clear();
+					databasefile = "";
+					save->setText(" Save ");
+					break;
+				}
 			}
 
 			for (int i = 0; i < database->columnCount(); i++) {
@@ -420,7 +423,8 @@ bool cModificationsWidget::saveDatabase() {
 	}
 	else {
 
-		QProgressDialog progress("Saving Modifications...", /*"Cancel"*/0, 0, database->rowCount(), this);
+		QProgressDialog progress("Saving Modifications...", 0, 0, database->rowCount(), this);
+		progress.setMinimumWidth(250);
 		cEventFilter filter;
 		progress.installEventFilter(&filter);
 		progress.setMinimumDuration(0);
@@ -467,9 +471,6 @@ bool cModificationsWidget::saveDatabase() {
 			modifications.push_back(modification);
 
 			progress.setValue(i);
-			//if (progress.wasCanceled()) {
-			//	break;
-			//}
 		}
 
 		storeModificationsToPlainTextStream(outputstream, modifications);
@@ -580,13 +581,15 @@ void cModificationsWidget::filterRows() {
 	bool match;
 	int i, j;
 
-	QProgressDialog progress("Updating...", /*"Cancel"*/0, 0, rowcount, this);
+	QProgressDialog progress("Updating...", "Cancel", 0, rowcount, this);
+	progress.setMinimumWidth(250);
 	cEventFilter filter;
 	progress.installEventFilter(&filter);
 	progress.setMinimumDuration(0);
 	progress.setWindowModality(Qt::WindowModal);
 
 	for (i = 0; i < rowcount; i++) {
+
 		match = false;
 		for (j = 0; j < database->columnCount(); j++) {
 			// ignore non-text fields
@@ -601,6 +604,12 @@ void cModificationsWidget::filterRows() {
 		}
 		database->setRowHidden(i, !match);
 		progress.setValue(i);
+
+		if (progress.wasCanceled()) {
+			resetFilter();
+			break;
+		}
+
 	}
 
 	progress.setValue(rowcount);
@@ -611,7 +620,8 @@ void cModificationsWidget::resetFilter() {
 	rowsfilterline->setText("");
 	int rowcount = database->rowCount();
 
-	QProgressDialog progress("Updating...", /*"Cancel"*/0, 0, rowcount, this);
+	QProgressDialog progress("Updating...", 0, 0, rowcount, this);
+	progress.setMinimumWidth(250);
 	cEventFilter filter;
 	progress.installEventFilter(&filter);
 	progress.setMinimumDuration(0);

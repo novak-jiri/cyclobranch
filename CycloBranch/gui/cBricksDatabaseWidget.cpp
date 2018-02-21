@@ -68,8 +68,8 @@ cBricksDatabaseWidget::cBricksDatabaseWidget(QWidget* parent) {
 	rowsfilterbutton->setToolTip("Filter Search Results");
 	rowsfilterbutton->setMinimumWidth(50);
 
-	rowsfilterclearbutton = new QPushButton("Clear");
-	rowsfilterclearbutton->setToolTip("Clear Form and Reset Search Results");
+	rowsfilterclearbutton = new QPushButton("Reset");
+	rowsfilterclearbutton->setToolTip("Reset Search Results");
 	rowsfilterclearbutton->setMinimumWidth(50);
 	rowsfilterclearbutton->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_R));
 
@@ -198,7 +198,8 @@ void cBricksDatabaseWidget::deleteTable(bool enableprogress) {
 	int rowcount = database->rowCount();
 
 	if (enableprogress) {
-		progress = new QProgressDialog("Clearing the table...", /*"Cancel"*/0, 0, rowcount, this);
+		progress = new QProgressDialog("Clearing the table...", 0, 0, rowcount, this);
+		progress->setMinimumWidth(250);
 		progress->installEventFilter(&filter);
 		progress->setMinimumDuration(0);
 		progress->setWindowModality(Qt::WindowModal);
@@ -213,9 +214,6 @@ void cBricksDatabaseWidget::deleteTable(bool enableprogress) {
 
         if (enableprogress) {
             progress->setValue(i);
-            //if (progress->wasCanceled()) {
-            //    break;
-            //}
         }
     }
 	
@@ -380,7 +378,8 @@ void cBricksDatabaseWidget::loadDatabase() {
 
 			deleteTable(true);
 
-			QProgressDialog progress("Loading the Databatase of Building Blocks...", /*"Cancel"*/0, 0, bricks.size(), this);
+			QProgressDialog progress("Loading the Database of Building Blocks...", "Cancel", 0, bricks.size(), this);
+			progress.setMinimumWidth(250);
 			cEventFilter filter;
 			progress.installEventFilter(&filter);
 			progress.setMinimumDuration(0);
@@ -412,9 +411,14 @@ void cBricksDatabaseWidget::loadDatabase() {
 				((QLabel *)database->cellWidget(i, 6))->setOpenExternalLinks(true);
 
 				progress.setValue(i);
-				//if (progress.wasCanceled()) {
-				//	break;
-				//}
+				if (progress.wasCanceled()) {
+					deleteTable(true);
+					bricks.clear();
+					databasefile = "";
+					save->setText(" Save ");
+					break;
+				}
+			
 			}
 
 			for (int i = 0; i < database->columnCount(); i++) {
@@ -452,7 +456,8 @@ bool cBricksDatabaseWidget::saveDatabase() {
 	}
 	else {
 
-		QProgressDialog progress("Saving the Databatase of Building Blocks...", /*"Cancel"*/0, 0, database->rowCount(), this);
+		QProgressDialog progress("Saving the Database of Building Blocks...", 0, 0, database->rowCount(), this);
+		progress.setMinimumWidth(250);
 		cEventFilter filter;
 		progress.installEventFilter(&filter);
 		progress.setMinimumDuration(0);
@@ -504,9 +509,6 @@ bool cBricksDatabaseWidget::saveDatabase() {
 			bricks.push_back(b);
 
 			progress.setValue(i);
-			//if (progress.wasCanceled()) {
-			//	break;
-			//}
 		}
 
 		bricks.storeToPlainTextStream(outputstream);
@@ -622,13 +624,15 @@ void cBricksDatabaseWidget::filterRows() {
 	bool match;
 	int i, j;
 
-	QProgressDialog progress("Updating...", /*"Cancel"*/0, 0, rowcount, this);
+	QProgressDialog progress("Updating...", "Cancel", 0, rowcount, this);
+	progress.setMinimumWidth(250);
 	cEventFilter filter;
 	progress.installEventFilter(&filter);
 	progress.setMinimumDuration(0);
 	progress.setWindowModality(Qt::WindowModal);
 
 	for (i = 0; i < rowcount; i++) {
+
 		match = false;
 		for (j = 0; j < database->columnCount(); j++) {
 			// ignore non-text fields
@@ -643,6 +647,12 @@ void cBricksDatabaseWidget::filterRows() {
 		}
 		database->setRowHidden(i, !match);
 		progress.setValue(i);
+
+		if (progress.wasCanceled()) {
+			resetFilter();
+			break;
+		}
+
 	}
 
 	progress.setValue(rowcount);
@@ -653,7 +663,8 @@ void cBricksDatabaseWidget::resetFilter() {
 	rowsfilterline->setText("");
 	int rowcount = database->rowCount();
 
-	QProgressDialog progress("Updating...", /*"Cancel"*/0, 0, rowcount, this);
+	QProgressDialog progress("Updating...", 0, 0, rowcount, this);
+	progress.setMinimumWidth(250);
 	cEventFilter filter;
 	progress.installEventFilter(&filter);
 	progress.setMinimumDuration(0);

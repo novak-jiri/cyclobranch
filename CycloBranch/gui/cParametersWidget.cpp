@@ -63,9 +63,9 @@ cParametersWidget::cParametersWidget(QWidget* parent) {
 	peptidetype->addItem(tr("Cyclic"));
 	peptidetype->addItem(tr("Branched"));
 	peptidetype->addItem(tr("Branch-cyclic"));
-#if POLYKETIDE_SIDEROPHORES == 1
-	peptidetype->addItem(tr("Linear oligoketide siderophore"));
-	peptidetype->addItem(tr("Cyclic oligoketide siderophore"));
+#if OLIGOKETIDES == 1
+	peptidetype->addItem(tr("Linear oligoketide"));
+	peptidetype->addItem(tr("Cyclic oligoketide"));
 #endif
 	peptidetype->addItem(tr("Linear polysaccharide (beta version)"));
 	//peptidetype->addItem(tr("Other"));
@@ -666,7 +666,7 @@ void cParametersWidget::peaklistButtonReleased() {
 	#if OS_TYPE != WIN
 		QString filename = QFileDialog::getOpenFileName(this, tr("Select Peaklist..."), lastdirselectpeaklist, tr("Peak Lists (*.txt *.mgf *.mzML *.mzXML *.imzML)"));
 	#else
-		QString filename = QFileDialog::getOpenFileName(this, tr("Select Peaklist..."), lastdirselectpeaklist, tr("Peak Lists (*.txt *.mgf *.mzML *.mzXML *.baf *.mis *.imzML)"));
+		QString filename = QFileDialog::getOpenFileName(this, tr("Select Peaklist..."), lastdirselectpeaklist, tr("Peak Lists (*.txt *.mgf *.mzML *.mzXML *.baf *.imzML *.mis)"));
 	#endif
 
 	if (!filename.isEmpty()) {
@@ -796,12 +796,12 @@ bool cParametersWidget::updateParameters() {
 		case branchcyclic:
 			start = a_ion;
 			break;
-#if POLYKETIDE_SIDEROPHORES == 1
-		case linearpolyketide:
+#if OLIGOKETIDES == 1
+		case linearoligoketide:
 			start = l1h_ion;
 			break;
-		case cyclicpolyketide:
-			start = l0h_ion;
+		case cyclicoligoketide:
+			start = l1h_ion; // l0h_ion;
 			break;
 #endif
 		case linearpolysaccharide:
@@ -888,12 +888,12 @@ void cParametersWidget::restoreParameters() {
 		case branchcyclic:
 			start = a_ion;
 			break;
-#if POLYKETIDE_SIDEROPHORES == 1
-		case linearpolyketide:
+#if OLIGOKETIDES == 1
+		case linearoligoketide:
 			start = l1h_ion;
 			break;
-		case cyclicpolyketide:
-			start = l0h_ion;
+		case cyclicoligoketide:
+			start = l1h_ion; // l0h_ion;
 			break;
 #endif
 		case linearpolysaccharide:
@@ -974,8 +974,8 @@ void cParametersWidget::updateSettingsWhenPeptideTypeChanged(int index) {
 		searchedsequenceCtermmodif->setDisabled(true);
 		searchedsequenceTmodif->setDisabled(false);
 		break;
-#if POLYKETIDE_SIDEROPHORES == 1
-	case linearpolyketide:
+#if OLIGOKETIDES == 1
+	case linearoligoketide:
 		modificationsline->setDisabled(false);
 		modificationsbutton->setDisabled(false);
 		cyclicnterminus->setDisabled(true);
@@ -985,7 +985,7 @@ void cParametersWidget::updateSettingsWhenPeptideTypeChanged(int index) {
 		searchedsequenceCtermmodif->setDisabled(false);
 		searchedsequenceTmodif->setDisabled(true);
 		break;
-	case cyclicpolyketide:
+	case cyclicoligoketide:
 		modificationsline->setDisabled(true);
 		modificationsbutton->setDisabled(true);
 		cyclicnterminus->setDisabled(true);
@@ -1176,13 +1176,13 @@ void cParametersWidget::resetFragmentIonTypes() {
 			start = a_ion;
 			end = z_ion_dehydrated_and_deamidated;
 			break;
-#if POLYKETIDE_SIDEROPHORES == 1
-		case linearpolyketide:
+#if OLIGOKETIDES == 1
+		case linearoligoketide:
 			start = l1h_ion;
 			end = r2oh_ion_co_loss_dehydrated_and_deamidated;
 			break;
-		case cyclicpolyketide:
-			start = l0h_ion;
+		case cyclicoligoketide:
+			start = l1h_ion; // l0h_ion;
 			end = l2h_ion_co_loss_dehydrated_and_deamidated;
 			break;
 #endif
@@ -1223,16 +1223,16 @@ void cParametersWidget::resetFragmentIonTypes() {
 					fragmentiontypes->getList()->item(i-start)->setSelected(true);
 				}
 				break;
-#if POLYKETIDE_SIDEROPHORES == 1
-			case linearpolyketide:
+#if OLIGOKETIDES == 1
+			case linearoligoketide:
 				if (((eFragmentIonType)i == l1h_ion) || ((eFragmentIonType)i == l2h_ion) || ((eFragmentIonType)i == r1h_ion) || ((eFragmentIonType)i == r2h_ion) ||
 					((eFragmentIonType)i == l1oh_ion) || ((eFragmentIonType)i == l2oh_ion) || ((eFragmentIonType)i == r1oh_ion) || ((eFragmentIonType)i == r2oh_ion)
 					) {
 					fragmentiontypes->getList()->item(i-start)->setSelected(true);
 				}
 				break;
-			case cyclicpolyketide:
-				if (((eFragmentIonType)i == l0h_ion) || ((eFragmentIonType)i == l1h_ion) || ((eFragmentIonType)i == l2h_ion)) {
+			case cyclicoligoketide:
+				if (/*((eFragmentIonType)i == l0h_ion) ||*/ ((eFragmentIonType)i == l1h_ion) || ((eFragmentIonType)i == l2h_ion)) {
 					fragmentiontypes->getList()->item(i-start)->setSelected(true);
 				}
 				break;

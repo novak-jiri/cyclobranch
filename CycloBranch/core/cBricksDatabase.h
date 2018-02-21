@@ -134,9 +134,10 @@ public:
 	/**
 		\brief Get the mass of a composition of bricks.
 		\param combarray reference to an input integer vector of ids
+		\param numberofbasicbricks number of basic building blocks
 		\retval double cumulative mass of the bricks in the \a combarray
 	*/ 
-	double getMassOfComposition(vector<int>& combarray);
+	double getMassOfComposition(vector<int>& combarray, int numberofbasicbricks);
 
 
 	/**
@@ -223,15 +224,15 @@ public:
 	void load(ifstream& is);
 
 
-#if POLYKETIDE_SIDEROPHORES == 1
+#if OLIGOKETIDES == 1
 
 
 	/**
-		\brief Check if the numbers of hydrogen and hydroxyl blocks are correct.
+		\brief Check if the numbers of H2 loss and H2O loss blocks are correct.
 		\param brickseries a tested combination of building blocks
 		\retval bool true when the numbers of blocks are correct
 	*/ 
-	bool checkPolyketideBlocks(cBrick& brickseries);
+	bool checkKetideBlocks(cBrick& brickseries);
 
 
 #endif

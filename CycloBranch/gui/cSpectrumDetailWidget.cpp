@@ -121,13 +121,13 @@ string cSpectrumDetailWidget::getDetailsAsHTMLString() {
 				s += "<br/><br/>";
 				s += "Branch Modification: " + bname + "<br/>";
 				break;
-#if POLYKETIDE_SIDEROPHORES == 1
-			case linearpolyketide:
+#if OLIGOKETIDES == 1
+			case linearoligoketide:
 				s += "<br/><br/>";
 				s += "Left Modification: " + lname + "<br/>";
 				s += "Right Modification: " + rname + "<br/>";
 				break;
-			case cyclicpolyketide:
+			case cyclicoligoketide:
 				s += "<br/>";
 				break;
 #endif
@@ -435,6 +435,7 @@ cSpectrumDetailWidget::~cSpectrumDetailWidget() {
 		delete textbrowser;
 
 		//QProgressDialog progress("Clearing the peaklist...", /*"Cancel"*/0, 0, peakstable->rowCount(), this);
+		//progress.setMinimumWidth(250);
 		//cEventFilter filter;
 		//progress.installEventFilter(&filter);
 		//progress.setMinimumDuration(0);
@@ -482,14 +483,14 @@ cSpectrumDetailWidget::~cSpectrumDetailWidget() {
 			switch (parameters->peptidetype)
 			{
 			case linear:
-#if POLYKETIDE_SIDEROPHORES == 1
-			case linearpolyketide:
+#if OLIGOKETIDES == 1
+			case linearoligoketide:
 #endif
 				delete linearwidget;
 				break;
 			case cyclic:
-#if POLYKETIDE_SIDEROPHORES == 1
-			case cyclicpolyketide:
+#if OLIGOKETIDES == 1
+			case cyclicoligoketide:
 #endif
 				delete cyclicwidget;
 				break;
@@ -556,14 +557,14 @@ void cSpectrumDetailWidget::prepareToShow(ePeptideType peptidetype) {
 			switch (peptidetype)
 			{
 			case linear:
-#if POLYKETIDE_SIDEROPHORES == 1
-			case linearpolyketide:
+#if OLIGOKETIDES == 1
+			case linearoligoketide:
 #endif
 				linearwidget = new cLinearWidget();
 				break;
 			case cyclic:
-#if POLYKETIDE_SIDEROPHORES == 1
-			case cyclicpolyketide:
+#if OLIGOKETIDES == 1
+			case cyclicoligoketide:
 #endif
 				cyclicwidget = new cCyclicWidget();
 				break;
@@ -778,8 +779,8 @@ void cSpectrumDetailWidget::prepareToShow(ePeptideType peptidetype) {
 		if (parameters && ((parameters->mode == denovoengine) || (parameters->mode == singlecomparison) || (parameters->mode == databasesearch))) {
 
 			// cyclic
-#if POLYKETIDE_SIDEROPHORES == 1
-			if (theoreticalspectrum && ((parameters->peptidetype == cyclic) || (parameters->peptidetype == cyclicpolyketide))) {
+#if OLIGOKETIDES == 1
+			if (theoreticalspectrum && ((parameters->peptidetype == cyclic) || (parameters->peptidetype == cyclicoligoketide))) {
 #else
 			if (theoreticalspectrum && (parameters->peptidetype == cyclic)) {
 #endif
@@ -880,14 +881,14 @@ void cSpectrumDetailWidget::prepareToShow(ePeptideType peptidetype) {
 			switch (peptidetype)
 			{
 			case linear:
-#if POLYKETIDE_SIDEROPHORES == 1
-			case linearpolyketide:
+#if OLIGOKETIDES == 1
+			case linearoligoketide:
 #endif
 				hsplitter1->addWidget(linearwidget);
 				break;
 			case cyclic:
-#if POLYKETIDE_SIDEROPHORES == 1
-			case cyclicpolyketide:
+#if OLIGOKETIDES == 1
+			case cyclicoligoketide:
 #endif
 				hsplitter1->addWidget(cyclicwidget);
 				break;
@@ -932,14 +933,14 @@ void cSpectrumDetailWidget::prepareToShow(ePeptideType peptidetype) {
 				switch (peptidetype)
 				{
 				case linear:
-#if POLYKETIDE_SIDEROPHORES == 1
-				case linearpolyketide:
+#if OLIGOKETIDES == 1
+				case linearoligoketide:
 #endif
 					linearwidget->initialize(parameters, theoreticalspectrum);
 					break;
 				case cyclic:
-#if POLYKETIDE_SIDEROPHORES == 1
-				case cyclicpolyketide:
+#if OLIGOKETIDES == 1
+				case cyclicoligoketide:
 #endif
 					cyclicwidget->initialize(parameters, theoreticalspectrum);
 					break;
@@ -1159,6 +1160,7 @@ void cSpectrumDetailWidget::preparePeaksTable() {
 	peakstable->setRowCount(thpeakscount + theoreticalspectrum->getUnmatchedPeaks()->size());
 
 	QProgressDialog progress("Preparing the peaklist...", /*"Cancel"*/0, 0, thpeakscount + theoreticalspectrum->getUnmatchedPeaks()->size(), parent);
+	progress.setMinimumWidth(250);
 	cEventFilter filter;
 	progress.installEventFilter(&filter);
 	progress.setMinimumDuration(0);
@@ -1371,8 +1373,8 @@ void cSpectrumDetailWidget::exportPeptide() {
 
 		switch ((ePeptideType)parameters->peptidetype) {
 			case linear:
-#if POLYKETIDE_SIDEROPHORES == 1
-			case linearpolyketide:
+#if OLIGOKETIDES == 1
+			case linearoligoketide:
 #endif
 				rx = ".+\\.pdf$";
 				if (!selected && (regex_search(filename.toStdString(), rx))) {
@@ -1401,8 +1403,8 @@ void cSpectrumDetailWidget::exportPeptide() {
 				}
 				break;
 			case cyclic:
-#if POLYKETIDE_SIDEROPHORES == 1
-			case cyclicpolyketide:
+#if OLIGOKETIDES == 1
+			case cyclicoligoketide:
 #endif
 				rx = ".+\\.pdf$";
 				if (!selected && (regex_search(filename.toStdString(), rx))) {
@@ -1522,12 +1524,14 @@ void cSpectrumDetailWidget::exportTableToCSV() {
 	
 	if (!filename.isEmpty()) {
 
-		QProgressDialog progress("Exporting the CSV file...", /*"Cancel"*/0, 0, peakstable->rowCount(), this);
+		QProgressDialog progress("Exporting the CSV file...", "Cancel", 0, peakstable->rowCount(), this);
+		progress.setMinimumWidth(250);
 		cEventFilter filter;
 		progress.installEventFilter(&filter);
 		progress.setMinimumDuration(0);
 		progress.setWindowModality(Qt::WindowModal);
 		
+		bool removefile = false;
 		QFile file(filename);
 		if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
 			return;
@@ -1571,12 +1575,17 @@ void cSpectrumDetailWidget::exportTableToCSV() {
 			out << endl;
 
 			progress.setValue(i);
-			//if (progress.wasCanceled()) {
-			//	break;
-			//}
+			if (progress.wasCanceled()) {
+				removefile = true;
+				break;
+			}
 		}
 
 		file.close();
+
+		if (removefile) {
+			file.remove();
+		}
 
 		progress.setValue(peakstable->rowCount());
 
@@ -1652,7 +1661,8 @@ void cSpectrumDetailWidget::filterPeaksTable() {
 	bool hide;
 	cPeaksList* thpeaks = theoreticalspectrum->getTheoreticalPeaks();
 
-	QProgressDialog progress("Updating...", /*"Cancel"*/0, 0, rowcount, this);
+	QProgressDialog progress("Updating...", 0, 0, rowcount, this);
+	progress.setMinimumWidth(250);
 	cEventFilter filter;
 	progress.installEventFilter(&filter);
 	progress.setMinimumDuration(0);

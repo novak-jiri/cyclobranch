@@ -36,7 +36,7 @@ class cBrick;
 #endif
 
 
-#define POLYKETIDE_SIDEROPHORES 1
+#define OLIGOKETIDES 1
 
 
 using namespace std;
@@ -51,9 +51,9 @@ enum ePeptideType {
 	cyclic = 1,
 	branched = 2,
 	branchcyclic = 3,
-#if POLYKETIDE_SIDEROPHORES == 1
-	linearpolyketide = 4,
-	cyclicpolyketide = 5,
+#if OLIGOKETIDES == 1
+	linearoligoketide = 4,
+	cyclicoligoketide = 5,
 	linearpolysaccharide = 6,
 	other = 7
 #else

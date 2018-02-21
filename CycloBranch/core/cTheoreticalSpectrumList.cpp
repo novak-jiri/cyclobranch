@@ -256,12 +256,12 @@ int cTheoreticalSpectrumList::parallelCompareAndStore(cCandidateSet& candidates,
 		case branchcyclic:
 			theoreticalpeaksrealsize = tsp.compareBranchCyclic(peaklist, *bricksdb, true, rxsequencetag, rxsearchedsequence);
 			break;
-#if POLYKETIDE_SIDEROPHORES == 1
-		case linearpolyketide:
-			theoreticalpeaksrealsize = tsp.compareLinearPolyketideSiderophore(peaklist, *bricksdb, true, rxsequencetag, rxsearchedsequence);
+#if OLIGOKETIDES == 1
+		case linearoligoketide:
+			theoreticalpeaksrealsize = tsp.compareLinearOligoketide(peaklist, *bricksdb, true, rxsequencetag, rxsearchedsequence);
 			break;
-		case cyclicpolyketide:
-			theoreticalpeaksrealsize = tsp.compareCyclicPolyketideSiderophore(peaklist, *bricksdb, true, rxsequencetag, rxsearchedsequence);
+		case cyclicoligoketide:
+			theoreticalpeaksrealsize = tsp.compareCyclicOligoketide(peaklist, *bricksdb, true, rxsequencetag, rxsearchedsequence);
 			break;
 #endif
 		case linearpolysaccharide:

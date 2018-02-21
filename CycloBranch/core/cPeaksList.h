@@ -138,9 +138,16 @@ public:
 	/**
 		\brief Load the spectrum from .ibd file.
 		\param imzmlitem cImzML containing the offset in the ibd file
-		\param ibdstream ibd binary file stream
+		\param ibdstream an input binary file stream
 	*/ 
 	void loadFromIBDStream(cImzMLItem& imzmlitem, ifstream &ibdstream);
+
+
+	/**
+		\brief Store the spectrum into .ibd file.
+		\param ibdstream an output binary file stream
+	*/ 
+	void storeToIBDStream(ofstream &ibdstream);
 
 
 	/**
@@ -304,9 +311,13 @@ public:
 		\brief Get a maximum intensity of a peak in an interval of mz ratios.
 		\param minmz minimum mz ratio
 		\param maxmz maximum mz ratio
+		\param hidematched true, if matched peaks are hidden
+		\param hideunmatched true, if unmatched peaks are hidden
+		\param peptidetype the type of peptide
+		\param hidescrambled true, if scrambled peaks are hidden
 		\retval double intensity
 	*/ 
-	double getMaximumIntensityFromMZInterval(double minmz, double maxmz);
+	double getMaximumIntensityFromMZInterval(double minmz, double maxmz, bool hidematched, bool hideunmatched, ePeptideType peptidetype, bool hidescrambled);
 
 
 	/**

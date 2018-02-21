@@ -300,8 +300,8 @@ int cDeNovoGraph::createGraph(bool& terminatecomputation) {
 		lastsystemnode = (int)graph.size() - 1;
 		startnode = 1;
 		break;
-#if POLYKETIDE_SIDEROPHORES == 1
-	case linearpolyketide:
+#if OLIGOKETIDES == 1
+	case linearoligoketide:
 		node.clear();
 		node.setMZRatio(0);
 		node.setIntensity(0);
@@ -402,20 +402,20 @@ int cDeNovoGraph::createGraph(bool& terminatecomputation) {
 		lastsystemnode = (int)graph.size() - 1;
 		startnode = 1;
 		break;
-	case cyclicpolyketide:
+	case cyclicoligoketide:
 		node.clear();
 		node.setMZRatio(0);
 		node.setIntensity(0);
-		node.addIonAnnotation(l0h_ion);
+		//node.addIonAnnotation(l0h_ion);
 		node.addIonAnnotation(l1h_ion);
 		node.addIonAnnotation(l2h_ion);
 		graph.push_back(node);
 
-		node.clear();
-		node.setMZRatio(parameters->fragmentdefinitions[l0h_ion].massdifference + negativeshift);
-		node.setIntensity(0);
-		node.addIonAnnotation(l0h_ion);
-		graph.push_back(node);
+		//node.clear();
+		//node.setMZRatio(parameters->fragmentdefinitions[l0h_ion].massdifference + negativeshift);
+		//node.setIntensity(0);
+		//node.addIonAnnotation(l0h_ion);
+		//graph.push_back(node);
 
 		node.clear();
 		node.setMZRatio(parameters->fragmentdefinitions[l1h_ion].massdifference + negativeshift);
@@ -581,11 +581,11 @@ int cDeNovoGraph::createGraph(bool& terminatecomputation) {
 		}
 		else {
 			b.clear();
-			b.setMass(bricksdatabasewithcombinations.getMassOfComposition(combarray));
+			b.setMass(bricksdatabasewithcombinations.getMassOfComposition(combarray, numberofbasicbricks));
 			b.setComposition(compositionname, true);
 
-#if POLYKETIDE_SIDEROPHORES == 1
-			if (((parameters->peptidetype == linearpolyketide) || (parameters->peptidetype == cyclicpolyketide)) && !bricksdatabasewithcombinations.checkPolyketideBlocks(b)) {
+#if OLIGOKETIDES == 1
+			if (((parameters->peptidetype == linearoligoketide) || (parameters->peptidetype == cyclicoligoketide)) && !bricksdatabasewithcombinations.checkKetideBlocks(b)) {
 				continue;
 			}
 #endif
@@ -623,9 +623,9 @@ int cDeNovoGraph::createGraph(bool& terminatecomputation) {
 			for (int k = 0; k < (int)parameters->fragmentionsfordenovograph.size(); k++) { 
 				
 				if (/*!graph[i].ionannotation[parameters->fragmentionsfordenovograph[k]] ||*/ (parameters->fragmentionsfordenovograph[k] == precursor_ion)
-#if POLYKETIDE_SIDEROPHORES == 1
-					|| (parameters->fragmentionsfordenovograph[k] == linear_polyketide_precursor_ion_h_h) || (parameters->fragmentionsfordenovograph[k] == linear_polyketide_precursor_ion_h_oh) 
-					|| (parameters->fragmentionsfordenovograph[k] == linear_polyketide_precursor_ion_oh_oh) || (parameters->fragmentionsfordenovograph[k] == cyclic_polyketide_precursor_ion)
+#if OLIGOKETIDES == 1
+					|| (parameters->fragmentionsfordenovograph[k] == linear_oligoketide_precursor_ion_h_h) || (parameters->fragmentionsfordenovograph[k] == linear_oligoketide_precursor_ion_h_oh) 
+					|| (parameters->fragmentionsfordenovograph[k] == linear_oligoketide_precursor_ion_oh_oh) || (parameters->fragmentionsfordenovograph[k] == cyclic_oligoketide_precursor_ion)
 #endif
 					) {
 					continue;
@@ -635,19 +635,19 @@ int cDeNovoGraph::createGraph(bool& terminatecomputation) {
 					
 					// test for incompatible ion series
 					if (
-#if POLYKETIDE_SIDEROPHORES == 1
+#if OLIGOKETIDES == 1
 						(
 #endif
 						!((parameters->fragmentdefinitions[parameters->fragmentionsfordenovograph[k]].nterminal == parameters->fragmentdefinitions[parameters->fragmentionsfordenovograph[m]].nterminal) && 
 						(parameters->fragmentdefinitions[parameters->fragmentionsfordenovograph[k]].cterminal == parameters->fragmentdefinitions[parameters->fragmentionsfordenovograph[m]].cterminal)) 
-#if POLYKETIDE_SIDEROPHORES == 1
+#if OLIGOKETIDES == 1
 						||
-						(((parameters->peptidetype == linearpolyketide) || (parameters->peptidetype == cyclicpolyketide)) && 
-						!(((parameters->fragmentionsfordenovograph[k] == l0h_ion) && (parameters->fragmentionsfordenovograph[m] == l0h_ion)) || ((parameters->fragmentionsfordenovograph[k] == l1h_ion) && (parameters->fragmentionsfordenovograph[m] == l1h_ion)) || ((parameters->fragmentionsfordenovograph[k] == l2h_ion) && (parameters->fragmentionsfordenovograph[m] == l2h_ion))
+						(((parameters->peptidetype == linearoligoketide) || (parameters->peptidetype == cyclicoligoketide)) && 
+						!(/*((parameters->fragmentionsfordenovograph[k] == l0h_ion) && (parameters->fragmentionsfordenovograph[m] == l0h_ion)) ||*/ ((parameters->fragmentionsfordenovograph[k] == l1h_ion) && (parameters->fragmentionsfordenovograph[m] == l1h_ion)) || ((parameters->fragmentionsfordenovograph[k] == l2h_ion) && (parameters->fragmentionsfordenovograph[m] == l2h_ion))
 						|| ((parameters->fragmentionsfordenovograph[k] == l1oh_ion) && (parameters->fragmentionsfordenovograph[m] == l1oh_ion)) || ((parameters->fragmentionsfordenovograph[k] == l2oh_ion) && (parameters->fragmentionsfordenovograph[m] == l2oh_ion))))
 						)						
-						&& (parameters->fragmentionsfordenovograph[m] != linear_polyketide_precursor_ion_h_h) && (parameters->fragmentionsfordenovograph[m] != linear_polyketide_precursor_ion_h_oh)
-						&& (parameters->fragmentionsfordenovograph[m] != linear_polyketide_precursor_ion_oh_oh) && (parameters->fragmentionsfordenovograph[m] != cyclic_polyketide_precursor_ion)
+						&& (parameters->fragmentionsfordenovograph[m] != linear_oligoketide_precursor_ion_h_h) && (parameters->fragmentionsfordenovograph[m] != linear_oligoketide_precursor_ion_h_oh)
+						&& (parameters->fragmentionsfordenovograph[m] != linear_oligoketide_precursor_ion_oh_oh) && (parameters->fragmentionsfordenovograph[m] != cyclic_oligoketide_precursor_ion)
 #endif
 						&& (parameters->fragmentionsfordenovograph[m] != precursor_ion)
 						) {
@@ -658,9 +658,9 @@ int cDeNovoGraph::createGraph(bool& terminatecomputation) {
 					for (int n = 0; n < (int)parameters->searchedmodifications.size(); n++) {
 
 						if ((n > 0) && (parameters->fragmentionsfordenovograph[m] != precursor_ion)
-#if POLYKETIDE_SIDEROPHORES == 1
-							&& (parameters->fragmentionsfordenovograph[m] != linear_polyketide_precursor_ion_h_h) && (parameters->fragmentionsfordenovograph[m] != linear_polyketide_precursor_ion_h_oh)
-							&& (parameters->fragmentionsfordenovograph[m] != linear_polyketide_precursor_ion_oh_oh) && (parameters->fragmentionsfordenovograph[m] != cyclic_polyketide_precursor_ion)
+#if OLIGOKETIDES == 1
+							&& (parameters->fragmentionsfordenovograph[m] != linear_oligoketide_precursor_ion_h_h) && (parameters->fragmentionsfordenovograph[m] != linear_oligoketide_precursor_ion_h_oh)
+							&& (parameters->fragmentionsfordenovograph[m] != linear_oligoketide_precursor_ion_oh_oh) && (parameters->fragmentionsfordenovograph[m] != cyclic_oligoketide_precursor_ion)
 #endif			
 							) {
 							continue;
@@ -670,8 +670,8 @@ int cDeNovoGraph::createGraph(bool& terminatecomputation) {
 						for (int p = 0; p < (int)parameters->searchedmodifications.size(); p++) {
 
 							if ((p > 0) && ((parameters->peptidetype == linear) || (parameters->peptidetype == cyclic) || (parameters->peptidetype == linearpolysaccharide)
-#if POLYKETIDE_SIDEROPHORES == 1
-								|| (parameters->peptidetype == linearpolyketide) || (parameters->peptidetype == cyclicpolyketide)
+#if OLIGOKETIDES == 1
+								|| (parameters->peptidetype == linearoligoketide) || (parameters->peptidetype == cyclicoligoketide)
 #endif						
 								)) {
 								continue;
@@ -679,17 +679,17 @@ int cDeNovoGraph::createGraph(bool& terminatecomputation) {
 
 							termmass = 0;
 
-#if POLYKETIDE_SIDEROPHORES == 1
+#if OLIGOKETIDES == 1
 							if ((parameters->fragmentionsfordenovograph[m] == precursor_ion) 
-								|| (parameters->fragmentionsfordenovograph[m] == linear_polyketide_precursor_ion_h_h) || (parameters->fragmentionsfordenovograph[m] == linear_polyketide_precursor_ion_h_oh)
-								|| (parameters->fragmentionsfordenovograph[m] == linear_polyketide_precursor_ion_oh_oh) || (parameters->fragmentionsfordenovograph[m] == cyclic_polyketide_precursor_ion)) {
+								|| (parameters->fragmentionsfordenovograph[m] == linear_oligoketide_precursor_ion_h_h) || (parameters->fragmentionsfordenovograph[m] == linear_oligoketide_precursor_ion_h_oh)
+								|| (parameters->fragmentionsfordenovograph[m] == linear_oligoketide_precursor_ion_oh_oh) || (parameters->fragmentionsfordenovograph[m] == cyclic_oligoketide_precursor_ion)) {
 #else
 							if (parameters->fragmentionsfordenovograph[m] == precursor_ion) {
 #endif
 
 								if ((parameters->peptidetype == linear) || (parameters->peptidetype == linearpolysaccharide)
-#if POLYKETIDE_SIDEROPHORES == 1
-									|| (parameters->peptidetype == linearpolyketide)
+#if OLIGOKETIDES == 1
+									|| (parameters->peptidetype == linearoligoketide)
 #endif
 									) {
 									if ((n > 0) && ((parameters->fragmentdefinitions[parameters->fragmentionsfordenovograph[k]].nterminal && parameters->searchedmodifications[n].nterminal) || (parameters->fragmentdefinitions[parameters->fragmentionsfordenovograph[k]].cterminal && parameters->searchedmodifications[n].cterminal))) {
@@ -766,10 +766,10 @@ int cDeNovoGraph::createGraph(bool& terminatecomputation) {
 												}
 
 												// irrelevant connection with precursor
-#if POLYKETIDE_SIDEROPHORES == 1
+#if OLIGOKETIDES == 1
 												if (((parameters->fragmentionsfordenovograph[m] == precursor_ion) 
-													|| (parameters->fragmentionsfordenovograph[m] == linear_polyketide_precursor_ion_h_h) || (parameters->fragmentionsfordenovograph[m] == linear_polyketide_precursor_ion_h_oh)
-													|| (parameters->fragmentionsfordenovograph[m] == linear_polyketide_precursor_ion_oh_oh) || (parameters->fragmentionsfordenovograph[m] == cyclic_polyketide_precursor_ion)) 
+													|| (parameters->fragmentionsfordenovograph[m] == linear_oligoketide_precursor_ion_h_h) || (parameters->fragmentionsfordenovograph[m] == linear_oligoketide_precursor_ion_h_oh)
+													|| (parameters->fragmentionsfordenovograph[m] == linear_oligoketide_precursor_ion_oh_oh) || (parameters->fragmentionsfordenovograph[m] == cyclic_oligoketide_precursor_ion)) 
 													&& (middle != (int)graph.size() - 1) && (i != (int)graph.size() - 1)) {
 #else
 												if ((parameters->fragmentionsfordenovograph[m] == precursor_ion) && (middle != (int)graph.size() - 1) && (i != (int)graph.size() - 1)) {
@@ -1016,7 +1016,7 @@ int cDeNovoGraph::connectEdgesFormingPathsNotFinishingInPrecursor(bool& terminat
 			b.setArtificial(true);
 			bricksdatabasewithcombinations.push_back(b);
 
-#if POLYKETIDE_SIDEROPHORES == 1
+#if OLIGOKETIDES == 1
 
 			// -H2 brick (3)
 			b.setName(to_string(e.massdifference - 2*H));

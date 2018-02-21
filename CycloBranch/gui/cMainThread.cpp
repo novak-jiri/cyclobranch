@@ -8,14 +8,14 @@ bool cMainThread::checkModifications(cParameters& parameters, cSequence& sequenc
 	errormessage = "";
 
 	if ((sequence.getPeptideType() == linear) || (sequence.getPeptideType() == branched) || (sequence.getPeptideType() == branchcyclic) || (sequence.getPeptideType() == linearpolysaccharide)
-#if POLYKETIDE_SIDEROPHORES == 1
-		|| (sequence.getPeptideType() == linearpolyketide)
+#if OLIGOKETIDES == 1
+		|| (sequence.getPeptideType() == linearoligoketide)
 #endif
 		) {
 
 		if ((sequence.getPeptideType() == linear) || (sequence.getPeptideType() == branched) || (sequence.getPeptideType() == linearpolysaccharide)
-#if POLYKETIDE_SIDEROPHORES == 1
-			|| (sequence.getPeptideType() == linearpolyketide)
+#if OLIGOKETIDES == 1
+			|| (sequence.getPeptideType() == linearoligoketide)
 #endif
 			) {
 			startmodifid = -1;
@@ -29,8 +29,8 @@ bool cMainThread::checkModifications(cParameters& parameters, cSequence& sequenc
 		for (int i = 0; i < (int)parameters.searchedmodifications.size(); i++) {
 
 			if ((sequence.getPeptideType() == linear) || (sequence.getPeptideType() == branched) || (sequence.getPeptideType() == linearpolysaccharide)
-#if POLYKETIDE_SIDEROPHORES == 1
-				|| (sequence.getPeptideType() == linearpolyketide)
+#if OLIGOKETIDES == 1
+				|| (sequence.getPeptideType() == linearoligoketide)
 #endif			
 				) {
 				if (parameters.searchedmodifications[i].name.compare(sequence.getNTterminalModification()) == 0) {
@@ -384,12 +384,12 @@ void cMainThread::run() {
 			// set candidate
 			c.setCandidate(v, netmp, startmodifid, endmodifid, middlemodifid, branchstart, branchend);
 
-#if POLYKETIDE_SIDEROPHORES == 1
+#if OLIGOKETIDES == 1
 
-			if (!calculatesummaries && ((parameters.sequencedatabase[i].getPeptideType() == linearpolyketide) || (parameters.sequencedatabase[i].getPeptideType() == cyclicpolyketide))) {
+			if (!calculatesummaries && ((parameters.sequencedatabase[i].getPeptideType() == linearoligoketide) || (parameters.sequencedatabase[i].getPeptideType() == cyclicoligoketide))) {
 
-				if (!c.checkPolyketideSequence(parameters.bricksdatabase, parameters.sequencedatabase[i].getPeptideType())) {
-					if (parameters.sequencedatabase[i].getPeptideType() == linearpolyketide) {
+				if (!c.checkKetideSequence(parameters.bricksdatabase, parameters.sequencedatabase[i].getPeptideType())) {
+					if (parameters.sequencedatabase[i].getPeptideType() == linearoligoketide) {
 						*os << "Ignored sequence: " << parameters.sequencedatabase[i].getName() << " " << parameters.sequencedatabase[i].getSequence() << "; the order of building blocks is not correct." << endl;
 					}
 					else {
@@ -401,10 +401,10 @@ void cMainThread::run() {
 				eResidueLossType leftresiduelosstype = c.getLeftResidueType(parameters.bricksdatabase);
 				eResidueLossType rightresiduelosstype = c.getRightResidueType(parameters.bricksdatabase);
 
-				if (((leftresiduelosstype == h2) && (c.getStartModifID() > 0) && parameters.searchedmodifications[c.getStartModifID()].cterminal) 
-					|| ((leftresiduelosstype == h2o2) && (c.getStartModifID() > 0) && parameters.searchedmodifications[c.getStartModifID()].nterminal)
-					|| ((rightresiduelosstype == h2) && (c.getEndModifID() > 0) && parameters.searchedmodifications[c.getEndModifID()].cterminal)
-					|| ((rightresiduelosstype == h2o2) && (c.getEndModifID() > 0) && parameters.searchedmodifications[c.getEndModifID()].nterminal)) {
+				if (((leftresiduelosstype == h2_loss) && (c.getStartModifID() > 0) && parameters.searchedmodifications[c.getStartModifID()].cterminal) 
+					|| ((leftresiduelosstype == h2o_loss) && (c.getStartModifID() > 0) && parameters.searchedmodifications[c.getStartModifID()].nterminal)
+					|| ((rightresiduelosstype == h2_loss) && (c.getEndModifID() > 0) && parameters.searchedmodifications[c.getEndModifID()].cterminal)
+					|| ((rightresiduelosstype == h2o_loss) && (c.getEndModifID() > 0) && parameters.searchedmodifications[c.getEndModifID()].nterminal)) {
 					*os << "Ignored sequence: " << parameters.sequencedatabase[i].getName() << " " << parameters.sequencedatabase[i].getSequence() << "; the N-terminal modification is attached to C-terminus or vice versa." << endl;
 					continue;
 				}

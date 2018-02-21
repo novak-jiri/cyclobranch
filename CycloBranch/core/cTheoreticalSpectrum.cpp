@@ -143,42 +143,42 @@ void cTheoreticalSpectrum::generatePrecursorIon(vector<int>& intcomposition, cBr
 		endtype = (int)cyclic_precursor_ion_co_loss_and_dehydrated_and_deamidated;
 		usedmodifications.insert(candidate.getMiddleModifID());
 		break;
-#if POLYKETIDE_SIDEROPHORES == 1
-	case linearpolyketide:
+#if OLIGOKETIDES == 1
+	case linearoligoketide:
 		peak.mzratio = parameters->searchedmodifications[candidate.getStartModifID()].massdifference + parameters->searchedmodifications[candidate.getEndModifID()].massdifference;
 		peak.seriesid = 0;
 
-		switch (candidate.getResidueLossType(bricksdatabasewithcombinations))
+		switch (candidate.getKetidePrecursorType(bricksdatabasewithcombinations))
 		{
-		case water:
-			starttype = (int)linear_polyketide_precursor_ion_h_oh;
-			endtype = (int)linear_polyketide_precursor_ion_h_oh_co_loss_dehydrated_and_deamidated;
+		case ketide_precursor_h2o:
+			starttype = (int)linear_oligoketide_precursor_ion_h_oh;
+			endtype = (int)linear_oligoketide_precursor_ion_h_oh_co_loss_dehydrated_and_deamidated;
 			break;
-		case h2:
-			starttype = (int)linear_polyketide_precursor_ion_h_h;
-			endtype = (int)linear_polyketide_precursor_ion_h_h_co_loss_dehydrated_and_deamidated;
+		case ketide_precursor_h2:
+			starttype = (int)linear_oligoketide_precursor_ion_h_h;
+			endtype = (int)linear_oligoketide_precursor_ion_h_h_co_loss_dehydrated_and_deamidated;
 			break;
-		case h2o2:
-			starttype = (int)linear_polyketide_precursor_ion_oh_oh;
-			endtype = (int)linear_polyketide_precursor_ion_oh_oh_co_loss_dehydrated_and_deamidated;
+		case ketide_precursor_h2o2:
+			starttype = (int)linear_oligoketide_precursor_ion_oh_oh;
+			endtype = (int)linear_oligoketide_precursor_ion_oh_oh_co_loss_dehydrated_and_deamidated;
 			break;
 		default:
 			break;
 		}
 
 		if (candidate.hasFirstBrickArtificial(bricksdatabasewithcombinations) || candidate.hasLastBrickArtificial(bricksdatabasewithcombinations)) {
-			starttype = (int)linear_polyketide_precursor_ion_h_h;
-			endtype = (int)linear_polyketide_precursor_ion_oh_oh_co_loss_dehydrated_and_deamidated;
+			starttype = (int)linear_oligoketide_precursor_ion_h_h;
+			endtype = (int)linear_oligoketide_precursor_ion_oh_oh_co_loss_dehydrated_and_deamidated;
 		}
 
 		usedmodifications.insert(candidate.getStartModifID());
 		usedmodifications.insert(candidate.getEndModifID());
 		break;
-	case cyclicpolyketide:
+	case cyclicoligoketide:
 		peak.mzratio = 0;
 		peak.seriesid = (int)intcomposition.size() - 1;
-		starttype = (int)cyclic_polyketide_precursor_ion;
-		endtype = (int)cyclic_polyketide_precursor_ion_co_loss_dehydrated_and_deamidated;
+		starttype = (int)cyclic_oligoketide_precursor_ion;
+		endtype = (int)cyclic_oligoketide_precursor_ion_co_loss_dehydrated_and_deamidated;
 		break;
 #endif
 	case linearpolysaccharide:
@@ -1214,7 +1214,7 @@ int cTheoreticalSpectrum::compareCyclic(cPeaksList& sortedpeaklist, cBricksDatab
 		return -2;
 	}
 
-	eResidueLossType leftresiduelosstype = water;
+	eResidueLossType leftresiduelosstype = h2o_loss;
 	bool hasfirstblockartificial = false;
 
 	for (int i = 0; i < 2*r; i++) {
@@ -1224,7 +1224,7 @@ int cTheoreticalSpectrum::compareCyclic(cPeaksList& sortedpeaklist, cBricksDatab
 		brick.setComposition(rotations[i], false);
 		brick.explodeToIntComposition(intcomposition);
 
-#if POLYKETIDE_SIDEROPHORES == 1
+#if OLIGOKETIDES == 1
 		eResidueLossType leftresiduelosstype = bricksdatabasewithcombinations[intcomposition[0] - 1].getResidueLossType();
 		bool hasfirstblockartificial = bricksdatabasewithcombinations[intcomposition[0] - 1].isArtificial();
 #endif
@@ -1735,12 +1735,12 @@ int cTheoreticalSpectrum::compareBranchCyclic(cPeaksList& sortedpeaklist, cBrick
 }
 
 
-#if POLYKETIDE_SIDEROPHORES == 1
+#if OLIGOKETIDES == 1
 
 
-int cTheoreticalSpectrum::compareLinearPolyketideSiderophore(cPeaksList& sortedpeaklist, cBricksDatabase& bricksdatabasewithcombinations, bool writedescription, regex& sequencetag, regex& searchedsequence) {
+int cTheoreticalSpectrum::compareLinearOligoketide(cPeaksList& sortedpeaklist, cBricksDatabase& bricksdatabasewithcombinations, bool writedescription, regex& sequencetag, regex& searchedsequence) {
 	
-	if (!candidate.checkPolyketideSequence(bricksdatabasewithcombinations, parameters->peptidetype)) {
+	if (!candidate.checkKetideSequence(bricksdatabasewithcombinations, parameters->peptidetype)) {
 		return -2;
 	}
 
@@ -1761,10 +1761,10 @@ int cTheoreticalSpectrum::compareLinearPolyketideSiderophore(cPeaksList& sortedp
 	bool haslastblockartificial = bricksdatabasewithcombinations[intcomposition.back() - 1].isArtificial();
 
 	if (!hasfirstblockartificial && !haslastblockartificial) {
-		if (((leftresiduelosstype == h2) && (candidate.getStartModifID() > 0) && parameters->searchedmodifications[candidate.getStartModifID()].cterminal) 
-			|| ((leftresiduelosstype == h2o2) && (candidate.getStartModifID() > 0) && parameters->searchedmodifications[candidate.getStartModifID()].nterminal)
-			|| ((rightresiduelosstype == h2) && (candidate.getEndModifID() > 0) && parameters->searchedmodifications[candidate.getEndModifID()].cterminal)
-			|| ((rightresiduelosstype == h2o2) && (candidate.getEndModifID() > 0) && parameters->searchedmodifications[candidate.getEndModifID()].nterminal)) {
+		if (((leftresiduelosstype == h2_loss) && (candidate.getStartModifID() > 0) && parameters->searchedmodifications[candidate.getStartModifID()].cterminal) 
+			|| ((leftresiduelosstype == h2o_loss) && (candidate.getStartModifID() > 0) && parameters->searchedmodifications[candidate.getStartModifID()].nterminal)
+			|| ((rightresiduelosstype == h2_loss) && (candidate.getEndModifID() > 0) && parameters->searchedmodifications[candidate.getEndModifID()].cterminal)
+			|| ((rightresiduelosstype == h2o_loss) && (candidate.getEndModifID() > 0) && parameters->searchedmodifications[candidate.getEndModifID()].nterminal)) {
 			return -2;
 		}
 	}
@@ -1798,16 +1798,16 @@ int cTheoreticalSpectrum::compareLinearPolyketideSiderophore(cPeaksList& sortedp
 
 	for (int i = 0; i < (int)parameters->fragmentionsfortheoreticalspectra.size(); i++) {
 		if (
-			((hasfirstblockartificial || (leftresiduelosstype == h2)) && ((parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].parent == l1h_ion) || (parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].parent == l2h_ion)))
+			((hasfirstblockartificial || (leftresiduelosstype == h2_loss)) && ((parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].parent == l1h_ion) || (parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].parent == l2h_ion)))
 			|| 
-			((hasfirstblockartificial || (leftresiduelosstype == h2o2)) && ((parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].parent == l1oh_ion) || (parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].parent == l2oh_ion)))
+			((hasfirstblockartificial || (leftresiduelosstype == h2o_loss)) && ((parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].parent == l1oh_ion) || (parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].parent == l2oh_ion)))
 			) {
 			generateNTerminalFragmentIons(parameters->precursorcharge, theoreticalpeaksrealsize, intcomposition, parameters->fragmentionsfortheoreticalspectra[i], bricksdatabasewithcombinations, writedescription, 0, splittingsites, parameters->searchedmodifications, parameters->peptidetype, 0, leftresiduelosstype, hasfirstblockartificial);
 		}
 		if (
-			((haslastblockartificial || (rightresiduelosstype == h2)) && ((parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].parent == r1h_ion) || (parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].parent == r2h_ion)))
+			((haslastblockartificial || (rightresiduelosstype == h2_loss)) && ((parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].parent == r1h_ion) || (parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].parent == r2h_ion)))
 			|| 
-			((haslastblockartificial || (rightresiduelosstype == h2o2)) && ((parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].parent == r1oh_ion) || (parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].parent == r2oh_ion)))
+			((haslastblockartificial || (rightresiduelosstype == h2o_loss)) && ((parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].parent == r1oh_ion) || (parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].parent == r2oh_ion)))
 			) {
 			generateCTerminalFragmentIons(parameters->precursorcharge, theoreticalpeaksrealsize, intcomposition, parameters->fragmentionsfortheoreticalspectra[i], bricksdatabasewithcombinations, writedescription, 0, splittingsites, parameters->searchedmodifications, parameters->peptidetype, 0, rightresiduelosstype, haslastblockartificial);
 		}
@@ -1902,9 +1902,9 @@ int cTheoreticalSpectrum::compareLinearPolyketideSiderophore(cPeaksList& sortedp
 }
 
 
-int cTheoreticalSpectrum::compareCyclicPolyketideSiderophore(cPeaksList& sortedpeaklist, cBricksDatabase& bricksdatabasewithcombinations, bool writedescription, regex& sequencetag, regex& searchedsequence) {
+int cTheoreticalSpectrum::compareCyclicOligoketide(cPeaksList& sortedpeaklist, cBricksDatabase& bricksdatabasewithcombinations, bool writedescription, regex& sequencetag, regex& searchedsequence) {
 
-	if (!candidate.checkPolyketideSequence(bricksdatabasewithcombinations, parameters->peptidetype)) {
+	if (!candidate.checkKetideSequence(bricksdatabasewithcombinations, parameters->peptidetype)) {
 		return -2;
 	}
 
@@ -2222,8 +2222,8 @@ void cTheoreticalSpectrum::generateNTerminalFragmentIons(int maxcharge, int& pea
 
 	peak.mzratio = parameters->fragmentdefinitions[fragmentiontype].massdifference;
 	if ((peptidetype == linear) || (peptidetype == linearpolysaccharide)
-#if POLYKETIDE_SIDEROPHORES == 1
-		|| (peptidetype == linearpolyketide)
+#if OLIGOKETIDES == 1
+		|| (peptidetype == linearoligoketide)
 #endif
 		) {
 		peak.mzratio += searchedmodifications[candidate.getStartModifID()].massdifference;
@@ -2253,11 +2253,11 @@ void cTheoreticalSpectrum::generateNTerminalFragmentIons(int maxcharge, int& pea
 	case linearpolysaccharide:
 		peak.rotationid = rotationid;
 		break;
-#if POLYKETIDE_SIDEROPHORES == 1
-	case linearpolyketide:
+#if OLIGOKETIDES == 1
+	case linearoligoketide:
 		peak.rotationid = rotationid;
 		break;
-	case cyclicpolyketide:
+	case cyclicoligoketide:
 		peak.rotationid = rotationid;
 		break;
 #endif
@@ -2291,48 +2291,48 @@ void cTheoreticalSpectrum::generateNTerminalFragmentIons(int maxcharge, int& pea
 			//}
 		}
 
-#if POLYKETIDE_SIDEROPHORES == 1
-		if (peptidetype == linearpolyketide) {
-			if (!hasfirstblockartificial && (leftresiduelosstype == h2) && (parameters->fragmentdefinitions[fragmentiontype].parent == l1h_ion) && (i % 2 == 0)) {
+#if OLIGOKETIDES == 1
+		if (peptidetype == linearoligoketide) {
+			if (!hasfirstblockartificial && (leftresiduelosstype == h2_loss) && (parameters->fragmentdefinitions[fragmentiontype].parent == l1h_ion) && (i % 2 == 0)) {
 				continue;
 			}
 
-			if (!hasfirstblockartificial && (leftresiduelosstype == h2) && (parameters->fragmentdefinitions[fragmentiontype].parent == l2h_ion) && (i % 2 == 1)) {
+			if (!hasfirstblockartificial && (leftresiduelosstype == h2_loss) && (parameters->fragmentdefinitions[fragmentiontype].parent == l2h_ion) && (i % 2 == 1)) {
 				continue;
 			}
 
-			if (!hasfirstblockartificial && (leftresiduelosstype == h2o2) && (parameters->fragmentdefinitions[fragmentiontype].parent == l1oh_ion) && (i % 2 == 1)) {
+			if (!hasfirstblockartificial && (leftresiduelosstype == h2o_loss) && (parameters->fragmentdefinitions[fragmentiontype].parent == l1oh_ion) && (i % 2 == 1)) {
 				continue;
 			}
 
-			if (!hasfirstblockartificial && (leftresiduelosstype == h2o2) && (parameters->fragmentdefinitions[fragmentiontype].parent == l2oh_ion) && (i % 2 == 0)) {
+			if (!hasfirstblockartificial && (leftresiduelosstype == h2o_loss) && (parameters->fragmentdefinitions[fragmentiontype].parent == l2oh_ion) && (i % 2 == 0)) {
 				continue;
 			}	
 		}
 		
-		if (peptidetype == cyclicpolyketide) {
+		if (peptidetype == cyclicoligoketide) {
 
-			if (!hasfirstblockartificial && (leftresiduelosstype == h2) && (parameters->fragmentdefinitions[fragmentiontype].parent == l0h_ion)) { // b+2H ion is generated instead of b-2H
+			//if (!hasfirstblockartificial && (leftresiduelosstype == h2_loss) && (parameters->fragmentdefinitions[fragmentiontype].parent == l0h_ion)) { // b+2H ion is generated instead of b-2H
+			//	continue;
+			//}
+
+			if (!hasfirstblockartificial && (leftresiduelosstype == h2_loss) && (parameters->fragmentdefinitions[fragmentiontype].parent == l1h_ion) && (i % 2 == 0)) {
 				continue;
 			}
 
-			if (!hasfirstblockartificial && (leftresiduelosstype == h2) && (parameters->fragmentdefinitions[fragmentiontype].parent == l1h_ion) && (i % 2 == 0)) {
+			if (!hasfirstblockartificial && (leftresiduelosstype == h2_loss) && (parameters->fragmentdefinitions[fragmentiontype].parent == l2h_ion) && (i % 2 == 1)) {
 				continue;
 			}
 
-			if (!hasfirstblockartificial && (leftresiduelosstype == h2) && (parameters->fragmentdefinitions[fragmentiontype].parent == l2h_ion) && (i % 2 == 1)) {
+			//if (!hasfirstblockartificial && (leftresiduelosstype == h2o_loss) && (parameters->fragmentdefinitions[fragmentiontype].parent == l0h_ion) && (i % 2 == 1)) {
+			//	continue;
+			//}
+
+			if (!hasfirstblockartificial && (leftresiduelosstype == h2o_loss) && (parameters->fragmentdefinitions[fragmentiontype].parent == l1h_ion) && (i % 2 == 0)) { // ok - even numbers of blocks => always b-ion
 				continue;
 			}
 
-			if (!hasfirstblockartificial && (leftresiduelosstype == h2o2) && (parameters->fragmentdefinitions[fragmentiontype].parent == l0h_ion) && (i % 2 == 1)) {
-				continue;
-			}
-
-			if (!hasfirstblockartificial && (leftresiduelosstype == h2o2) && (parameters->fragmentdefinitions[fragmentiontype].parent == l1h_ion) && (i % 2 == 0)) { // ok - even numbers of blocks => always b-ion
-				continue;
-			}
-
-			if (!hasfirstblockartificial && (leftresiduelosstype == h2o2) && (parameters->fragmentdefinitions[fragmentiontype].parent == l2h_ion)) { // b-2H ion is generated instead of b+2H
+			if (!hasfirstblockartificial && (leftresiduelosstype == h2o_loss) && (parameters->fragmentdefinitions[fragmentiontype].parent == l2h_ion)) { // b-2H ion is generated instead of b+2H
 				continue;
 			}	
 		}
@@ -2343,8 +2343,8 @@ void cTheoreticalSpectrum::generateNTerminalFragmentIons(int maxcharge, int& pea
 		if (writedescription) {
 
 			peak.description = "";
-#if POLYKETIDE_SIDEROPHORES == 1
-			if ((peptidetype == cyclic) || (peptidetype == cyclicpolyketide)) {
+#if OLIGOKETIDES == 1
+			if ((peptidetype == cyclic) || (peptidetype == cyclicoligoketide)) {
 #else
 			if (peptidetype == cyclic) {
 #endif
@@ -2358,8 +2358,8 @@ void cTheoreticalSpectrum::generateNTerminalFragmentIons(int maxcharge, int& pea
 				peak.description += to_string(trotation->id + 1) + "_";
 			}
 
-#if POLYKETIDE_SIDEROPHORES == 1
-			if ((peptidetype == linearpolyketide) || (peptidetype == cyclicpolyketide)) {
+#if OLIGOKETIDES == 1
+			if ((peptidetype == linearoligoketide) || (peptidetype == cyclicoligoketide)) {
 				peak.description += parameters->fragmentdefinitions[fragmentiontype].name.substr(0, 2) + to_string(i + 1);
 				if (parameters->fragmentdefinitions[fragmentiontype].name.size() > 2) {
 					peak.description += parameters->fragmentdefinitions[fragmentiontype].name.substr(2, parameters->fragmentdefinitions[fragmentiontype].name.length() - 2);
@@ -2371,7 +2371,7 @@ void cTheoreticalSpectrum::generateNTerminalFragmentIons(int maxcharge, int& pea
 				if (parameters->fragmentdefinitions[fragmentiontype].name.size() > 1) {
 					peak.description += parameters->fragmentdefinitions[fragmentiontype].name.substr(1, parameters->fragmentdefinitions[fragmentiontype].name.length() - 1);
 				}
-#if POLYKETIDE_SIDEROPHORES == 1
+#if OLIGOKETIDES == 1
 			}
 #endif
 
@@ -2428,8 +2428,8 @@ void cTheoreticalSpectrum::generateCTerminalFragmentIons(int maxcharge, int& pea
 
 	peak.mzratio = parameters->fragmentdefinitions[fragmentiontype].massdifference;
 	if ((peptidetype == linear) || (peptidetype == linearpolysaccharide)
-#if POLYKETIDE_SIDEROPHORES == 1
-		|| (peptidetype == linearpolyketide)
+#if OLIGOKETIDES == 1
+		|| (peptidetype == linearoligoketide)
 #endif
 		) {
 		peak.mzratio += searchedmodifications[candidate.getEndModifID()].massdifference;
@@ -2456,11 +2456,11 @@ void cTheoreticalSpectrum::generateCTerminalFragmentIons(int maxcharge, int& pea
 	case branchcyclic:
 		peak.rotationid = rotationid*6 + trotation->id; // to do - potential bug
 		break;
-#if POLYKETIDE_SIDEROPHORES == 1
-	case linearpolyketide:
+#if OLIGOKETIDES == 1
+	case linearoligoketide:
 		peak.rotationid = rotationid;
 		break;
-	case cyclicpolyketide:
+	case cyclicoligoketide:
 		peak.rotationid = rotationid;
 		break;
 #endif
@@ -2498,21 +2498,21 @@ void cTheoreticalSpectrum::generateCTerminalFragmentIons(int maxcharge, int& pea
 			//}
 		}
 
-#if POLYKETIDE_SIDEROPHORES == 1
-		if (peptidetype == linearpolyketide) {
-			if (!haslastblockartificial && (rightresiduelosstype == h2) && (parameters->fragmentdefinitions[fragmentiontype].parent == r1h_ion) && (order % 2 == 0)) {
+#if OLIGOKETIDES == 1
+		if (peptidetype == linearoligoketide) {
+			if (!haslastblockartificial && (rightresiduelosstype == h2_loss) && (parameters->fragmentdefinitions[fragmentiontype].parent == r1h_ion) && (order % 2 == 0)) {
 				continue;
 			}
 
-			if (!haslastblockartificial && (rightresiduelosstype == h2) && (parameters->fragmentdefinitions[fragmentiontype].parent == r2h_ion) && (order % 2 == 1)) {
+			if (!haslastblockartificial && (rightresiduelosstype == h2_loss) && (parameters->fragmentdefinitions[fragmentiontype].parent == r2h_ion) && (order % 2 == 1)) {
 				continue;
 			}
 
-			if (!haslastblockartificial && (rightresiduelosstype == h2o2) && (parameters->fragmentdefinitions[fragmentiontype].parent == r1oh_ion) && (order % 2 == 1)) {
+			if (!haslastblockartificial && (rightresiduelosstype == h2o_loss) && (parameters->fragmentdefinitions[fragmentiontype].parent == r1oh_ion) && (order % 2 == 1)) {
 				continue;
 			}
 
-			if (!haslastblockartificial && (rightresiduelosstype == h2o2) && (parameters->fragmentdefinitions[fragmentiontype].parent == r2oh_ion) && (order % 2 == 0)) {
+			if (!haslastblockartificial && (rightresiduelosstype == h2o_loss) && (parameters->fragmentdefinitions[fragmentiontype].parent == r2oh_ion) && (order % 2 == 0)) {
 				continue;
 			}		
 		}
@@ -2523,8 +2523,8 @@ void cTheoreticalSpectrum::generateCTerminalFragmentIons(int maxcharge, int& pea
 		if (writedescription) {
 
 			peak.description = "";
-#if POLYKETIDE_SIDEROPHORES == 1
-			if (peptidetype == cyclicpolyketide) {
+#if OLIGOKETIDES == 1
+			if (peptidetype == cyclicoligoketide) {
 				peak.description += to_string(splittingsites[rotationid].first + 1) + "-" + to_string(splittingsites[rotationid].second + 1) + "_";
 			}
 #endif
@@ -2539,8 +2539,8 @@ void cTheoreticalSpectrum::generateCTerminalFragmentIons(int maxcharge, int& pea
 				peak.description += to_string(trotation->id + 1) + "_";
 			}
 
-#if POLYKETIDE_SIDEROPHORES == 1
-			if ((peptidetype == linearpolyketide) || (peptidetype == cyclicpolyketide)) {
+#if OLIGOKETIDES == 1
+			if ((peptidetype == linearoligoketide) || (peptidetype == cyclicoligoketide)) {
 				peak.description += parameters->fragmentdefinitions[fragmentiontype].name.substr(0, 2) + to_string((int)intcomposition.size() - i);
 				if (parameters->fragmentdefinitions[fragmentiontype].name.size() > 2) {
 					peak.description += parameters->fragmentdefinitions[fragmentiontype].name.substr(2, parameters->fragmentdefinitions[fragmentiontype].name.length() - 2);
@@ -2552,7 +2552,7 @@ void cTheoreticalSpectrum::generateCTerminalFragmentIons(int maxcharge, int& pea
 				if (parameters->fragmentdefinitions[fragmentiontype].name.size() > 1) {
 					peak.description += parameters->fragmentdefinitions[fragmentiontype].name.substr(1, parameters->fragmentdefinitions[fragmentiontype].name.length() - 1);
 				}
-#if POLYKETIDE_SIDEROPHORES == 1
+#if OLIGOKETIDES == 1
 			}
 #endif
 

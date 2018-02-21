@@ -210,14 +210,14 @@ void generateCyclicLabelsToRight(bool nterminal, int rotationid, int rotationsta
 	string name;
 	int m;
 	if ((visiblerotationid == -1) || ((parameters->peptidetype == cyclic) && (visiblerotationid == rotationid)) 
-#if POLYKETIDE_SIDEROPHORES == 1
-		|| ((parameters->peptidetype == cyclicpolyketide) && (visiblerotationid == rotationid))
+#if OLIGOKETIDES == 1
+		|| ((parameters->peptidetype == cyclicoligoketide) && (visiblerotationid == rotationid))
 #endif
 		|| ((parameters->peptidetype == branchcyclic) && (visiblerotationid == rotationid/6))) {
 		for (int i = 0; i < (int)parameters->fragmentionsfortheoreticalspectra.size(); i++) {
 			if ((nterminal && parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].nterminal) || (!nterminal && parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].cterminal)
-#if POLYKETIDE_SIDEROPHORES == 1
-				|| (parameters->peptidetype == cyclicpolyketide)
+#if OLIGOKETIDES == 1
+				|| (parameters->peptidetype == cyclicoligoketide)
 #endif
 				) {
 				m = 0;
@@ -225,14 +225,14 @@ void generateCyclicLabelsToRight(bool nterminal, int rotationid, int rotationsta
 					if ((branchstart == -1) || (branchend == -1) || ((branchstart >= 0) && (j < branchstart)) || ((branchend >= 0) && (j >= branchend))) {
 						if (theoreticalspectrum->getVisualCoverage()[rotationid*parameters->fragmentionsfortheoreticalspectra.size() + i].series[j] > 0) {
 							name = theoreticalspectrum->getVisualCoverage()[rotationid*parameters->fragmentionsfortheoreticalspectra.size() + i].name.substr(0, theoreticalspectrum->getVisualCoverage()[rotationid*parameters->fragmentionsfortheoreticalspectra.size() + i].name.rfind('_') + 1);
-#if POLYKETIDE_SIDEROPHORES == 1							
-							if (parameters->peptidetype == cyclicpolyketide) {
+#if OLIGOKETIDES == 1							
+							if (parameters->peptidetype == cyclicoligoketide) {
 								name += parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].name.substr(0, 2) + to_string(j + 1) + parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].name.substr(2);
 							}
 							else {
 #endif
 								name += parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].name[0] + to_string(j + 1) + parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].name.substr(1);
-#if POLYKETIDE_SIDEROPHORES == 1
+#if OLIGOKETIDES == 1
 							}
 #endif
 							
@@ -268,14 +268,14 @@ void generateCyclicLabelsToLeft(bool nterminal, int rotationid, int rotationstar
 	string name;
 	int m;
 	if ((visiblerotationid == -1) || ((parameters->peptidetype == cyclic) && (visiblerotationid == rotationid)) 
-#if POLYKETIDE_SIDEROPHORES == 1
-		|| ((parameters->peptidetype == cyclicpolyketide) && (visiblerotationid == rotationid))
+#if OLIGOKETIDES == 1
+		|| ((parameters->peptidetype == cyclicoligoketide) && (visiblerotationid == rotationid))
 #endif		
 		|| ((parameters->peptidetype == branchcyclic) && (visiblerotationid == rotationid/6))) {
 		for (int i = 0; i < (int)parameters->fragmentionsfortheoreticalspectra.size(); i++) {
 			if ((nterminal && parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].nterminal) || (!nterminal && parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].cterminal)
-#if POLYKETIDE_SIDEROPHORES == 1
-				|| (parameters->peptidetype == cyclicpolyketide)
+#if OLIGOKETIDES == 1
+				|| (parameters->peptidetype == cyclicoligoketide)
 #endif			
 				) {
 				m = 0;
@@ -283,14 +283,14 @@ void generateCyclicLabelsToLeft(bool nterminal, int rotationid, int rotationstar
 					if ((branchstart == -1) || (branchend == -1) || ((branchstart >= 0) && (j < branchstart)) || ((branchend >= 0) && (j >= branchend))) {
 						if (theoreticalspectrum->getVisualCoverage()[rotationid*parameters->fragmentionsfortheoreticalspectra.size() + i].series[j] > 0) {
 							name = theoreticalspectrum->getVisualCoverage()[rotationid*parameters->fragmentionsfortheoreticalspectra.size() + i].name.substr(0, theoreticalspectrum->getVisualCoverage()[rotationid*parameters->fragmentionsfortheoreticalspectra.size() + i].name.rfind('_') + 1);
-#if POLYKETIDE_SIDEROPHORES == 1							
-							if (parameters->peptidetype == cyclicpolyketide) {
+#if OLIGOKETIDES == 1							
+							if (parameters->peptidetype == cyclicoligoketide) {
 								name += parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].name.substr(0, 2) + to_string(j + 1) + parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].name.substr(2);
 							}
 							else {
 #endif
 								name += parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].name[0] + to_string(j + 1) + parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].name.substr(1);
-#if POLYKETIDE_SIDEROPHORES == 1
+#if OLIGOKETIDES == 1
 							}					
 #endif
 							cumulativeangle = angle*(double)((2*numberofringblocks - rotationstart + numberofringblocks - m - 1) % numberofringblocks) + angle/(double)2;

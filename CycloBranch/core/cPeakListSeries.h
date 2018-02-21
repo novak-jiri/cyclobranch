@@ -7,6 +7,8 @@
 #ifndef _CPEAKLISTSERIES_H
 #define _CPEAKLISTSERIES_H
 
+#include <sstream>
+
 #include "core/cPeaksList.h"
 
 
@@ -85,7 +87,7 @@ public:
 		\param minimumrelativeintensitythreshold a minimum threshold of relative intensity
 		\param os pointer to the main thread of the application (output stream)
 		\param terminatecomputation reference to a variable determining that the computation must be stopped
-		\retval int 0 = success; -1 = error
+		\retval int 0 = success; -1 = aborted by user, -2 = error
 	*/ 
 	int loadFromIMZMLStream(string& imzmlfilename, ifstream &ibdstream, double minimumrelativeintensitythreshold, cMainThread* os, bool& terminatecomputation);
 

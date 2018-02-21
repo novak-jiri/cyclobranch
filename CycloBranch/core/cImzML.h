@@ -12,9 +12,13 @@
 #include <xercesc/dom/DOM.hpp>
 #include <string>
 #include <vector>
+#include <sstream>
  
 using namespace std;
 using namespace xercesc;
+
+
+class cPeaksList;
 
 
 /**
@@ -80,6 +84,9 @@ struct cImzMLItem {
 class cImzML {
 
 	XercesDOMParser* parser;
+	DOMDocument* document;
+
+	bool profilespectra;
 	vector<cImzMLItem> imzmlitems;
 
 public:
@@ -101,7 +108,14 @@ public:
 		\brief Parse an imzml file.
 		\param filename imzml filename
 	*/ 
-	void parse(string filename);
+	void parse(string& filename);
+ 
+
+	/**
+		\brief Update values after conversion of profile spectra into centroid spectra.
+		\param peaklists an updated vector of peaklists
+	*/ 
+	void updateRawDataToPeakList(vector<cPeaksList>& peaklists);
  
 
 	/**
@@ -109,6 +123,20 @@ public:
 		\retval vector<cImzMLItem> a vector of cImzML items
 	*/ 
 	vector<cImzMLItem>& getItems();
+
+
+	/**
+		\brief Check if the file contains profile spectra.
+		\retval bool true if the file contains profile spectra
+	*/ 
+	bool hasProfileSpectra();
+
+
+	/**
+		\brief Write an imzml file.
+		\param filename an output imzml filename
+	*/ 
+	void write(string& filename);
  
 };
 

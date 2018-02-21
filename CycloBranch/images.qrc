@@ -33,5 +33,7 @@
         <file>images/icons/66.png</file>
         <file>images/icons/5.png</file>
         <file>images/icons/25.png</file>
+        <file>images/icons/43.png</file>
+        <file>images/icons/23.png</file>
     </qresource>
 </RCC>

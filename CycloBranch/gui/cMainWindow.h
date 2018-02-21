@@ -11,6 +11,7 @@
 #include <QDesktopServices>
 #include <QUrl>
 #include <QFileInfo>
+#include <QFile>
 #include "core/utilities.h"
 #include "core/cAllocator.h"
 #include "core/cTheoreticalSpectrum.h"
@@ -22,9 +23,11 @@
 #include "gui/cSequenceDatabaseWidget.h"
 #include "gui/cModificationsWidget.h"
 #include "gui/cDrawPeptideWidget.h"
+#include "gui/cSummaryPeaksTableWidget.h"
 #include "gui/cMainThread.h"
 #include "gui/cDelegate.h"
 #include "gui/cHTMLExportDialog.h"
+#include "gui/cImageWindow.h"
 
 
 // forward declaration
@@ -101,6 +104,8 @@ private:
 	QAction *actionSmilesToMonomers;
 	QAction* actionShowIsomers;
 	QAction* actionGraph;
+	QAction* actionSummaryTableOfMatchedPeaks;
+	QAction* actionImageWindow;
 	QAction* actionLog;
 	QAction* actionHTMLDocumentation;
 	QAction* actionPDFManual;
@@ -128,6 +133,8 @@ private:
 	cSequenceDatabaseWidget* sequencedatabasewidget;
 	cModificationsWidget* modificationswidget;
 	cDrawPeptideWidget* drawpeptidewidget;
+	cSummaryPeaksTableWidget* summarytableofmatchedpeaks;
+	cImageWindow* imagewindow;
 	cParametersWidget* parameterswidget;
 	cHTMLExportDialog* htmlexportdialog;
 
@@ -142,6 +149,8 @@ private:
 	QString lastdirexporttohtml;
 	QString lastdirsaveresults;
 	QString lastdiropenresults;
+
+	bool summarytableisprepared;
 
 	cAllocator<QTableWidgetItem> widgetitemallocator;
 
@@ -171,6 +180,10 @@ private slots:
 	void showDrawPeptideWidget();
 
 	void setAndShowDrawPeptideWidget(int peptidetypeindex, QString sequence);
+
+	void showSummaryTableOfMatchedPeaks();
+
+	void showImageWindow();
 	
 	void showGraph();
 
@@ -227,6 +240,8 @@ private slots:
 	void gotoNorine();
 
 	void gotoSmiles2Monomers();
+
+	void summaryPeaksTableCancelled();
 
 	//void showContextMenu(const QPoint &pt);
 

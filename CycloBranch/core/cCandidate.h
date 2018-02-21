@@ -569,14 +569,14 @@ public:
 
 
 	/**
-		\brief Get the residue loss type.
+		\brief Get the precursor type.
 		\param bricksdatabase a database of building blocks
-		\retval eResidueLossType the residue loss type
+		\retval eKetidePrecursorType the type of precursor ion
 	*/ 
-	eResidueLossType getResidueLossType(cBricksDatabase& bricksdatabase);
+	eKetidePrecursorType getKetidePrecursorType(cBricksDatabase& bricksdatabase);
 
 
-#if POLYKETIDE_SIDEROPHORES == 1
+#if OLIGOKETIDES == 1
 
 	/**
 		\brief Check if the order of blocks is correct.
@@ -584,7 +584,7 @@ public:
 		\param peptidetype the type of peptide
 		\retval bool true when the order of blocks is correct; false otherwise
 	*/ 
-	bool checkPolyketideSequence(cBricksDatabase& bricksdatabase, ePeptideType peptidetype);
+	bool checkKetideSequence(cBricksDatabase& bricksdatabase, ePeptideType peptidetype);
 
 
 	/**
@@ -604,12 +604,12 @@ public:
 
 
 	/**
-		\brief Check if the numbers of hydrogen and hydroxyl blocks are correct.
+		\brief Check if the numbers of H2 loss and H2O loss blocks are correct.
 		\param bricksdatabase a database of building blocks
 		\param peptidetype the type of peptide
 		\retval bool true when the numbers of blocks are correct
 	*/ 
-	bool checkPolyketideBlocks(cBricksDatabase& bricksdatabase, ePeptideType peptidetype);
+	bool checkKetideBlocks(cBricksDatabase& bricksdatabase, ePeptideType peptidetype);
 
 
 #endif

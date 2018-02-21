@@ -337,7 +337,7 @@ void cSpectrumSceneWidget::redrawScene() {
 	QFontMetrics fm(myFont);
 
 	// maximum intensity in the interval <minmzratio, maxmzratio>
-	double maxintensity = theoreticalspectrum->getExperimentalSpectrum().getMaximumIntensityFromMZInterval(minmzratio, maxmzratio);
+	double maxintensity = theoreticalspectrum->getExperimentalSpectrum().getMaximumIntensityFromMZInterval(minmzratio, maxmzratio, hidematched, hideunmatched, parameters->peptidetype, hidescrambled);
 
 	scene->removeItem(zoomgroup);
 	scene->clear();
@@ -387,6 +387,11 @@ void cSpectrumSceneWidget::redrawScene() {
 
 		// hide matched peaks
 		if (hidematched && (theoreticalspectrum->getExperimentalSpectrum()[i].matched > 0)) {
+			continue;
+		}
+
+		// hide scrambled peaks
+		if ((parameters->peptidetype == cyclic) && hidescrambled && theoreticalspectrum->getExperimentalSpectrum()[i].scrambled) {
 			continue;
 		}
 

@@ -50,7 +50,7 @@ void cBrick::clear() {
 	mass = 0;
 	composition = "";
 	artificial = false;
-	residuelosstype = water;
+	residuelosstype = h2o_loss;
 }
 
 

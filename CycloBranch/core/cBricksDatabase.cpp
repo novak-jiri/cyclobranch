@@ -67,7 +67,7 @@ bool cBricksDatabase::nextCombination(vector<int>& combarray, int numberofbasicb
 		combarray[pointer]++;
 
 		// set combarray[pointer] to the maximum value when outside of the mass range
-		mass = getMassOfComposition(combarray);
+		mass = getMassOfComposition(combarray, numberofbasicbricks);
 
 		if ((cyFlag == 0) && (combarray[pointer] <= numberofbasicbricks) && (((maximumcumulativemass > 0) && (mass > maximumcumulativemass)) || (mass > neutralprecursormass))) {
 			combarray[pointer] = numberofbasicbricks + 1;
@@ -82,7 +82,7 @@ bool cBricksDatabase::nextCombination(vector<int>& combarray, int numberofbasicb
 				}
 
 				// skip combinations outside of the mass range
-				mass = getMassOfComposition(combarray);
+				mass = getMassOfComposition(combarray, numberofbasicbricks);
 
 				while ((combarray[pointer] <= numberofbasicbricks) && (pointer < maximumbricksincombination - 1) && (((maximumcumulativemass > 0) && (mass > maximumcumulativemass)) || (mass > neutralprecursormass))) {
 					pointer++;
@@ -92,7 +92,7 @@ bool cBricksDatabase::nextCombination(vector<int>& combarray, int numberofbasicb
 						combarray[i] = combarray[pointer];
 					}
 
-					mass = getMassOfComposition(combarray);
+					mass = getMassOfComposition(combarray, numberofbasicbricks);
 				}
 
 				if ((combarray[pointer] > numberofbasicbricks) || ((maximumcumulativemass > 0) && (mass > maximumcumulativemass)) || (mass > neutralprecursormass)) {
@@ -128,7 +128,7 @@ int cBricksDatabase::loadFromPlainTextStream(ifstream &stream, string& errormess
 	size_t pos;
 	double mass;
 
-#if POLYKETIDE_SIDEROPHORES == 1
+#if OLIGOKETIDES == 1
 	regex rx;
 	string name;
 #endif
@@ -165,17 +165,12 @@ int cBricksDatabase::loadFromPlainTextStream(ifstream &stream, string& errormess
 			break;
 		}
 
-#if POLYKETIDE_SIDEROPHORES == 1
+#if OLIGOKETIDES == 1
 		name = b.getName();
 
 		rx = "^\\(-2H\\) ";
 		if (regex_search(name, rx)) {
-			b.setResidueLossType(h2);
-		}
-
-		rx = "^\\(-2OH\\) ";
-		if (regex_search(name, rx)) {
-			b.setResidueLossType(h2o2);
+			b.setResidueLossType(h2_loss);
 		}
 #endif
 
@@ -284,11 +279,11 @@ cBrick& cBricksDatabase::operator[](int position) {
 }
 
 
-double cBricksDatabase::getMassOfComposition(vector<int>& combarray) {
+double cBricksDatabase::getMassOfComposition(vector<int>& combarray, int numberofbasicbricks) {
 	double mass = 0;
 	int i = 0;
 	while (i < (int)combarray.size()) {
-		if (combarray[i] > 0) {
+		if ((combarray[i] > 0) && (combarray[i] <= numberofbasicbricks)) {
 			mass += bricks[combarray[i] - 1].getMass();
 		}
 		i++;
@@ -554,10 +549,10 @@ void cBricksDatabase::load(ifstream& is) {
 }
 
 
-#if POLYKETIDE_SIDEROPHORES == 1
+#if OLIGOKETIDES == 1
 
 
-bool cBricksDatabase::checkPolyketideBlocks(cBrick& brickseries) {
+bool cBricksDatabase::checkKetideBlocks(cBrick& brickseries) {
 	vector<int> intcomposition;
 	brickseries.explodeToIntComposition(intcomposition);
 
@@ -565,20 +560,26 @@ bool cBricksDatabase::checkPolyketideBlocks(cBrick& brickseries) {
 		return false;
 	}
 
-	int hydrogens = 0;
-	int hydroxyls = 0;
+	int h2_blocks = 0;
+	int h2o_blocks = 0;
 	for (int i = 0; i < (int)intcomposition.size(); i++) {
-		if (bricks[intcomposition[i] - 1].getResidueLossType() == h2) {
-			hydrogens++;
+		if (bricks[intcomposition[i] - 1].getResidueLossType() == h2_loss) {
+			h2_blocks++;
 		}
-		if (bricks[intcomposition[i] - 1].getResidueLossType() == h2o2) {
-			hydroxyls++;
+		if (bricks[intcomposition[i] - 1].getResidueLossType() == h2o_loss) {
+			h2o_blocks++;
 		}
 	}
 
-	if ((hydrogens == hydroxyls) || (hydrogens == hydroxyls + 1) || (hydrogens + 1 == hydroxyls)) {
+	if ((h2_blocks == h2o_blocks) || (h2_blocks == h2o_blocks + 1) || (h2_blocks + 1 == h2o_blocks)) {
 		return true;
 	}
+
+	/*
+	if ((h2_blocks == 0) && (h2o_blocks == (int)intcomposition.size())) {
+		return true;
+	}
+	*/
 
 	return false;
 }

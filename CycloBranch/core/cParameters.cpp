@@ -84,7 +84,7 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 	ifstream sequencedatabasestream;
 	regex rx;
 	string s;
-	int i;
+	int i, errtype;
 	string foldername;
 	string ibdfilename;
 
@@ -290,9 +290,40 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 					#endif
 					break;
 				case imzML:
-					if (peaklistseries.loadFromIMZMLStream(peaklistfilename, peakliststream, minimumrelativeintensitythreshold, os, terminatecomputation) == -1) {
+					errtype = peaklistseries.loadFromIMZMLStream(peaklistfilename, peakliststream, minimumrelativeintensitythreshold, os, terminatecomputation);
+					if (errtype == -1) {
 						error = true;
-						errormessage = "Aborted by user.";
+						errormessage = "Aborted by user.\n";
+					}
+					if (errtype == -2) {
+						error = true;
+						#if OS_TYPE == UNX
+							errormessage = "Raw data cannot be converted.\n";
+							errormessage += "Does the file '" + peaklistfilename + "' exist ?\n";
+							errormessage += "Is the directory with the file '" + peaklistfilename + "' writable ?\n";
+							errormessage += "Do you have enough space on your hard drive ?\n";
+							errormessage += "Do you have OpenMS 1.11 installed (sudo apt-get install topp) ?\n";
+							errormessage += "Do you have 'raw2peaks.sh' file located in '" + installdir.toStdString() + "External/linux' folder ?\n";
+							errormessage += "Is the file 'raw2peaks.sh' executable (sudo chmod +x " + installdir.toStdString() + "External/linux/raw2peaks.sh) ? \n";
+						#else
+							#if OS_TYPE == OSX
+								errormessage = "Raw data cannot be converted.\n";
+								errormessage += "Does the file '" + peaklistfilename + "' exist ?\n";
+								errormessage += "Is the directory with the file '" + peaklistfilename + "' writable ?\n";
+								errormessage += "Do you have enough space on your hard drive ?\n";
+								errormessage += "Do you have OpenMS 1.11 installed ?\n";
+								errormessage += "Do you have 'raw2peaks.sh' file located in '" + installdir.toStdString() + "External/macosx' folder ?\n";
+								errormessage += "Is the file 'raw2peaks.sh' executable (sudo chmod +x " + installdir.toStdString() + "External/macosx/raw2peaks.sh) ? \n";
+							#else		
+								errormessage = "Raw data cannot be converted.\n";
+								errormessage += "Does the file '" + peaklistfilename + "' exist ?\n";
+								errormessage += "Is the directory with the file '" + peaklistfilename + "' writable ?\n";
+								errormessage += "Do you have enough space on your hard drive ?\n";
+								errormessage += "Do you have OpenMS 1.11 installed ?\n";
+								errormessage += "Do you have a path to OpenMS binaries folder in your PATH variable (e.g., 'C:/Program Files/OpenMS-1.11/bin') ?\n";
+								errormessage += "Do you have 'raw2peaks.bat' file located in the '" + appname.toStdString() + "/External/windows' folder ?\n";
+							#endif
+						#endif
 					}
 					break;
 				default:
@@ -512,12 +543,12 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 		case branchcyclic:
 			initializeFragmentIonsForDeNovoGraphOfBranchCyclicPeptides(fragmentionsfordenovograph);
 			break;
-#if POLYKETIDE_SIDEROPHORES == 1
-		case linearpolyketide:
-			initializeFragmentIonsForDeNovoGraphOfLinearPolyketideSiderophore(fragmentionsfordenovograph);
+#if OLIGOKETIDES == 1
+		case linearoligoketide:
+			initializeFragmentIonsForDeNovoGraphOfLinearOligoketide(fragmentionsfordenovograph);
 			break;
-		case cyclicpolyketide:
-			initializeFragmentIonsForDeNovoGraphOfCyclicPolyketideSiderophore(fragmentionsfordenovograph);
+		case cyclicoligoketide:
+			initializeFragmentIonsForDeNovoGraphOfCyclicOligoketide(fragmentionsfordenovograph);
 			break;
 #endif
 		case linearpolysaccharide:
@@ -581,12 +612,12 @@ string cParameters::printToString() {
 	case branchcyclic:
 		s += "Branch-cyclic\n";
 		break;
-#if POLYKETIDE_SIDEROPHORES == 1
-	case linearpolyketide:
-		s += "Linear oligoketide siderophore\n";
+#if OLIGOKETIDES == 1
+	case linearoligoketide:
+		s += "Linear oligoketide\n";
 		break;
-	case cyclicpolyketide:
-		s += "Cyclic oligoketide siderophore\n";
+	case cyclicoligoketide:
+		s += "Cyclic oligoketide\n";
 		break;
 #endif
 	case linearpolysaccharide:

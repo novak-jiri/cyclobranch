@@ -90,6 +90,13 @@ cMainWindow::cMainWindow() {
 	actionGraph = new QAction(QIcon(":/images/icons/32.png"), tr("De Novo &Graph"), this);
 	actionGraph->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_G));
 
+	actionSummaryTableOfMatchedPeaks = new QAction(QIcon(":/images/icons/43.png"), tr("S&ummary Table of Matched Peaks"), this);
+	actionSummaryTableOfMatchedPeaks->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_U));
+
+	actionImageWindow = new QAction(QIcon(":/images/icons/23.png"), tr("Image &Window"), this);
+	actionImageWindow->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_W));
+	actionImageWindow->setDisabled(true);
+
 	actionLog = new QAction(QIcon(":/images/icons/2.png"), tr("&Log Window"), this);
 	actionLog->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_L));
 	actionLog->setCheckable(true);
@@ -130,6 +137,8 @@ cMainWindow::cMainWindow() {
 	toolbarView = addToolBar(tr("View"));
 	toolbarView->addAction(actionShowIsomers);
 	toolbarView->addAction(actionGraph);
+	toolbarView->addAction(actionSummaryTableOfMatchedPeaks);
+	toolbarView->addAction(actionImageWindow);
 	toolbarView->addAction(actionLog);
 
 	toolbarHelp = addToolBar(tr("Help"));
@@ -148,8 +157,8 @@ cMainWindow::cMainWindow() {
 	rowsfilterbutton->setToolTip("Filter Search Results");
 	rowsfilterbutton->setMinimumWidth(50);
 
-	rowsfilterclearbutton = new QPushButton("Clear");
-	rowsfilterclearbutton->setToolTip("Clear Form and Reset Search Results");
+	rowsfilterclearbutton = new QPushButton("Reset");
+	rowsfilterclearbutton->setToolTip("Reset Search Results");
 	rowsfilterclearbutton->setMinimumWidth(50);
 	rowsfilterclearbutton->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_R));
 
@@ -182,6 +191,8 @@ cMainWindow::cMainWindow() {
 	sequencedatabasewidget = new cSequenceDatabaseWidget(this);
 	modificationswidget = new cModificationsWidget();
 	drawpeptidewidget = new cDrawPeptideWidget(this);
+	summarytableofmatchedpeaks = new cSummaryPeaksTableWidget(this);
+	imagewindow = new cImageWindow(this);
 	parameterswidget = new cParametersWidget(this);
 	htmlexportdialog = new cHTMLExportDialog(this);
 	
@@ -206,6 +217,8 @@ cMainWindow::cMainWindow() {
 	connect(actionSmilesToMonomers, SIGNAL(triggered()), this, SLOT(gotoSmiles2Monomers()));
 	connect(actionShowIsomers, SIGNAL(triggered()), this, SLOT(updateSpectra()));
 	connect(actionGraph, SIGNAL(triggered()), this, SLOT(showGraph()));
+	connect(actionSummaryTableOfMatchedPeaks, SIGNAL(triggered()), this, SLOT(showSummaryTableOfMatchedPeaks()));
+	connect(actionImageWindow, SIGNAL(triggered()), this, SLOT(showImageWindow()));
 	connect(actionLog, SIGNAL(triggered()), this, SLOT(showHideLog()));
 	connect(actionHTMLDocumentation, SIGNAL(triggered()), this, SLOT(showHTMLDocumentation()));
 	connect(actionPDFManual, SIGNAL(triggered()), this, SLOT(showPDFManual()));
@@ -213,6 +226,8 @@ cMainWindow::cMainWindow() {
 
 	connect(rowsfilterbutton, SIGNAL(released()), this, SLOT(filterResults()));
 	connect(rowsfilterclearbutton, SIGNAL(released()), this, SLOT(resetFilter()));
+
+	connect(summarytableofmatchedpeaks, SIGNAL(tableCancelled()), this, SLOT(summaryPeaksTableCancelled()));
 
 	// add subitems to the items in main menu
 	// menuFile->addAction(actionOpen);
@@ -236,8 +251,11 @@ cMainWindow::cMainWindow() {
 	menuTools->addAction(actionNorine);
 	menuTools->addAction(actionSmilesToMonomers);
 	menuView->addAction(actionShowIsomers);
-	menuView->addSeparator();
 	menuView->addAction(actionGraph);
+	menuView->addSeparator();
+	menuView->addAction(actionSummaryTableOfMatchedPeaks);
+	menuView->addAction(actionImageWindow);
+	menuView->addSeparator();
 	menuView->addAction(actionLog);
 	menuHelp->addAction(actionHTMLDocumentation);
 	menuHelp->addAction(actionPDFManual);
@@ -268,6 +286,8 @@ cMainWindow::cMainWindow() {
 	sequencedatabasewidget->hide();
 	modificationswidget->hide();
 	drawpeptidewidget->hide();
+	summarytableofmatchedpeaks->hide();
+	imagewindow->hide();
 	parameterswidget->hide();
 
 	splitter->setOrientation(Qt::Vertical);
@@ -293,6 +313,8 @@ cMainWindow::cMainWindow() {
 	lastdirsaveresults = "./";
 	lastdiropenresults = "./";
 
+	summarytableisprepared = false;
+
 	quitapp = false;
 }
 
@@ -317,6 +339,8 @@ cMainWindow::~cMainWindow() {
 	delete sequencedatabasewidget;
 	delete modificationswidget;
 	delete drawpeptidewidget;
+	delete summarytableofmatchedpeaks;
+	delete imagewindow;
 	delete parameterswidget;
 	delete htmlexportdialog;
 
@@ -335,6 +359,8 @@ cMainWindow::~cMainWindow() {
 	delete actionSmilesToMonomers;
 	delete actionShowIsomers;
 	delete actionGraph;
+	delete actionSummaryTableOfMatchedPeaks;
+	delete actionImageWindow;
 	delete actionLog;
 	delete actionHTMLDocumentation;
 	delete actionPDFManual;
@@ -443,8 +469,8 @@ void cMainWindow::reportSpectrum(int id, cTheoreticalSpectrum& theoreticalspectr
 		switch (parameters.peptidetype)
 		{
 		case linear:
-#if POLYKETIDE_SIDEROPHORES == 1
-		case linearpolyketide:
+#if OLIGOKETIDES == 1
+		case linearoligoketide:
 #endif
 		case linearpolysaccharide:
 			results->setItem(row, 6 + dbsearchspecificcolumncount, widgetitemallocator.getNewItem());
@@ -461,8 +487,8 @@ void cMainWindow::reportSpectrum(int id, cTheoreticalSpectrum& theoreticalspectr
 			results->item(row, 8 + dbsearchspecificcolumncount)->setText(parameters.searchedmodifications[theoreticalspectrum.getCandidate().getEndModifID()].name.c_str());
 			break;
 		case cyclic:
-#if POLYKETIDE_SIDEROPHORES == 1
-		case cyclicpolyketide:
+#if OLIGOKETIDES == 1
+		case cyclicoligoketide:
 #endif
 			results->setItem(row, 6 + dbsearchspecificcolumncount, widgetitemallocator.getNewItem());
 			results->item(row, 6 + dbsearchspecificcolumncount)->setData(Qt::DisplayRole, theoreticalspectrum.getNumberOfMatchedBricks());	
@@ -583,6 +609,24 @@ void cMainWindow::setAndShowDrawPeptideWidget(int peptidetypeindex, QString sequ
 }
 
 
+void cMainWindow::showSummaryTableOfMatchedPeaks() {
+	summarytableofmatchedpeaks->show();
+	summarytableofmatchedpeaks->activateWindow();
+	if (!summarytableisprepared) {
+		summarytableisprepared = true;
+		rowsfilterwidget->setEnabled(false);
+		summarytableofmatchedpeaks->prepareToShow(results, &parameters, &theoreticalspectrumlist);
+		rowsfilterwidget->setEnabled(true);
+	}
+}
+
+
+void cMainWindow::showImageWindow() {
+	imagewindow->show();
+	imagewindow->activateWindow();
+}
+
+
 void cMainWindow::showGraph() {
 	graph->show();
 	graph->activateWindow();
@@ -607,7 +651,31 @@ void cMainWindow::run() {
 	theoreticalspectrumlist.clear();
 	spectradetails.clear();
 
-	cMainThread* thread = new cMainThread(parameterswidget->getParameters(), theoreticalspectrumlist, true, false);
+	cParameters localparameters = parameterswidget->getParameters();
+
+	regex rx;
+	rx = "\\.[iI][mM][zZ][mM][lL]$";
+	if (regex_search(localparameters.peaklistfilename, rx)) {
+		string convertedimzml = localparameters.peaklistfilename.substr(0, (int)localparameters.peaklistfilename.size() - 6);
+		string convertedibd = convertedimzml;
+		convertedimzml += "_converted.imzML";
+		convertedibd += "_converted.ibd";
+
+		if (QFile::exists(convertedimzml.c_str()) && QFile::exists(convertedibd.c_str())) {
+			QMessageBox::StandardButton reply;
+			string s = "The converted imzML file '" + convertedimzml.substr(convertedimzml.rfind('/') + 1) + "' has been found.\n\nDo you want to proceed with this file instead of the original imzML file '";
+			s += localparameters.peaklistfilename.substr(localparameters.peaklistfilename.rfind('/') + 1) + "' ?";
+			s += "\n\nClick 'Yes' to proceed the converted file.\nClick 'No' to convert the original file again. Note: The conversion may be time-consuming.";
+
+			reply = QMessageBox::question(this, "Do you want to proceed the converted file ?", s.c_str(), QMessageBox::Yes|QMessageBox::No);
+
+			if (reply == QMessageBox::Yes) {
+				localparameters.peaklistfilename = convertedimzml;
+			}
+		}
+	}
+
+	cMainThread* thread = new cMainThread(localparameters, theoreticalspectrumlist, true, false);
 	connect(thread, SIGNAL(message(QString)), this, SLOT(updateLog(QString)));
 	connect(thread, SIGNAL(enableRunButtonAndSettings(bool)), this, SLOT(enableRunButtonAndSettings(bool)));
 	connect(thread, SIGNAL(enableStopButton(bool)), this, SLOT(enableStopButton(bool)));
@@ -616,6 +684,10 @@ void cMainWindow::run() {
 	connect(thread, SIGNAL(reportSpectra()), this, SLOT(reportSpectra()));
 	connect(thread, SIGNAL(setGraph(string)), this, SLOT(setGraph(string)));
 	connect(this, SIGNAL(stopComputation()), thread, SLOT(stopComputation()));
+
+	summarytableofmatchedpeaks->deleteTable(true);
+	summarytableofmatchedpeaks->hide();
+	summarytableisprepared = false;
 
 	thread->start();
 }
@@ -660,13 +732,14 @@ void cMainWindow::enableButtonsHandlingResults(bool enable) {
 	actionExportToCsv->setEnabled(enable);
 	actionExportToHTML->setEnabled(enable);
 	rowsfilterwidget->setEnabled(enable);
+	actionSummaryTableOfMatchedPeaks->setEnabled(enable);
 	
 	if (parameters.mode == dereplication) {
 		actionShowIsomers->setEnabled(false);
 	}
 	else {
 		actionShowIsomers->setEnabled(enable);
-	}
+	}	
 }
 
 
@@ -684,8 +757,8 @@ void cMainWindow::reportSpectra() {
 	switch (parameters.peptidetype)
 	{
 	case linear:
-#if POLYKETIDE_SIDEROPHORES == 1
-	case linearpolyketide:
+#if OLIGOKETIDES == 1
+	case linearoligoketide:
 #endif
 	case linearpolysaccharide:
 		resultsspecificcolumncount = 2;
@@ -694,8 +767,8 @@ void cMainWindow::reportSpectra() {
 		resultsspecificcolumncount = 3;
 		break;
 	case cyclic:
-#if POLYKETIDE_SIDEROPHORES == 1
-	case cyclicpolyketide:
+#if OLIGOKETIDES == 1
+	case cyclicoligoketide:
 #endif
 		resultsspecificcolumncount = 1;
 		break;
@@ -766,8 +839,8 @@ void cMainWindow::reportSpectra() {
 			results->horizontalHeaderItem(8 + dbsearchspecificcolumncount)->setText("C-terminal Modification");
 			break;
 		case cyclic:
-#if POLYKETIDE_SIDEROPHORES == 1
-		case cyclicpolyketide:
+#if OLIGOKETIDES == 1
+		case cyclicoligoketide:
 #endif
 			results->setHorizontalHeaderItem(6 + dbsearchspecificcolumncount, widgetitemallocator.getNewItem());
 			results->horizontalHeaderItem(6 + dbsearchspecificcolumncount)->setText("Matched Bricks");
@@ -776,8 +849,8 @@ void cMainWindow::reportSpectra() {
 			results->setHorizontalHeaderItem(6 + dbsearchspecificcolumncount, widgetitemallocator.getNewItem());
 			results->horizontalHeaderItem(6 + dbsearchspecificcolumncount)->setText("Branch Modification");
 			break;
-#if POLYKETIDE_SIDEROPHORES == 1
-		case linearpolyketide:
+#if OLIGOKETIDES == 1
+		case linearoligoketide:
 			results->setHorizontalHeaderItem(6 + dbsearchspecificcolumncount, widgetitemallocator.getNewItem());
 			results->horizontalHeaderItem(6 + dbsearchspecificcolumncount)->setText("Left Terminal Modification");
 			results->setHorizontalHeaderItem(7 + dbsearchspecificcolumncount, widgetitemallocator.getNewItem());
@@ -856,6 +929,7 @@ void cMainWindow::reportSpectra() {
 	}
 
 	QProgressDialog progress("Preparing the report...", /*"Cancel"*/0, 0, theoreticalspectrumlist.size(), this);
+	progress.setMinimumWidth(250);
 	cEventFilter filter;
 	progress.installEventFilter(&filter);
 	progress.setMinimumDuration(0);
@@ -888,7 +962,8 @@ void cMainWindow::updateSpectra() {
 		bool reportisomers = actionShowIsomers->isChecked();
 		string peptidesequence;
 
-		QProgressDialog progress("Updating the report...", /*"Cancel"*/0, 0, theoreticalspectrumlist.size(), this);
+		QProgressDialog progress("Updating the report...", 0, 0, theoreticalspectrumlist.size(), this);
+		progress.setMinimumWidth(250);
 		cEventFilter filter;
 		progress.installEventFilter(&filter);
 		progress.setMinimumDuration(0);
@@ -899,9 +974,6 @@ void cMainWindow::updateSpectra() {
 			results->item(i, 2 + dbsearchspecificcolumncount)->setText(peptidesequence.c_str());
 
 			progress.setValue(i);
-			//if (progress.wasCanceled()) {
-			//	break;
-			//}
 		}
 
 		for (int i = 0; i < results->columnCount(); i++) {
@@ -958,12 +1030,14 @@ void cMainWindow::exportToCsv() {
 	if (!filename.isEmpty()) {
 		lastdirexporttocsv = filename;
 
-		QProgressDialog progress("Exporting CSV file...", /*"Cancel"*/0, 0, results->rowCount(), this);
+		QProgressDialog progress("Exporting CSV file...", "Cancel", 0, results->rowCount(), this);
+		progress.setMinimumWidth(250);
 		cEventFilter filter;
 		progress.installEventFilter(&filter);
 		progress.setMinimumDuration(0);
 		progress.setWindowModality(Qt::WindowModal);
 		
+		bool removefile = false;
 		QFile file(filename);
 		if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
 			return;
@@ -994,16 +1068,20 @@ void cMainWindow::exportToCsv() {
 			out << endl;
 
 			progress.setValue(i);
-			//if (progress.wasCanceled()) {
-			//	break;
-			//}
+			if (progress.wasCanceled()) {
+				removefile = true;
+				break;
+			}
 		}
 
 		file.close();
 
+		if (removefile) {
+			file.remove();
+		}
+
 		progress.setValue(results->rowCount());
 	}
-
 }
 
 
@@ -1018,12 +1096,14 @@ void cMainWindow::exportToHTML() {
 	if (!filename.isEmpty()) {			
 		lastdirexporttohtml = filename;
 
-		QProgressDialog progress("Exporting HTML report...", /*"Cancel"*/0, 0, results->rowCount(), this);
+		QProgressDialog progress("Exporting HTML report...", "Cancel", 0, results->rowCount(), this);
+		progress.setMinimumWidth(250);
 		cEventFilter filter;
 		progress.installEventFilter(&filter);
 		progress.setMinimumDuration(0);
 		progress.setWindowModality(Qt::WindowModal);
 
+		bool removefile = false;
 		QFile file(filename);
 		if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
 			return;
@@ -1215,9 +1295,10 @@ void cMainWindow::exportToHTML() {
 					out << "<br/><hr size=\"1\"/>\n";
 
 					progress.setValue(i);
-					//if (progress.wasCanceled()) {
-					//	break;
-					//}
+					if (progress.wasCanceled()) {
+						removefile = true;
+						break;
+					}
 				}
 				
 			}
@@ -1228,6 +1309,10 @@ void cMainWindow::exportToHTML() {
 		}
 		
 		file.close();
+
+		if (removefile) {
+			file.remove();
+		}
 
 		progress.setValue(results->rowCount());
 
@@ -1267,12 +1352,14 @@ void cMainWindow::saveResultsFile() {
 	if (!filename.isEmpty()) {
 		lastdirsaveresults = filename;
 
-		QProgressDialog progress("Saving the report...", /*"Cancel"*/0, 0, theoreticalspectrumlist.size(), this);
+		QProgressDialog progress("Saving the report...", "Cancel", 0, theoreticalspectrumlist.size(), this);
+		progress.setMinimumWidth(250);
 		cEventFilter filter;
 		progress.installEventFilter(&filter);
 		progress.setMinimumDuration(0);
 		progress.setWindowModality(Qt::WindowModal);
 		
+		bool removefile = false;
 		ofstream outfile;
 		outfile.open(filename.toStdString().c_str(), ios::out | ios::binary | ios::trunc);
 
@@ -1302,13 +1389,18 @@ void cMainWindow::saveResultsFile() {
 			for (int i = 0; i < theoreticalspectrumlist.size(); i++) {
 				theoreticalspectrumlist[i].store(outfile);
 				progress.setValue(i);
-				//if (progress.wasCanceled()) {
-				//	break;
-				//}
+				if (progress.wasCanceled()) {
+					removefile = true;
+					break;
+				}
 			}
 
 			// close file
 			outfile.close();
+			
+			if (removefile) {
+				QFile::remove(filename);
+			}
 		}
 	
 		progress.setValue(theoreticalspectrumlist.size());
@@ -1357,6 +1449,10 @@ void cMainWindow::openResultsFile() {
 			}
 
 			deleteResults();
+
+			summarytableofmatchedpeaks->deleteTable(true);
+			summarytableofmatchedpeaks->hide();
+			summarytableisprepared = false;
 			
 			theoreticalspectrumlist.clear();
 			spectradetails.clear();
@@ -1386,7 +1482,8 @@ void cMainWindow::openResultsFile() {
 			// load theoretical spectra
 			infile.read((char *)&size, sizeof(int));
 
-			QProgressDialog progress("Loading the report...", /*"Cancel"*/0, 0, size, this);
+			QProgressDialog progress("Loading the report...", 0, 0, size, this);
+			progress.setMinimumWidth(250);
 			cEventFilter filter;
 			progress.installEventFilter(&filter);
 			progress.setMinimumDuration(0);
@@ -1396,9 +1493,6 @@ void cMainWindow::openResultsFile() {
 				theoreticalspectrum.load(infile);
 				theoreticalspectrumlist.add(theoreticalspectrum);
 				progress.setValue(i);
-				//if (progress.wasCanceled()) {
-				//	break;
-				//}
 			}
 
 			progress.setValue(size);
@@ -1450,13 +1544,18 @@ void cMainWindow::quitApplication() {
 
 
 void cMainWindow::filterResults() {
+	summarytableofmatchedpeaks->deleteTable(true);
+	summarytableofmatchedpeaks->hide();
+	summarytableisprepared = false;
+
 	Qt::CaseSensitivity casesensitive = rowsfiltercasesensitive->isChecked()?Qt::CaseSensitive:Qt::CaseInsensitive;
 	QString str = rowsfilterline->text();
 	int rowcount = results->rowCount();
 	bool match;
 	int i, j;
 
-	QProgressDialog progress("Updating the report...", /*"Cancel"*/0, 0, rowcount, this);
+	QProgressDialog progress("Updating the report...", "Cancel", 0, rowcount, this);
+	progress.setMinimumWidth(250);
 	cEventFilter filter;
 	progress.installEventFilter(&filter);
 	progress.setMinimumDuration(0);
@@ -1472,6 +1571,12 @@ void cMainWindow::filterResults() {
 		}
 		results->setRowHidden(i, !match);
 		progress.setValue(i);
+
+		if (progress.wasCanceled()) {
+			resetFilter();
+			break;
+		}
+
 	}
 
 	progress.setValue(rowcount);
@@ -1479,10 +1584,15 @@ void cMainWindow::filterResults() {
 
 
 void cMainWindow::resetFilter() {
+	summarytableofmatchedpeaks->deleteTable(true);
+	summarytableofmatchedpeaks->hide();
+	summarytableisprepared = false;
+
 	rowsfilterline->setText("");
 	int rowcount = results->rowCount();
 
-	QProgressDialog progress("Updating the report...", /*"Cancel"*/0, 0, rowcount, this);
+	QProgressDialog progress("Updating the report...", 0, 0, rowcount, this);
+	progress.setMinimumWidth(250);
 	cEventFilter filter;
 	progress.installEventFilter(&filter);
 	progress.setMinimumDuration(0);
@@ -1506,6 +1616,10 @@ void cMainWindow::gotoSmiles2Monomers() {
 	QDesktopServices::openUrl(QUrl("http://bioinfo.lifl.fr/norine/smiles2monomers.jsp"));
 }
 
+
+void cMainWindow::summaryPeaksTableCancelled() {
+	summarytableisprepared = false;
+}
 
 /*
 void cMainWindow::showContextMenu(const QPoint &pt) {

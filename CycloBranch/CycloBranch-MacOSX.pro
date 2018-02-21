@@ -53,6 +53,8 @@ HEADERS += core/cAllocator.h \
            gui/cFragmentIonsListWidget.h \
            gui/cGraphWidget.h \
            gui/cHTMLExportDialog.h \
+           gui/cImageWindow.h \
+           gui/cImageWindowWidget.h \
            gui/cLinearWidget.h \
            gui/cMainThread.h \
            gui/cMainWindow.h \
@@ -61,6 +63,7 @@ HEADERS += core/cAllocator.h \
            gui/cSequenceDatabaseWidget.h \
            gui/cSpectrumDetailWidget.h \
            gui/cSpectrumSceneWidget.h \
+           gui/cSummaryPeaksTableWidget.h \
            parallel/cGraphReaderThread.h \
            parallel/cSpectrumComparatorThread.h
 SOURCES += core/cBrick.cpp \
@@ -94,6 +97,8 @@ SOURCES += core/cBrick.cpp \
            gui/cFragmentIonsListWidget.cpp \
            gui/cGraphWidget.cpp \
            gui/cHTMLExportDialog.cpp \
+           gui/cImageWindow.cpp \
+           gui/cImageWindowWidget.cpp \
            gui/cLinearWidget.cpp \
            gui/cMainThread.cpp \
            gui/cMainWindow.cpp \
@@ -102,6 +107,7 @@ SOURCES += core/cBrick.cpp \
            gui/cSequenceDatabaseWidget.cpp \
            gui/cSpectrumDetailWidget.cpp \
            gui/cSpectrumSceneWidget.cpp \
+           gui/cSummaryPeaksTableWidget.cpp \
            parallel/cGraphReaderThread.cpp \
            parallel/cSpectrumComparatorThread.cpp \
            main.cpp

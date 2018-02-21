@@ -4,7 +4,7 @@
 
 
 QString appname = "CycloBranch";
-QString appversion = "v. 1.0.1512 (64-bit)";
+QString appversion = "v. 1.1.170 (64-bit)";
 
 
 #if OS_TYPE == UNX
@@ -75,14 +75,14 @@ bool checkRegex(ePeptideType peptidetype, string& sequence, string& errormessage
 	{
 	case linear:
 	case linearpolysaccharide:
-#if POLYKETIDE_SIDEROPHORES == 1
-	case linearpolyketide:
+#if OLIGOKETIDES == 1
+	case linearoligoketide:
 #endif
 		rx = "^\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])*$";
 		break;
 	case cyclic:
-#if POLYKETIDE_SIDEROPHORES == 1
-	case cyclicpolyketide:
+#if OLIGOKETIDES == 1
+	case cyclicoligoketide:
 #endif
 		rx = "^\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])+$";
 		break;
@@ -186,12 +186,12 @@ ePeptideType getPeptideTypeFromString(string& s) {
 	if (s.compare("branch-cyclic") == 0) {
 		return branchcyclic;
 	}
-#if POLYKETIDE_SIDEROPHORES == 1
-	if (s.compare("linear-oligoketide-siderophore") == 0) {
-		return linearpolyketide;
+#if OLIGOKETIDES == 1
+	if (s.compare("linear-oligoketide") == 0) {
+		return linearoligoketide;
 	}
-	if (s.compare("cyclic-oligoketide-siderophore") == 0) {
-		return cyclicpolyketide;
+	if (s.compare("cyclic-oligoketide") == 0) {
+		return cyclicoligoketide;
 	}
 #endif
 	if (s.compare("linear-polysaccharide") == 0) {
@@ -220,12 +220,12 @@ string getStringFromPeptideType(ePeptideType peptidetype) {
 	case branchcyclic:
 		return "branch-cyclic";
 		break;
-#if POLYKETIDE_SIDEROPHORES == 1
-	case linearpolyketide:
-		return "linear-oligoketide-siderophore";
+#if OLIGOKETIDES == 1
+	case linearoligoketide:
+		return "linear-oligoketide";
 		break;
-	case cyclicpolyketide:
-		return "cyclic-oligoketide-siderophore";
+	case cyclicoligoketide:
+		return "cyclic-oligoketide";
 		break;
 #endif
 	case linearpolysaccharide:

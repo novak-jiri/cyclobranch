@@ -314,6 +314,33 @@
     <ClCompile Include="core\cImzML.cpp">
       <Filter>Source Files\core</Filter>
     </ClCompile>
+    <ClCompile Include="gui\cSummaryPeaksTableWidget.cpp">
+      <Filter>Source Files\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_cSummaryPeaksTableWidget.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_cSummaryPeaksTableWidget.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="gui\cImageWindow.cpp">
+      <Filter>Source Files\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_cImageWindow.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_cImageWindow.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_cImageWindowWidget.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_cImageWindowWidget.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="gui\cImageWindowWidget.cpp">
+      <Filter>Source Files\gui</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="gui\cAboutWidget.h">
@@ -392,6 +419,15 @@
       <Filter>Header Files\gui</Filter>
     </CustomBuild>
     <CustomBuild Include="gui\cHTMLExportDialog.h">
+      <Filter>Header Files\gui</Filter>
+    </CustomBuild>
+    <CustomBuild Include="gui\cSummaryPeaksTableWidget.h">
+      <Filter>Header Files\gui</Filter>
+    </CustomBuild>
+    <CustomBuild Include="gui\cImageWindow.h">
+      <Filter>Header Files\gui</Filter>
+    </CustomBuild>
+    <CustomBuild Include="gui\cImageWindowWidget.h">
       <Filter>Header Files\gui</Filter>
     </CustomBuild>
   </ItemGroup>

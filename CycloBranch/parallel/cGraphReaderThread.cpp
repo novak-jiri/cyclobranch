@@ -97,19 +97,19 @@ int cGraphReaderThread::getCandidatesIter(bool cterminalstartingnode, cCandidate
 			candidate.setCandidate(composition, perspectivepath, startmodifID, endmodifID, middlemodifID, middlepos);			
 		}
 
-#if POLYKETIDE_SIDEROPHORES == 1
-		if ((parameters->peptidetype == linearpolyketide) && candidate.hasLastBrickArtificial(*bricksdatabasewithcombinations) && (composition.size() > 0) && (perspectivepath.size() > 0)) {
+#if OLIGOKETIDES == 1
+		if ((parameters->peptidetype == linearoligoketide) && candidate.hasLastBrickArtificial(*bricksdatabasewithcombinations) && (composition.size() > 0) && (perspectivepath.size() > 0)) {
 		
 			if ((*graph)[perspectivepath[0].nodeid].checkIonAnnotation(l1h_ion)) {
-				switch (candidate.getResidueLossType(*bricksdatabasewithcombinations))
+				switch (candidate.getKetidePrecursorType(*bricksdatabasewithcombinations))
 				{
-				case water:
+				case ketide_precursor_h2o:
 					bid = atoi(composition.back().c_str()) + 1; // offset of -H2O brick
 					break;
-				case h2:
+				case ketide_precursor_h2:
 					bid = atoi(composition.back().c_str()) + 3; // offset of -H2 brick
 					break;
-				case h2o2:
+				case ketide_precursor_h2o2:
 					bid = atoi(composition.back().c_str()) + 8; // offset of -H2O2 brick
 					break;
 				default:
@@ -122,15 +122,15 @@ int cGraphReaderThread::getCandidatesIter(bool cterminalstartingnode, cCandidate
 			}
 
 			if ((*graph)[perspectivepath[0].nodeid].checkIonAnnotation(l2h_ion)) {
-				switch (candidate.getResidueLossType(*bricksdatabasewithcombinations))
+				switch (candidate.getKetidePrecursorType(*bricksdatabasewithcombinations))
 				{
-				case water:
+				case ketide_precursor_h2o:
 					bid = atoi(composition.back().c_str()) + 4; // offset of -O brick
 					break;
-				case h2:
+				case ketide_precursor_h2:
 					bid = atoi(composition.back().c_str()); // nop
 					break;
-				case h2o2:
+				case ketide_precursor_h2o2:
 					bid = atoi(composition.back().c_str()) + 6; // offset of -O2 brick
 					break;
 				default:
@@ -143,15 +143,15 @@ int cGraphReaderThread::getCandidatesIter(bool cterminalstartingnode, cCandidate
 			}
 
 			if ((*graph)[perspectivepath[0].nodeid].checkIonAnnotation(l1oh_ion)) {
-				switch (candidate.getResidueLossType(*bricksdatabasewithcombinations))
+				switch (candidate.getKetidePrecursorType(*bricksdatabasewithcombinations))
 				{
-				case water:
+				case ketide_precursor_h2o:
 					bid = atoi(composition.back().c_str()) + 3; // offset of -H2 brick
 					break;
-				case h2:
+				case ketide_precursor_h2:
 					bid = atoi(composition.back().c_str()) + 7; // offset of -H2+O brick
 					break;
-				case h2o2:
+				case ketide_precursor_h2o2:
 					bid = atoi(composition.back().c_str()) + 1; // offset of -H2O brick
 					break;
 				default:
@@ -164,15 +164,15 @@ int cGraphReaderThread::getCandidatesIter(bool cterminalstartingnode, cCandidate
 			}
 
 			if ((*graph)[perspectivepath[0].nodeid].checkIonAnnotation(l2oh_ion)) {
-				switch (candidate.getResidueLossType(*bricksdatabasewithcombinations))
+				switch (candidate.getKetidePrecursorType(*bricksdatabasewithcombinations))
 				{
-				case water:
+				case ketide_precursor_h2o:
 					bid = atoi(composition.back().c_str()); // nop
 					break;
-				case h2:
+				case ketide_precursor_h2:
 					bid = atoi(composition.back().c_str()) + 5; // offset of +O brick
 					break;
-				case h2o2:
+				case ketide_precursor_h2o2:
 					bid = atoi(composition.back().c_str()) + 4; // offset of -O brick
 					break;
 				default:
@@ -190,8 +190,8 @@ int cGraphReaderThread::getCandidatesIter(bool cterminalstartingnode, cCandidate
 		if ((candidate.getComposition().compare("") != 0) && !candidate.hasOnlyArtificialBricks(*bricksdatabasewithcombinations) && !candidate.hasLastBrickInvalid(*bricksdatabasewithcombinations)) {
 
 			if (isInPpmMassErrorTolerance(precursormass, candidate.getPrecursorMass(*bricksdatabasewithcombinations, parameters), parameters->precursormasserrortolerance)
-#if POLYKETIDE_SIDEROPHORES == 1
-				&& (((parameters->peptidetype != linearpolyketide) && (parameters->peptidetype != cyclicpolyketide)) || candidate.checkPolyketideBlocks(*bricksdatabasewithcombinations, parameters->peptidetype))
+#if OLIGOKETIDES == 1
+				&& (((parameters->peptidetype != linearoligoketide) && (parameters->peptidetype != cyclicoligoketide)) || candidate.checkKetideBlocks(*bricksdatabasewithcombinations, parameters->peptidetype))
 #endif
 				) {
 				
@@ -326,8 +326,8 @@ void cGraphReaderThread::run() {
 			}
 		}
 		break;
-#if POLYKETIDE_SIDEROPHORES == 1
-	case linearpolyketide:
+#if OLIGOKETIDES == 1
+	case linearoligoketide:
 		for (int i = 1; i <= lastsystemnode; i++) {
 			if (i - 4 > 0) {
 				startmodifID = i - 4;
@@ -338,7 +338,7 @@ void cGraphReaderThread::run() {
 			}
 		}
 		break;
-	case cyclicpolyketide:
+	case cyclicoligoketide:
 		for (int i = 1; i <= lastsystemnode; i++) {
 			if (getCandidatesIter(false, candidates, i, composition, unchargedprecursormass, 0, 0, 0, -1, perspectivepath, (*graph)[i].getMZRatio(), terminatecomputation) == -1) {
 				// terminated

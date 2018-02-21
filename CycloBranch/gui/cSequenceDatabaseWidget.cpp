@@ -58,8 +58,8 @@ cSequenceDatabaseWidget::cSequenceDatabaseWidget(QWidget* parent) {
 	rowsfilterbutton->setToolTip("Filter Search Results");
 	rowsfilterbutton->setMinimumWidth(50);
 
-	rowsfilterclearbutton = new QPushButton("Clear");
-	rowsfilterclearbutton->setToolTip("Clear Form and Reset Search Results");
+	rowsfilterclearbutton = new QPushButton("Reset");
+	rowsfilterclearbutton->setToolTip("Reset Search Results");
 	rowsfilterclearbutton->setMinimumWidth(50);
 	rowsfilterclearbutton->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_R));
 
@@ -145,7 +145,7 @@ cSequenceDatabaseWidget::cSequenceDatabaseWidget(QWidget* parent) {
 }
 
 
-cSequenceDatabaseWidget::~cSequenceDatabaseWidget() {
+cSequenceDatabaseWidget::~cSequenceDatabaseWidget() {	
 	deleteTable(false);
 
 	for (int i = 0; i < database->columnCount(); i++) {
@@ -196,7 +196,8 @@ void cSequenceDatabaseWidget::deleteTable(bool enableprogress) {
 	int rowcount = database->rowCount();
 
 	if (enableprogress) {
-		progress = new QProgressDialog("Clearing the table...", /*"Cancel"*/0, 0, rowcount, this);
+		progress = new QProgressDialog("Clearing the table...", 0, 0, rowcount, this);
+		progress->setMinimumWidth(250);
 		progress->installEventFilter(&filter);
 		progress->setMinimumDuration(0);
 		progress->setWindowModality(Qt::WindowModal);
@@ -212,9 +213,6 @@ void cSequenceDatabaseWidget::deleteTable(bool enableprogress) {
 
 		if (enableprogress) {
 			progress->setValue(i);
-			//if (progress->wasCanceled()) {
-			//	break;
-			//}
 		}
 	}
 
@@ -293,14 +291,14 @@ bool cSequenceDatabaseWidget::checkSequence(int row) {
 	{
 	case linear:
 	case linearpolysaccharide:
-#if POLYKETIDE_SIDEROPHORES == 1
-	case linearpolyketide:
+#if OLIGOKETIDES == 1
+	case linearoligoketide:
 #endif
 		rx = "^\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])*$";
 		break;
 	case cyclic:
-#if POLYKETIDE_SIDEROPHORES == 1
-	case cyclicpolyketide:
+#if OLIGOKETIDES == 1
+	case cyclicoligoketide:
 #endif
 		rx = "^\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])+$";
 		break;
@@ -439,7 +437,8 @@ void cSequenceDatabaseWidget::loadDatabase() {
 			sequences.clear();
 			sequences.loadFromPlainTextStream(inputstream);
 
-			QProgressDialog progress("Loading the Sequence Databatase...", /*"Cancel"*/0, 0, sequences.size(), this);
+			QProgressDialog progress("Loading the Sequence Database...", "Cancel", 0, sequences.size(), this);
+			progress.setMinimumWidth(250);
 			cEventFilter filter;
 			progress.installEventFilter(&filter);
 			progress.setMinimumDuration(0);
@@ -490,9 +489,13 @@ void cSequenceDatabaseWidget::loadDatabase() {
                 ((QLabel *)database->cellWidget(i, 10))->setOpenExternalLinks(true);
 
 				progress.setValue(i);
-				//if (progress.wasCanceled()) {
-				//	break;
-				//}
+				if (progress.wasCanceled()) {
+					deleteTable(true);
+					sequences.clear();
+					databasefile = "";
+					save->setText(" Save ");
+					break;
+				}
 			}
 
 			for (int i = 0; i < database->columnCount(); i++) {
@@ -530,7 +533,8 @@ bool cSequenceDatabaseWidget::saveDatabase() {
 	}
 	else {
 
-		QProgressDialog progress("Saving the Sequence Databatase...", /*"Cancel"*/0, 0, database->rowCount(), this);
+		QProgressDialog progress("Saving the Sequence Database...", 0, 0, database->rowCount(), this);
+		progress.setMinimumWidth(250);
 		cEventFilter filter;
 		progress.installEventFilter(&filter);
 		progress.setMinimumDuration(0);
@@ -597,9 +601,6 @@ bool cSequenceDatabaseWidget::saveDatabase() {
 			sequences.push_back(seq);
 			
 			progress.setValue(i);
-			//if (progress.wasCanceled()) {
-			//	break;
-			//}
 		}
 
 		sequences.storeToPlainTextStream(outputstream);
@@ -731,13 +732,15 @@ void cSequenceDatabaseWidget::filterRows() {
 	bool match;
 	int i, j;
 
-	QProgressDialog progress("Updating...", /*"Cancel"*/0, 0, rowcount, this);
+	QProgressDialog progress("Updating...", "Cancel", 0, rowcount, this);
+	progress.setMinimumWidth(250);
 	cEventFilter filter;
 	progress.installEventFilter(&filter);
 	progress.setMinimumDuration(0);
 	progress.setWindowModality(Qt::WindowModal);
 
 	for (i = 0; i < rowcount; i++) {
+
 		match = false;
 		for (j = 0; j < database->columnCount(); j++) {
 			// ignore non-text fields
@@ -752,6 +755,12 @@ void cSequenceDatabaseWidget::filterRows() {
 		}
 		database->setRowHidden(i, !match);
 		progress.setValue(i);
+
+		if (progress.wasCanceled()) {
+			resetFilter();
+			break;
+		}
+
 	}
 
 	progress.setValue(rowcount);
@@ -762,7 +771,8 @@ void cSequenceDatabaseWidget::resetFilter() {
 	rowsfilterline->setText("");
 	int rowcount = database->rowCount();
 
-	QProgressDialog progress("Updating...", /*"Cancel"*/0, 0, rowcount, this);
+	QProgressDialog progress("Updating...", 0, 0, rowcount, this);
+	progress.setMinimumWidth(250);
 	cEventFilter filter;
 	progress.installEventFilter(&filter);
 	progress.setMinimumDuration(0);

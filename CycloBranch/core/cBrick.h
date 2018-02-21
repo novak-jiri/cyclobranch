@@ -21,9 +21,18 @@ using namespace std;
 	\brief Residue loss types.
 */
 enum eResidueLossType {
-	water = 0,
-	h2,
-	h2o2
+	h2o_loss = 0,
+	h2_loss
+};
+
+
+/**
+	\brief Precursor loss types.
+*/
+enum eKetidePrecursorType {
+	ketide_precursor_h2o = 0,
+	ketide_precursor_h2,
+	ketide_precursor_h2o2
 };
 
 
