@@ -10,6 +10,7 @@
 #include <string>
 #include <fstream>
 #include <QWidget>
+#include "core/utilities.h"
 
 
 using namespace std;

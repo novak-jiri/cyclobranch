@@ -16,6 +16,8 @@
 #include "gui/cGraphWidget.h"
 #include "gui/cParametersWidget.h"
 #include "gui/cSpectrumDetailWidget.h"
+#include "gui/cBricksDatabaseWidget.h"
+#include "gui/cSequenceDatabaseWidget.h"
 #include "gui/cMainThread.h"
 
 // forward declaration
@@ -54,6 +56,7 @@ private:
 	// items in the menu
 	QMenu* menuFile;
 	QMenu* menuSearch;
+	QMenu* menuTools;
 	QMenu* menuView;
 	QMenu* menuHelp;
 	
@@ -66,6 +69,8 @@ private:
 	QAction* actionRun;
 	QAction* actionStop;
 	QAction* actionProperties;
+	QAction* actionBricksDatabase;
+	QAction* actionSequenceDatabase;
 	QAction* actionGraph;
 	QAction* actionLog;
 	QAction* actionHTMLDocumentation;
@@ -82,10 +87,13 @@ private:
 		
 	cAboutWidget* about;
 	cGraphWidget* graph;
+	cBricksDatabaseWidget* bricksdatabasewidget;
+	cSequenceDatabaseWidget* sequencedatabasewidget;
 	cParametersWidget* parameterswidget;
 
 	int resultsbasecolumncount;
 	int resultsspecificcolumncount;
+	int dbsearchspecificcolumncount;
 
 	vector<int> resultsheadersort;
 
@@ -102,6 +110,10 @@ private slots:
 	void showHideLog();
 
 	void showAbout();
+
+	void showBricksDatabase();
+
+	void showSequenceDatabase();
 
 	void showGraph();
 

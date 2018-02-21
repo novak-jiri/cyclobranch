@@ -90,7 +90,24 @@ int cTheoreticalSpectrumList::parallelCompareAndStore(cCandidateSet& candidates,
 	regex rxsequencetag, rxsearchedsequence;
 	cSpectrumComparatorThread* comparatorthread;
 	string stmp;
-	cBricksDatabase* bricksdb = (parameters->mode == 0) ? graph->getBrickDatabaseWithCombinations() : &parameters->bricksdatabase;
+	
+	cBricksDatabase* bricksdb = 0;
+	switch (parameters->mode)
+	{
+	case denovoengine:
+		bricksdb = graph->getBrickDatabaseWithCombinations();
+		break;
+	case singlecomparison:
+		bricksdb = &parameters->bricksdatabase;
+		break;
+	case databasesearch:
+		bricksdb = &parameters->bricksdatabase;
+		break;
+	default:
+		return -1;
+		break;
+	}
+	
 	vector<cTheoreticalSpectrum> resultspectra;
 	//int pos;
 	
@@ -142,7 +159,7 @@ int cTheoreticalSpectrumList::parallelCompareAndStore(cCandidateSet& candidates,
 		return -1;
 	}
 
-	if (parameters->mode == 0) {
+	if ((parameters->mode == denovoengine) || (parameters->mode == databasesearch)) {
 
 		QThreadPool::globalInstance()->setMaxThreadCount(parameters->maximumnumberofthreads);
 
@@ -176,7 +193,8 @@ int cTheoreticalSpectrumList::parallelCompareAndStore(cCandidateSet& candidates,
 				}
 
 				if ((i % 10000 == 0) && (i > 0)) {
-					*os << "(Remaining candidates in buffer: " << size << "; Are they all ?: " << (os->isGraphReaderWorking() ? "no" : "yes") << ")" << endl;
+					//*os << "(Remaining candidates in buffer: " << size << "; Are they all ?: " << (os->isGraphReaderWorking() ? "no" : "yes") << ")" << endl;
+					*os << endl;
 				}
 
 				i++;
@@ -235,6 +253,7 @@ int cTheoreticalSpectrumList::parallelCompareAndStore(cCandidateSet& candidates,
 		case linearpolysaccharide:
 			theoreticalpeaksrealsize = tsp.compareLinearPolysaccharide(peaklist, *bricksdb, true, rxsequencetag, rxsearchedsequence);
 			break;
+		case other:
 		default:
 			break;
 		}
@@ -261,7 +280,7 @@ int cTheoreticalSpectrumList::parallelCompareAndStore(cCandidateSet& candidates,
 			theoreticalspectra[i].setBackboneAcronyms(*bricksdb);
 			theoreticalspectra[i].setBranchAcronyms(*bricksdb);
 		}
-		if (parameters->mode == 0) {
+		if (parameters->mode == denovoengine) {
 			theoreticalspectra[i].setPath(*graph);
 		}
 		// parameters must not be used by viewer, they are not stored/loaded

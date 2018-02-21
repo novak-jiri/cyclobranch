@@ -1,6 +1,6 @@
 /**
 	\file cBricksDatabase.h
-	\brief The representation of a database of bricks.
+	\brief The database of building blocks.
 */
 
 
@@ -12,6 +12,7 @@
 #include <vector>
 #include <string>
 #include <algorithm>
+#include <iomanip>
 
 
 #include "core/cBrick.h"
@@ -92,6 +93,13 @@ public:
 		\retval int 0 when the database was successfully loaded, -1 when an error occurred (\a errormessage is filled up)
 	*/ 
 	int loadFromPlainTextStream(ifstream &stream, string& errormessage);
+
+
+	/**
+		\brief Store the database of bricks into a plain text stream.
+		\param stream reference to an output file stream
+	*/ 
+	void storeToPlainTextStream(ofstream &stream);
 
 
 	/**
@@ -181,9 +189,10 @@ public:
 	/**
 		\brief Replace acronyms of bricks by ids.
 		\param sequence reference to an input/output string containing acronyms/ids of bricks
+		\param errormessage reference to a string where an error message is stored when \a sequence contains an unknown building block
 		\retval bool true when the replacement was successful, false when an acronym of a brick is unknown
 	*/ 
-	bool replaceAcronymsByIDs(string& sequence);
+	bool replaceAcronymsByIDs(string& sequence, string& errormessage);
 
 
 	/**

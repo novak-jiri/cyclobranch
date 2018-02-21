@@ -246,19 +246,11 @@ double cSummaryFormula::getMass() {
 
 
 void cSummaryFormula::store(ofstream& os) {
-	int size;
-
-	size = (int)formula.size();
-	os.write((char *)&size, sizeof(int));
-	os.write(formula.c_str(), formula.size());
+	storeString(formula, os);
 }
 
 
 void cSummaryFormula::load(ifstream& is) {
-	int size;
-
-	is.read((char *)&size, sizeof(int));
-	formula.resize(size);
-	is.read(&formula[0], formula.size());
+	loadString(formula, is);
 }
 

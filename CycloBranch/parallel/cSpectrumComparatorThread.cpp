@@ -106,7 +106,7 @@ void cSpectrumComparatorThread::run() {
 	double score;
 		
 	permutations.getSet().clear();
-	if ((parameters->mode == 0) && (parameters->generatebrickspermutations)) {
+	if ((parameters->mode == denovoengine) && (parameters->generatebrickspermutations)) {
 		candidate.getPermutations(permutations, terminatecomputation);
 	}
 	else {
@@ -144,6 +144,8 @@ void cSpectrumComparatorThread::run() {
 			break;
 		case linearpolysaccharide:
 			theoreticalpeaksrealsize = tsp.compareLinearPolysaccharide(peaklist, *bricksdatabasewithcombinations, false, *rxsequencetag, *rxsearchedsequence);
+			break;
+		case other:
 			break;
 		default:
 			break;

@@ -50,20 +50,12 @@ void cGraphWidget::closeEvent(QCloseEvent *event) {
 
 
 void cGraphWidget::store(ofstream& os) {
-	int size;
-
-	size = (int)htmlstring.size();
-	os.write((char *)&size, sizeof(int));
-	os.write(htmlstring.c_str(), htmlstring.size());
+	storeString(htmlstring, os);
 }
 
 
 void cGraphWidget::load(ifstream& is) {
-	int size;
-
-	is.read((char *)&size, sizeof(int));
-	htmlstring.resize(size);
-	is.read(&htmlstring[0], htmlstring.size());
+	loadString(htmlstring, is);
 	textbrowser->setHtml(htmlstring.c_str());
 }
 

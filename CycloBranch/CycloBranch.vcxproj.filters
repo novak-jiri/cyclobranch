@@ -212,6 +212,33 @@
     <ClCompile Include="core\cSummaryFormula.cpp">
       <Filter>Source Files\core</Filter>
     </ClCompile>
+    <ClCompile Include="gui\cBricksDatabaseWidget.cpp">
+      <Filter>Source Files\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_cBricksDatabaseWidget.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_cBricksDatabaseWidget.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="core\cSequenceDatabase.cpp">
+      <Filter>Source Files\core</Filter>
+    </ClCompile>
+    <ClCompile Include="core\cSequence.cpp">
+      <Filter>Source Files\core</Filter>
+    </ClCompile>
+    <ClCompile Include="core\utilities.cpp">
+      <Filter>Source Files\core</Filter>
+    </ClCompile>
+    <ClCompile Include="gui\cSequenceDatabaseWidget.cpp">
+      <Filter>Source Files\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_cSequenceDatabaseWidget.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_cSequenceDatabaseWidget.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="gui\cAboutWidget.h">
@@ -259,6 +286,12 @@
     <CustomBuild Include="gui\cLassoWidget.h">
       <Filter>Header Files\gui</Filter>
     </CustomBuild>
+    <CustomBuild Include="gui\cBricksDatabaseWidget.h">
+      <Filter>Header Files\gui</Filter>
+    </CustomBuild>
+    <CustomBuild Include="gui\cSequenceDatabaseWidget.h">
+      <Filter>Header Files\gui</Filter>
+    </CustomBuild>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="core\cBrick.h">
@@ -295,6 +328,15 @@
       <Filter>Header Files\core</Filter>
     </ClInclude>
     <ClInclude Include="core\cSummaryFormula.h">
+      <Filter>Header Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="core\cSequenceDatabase.h">
+      <Filter>Header Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="core\cSequence.h">
+      <Filter>Header Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="core\utilities.h">
       <Filter>Header Files\core</Filter>
     </ClInclude>
   </ItemGroup>

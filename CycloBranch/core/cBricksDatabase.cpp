@@ -105,7 +105,7 @@ bool cBricksDatabase::nextCombination(vector<int>& combarray, int numberofbasicb
 
 
 cBricksDatabase::cBricksDatabase() {
-	bricks.clear();
+	clear();
 }
 
 
@@ -119,6 +119,7 @@ int cBricksDatabase::loadFromPlainTextStream(ifstream &stream, string& errormess
 	errormessage = "";
 	cSummaryFormula formula;
 	
+	bricks.clear();
 	while (stream.good()) {
 		getline(stream,s);
 
@@ -207,9 +208,18 @@ int cBricksDatabase::loadFromPlainTextStream(ifstream &stream, string& errormess
 		return -1;
 	}
 
-	sortbyMass();
-
 	return 0;
+}
+
+
+void cBricksDatabase::storeToPlainTextStream(ofstream &stream) {
+	for (int i = 0; i < bricks.size(); i++) {
+		stream << bricks[i].getName() << "\t";
+		stream << bricks[i].getAcronymsAsString() << "\t";
+		stream << bricks[i].getSummary() << "\t";
+		stream << std::fixed << std::setprecision(10) << bricks[i].getMass() << "\t";
+		stream << bricks[i].getReferencesAsString() << endl;
+	}
 }
 
 
@@ -409,7 +419,7 @@ void cBricksDatabase::clear() {
 }
 
 
-bool cBricksDatabase::replaceAcronymsByIDs(string& sequence) {
+bool cBricksDatabase::replaceAcronymsByIDs(string& sequence, string& errormessage) {
 	string s = "";
 	string acronym;
 	bool insidebrick = false;
@@ -447,6 +457,7 @@ bool cBricksDatabase::replaceAcronymsByIDs(string& sequence) {
 			//}
 			
 			if (!found) {
+				errormessage = "Invalid brick acronym '" + acronym + "' typed in the sequence: " + sequence + ".";
 				return false;
 			}
 

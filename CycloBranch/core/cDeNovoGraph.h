@@ -26,6 +26,12 @@ using namespace std;
 
 
 /**
+	\brief Maximum number of candidates to be read from the graph.
+*/
+const long long unsigned maximumcandidates = 1000000000;
+
+
+/**
 	\brief Compare two nodes.
 	\param node1 reference to the first node
 	\param node2 reference to the second node
@@ -49,7 +55,7 @@ class cDeNovoGraph {
 
 	cGraphReaderThread* graphreaderthread;
 
-	bool findPath(int sourcenodeid, int edgeid, int targetnodeid, string& composition, string brickspath, int maximumbricksincombination, int depth);
+	bool findPath(int sourcenodeid, int edgeid, int targetnodeid, string& composition, string brickspath, int maximumbricksincombination, vector<int>& path);
 
 	// create vectors of edges from temporary unordered_sets
 	void createVectorsOfEdges();
@@ -124,9 +130,11 @@ public:
 	/**
 		\brief Start the graph reader.
 		\param candidates output set of candidates
+		\param count an output number of peptide sequence candidates
+		\param scanmode 0 = get candidates; 1 = calculate the number of peptide sequence candidates
 		\param terminatecomputation reference to a variable determining that the computation must be stopped
 	*/ 
-	void startGraphReader(cCandidateSet& candidates, bool& terminatecomputation);
+	void startGraphReader(cCandidateSet& candidates, long long unsigned& count, int scanmode, bool& terminatecomputation);
 
 
 	/**

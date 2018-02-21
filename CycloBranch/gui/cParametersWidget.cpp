@@ -16,6 +16,7 @@
 #include <QCheckBox>
 #include <QTableWidget>
 #include <QHeaderView>
+#include <QMessageBox>
 
 
 cParametersWidget::cParametersWidget() {
@@ -25,6 +26,7 @@ cParametersWidget::cParametersWidget() {
 	oldsettingsfile = "";
 	peaklistfilename = "";
 	brickdatabasefilename = "";
+	sequencedatabasefilename = "";
 
 	stdbuttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Apply | QDialogButtonBox::Cancel);
 	stdbuttons->button(QDialogButtonBox::Ok)->setToolTip("Accept changes and hide window.");
@@ -54,6 +56,7 @@ cParametersWidget::cParametersWidget() {
 	peptidetype->addItem(tr("Branched"));
 	peptidetype->addItem(tr("Lasso"));
 	peptidetype->addItem(tr("Linear polysaccharide (beta version)"));
+	//peptidetype->addItem(tr("Other"));
 	peaklistformlayout->addRow(tr("Peptide Type: "), peptidetype);
 
 	peaklistline = new QLineEdit();
@@ -201,9 +204,11 @@ cParametersWidget::cParametersWidget() {
 	applicationformlayout = new QFormLayout();
 	
 	mode = new QComboBox();
-	mode->setToolTip("De Novo Search Engine (identification mode) - the default mode of the application.\nCompare Spectrum of Searched Sequence with Peaklist (annotation mode) - a theoretical spectrum is generated for an input \"Searched Peptide Sequence\" and it is compared with the peaklist.");
+	mode->setToolTip("De Novo Search Engine (identification mode) - the default mode of the application.\nCompare Peaklist with Spectrum of Searched Sequence (annotation mode) - a theoretical spectrum is generated for an input \"Searched Peptide Sequence\" and it is compared with the peaklist.\nCompare Peaklist with Database - MS/MS data (identification mode) - the peaklist is compared with theoretical spectra generated from a database of sequences.\nCompare Peaklist with Database - MS data (identification mode) - the peaklist is compared with theoretical peaks generated from a database of sequences.");
 	mode->addItem(tr("De Novo Search Engine"));
-	mode->addItem(tr("Compare Spectrum of Searched Sequence with Peaklist"));
+	mode->addItem(tr("Compare Peaklist with Spectrum of Searched Sequence"));
+	mode->addItem(tr("Compare Peaklist with Database - MS/MS data"));
+	mode->addItem(tr("Compare Peaklist with Database - MS data"));
 	applicationformlayout->addRow(tr("Mode: "), mode);
 
 	maximumnumberofthreads = new QSpinBox();
@@ -215,8 +220,8 @@ cParametersWidget::cParametersWidget() {
 	scoretype = new QComboBox();
 	scoretype->setToolTip("A score for peptide-spectrum matches.");
 	scoretype->addItem(tr("Number of b-ions"));
-	scoretype->addItem(tr("Number of b-ions + water loss b-ions"));
-	scoretype->addItem(tr("Number of b-ions + ammonia loss b-ions"));
+	scoretype->addItem(tr("Number of b-ions + dehydrated b-ions"));
+	scoretype->addItem(tr("Number of b-ions + deamidated b-ions"));
 	scoretype->addItem(tr("Number of y-ions + b-ions (not for cyclic peptides)"));
 	scoretype->addItem(tr("Number of y-ions (not for cyclic peptides)"));
 	scoretype->addItem(tr("Sum of relative intensities of matched peaks"));
@@ -240,7 +245,7 @@ cParametersWidget::cParametersWidget() {
 	applicationformlayout->addRow(tr("Fragment Ion Types in Theoretical Spectra: "), fragmentiontypes);
 
 	clearhitswithoutparent = new QCheckBox();
-	clearhitswithoutparent->setToolTip("When checked, a hit of a peak is not considered when corresponding parent peak is not hit (e.g., a hit of a water loss b-ion is not considered as a hit when corresponding b-ion has not been hit).");
+	clearhitswithoutparent->setToolTip("When checked, a hit of a peak is not considered when corresponding parent peak is not hit (e.g., a hit of a dehydrated b-ion is not considered as a hit when corresponding b-ion has not been hit).");
 	applicationformlayout->addRow(tr("Remove Hits of Fragments without Hits of Parent Fragments: "), clearhitswithoutparent);
 
 	cyclicnterminus = new QCheckBox();
@@ -272,10 +277,25 @@ cParametersWidget::cParametersWidget() {
 	denovographgroupbox->setLayout(denovographformlayout);
 
 
+	databasesearchformlayout = new QFormLayout();
+
+	sequencedatabaseline = new QLineEdit();
+	sequencedatabaseline->setToolTip("Select the txt file containing a database of sequences.");
+	sequencedatabasebutton = new QPushButton("Select");
+	sequencedatabasebutton->setToolTip("Select the txt file containing a database of sequences.");
+	sequencedatabaselayout = new QHBoxLayout();
+	sequencedatabaselayout->addWidget(sequencedatabaseline);
+	sequencedatabaselayout->addWidget(sequencedatabasebutton);
+	databasesearchformlayout->addRow(tr("Sequence Database File: "), sequencedatabaselayout);
+
+	databasesearchgroupbox = new QGroupBox("Database Search");
+	databasesearchgroupbox->setLayout(databasesearchformlayout);
+
+
 	searchedsequenceformlayout = new QFormLayout();
 
 	searchedsequence = new QLineEdit();
-	searchedsequence->setToolTip("A peptide sequence which you are searching for or a peptide sequence tag.\nA peptide sequence must be entered when \"Mode\" is set up to \"Compare Spectrum of Searched Sequence with Peaklist\".\nOtherwise, it is similar to the option \"Peptide Sequence Tag\" with a difference that a peptide sequence candidate is not removed from the search but it is just highlighted in an output report of peptide sequence candidates.");
+	searchedsequence->setToolTip("A peptide sequence which you are searching for or a peptide sequence tag.\nA peptide sequence must be entered when \"Mode\" is set up to \"Compare Peaklist with Spectrum of Searched Sequence\".\nOtherwise, it is similar to the option \"Peptide Sequence Tag\" with a difference that a peptide sequence candidate is not removed from the search but it is just highlighted in an output report of peptide sequence candidates.");
 	searchedsequence->setMaxLength(1024*1024);
 	searchedsequenceformlayout->addRow(tr("Sequence: "), searchedsequence);
 
@@ -303,6 +323,7 @@ cParametersWidget::cParametersWidget() {
 	vlayout2 = new QVBoxLayout();
 	vlayout2->addWidget(applicationgroupbox);
 	vlayout2->addWidget(denovographgroupbox);
+	vlayout2->addWidget(databasesearchgroupbox);
 	vlayout2->addWidget(searchedsequencegroupbox);
 	vlayout2->addStretch(1);
 		
@@ -334,6 +355,7 @@ cParametersWidget::cParametersWidget() {
 	connect(peptidetype, SIGNAL(currentIndexChanged(int)), this, SLOT(updateSettingsWhenPeptideTypeChanged(int)));
 	connect(mode, SIGNAL(currentIndexChanged(int)), this, SLOT(updateSettingsWhenModeChanged(int)));
 	connect(fragmentiontypes, SIGNAL(resetReleased()), this, SLOT(resetFragmentIonTypes()));
+	connect(sequencedatabasebutton, SIGNAL(released()), this, SLOT(sequenceDatabaseButtonReleased()));
 
 
 	updateSettingsWhenPeptideTypeChanged(peptidetype->currentIndex());
@@ -346,6 +368,7 @@ cParametersWidget::cParametersWidget() {
 	lastdirsavesettings = "./Settings/";
 	lastdirselectpeaklist = "./PeakLists/";
 	lastdirselectbricksdatabase = "./BrickDatabases/";
+	lastdirselectsequencedatabase = "./SequenceDatabases/";
 }
 
 
@@ -411,6 +434,12 @@ cParametersWidget::~cParametersWidget() {
 	delete blindedges;
 	delete denovographformlayout;
 	delete denovographgroupbox;
+
+	delete sequencedatabaseline;
+	delete sequencedatabasebutton;
+	delete sequencedatabaselayout;
+	delete databasesearchformlayout;
+	delete databasesearchgroupbox;
 
 	delete searchedsequence;
 	delete searchedsequenceNtermmodif;
@@ -572,6 +601,8 @@ void cParametersWidget::loadSettings() {
 
 		blindedges->setCurrentIndex(settings.value("blindedges", 2).toInt());
 
+		sequencedatabaseline->setText(settings.value("sequencedatabase", "").toString());
+
 		searchedsequence->setText(settings.value("searchedsequence", "").toString());
 		searchedsequenceNtermmodif->setText(settings.value("searchedsequenceNtermmodif", "").toString());
 		searchedsequenceCtermmodif->setText(settings.value("searchedsequenceCtermmodif", "").toString());
@@ -651,6 +682,8 @@ void cParametersWidget::saveSettings() {
 
 	settings.setValue("blindedges", blindedges->currentIndex());
 
+	settings.setValue("sequencedatabase", sequencedatabaseline->text());
+
 	settings.setValue("searchedsequence", searchedsequence->text());
 	settings.setValue("searchedsequenceNtermmodif", searchedsequenceNtermmodif->text());
 	settings.setValue("searchedsequenceCtermmodif", searchedsequenceCtermmodif->text());
@@ -683,12 +716,23 @@ void cParametersWidget::peaklistButtonReleased() {
 
 
 void cParametersWidget::brickDatabaseButtonReleased() {
-	QString filename = QFileDialog::getOpenFileName(this, tr("Select Brick Database..."), lastdirselectbricksdatabase, tr("Text Files (*.txt)"));
+	QString filename = QFileDialog::getOpenFileName(this, tr("Select Building Blocks Database..."), lastdirselectbricksdatabase, tr("Text Files (*.txt)"));
 	lastdirselectbricksdatabase = filename;
 
 	if (filename.toStdString().compare("") != 0) {
 		brickdatabasefilename = filename.toStdString();
 		brickdatabaseline->setText(filename);
+	}
+}
+
+
+void cParametersWidget::sequenceDatabaseButtonReleased() {
+	QString filename = QFileDialog::getOpenFileName(this, tr("Select Sequence Database..."), lastdirselectsequencedatabase, tr("Text Files (*.txt)"));
+	lastdirselectsequencedatabase = filename;
+
+	if (filename.toStdString().compare("") != 0) {
+		sequencedatabasefilename = filename.toStdString();
+		sequencedatabaseline->setText(filename);
 	}
 }
 
@@ -703,7 +747,31 @@ void cParametersWidget::modificationsRemoveButtonReleased() {
 }
 
 
-void cParametersWidget::updateParameters() {
+bool cParametersWidget::updateParameters() {
+	QMessageBox msgBox;
+	QString errstr;
+
+	if (peaklistline->text().toStdString().compare("") == 0) {
+		errstr = "A peaklist must be specified.";
+		msgBox.setText(errstr);
+		msgBox.exec();
+		return false;
+	}
+
+	if ((brickdatabaseline->text().toStdString().compare("") == 0) && (((modeType)mode->currentIndex() == denovoengine) || ((modeType)mode->currentIndex() == singlecomparison) || ((modeType)mode->currentIndex() == databasesearch))) {
+		errstr = "A database of building blocks must be specified.";
+		msgBox.setText(errstr);
+		msgBox.exec();
+		return false;
+	}
+
+	if ((sequencedatabaseline->text().toStdString().compare("") == 0) && (((modeType)mode->currentIndex() == databasesearch) || ((modeType)mode->currentIndex() == dereplication))) {
+		errstr = "A sequence database must be specified.";
+		msgBox.setText(errstr);
+		msgBox.exec();
+		return false;
+	}
+
 	parameters.peptidetype = (peptideType)peptidetype->currentIndex();
 	parameters.peaklistfilename = peaklistline->text().toStdString();
 	parameters.precursormass = precursormass->value();
@@ -740,7 +808,7 @@ void cParametersWidget::updateParameters() {
 		i++;
 	}
 
-	parameters.mode = mode->currentIndex();
+	parameters.mode = (modeType)mode->currentIndex();
 	parameters.maximumnumberofthreads = maximumnumberofthreads->value();
 	parameters.scoretype = (scoreType)scoretype->currentIndex();
 	parameters.hitsreported = hitsreported->value();
@@ -749,23 +817,30 @@ void cParametersWidget::updateParameters() {
 
 	parameters.fragmentionsfortheoreticalspectra.clear();
 	int start;
-	switch ((peptideType)peptidetype->currentIndex())
-	{
-	case linear:
-	case branched:
-		start = b_ion;
-		break;
-	case cyclic:
-		start = b_ion;
-		break;
-	case lasso:
-		start = b_ion;
-		break;
-	case linearpolysaccharide:
-		start = ms_nterminal_ion_hplus;
-		break;
-	default:
-		break;
+
+	if ((modeType)mode->currentIndex() == dereplication) {
+		start = ms_hplus;
+	}
+	else {
+		switch ((peptideType)peptidetype->currentIndex())
+		{
+		case linear:
+		case branched:
+			start = b_ion;
+			break;
+		case cyclic:
+			start = b_ion;
+			break;
+		case lasso:
+			start = b_ion;
+			break;
+		case linearpolysaccharide:
+			start = ms_nterminal_ion_hplus;
+			break;
+		case other:
+		default:
+			break;
+		}
 	}
 
 	for (int i = 0; i < fragmentiontypes->getList()->count(); i++) {
@@ -783,6 +858,8 @@ void cParametersWidget::updateParameters() {
 
 	parameters.blindedges = blindedges->currentIndex();
 
+	parameters.sequencedatabasefilename = sequencedatabaseline->text().toStdString();
+
 	parameters.searchedsequence = searchedsequence->text().toStdString();
 	parameters.originalsearchedsequence = parameters.searchedsequence;
 	parameters.searchedsequenceNtermmodif = searchedsequenceNtermmodif->text().toStdString();
@@ -790,12 +867,15 @@ void cParametersWidget::updateParameters() {
 	parameters.searchedsequenceTmodif = searchedsequenceTmodif->text().toStdString();
 
 	oldsettingsfile = settingsfile;
+
+	return true;
 }
 
 
 void cParametersWidget::updateParametersAndHide() {
-	updateParameters();
-	hide();
+	if (updateParameters()) {
+		hide();
+	}
 }
 
 
@@ -845,23 +925,29 @@ void cParametersWidget::restoreParameters() {
 	sequencetag->setText(parameters.sequencetag.c_str());
 
 	int start;
-	switch (parameters.peptidetype)
-	{
-	case linear:
-	case branched:
-		start = b_ion;
-		break;
-	case cyclic:
-		start = b_ion;
-		break;
-	case lasso:
-		start = b_ion;
-		break;
-	case linearpolysaccharide:
-		start = ms_nterminal_ion_hplus;
-		break;
-	default:
-		break;
+	if (parameters.mode == dereplication) {
+		start = ms_hplus;
+	}
+	else {
+		switch (parameters.peptidetype)
+		{
+		case linear:
+		case branched:
+			start = b_ion;
+			break;
+		case cyclic:
+			start = b_ion;
+			break;
+		case lasso:
+			start = b_ion;
+			break;
+		case linearpolysaccharide:
+			start = ms_nterminal_ion_hplus;
+			break;
+		case other:
+		default:
+			break;
+		}
 	}
 
 	for (int i = 0; i < (int)parameters.fragmentionsfortheoreticalspectra.size(); i++) {
@@ -874,6 +960,8 @@ void cParametersWidget::restoreParameters() {
 	enablescrambling->setChecked(parameters.enablescrambling);
 	
 	blindedges->setCurrentIndex(parameters.blindedges);
+
+	sequencedatabaseline->setText(parameters.sequencedatabasefilename.c_str());
 
 	searchedsequence->setText(parameters.searchedsequence.c_str());
 	searchedsequenceNtermmodif->setText(parameters.searchedsequenceNtermmodif.c_str());
@@ -943,6 +1031,7 @@ void cParametersWidget::updateSettingsWhenPeptideTypeChanged(int index) {
 		cycliccterminus->setDisabled(true);
 		enablescrambling->setDisabled(true);
 		break;
+	case other:
 	default:
 		break;
 	}
@@ -951,11 +1040,15 @@ void cParametersWidget::updateSettingsWhenPeptideTypeChanged(int index) {
 
 void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 
-	switch (index)
+	switch ((modeType)index)
 	{
-	case 0:
+	case denovoengine:
+		peptidetype->setDisabled(false);
 		precursormass->setDisabled(false);
+		precursorcharge->setDisabled(false);
 		precursormasserrortolerance->setDisabled(false);
+		brickdatabaseline->setDisabled(false);
+		brickdatabasebutton->setDisabled(false);
 		maximumbricksincombinationbegin->setDisabled(false);
 		maximumbricksincombinationmiddle->setDisabled(false);
 		maximumbricksincombinationend->setDisabled(false);
@@ -965,11 +1058,21 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 		scoretype->setDisabled(false);
 		hitsreported->setDisabled(false);
 		sequencetag->setDisabled(false);
+		fragmentiontypes->setDisabled(false);
+		clearhitswithoutparent->setDisabled(false);
 		denovographgroupbox->setDisabled(false);
+		databasesearchgroupbox->setDisabled(true);
+		searchedsequence->setDisabled(false);
+
+		updateSettingsWhenPeptideTypeChanged(peptidetype->currentIndex());
 		break;
-	case 1:
+	case singlecomparison:
+		peptidetype->setDisabled(false);
 		precursormass->setDisabled(true);
+		precursorcharge->setDisabled(false);
 		precursormasserrortolerance->setDisabled(true);
+		brickdatabaseline->setDisabled(false);
+		brickdatabasebutton->setDisabled(false);
 		maximumbricksincombinationbegin->setDisabled(true);
 		maximumbricksincombinationmiddle->setDisabled(true);
 		maximumbricksincombinationend->setDisabled(true);
@@ -979,7 +1082,69 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 		scoretype->setDisabled(true);
 		hitsreported->setDisabled(true);
 		sequencetag->setDisabled(true);
+		fragmentiontypes->setDisabled(false);
+		clearhitswithoutparent->setDisabled(false);
 		denovographgroupbox->setDisabled(true);
+		databasesearchgroupbox->setDisabled(true);
+		searchedsequence->setDisabled(false);
+
+		updateSettingsWhenPeptideTypeChanged(peptidetype->currentIndex());
+		break;
+	case databasesearch:
+		peptidetype->setDisabled(false);
+		precursormass->setDisabled(false);
+		precursorcharge->setDisabled(false);
+		precursormasserrortolerance->setDisabled(false);
+		brickdatabaseline->setDisabled(false);
+		brickdatabasebutton->setDisabled(false);
+		maximumbricksincombinationbegin->setDisabled(true);
+		maximumbricksincombinationmiddle->setDisabled(true);
+		maximumbricksincombinationend->setDisabled(true);
+		maximumcumulativemass->setDisabled(true);
+		generatebrickspermutations->setDisabled(true);
+		maximumnumberofthreads->setDisabled(false);
+		scoretype->setDisabled(false);
+		hitsreported->setDisabled(false);
+		sequencetag->setDisabled(false);
+		fragmentiontypes->setDisabled(false);
+		clearhitswithoutparent->setDisabled(false);
+		denovographgroupbox->setDisabled(true);
+		databasesearchgroupbox->setDisabled(false);
+		searchedsequence->setDisabled(false);
+
+		updateSettingsWhenPeptideTypeChanged(peptidetype->currentIndex());
+		break;
+	case dereplication:
+		peptidetype->setDisabled(true);
+		precursormass->setDisabled(true);
+		precursorcharge->setDisabled(false);
+		precursormasserrortolerance->setDisabled(true);
+		brickdatabaseline->setDisabled(true);
+		brickdatabasebutton->setDisabled(true);
+		maximumbricksincombinationbegin->setDisabled(true);
+		maximumbricksincombinationmiddle->setDisabled(true);
+		maximumbricksincombinationend->setDisabled(true);
+		maximumcumulativemass->setDisabled(true);
+		generatebrickspermutations->setDisabled(true);
+		maximumnumberofthreads->setDisabled(true);
+		scoretype->setDisabled(true);
+		hitsreported->setDisabled(true);
+		sequencetag->setDisabled(true);
+		fragmentiontypes->setDisabled(false);
+		clearhitswithoutparent->setDisabled(true);
+		denovographgroupbox->setDisabled(true);
+		databasesearchgroupbox->setDisabled(false);
+		searchedsequence->setDisabled(true);
+
+		resetFragmentIonTypes();
+		
+		modificationsgroupbox->setDisabled(true);
+		searchedsequenceNtermmodif->setDisabled(true);
+		searchedsequenceCtermmodif->setDisabled(true);
+		searchedsequenceTmodif->setDisabled(true);
+		cyclicnterminus->setDisabled(true);
+		cycliccterminus->setDisabled(true);
+		enablescrambling->setDisabled(true);
 		break;
 	default:
 		break;
@@ -992,26 +1157,34 @@ void cParametersWidget::resetFragmentIonTypes() {
 	fragmentiontypes->getList()->clear();
 	fragmentIonType start, end;
 
-	switch ((peptideType)peptidetype->currentIndex()) {
-	case linear:
-	case branched:
-		start = b_ion;
-		end = y_ion_water_and_ammonia_loss;
-		break;
-	case cyclic:
-		start = b_ion;
-		end = a_ion_water_and_ammonia_loss;
-		break;
-	case lasso:
-		start = b_ion;
-		end = y_ion_water_and_ammonia_loss;
-		break;
-	case linearpolysaccharide:
-		start = ms_nterminal_ion_hplus;
-		end = ms_cterminal_ion_kplus;
-		break;
-	default:
-		break;
+
+	if ((modeType)mode->currentIndex() == dereplication) {
+		start = ms_hplus;
+		end = ms_MFe4H;
+	}
+	else {
+		switch ((peptideType)peptidetype->currentIndex()) {
+		case linear:
+		case branched:
+			start = b_ion;
+			end = y_ion_water_and_ammonia_loss;
+			break;
+		case cyclic:
+			start = b_ion;
+			end = a_ion_water_and_ammonia_loss;
+			break;
+		case lasso:
+			start = b_ion;
+			end = y_ion_water_and_ammonia_loss;
+			break;
+		case linearpolysaccharide:
+			start = ms_nterminal_ion_hplus;
+			end = ms_cterminal_ion_kplus;
+			break;
+		case other:
+		default:
+			break;
+		}
 	}
 
 	for (int i = start; i <= end; i++) {

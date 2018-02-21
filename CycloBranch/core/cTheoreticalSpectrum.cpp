@@ -13,9 +13,7 @@ void visualSeries::store(ofstream& os) {
 		os.write((char *)&series[i], sizeof(int));
 	}
 
-	size = (int)name.size();
-	os.write((char *)&size, sizeof(int));
-	os.write(name.c_str(), name.size());
+	storeString(name, os);
 }
 
 
@@ -28,9 +26,7 @@ void visualSeries::load(ifstream& is) {
 		is.read((char *)&series[i], sizeof(int));
 	}
 
-	is.read((char *)&size, sizeof(int));
-	name.resize(size);
-	is.read(&name[0], name.size());
+	loadString(name, is);
 }
 
 
@@ -77,6 +73,7 @@ void cTheoreticalSpectrum::searchForPeakPairs(cPeaksList& theoreticalpeaks, int 
 
 void cTheoreticalSpectrum::computeSomeStatistics(bool writedescription) {
 	experimentalpeaksmatched = 0;
+	scrambledpeaksmatched = 0;
 	if (writedescription) {
 		unmatchedpeaks = "";
 	}
@@ -85,7 +82,15 @@ void cTheoreticalSpectrum::computeSomeStatistics(bool writedescription) {
 		if (experimentalpeaks[i].matched > 0) {
 			experimentalpeaksmatched++;
 			intensityweightedscore += experimentalpeaks[i].intensity;
-			matchedions[experimentalpeaks[i].iontype]++;
+			
+			if (parameters && ((parameters->mode == denovoengine) || (parameters->mode == singlecomparison) || (parameters->mode == databasesearch))) {
+				if (!experimentalpeaks[i].scrambled) {
+					matchedions[experimentalpeaks[i].iontype]++;
+				}
+				else {
+					scrambledpeaksmatched++;
+				}
+			}
 		}
 		else {
 			if (writedescription) {
@@ -181,10 +186,10 @@ void cTheoreticalSpectrum::generateScrambledIons(cBricksDatabase& bricksdatabase
 			scrambledspeaksrealsize++;
 		}
 	}
+	scrambledpeaks.resize(scrambledspeaksrealsize);
 
 	// erase all scrambled peaks whose mz ratios collide with common fragment ions
 	// eraseAll - time consuming 55.8%
-	// scrambledpeaks.resize(scrambledspeaksrealsize);
 	// scrambledpeaks.sortbyMass();
 	// for (int i = 0; i < theoreticalpeaksrealsize; i++) {
 	// 	scrambledpeaks.eraseAll(theoreticalpeaks[i].mzratio);
@@ -311,6 +316,7 @@ void cTheoreticalSpectrum::clear(bool clearpeaklist) {
 
 	candidate.clear();
 	experimentalpeaksmatched = 0;
+	scrambledpeaksmatched = 0;
 	peakstested = 0;
 	experimentalpeaksmatchedratio = 0;
 	unmatchedpeaks = "";
@@ -1256,7 +1262,7 @@ int cTheoreticalSpectrum::compareLasso(cPeaksList& sortedpeaklist, cBricksDataba
 				}
 
 				// all permmutations except 3 and 5 have invalid c-terms
-				if (parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].cterminal && ((k == 3) || (k == 5) || ((k == 0) && (trotationsoflassorotations[j][k].endsWithBracket())) || ((k == 2) && (trotationsoflassorotations[j][k].startsWithBracket())))) {
+				if (parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].cterminal && ((k == 3) || (k == 5) /*|| ((k == 0) && (trotationsoflassorotations[j][k].endsWithBracket())) || ((k == 2) && (trotationsoflassorotations[j][k].startsWithBracket()))*/)) {
 					// if the end modification is cterminal, generate c-terminal ions (**)
 					if (parameters->searchedmodifications[trotationsoflassorotations[j][k].endmodifID].cterminal) {
 						generateCTerminalFragmentIons(parameters->precursorcharge, theoreticalpeaksrealsize, stringcomposition, trotationsoflassorotations[j][k].bricks, parameters->fragmentionsfortheoreticalspectra[i], bricksdatabasewithcombinations, writedescription, j, splittingsites, parameters->searchedmodifications, lasso, &trotationsoflassorotations[j][k]);
@@ -1580,6 +1586,64 @@ int cTheoreticalSpectrum::compareLinearPolysaccharide(cPeaksList& sortedpeaklist
 }
 
 
+void cTheoreticalSpectrum::compareMSSpectrum(cParameters* parameters) {
+	experimentalpeaks = parameters->peaklist;
+	experimentalpeaks.sortbyMass();
+
+	cPeak peak;
+	cSummaryFormula formula;
+	theoreticalpeaks.resize((int)parameters->fragmentionsfortheoreticalspectra.size()*parameters->sequencedatabase.size()*parameters->precursorcharge);
+	for (int i = 0; i < parameters->sequencedatabase.size(); i++) {
+		peak.clear();
+		formula.clear();
+
+		formula.setFormula(parameters->sequencedatabase[i].getSummaryFormula());
+
+		for (int j = 0; j < (int)parameters->fragmentionsfortheoreticalspectra.size(); j++) {
+			for (int k = 0; k < parameters->precursorcharge; k++) {
+				peak.mzratio = (double)parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[j]].multiplier*formula.getMass() + parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[j]].massdifference;
+				if (parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[j]].positive) {
+					peak.mzratio += (double)k*Hplus;
+				}
+				else {
+					peak.mzratio -= (double)k*Hplus;
+				}
+				peak.mzratio = peak.mzratio/(double)(k + 1);
+				peak.description = parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[j]].name.substr(0, parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[j]].name.size() - 1) + " ";
+				peak.description += to_string(k + 1);
+				if (parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[j]].positive) {
+					peak.description += "+";
+				}
+				else {
+					peak.description += "-";
+				}
+				peak.description += " " + parameters->sequencedatabase[i].getName() + " (" + parameters->sequencedatabase[i].getSummaryFormula() + "): ";
+
+				theoreticalpeaks[(i*(int)parameters->fragmentionsfortheoreticalspectra.size() + j)*parameters->precursorcharge + k] = peak;
+			}
+		}
+	}
+	theoreticalpeaks.sortbyMass();
+
+	vector<set<int> > experimentalpeakmatches;
+	searchForPeakPairs(theoreticalpeaks, theoreticalpeaks.size(), experimentalpeaks, experimentalpeakmatches, parameters->fragmentmasserrortolerance);
+
+	// fill annotations of peaks
+	for (int i = 0; i < (int)experimentalpeaks.size(); i++) {
+		for (set<int>::iterator it = experimentalpeakmatches[i].begin(); it != experimentalpeakmatches[i].end(); ++it) {
+
+			if (experimentalpeaks[i].description.compare("") != 0) {
+				experimentalpeaks[i].description += ",";
+			}
+			experimentalpeaks[i].description += theoreticalpeaks[*it].description.substr(0,theoreticalpeaks[*it].description.find(':'));
+			theoreticalpeaks[*it].matchdescription += ", measured mass " + to_string((long double)experimentalpeaks[i].mzratio) + " matched with " + to_string((long double)ppmError(experimentalpeaks[i].mzratio, theoreticalpeaks[*it].mzratio)) + " ppm error";
+		}
+	}
+
+	computeSomeStatistics(true);
+}
+
+
 int cTheoreticalSpectrum::getNumberOfPeaks() {
 	return theoreticalpeaks.size();
 }
@@ -1587,6 +1651,11 @@ int cTheoreticalSpectrum::getNumberOfPeaks() {
 
 int cTheoreticalSpectrum::getNumberOfMatchedPeaks() {
 	return experimentalpeaksmatched;
+}
+
+
+int cTheoreticalSpectrum::getNumberOfScrambledPeaks() {
+	return scrambledpeaksmatched;
 }
 
 
@@ -1620,6 +1689,8 @@ void cTheoreticalSpectrum::printMatch(ofstream& os, peptideType peptidetype) {
 	case branched:
 	case lasso:
 		os << "Composition: " << candidate.getTComposition();
+		break;
+	case other:
 		break;
 	default:
 		break;
@@ -1702,11 +1773,16 @@ void cTheoreticalSpectrum::printMatch(ofstream& os, peptideType peptidetype) {
 		break;
 	case linearpolysaccharide:
 		break;
+	case other:
+		break;
 	default:
 		break;
 	}
 
 	os << "Matched peaks: " << experimentalpeaksmatched << endl;
+	if (peptidetype == cyclic) {
+		os << "Scrambled peaks matched: " << scrambledpeaksmatched << endl;
+	}
 	os << "Total peaks: " << peakstested << endl;
 	os << "Sum of Relative Intensities: " << intensityweightedscore << endl;
 	os << "Ratio of matched peaks: " << experimentalpeaksmatchedratio*100.0f << "%" << endl << endl;
@@ -1747,6 +1823,8 @@ void cTheoreticalSpectrum::generateNTerminalFragmentIons(int maxcharge, int& pea
 		break;
 	case linearpolysaccharide:
 		peak.rotationid = rotationid;
+		break;
+	case other:
 		break;
 	default:
 		break;
@@ -1873,6 +1951,8 @@ void cTheoreticalSpectrum::generateCTerminalFragmentIons(int maxcharge, int& pea
 	case linearpolysaccharide:
 		peak.rotationid = rotationid;
 		break;
+	case other:
+		break;
 	default:
 		break;
 	}
@@ -1997,6 +2077,7 @@ void cTheoreticalSpectrum::setRealPeptideName(cBricksDatabase& bricksdatabase, p
 	case lasso:
 		realpeptidename = candidate.getRealNameTComposition(bricksdatabase);
 		break;
+	case other:
 	default:
 		realpeptidename = "";
 		break;
@@ -2016,6 +2097,7 @@ void cTheoreticalSpectrum::setAcronymPeptideNameWithHTMLReferences(cBricksDataba
 	case lasso:
 		acronympeptidename = candidate.getAcronymsTComposition(bricksdatabase);
 		break;
+	case other:
 	default:
 		acronympeptidename = "";
 		break;
@@ -2215,6 +2297,7 @@ void cTheoreticalSpectrum::store(ofstream& os) {
 	candidate.store(os);
 
 	os.write((char *)&experimentalpeaksmatched, sizeof(int));
+	os.write((char *)&scrambledpeaksmatched, sizeof(int));
 
 	size = (int)matchedions.size();
 	os.write((char *)&size, sizeof(int));
@@ -2226,13 +2309,8 @@ void cTheoreticalSpectrum::store(ofstream& os) {
 	os.write((char *)&peakstested, sizeof(int));
 	os.write((char *)&experimentalpeaksmatchedratio, sizeof(double));
 
-	size = (int)unmatchedpeaks.size();
-	os.write((char *)&size, sizeof(int));
-	os.write(unmatchedpeaks.c_str(), unmatchedpeaks.size());
-
-	size = (int)coveragebyseries.size();
-	os.write((char *)&size, sizeof(int));
-	os.write(coveragebyseries.c_str(), coveragebyseries.size());
+	storeString(unmatchedpeaks, os);
+	storeString(coveragebyseries, os);
 
 	os.write((char *)&valid, sizeof(bool));
 	os.write((char *)&intensityweightedscore, sizeof(double));
@@ -2248,41 +2326,12 @@ void cTheoreticalSpectrum::store(ofstream& os) {
 	os.write((char *)&reversevalidposition, sizeof(int));
 	os.write((char *)&seriescompleted, sizeof(int));
 
-	size = (int)realpeptidename.size();
-	os.write((char *)&size, sizeof(int));
-	os.write(realpeptidename.c_str(), realpeptidename.size());
-
-	size = (int)acronympeptidename.size();
-	os.write((char *)&size, sizeof(int));
-	os.write(acronympeptidename.c_str(), acronympeptidename.size());
-
-	size = (int)acronyms.size();
-	os.write((char *)&size, sizeof(int));
-	for (int i = 0; i < (int)acronyms.size(); i++) {
-		size = (int)acronyms[i].size();
-		os.write((char *)&size, sizeof(int));
-		os.write(acronyms[i].c_str(), acronyms[i].size());
-	}
-
-	size = (int)backboneacronyms.size();
-	os.write((char *)&size, sizeof(int));
-	for (int i = 0; i < (int)backboneacronyms.size(); i++) {
-		size = (int)backboneacronyms[i].size();
-		os.write((char *)&size, sizeof(int));
-		os.write(backboneacronyms[i].c_str(), backboneacronyms[i].size());
-	}
-
-	size = (int)branchacronyms.size();
-	os.write((char *)&size, sizeof(int));
-	for (int i = 0; i < (int)branchacronyms.size(); i++) {
-		size = (int)branchacronyms[i].size();
-		os.write((char *)&size, sizeof(int));
-		os.write(branchacronyms[i].c_str(), branchacronyms[i].size());
-	}
-
-	size = (int)path.size();
-	os.write((char *)&size, sizeof(int));
-	os.write(path.c_str(), path.size());
+	storeString(realpeptidename, os);
+	storeString(acronympeptidename, os);
+	storeStringVector(acronyms, os);
+	storeStringVector(backboneacronyms, os);
+	storeStringVector(branchacronyms, os);
+	storeString(path, os);
 }
 
 
@@ -2298,6 +2347,7 @@ void cTheoreticalSpectrum::load(ifstream& is) {
 	candidate.load(is);
 
 	is.read((char *)&experimentalpeaksmatched, sizeof(int));
+	is.read((char *)&scrambledpeaksmatched, sizeof(int));
 
 	is.read((char *)&size, sizeof(int));
 	matchedions.clear();
@@ -2310,13 +2360,8 @@ void cTheoreticalSpectrum::load(ifstream& is) {
 	is.read((char *)&peakstested, sizeof(int));
 	is.read((char *)&experimentalpeaksmatchedratio, sizeof(double));
 
-	is.read((char *)&size, sizeof(int));
-	unmatchedpeaks.resize(size);
-	is.read(&unmatchedpeaks[0], unmatchedpeaks.size());
-
-	is.read((char *)&size, sizeof(int));
-	coveragebyseries.resize(size);
-	is.read(&coveragebyseries[0], coveragebyseries.size());
+	loadString(unmatchedpeaks, is);
+	loadString(coveragebyseries, is);
 
 	is.read((char *)&valid, sizeof(bool));
 	is.read((char *)&intensityweightedscore, sizeof(double));
@@ -2332,40 +2377,11 @@ void cTheoreticalSpectrum::load(ifstream& is) {
 	is.read((char *)&reversevalidposition, sizeof(int));
 	is.read((char *)&seriescompleted, sizeof(int));
 
-	is.read((char *)&size, sizeof(int));
-	realpeptidename.resize(size);
-	is.read(&realpeptidename[0], realpeptidename.size());
-
-	is.read((char *)&size, sizeof(int));
-	acronympeptidename.resize(size);
-	is.read(&acronympeptidename[0], acronympeptidename.size());
-
-	is.read((char *)&size, sizeof(int));
-	acronyms.resize(size);
-	for (int i = 0; i < (int)acronyms.size(); i++) {
-		is.read((char *)&size, sizeof(int));
-		acronyms[i].resize(size);
-		is.read(&acronyms[i][0], acronyms[i].size());
-	}
-
-	is.read((char *)&size, sizeof(int));
-	backboneacronyms.resize(size);
-	for (int i = 0; i < (int)backboneacronyms.size(); i++) {
-		is.read((char *)&size, sizeof(int));
-		backboneacronyms[i].resize(size);
-		is.read(&backboneacronyms[i][0], backboneacronyms[i].size());
-	}
-
-	is.read((char *)&size, sizeof(int));
-	branchacronyms.resize(size);
-	for (int i = 0; i < (int)branchacronyms.size(); i++) {
-		is.read((char *)&size, sizeof(int));
-		branchacronyms[i].resize(size);
-		is.read(&branchacronyms[i][0], branchacronyms[i].size());
-	}
-
-	is.read((char *)&size, sizeof(int));
-	path.resize(size);
-	is.read(&path[0], path.size());
+	loadString(realpeptidename, is);
+	loadString(acronympeptidename, is);
+	loadStringVector(acronyms, is);
+	loadStringVector(backboneacronyms, is);
+	loadStringVector(branchacronyms, is);
+	loadString(path, is);
 }
 

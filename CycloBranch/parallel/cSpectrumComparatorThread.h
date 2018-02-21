@@ -26,7 +26,7 @@ bool compareBandAllIonsDesc(cTheoreticalSpectrum& a, cTheoreticalSpectrum& b);
 
 
 /**
-	\brief Compare scores of two theoretical spectra (number of b-ions + water loss b-ions and all ions as a secondary score).
+	\brief Compare scores of two theoretical spectra (number of b-ions + dehydrated b-ions and all ions as a secondary score).
 	\param a first theoretical spectrum
 	\param b second theoretical spectrum
 	\retval bool true if the score of \a a is greater than the score of \a b
@@ -35,7 +35,7 @@ bool compareBBwaterLossAndAllIonsDesc(cTheoreticalSpectrum& a, cTheoreticalSpect
 
 
 /**
-	\brief Compare scores of two theoretical spectra (number of b-ions + ammonia loss b-ions and all ions as a secondary score).
+	\brief Compare scores of two theoretical spectra (number of b-ions + deamidated b-ions and all ions as a secondary score).
 	\param a first theoretical spectrum
 	\param b second theoretical spectrum
 	\retval bool true if the score of \a a is greater than the score of \a b

@@ -40,12 +40,13 @@ private:
 	cParameters* parameters;
 	cMainThread* os;
 	int lastsystemnode;
-	int mode;
+	long long unsigned* count;
+	int scanmode;
 	bool* terminatecomputation;
 
-	int getTheoreticalSpectraIter(bool cterminalstartingnode, cCandidateSet* candidates, int nodeid, vector<string>& composition, double precursormass, long long &count, int startmodifID, int endmodifID, int middlemodifID, int middlepos, vector<nodeEdge>& perspectivepath, double cummass, bool* terminatecomputation);
+	int getTheoreticalSpectraIter(bool cterminalstartingnode, cCandidateSet* candidates, int nodeid, vector<string>& composition, double precursormass, int startmodifID, int endmodifID, int middlemodifID, int middlepos, vector<nodeEdge>& perspectivepath, double cummass, bool* terminatecomputation);
 
-	int reverseCTerminalCandidates(int nodeid, cCandidateSet* candidates, double precursormass, long long& count, int startmodifID, bool* terminatecomputation);
+	int reverseCTerminalCandidates(int nodeid, cCandidateSet* candidates, double precursormass, int startmodifID, bool* terminatecomputation);
 
 public:
 
@@ -64,9 +65,11 @@ public:
 		\param parameters pointer to program parameters
 		\param os pointer to the main thread of the application
 		\param lastsystemnode position of the last system node in the de novo graph
+		\param count an output number of peptide sequence candidates
+		\param scanmode 0 = get candidates; 1 = calculate the number of peptide sequence candidates
 		\param terminatecomputation reference to a variable determining that the thread must be stopped
 	*/ 
-	void initialize(vector<cDeNovoGraphNode>& graph, cBricksDatabase& bricksdatabasewithcombinations, cCandidateSet& candidates, cParameters* parameters, cMainThread* os, int lastsystemnode, bool& terminatecomputation);
+	void initialize(vector<cDeNovoGraphNode>& graph, cBricksDatabase& bricksdatabasewithcombinations, cCandidateSet& candidates, cParameters* parameters, cMainThread* os, int lastsystemnode, long long unsigned& count, int scanmode, bool& terminatecomputation);
 
 
 protected:

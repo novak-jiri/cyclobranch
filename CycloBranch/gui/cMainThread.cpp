@@ -2,7 +2,170 @@
 
 
 QString appname = "CycloBranch";
-QString appversion = "v. 1.0.739 (64-bit)";
+QString appversion = "v. 1.0.850 (64-bit)";
+
+
+bool cMainThread::checkModifications(cParameters& parameters, cSequence& sequence, int& startmodifid, int& endmodifid, int& middlemodifid, string& errormessage) {
+	startmodifid = 0;
+	endmodifid = 0;
+	middlemodifid = 0;
+	errormessage = "";
+
+	if ((parameters.peptidetype == linear) || (parameters.peptidetype == branched) || (parameters.peptidetype == lasso) || (parameters.peptidetype == linearpolysaccharide)) {
+
+		if ((parameters.peptidetype == linear) || (parameters.peptidetype == branched) || (parameters.peptidetype == linearpolysaccharide)) {
+			startmodifid = -1;
+			endmodifid = -1;
+		}
+
+		if ((parameters.peptidetype == branched) || (parameters.peptidetype == lasso)) {
+			middlemodifid = -1;
+		}
+
+		for (int i = 0; i < (int)parameters.searchedmodifications.size(); i++) {
+
+			if ((parameters.peptidetype == linear) || (parameters.peptidetype == branched) || (parameters.peptidetype == linearpolysaccharide)) {
+				if (parameters.searchedmodifications[i].name.compare(sequence.getNTterminalModification()) == 0) {
+					startmodifid = i;
+				}
+
+				if (parameters.searchedmodifications[i].name.compare(sequence.getCTterminalModification()) == 0) {
+					endmodifid = i;
+				}
+			}
+
+			if ((parameters.peptidetype == branched) || (parameters.peptidetype == lasso)) {
+				if (parameters.searchedmodifications[i].name.compare(sequence.getBranchModification()) == 0) {
+					middlemodifid = i;
+				}
+			}
+
+		}
+
+		if (startmodifid == -1) {
+			errormessage = "The N-terminal modification in the sequence " + sequence.getSequence() + " is not listed in the field 'N-terminal and C-terminal modifications': " + sequence.getNTterminalModification();
+
+			return false;
+		}
+
+		if (endmodifid == -1) {
+			errormessage = "The C-terminal modification in the sequence " + sequence.getSequence() + " is not listed in the field 'N-terminal and C-terminal modifications': " + sequence.getCTterminalModification();
+			return false;
+		}
+
+		if (middlemodifid == -1) {
+			errormessage = "The branch modification in the sequence " + sequence.getSequence() + " is not listed in the field 'N-terminal and C-terminal modifications': " + sequence.getBranchModification();
+			return false;
+		}
+		
+	}
+
+	return true;
+}
+
+
+void cMainThread::parseBranch(peptideType peptidetype, string& composition, vector<string>& vectorcomposition, int& branchstart, int& branchend) {
+	string s = composition;
+	cBrick b;
+	branchstart = -1;
+	branchend = -1;
+
+	if ((peptidetype == branched) || (peptidetype == lasso)) {
+		int i = 0;
+		while (i < (int)s.size()) {
+			if (s[i] == '\\') {
+				s.erase(s.begin() + i);
+			}
+			else {
+				i++;
+			}
+		}
+
+		for (int i = 0; i < (int)s.size(); i++) {
+			if (s[i] == '(') {
+				if (i > 0) {
+					b.clear();
+					b.setComposition(s.substr(0, i - 1), false);
+					branchstart = getNumberOfBricks(b.getComposition());
+					s[i] = '-';
+				}
+				else {
+					s.erase(s.begin());
+					branchstart = 0;
+				}
+				break;
+			}
+		}
+
+		for (int i = 0; i < (int)s.size(); i++) {
+			if (s[i] == ')') {
+				b.clear();
+				b.setComposition(s.substr(0, i - 1), false);
+				branchend = getNumberOfBricks(b.getComposition()) - 1;
+				if (i < (int)s.size() - 1) {
+					s[i] = '-';
+				}
+				else {
+					s.erase(s.begin() + i);
+				}
+				break;
+			}
+		}
+
+		if (branchend <= branchstart) {
+			branchstart = -1;
+			branchend = -1;
+		}
+	}
+
+	b.clear();
+	b.setComposition(s, false);
+	b.explodeToStringComposition(vectorcomposition);
+}
+
+
+bool cMainThread::checkRegex(cParameters& parameters, string& sequence, string& errormessage) {
+	errormessage = "";
+
+	if (sequence.compare("") == 0) {
+		errormessage = "The sequence is empty.";
+		return false;
+	}
+
+	regex rx;
+	// [^\\[\\]]+ is used instead of .+ to prevent from a too complex regex error
+	switch (parameters.peptidetype)
+	{
+	case linear:
+	case cyclic:
+	case linearpolysaccharide:
+		rx = "^\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])*$";
+		break;
+	case branched:
+		rx = "^\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])*\\\\\\(\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])*\\\\\\)\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])*$";
+		break;
+	case lasso:
+		rx = "(^(\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])*)?\\\\\\(\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])*\\\\\\)\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])*$|^\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])*\\\\\\(\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])*\\\\\\)(\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])*)?$)";
+		break;
+	case other:
+	default:
+		rx = ".*";
+		break;
+	}
+
+	try {
+		if (!(regex_search(sequence, rx))) {
+			errormessage = "The format of sequence is invalid: " + sequence + ".";
+			return false;
+		}
+	}
+	catch (std::regex_error& e) {
+		errormessage = "cMainThread::checkRegex: regex_search failed, error no. " + to_string(e.code());
+		return false;
+	}
+
+	return true;
+}
 
 
 cMainThread::cMainThread(cParameters& parameters, bool enablelogwindow, bool enablestdout) {
@@ -74,6 +237,7 @@ void cMainThread::run() {
 	emitStartSignals();
 
 	cMainThread* os = this;
+	string errormessage;
 	
 	cCandidateSet candidates;
 	candidates.getSet().clear();
@@ -92,77 +256,58 @@ void cMainThread::run() {
 	}
 	*os << parameters.printToString();
 
-	if (!parameters.bricksdatabase.replaceAcronymsByIDs(parameters.sequencetag)) {
-		*os << "Error: invalid brick acronym typed in the sequence tag." << endl;
-		emit safeExit();
-		return;	
-	}
-
-	if (parameters.mode == 1) {
-		if (parameters.searchedsequence.compare("") == 0) {
-			*os << "Error: Searched sequence is empty." << endl;
-			safeExit();
-			return;
-		}
-
-		regex rx;
-		// [^\\[\\]]+ is used instead of .+ to prevent from a too complex regex error
-		switch (parameters.peptidetype)
-		{
-		case linear:
-		case cyclic:
-		case linearpolysaccharide:
-			rx = "^\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])*$";
-			break;
-		case branched:
-			rx = "^\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])*\\\\\\(\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])*\\\\\\)\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])*$";
-			break;
-		case lasso:
-			rx = "(^(\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])*)?\\\\\\(\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])*\\\\\\)\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])*$|^\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])*\\\\\\(\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])*\\\\\\)(\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])*)?$)";
-			break;
-		default:
-			rx = "";
-			break;
-		}
-
-		try {
-			if (!(regex_search(parameters.searchedsequence, rx))) {
-				*os << "Error: The format of searched sequence is invalid." << endl;
-				safeExit();
-				return;
-			}
-		}
-		catch (std::regex_error& e) {
-			*os << "cMainThread::run: regex_search failed, error no. " << e.code() << endl;
-			safeExit();
-			return;
-		}
-	}
-
-	if (!parameters.bricksdatabase.replaceAcronymsByIDs(parameters.searchedsequence)) {
-		*os << "Error: invalid brick acronym typed in the searched sequence." << endl;
-		emit safeExit();
-		return;	
-	}
-
-	string errormessage = "";
-	cSummaryFormula formula;
-	for (int i = 0; i < (int)parameters.searchedmodifications.size(); i++) {
-		formula.clear();
-		formula.setFormula(parameters.searchedmodifications[i].summary);
-		if (formula.isValid(errormessage)) {
-			parameters.searchedmodifications[i].massdifference = formula.getMass();
-		}
-		else {
-			*os << errormessage << endl;
+	if ((parameters.mode == denovoengine) || (parameters.mode == singlecomparison) || (parameters.mode == databasesearch)) {
+		if (!parameters.bricksdatabase.replaceAcronymsByIDs(parameters.sequencetag, errormessage)) {
+			*os << "Error: " << errormessage << endl;
 			emit safeExit();
 			return;	
 		}
 	}
 
+	if (parameters.mode == singlecomparison) {
+		errormessage = "";
+		if (!checkRegex(parameters, parameters.searchedsequence, errormessage)) {
+			*os << "Error: " << errormessage << endl;
+			emit safeExit();
+			return;	
+		}
+	}
+
+	if ((parameters.mode == denovoengine) || (parameters.mode == singlecomparison) || (parameters.mode == databasesearch)) {
+		if (!parameters.bricksdatabase.replaceAcronymsByIDs(parameters.searchedsequence, errormessage)) {
+			*os << "Error: " << errormessage << endl;
+			emit safeExit();
+			return;	
+		}
+	}
+
+	if ((parameters.mode == denovoengine) || (parameters.mode == singlecomparison) || (parameters.mode == databasesearch)) {
+		if (parameters.peptidetype != cyclic) {
+			// check summary formulas of modifications
+			errormessage = "";
+			cSummaryFormula formula;
+			for (int i = 0; i < (int)parameters.searchedmodifications.size(); i++) {
+				formula.clear();
+				formula.setFormula(parameters.searchedmodifications[i].summary);
+				if (formula.isValid(errormessage)) {
+					parameters.searchedmodifications[i].massdifference = formula.getMass();
+				}
+				else {
+					*os << errormessage << endl;
+					emit safeExit();
+					return;	
+				}
+			}
+		}
+	}
+
 	parameters.peaklist.sortbyMass();
 	parameters.peaklist.cropMinimumMZRatio(parameters.minimummz);
-	parameters.peaklist.cropMaximumMZRatio(uncharge(parameters.precursormass, parameters.precursorcharge));
+
+	if ((parameters.mode == denovoengine) || (parameters.mode == singlecomparison) || (parameters.mode == databasesearch)) {
+		parameters.peaklist.cropMaximumMZRatio(uncharge(parameters.precursormass, parameters.precursorcharge));
+	}
+
 	if (parameters.peaklist.normalizeIntenzity() == -1) {
 		*os << "Error: the spectrum cannot be normalized; the maximum intensity is <= 0." << endl;
 		emit safeExit();
@@ -177,8 +322,9 @@ void cMainThread::run() {
 		parameters.peaklist.removeIsotopes(parameters.precursorcharge, parameters.masserrortolerancefordeisotoping, this);
 	}
 
-	//search engine
-	if (parameters.mode == 0) {
+
+	// de novo search engine
+	if (parameters.mode == denovoengine) {
 
 		// create the de novo graph
 		graph.initialize(*os, parameters);
@@ -228,160 +374,158 @@ void cMainThread::run() {
 
 		emit setGraph(graph.printGraph());
 
-		// process the theoretical spectra
-		*os << "Starting the graph reader... ";
-		// mode 0 = get candidates
-		graph.startGraphReader(candidates, terminatecomputation);
-		*os << "ok" << endl << endl;
+		*os << "Calculating the number of paths forming peptide sequence candidates... ";
+		long long unsigned count = 0;
+		long long unsigned lastcount = 0;
+		graph.startGraphReader(candidates, count, 1, terminatecomputation);
+		while (graphreaderisworking) {
+			while (count >= lastcount + 1000000) {
+				lastcount += 1000000;
+				*os << lastcount << " ";
+				if (lastcount % 10000000 == 0) {
+					*os << endl;
+				}
+			}
+			usleep(1000);
+		}		
+		*os << " ok" << endl;
+		*os << "Number of paths found: " << count << endl << endl;
+
+		if (count > maximumcandidates) {
+			*os << "The number of sequence candidates is too high. The identification would be very time-consuming. Please, change the settings and search again." << endl << endl;
+			*os << "Aborted." << endl;
+			emitEndSignals();
+			endNow();
+			return;
+		}
+
+		count = 0;
+		graph.startGraphReader(candidates, count, 0, terminatecomputation);
 
 	}
-	// comparison of a theoretical spectrum
-	else {
 
+
+	// single comparison of a peaklist with a theoretical spectrum
+	if (parameters.mode == singlecomparison) {
 		vector<string> v;
 		cCandidate c;
-		cBrick b;
-		string s;
-		int startmodifid, endmodifid, middlemodifid;
-		int branchstart = -1;
-		int branchend = -1;
+		int startmodifid, endmodifid, middlemodifid, branchstart, branchend;
 
-		if ((parameters.peptidetype == linear) || (parameters.peptidetype == branched) || (parameters.peptidetype == lasso) || (parameters.peptidetype == linearpolysaccharide)) {
+		cSequence sequence;
+		sequence.setNTterminalModification(parameters.searchedsequenceNtermmodif);
+		sequence.setCTterminalModification(parameters.searchedsequenceCtermmodif);
+		sequence.setBranchModification(parameters.searchedsequenceTmodif);
 
-			if ((parameters.peptidetype == linear) || (parameters.peptidetype == branched) || (parameters.peptidetype == linearpolysaccharide)) {
-				startmodifid = -1;
-				endmodifid = -1;
-			}
-			else {
-				startmodifid = 0;
-				endmodifid = 0;
-			}
-
-			if ((parameters.peptidetype == branched) || (parameters.peptidetype == lasso)) {
-				middlemodifid = -1;
-			}
-			else {
-				middlemodifid = 0;
-			}
-
-			for (int i = 0; i < (int)parameters.searchedmodifications.size(); i++) {
-
-				if ((parameters.peptidetype == linear) || (parameters.peptidetype == branched) || (parameters.peptidetype == linearpolysaccharide)) {
-					if (parameters.searchedmodifications[i].name.compare(parameters.searchedsequenceNtermmodif) == 0) {
-						startmodifid = i;
-					}
-
-					if (parameters.searchedmodifications[i].name.compare(parameters.searchedsequenceCtermmodif) == 0) {
-						endmodifid = i;
-					}
-				}
-
-				if ((parameters.peptidetype == branched) || (parameters.peptidetype == lasso)) {
-					if (parameters.searchedmodifications[i].name.compare(parameters.searchedsequenceTmodif) == 0) {
-						middlemodifid = i;
-					}
-				}
-
-			}
-
-			if (startmodifid == -1) {
-				*os << endl << "Error: Unknown N-terminal modification is used." << endl;
-				emitEndSignals();
-				endNow();
-				return;
-			}
-
-			if (endmodifid == -1) {
-				*os << endl << "Error: Unknown C-terminal modification is used." << endl;
-				emitEndSignals();
-				endNow();
-				return;
-			}
-
-			if (middlemodifid == -1) {
-				*os << endl << "Error: Unknown branch modification is used." << endl;
-				emitEndSignals();
-				endNow();
-				return;
-			}
-		
+		errormessage = "";
+		if (!checkModifications(parameters, sequence, startmodifid, endmodifid, middlemodifid, errormessage)) {
+			*os << endl << "Error: " << errormessage << endl;
+			emitEndSignals();
+			endNow();
+			return;
 		}
 
-		s = parameters.searchedsequence;
-		if ((parameters.peptidetype == branched) || (parameters.peptidetype == lasso)) {
-			int i = 0;
-			while (i < (int)s.size()) {
-				if (s[i] == '\\') {
-					s.erase(s.begin() + i);
-				}
-				else {
-					i++;
-				}
-			}
+		parseBranch(parameters.peptidetype, parameters.searchedsequence, v, branchstart, branchend);
 
-			for (int i = 0; i < (int)s.size(); i++) {
-				if (s[i] == '(') {
-					if (i > 0) {
-						b.clear();
-						b.setComposition(s.substr(0, i - 1), false);
-						branchstart = getNumberOfBricks(b.getComposition());
-						s[i] = '-';
-					}
-					else {
-						s.erase(s.begin());
-						branchstart = 0;
-					}
-					break;
-				}
-			}
-
-			for (int i = 0; i < (int)s.size(); i++) {
-				if (s[i] == ')') {
-					b.clear();
-					b.setComposition(s.substr(0, i - 1), false);
-					branchend = getNumberOfBricks(b.getComposition()) - 1;
-					if (i < (int)s.size() - 1) {
-						s[i] = '-';
-					}
-					else {
-						s.erase(s.begin() + i);
-					}
-					break;
-				}
-			}
-
-			if (branchend <= branchstart) {
-				branchstart = -1;
-				branchend = -1;
-			}
-		}
-		
-		b.clear();
-		b.setComposition(s, false);
-		b.explodeToStringComposition(v);
-		vector<nodeEdge> tmp;
-		c.setCandidate(v, tmp, startmodifid, endmodifid, middlemodifid, branchstart, branchend);
-
+		vector<nodeEdge> netmp;
+		c.setCandidate(v, netmp, startmodifid, endmodifid, middlemodifid, branchstart, branchend);
 		candidates.getSet().insert(c);
+		
+		graphreaderisworking = false;
+	}
+
+
+	// database search - MS/MS mode
+	if (parameters.mode == databasesearch) {
+		string composition;
+		vector<string> v;
+		cCandidate c;
+		vector<nodeEdge> netmp;
+		int startmodifid, endmodifid, middlemodifid, branchstart, branchend;
+
+		bool calculatesummaries = false;
+
+		for (int i = 0; i < parameters.sequencedatabase.size(); i++) {
+
+			v.clear();
+			c.clear();
+			netmp.clear();
+			errormessage = "";
+
+			// check peptide type
+			if (!calculatesummaries && (parameters.peptidetype != parameters.sequencedatabase[i].getPeptideType())) {
+				continue;
+			}
+
+			// check format of sequence
+			if (!calculatesummaries && !checkRegex(parameters, parameters.sequencedatabase[i].getSequence(), errormessage)) {
+				*os << "Ignored sequence: " << errormessage << endl;
+				continue;
+			}
+
+			// replace acronyms of bricks by ids
+			composition = parameters.sequencedatabase[i].getSequence();
+			if (!parameters.bricksdatabase.replaceAcronymsByIDs(composition, errormessage)) {
+				*os << "Ignored sequence: " << errormessage << endl;
+				continue;
+			}
+
+			// check whether modification are defined
+			if (!checkModifications(parameters, parameters.sequencedatabase[i], startmodifid, endmodifid, middlemodifid, errormessage)) {
+				*os << "Ignored sequence: " << errormessage << endl;
+				continue;
+			}
+
+			// parse branch of a branched or a lasso peptide
+			parseBranch(parameters.sequencedatabase[i].getPeptideType(), composition, v, branchstart, branchend);
+
+			// set candidate and check precursor mass error
+			c.setCandidate(v, netmp, startmodifid, endmodifid, middlemodifid, branchstart, branchend);
+			if (!calculatesummaries && !isInPpmMassErrorTolerance(uncharge(parameters.precursormass, parameters.precursorcharge), c.getPrecursorMass(parameters.bricksdatabase, &parameters), parameters.precursormasserrortolerance)) {
+				continue;
+			}
+
+			c.setName(parameters.sequencedatabase[i].getName());
+			candidates.getSet().insert(c);
+
+			if (calculatesummaries) {
+				*os << c.getSummaryFormula(parameters, parameters.sequencedatabase[i].getPeptideType()) << endl;
+			}
+		}
+		
+		if (calculatesummaries) {
+			*os << endl << "done." << endl;
+			emit safeExit();
+			return;
+		}
+
+		*os << "Number of candidates in the precursor mass error tolerance found: " << candidates.size() << endl;
+
 		graphreaderisworking = false;
 
 	}
 
-	*os << "Comparing theoretical spectra of candidates with the peak list... " << endl;
-	*os << "Permutations of combinations of bricks: ";
-	if (parameters.generatebrickspermutations) {
-		*os << "on" << endl;
+
+	// database search - MS mode
+	if (parameters.mode == dereplication) {
+		*os << "Comparing theoretical peaks with the peak list... " << endl;
+		cTheoreticalSpectrum ts;
+		ts.compareMSSpectrum(&parameters);
+		theoreticalspectra.initialize(*os, parameters, &graph);
+		theoreticalspectra.add(ts);
+		*os << " ok" << endl;
 	}
-	else {
-		*os << "off" << endl;
+	
+
+	if ((parameters.mode == denovoengine) || (parameters.mode == singlecomparison) || (parameters.mode == databasesearch)) {
+		*os << "Comparing theoretical spectra of candidates with the peak list... " << endl;
+		theoreticalspectra.initialize(*os, parameters, &graph);
+		if (theoreticalspectra.parallelCompareAndStore(candidates, terminatecomputation) == -1) {
+			emitEndSignals();
+			endNow();
+			return;
+		}
+		*os << " ok" << endl;
 	}
-	theoreticalspectra.initialize(*os, parameters, &graph);
-	if (theoreticalspectra.parallelCompareAndStore(candidates, terminatecomputation) == -1) {
-		emitEndSignals();
-		endNow();
-		return;
-	}
-	*os << "ok" << endl;
 
 	/*
 	*os << endl << "Explanation list of peaks (m/z ratio: <Result ID 1> <Result ID 2> etc.):" << endl;
@@ -437,7 +581,7 @@ void cMainThread::emitStartSignals() {
 	emit enableStopButton(true);
 	emit enableButtonsHandlingResults(false);
 
-	if (parameters.mode != 0) {
+	if (parameters.mode != denovoengine) {
 		emit setGraph("");
 	}
 }

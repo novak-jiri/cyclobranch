@@ -3,7 +3,7 @@
 #include "gui/cMainThread.h"
 
 
-int cGraphReaderThread::getTheoreticalSpectraIter(bool cterminalstartingnode, cCandidateSet* candidates, int nodeid, vector<string>& composition, double precursormass, long long &count, int startmodifID, int endmodifID, int middlemodifID, int middlepos, vector<nodeEdge>& perspectivepath, double cummass, bool* terminatecomputation) {
+int cGraphReaderThread::getTheoreticalSpectraIter(bool cterminalstartingnode, cCandidateSet* candidates, int nodeid, vector<string>& composition, double precursormass, int startmodifID, int endmodifID, int middlemodifID, int middlepos, vector<nodeEdge>& perspectivepath, double cummass, bool* terminatecomputation) {
 	nodeEdge ne;
 	int tmpmiddlemodifID = 0;
 	int finish;
@@ -52,7 +52,7 @@ int cGraphReaderThread::getTheoreticalSpectraIter(bool cterminalstartingnode, cC
 			}
 
 			composition.push_back((*graph)[nodeid][i].composition);
-			finish = getTheoreticalSpectraIter(cterminalstartingnode, candidates, (*graph)[nodeid][i].targetnode, composition, precursormass, count, startmodifID, (*graph)[nodeid][i].endmodifID, tmpmiddlemodifID, middlepos, perspectivepath, cummass + (*graph)[nodeid][i].massdifference, terminatecomputation);
+			finish = getTheoreticalSpectraIter(cterminalstartingnode, candidates, (*graph)[nodeid][i].targetnode, composition, precursormass, startmodifID, (*graph)[nodeid][i].endmodifID, tmpmiddlemodifID, middlepos, perspectivepath, cummass + (*graph)[nodeid][i].massdifference, terminatecomputation);
 			composition.pop_back();
 
 			perspectivepath.pop_back();
@@ -78,34 +78,48 @@ int cGraphReaderThread::getTheoreticalSpectraIter(bool cterminalstartingnode, cC
 				if ((parameters->peptidetype == branched) || (parameters->peptidetype == lasso)) {
 					result.getSet().clear();
 					candidate.prepareBranchedCandidate(result, parameters->peptidetype, terminatecomputation);
-					candidates->lock();
-					for (auto i = result.getSet().begin(); i != result.getSet().end(); ++i) {
-						candidates->getSet().insert(*i);
+					if (scanmode == 0) {
+						candidates->lock();
+						for (auto i = result.getSet().begin(); i != result.getSet().end(); ++i) {
+							candidates->getSet().insert(*i);
+						}
+						candidates->unlock();
 					}
-					candidates->unlock();
+					else {
+						*count += (long long unsigned)result.getSet().size();
+						if (*count > maximumcandidates) {
+							return -1;
+						}
+					}
 				}
 				else {
-					candidates->lock();
-					candidates->getSet().insert(candidate);
-					candidates->unlock();
+					if (scanmode == 0) {
+						candidates->lock();
+						candidates->getSet().insert(candidate);
+						candidates->unlock();
+					}
+					else {
+						*count += 1;
+						if (*count > maximumcandidates) {
+							return -1;
+						}
+					}
 				}
 
-				count++;
-
-				candidates->lock();
-				size = candidates->size();
-				candidates->unlock();
-
-				while (size >= parameters->maximumnumberofcandidates) {
-					usleep(1000);
-
-					if (*terminatecomputation) {
-						return -1;
-					}
-
+				if (scanmode == 0) {
 					candidates->lock();
 					size = candidates->size();
 					candidates->unlock();
+					while (size >= parameters->maximumnumberofcandidates) {
+						usleep(1000);
+
+						if (*terminatecomputation) {
+							return -1;
+						}
+						candidates->lock();
+						size = candidates->size();
+						candidates->unlock();
+					}
 				}
 
 			}
@@ -118,11 +132,11 @@ int cGraphReaderThread::getTheoreticalSpectraIter(bool cterminalstartingnode, cC
 }
 
 
-int cGraphReaderThread::reverseCTerminalCandidates(int nodeid, cCandidateSet* candidates, double precursormass, long long &count, int startmodifID, bool* terminatecomputation) {
+int cGraphReaderThread::reverseCTerminalCandidates(int nodeid, cCandidateSet* candidates, double precursormass, int startmodifID, bool* terminatecomputation) {
 	vector<string> composition;
 	vector<nodeEdge> perspectivepath;
 
-	if (getTheoreticalSpectraIter((*graph)[nodeid].checkIonAnnotation(y_ion), candidates, nodeid, composition, precursormass, count, startmodifID, 0, 0, -1, perspectivepath, (*graph)[nodeid].getMZRatio(), terminatecomputation) == -1) {
+	if (getTheoreticalSpectraIter((*graph)[nodeid].checkIonAnnotation(y_ion), candidates, nodeid, composition, precursormass, startmodifID, 0, 0, -1, perspectivepath, (*graph)[nodeid].getMZRatio(), terminatecomputation) == -1) {
 		return -1;
 	}
 
@@ -137,22 +151,24 @@ cGraphReaderThread::cGraphReaderThread() {
 	parameters = 0;
 	os = 0;
 	lastsystemnode = 0;
-	mode = 0;
+	scanmode = 0;
 	terminatecomputation = 0;
+	count = 0;
 
 	// delete thread when run is finished
 	connect(this, SIGNAL(finished()), this, SLOT(deleteLater()));
 }
 
 
-void cGraphReaderThread::initialize(vector<cDeNovoGraphNode>& graph, cBricksDatabase& bricksdatabasewithcombinations, cCandidateSet& candidates, cParameters* parameters, cMainThread* os, int lastsystemnode, bool& terminatecomputation) {
+void cGraphReaderThread::initialize(vector<cDeNovoGraphNode>& graph, cBricksDatabase& bricksdatabasewithcombinations, cCandidateSet& candidates, cParameters* parameters, cMainThread* os, int lastsystemnode, long long unsigned& count, int scanmode, bool& terminatecomputation) {
 	this->graph = &graph;
 	this->bricksdatabasewithcombinations = &bricksdatabasewithcombinations;
 	this->candidates = &candidates;
 	this->parameters = parameters;
 	this->os = os;
 	this->lastsystemnode = lastsystemnode;
-	this->mode = mode;
+	this->count = &count;
+	this->scanmode = scanmode;
 	this->terminatecomputation = &terminatecomputation;
 }
 
@@ -160,15 +176,14 @@ void cGraphReaderThread::initialize(vector<cDeNovoGraphNode>& graph, cBricksData
 void cGraphReaderThread::run() {
 	vector<string> composition;
 	vector<nodeEdge> perspectivepath;
-	long long count = 0;
 	int startmodifID = 0;
 	double unchargedprecursormass = uncharge(parameters->precursormass, parameters->precursorcharge);
 
 	switch (parameters->peptidetype)
 	{
 	case cyclic:
-		if (getTheoreticalSpectraIter(false, candidates, 0, composition, unchargedprecursormass, count, 0, 0, 0, -1, perspectivepath, (*graph)[0].getMZRatio(), terminatecomputation) == -1) {
-			// terminated by user
+		if (getTheoreticalSpectraIter(false, candidates, 0, composition, unchargedprecursormass, 0, 0, 0, -1, perspectivepath, (*graph)[0].getMZRatio(), terminatecomputation) == -1) {
+			// terminated
 			return;
 		}
 		break;
@@ -178,8 +193,8 @@ void cGraphReaderThread::run() {
 			if (i - 2 > 0) {
 				startmodifID = i - 2;
 			}
-			if (reverseCTerminalCandidates(i, candidates, unchargedprecursormass, count, startmodifID, terminatecomputation) == -1) {
-				// terminated by user
+			if (reverseCTerminalCandidates(i, candidates, unchargedprecursormass, startmodifID, terminatecomputation) == -1) {
+				// terminated
 				return;
 			}
 		}
@@ -189,8 +204,8 @@ void cGraphReaderThread::run() {
 			if (i - 1/*2*/ > 0) {
 				startmodifID = i - 1/*2*/;
 			}
-			if (reverseCTerminalCandidates(i, candidates, unchargedprecursormass, count, startmodifID, terminatecomputation) == -1) {
-				// terminated by user
+			if (reverseCTerminalCandidates(i, candidates, unchargedprecursormass, startmodifID, terminatecomputation) == -1) {
+				// terminated
 				return;
 			}
 		}
@@ -200,11 +215,13 @@ void cGraphReaderThread::run() {
 			if (i - 1 > 0) {
 				startmodifID = i - 1;
 			}
-			if (reverseCTerminalCandidates(i, candidates, unchargedprecursormass, count, startmodifID, terminatecomputation) == -1) {
-				// terminated by user
+			if (reverseCTerminalCandidates(i, candidates, unchargedprecursormass, startmodifID, terminatecomputation) == -1) {
+				// terminated
 				return;
 			}
 		}
+		break;
+	case other:
 		break;
 	default:
 		break;

@@ -99,6 +99,7 @@ class cTheoreticalSpectrum {
 	cPeaksList experimentalpeaks;
 	cCandidate candidate;
 	int experimentalpeaksmatched;
+	int scrambledpeaksmatched;
 	map<fragmentIonType, int> matchedions;
 	int peakstested;
 	double experimentalpeaksmatchedratio;
@@ -243,10 +244,24 @@ public:
 
 
 	/**
+		\brief Compare theoretical peaks with an experimental spectrum.
+		\param parameters a pointer to the parameters of the application
+	*/ 
+	void compareMSSpectrum(cParameters* parameters);
+
+
+	/**
 		\brief Get the number of matched peaks between an experimental and a theoretical spectrum.
 		\retval int number of matched peaks
 	*/ 
 	int getNumberOfMatchedPeaks();
+
+
+	/**
+		\brief Get the number of matched scrambled peaks between an experimental and a theoretical spectrum.
+		\retval int number of matched scrambled peaks
+	*/ 
+	int getNumberOfScrambledPeaks();
 
 
 	/**

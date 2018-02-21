@@ -127,6 +127,7 @@ void cBrick::setSummary(string& summary) {
 
 
 void cBrick::setAcronyms(string& acronyms) {
+	this->acronyms.clear();
 	string s = "";
 	int i = 0;
 	while (i < (int)acronyms.size()) {
@@ -148,6 +149,7 @@ void cBrick::setAcronyms(string& acronyms) {
 
 
 void cBrick::setReferences(string& references) {
+	this->references.clear();
 	string s = "";
 	int i = 0;
 	while (i < (int)references.size()) {
@@ -235,6 +237,18 @@ string cBrick::getAcronymsAsString() {
 }
 
 
+string cBrick::getReferencesAsString() {
+	string s = "";
+	for (int i = 0; i < (int)references.size(); i++) {
+		s += references[i];
+		if (i < (int)references.size() - 1) {
+			s += "/";
+		}
+	}
+	return s;
+}
+
+
 string cBrick::getFirstAcronymAsString() {
 	if (acronyms.size() == 0) {
 		return "";
@@ -244,6 +258,10 @@ string cBrick::getFirstAcronymAsString() {
 
 
 string cBrick::getAcronymsWithReferencesAsHTMLString() {
+	if (acronyms.size() != references.size()) {
+		return "";
+	}
+
 	string s = "";
 	regex rx;
 	bool correctreference;
@@ -278,9 +296,9 @@ string cBrick::getAcronymsWithReferencesAsHTMLString() {
 
 			// PDB
 			if (!correctreference) {
-				rx = "^PDB: [A-Z]+$";
+				rx = "^PDB: ([A-Z]|[0-9])+$";
 				if (regex_search(references[i], rx)) {
-					s += "<a href=\"http://www.pdb.org/pdb/ligand/ligandsummary.do?hetId=" + references[i].substr(5) + "\">";
+					s += "<a href=\"http://www.ebi.ac.uk/pdbe-srv/pdbechem/chemicalCompound/show/" + references[i].substr(5) + "\">";
 					s += acronyms[i];
 					s += "</a>";
 					correctreference = true;
@@ -349,75 +367,23 @@ bool cBrick::isArtificial() {
 
 
 void cBrick::store(ofstream& os) {
-	int size;
-
-	size = (int)name.size();
-	os.write((char *)&size, sizeof(int));
-	os.write(name.c_str(), name.size());
-
-	size = (int)acronyms.size();
-	os.write((char *)&size, sizeof(int));
-	for (int i = 0; i < (int)acronyms.size(); i++) {
-		size = (int)acronyms[i].size();
-		os.write((char *)&size, sizeof(int));
-		os.write(acronyms[i].c_str(), acronyms[i].size());
-	}
-
-	size = (int)references.size();
-	os.write((char *)&size, sizeof(int));
-	for (int i = 0; i < (int)references.size(); i++) {
-		size = (int)references[i].size();
-		os.write((char *)&size, sizeof(int));
-		os.write(references[i].c_str(), references[i].size());
-	}
-
-	size = (int)summary.size();
-	os.write((char *)&size, sizeof(int));
-	os.write(summary.c_str(), summary.size());
-
+	storeString(name, os);
+	storeStringVector(acronyms, os);
+	storeStringVector(references, os);
+	storeString(summary, os);
 	os.write((char *)&mass, sizeof(double));
-
-	size = (int)composition.size();
-	os.write((char *)&size, sizeof(int));
-	os.write(composition.c_str(), composition.size());
-
+	storeString(composition, os);
 	os.write((char *)&artificial, sizeof(bool));
 }
 
 
 void cBrick::load(ifstream& is) {
-	int size;
-
-	is.read((char *)&size, sizeof(int));
-	name.resize(size);
-	is.read(&name[0], name.size());
-
-	is.read((char *)&size, sizeof(int));
-	acronyms.resize(size);
-	for (int i = 0; i < (int)acronyms.size(); i++) {
-		is.read((char *)&size, sizeof(int));
-		acronyms[i].resize(size);
-		is.read(&acronyms[i][0], acronyms[i].size());
-	}
-
-	is.read((char *)&size, sizeof(int));
-	references.resize(size);
-	for (int i = 0; i < (int)references.size(); i++) {
-		is.read((char *)&size, sizeof(int));
-		references[i].resize(size);
-		is.read(&references[i][0], references[i].size());
-	}
-
-	is.read((char *)&size, sizeof(int));
-	summary.resize(size);
-	is.read(&summary[0], summary.size());
-
+	loadString(name, is);
+	loadStringVector(acronyms, is);
+	loadStringVector(references, is);
+	loadString(summary, is);
 	is.read((char *)&mass, sizeof(double));
-
-	is.read((char *)&size, sizeof(int));
-	composition.resize(size);
-	is.read(&composition[0], composition.size());
-
+	loadString(composition, is);
 	is.read((char *)&artificial, sizeof(bool));
 }
 

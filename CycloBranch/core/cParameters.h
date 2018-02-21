@@ -11,10 +11,22 @@
 #include <fstream>
 #include "core/cPeaksList.h"
 #include "core/cBricksDatabase.h"
+#include "core/cSequenceDatabase.h"
 
 class cMainThread;
 
 using namespace std;
+
+
+/**
+	\brief Running modes of the application.
+*/
+enum modeType {
+	denovoengine = 0,
+	singlecomparison = 1,
+	databasesearch = 2,
+	dereplication = 3
+};
 
 
 /**
@@ -58,7 +70,7 @@ public:
 
 
 	/**
-		\brief An internal structure representing a peak list.
+		\brief A structure representing a peak list.
     */
     cPeaksList peaklist;
 
@@ -112,7 +124,7 @@ public:
 
 
 	/**
-		\brief An internal structure representing a database of bricks.
+		\brief A structure representing a database of bricks.
     */
     cBricksDatabase bricksdatabase;
 
@@ -162,7 +174,7 @@ public:
 	/**
 		\brief Program mode.
     */
-    int mode;
+	modeType mode;
 
 
 	/**
@@ -253,6 +265,18 @@ public:
 		\brief The identifier of an action with edges forming blind paths.
     */
     int blindedges;
+
+
+	/**
+		\brief A file name of a sequence database.
+    */
+    string sequencedatabasefilename;
+
+
+	/**
+		\brief A structure representing a database of sequences.
+    */
+    cSequenceDatabase sequencedatabase;
 
 
 	/**

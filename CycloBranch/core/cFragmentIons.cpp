@@ -3,6 +3,7 @@
 
 cPeriodicTableMap::cPeriodicTableMap() {
 	table["H"] = H;
+	table["D"] = D;
 	table["Li"] = Li;
 	table["Be"] = Be;
 	table["B"] = B;
@@ -46,6 +47,59 @@ int cPeriodicTableMap::count(string& element) {
 }
 
 
+peptideType getPeptideTypeFromString(string s) {
+	if (s.compare("linear") == 0) {
+		return linear;
+	}
+	if (s.compare("cyclic") == 0) {
+		return cyclic;
+	}
+	if (s.compare("branched") == 0) {
+		return branched;
+	}
+	if (s.compare("lasso") == 0) {
+		return lasso;
+	}
+	if (s.compare("linearpolysaccharide") == 0) {
+		return linearpolysaccharide;
+	}
+	if (s.compare("other") == 0) {
+		return other;
+	}
+
+	return other;
+}
+
+
+string getStringFromPeptideType(peptideType peptidetype) {
+	switch (peptidetype)
+	{
+	case linear:
+		return "linear";
+		break;
+	case cyclic:
+		return "cyclic";
+		break;
+	case branched:
+		return "branched";
+		break;
+	case lasso:
+		return "lasso";
+		break;
+	case linearpolysaccharide:
+		return "linearpolysaccharide";
+		break;
+	case other:
+		return "other";
+		break;
+	default:
+		break;
+	}
+
+	return "other";
+}
+
+
 double charge(double mass, int charge) {
 	return (mass + ((double)(charge - 1))*Hplus)/(double)charge;
 }
@@ -57,38 +111,26 @@ double uncharge(double mass, int charge) {
 
 
 void fragmentDescription::store(ofstream& os) {
-	int size;
-	
-	size = (int)name.size();
-	os.write((char *)&size, sizeof(int));
-	os.write(name.c_str(), (int)name.size());
-
-	size = (int)summary.size();
-	os.write((char *)&size, sizeof(int));
-	os.write(summary.c_str(), (int)summary.size());
-
+	storeString(name, os);
+	storeString(summary, os);
 	os.write((char *)&massdifference, sizeof(double));
 	os.write((char *)&nterminal, sizeof(bool));
 	os.write((char *)&cterminal, sizeof(bool));
 	os.write((char *)&parent, sizeof(fragmentIonType));
+	os.write((char *)&positive, sizeof(bool));
+	os.write((char *)&multiplier, sizeof(int));
 }
 
 
 void fragmentDescription::load(ifstream& is) {
-	int size;
-	
-	is.read((char *)&size, sizeof(int));
-	name.resize(size);
-	is.read(&name[0], name.size());
-
-	is.read((char *)&size, sizeof(int));
-	summary.resize(size);
-	is.read(&summary[0], summary.size());
-
+	loadString(name, is);
+	loadString(summary, is);
 	is.read((char *)&massdifference, sizeof(double));
 	is.read((char *)&nterminal, sizeof(bool));
 	is.read((char *)&cterminal, sizeof(bool));
 	is.read((char *)&parent, sizeof(fragmentIonType));
+	is.read((char *)&positive, sizeof(bool));
+	is.read((char *)&multiplier, sizeof(int));
 }
 
 
@@ -351,6 +393,150 @@ void cFragmentIons::recalculateFragments(bool cyclicnterminus, bool cyclicctermi
 	fragmentions[ms_cterminal_ion_kplus].name = "C_K+";
 	fragmentions[ms_cterminal_ion_kplus].massdifference = H2O + Kplus;
 	fragmentions[ms_cterminal_ion_kplus].parent = ms_cterminal_ion_kplus;
+
+	// initialize ion H+
+	fragmentions[ms_hplus].nterminal = true;
+	fragmentions[ms_hplus].cterminal = true;
+	fragmentions[ms_hplus].name = "[M+H]+";
+	fragmentions[ms_hplus].massdifference = Hplus;
+	fragmentions[ms_hplus].parent = ms_hplus;
+	fragmentions[ms_hplus].positive = true;
+	fragmentions[ms_hplus].multiplier = 1;
+
+	// initialize ion Na+
+	fragmentions[ms_naplus].nterminal = true;
+	fragmentions[ms_naplus].cterminal = true;
+	fragmentions[ms_naplus].name = "[M+Na]+";
+	fragmentions[ms_naplus].massdifference = Naplus;
+	fragmentions[ms_naplus].parent = ms_naplus;
+	fragmentions[ms_naplus].positive = true;
+	fragmentions[ms_naplus].multiplier = 1;
+
+	// initialize ion K+
+	fragmentions[ms_kplus].nterminal = true;
+	fragmentions[ms_kplus].cterminal = true;
+	fragmentions[ms_kplus].name = "[M+K]+";
+	fragmentions[ms_kplus].massdifference = Kplus;
+	fragmentions[ms_kplus].parent = ms_kplus;
+	fragmentions[ms_kplus].positive = true;
+	fragmentions[ms_kplus].multiplier = 1;
+
+	// initialize ion H-
+	fragmentions[ms_hminus].nterminal = true;
+	fragmentions[ms_hminus].cterminal = true;
+	fragmentions[ms_hminus].name = "[M-H]-";
+	fragmentions[ms_hminus].massdifference = -Hplus;
+	fragmentions[ms_hminus].parent = ms_hminus;
+	fragmentions[ms_hminus].positive = false;
+	fragmentions[ms_hminus].multiplier = 1;
+
+	// initialize ion [3M+2Fe-5H]+
+	fragmentions[ms_3M2Fe5H].nterminal = true;
+	fragmentions[ms_3M2Fe5H].cterminal = true;
+	fragmentions[ms_3M2Fe5H].name = "[3M+2Fe-5H]+";
+	fragmentions[ms_3M2Fe5H].massdifference = 2*Fe - 6*H + Hplus;
+	fragmentions[ms_3M2Fe5H].parent = ms_3M2Fe5H;
+	fragmentions[ms_3M2Fe5H].positive = true;
+	fragmentions[ms_3M2Fe5H].multiplier = 3;
+
+	// initialize ion [2M+Fe-2H]+
+	fragmentions[ms_2MFe2H].nterminal = true;
+	fragmentions[ms_2MFe2H].cterminal = true;
+	fragmentions[ms_2MFe2H].name = "[2M+Fe-2H]+";
+	fragmentions[ms_2MFe2H].massdifference = Fe - 3*H + Hplus;
+	fragmentions[ms_2MFe2H].parent = ms_2MFe2H;
+	fragmentions[ms_2MFe2H].positive = true;
+	fragmentions[ms_2MFe2H].multiplier = 2;
+
+	// initialize ion [3M+Fe-2H]+
+	fragmentions[ms_3MFe2H].nterminal = true;
+	fragmentions[ms_3MFe2H].cterminal = true;
+	fragmentions[ms_3MFe2H].name = "[3M+Fe-2H]+";
+	fragmentions[ms_3MFe2H].massdifference = Fe - 3*H + Hplus;
+	fragmentions[ms_3MFe2H].parent = ms_3MFe2H;
+	fragmentions[ms_3MFe2H].positive = true;
+	fragmentions[ms_3MFe2H].multiplier = 3;
+
+	// initialize ion [M+Fe-2H]+
+	fragmentions[ms_MFe2H].nterminal = true;
+	fragmentions[ms_MFe2H].cterminal = true;
+	fragmentions[ms_MFe2H].name = "[M+Fe-2H]+";
+	fragmentions[ms_MFe2H].massdifference = Fe - 3*H + Hplus;
+	fragmentions[ms_MFe2H].parent = ms_MFe2H;
+	fragmentions[ms_MFe2H].positive = true;
+	fragmentions[ms_MFe2H].multiplier = 1;
+
+	// initialize ion [3M+2Fe-6H+Na]+
+	fragmentions[ms_3M2Fe6HNa].nterminal = true;
+	fragmentions[ms_3M2Fe6HNa].cterminal = true;
+	fragmentions[ms_3M2Fe6HNa].name = "[3M+2Fe-6H+Na]+";
+	fragmentions[ms_3M2Fe6HNa].massdifference = 2*Fe - 6*H + Naplus;
+	fragmentions[ms_3M2Fe6HNa].parent = ms_3M2Fe6HNa;
+	fragmentions[ms_3M2Fe6HNa].positive = true;
+	fragmentions[ms_3M2Fe6HNa].multiplier = 3;
+
+	// initialize ion [2M+Fe-3H+Na]+
+	fragmentions[ms_2MFe3HNa].nterminal = true;
+	fragmentions[ms_2MFe3HNa].cterminal = true;
+	fragmentions[ms_2MFe3HNa].name = "[2M+Fe-3H+Na]+";
+	fragmentions[ms_2MFe3HNa].massdifference = Fe - 3*H + Naplus;
+	fragmentions[ms_2MFe3HNa].parent = ms_2MFe3HNa;
+	fragmentions[ms_2MFe3HNa].positive = true;
+	fragmentions[ms_2MFe3HNa].multiplier = 2;
+
+	// initialize ion [3M+Fe-3H+Na]+
+	fragmentions[ms_3MFe3HNa].nterminal = true;
+	fragmentions[ms_3MFe3HNa].cterminal = true;
+	fragmentions[ms_3MFe3HNa].name = "[3M+Fe-3H+Na]+";
+	fragmentions[ms_3MFe3HNa].massdifference = Fe - 3*H + Naplus;
+	fragmentions[ms_3MFe3HNa].parent = ms_3MFe3HNa;
+	fragmentions[ms_3MFe3HNa].positive = true;
+	fragmentions[ms_3MFe3HNa].multiplier = 3;
+
+	// initialize ion [M+Fe-3H+Na]+
+	fragmentions[ms_MFe3HNa].nterminal = true;
+	fragmentions[ms_MFe3HNa].cterminal = true;
+	fragmentions[ms_MFe3HNa].name = "[M+Fe-3H+Na]+";
+	fragmentions[ms_MFe3HNa].massdifference = Fe - 3*H + Naplus;
+	fragmentions[ms_MFe3HNa].parent = ms_MFe3HNa;
+	fragmentions[ms_MFe3HNa].positive = true;
+	fragmentions[ms_MFe3HNa].multiplier = 1;
+
+	// initialize ion [3M+2Fe-7H]-
+	fragmentions[ms_3M2Fe7H].nterminal = true;
+	fragmentions[ms_3M2Fe7H].cterminal = true;
+	fragmentions[ms_3M2Fe7H].name = "[3M+2Fe-7H]-";
+	fragmentions[ms_3M2Fe7H].massdifference = 2*Fe - 6*H - Hplus;
+	fragmentions[ms_3M2Fe7H].parent = ms_3M2Fe7H;
+	fragmentions[ms_3M2Fe7H].positive = false;
+	fragmentions[ms_3M2Fe7H].multiplier = 3;
+
+	// initialize ion [2M+Fe-4H]-
+	fragmentions[ms_2MFe4H].nterminal = true;
+	fragmentions[ms_2MFe4H].cterminal = true;
+	fragmentions[ms_2MFe4H].name = "[2M+Fe-4H]-";
+	fragmentions[ms_2MFe4H].massdifference = Fe - 3*H - Hplus;
+	fragmentions[ms_2MFe4H].parent = ms_2MFe4H;
+	fragmentions[ms_2MFe4H].positive = false;
+	fragmentions[ms_2MFe4H].multiplier = 2;
+
+	// initialize ion [3M+Fe-4H]-
+	fragmentions[ms_3MFe4H].nterminal = true;
+	fragmentions[ms_3MFe4H].cterminal = true;
+	fragmentions[ms_3MFe4H].name = "[3M+Fe-4H]-";
+	fragmentions[ms_3MFe4H].massdifference = Fe - 3*H - Hplus;
+	fragmentions[ms_3MFe4H].parent = ms_3MFe4H;
+	fragmentions[ms_3MFe4H].positive = false;
+	fragmentions[ms_3MFe4H].multiplier = 3;
+
+	// initialize ion [M+Fe-4H]-
+	fragmentions[ms_MFe4H].nterminal = true;
+	fragmentions[ms_MFe4H].cterminal = true;
+	fragmentions[ms_MFe4H].name = "[M+Fe-4H]-";
+	fragmentions[ms_MFe4H].massdifference = Fe - 3*H - Hplus;
+	fragmentions[ms_MFe4H].parent = ms_MFe4H;
+	fragmentions[ms_MFe4H].positive = false;
+	fragmentions[ms_MFe4H].multiplier = 1;
 
 	// initialize B-2H ion
 	//fragmentions[b_ion_2H_loss].nterminal = true;

@@ -134,6 +134,7 @@ class cCandidate {
 	int branchstart;
 	int branchend;
 	vector<nodeEdge> path;
+	string name;
 
 	vector<string> composition;
 	string internalcomposition;
@@ -413,9 +414,10 @@ public:
 	/**
 		\brief Get the summary formula of the peptide sequence candidate.
 		\param parameters a reference to the parameters of the application
+		\param peptidetype the type of peptide
 		\retval string the summary formula
 	*/ 
-	string getSummaryFormula(cParameters& parameters);
+	string getSummaryFormula(cParameters& parameters, peptideType peptidetype);
 
 
 	/**
@@ -430,6 +432,20 @@ public:
 		\param is an input stream
 	*/ 
 	void load(ifstream& is);
+
+
+	/**
+		\brief Set the name of peptide.
+		\param name name
+	*/ 
+	void setName(string& name);
+
+
+	/**
+		\brief Get the name of peptide.
+		\retval string name
+	*/ 
+	string& getName();
 
 };
 

@@ -13,6 +13,7 @@
 #include <vector>
 #include <algorithm>
 #include <regex>
+#include "core/utilities.h"
 
 using namespace std;
 
@@ -183,6 +184,13 @@ public:
 		\retval string acronyms of all izomers separated by '/'
 	*/ 
 	string getAcronymsAsString();
+	
+
+	/**
+		\brief Get all references.
+		\retval string references of all izomers separated by '/'
+	*/ 
+	string getReferencesAsString();
 	
 
 	/**

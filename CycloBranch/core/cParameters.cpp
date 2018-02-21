@@ -30,7 +30,7 @@ void cParameters::clear() {
 	maximumcumulativemass = 0;
 	generatebrickspermutations = true;
 	maximumnumberofthreads = 1;
-	mode = 0;
+	mode = denovoengine;
 	scoretype = b_ions;
 	clearhitswithoutparent = false;
 	cyclicnterminus = false;
@@ -46,6 +46,8 @@ void cParameters::clear() {
 	searchedsequenceTmodif = "";
 	maximumnumberofcandidates = 50000;
 	blindedges = 2;
+	sequencedatabase.clear();
+	sequencedatabasefilename = "";
 
 	searchedmodifications.clear();
 	searchedmodifications.push_back(fragmentDescription("", 0, "", true, true));
@@ -61,6 +63,7 @@ int cParameters::checkAndPrepare() {
 	string errormessage = "";
 	ifstream peakliststream;
 	ifstream bricksdatabasestream;
+	ifstream sequencedatabasestream;
 	regex rx;
 	ePeakListFileFormat peaklistfileformat;
 	string s;
@@ -68,184 +71,199 @@ int cParameters::checkAndPrepare() {
 
 	// peaklist check
 	if (!error) {
-		if (peaklistfilename == "") {
-			error = true;
-			errormessage = "A peaklist is not specified.";
+
+		peaklistfileformat = txt;
+			
+		try {
+
+			rx = "\\.[mM][gG][fF]$";
+			// Mascot Generic Format
+			if (regex_search(peaklistfilename, rx)) {
+				peaklistfileformat = mgf;
+			}
+			
+			rx = "\\.[mM][zZ][mM][lL]$";
+			// mzML
+			if (regex_search(peaklistfilename, rx)) {
+				peaklistfileformat = mzML;
+			}
+			
+			rx = "\\.[mM][zZ][xX][mM][lL]$";
+			// mzXML
+			if (regex_search(peaklistfilename, rx)) {
+				peaklistfileformat = mzXML;
+			}
+			
+			rx = "\\.[bB][aA][fF]$";
+			// Bruker Analysis File
+			if (regex_search(peaklistfilename, rx)) {
+				peaklistfileformat = baf;
+			}
+
 		}
-		else {
-			peaklistfileformat = txt;
-			
-			try {
+		catch (std::regex_error& e) {
+			error = true;
+			errormessage = "cParameters::checkAndPrepare: regex_search failed, error no. " + to_string((int)e.code()) + "\n";
+		}
 
-				rx = "\\.[mM][gG][fF]$";
-				// Mascot Generic Format
-				if (regex_search(peaklistfilename, rx)) {
-					peaklistfileformat = mgf;
-				}
-			
-				rx = "\\.[mM][zZ][mM][lL]$";
-				// mzML
-				if (regex_search(peaklistfilename, rx)) {
-					peaklistfileformat = mzML;
-				}
-			
-				rx = "\\.[mM][zZ][xX][mM][lL]$";
-				// mzXML
-				if (regex_search(peaklistfilename, rx)) {
-					peaklistfileformat = mzXML;
-				}
-			
-				rx = "\\.[bB][aA][fF]$";
-				// Bruker Analysis File
-				if (regex_search(peaklistfilename, rx)) {
-					peaklistfileformat = baf;
+		if (!error) {
+
+			switch (peaklistfileformat) 
+			{
+			case txt:
+				peakliststream.open(peaklistfilename);
+				break;
+			case mgf:
+				peakliststream.open(peaklistfilename);
+				break;
+			case mzML:
+			case mzXML:
+				*os << "Converting the file " + peaklistfilename + " to .mgf ... ";
+				s = "External\\any2mgf.bat \"" + peaklistfilename + "\"";
+				if (system(s.c_str()) != 0) {
+					error = true;
+					errormessage = "The file cannot be converted.\n";
+					errormessage += "Does the file '" + peaklistfilename + "' exist ?\n";
+					errormessage += "Do you have OpenMS installed ?\n";
+					errormessage += "Do you have path to the OpenMS/bin/FileConverter.exe in your PATH variable ?\n";
+					errormessage += "Is the directory with the file '" + peaklistfilename + "' writable ?\n";
+					errormessage += "Do you have 'any2mgf.bat' file located in the 'External' folder ?\n";
 				}
 
+				if (!error) {
+					*os << "ok" << endl << endl;
+					peakliststream.open(peaklistfilename + ".mgf");
+				}
+				break;
+			case baf:
+				*os << "Converting the file " + peaklistfilename + " ... ";
+				s = "External\\baf2csv.bat \"" + peaklistfilename + "\"";
+				if (system(s.c_str()) != 0) {
+					error = true;
+					errormessage = "The file cannot be converted.\n";
+					errormessage += "Does the file '" + peaklistfilename + "' exist ?\n";
+					errormessage += "Do you have Bruker Daltonik's CompassXport installed ?\n";
+					errormessage += "Do you have path to the CompassXport.exe in your PATH variable ?\n";
+					errormessage += "Is the directory with the file '" + peaklistfilename + "' writable ?\n";
+					errormessage += "Do you have 'baf2csv.bat' file located in the 'External' folder ?\n";
+				}
+
+				if (!error) {
+					*os << "ok" << endl << endl;
+					peakliststream.open(peaklistfilename + ".csv");
+				}
+				break;
+			default:
+				break;
 			}
-			catch (std::regex_error& e) {
+
+		}
+			
+
+		if (!error) {
+			if (!peakliststream.good()) {
 				error = true;
-				errormessage = "cParameters::checkAndPrepare: regex_search failed, error no. " + to_string((int)e.code()) + "\n";
+				errormessage = "Cannot open the file '" + peaklistfilename + "'.";
 			}
-
-			if (!error) {
-
-				switch (peaklistfileformat) 
-				{
+			else {
+				if (os) {
+					*os << "Loading the peak list... ";
+				}
+				switch (peaklistfileformat) {
 				case txt:
-					peakliststream.open(peaklistfilename);
-					break;
-				case mgf:
-					peakliststream.open(peaklistfilename);
+					peaklist.loadFromPlainTextStream(peakliststream);
 					break;
 				case mzML:
 				case mzXML:
-					*os << "Converting the file " + peaklistfilename + " to .mgf ... ";
-					s = "External\\any2mgf.bat \"" + peaklistfilename + "\"";
-					if (system(s.c_str()) != 0) {
-						error = true;
-						errormessage = "The file cannot be converted.\n";
-						errormessage += "Does the file '" + peaklistfilename + "' exist ?\n";
-						errormessage += "Do you have OpenMS installed ?\n";
-						errormessage += "Do you have path to the OpenMS/bin/FileConverter.exe in your PATH variable ?\n";
-						errormessage += "Is the directory with the file '" + peaklistfilename + "' writable ?\n";
-						errormessage += "Do you have 'any2mgf.bat' file located in the 'External' folder ?\n";
-					}
-
-					if (!error) {
-						*os << "ok" << endl << endl;
-						peakliststream.open(peaklistfilename + ".mgf");
-					}
+				case mgf:
+					peaklist.loadFromMGFStream(peakliststream);
 					break;
 				case baf:
-					*os << "Converting the file " + peaklistfilename + " ... ";
-					s = "External\\baf2csv.bat \"" + peaklistfilename + "\"";
-					if (system(s.c_str()) != 0) {
-						error = true;
-						errormessage = "The file cannot be converted.\n";
-						errormessage += "Does the file '" + peaklistfilename + "' exist ?\n";
-						errormessage += "Do you have Bruker Daltonik's CompassXport installed ?\n";
-						errormessage += "Do you have path to the CompassXport.exe in your PATH variable ?\n";
-						errormessage += "Is the directory with the file '" + peaklistfilename + "' writable ?\n";
-						errormessage += "Do you have 'baf2csv.bat' file located in the 'External' folder ?\n";
-					}
-
-					if (!error) {
-						*os << "ok" << endl << endl;
-						peakliststream.open(peaklistfilename + ".csv");
-					}
+					peaklist.loadFromBAFStream(peakliststream);
 					break;
 				default:
 					break;
 				}
-
-			}
-			
-
-			if (!error) {
-				if (!peakliststream.good()) {
-					error = true;
-					errormessage = "Cannot open the file '" + peaklistfilename + "'.";
+				if (os) {
+					*os << "ok" << endl << endl;
 				}
-				else {
-					if (os) {
-						*os << "Loading the peak list... ";
-					}
-					switch (peaklistfileformat) {
-					case txt:
-						peaklist.loadFromPlainTextStream(peakliststream);
-						break;
-					case mzML:
-					case mzXML:
-					case mgf:
-						peaklist.loadFromMGFStream(peakliststream);
-						break;
-					case baf:
-						peaklist.loadFromBAFStream(peakliststream);
-						break;
-					default:
-						break;
-					}
-					if (os) {
-						*os << "ok" << endl << endl;
-					}
-				}
-				peakliststream.close();
 			}
+			peakliststream.close();
 		}
+
 	}
 
 
 	// bricksdatabase check
-	if (!error) {
-		if (bricksdatabasefilename == "") {
+	if (!error && ((mode == denovoengine) || (mode == singlecomparison) || (mode == databasesearch))) {
+
+		bricksdatabasestream.open(bricksdatabasefilename);
+		if (!bricksdatabasestream.good()) {
 			error = true;
-			errormessage = "A database of bricks is not specified.";
+			errormessage = "Cannot open the file '" + bricksdatabasefilename + "'.";
 		}
 		else {
-			bricksdatabasestream.open(bricksdatabasefilename);
-			if (!bricksdatabasestream.good()) {
+			if (os) {
+				*os << "Loading the database of bricks... ";
+			}
+			if (bricksdatabase.loadFromPlainTextStream(bricksdatabasestream, errormessage) == -1) {
 				error = true;
-				errormessage = "Cannot open the file '" + bricksdatabasefilename + "'.";
 			}
 			else {
 				if (os) {
-					*os << "Loading the database of bricks... ";
-				}
-				if (bricksdatabase.loadFromPlainTextStream(bricksdatabasestream, errormessage) == -1) {
-					error = true;
-				}
-				else {
-					if (os) {
-						*os << "ok" << endl << endl;
-					}
+					*os << "ok" << endl << endl;
 				}
 			}
-			bricksdatabasestream.close();
+		}
+		bricksdatabasestream.close();
 
-			// check for redundant acronyms and []
-			for (int i = 0; i < (int)bricksdatabase.size(); i++) {
-				for (int j = 0; j < (int)bricksdatabase[i].getAcronyms().size(); j++) {
+		bricksdatabase.sortbyMass();
 
-					if ((bricksdatabase[i].getAcronyms()[j].find('[') != string::npos) || (bricksdatabase[i].getAcronyms()[j].find(']') != string::npos)) {
-						error = true;
-						errormessage = "Forbidden symbol '[' or ']' used in the acronym '" + bricksdatabase[i].getAcronyms()[j] + "' of the brick no. " + to_string(i + 1) + ".\n\n";
-					}
+		// check for redundant acronyms and []
+		for (int i = 0; i < (int)bricksdatabase.size(); i++) {
+			for (int j = 0; j < (int)bricksdatabase[i].getAcronyms().size(); j++) {
 
-					for (int k = i; k < (int)bricksdatabase.size(); k++) {
-						for (int m = j; m < (int)bricksdatabase[k].getAcronyms().size(); m++) {
-							if ((i == k) && (j == m)) {
-								continue;
-							}
-							if (bricksdatabase[i].getAcronyms()[j].compare(bricksdatabase[k].getAcronyms()[m]) == 0) {
-								error = true;
-								errormessage = "Redundant acronym '" + bricksdatabase[i].getAcronyms()[j] + "' used in brick no. " + to_string(i + 1) + " and brick no. " + to_string(k + 1) + ".\n\n";
-							}
+				if ((bricksdatabase[i].getAcronyms()[j].find('[') != string::npos) || (bricksdatabase[i].getAcronyms()[j].find(']') != string::npos)) {
+					error = true;
+					errormessage = "Forbidden symbol '[' or ']' used in the acronym '" + bricksdatabase[i].getAcronyms()[j] + "' of the brick no. " + to_string(i + 1) + ".\n\n";
+				}
+
+				for (int k = i; k < (int)bricksdatabase.size(); k++) {
+					for (int m = j; m < (int)bricksdatabase[k].getAcronyms().size(); m++) {
+						if ((i == k) && (j == m)) {
+							continue;
+						}
+						if (bricksdatabase[i].getAcronyms()[j].compare(bricksdatabase[k].getAcronyms()[m]) == 0) {
+							error = true;
+							errormessage = "Redundant acronym '" + bricksdatabase[i].getAcronyms()[j] + "' used in brick no. " + to_string(i + 1) + " and brick no. " + to_string(k + 1) + ".\n\n";
 						}
 					}
 				}
 			}
-
 		}
+
+	}
+
+
+	// sequencedatabase check
+	if (!error && ((mode == databasesearch) || (mode == dereplication))) {
+
+		sequencedatabasestream.open(sequencedatabasefilename);
+		if (!sequencedatabasestream.good()) {
+			error = true;
+			errormessage = "Cannot open the file '" + sequencedatabasefilename + "'.";
+		}
+		else {
+			if (os) {
+				*os << "Loading the database of sequences... ";
+			}
+			sequencedatabase.loadFromPlainTextStream(sequencedatabasestream);
+			if (os) {
+				*os << "ok" << endl << endl;
+			}
+		}
+		sequencedatabasestream.close();
+
 	}
 
 
@@ -268,6 +286,10 @@ int cParameters::checkAndPrepare() {
 			break;
 		case linearpolysaccharide:
 			initializeFragmentIonsForDeNovoGraphOfLinearPolysaccharide(fragmentionsfordenovograph);
+			break;
+		case other:
+			error = true;
+			errormessage = "Invalid peptide type 'other'.\n\n";
 			break;
 		default:
 			error = true;
@@ -312,6 +334,9 @@ string cParameters::printToString() {
 	case linearpolysaccharide:
 		s += "Linear polysaccharide (beta version)\n";
 		break;
+	case other:
+		s += "Other\n";
+		break;
 	default:
 		break;
 	}
@@ -340,12 +365,18 @@ string cParameters::printToString() {
 	}
 
 	s += "Mode: ";
-	switch (mode) {
-	case 0:
+	switch ((modeType)mode) {
+	case denovoengine:
 		s += "De Novo Search Engine";
 		break;
-	case 1:
-		s += "Compare Spectrum of Searched Sequence with Peaklist";
+	case singlecomparison:
+		s += "Compare Peaklist with Spectrum of Searched Sequence";
+		break;
+	case databasesearch:
+		s += "Compare Peaklist with Database - MS/MS data";
+		break;
+	case dereplication:
+		s += "Compare Peaklist with Database - MS data";
 		break;
 	default:
 		break;
@@ -360,10 +391,10 @@ string cParameters::printToString() {
 		s += "Number of b-ions";
 		break;
 	case b_ions_and_b_water_loss_ions:
-		s += "Number of b-ions + water loss b-ions";
+		s += "Number of b-ions + dehydrated b-ions";
 		break;
 	case b_ions_and_b_ammonia_loss_ions:
-		s += "Number of b-ions + ammonia loss b-ions";
+		s += "Number of b-ions + deamidated b-ions";
 		break;
 	case y_ions_and_b_ions:
 		s += "Number of y-ions + b-ions (not for cyclic peptides)";
@@ -430,6 +461,8 @@ string cParameters::printToString() {
 	}
 	s += "\n";
 
+	s += "Sequence Database File: " + sequencedatabasefilename + "\n";
+
 	s += "Searched Peptide Sequence: " + originalsearchedsequence + "\n";
 	s += "N-terminal Modification of Searched Peptide Sequence: " + searchedsequenceNtermmodif + "\n";
 	s += "C-terminal Modification of Searched Peptide Sequence: " + searchedsequenceCtermmodif + "\n";
@@ -463,10 +496,7 @@ void cParameters::store(ofstream& os) {
 
 	os.write((char *)&peptidetype, sizeof(peptideType));
 
-	size = (int)peaklistfilename.size();
-	os.write((char *)&size, sizeof(int));
-	os.write(peaklistfilename.c_str(), peaklistfilename.size());
-
+	storeString(peaklistfilename, os);
 	peaklist.store(os);
 
 	os.write((char *)&precursormass, sizeof(double));
@@ -477,10 +507,7 @@ void cParameters::store(ofstream& os) {
 	os.write((char *)&minimumrelativeintensitythreshold, sizeof(double));
 	os.write((char *)&minimummz, sizeof(double));
 
-	size = (int)bricksdatabasefilename.size();
-	os.write((char *)&size, sizeof(int));
-	os.write(bricksdatabasefilename.c_str(), bricksdatabasefilename.size());
-
+	storeString(bricksdatabasefilename, os);
 	bricksdatabase.store(os);
 
 	os.write((char *)&maximumbricksincombinationbegin, sizeof(int));
@@ -490,7 +517,7 @@ void cParameters::store(ofstream& os) {
 	os.write((char *)&maximumcumulativemass, sizeof(double));
 	os.write((char *)&generatebrickspermutations, sizeof(bool));
 	os.write((char *)&maximumnumberofthreads, sizeof(int));
-	os.write((char *)&mode, sizeof(int));
+	os.write((char *)&mode, sizeof(modeType));
 	os.write((char *)&scoretype, sizeof(scoreType));
 	os.write((char *)&clearhitswithoutparent, sizeof(bool));
 	os.write((char *)&cyclicnterminus, sizeof(bool));
@@ -498,36 +525,19 @@ void cParameters::store(ofstream& os) {
 	os.write((char *)&enablescrambling, sizeof(bool));
 	os.write((char *)&hitsreported, sizeof(int));
 
-	size = (int)sequencetag.size();
-	os.write((char *)&size, sizeof(int));
-	os.write(sequencetag.c_str(), sequencetag.size());
-
-	size = (int)originalsequencetag.size();
-	os.write((char *)&size, sizeof(int));
-	os.write(originalsequencetag.c_str(), originalsequencetag.size());
-
-	size = (int)searchedsequence.size();
-	os.write((char *)&size, sizeof(int));
-	os.write(searchedsequence.c_str(), searchedsequence.size());
-
-	size = (int)originalsearchedsequence.size();
-	os.write((char *)&size, sizeof(int));
-	os.write(originalsearchedsequence.c_str(), originalsearchedsequence.size());
-
-	size = (int)searchedsequenceNtermmodif.size();
-	os.write((char *)&size, sizeof(int));
-	os.write(searchedsequenceNtermmodif.c_str(), searchedsequenceNtermmodif.size());
-
-	size = (int)searchedsequenceCtermmodif.size();
-	os.write((char *)&size, sizeof(int));
-	os.write(searchedsequenceCtermmodif.c_str(), searchedsequenceCtermmodif.size());
-
-	size = (int)searchedsequenceTmodif.size();
-	os.write((char *)&size, sizeof(int));
-	os.write(searchedsequenceTmodif.c_str(), searchedsequenceTmodif.size());
+	storeString(sequencetag, os);
+	storeString(originalsequencetag, os);
+	storeString(searchedsequence, os);
+	storeString(originalsearchedsequence, os);
+	storeString(searchedsequenceNtermmodif, os);
+	storeString(searchedsequenceCtermmodif, os);
+	storeString(searchedsequenceTmodif, os);
 
 	os.write((char *)&maximumnumberofcandidates, sizeof(int));
 	os.write((char *)&blindedges, sizeof(int));
+
+	storeString(sequencedatabasefilename, os);
+	sequencedatabase.store(os);
 
 	size = (int)searchedmodifications.size();
 	os.write((char *)&size, sizeof(int));
@@ -558,10 +568,7 @@ void cParameters::load(ifstream& is) {
 
 	is.read((char *)&peptidetype, sizeof(peptideType));
 
-	is.read((char *)&size, sizeof(int));
-	peaklistfilename.resize(size);
-	is.read(&peaklistfilename[0], peaklistfilename.size());
-
+	loadString(peaklistfilename, is);
 	peaklist.load(is);
 
 	is.read((char *)&precursormass, sizeof(double));
@@ -572,10 +579,7 @@ void cParameters::load(ifstream& is) {
 	is.read((char *)&minimumrelativeintensitythreshold, sizeof(double));
 	is.read((char *)&minimummz, sizeof(double));
 
-	is.read((char *)&size, sizeof(int));
-	bricksdatabasefilename.resize(size);
-	is.read(&bricksdatabasefilename[0], bricksdatabasefilename.size());
-
+	loadString(bricksdatabasefilename, is);
 	bricksdatabase.load(is);
 
 	is.read((char *)&maximumbricksincombinationbegin, sizeof(int));
@@ -585,7 +589,7 @@ void cParameters::load(ifstream& is) {
 	is.read((char *)&maximumcumulativemass, sizeof(double));
 	is.read((char *)&generatebrickspermutations, sizeof(bool));
 	is.read((char *)&maximumnumberofthreads, sizeof(int));
-	is.read((char *)&mode, sizeof(int));
+	is.read((char *)&mode, sizeof(modeType));
 	is.read((char *)&scoretype, sizeof(scoreType));
 	is.read((char *)&clearhitswithoutparent, sizeof(bool));
 	is.read((char *)&cyclicnterminus, sizeof(bool));
@@ -593,36 +597,19 @@ void cParameters::load(ifstream& is) {
 	is.read((char *)&enablescrambling, sizeof(bool));
 	is.read((char *)&hitsreported, sizeof(int));
 
-	is.read((char *)&size, sizeof(int));
-	sequencetag.resize(size);
-	is.read(&sequencetag[0], sequencetag.size());
-
-	is.read((char *)&size, sizeof(int));
-	originalsequencetag.resize(size);
-	is.read(&originalsequencetag[0], originalsequencetag.size());
-
-	is.read((char *)&size, sizeof(int));
-	searchedsequence.resize(size);
-	is.read(&searchedsequence[0], searchedsequence.size());
-
-	is.read((char *)&size, sizeof(int));
-	originalsearchedsequence.resize(size);
-	is.read(&originalsearchedsequence[0], originalsearchedsequence.size());
-
-	is.read((char *)&size, sizeof(int));
-	searchedsequenceNtermmodif.resize(size);
-	is.read(&searchedsequenceNtermmodif[0], searchedsequenceNtermmodif.size());
-
-	is.read((char *)&size, sizeof(int));
-	searchedsequenceCtermmodif.resize(size);
-	is.read(&searchedsequenceCtermmodif[0], searchedsequenceCtermmodif.size());
-
-	is.read((char *)&size, sizeof(int));
-	searchedsequenceTmodif.resize(size);
-	is.read(&searchedsequenceTmodif[0], searchedsequenceTmodif.size());
+	loadString(sequencetag, is);
+	loadString(originalsequencetag, is);
+	loadString(searchedsequence, is);
+	loadString(originalsearchedsequence, is);
+	loadString(searchedsequenceNtermmodif, is);
+	loadString(searchedsequenceCtermmodif, is);
+	loadString(searchedsequenceTmodif, is);
 
 	is.read((char *)&maximumnumberofcandidates, sizeof(int));
 	is.read((char *)&blindedges, sizeof(int));
+
+	loadString(sequencedatabasefilename, is);
+	sequencedatabase.load(is);
 
 	is.read((char *)&size, sizeof(int));
 	searchedmodifications.resize(size);

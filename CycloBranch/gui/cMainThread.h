@@ -49,6 +49,12 @@ private:
 	cTheoreticalSpectrumList theoreticalspectra;
 	cParameters parameters;
 
+	bool checkModifications(cParameters& parameters, cSequence& sequence, int& startmodifid, int& endmodifid, int& middlemodifid, string& errormessage);
+
+	void parseBranch(peptideType peptidetype, string& composition, vector<string>& vectorcomposition, int& branchstart, int& branchend);
+
+	bool checkRegex(cParameters& parameters, string& sequence, string& errormessage);
+
 public:
 
 

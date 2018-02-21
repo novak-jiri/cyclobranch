@@ -22,23 +22,34 @@ cDeNovoGraph::cDeNovoGraph() {
 }
 
 
-bool cDeNovoGraph::findPath(int sourcenodeid, int edgeid, int targetnodeid, string& composition, string brickspath, int maximumbricksincombination, int depth) {
+bool cDeNovoGraph::findPath(int sourcenodeid, int edgeid, int targetnodeid, string& composition, string brickspath, int maximumbricksincombination, vector<int>& path) {
 	string localbrickpath;
-	
+	bool found;
+	bool badpath;
 	int count = getNumberOfBricks(brickspath);
 
-	if ((depth > 1) && (sourcenodeid == targetnodeid)) {
+	if ((path.size() > 1) && (sourcenodeid == targetnodeid)) {
 		cBrick b;
 		b.setComposition(brickspath, true);
 		if (composition.compare(b.getComposition()) == 0)  {
-			//*os << endl << "brick: " << brickspath << " path: " << sourcenodeid << " ";
+			//*os << " path: " << graph[sourcenodeid].getMZRatio() << " ";
 			return true;
 		}
 	}
 	
 	if (count < maximumbricksincombination) {
 		for (int i = 0; i < (int)graph[sourcenodeid].size(); i++) {
-			if ((i == edgeid) && (depth == 0)) {
+			if ((i == edgeid) && (path.size() == 0)) {
+				continue;
+			}
+			badpath = false;
+			for (int j = 0; j < (int)path.size(); j++) {
+				if (path[j] == sourcenodeid) {
+					badpath = true;
+					break;
+				}
+			}
+			if (badpath) {
 				continue;
 			}
 			localbrickpath = brickspath;
@@ -46,8 +57,11 @@ bool cDeNovoGraph::findPath(int sourcenodeid, int edgeid, int targetnodeid, stri
 				localbrickpath += '-';
 			}
 			localbrickpath += graph[sourcenodeid][i].composition;
-			if (findPath(graph[sourcenodeid][i].targetnode, i, targetnodeid, composition, localbrickpath, maximumbricksincombination, depth + 1)) {
-				//*os << sourcenodeid << " ";
+			path.push_back(sourcenodeid);
+			found = findPath(graph[sourcenodeid][i].targetnode, i, targetnodeid, composition, localbrickpath, maximumbricksincombination, path);
+			path.pop_back();
+			if (found) {
+				//*os << graph[sourcenodeid].getMZRatio() << " ";
 				return true;
 			}
 		}
@@ -124,13 +138,13 @@ int cDeNovoGraph::createGraph(bool& terminatecomputation) {
 	sortedpeaklist.removeChargeVariants(parameters->precursorcharge, parameters->fragmentmasserrortolerance);
 	*os << "Number of nodes after deconvolution: " << sortedpeaklist.size() << endl;
 
-	// remove water loss peaks
+	// remove dehydrated peaks
 	sortedpeaklist.removeNeutralLoss(- H2O, parameters->precursorcharge, parameters->fragmentmasserrortolerance);
-	*os << "Number of nodes when water loss ions are removed: " << sortedpeaklist.size() << endl;
+	*os << "Number of nodes when dehydrated ions are removed: " << sortedpeaklist.size() << endl;
 
-	// remove ammonia loss peaks
+	// remove deamidated peaks
 	sortedpeaklist.removeNeutralLoss(- NH3, parameters->precursorcharge, parameters->fragmentmasserrortolerance);
-	*os << "Number of nodes when ammonia loss ions are removed: " << sortedpeaklist.size() << endl;	
+	*os << "Number of nodes when deamidated ions are removed: " << sortedpeaklist.size() << endl;	
 
 	// insert system nodes
 	switch (parameters->peptidetype)
@@ -317,6 +331,9 @@ int cDeNovoGraph::createGraph(bool& terminatecomputation) {
 		lastsystemnode = (int)graph.size() - 1;
 		startnode = 1;
 		break;
+	case other:
+		*os << "Invalid peptide type 'Other'." << endl;
+		return -1;
 	default:
 		*os << "Undefined peptide type." << endl;
 		return -1;
@@ -832,6 +849,7 @@ int cDeNovoGraph::removePathsWhichCanBeSubstitutedByLongerPath(bool& terminateco
 	*os << "Removing edges forming paths which can be substituted by longer paths... ";
 	int edgesremoved = 0;
 	int j;
+	vector<int> path;
 	
 	for (int i = startnode; i < (int)graph.size(); i++) {
 
@@ -844,8 +862,9 @@ int cDeNovoGraph::removePathsWhichCanBeSubstitutedByLongerPath(bool& terminateco
 		while (j < (int)graph[i].size()) {
 			cBrick b;
 			b.setComposition(graph[i][j].composition, true);
-			if (findPath(i, j, graph[i][j].targetnode, b.getComposition(), "", parameters->maximumbricksincombination, 0)) {
-				//*os << endl << "removing edge: " << i << "->" << graph[i][j].targetnode << " ";
+			path.clear();
+			if (findPath(i, j, graph[i][j].targetnode, b.getComposition(), "", parameters->maximumbricksincombination, path)) {
+				//*os << "removing edge: " << graph[i].getMZRatio() << "->" << graph[graph[i][j].targetnode].getMZRatio() << " " << bricksdatabasewithcombinations.getTagName(b.getComposition()) << endl;
 				graph[i].removeEdge(j);
 				edgesremoved++;
 			}
@@ -862,9 +881,9 @@ int cDeNovoGraph::removePathsWhichCanBeSubstitutedByLongerPath(bool& terminateco
 }
 
 
-void cDeNovoGraph::startGraphReader(cCandidateSet& candidates, bool& terminatecomputation) {
+void cDeNovoGraph::startGraphReader(cCandidateSet& candidates, long long unsigned& count, int scanmode, bool& terminatecomputation) {
 	graphreaderthread = new cGraphReaderThread();
-	graphreaderthread->initialize(graph, bricksdatabasewithcombinations, candidates, parameters, os, lastsystemnode, terminatecomputation);
+	graphreaderthread->initialize(graph, bricksdatabasewithcombinations, candidates, parameters, os, lastsystemnode, count, scanmode, terminatecomputation);
 	os->connect(graphreaderthread, SIGNAL(finished()), os, SLOT(graphReaderFinished()));
 	os->setGraphReaderIsWorking(true);
 	graphreaderthread->start();

@@ -244,6 +244,7 @@ void cCandidate::clear() {
 	branchstart = -1;
 	branchend = -1;
 	path.clear();
+	name = "";
 }
 
 
@@ -699,6 +700,10 @@ double cCandidate::getPrecursorMass(cBricksDatabase& brickdatabasewithcombinatio
 	case lasso:
 		mass = parameters->fragmentdefinitions[cyclic_precursor_ion].massdifference + parameters->searchedmodifications[middlemodifID].massdifference;
 		break;
+	case other:
+		break;
+	default:
+		break;
 	}
 	
 	for (int i = 0; i < (int)bricks.size(); i++) {
@@ -873,7 +878,7 @@ void cCandidate::getLassoRotations(vector<cCandidate>& lassorotations, bool incl
 }
 
 
-string cCandidate::getSummaryFormula(cParameters& parameters) {
+string cCandidate::getSummaryFormula(cParameters& parameters, peptideType peptidetype) {
 	cBrick b;
 	vector<int> bricks;
 	b.setComposition(internalcomposition, false);
@@ -882,7 +887,7 @@ string cCandidate::getSummaryFormula(cParameters& parameters) {
 	cSummaryFormula formula;
 	string summary;
 
-	switch (parameters.peptidetype)
+	switch (peptidetype)
 	{
 	case linear:
 	case linearpolysaccharide:
@@ -902,6 +907,10 @@ string cCandidate::getSummaryFormula(cParameters& parameters) {
 		break;
 	case lasso:
 		formula.addFormula(parameters.searchedmodifications[middlemodifID].summary);
+		break;
+	case other:
+		break;
+	default:
 		break;
 	}
 
@@ -934,17 +943,9 @@ void cCandidate::store(ofstream& os) {
 		path[i].store(os);
 	}
 
-	size = (int)composition.size();
-	os.write((char *)&size, sizeof(int));
-	for (int i = 0; i < (int)composition.size(); i++) {
-		size = (int)composition[i].size();
-		os.write((char *)&size, sizeof(int));
-		os.write(composition[i].c_str(), composition[i].size());
-	}
-
-	size = (int)internalcomposition.size();
-	os.write((char *)&size, sizeof(int));
-	os.write(internalcomposition.c_str(), internalcomposition.size());
+	storeString(name, os);
+	storeStringVector(composition, os);
+	storeString(internalcomposition, os);
 
 	os.write((char *)&numberofinternalbricks, sizeof(int));
 }
@@ -965,19 +966,21 @@ void cCandidate::load(ifstream& is) {
 		path[i].load(is);
 	}
 
-	is.read((char *)&size, sizeof(int));
-	composition.resize(size);
-	for (int i = 0; i < (int)composition.size(); i++) {
-		is.read((char *)&size, sizeof(int));
-		composition[i].resize(size);
-		is.read(&composition[i][0], composition[i].size());
-	}
-
-	is.read((char *)&size, sizeof(int));
-	internalcomposition.resize(size);
-	is.read(&internalcomposition[0], internalcomposition.size());
+	loadString(name, is);
+	loadStringVector(composition, is);
+	loadString(internalcomposition, is);
 
 	is.read((char *)&numberofinternalbricks, sizeof(int));
+}
+
+
+void cCandidate::setName(string& name) {
+	this->name = name;
+}
+
+
+string& cCandidate::getName() {
+	return name;
 }
 
 

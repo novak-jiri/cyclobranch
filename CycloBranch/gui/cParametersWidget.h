@@ -35,6 +35,7 @@ class QGroupBox;
 class QCheckBox;
 class QTableWidget;
 class QListWidget;
+class QMessageBox;
 
 
 /**
@@ -148,6 +149,13 @@ private:
 	QFormLayout* denovographformlayout;
 	QComboBox* blindedges;
 
+	QGroupBox* databasesearchgroupbox;
+	QFormLayout* databasesearchformlayout;
+	QLineEdit* sequencedatabaseline;
+	QPushButton* sequencedatabasebutton;
+	QHBoxLayout* sequencedatabaselayout;
+	string sequencedatabasefilename;
+	
 	QGroupBox* searchedsequencegroupbox;
 	QFormLayout* searchedsequenceformlayout;
 	QLineEdit* searchedsequence;
@@ -159,6 +167,7 @@ private:
 	QString lastdirsavesettings;
 	QString lastdirselectpeaklist;
 	QString lastdirselectbricksdatabase;
+	QString lastdirselectsequencedatabase;
 
 	void deleteRow(int number);
 
@@ -181,11 +190,13 @@ private slots:
 
 	void brickDatabaseButtonReleased();
 
+	void sequenceDatabaseButtonReleased();
+
 	void modificationsInsertButtonReleased();
 
 	void modificationsRemoveButtonReleased();
 
-	void updateParameters();
+	bool updateParameters();
 
 	void updateParametersAndHide();
 	

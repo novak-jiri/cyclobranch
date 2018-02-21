@@ -14,6 +14,7 @@
 #include <map>
 #include <vector>
 #include <QMetaType>
+#include "core/utilities.h"
 
 
 using namespace std;
@@ -24,6 +25,7 @@ const double Hplus = 1.00727645;
 const double Naplus = 22.989222;
 const double Kplus = 38.963158;
 const double H = 1.0078250321;
+const double D = 2.014102;
 const double Li = 7.016004;
 const double Be = 9.012182;
 const double B = 11.009306;
@@ -54,6 +56,7 @@ const double Se = 79.916519;
 const double Br = 78.918327;
 const double Mo = 97.905411;
 const double I = 126.904457;
+const double e = H - Hplus;
 
 
 /**
@@ -64,7 +67,7 @@ class cPeriodicTableMap {
 	map<string, double> table;
 
 public:
-
+	
 
 	/**
 		\brief The constructor.
@@ -113,8 +116,25 @@ enum peptideType {
 	cyclic = 1,
 	branched = 2,
 	lasso = 3,
-	linearpolysaccharide = 4
+	linearpolysaccharide = 4,
+	other = 5
 };
+
+
+/**
+	\brief Convert a string to peptide type.
+	\param s string
+	\retval peptideType type of peptide
+*/
+peptideType getPeptideTypeFromString(string s);
+
+
+/**
+	\brief Convert the peptide type to a string.
+	\param peptidetype type of peptide
+	\retval string string
+*/
+string getStringFromPeptideType(peptideType peptidetype);
 
 
 /**
@@ -179,6 +199,22 @@ enum fragmentIonType {
 	ms_cterminal_ion_hplus = 31,
 	ms_cterminal_ion_naplus = 32,
 	ms_cterminal_ion_kplus = 33,
+	ms_hplus = 34,
+	ms_naplus = 35,
+	ms_kplus = 36,
+	ms_hminus = 37,
+	ms_3M2Fe5H = 38,
+	ms_2MFe2H = 39,
+	ms_3MFe2H = 40,
+	ms_MFe2H = 41,
+	ms_3M2Fe6HNa = 42,
+	ms_2MFe3HNa = 43,
+	ms_3MFe3HNa = 44,
+	ms_MFe3HNa = 45,
+	ms_3M2Fe7H = 46,
+	ms_2MFe4H = 47,
+	ms_3MFe4H = 48,
+	ms_MFe4H = 49,
 	//b_ion_2H_loss = 34,
 	fragmentIonTypeEnd
 };
@@ -232,6 +268,18 @@ struct fragmentDescription {
 
 
 	/**
+		\brief True when the fragment is charged positively; false when the fragment is charged negatively.
+	*/ 
+	bool positive;
+
+
+	/**
+		\brief The multiplier (n) of M in [nM + H]+.
+	*/ 
+	int multiplier;
+
+
+	/**
 		\brief The default constructor.
 	*/ 
 	fragmentDescription() {
@@ -241,6 +289,8 @@ struct fragmentDescription {
 		nterminal = false;
 		cterminal = false;
 		parent = fragmentIonTypeEnd;
+		positive = true;
+		multiplier = 1;
 	}
 
 
@@ -251,15 +301,19 @@ struct fragmentDescription {
 		\param summary summary formula of the fragment
 		\param nterminal true when the fragment is N-terminal
 		\param cterminal true when the fragment is C-terminal
+		\param positive true when the fragment is charged positively; false when the fragment is charged negatively
+		\param multiplier the multiplier (n) of M in [nM + H]+
 		\param parent parent fragment type
 	*/ 
-	fragmentDescription(string name, double massdifference, string summary, bool nterminal, bool cterminal, fragmentIonType parent = fragmentIonTypeEnd) {
+	fragmentDescription(string name, double massdifference, string summary, bool nterminal, bool cterminal, fragmentIonType parent = fragmentIonTypeEnd, bool positive = true, int multiplier = 1) {
 		this->name = name;
 		this->massdifference = massdifference;
 		this->summary = summary;
 		this->nterminal = nterminal;
 		this->cterminal = cterminal;
 		this->parent = parent;
+		this->positive = positive;
+		this->multiplier = multiplier;
 	}
 
 
