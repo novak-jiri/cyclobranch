@@ -181,7 +181,7 @@ private slots:
 
 	void setAndShowDrawPeptideWidget(int peptidetypeindex, QString sequence);
 
-	void prepareSummaryTableOfMatchedPeaks();
+	bool prepareSummaryTableOfMatchedPeaks();
 
 	void showSummaryTableOfMatchedPeaks();
 

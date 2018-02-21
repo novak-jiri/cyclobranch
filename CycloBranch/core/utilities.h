@@ -11,6 +11,9 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <sstream>
+#include <iomanip>
+#include <cfloat>
 #include <QString>
 #include <QByteArray>
 #include <QMetaType>
@@ -41,6 +44,27 @@ class cBrick;
 
 using namespace std;
 using namespace boost;
+
+
+/**
+	\brief Vendor types.
+*/
+enum eVendorType {
+	unknownvendor = 0,
+	bruker = 1,
+	waters = 2
+};
+
+
+/**
+	\brief Running modes of the application.
+*/
+enum eModeType {
+	denovoengine = 0,
+	singlecomparison = 1,
+	databasesearch = 2,
+	dereplication = 3
+};
 
 
 /**
@@ -169,6 +193,14 @@ double cropPrecisionToSixDecimals(double value);
 
 
 /**
+	\brief Crop decimals of a double.
+	\param value an input value
+	\retval QByteArray a value with the limited precision
+*/
+QByteArray cropDecimalsByteArray(double value);
+
+
+/**
 	\brief Crop a precision of a double to six decimal places.
 	\param value an input value
 	\retval QByteArray a value with the limited precision
@@ -206,9 +238,15 @@ struct cCoordinates {
 
 
 	/**
-		\brief intensity
+		\brief relative intensity
 	*/ 
-	double intensity;
+	double relativeintensity;
+
+
+	/**
+		\brief absolute intensity
+	*/ 
+	double absoluteintensity;
 
 
 	/**
@@ -225,7 +263,8 @@ struct cCoordinates {
 		y = 0;
 		id = 0;
 		mzratio = 0;
-		intensity = 0;
+		relativeintensity = 0;
+		absoluteintensity = 0;
 		name = "";
 	}
 
@@ -236,16 +275,12 @@ struct cCoordinates {
 		\param y coordinate y
 		\param id scan id
 		\param mzratio m/z ratio
-		\param intensity intensity
+		\param relativeintensity relativeintensity
+		\param absoluteintensity absoluteintensity
 		\param name the name of item
 	*/ 
-	cCoordinates(int x, int y, int id, double mzratio, double intensity, string name = "") {
-		this->x = x;
-		this->y = y;
-		this->id = id;
-		this->mzratio = mzratio;
-		this->intensity = intensity;
-		this->name = name;
+	cCoordinates(int x, int y, int id, double mzratio, double relativeintensity, double absoluteintensity, string name = "") {
+		set(x, y, id, mzratio, relativeintensity, absoluteintensity, name);
 	}
 
 
@@ -255,15 +290,17 @@ struct cCoordinates {
 		\param y coordinate y
 		\param id scan id
 		\param mzratio m/z ratio
-		\param intensity intensity
+		\param relativeintensity relativeintensity
+		\param absoluteintensity absoluteintensity
 		\param name the name of item
 	*/ 
-	void set(int x, int y, int id, double mzratio, double intensity, string name = "") {
+	void set(int x, int y, int id, double mzratio, double relativeintensity, double absoluteintensity, string name = "") {
 		this->x = x;
 		this->y = y;
 		this->id = id;
 		this->mzratio = mzratio;
-		this->intensity = intensity;
+		this->relativeintensity = relativeintensity;
+		this->absoluteintensity = absoluteintensity;
 		this->name = name;
 	}
 
@@ -300,6 +337,22 @@ struct hash_cCoordinates {
 	\retval bool true when cCoordinates are equal
 */
 bool operator == (cCoordinates const& a, cCoordinates const& b);
+
+
+/**
+	\brief Get factorial of a value.
+	\param value value
+	\retval double factorial of the value
+*/
+double fact(int value);
+
+
+/**
+	\brief Get median from a vector of doubles.
+	\param vector vector of doubles
+	\retval double median value
+*/
+double median(vector<double>& vector);
 
 
 #endif

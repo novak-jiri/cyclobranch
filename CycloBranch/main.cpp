@@ -16,6 +16,8 @@
 	\retval int 0 when the application finished successfully
 */ 
 int main(int argc, char** argv) {
+
+	XMLPlatformUtils::Initialize();
 	
 	QApplication app(argc, argv);
 	Q_INIT_RESOURCE(images);
@@ -51,7 +53,11 @@ int main(int argc, char** argv) {
 
 	splash.finish(&mwin);
 
-	return app.exec();
+	int resultcode = app.exec();
+
+	XMLPlatformUtils::Terminate();
+
+	return resultcode;
 
 }
 

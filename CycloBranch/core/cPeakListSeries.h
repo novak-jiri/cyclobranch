@@ -81,16 +81,44 @@ public:
 
 
 	/**
-		\brief Load the series of peaklists from .imzML file.
-		\param imzmlfilename imzML filename
-		\param ibdstream ibd binary file stream
-		\param minimumrelativeintensitythreshold a minimum threshold of relative intensity
+		\brief Load the series of peaklists from a .csv file converted from apex data by CompassXport.
+		\param filename filename
+		\param stream source stream
+		\param titlestream title stream
 		\param fwhm FWHM
 		\param os pointer to the main thread of the application (output stream)
 		\param terminatecomputation reference to a variable determining that the computation must be stopped
 		\retval int 0 = success; -1 = aborted by user, -2 = error
 	*/ 
-	int loadFromIMZMLStream(string& imzmlfilename, ifstream &ibdstream, double minimumrelativeintensitythreshold, double fwhm, cMainThread* os, bool& terminatecomputation);
+	int loadFromProfileApexStream(string& filename, ifstream &stream, ifstream &titlestream, double fwhm, cMainThread* os, bool& terminatecomputation);
+
+
+	/**
+		\brief Load the series of peaklists from .mzML file.
+		\param mzmlfilename mzML filename
+		\param mzmlstream mzML file stream
+		\param fwhm FWHM
+		\param mode program mode
+		\param os pointer to the main thread of the application (output stream)
+		\param terminatecomputation reference to a variable determining that the computation must be stopped
+		\retval int 0 = success; -1 = aborted by user, -2 = error
+	*/ 
+	int loadFromMZMLStream(string& mzmlfilename, ifstream &mzmlstream, double fwhm, eModeType mode, cMainThread* os, bool& terminatecomputation);
+
+
+	/**
+		\brief Load the series of peaklists from .imzML file.
+		\param imzmlfilename imzML filename
+		\param ibdstream ibd binary file stream
+		\param fwhm FWHM
+		\param maxcountx max count of pixel x - parsed from imzML file
+		\param maxcounty max count of pixel y - parsed from imzML file
+		\param vendor vendor type
+		\param os pointer to the main thread of the application (output stream)
+		\param terminatecomputation reference to a variable determining that the computation must be stopped
+		\retval int 0 = success; -1 = aborted by user, -2 = error
+	*/ 
+	int loadFromIMZMLStream(string& imzmlfilename, ifstream &ibdstream, double fwhm, int& maxcountx, int& maxcounty, eVendorType& vendor, cMainThread* os, bool& terminatecomputation);
 
 
 	/**

@@ -779,7 +779,7 @@ double cCandidate::calculatePrecursorMass(cBricksDatabase& brickdatabasewithcomb
 		mass += brickdatabasewithcombinations[bricks[i] - 1].getMass();
 	}
 	
-	return (parameters->precursorcharge > 0)?mass:mass-2*Hplus;
+	return (parameters->precursorcharge > 0)?mass:mass-2*(H - e);
 }
 
 
@@ -1064,9 +1064,9 @@ cSummaryFormula cCandidate::calculateSummaryFormula(cParameters& parameters, ePe
 		
 		cSummaryFormula tempformula;
 		tempformula.setFormula(formula.getSummary());
-		summary = "Hplus";
+		summary = "H+";
 		tempformula.addFormula(summary);
-		summary = (parameters.precursorcharge > 0)?"":"Hplus-2";
+		summary = (parameters.precursorcharge > 0)?"":"H-2+-2";
 		tempformula.addFormula(summary);
 
 		precursormass = charge(uncharge(precursormass, parameters.precursorcharge), (parameters.precursorcharge > 0)?1:-1);

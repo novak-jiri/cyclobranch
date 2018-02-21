@@ -193,7 +193,7 @@ cBricksDatabaseWidget::cBricksDatabaseWidget(QWidget* parent) {
 
 	setCentralWidget(mainwidget);
 
-	resize(1280, 750);
+	resize(1280, 770);
 
 	databasefile = "";
 

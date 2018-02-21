@@ -69,7 +69,7 @@ bool cBricksDatabase::nextCombination(vector<int>& combarray, int numberofbasicb
 		// set combarray[pointer] to the maximum value when outside of the mass range
 		mass = getMassOfComposition(combarray, numberofbasicbricks);
 
-		if ((cyFlag == 0) && (combarray[pointer] <= numberofbasicbricks) && (((maximumcumulativemass > 0) && (mass > maximumcumulativemass)) || (mass > neutralprecursormass))) {
+		if ((cyFlag == 0) && (combarray[pointer] <= numberofbasicbricks) && (((maximumcumulativemass > 0) && (mass > maximumcumulativemass)) || ((neutralprecursormass > 0) && (mass > neutralprecursormass)))) {
 			combarray[pointer] = numberofbasicbricks + 1;
 		}
 
@@ -84,7 +84,7 @@ bool cBricksDatabase::nextCombination(vector<int>& combarray, int numberofbasicb
 				// skip combinations outside of the mass range
 				mass = getMassOfComposition(combarray, numberofbasicbricks);
 
-				while ((combarray[pointer] <= numberofbasicbricks) && (pointer < maximumbricksincombination - 1) && (((maximumcumulativemass > 0) && (mass > maximumcumulativemass)) || (mass > neutralprecursormass))) {
+				while ((combarray[pointer] <= numberofbasicbricks) && (pointer < maximumbricksincombination - 1) && (((maximumcumulativemass > 0) && (mass > maximumcumulativemass)) || ((neutralprecursormass > 0) && (mass > neutralprecursormass)))) {
 					pointer++;
 					combarray[pointer]++;
 
@@ -95,7 +95,7 @@ bool cBricksDatabase::nextCombination(vector<int>& combarray, int numberofbasicb
 					mass = getMassOfComposition(combarray, numberofbasicbricks);
 				}
 
-				if ((combarray[pointer] > numberofbasicbricks) || ((maximumcumulativemass > 0) && (mass > maximumcumulativemass)) || (mass > neutralprecursormass)) {
+				if ((combarray[pointer] > numberofbasicbricks) || ((maximumcumulativemass > 0) && (mass > maximumcumulativemass)) || ((neutralprecursormass > 0) && (mass > neutralprecursormass))) {
 					return false;
 				}
 

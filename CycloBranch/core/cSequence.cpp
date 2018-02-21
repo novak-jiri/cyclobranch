@@ -153,7 +153,7 @@ string cSequence::getNameWithReferenceAsHTMLString() {
 			}
 		}
 
-		// Lipidmaps (undocumented)
+		// Lipidmaps
 		if (!correctreference) {
 			rx = "^LM([A-Z]|[0-9])+$";
 			if (regex_search(reference, rx)) {
@@ -169,6 +169,17 @@ string cSequence::getNameWithReferenceAsHTMLString() {
 			rx = "^C[0-9]{5}$";
 			if (regex_search(reference, rx)) {
 				s += "<a href=\"http://www.genome.jp/dbget-bin/www_bget?cpd:" + reference + "\">";
+				s += name;
+				s += "</a>";
+				correctreference = true;
+			}
+		}
+
+		// CAYMAN (undocumented)
+		if (!correctreference) {
+			rx = "^CAYMAN: [0-9]+$";
+			if (regex_search(reference, rx)) {
+				s += "<a href=\"https://www.caymanchem.com/product/" + reference.substr(8) + "\">";
 				s += name;
 				s += "</a>";
 				correctreference = true;

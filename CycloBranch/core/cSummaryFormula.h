@@ -16,6 +16,11 @@ using namespace std;
 using namespace boost;
 
 
+class cPeaksList;
+class cPeakListSeries;
+class cBricksDatabase;
+
+
 /**
 	\brief The representation of a summary formula.
 */
@@ -26,6 +31,14 @@ class cSummaryFormula {
 	string formula;
 
 	void explodeSummary(map<string, int>& atoms, string& summary);
+
+	void combineAtoms(cPeakListSeries& peaklistseries, cPeaksList& isotopeprofile, int depth, double mass, double intensity, int charge, string description, double minimumabsoluteintensity);
+
+	double getIntensity(cBricksDatabase& bricksprobabilities, vector<int>& combarray, int mostintenseid, int mostintenseatomscount, int isotopecount);
+
+	void getIsotopeSummary(string& description, cBricksDatabase& bricks, vector<int>& combarray, int mostintenseid, int mostintenseatomscount, int isotopecount, bool positive);
+
+	void reduceIsotopeProfile(cPeaksList& isotopeprofile, cPeaksList& reducedprofile, double fwhm);
 
 public:
 
@@ -100,6 +113,16 @@ public:
 		\retval double mass of the formula
 	*/
 	double getMass();
+
+
+	/**
+		\brief Get a theoretical isotope pattern of the formula.
+		\param fwhm FWHM
+		\param charge charge
+		\param positive true if the charge is positive charge, false if the charge is negative
+		\retval cPeaksList isotopic pattern of the formula
+	*/
+	cPeaksList getIsotopePattern(double fwhm, int charge, bool positive);
 
 
 	/**

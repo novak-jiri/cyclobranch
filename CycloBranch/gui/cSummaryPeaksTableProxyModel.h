@@ -24,6 +24,7 @@ private:
 
 	eModeType mode;
 	ePeakListFileFormat peaklistfileformat;
+	bool generateisotopepattern;
 
 public:
 
@@ -62,8 +63,9 @@ public:
 		\brief Initialize the model.
 		\param mode program mode
 		\param peaklistfileformat peaklist format
+		\param generateisotopepattern true if full isotope patterns are generated; false otherwise
 	*/ 
-	void initialize(eModeType mode, ePeakListFileFormat peaklistfileformat);
+	void initialize(eModeType mode, ePeakListFileFormat peaklistfileformat, bool generateisotopepattern);
 
 
 	/**

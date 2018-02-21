@@ -89,7 +89,7 @@ cTheoreticalSpectrum& cTheoreticalSpectrumList::operator[](int position) {
 
 
 int cTheoreticalSpectrumList::parallelCompareAndStore(cCandidateSet& candidates, bool& terminatecomputation) {
-	cPeaksList peaklist = parameters->peaklistseries[0];
+	cPeaksList peaklist = parameters->peaklistseries[parameters->scannumber - 1];
 	peaklist.sortbyMass();
 	cCandidateSet permutations;
 	theoreticalspectra.clear();
@@ -161,7 +161,7 @@ int cTheoreticalSpectrumList::parallelCompareAndStore(cCandidateSet& candidates,
 		rxsearchedsequence = stmp;
 	}
 	catch (regex_error& e) {
-		*os << endl << endl << "Error: Bad Regular Expression in Searched Peptide Sequence." << endl << e.what() << endl;
+		*os << endl << endl << "Error: Bad Regular Expression in the field 'Searched Sequence'." << endl << e.what() << endl;
 		return -1;
 	}
 

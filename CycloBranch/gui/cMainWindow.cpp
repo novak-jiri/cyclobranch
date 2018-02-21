@@ -66,7 +66,7 @@ cMainWindow::cMainWindow() {
 	actionBricksDatabase = new QAction(QIcon(":/images/icons/68.png"), tr("&Building Blocks Editor"), this);
 	actionBricksDatabase->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_B));
 
-	actionSequenceDatabase = new QAction(QIcon(":/images/icons/26.png"), tr("Sequence &Database Editor"), this);
+	actionSequenceDatabase = new QAction(QIcon(":/images/icons/26.png"), tr("Sequence/Compound &Database Editor"), this);
 	actionSequenceDatabase->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_D));
 
 	actionModifications = new QAction(QIcon(":/images/icons/61.png"), tr("&Modifications Editor"), this);
@@ -182,6 +182,7 @@ cMainWindow::cMainWindow() {
 	resultsproxymodel = new cMainWindowProxyModel(this);
 
 	logWindow = new QTextEdit(this);
+	logWindow->setPlainText("To start the program: click \"Search -> Settings\", configure the tool and then click \"Search -> Run\".");
 	splitter = new QSplitter(this);
 
 	about = new cAboutWidget(this);
@@ -228,7 +229,8 @@ cMainWindow::cMainWindow() {
 	connect(rowsfilterclearbutton, SIGNAL(released()), this, SLOT(resetFilter()));
 
 	connect(summarytableofmatchedpeaks, SIGNAL(tableCancelled()), this, SLOT(summaryPeaksTableCancelled()));
-	connect(summarytableofmatchedpeaks, SIGNAL(sendCoordinates(vector<cCoordinates>)), imagewindow, SLOT(setCoordinates(vector<cCoordinates>)));
+	connect(summarytableofmatchedpeaks, SIGNAL(sendFilterOptions(vector<cCoordinates>, string, bool)), imagewindow, SLOT(setFilterOptions(vector<cCoordinates>, string, bool)));
+	connect(summarytableofmatchedpeaks, SIGNAL(resetRegion()), imagewindow, SLOT(clearSelection()));
 
 	// add subitems to the items in main menu
 	// menuFile->addAction(actionOpen);
@@ -305,7 +307,7 @@ cMainWindow::cMainWindow() {
 	setCentralWidget(splitter);
 
 	// set the size of main window
-	resize(1280, 750);
+	resize(1280, 770);
 
 	resultsbasecolumncount = 9;
 	resultsspecificcolumncount = 0;
@@ -542,20 +544,23 @@ void cMainWindow::reportSpectrum(int row, cTheoreticalSpectrum& theoreticalspect
 
 	if (parameters.mode == dereplication) {
 		resultsmodel->setItem(row, 2, new QStandardItem());
-		resultsmodel->item(row, 2)->setData(QVariant::fromValue(theoreticalspectrum.getNumberOfMatchedPeaks()), Qt::DisplayRole);
+		resultsmodel->item(row, 2)->setText(theoreticalspectrum.getExperimentalSpectrum().getTitle().c_str());
 
 		resultsmodel->setItem(row, 3, new QStandardItem());
-		resultsmodel->item(row, 3)->setData(QVariant::fromValue(cropPrecisionToSixDecimalsByteArray(theoreticalspectrum.getRatioOfMatchedPeaks()*100)), Qt::DisplayRole);
+		resultsmodel->item(row, 3)->setData(QVariant::fromValue(theoreticalspectrum.getNumberOfMatchedPeaks()), Qt::DisplayRole);
 
 		resultsmodel->setItem(row, 4, new QStandardItem());
-		resultsmodel->item(row, 4)->setData(QVariant::fromValue(cropPrecisionToSixDecimalsByteArray(theoreticalspectrum.getWeightedIntensityScore())), Qt::DisplayRole);
+		resultsmodel->item(row, 4)->setData(QVariant::fromValue(cropPrecisionToSixDecimalsByteArray(theoreticalspectrum.getRatioOfMatchedPeaks()*100)), Qt::DisplayRole);
+
+		resultsmodel->setItem(row, 5, new QStandardItem());
+		resultsmodel->item(row, 5)->setData(QVariant::fromValue(cropPrecisionToSixDecimalsByteArray(theoreticalspectrum.getWeightedIntensityScore())), Qt::DisplayRole);
 
 		if ((parameters.peaklistfileformat == mis) || (parameters.peaklistfileformat == imzML)) {
-			resultsmodel->setItem(row, 5, new QStandardItem());
-			resultsmodel->item(row, 5)->setData(QVariant::fromValue(theoreticalspectrum.getExperimentalSpectrum().getCoordinateX()), Qt::DisplayRole);	
-
 			resultsmodel->setItem(row, 6, new QStandardItem());
-			resultsmodel->item(row, 6)->setData(QVariant::fromValue(theoreticalspectrum.getExperimentalSpectrum().getCoordinateY()), Qt::DisplayRole);		
+			resultsmodel->item(row, 6)->setData(QVariant::fromValue(theoreticalspectrum.getExperimentalSpectrum().getCoordinateX()), Qt::DisplayRole);	
+
+			resultsmodel->setItem(row, 7, new QStandardItem());
+			resultsmodel->item(row, 7)->setData(QVariant::fromValue(theoreticalspectrum.getExperimentalSpectrum().getCoordinateY()), Qt::DisplayRole);		
 		}
 	}
 
@@ -618,27 +623,30 @@ void cMainWindow::setAndShowDrawPeptideWidget(int peptidetypeindex, QString sequ
 }
 
 
-void cMainWindow::prepareSummaryTableOfMatchedPeaks() {
+bool cMainWindow::prepareSummaryTableOfMatchedPeaks() {
 	if (!summarytableisprepared) {
-		summarytableisprepared = true;
 		rowsfilterwidget->setEnabled(false);
-		summarytableofmatchedpeaks->prepareToShow(resultsmodel, resultsproxymodel, &parameters, &theoreticalspectrumlist);
+		summarytableisprepared = summarytableofmatchedpeaks->prepareToShow(resultsmodel, resultsproxymodel, &parameters, &theoreticalspectrumlist);
 		rowsfilterwidget->setEnabled(true);
 	}
+	return summarytableisprepared;
 }
 
 
 void cMainWindow::showSummaryTableOfMatchedPeaks() {
-	summarytableofmatchedpeaks->show();
-	summarytableofmatchedpeaks->activateWindow();
-	prepareSummaryTableOfMatchedPeaks();
+	if (prepareSummaryTableOfMatchedPeaks()) {
+		summarytableofmatchedpeaks->show();
+		summarytableofmatchedpeaks->activateWindow();
+	}
 }
 
 
 void cMainWindow::showImageWindow() {
-	imagewindow->show();
-	imagewindow->activateWindow();
-	prepareSummaryTableOfMatchedPeaks();
+	if (prepareSummaryTableOfMatchedPeaks()) {
+		imagewindow->setDefaultMaxXY(parameters.maxcountx, parameters.maxcounty, parameters.vendor);
+		imagewindow->show();
+		imagewindow->activateWindow();
+	}
 }
 
 
@@ -692,6 +700,27 @@ void cMainWindow::run() {
 
 			if (reply == QMessageBox::Yes) {
 				localparameters.peaklistfilename = convertedimzml;
+			}
+		}
+	}
+
+	rx = "\\.[mM][zZ][mM][lL]$";
+	if (regex_search(localparameters.peaklistfilename, rx)) {
+		string convertedmzml = localparameters.peaklistfilename.substr(0, (int)localparameters.peaklistfilename.size() - 5);
+		convertedmzml += "_converted_fwhm_";
+		convertedmzml += to_string(localparameters.fwhm);
+		convertedmzml += ".mzML";
+
+		if (QFile::exists(convertedmzml.c_str())) {
+			QMessageBox::StandardButton reply;
+			string s = "The converted mzML file '" + convertedmzml.substr(convertedmzml.rfind('/') + 1) + "' has been found.\n\nDo you want to proceed with this file instead of the original mzML file '";
+			s += localparameters.peaklistfilename.substr(localparameters.peaklistfilename.rfind('/') + 1) + "' ?";
+			s += "\n\nClick 'Yes' to proceed the converted file.\nClick 'No' to convert the original file again. Note: The conversion may be time-consuming.";
+
+			reply = QMessageBox::question(this, "Do you want to proceed the converted file ?", s.c_str(), QMessageBox::Yes|QMessageBox::No);
+
+			if (reply == QMessageBox::Yes) {
+				localparameters.peaklistfilename = convertedmzml;
 			}
 		}
 	}
@@ -935,10 +964,10 @@ void cMainWindow::reportSpectra() {
 
 	if (parameters.mode == dereplication) {
 		if ((parameters.peaklistfileformat == mis) || (parameters.peaklistfileformat == imzML)) {
-			resultsmodel->setColumnCount(7);
+			resultsmodel->setColumnCount(8);
 		}
 		else {
-			resultsmodel->setColumnCount(5);
+			resultsmodel->setColumnCount(6);
 		}
 
 		resultsmodel->setHorizontalHeaderItem(0, new QStandardItem());
@@ -950,25 +979,29 @@ void cMainWindow::reportSpectra() {
 		results->setItemDelegateForColumn(1, new QItemDelegate());
 
 		resultsmodel->setHorizontalHeaderItem(2, new QStandardItem());
-		resultsmodel->horizontalHeaderItem(2)->setText("Matched Peaks");
+		resultsmodel->horizontalHeaderItem(2)->setText("Title");
 		results->setItemDelegateForColumn(2, new QItemDelegate());
 
 		resultsmodel->setHorizontalHeaderItem(3, new QStandardItem());
-		resultsmodel->horizontalHeaderItem(3)->setText("Ratio of Matched Peaks [%]");
+		resultsmodel->horizontalHeaderItem(3)->setText("Matched Peaks");
 		results->setItemDelegateForColumn(3, new QItemDelegate());
 
 		resultsmodel->setHorizontalHeaderItem(4, new QStandardItem());
-		resultsmodel->horizontalHeaderItem(4)->setText("Sum of Relative Intensities");
+		resultsmodel->horizontalHeaderItem(4)->setText("Ratio of Matched Peaks [%]");
 		results->setItemDelegateForColumn(4, new QItemDelegate());
 
-		if ((parameters.peaklistfileformat == mis) || (parameters.peaklistfileformat == imzML)) {
-			resultsmodel->setHorizontalHeaderItem(5, new QStandardItem());
-			resultsmodel->horizontalHeaderItem(5)->setText("Coordinate X");
-			results->setItemDelegateForColumn(5, new QItemDelegate());
+		resultsmodel->setHorizontalHeaderItem(5, new QStandardItem());
+		resultsmodel->horizontalHeaderItem(5)->setText("Sum of Relative Intensities");
+		results->setItemDelegateForColumn(5, new QItemDelegate());
 
+		if ((parameters.peaklistfileformat == mis) || (parameters.peaklistfileformat == imzML)) {
 			resultsmodel->setHorizontalHeaderItem(6, new QStandardItem());
-			resultsmodel->horizontalHeaderItem(6)->setText("Coordinate Y");
+			resultsmodel->horizontalHeaderItem(6)->setText("Coordinate X");
 			results->setItemDelegateForColumn(6, new QItemDelegate());
+
+			resultsmodel->setHorizontalHeaderItem(7, new QStandardItem());
+			resultsmodel->horizontalHeaderItem(7)->setText("Coordinate Y");
+			results->setItemDelegateForColumn(7, new QItemDelegate());			
 		}
 	}
 
@@ -1235,17 +1268,27 @@ void cMainWindow::exportToHTML() {
 				string tdwidth;
 				if (parameters.mode == dereplication) {
 					if ((parameters.peaklistfileformat == mis) || (parameters.peaklistfileformat == imzML)) {
-						columncount = 11;
+						if (parameters.generateisotopepattern) {
+							columncount = 13;
+						}
+						else {
+							columncount = 12;
+						}
 					}
 					else {
-						columncount = 9;
+						if (parameters.generateisotopepattern) {
+							columncount = 11;
+						}
+						else {
+							columncount = 10;
+						}
 					}
 				}
 				else if (parameters.mode == denovoengine) {
-					columncount = 8;
+					columncount = 9;
 				}
 				else {
-					columncount = 7;
+					columncount = 8;
 				}
 
 				tdwidth = to_string(100/columncount);
@@ -1269,8 +1312,14 @@ void cMainWindow::exportToHTML() {
 				}
 
 				out << "<th width=\"" << tdwidth.c_str() << "%\"><b>Theoretical m/z</b></th>";
+
+				if ((parameters.mode == dereplication) && (parameters.generateisotopepattern)) {
+					out << "<th width=\"" << tdwidth.c_str() << "%\"><b>Theoretical Intensity [%]</b></th>";
+				}
+
 				out << "<th width=\"" << tdwidth.c_str() << "%\"><b>Experimental m/z</b></th>";
-				out << "<th width=\"" << tdwidth.c_str() << "%\"><b>Intensity [%]</b></th>";
+				out << "<th width=\"" << tdwidth.c_str() << "%\"><b>Relative Intensity [%]</b></th>";
+				out << "<th width=\"" << tdwidth.c_str() << "%\"><b>Absolute Intensity</b></th>";
 				out << "<th width=\"" << tdwidth.c_str() << "%\"><b>Error [ppm]</b></th>";
 
 				if (parameters.mode == dereplication) {
@@ -1494,6 +1543,8 @@ void cMainWindow::openResultsFile() {
 			summarytableofmatchedpeaks->deleteTable();
 			summarytableofmatchedpeaks->hide();
 			summarytableisprepared = false;
+
+			imagewindow->hide();
 			
 			theoreticalspectrumlist.clear();
 			spectradetails.clear();

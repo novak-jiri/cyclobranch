@@ -30,6 +30,7 @@
 #include "gui/cEventFilter.h"
 #include "gui/cViewButtonDelegate.h"
 #include "gui/cSpectrumDetailProxyModel.h"
+#include "gui/cHTMLDelegate.h"
 
 
 // forward declaration

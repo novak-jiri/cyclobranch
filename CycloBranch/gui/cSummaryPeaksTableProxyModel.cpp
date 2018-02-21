@@ -9,9 +9,10 @@ cSummaryPeaksTableProxyModel::cSummaryPeaksTableProxyModel(QObject *parent) : QS
 }
 
 
-void cSummaryPeaksTableProxyModel::initialize(eModeType mode, ePeakListFileFormat peaklistfileformat) {
+void cSummaryPeaksTableProxyModel::initialize(eModeType mode, ePeakListFileFormat peaklistfileformat, bool generateisotopepattern) {
 	this->mode = mode;
 	this->peaklistfileformat = peaklistfileformat;
+	this->generateisotopepattern = generateisotopepattern;
 }
 
 
@@ -28,17 +29,27 @@ bool cSummaryPeaksTableProxyModel::filterAcceptsRow(int sourceRow, const QModelI
 
 	if (mode == dereplication) {
 		if ((peaklistfileformat == mis) || (peaklistfileformat == imzML)) {
-			size = 10;
+			if (generateisotopepattern) {
+				size = 12;
+			}
+			else {
+				size = 11;
+			}
 		}
 		else {
-			size = 8;
+			if (generateisotopepattern) {
+				size = 10;
+			}
+			else {
+				size = 9;
+			}
 		}
 	}
 	else if (mode == denovoengine) {
-		size = 8;
+		size = 9;
 	}
 	else {
-		size = 7;
+		size = 8;
 	}
 
 	if ((mode == dereplication) && ((peaklistfileformat == mis) || (peaklistfileformat == imzML))) {

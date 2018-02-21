@@ -16,29 +16,17 @@ void cParameters::clear() {
 	peaklistfilename = "";
 	peaklistfileformat = txt;
 	peaklistseries.clear();
+	scannumber = 1;
 	precursormass = 0;
 	precursoradduct = "";
-	precursorAdductHasLi = false;
-	precursorAdductHasNa = false;
-	precursorAdductHasMg = false;
-	precursorAdductHasAl = false;
-	precursorAdductHasK = false;
-	precursorAdductHasCa = false;
-	precursorAdductHasMn = false;
-	precursorAdductHasCr = false;
-	precursorAdductHasFe = false;
-	precursorAdductHasCo = false;
-	precursorAdductHasNi = false;
-	precursorAdductHasCu = false;
-	precursorAdductHasZn = false;
-	precursorAdductHasGa = false;
+	metaladducts.clear();	
 	precursormasserrortolerance = 5;
 	precursorcharge = 1;
 	fragmentmasserrortolerance = 5;
-	masserrortolerancefordeisotoping = 5;
-	minimumrelativeintensitythreshold = 0;
+	masserrortolerancefordeisotoping = 0;
+	minimumrelativeintensitythreshold = 1;
 	minimummz = 150;
-	fwhm = 0.1;
+	fwhm = 0.05;
 	bricksdatabasefilename = "";
 	bricksdatabase.clear();
 	maximumbricksincombinationbegin = 1;
@@ -51,8 +39,9 @@ void cParameters::clear() {
 	searchedmodifications.clear();
 	maximumnumberofthreads = 1;
 	mode = denovoengine;
-	scoretype = b_ions;
+	scoretype = matched_peaks;
 	clearhitswithoutparent = false;
+	generateisotopepattern = false;
 	cyclicnterminus = false;
 	cycliccterminus = false;
 	enablescrambling = false;
@@ -73,6 +62,13 @@ void cParameters::clear() {
 
 	fragmentionsfordenovograph.clear();
 	fragmentionsfortheoreticalspectra.clear();
+
+	peakidtodesc.clear();
+	peakdesctoid.clear();
+
+	maxcountx = 1;
+	maxcounty = 1;
+	vendor = unknownvendor;
 }
 
 
@@ -82,6 +78,7 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 	string errormessage = "";
 	ifstream peakliststream;
 	ifstream spotliststream;
+	ifstream titleliststream;
 	ifstream bricksdatabasestream;
 	ifstream modificationsstream;
 	ifstream sequencedatabasestream;
@@ -133,10 +130,16 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 				if (regex_search(peaklistfilename, rx)) {
 					peaklistfileformat = mis;
 				}
+
+				rx = "ser$";
+				// apex File
+				if (regex_search(peaklistfilename, rx)) {
+					peaklistfileformat = ser;
+				}
 			#endif
 
 			rx = "\\.[iI][mM][zZ][mM][lL]$";
-			// flexImaging File
+			// imzML File
 			if (regex_search(peaklistfilename, rx)) {
 				peaklistfileformat = imzML;
 			}
@@ -157,7 +160,6 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 			case mgf:
 				peakliststream.open(peaklistfilename);
 				break;
-			case mzML:
 			case mzXML:
 				*os << "Converting the file " + peaklistfilename + " to mgf ... ";
 				
@@ -192,7 +194,7 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 							errormessage += "Does the file '" + peaklistfilename + "' exist ?\n";
 							errormessage += "Is the directory with the file '" + peaklistfilename + "' writable ?\n";
 							errormessage += "Do you have FileConverter installed (OpenMS must be installed) ?\n";
-							errormessage += "Do you have a path to FileConverter in your PATH variable (e.g., 'C:/Program Files/OpenMS-1.11/bin') ?\n";
+							errormessage += "Do you have a path to FileConverter in your PATH variable (e.g., 'C:/Program Files/OpenMS-2.0/bin') ?\n";
 							errormessage += "Do you have 'any2mgf.bat' file located in the '" + appname.toStdString() + "/External/windows' folder ?\n";
 						}
 					#endif
@@ -245,6 +247,31 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 					}
 				#endif
 				break;
+			case ser:
+				#if OS_TYPE == WIN
+					foldername = peaklistfilename.substr(0, peaklistfilename.length() - 4);
+					*os << "Converting apex data folder " + foldername + " ... ";
+					s = "External\\windows\\ser2csv.bat \"" + foldername + "\"";
+					if (system(s.c_str()) != 0) {
+						error = true;
+						errormessage = "The folder cannot be converted.\n";
+						errormessage += "Does the folder '" + foldername + "' exist ?\n";
+						errormessage += "Do you have Bruker Daltonik's CompassXport installed ?\n";
+						errormessage += "Do you have path to the CompassXport.exe in your PATH variable ?\n";
+						errormessage += "Is the directory with the file '" + peaklistfilename + "' writable ?\n";
+						errormessage += "Do you have 'ser2csv.bat' file located in the 'External/windows' folder ?\n";
+					}
+
+					if (!error) {
+						*os << "ok" << endl << endl;
+						peakliststream.open(foldername + ".csv");
+						titleliststream.open(foldername + ".txt");
+					}
+				#endif
+				break;
+			case mzML:
+				peakliststream.open(peaklistfilename);
+				break;
 			case imzML:
 				ibdfilename = peaklistfilename.substr(0, (int)peaklistfilename.size() - 5);
 				ibdfilename += "ibd";
@@ -260,7 +287,7 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 		if (!error) {
 			if (!peakliststream.good()) {
 				error = true;
-				if (peaklistfileformat == mis) {
+				if ((peaklistfileformat == mis) || (peaklistfileformat == ser)) {
 					errormessage = "Cannot open the folder '" + foldername + "'.";
 				}
 				else {
@@ -268,14 +295,13 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 				}
 			}
 			else {
-				if (os) {
-					*os << "Loading the peak list... ";
+				if (os && (peaklistfileformat != mzML) && (peaklistfileformat != imzML) && (peaklistfileformat != ser)) {
+					*os << "Loading the peaklist(s)... ";
 				}
 				switch (peaklistfileformat) {
 				case txt:
 					peaklistseries.loadFromPlainTextStream(peakliststream);
 					break;
-				case mzML:
 				case mzXML:
 				case mgf:
 					peaklistseries.loadFromMGFStream(peakliststream);
@@ -292,8 +318,28 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 						spotliststream.close();
 					#endif
 					break;
-				case imzML:
-					errtype = peaklistseries.loadFromIMZMLStream(peaklistfilename, peakliststream, minimumrelativeintensitythreshold, fwhm, os, terminatecomputation);
+				case ser:
+					#if OS_TYPE == WIN
+						errtype = peaklistseries.loadFromProfileApexStream(peaklistfilename, peakliststream, titleliststream, fwhm, os, terminatecomputation);
+						titleliststream.close();
+						if (errtype == -1) {
+							error = true;
+							errormessage = "Aborted by user.\n";
+						}
+						if (errtype == -2) {
+							error = true;
+							errormessage = "Raw data cannot be converted.\n";
+							errormessage += "Does the folder '" + peaklistfilename.substr(0, peaklistfilename.length() - 4) + "' exist ?\n";
+							errormessage += "Is the directory '" + peaklistfilename.substr(0, peaklistfilename.length() - 4) + "' writable ?\n";
+							errormessage += "Do you have enough space on your hard drive ?\n";
+							errormessage += "Do you have OpenMS installed ?\n";
+							errormessage += "Do you have a path to OpenMS binaries folder in your PATH variable (e.g., 'C:/Program Files/OpenMS-2.0/bin') ?\n";
+							errormessage += "Do you have 'raw2peaks.bat' file located in the '" + appname.toStdString() + "/External/windows' folder ?\n";
+						}
+					#endif
+					break;
+				case mzML:
+					errtype = peaklistseries.loadFromMZMLStream(peaklistfilename, peakliststream, fwhm, mode, os, terminatecomputation);
 					if (errtype == -1) {
 						error = true;
 						errormessage = "Aborted by user.\n";
@@ -323,16 +369,61 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 								errormessage += "Is the directory with the file '" + peaklistfilename + "' writable ?\n";
 								errormessage += "Do you have enough space on your hard drive ?\n";
 								errormessage += "Do you have OpenMS installed ?\n";
-								errormessage += "Do you have a path to OpenMS binaries folder in your PATH variable (e.g., 'C:/Program Files/OpenMS-1.11/bin') ?\n";
+								errormessage += "Do you have a path to OpenMS binaries folder in your PATH variable (e.g., 'C:/Program Files/OpenMS-2.0/bin') ?\n";
 								errormessage += "Do you have 'raw2peaks.bat' file located in the '" + appname.toStdString() + "/External/windows' folder ?\n";
 							#endif
 						#endif
+					}
+					if (errtype == -3) {
+						error = true;
+						errormessage = "Failed to load the mzML file, zlib compression is not supported. The spectra must be stored in the mzML file with the attribute \"no compression\".\n";
+					}
+					break;
+				case imzML:
+					errtype = peaklistseries.loadFromIMZMLStream(peaklistfilename, peakliststream, fwhm, maxcountx, maxcounty, vendor, os, terminatecomputation);
+					if (errtype == -1) {
+						error = true;
+						errormessage = "Aborted by user.\n";
+					}
+					if (errtype == -2) {
+						error = true;
+						#if OS_TYPE == UNX
+							errormessage = "Raw data cannot be converted.\n";
+							errormessage += "Does the file '" + peaklistfilename + "' exist ?\n";
+							errormessage += "Is the directory with the file '" + peaklistfilename + "' writable ?\n";
+							errormessage += "Do you have enough space on your hard drive ?\n";
+							errormessage += "Do you have OpenMS installed (sudo apt-get install topp) ?\n";
+							errormessage += "Do you have 'raw2peaks.sh' file located in '" + installdir.toStdString() + "External/linux' folder ?\n";
+							errormessage += "Is the file 'raw2peaks.sh' executable (sudo chmod +x " + installdir.toStdString() + "External/linux/raw2peaks.sh) ? \n";
+						#else
+							#if OS_TYPE == OSX
+								errormessage = "Raw data cannot be converted.\n";
+								errormessage += "Does the file '" + peaklistfilename + "' exist ?\n";
+								errormessage += "Is the directory with the file '" + peaklistfilename + "' writable ?\n";
+								errormessage += "Do you have enough space on your hard drive ?\n";
+								errormessage += "Do you have OpenMS installed ?\n";
+								errormessage += "Do you have 'raw2peaks.sh' file located in '" + installdir.toStdString() + "External/macosx' folder ?\n";
+								errormessage += "Is the file 'raw2peaks.sh' executable (sudo chmod +x " + installdir.toStdString() + "External/macosx/raw2peaks.sh) ? \n";
+							#else		
+								errormessage = "Raw data cannot be converted.\n";
+								errormessage += "Does the file '" + peaklistfilename + "' exist ?\n";
+								errormessage += "Is the directory with the file '" + peaklistfilename + "' writable ?\n";
+								errormessage += "Do you have enough space on your hard drive ?\n";
+								errormessage += "Do you have OpenMS installed ?\n";
+								errormessage += "Do you have a path to OpenMS binaries folder in your PATH variable (e.g., 'C:/Program Files/OpenMS-2.0/bin') ?\n";
+								errormessage += "Do you have 'raw2peaks.bat' file located in the '" + appname.toStdString() + "/External/windows' folder ?\n";
+							#endif
+						#endif
+					}
+					if (errtype == -3) {
+						error = true;
+						errormessage = "Failed to load the imzML file, zlib compression is not supported. The spectra must be stored in the imzML file with the attribute \"no compression\".\n";
 					}
 					break;
 				default:
 					break;
 				}
-				if (os) {
+				if (os && (peaklistfileformat != mzML) && (peaklistfileformat != imzML) && (peaklistfileformat != ser)) {
 					*os << "ok" << endl << endl;
 				}
 			}
@@ -439,76 +530,13 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 			errormessage = "Precursor Ion Adduct: " + errormessage;
 		}
 
-		precursorAdductHasLi = false;
-		precursorAdductHasNa = false;
-		precursorAdductHasMg = false;
-		precursorAdductHasAl = false;
-		precursorAdductHasK = false;
-		precursorAdductHasCa = false;
-		precursorAdductHasMn = false;
-		precursorAdductHasCr = false;
-		precursorAdductHasFe = false;
-		precursorAdductHasCo = false;
-		precursorAdductHasNi = false;
-		precursorAdductHasCu = false;
-		precursorAdductHasZn = false;
-		precursorAdductHasGa = false;
+		metaladducts.clear();
 
-		rx = "Li";
-		if (regex_search(precursoradduct, rx)) {
-			precursorAdductHasLi = true;
-		}
-		rx = "Na";
-		if (regex_search(precursoradduct, rx)) {
-			precursorAdductHasNa = true;
-		}
-		rx = "Mg";
-		if (regex_search(precursoradduct, rx)) {
-			precursorAdductHasMg = true;
-		}
-		rx = "Al";
-		if (regex_search(precursoradduct, rx)) {
-			precursorAdductHasAl = true;
-		}
-		rx = "K";
-		if (regex_search(precursoradduct, rx)) {
-			precursorAdductHasK = true;
-		}
-		rx = "Ca";
-		if (regex_search(precursoradduct, rx)) {
-			precursorAdductHasCa = true;
-		}
-		rx = "Mn";
-		if (regex_search(precursoradduct, rx)) {
-			precursorAdductHasMn = true;
-		}
-		rx = "Cr";
-		if (regex_search(precursoradduct, rx)) {
-			precursorAdductHasCr = true;
-		}
-		rx = "Fe";
-		if (regex_search(precursoradduct, rx)) {
-			precursorAdductHasFe = true;
-		}
-		rx = "Co";
-		if (regex_search(precursoradduct, rx)) {
-			precursorAdductHasCo = true;
-		}
-		rx = "Ni";
-		if (regex_search(precursoradduct, rx)) {
-			precursorAdductHasNi = true;
-		}
-		rx = "Cu";
-		if (regex_search(precursoradduct, rx)) {
-			precursorAdductHasCu = true;
-		}
-		rx = "Zn";
-		if (regex_search(precursoradduct, rx)) {
-			precursorAdductHasZn = true;
-		}
-		rx = "Ga";
-		if (regex_search(precursoradduct, rx)) {
-			precursorAdductHasGa = true;
+		for (int i = 0; i < (int)periodictablemap.getAdductElements().size(); i++) {
+			rx = periodictablemap.getAdductElements()[i] + "[^a-z]";
+			if (regex_search(precursoradduct, rx)) {
+				metaladducts.push_back(periodictablemap.getAdductElements()[i]);
+			}
 		}
 	}
 
@@ -628,21 +656,22 @@ string cParameters::printToString() {
 	default:
 		break;
 	}
-	s += "Peaklist File: " + peaklistfilename + "\n";
-	s += "Precursor Mass: " + to_string(precursormass) + "\n";
+	s += "File: " + peaklistfilename + "\n";
+	s += "Scan no.: " + to_string(scannumber) + "\n";
+	s += "Precursor m/z Ratio: " + to_string(precursormass) + "\n";
 	s += "Precursor Ion Adduct: " + precursoradduct + "\n";
 	s += "Charge: " + to_string(precursorcharge) + "\n";
-	s += "Precursor Mass Error Tolerance: " + to_string(precursormasserrortolerance) + "\n";
-	s += "Fragment Mass Error Tolerance: " + to_string(fragmentmasserrortolerance) + "\n";
-	s += "Fragment Mass Error Tolerance for Deisotoping: " + to_string(masserrortolerancefordeisotoping) + "\n";
+	s += "Precursor m/z Error Tolerance: " + to_string(precursormasserrortolerance) + "\n";
+	s += "m/z Error Tolerance: " + to_string(fragmentmasserrortolerance) + "\n";
+	s += "m/z Error Tolerance for Deisotoping: " + to_string(masserrortolerancefordeisotoping) + "\n";
 	s += "Minimum Threshold of Relative Intensity: " + to_string(minimumrelativeintensitythreshold) + "\n";
 	s += "Minimum m/z Ratio: " + to_string(minimummz) + "\n";
 	s += "FWHM: " + to_string(fwhm) + "\n";
-	s += "Brick Database File: " + bricksdatabasefilename + "\n";
+	s += "Building Blocks Database File: " + bricksdatabasefilename + "\n";
 	s += "Maximum Number of Combined Blocks (start, middle, end): " + to_string(maximumbricksincombinationbegin) + ", " + to_string(maximumbricksincombinationmiddle) + ", " + to_string(maximumbricksincombinationend) + "\n";
 	s += "Maximum Cumulative Mass of Blocks: " + to_string(maximumcumulativemass) + "\n";
 
-	s += "Generate Permutations of Combined Bricks: ";
+	s += "Generate Permutations of Combined Blocks: ";
 	s += generatebrickspermutations ? "on" : "off";
 	s += "\n";
 
@@ -676,7 +705,7 @@ string cParameters::printToString() {
 	s += enablescrambling ? "on" : "off";
 	s += "\n";
 
-	s += "Similarity Search: ";
+	s += "Disable Precursor Mass Filter: ";
 	s += similaritysearch ? "on" : "off";
 	s += "\n";
 
@@ -703,7 +732,7 @@ string cParameters::printToString() {
 	}
 	s += "\n";
 
-	s += "Sequence Database File: " + sequencedatabasefilename + "\n";
+	s += "Sequence/Compound Database File: " + sequencedatabasefilename + "\n";
 
 	s += "Maximum Number of Threads: " + to_string(maximumnumberofthreads) + "\n";
 
@@ -739,7 +768,7 @@ string cParameters::printToString() {
 	}
 	s += "\n";
 
-	s += "Maximum Number of Candidate Peptides Reported: " + to_string(hitsreported) + "\n";
+	s += "Maximum Number of Sequence Candidates Reported: " + to_string(hitsreported) + "\n";
 	s += "Peptide Sequence Tag: " + originalsequencetag + "\n";
 
 	s += "Ion Types in Theoretical Spectra: ";
@@ -755,10 +784,14 @@ string cParameters::printToString() {
 	s += clearhitswithoutparent ? "on" : "off";
 	s += "\n";
 
-	s += "Searched Peptide Sequence: " + originalsearchedsequence + "\n";
-	s += "N-terminal Modification of Searched Peptide Sequence: " + searchedsequenceNtermmodif + "\n";
-	s += "C-terminal Modification of Searched Peptide Sequence: " + searchedsequenceCtermmodif + "\n";
-	s += "Branch Modification of Searched Peptide Sequence: " + searchedsequenceTmodif + "\n";
+	s += "Generate Full Isotope Patterns: ";
+	s += generateisotopepattern ? "on" : "off";
+	s += "\n";
+
+	s += "Searched Sequence: " + originalsearchedsequence + "\n";
+	s += "N-terminal Modification: " + searchedsequenceNtermmodif + "\n";
+	s += "C-terminal Modification: " + searchedsequenceCtermmodif + "\n";
+	s += "Branch Modification: " + searchedsequenceTmodif + "\n";
 
 	s += "\n";
 
@@ -783,6 +816,7 @@ void cParameters::updateFragmentDefinitions() {
 
 void cParameters::store(ofstream& os) {
 	int size;
+	string s;
 	
 	fragmentdefinitions.store(os);
 
@@ -792,23 +826,11 @@ void cParameters::store(ofstream& os) {
 	os.write((char *)&peaklistfileformat, sizeof(ePeakListFileFormat));
 	peaklistseries.store(os);
 
+	os.write((char *)&scannumber, sizeof(int));
 	os.write((char *)&precursormass, sizeof(double));
 
 	storeString(precursoradduct, os);
-	os.write((char *)&precursorAdductHasLi, sizeof(bool));
-	os.write((char *)&precursorAdductHasNa, sizeof(bool));
-	os.write((char *)&precursorAdductHasMg, sizeof(bool));
-	os.write((char *)&precursorAdductHasAl, sizeof(bool));
-	os.write((char *)&precursorAdductHasK, sizeof(bool));
-	os.write((char *)&precursorAdductHasCa, sizeof(bool));
-	os.write((char *)&precursorAdductHasMn, sizeof(bool));
-	os.write((char *)&precursorAdductHasCr, sizeof(bool));
-	os.write((char *)&precursorAdductHasFe, sizeof(bool));
-	os.write((char *)&precursorAdductHasCo, sizeof(bool));
-	os.write((char *)&precursorAdductHasNi, sizeof(bool));
-	os.write((char *)&precursorAdductHasCu, sizeof(bool));
-	os.write((char *)&precursorAdductHasZn, sizeof(bool));
-	os.write((char *)&precursorAdductHasGa, sizeof(bool));
+	storeStringVector(metaladducts, os);
 
 	os.write((char *)&precursormasserrortolerance, sizeof(double));
 	os.write((char *)&precursorcharge, sizeof(int));
@@ -839,6 +861,7 @@ void cParameters::store(ofstream& os) {
 	os.write((char *)&mode, sizeof(eModeType));
 	os.write((char *)&scoretype, sizeof(eScoreType));
 	os.write((char *)&clearhitswithoutparent, sizeof(bool));
+	os.write((char *)&generateisotopepattern, sizeof(bool));
 	os.write((char *)&cyclicnterminus, sizeof(bool));
 	os.write((char *)&cycliccterminus, sizeof(bool));
 	os.write((char *)&enablescrambling, sizeof(bool));
@@ -871,11 +894,31 @@ void cParameters::store(ofstream& os) {
 	for (int i = 0; i < (int)fragmentionsfortheoreticalspectra.size(); i++) {
 		os.write((char *)&fragmentionsfortheoreticalspectra[i], sizeof(eFragmentIonType));
 	}
+
+	size = (int)peakidtodesc.size();
+	os.write((char *)&size, sizeof(int));
+	for (auto it = peakidtodesc.begin(); it != peakidtodesc.end(); ++it) {
+		os.write((char *)&it->first, sizeof(int));
+		storeString(it->second, os);
+	}
+
+	size = (int)peakdesctoid.size();
+	os.write((char *)&size, sizeof(int));
+	for (auto it = peakdesctoid.begin(); it != peakdesctoid.end(); ++it) {
+		s = it->first;
+		storeString(s, os);
+		os.write((char *)&it->second, sizeof(int));
+	}
+
+	os.write((char *)&maxcountx, sizeof(int));
+	os.write((char *)&maxcounty, sizeof(int));
+	os.write((char *)&vendor, sizeof(eVendorType));
 }
 
 
 void cParameters::load(ifstream& is) {
-	int size;
+	int size, value;
+	string s;
 
 	os = 0;
 
@@ -887,24 +930,12 @@ void cParameters::load(ifstream& is) {
 	is.read((char *)&peaklistfileformat, sizeof(ePeakListFileFormat));
 	peaklistseries.load(is);
 
+	is.read((char *)&scannumber, sizeof(int));
 	is.read((char *)&precursormass, sizeof(double));
 
 	loadString(precursoradduct, is);
-	is.read((char *)&precursorAdductHasLi, sizeof(bool));
-	is.read((char *)&precursorAdductHasNa, sizeof(bool));
-	is.read((char *)&precursorAdductHasMg, sizeof(bool));
-	is.read((char *)&precursorAdductHasAl, sizeof(bool));
-	is.read((char *)&precursorAdductHasK, sizeof(bool));
-	is.read((char *)&precursorAdductHasCa, sizeof(bool));
-	is.read((char *)&precursorAdductHasMn, sizeof(bool));
-	is.read((char *)&precursorAdductHasCr, sizeof(bool));
-	is.read((char *)&precursorAdductHasFe, sizeof(bool));
-	is.read((char *)&precursorAdductHasCo, sizeof(bool));
-	is.read((char *)&precursorAdductHasNi, sizeof(bool));
-	is.read((char *)&precursorAdductHasCu, sizeof(bool));
-	is.read((char *)&precursorAdductHasZn, sizeof(bool));
-	is.read((char *)&precursorAdductHasGa, sizeof(bool));
-
+	loadStringVector(metaladducts, is);
+	
 	is.read((char *)&precursormasserrortolerance, sizeof(double));
 	is.read((char *)&precursorcharge, sizeof(int));
 	is.read((char *)&fragmentmasserrortolerance, sizeof(double));
@@ -934,6 +965,7 @@ void cParameters::load(ifstream& is) {
 	is.read((char *)&mode, sizeof(eModeType));
 	is.read((char *)&scoretype, sizeof(eScoreType));
 	is.read((char *)&clearhitswithoutparent, sizeof(bool));
+	is.read((char *)&generateisotopepattern, sizeof(bool));
 	is.read((char *)&cyclicnterminus, sizeof(bool));
 	is.read((char *)&cycliccterminus, sizeof(bool));
 	is.read((char *)&enablescrambling, sizeof(bool));
@@ -966,5 +998,25 @@ void cParameters::load(ifstream& is) {
 	for (int i = 0; i < (int)fragmentionsfortheoreticalspectra.size(); i++) {
 		is.read((char *)&fragmentionsfortheoreticalspectra[i], sizeof(eFragmentIonType));
 	}
+
+	is.read((char *)&size, sizeof(int));
+	peakidtodesc.clear();
+	for (int i = 0; i < size; i++) {
+		is.read((char *)&value, sizeof(int));
+		loadString(s, is);
+		peakidtodesc[value] = s;
+	}
+
+	is.read((char *)&size, sizeof(int));
+	peakdesctoid.clear();
+	for (int i = 0; i < size; i++) {
+		loadString(s, is);
+		is.read((char *)&value, sizeof(int));
+		peakdesctoid[s] = value;
+	}
+
+	is.read((char *)&maxcountx, sizeof(int));
+	is.read((char *)&maxcounty, sizeof(int));
+	is.read((char *)&vendor, sizeof(eVendorType));
 }
 

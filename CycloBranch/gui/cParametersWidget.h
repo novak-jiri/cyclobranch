@@ -131,6 +131,7 @@ private:
 	QLineEdit* peaklistline;
 	QPushButton* peaklistbutton;
 	QHBoxLayout* peaklistlayout;
+	QSpinBox* scannumber;
 	QDoubleSpinBox* precursormass;
 	QLineEdit* precursoradduct;
 	QSpinBox* precursorcharge;
@@ -177,6 +178,7 @@ private:
 	QLineEdit* sequencetag;
 	cFragmentIonsListWidget* fragmentiontypes;
 	QCheckBox* clearhitswithoutparent;
+	QCheckBox* generateisotopepattern;
 
 	QGroupBox* searchedsequencegroupbox;
 	QFormLayout* searchedsequenceformlayout;

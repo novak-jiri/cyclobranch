@@ -29,6 +29,7 @@ HEADERS += core/cBrick.h \
            core/cDeNovoGraphNode.h \
            core/cFragmentIons.h \
            core/cImzML.h \
+           core/cMzML.h \
            core/cParameters.h \
            core/cPeak.h \
            core/cPeakListSeries.h \
@@ -53,6 +54,7 @@ HEADERS += core/cBrick.h \
            gui/cFindDialog.h \
            gui/cFragmentIonsListWidget.h \
            gui/cGraphWidget.h \
+           gui/cHTMLDelegate.h \
            gui/cHTMLExportDialog.h \
            gui/cImageWindow.h \
            gui/cImageWindowWidget.h \
@@ -82,6 +84,7 @@ SOURCES += core/cBrick.cpp \
            core/cDeNovoGraphNode.cpp \
            core/cFragmentIons.cpp \
            core/cImzML.cpp \
+           core/cMzML.cpp \
            core/cParameters.cpp \
            core/cPeak.cpp \
            core/cPeakListSeries.cpp \
@@ -106,6 +109,7 @@ SOURCES += core/cBrick.cpp \
            gui/cFindDialog.cpp \
            gui/cFragmentIonsListWidget.cpp \
            gui/cGraphWidget.cpp \
+           gui/cHTMLDelegate.cpp \
            gui/cHTMLExportDialog.cpp \
            gui/cImageWindow.cpp \
            gui/cImageWindowWidget.cpp \

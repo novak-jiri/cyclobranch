@@ -4,7 +4,7 @@
 
 
 QString appname = "CycloBranch";
-QString appversion = "v. 1.1.570 (64-bit)";
+QString appversion = "v. 1.2.192 (64-bit)";
 
 
 #if OS_TYPE == UNX
@@ -236,6 +236,14 @@ double cropPrecisionToSixDecimals(double value) {
 }
 
 
+QByteArray cropDecimalsByteArray(double value) {
+	char buffer[50];
+	sprintf_s(buffer, "%.0f\0", value);
+	QByteArray bytearray = buffer;
+	return bytearray;
+}
+
+
 QByteArray cropPrecisionToSixDecimalsByteArray(double value) {
 	char buffer[50];
 	sprintf_s(buffer, "%.6f\0", value);
@@ -246,5 +254,30 @@ QByteArray cropPrecisionToSixDecimalsByteArray(double value) {
 
 bool operator == (cCoordinates const& a, cCoordinates const& b) {
 	return ((a.x == b.x) && (a.y == b.y) && (a.id == b.id));
+}
+
+
+double fact(int value) {
+	double result = 1;
+	while (value > 1) {
+		result *= value;
+		value--;
+	}
+	return result;
+}
+
+
+double median(vector<double>& vector) {
+	double median = 0;
+	sort(vector.begin(), vector.end());
+	if (vector.size() > 0) {
+		if (vector.size() % 2 == 0) {
+			median = (vector[vector.size() / 2 - 1] + vector[vector.size() / 2]) / 2.0;
+		}
+		else {
+			median = vector[vector.size() / 2];
+		}
+	}
+	return median;
 }
 

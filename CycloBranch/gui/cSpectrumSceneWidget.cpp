@@ -409,14 +409,14 @@ void cSpectrumSceneWidget::redrawScene() {
 
 	}
 
-	visiblepeaks.sortbyIntensityDesc();
+	visiblepeaks.sortbyRelativeIntensityDesc();
 
 	// visible peaks only
 	for (int i = 0; i < (int)visiblepeaks.size(); i++) {
 
 		x = getXPositionFromMZRatio(visiblepeaks[i].mzratio, origwidth);
 
-		y = visiblepeaks[i].intensity/maxintensity * (h - topmargin - bottommargin);
+		y = visiblepeaks[i].relativeintensity/maxintensity * (h - topmargin - bottommargin);
 
 		string coloredtrotationstring;
 		if (coloredtrotationid != -1) {
@@ -430,7 +430,13 @@ void cSpectrumSceneWidget::redrawScene() {
 
 		hits.clear();
 
-		s = visiblepeaks[i].description;
+		if ((parameters->mode == dereplication) && (visiblepeaks[i].descriptionid != -1)) {
+			s = parameters->peakidtodesc[visiblepeaks[i].descriptionid];
+		}
+		else {
+			s = visiblepeaks[i].description;
+		}
+
 		int position = (int)s.find(',');
 		while (position != (int)string::npos) {
 			hits.push_back(s.substr(0, position));
@@ -485,7 +491,7 @@ void cSpectrumSceneWidget::redrawScene() {
 			}
 		}
 
-		sprintf_s(tmpbuf,"%.3f\0",visiblepeaks[i].mzratio);
+		sprintf_s(tmpbuf,"%.5f\0",visiblepeaks[i].mzratio);
 		s = tmpbuf;
 		hits.push_back(s);
 		QGraphicsLineItem* line;

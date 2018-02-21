@@ -21,7 +21,7 @@
 cSequenceDatabaseWidget::cSequenceDatabaseWidget(QWidget* parent) {
 	this->parent = parent;
 
-	editorname = "Sequence Database Editor";
+	editorname = "Sequence/Compound Database Editor";
 
 	setWindowTitle(editorname);
 	setWindowIcon(QIcon(":/images/icons/26.png"));
@@ -186,7 +186,7 @@ cSequenceDatabaseWidget::cSequenceDatabaseWidget(QWidget* parent) {
 
 	setCentralWidget(mainwidget);
 
-	resize(1280, 750);
+	resize(1280, 770);
 
 	databasefile = "";
 

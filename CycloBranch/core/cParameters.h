@@ -23,17 +23,6 @@ using namespace boost;
 
 
 /**
-	\brief Running modes of the application.
-*/
-enum eModeType {
-	denovoengine = 0,
-	singlecomparison = 1,
-	databasesearch = 2,
-	dereplication = 3
-};
-
-
-/**
 	\brief Peak list file formats supported by the application.
 */
 enum ePeakListFileFormat {
@@ -42,8 +31,9 @@ enum ePeakListFileFormat {
 	mzML = 2,
 	mzXML = 3,
 	baf = 4,
-	mis = 5,
-	imzML = 6
+	imzML = 5,
+	mis = 6,
+	ser = 7
 };
 
 
@@ -88,6 +78,12 @@ public:
 
 
 	/**
+		\brief Scan number.
+    */
+    int scannumber;
+
+
+	/**
 		\brief Precursor mass of the peptide.
     */
     double precursormass;
@@ -100,87 +96,9 @@ public:
 
 
 	/**
-		\brief True when the precursor adduct contains Li.
+		\brief A list of parsed metal adducts from \a precursoradduct.
     */
-    bool precursorAdductHasLi;
-
-
-	/**
-		\brief True when the precursor adduct contains Na.
-    */
-    bool precursorAdductHasNa;
-
-
-	/**
-		\brief True when the precursor adduct contains Mg.
-    */
-    bool precursorAdductHasMg;
-
-
-	/**
-		\brief True when the precursor adduct contains Al.
-    */
-    bool precursorAdductHasAl;
-
-
-	/**
-		\brief True when the precursor adduct contains K.
-    */
-    bool precursorAdductHasK;
-
-
-	/**
-		\brief True when the precursor adduct contains Ca.
-    */
-    bool precursorAdductHasCa;
-
-
-	/**
-		\brief True when the precursor adduct contains Mn.
-    */
-    bool precursorAdductHasMn;
-
-
-	/**
-		\brief True when the precursor adduct contains Cr.
-    */
-    bool precursorAdductHasCr;
-
-
-	/**
-		\brief True when the precursor adduct contains Fe.
-    */
-    bool precursorAdductHasFe;
-
-
-	/**
-		\brief True when the precursor adduct contains Co.
-    */
-    bool precursorAdductHasCo;
-
-
-	/**
-		\brief True when the precursor adduct contains Ni.
-    */
-    bool precursorAdductHasNi;
-
-
-	/**
-		\brief True when the precursor adduct contains Cu.
-    */
-    bool precursorAdductHasCu;
-
-
-	/**
-		\brief True when the precursor adduct contains Zn.
-    */
-    bool precursorAdductHasZn;
-
-
-	/**
-		\brief True when the precursor adduct contains Ga.
-    */
-    bool precursorAdductHasGa;
+    vector<string> metaladducts;
 
 
 	/**
@@ -304,6 +222,12 @@ public:
 
 
 	/**
+		\brief True when complete isotope pattern is generated.
+    */
+    bool generateisotopepattern;
+
+
+	/**
 		\brief True when the N-terminus of a linear peptide is cyclized.
     */
 	bool cyclicnterminus;
@@ -420,7 +344,37 @@ public:
 	/**
 		\brief A vector of fragment ion types generated in theoretical spectra.
 	*/
-    vector<eFragmentIonType> fragmentionsfortheoreticalspectra;
+	vector<eFragmentIonType> fragmentionsfortheoreticalspectra;
+
+
+	/**
+		\brief A map of peak ids to descriptions.
+	*/
+	map<int, string> peakidtodesc;
+
+
+	/**
+		\brief A map of peak descriptions to ids.
+	*/
+	map<string, int> peakdesctoid;
+
+
+	/**
+		\brief Max count of pixel x - parsed from imzML file.
+	*/
+	int maxcountx;
+
+
+	/**
+		\brief Max count of pixel y - parsed from imzML file.
+	*/
+	int maxcounty;
+
+
+	/**
+		\brief Vendor type.
+	*/
+	eVendorType vendor;
 
 
 	/**
@@ -475,6 +429,7 @@ public:
 		\param is an input stream
 	*/ 
 	void load(ifstream& is);
+
 
 };
 

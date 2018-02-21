@@ -165,10 +165,15 @@ string cSpectrumDetailWidget::getPeaksTableAsHTMLString(bool unmatchedtheoretica
 		s += "<table class=\"tablesorter\" cellpadding=\"0\" cellspacing=\"0\" border=\"1\" width=\"100%\"><thead><tr>";
 
 		if (parameters->mode == dereplication) {
-			columncount = 8;
+			if (parameters->generateisotopepattern) {
+				columncount = 10;
+			}
+			else {
+				columncount = 9;
+			}
 		}
 		else {
-			columncount = 6;
+			columncount = 7;
 		}
 
 		tdwidth = to_string(100/columncount);
@@ -181,8 +186,14 @@ string cSpectrumDetailWidget::getPeaksTableAsHTMLString(bool unmatchedtheoretica
 		}
 
 		s += "<th width=\"" + tdwidth + "%\"><b>Theoretical m/z</b></th>";
+
+		if ((parameters->mode == dereplication) && (parameters->generateisotopepattern)) {
+			s += "<th width=\"" + tdwidth + "%\"><b>Theoretical Intensity [%]</b></th>";
+		}
+
 		s += "<th width=\"" + tdwidth + "%\"><b>Experimental m/z</b></th>";
-		s += "<th width=\"" + tdwidth + "%\"><b>Intensity [%]</b></th>";
+		s += "<th width=\"" + tdwidth + "%\"><b>Relative Intensity [%]</b></th>";
+		s += "<th width=\"" + tdwidth + "%\"><b>Absolute Intensity</b></th>";
 		s += "<th width=\"" + tdwidth + "%\"><b>Error [ppm]</b></th>";
 
 		if (parameters->mode == dereplication) {
@@ -211,11 +222,14 @@ string cSpectrumDetailWidget::getPeaksTableAsHTMLString(bool unmatchedtheoretica
 			thpeakscount = theoreticalspectrum->getTheoreticalPeaks()->size();
 		}
 
-		rowcount = thpeakscount + theoreticalspectrum->getUnmatchedPeaks()->size();
+		rowcount = thpeakscount + theoreticalspectrum->getUnmatchedPeaksCount();
 
 		// theoretical peaks
 		for (int i = 0; i < thpeakscount; i++) {
 			peak = &((*thpeaks)[i]);
+			if (peak->descriptionid != -1) {
+				peak->description = parameters->peakidtodesc[peak->descriptionid];
+			}
 
 			if (peak->matchedmz > 0) {
 				isred = true;
@@ -240,25 +254,31 @@ string cSpectrumDetailWidget::getPeaksTableAsHTMLString(bool unmatchedtheoretica
 		
 			s += printHTMLTableCell(to_string(cropPrecisionToSixDecimals(peak->mzratio)), isred);
 
+			if ((parameters->mode == dereplication) && (parameters->generateisotopepattern)) {
+				s += printHTMLTableCell(to_string(cropPrecisionToSixDecimals(peak->relativeintensity)), isred);
+			}
+
 			if (peak->matchedmz > 0) {
 				s += printHTMLTableCell(to_string(cropPrecisionToSixDecimals(peak->matchedmz)), isred);
-				s += printHTMLTableCell(to_string(cropPrecisionToSixDecimals(peak->matchedintensity)), isred);
+				s += printHTMLTableCell(to_string(cropPrecisionToSixDecimals(peak->matchedrelativeintensity)), isred);
+				s += printHTMLTableCell(QVariant(cropDecimalsByteArray(peak->matchedabsoluteintensity)).toString().toStdString(), isred);
 				s += printHTMLTableCell(to_string(cropPrecisionToSixDecimals(peak->matchedppm)), isred);
 			}
 			else {
-				s += "<td></td><td></td><td></td>";
+				s += "<td></td><td></td><td></td><td></td>";
 			}
 
 			if (parameters->mode == dereplication) {
 				s += printHTMLTableCell(peak->description.substr(peak->description.rfind('(') + 1, peak->description.rfind(')') - peak->description.rfind('(') - 1), isred);
 
-				langle = (int)peak->description.rfind('<');
+				langle = (int)peak->description.rfind("</a>");
 				rangle = (int)peak->description.find('>');
 				if ((langle != string::npos) && (rangle != string::npos)) {
 					s += printHTMLTableCell(peak->description.substr(rangle + 1, langle - rangle - 1), isred);
 
 					tmp1 = (int)peak->description.find('<');
-					tmp2 = (int)peak->description.rfind('>');
+					tmp2 = (int)peak->description.rfind("</a>");
+					tmp2 += 3;
 					s += printHTMLTableCell(peak->description.substr(tmp1, rangle - tmp1 + 1) + "view" + peak->description.substr(langle, tmp2 - langle + 1), isred);
 				}
 				else {
@@ -280,12 +300,20 @@ string cSpectrumDetailWidget::getPeaksTableAsHTMLString(bool unmatchedtheoretica
 
 		// unmatched experimental peaks
 		if (unmatchedexperimentalpeaks) {
-			for (int i = thpeakscount; i < thpeakscount + theoreticalspectrum->getUnmatchedPeaks()->size(); i++) {
+			int numberofexperimentalpeaks = theoreticalspectrum->getExperimentalSpectrum().size();
+			for (int i = 0; i < numberofexperimentalpeaks; i++) {
+				peak = &(theoreticalspectrum->getExperimentalSpectrum()[i]);
+				if (peak->matched > 0) {
+					continue;
+				}
 				s += "<tr>";
-				peak = &((*(theoreticalspectrum->getUnmatchedPeaks()))[i - thpeakscount]);
 				s += "<td></td><td></td>";
+				if ((parameters->mode == dereplication) && (parameters->generateisotopepattern)) {
+					s += "<td></td>";
+				}
 				s += printHTMLTableCell(to_string(cropPrecisionToSixDecimals(peak->mzratio)), false);
-				s += printHTMLTableCell(to_string(cropPrecisionToSixDecimals(peak->intensity)), false);
+				s += printHTMLTableCell(to_string(cropPrecisionToSixDecimals(peak->relativeintensity)), false);
+				s += printHTMLTableCell(QVariant(cropDecimalsByteArray(peak->absoluteintensity)).toString().toStdString(), false);
 				s += "<td></td><td></td>";
 				if (parameters->mode == dereplication) {
 					s += "<td></td><td></td>";
@@ -334,6 +362,9 @@ string cSpectrumDetailWidget::getPartialPeaksTableAsHTMLString(int id) {
 		// theoretical peaks
 		for (int i = 0; i < thpeakscount; i++) {
 			peak = &((*thpeaks)[i]);
+			if (peak->descriptionid != -1) {
+				peak->description = parameters->peakidtodesc[peak->descriptionid];
+			}
 
 			if (peak->matchedmz > 0) {
 				isred = true;
@@ -374,25 +405,31 @@ string cSpectrumDetailWidget::getPartialPeaksTableAsHTMLString(int id) {
 		
 			s += printHTMLTableCell(to_string(cropPrecisionToSixDecimals(peak->mzratio)), isred);
 
+			if ((parameters->mode == dereplication) && (parameters->generateisotopepattern)) {
+				s += printHTMLTableCell(to_string(cropPrecisionToSixDecimals(peak->relativeintensity)), isred);
+			}
+
 			if (peak->matchedmz > 0) {
 				s += printHTMLTableCell(to_string(cropPrecisionToSixDecimals(peak->matchedmz)), isred);
-				s += printHTMLTableCell(to_string(cropPrecisionToSixDecimals(peak->matchedintensity)), isred);
+				s += printHTMLTableCell(to_string(cropPrecisionToSixDecimals(peak->matchedrelativeintensity)), isred);
+				s += printHTMLTableCell(QVariant(cropDecimalsByteArray(peak->matchedabsoluteintensity)).toString().toStdString(), isred);
 				s += printHTMLTableCell(to_string(cropPrecisionToSixDecimals(peak->matchedppm)), isred);
 			}
 			else {
-				s += "<td></td><td></td><td></td>";
+				s += "<td></td><td></td><td></td><td></td>";
 			}
 
 			if (parameters->mode == dereplication) {
 				s += printHTMLTableCell(peak->description.substr(peak->description.rfind('(') + 1, peak->description.rfind(')') - peak->description.rfind('(') - 1), isred);
 
-				langle = (int)peak->description.rfind('<');
+				langle = (int)peak->description.rfind("</a>");
 				rangle = (int)peak->description.find('>');
 				if ((langle != string::npos) && (rangle != string::npos)) {
 					s += printHTMLTableCell(peak->description.substr(rangle + 1, langle - rangle - 1), isred);
 
 					tmp1 = (int)peak->description.find('<');
-					tmp2 = (int)peak->description.rfind('>');
+					tmp2 = (int)peak->description.rfind("</a>");
+					tmp2 += 3;
 					s += printHTMLTableCell(peak->description.substr(tmp1, rangle - tmp1 + 1) + "view" + peak->description.substr(langle, tmp2 - langle + 1), isred);
 				}
 				else {
@@ -892,7 +929,7 @@ void cSpectrumDetailWidget::prepareToShow(ePeptideType peptidetype) {
 		finddialog = new cFindDialog(this);
 		exportdialog = new cExportDialog(this);
 
-		resize(1280, 750);
+		resize(1280, 770);
 
 		if (parameters && theoreticalspectrum) {
 
@@ -1128,31 +1165,67 @@ void cSpectrumDetailWidget::preparePeaksTable() {
 	peakstable->verticalHeader()->setDefaultSectionSize(25);
 
 	if (parameters->mode == dereplication) {
-		peakstablemodel->setColumnCount(8);
+		if (parameters->generateisotopepattern) {
+			peakstablemodel->setColumnCount(10);
+		}
+		else {
+			peakstablemodel->setColumnCount(9);
+		}
 	}
 	else {
-		peakstablemodel->setColumnCount(6);
+		peakstablemodel->setColumnCount(7);
 	}
 
 	for (int i = 0; i < peakstablemodel->columnCount(); i++) {
 		peakstablemodel->setHorizontalHeaderItem(i, new QStandardItem());
 	}
 
-	peakstablemodel->horizontalHeaderItem(1)->setText("Theoretical m/z");
-	peakstablemodel->horizontalHeaderItem(2)->setText("Experimental m/z");
-	peakstablemodel->horizontalHeaderItem(3)->setText("Intensity [%]");
-	peakstablemodel->horizontalHeaderItem(4)->setText("Error [ppm]");
-
+	int currentcolumn = 0;
 	if (parameters->mode == dereplication) {
-		peakstablemodel->horizontalHeaderItem(0)->setText("Ion Type");
-		peakstablemodel->horizontalHeaderItem(5)->setText("Summary Formula");
-		peakstablemodel->horizontalHeaderItem(6)->setText("Name");
-		peakstablemodel->horizontalHeaderItem(7)->setText("Reference");
-		peakstable->setItemDelegateForColumn(7, new cViewButtonDelegate());
+		peakstablemodel->horizontalHeaderItem(currentcolumn)->setText("Ion Type");
 	}
 	else {
-		peakstablemodel->horizontalHeaderItem(0)->setText("Fragment Type");
-		peakstablemodel->horizontalHeaderItem(5)->setText("Sequence");
+		peakstablemodel->horizontalHeaderItem(currentcolumn)->setText("Fragment Type");
+	}
+	currentcolumn++;
+
+	peakstablemodel->horizontalHeaderItem(currentcolumn)->setText("Theoretical m/z");
+	currentcolumn++;
+
+	if ((parameters->mode == dereplication) && (parameters->generateisotopepattern)) {
+		peakstablemodel->horizontalHeaderItem(currentcolumn)->setText("Theoretical Intensity [%]");
+		currentcolumn++;
+	}
+
+	peakstablemodel->horizontalHeaderItem(currentcolumn)->setText("Experimental m/z");
+	currentcolumn++;
+
+	peakstablemodel->horizontalHeaderItem(currentcolumn)->setText("Relative Intensity [%]");
+	currentcolumn++;
+
+	peakstablemodel->horizontalHeaderItem(currentcolumn)->setText("Absolute Intensity");
+	currentcolumn++;
+
+	peakstablemodel->horizontalHeaderItem(currentcolumn)->setText("Error [ppm]");
+	currentcolumn++;
+
+	if (parameters->mode == dereplication) {
+		peakstablemodel->horizontalHeaderItem(currentcolumn)->setText("Summary Formula");
+		if (parameters->generateisotopepattern) {
+			peakstable->setItemDelegateForColumn(currentcolumn, new cHTMLDelegate());
+		}
+		currentcolumn++;
+
+		peakstablemodel->horizontalHeaderItem(currentcolumn)->setText("Name");
+		currentcolumn++;
+
+		peakstablemodel->horizontalHeaderItem(currentcolumn)->setText("Reference");
+		peakstable->setItemDelegateForColumn(currentcolumn, new cViewButtonDelegate());
+		currentcolumn++;
+	}
+	else {
+		peakstablemodel->horizontalHeaderItem(currentcolumn)->setText("Sequence");
+		currentcolumn++;
 	}
 
 	connect(peakstable->horizontalHeader(), SIGNAL(sectionClicked(int)), this, SLOT(headerItemClicked(int)));
@@ -1179,9 +1252,9 @@ void cSpectrumDetailWidget::preparePeaksTable() {
 		thpeakscount = theoreticalspectrum->getTheoreticalPeaks()->size();
 	}
 	
-	peakstablemodel->setRowCount(thpeakscount + theoreticalspectrum->getUnmatchedPeaks()->size());
+	peakstablemodel->setRowCount(thpeakscount + theoreticalspectrum->getUnmatchedPeaksCount());
 
-	QProgressDialog progress("Preparing the peaklist...", /*"Cancel"*/0, 0, thpeakscount + theoreticalspectrum->getUnmatchedPeaks()->size(), parent);
+	QProgressDialog progress("Preparing the peaklist...", /*"Cancel"*/0, 0, thpeakscount + theoreticalspectrum->getUnmatchedPeaksCount(), parent);
 	progress.setMinimumWidth(250);
 	cEventFilter filter;
 	progress.installEventFilter(&filter);
@@ -1195,6 +1268,9 @@ void cSpectrumDetailWidget::preparePeaksTable() {
 	// theoretical peaks
 	for (int i = 0; i < thpeakscount; i++) {
 		peak = &((*thpeaks)[i]);
+		if (peak->descriptionid != -1) {
+			peak->description = parameters->peakidtodesc[peak->descriptionid];
+		}
 
 		if (peak->matchedmz > 0) {
 			brush.setColor(QColor(255, 0, 0));
@@ -1203,67 +1279,101 @@ void cSpectrumDetailWidget::preparePeaksTable() {
 			brush.setColor(QColor(0, 0, 0));
 		}
 		
+		currentcolumn = 0;
 		if (parameters->mode == dereplication) {
 			secondspace = (int)peak->description.find(' ', peak->description.find(' ') + 1);
 
-			peakstablemodel->setItem(i, 0, new QStandardItem());
-			peakstablemodel->item(i, 0)->setForeground(brush);
-			peakstablemodel->item(i, 0)->setText(peak->description.substr(0, secondspace).c_str());
+			peakstablemodel->setItem(i, currentcolumn, new QStandardItem());
+			peakstablemodel->item(i, currentcolumn)->setForeground(brush);
+			peakstablemodel->item(i, currentcolumn)->setText(peak->description.substr(0, secondspace).c_str());
 		}
 		else {
-			peakstablemodel->setItem(i, 0, new QStandardItem());
-			peakstablemodel->item(i, 0)->setForeground(brush);
-			peakstablemodel->item(i, 0)->setText(peak->description.substr(0, peak->description.find(':')).c_str());
+			peakstablemodel->setItem(i, currentcolumn, new QStandardItem());
+			peakstablemodel->item(i, currentcolumn)->setForeground(brush);
+			peakstablemodel->item(i, currentcolumn)->setText(peak->description.substr(0, peak->description.find(':')).c_str());
 		}
+		currentcolumn++;
 		
-		peakstablemodel->setItem(i, 1, new QStandardItem());
-		peakstablemodel->item(i, 1)->setForeground(brush);
-		peakstablemodel->item(i, 1)->setData(QVariant::fromValue(cropPrecisionToSixDecimalsByteArray(peak->mzratio)), Qt::DisplayRole);
+		peakstablemodel->setItem(i, currentcolumn, new QStandardItem());
+		peakstablemodel->item(i, currentcolumn)->setForeground(brush);
+		peakstablemodel->item(i, currentcolumn)->setData(QVariant::fromValue(cropPrecisionToSixDecimalsByteArray(peak->mzratio)), Qt::DisplayRole);
+		currentcolumn++;
+
+		if ((parameters->mode == dereplication) && (parameters->generateisotopepattern)) {
+			peakstablemodel->setItem(i, currentcolumn, new QStandardItem());
+			peakstablemodel->item(i, currentcolumn)->setForeground(brush);
+			peakstablemodel->item(i, currentcolumn)->setData(QVariant::fromValue(cropPrecisionToSixDecimalsByteArray(peak->relativeintensity)), Qt::DisplayRole);
+			currentcolumn++;
+		}
 
 		if (peak->matchedmz > 0) {
-			peakstablemodel->setItem(i, 2, new QStandardItem());
-			peakstablemodel->item(i, 2)->setForeground(brush);
-			peakstablemodel->item(i, 2)->setData(QVariant::fromValue(cropPrecisionToSixDecimalsByteArray(peak->matchedmz)), Qt::DisplayRole);
+			peakstablemodel->setItem(i, currentcolumn, new QStandardItem());
+			peakstablemodel->item(i, currentcolumn)->setForeground(brush);
+			peakstablemodel->item(i, currentcolumn)->setData(QVariant::fromValue(cropPrecisionToSixDecimalsByteArray(peak->matchedmz)), Qt::DisplayRole);
+			currentcolumn++;
 
-			peakstablemodel->setItem(i, 3, new QStandardItem());
-			peakstablemodel->item(i, 3)->setForeground(brush);
-			peakstablemodel->item(i, 3)->setData(QVariant::fromValue(cropPrecisionToSixDecimalsByteArray(peak->matchedintensity)), Qt::DisplayRole);
+			peakstablemodel->setItem(i, currentcolumn, new QStandardItem());
+			peakstablemodel->item(i, currentcolumn)->setForeground(brush);
+			peakstablemodel->item(i, currentcolumn)->setData(QVariant::fromValue(cropPrecisionToSixDecimalsByteArray(peak->matchedrelativeintensity)), Qt::DisplayRole);
+			currentcolumn++;
 
-			peakstablemodel->setItem(i, 4, new QStandardItem());
-			peakstablemodel->item(i, 4)->setForeground(brush);
-			peakstablemodel->item(i, 4)->setData(QVariant::fromValue(cropPrecisionToSixDecimalsByteArray(peak->matchedppm)), Qt::DisplayRole);
+			peakstablemodel->setItem(i, currentcolumn, new QStandardItem());
+			peakstablemodel->item(i, currentcolumn)->setForeground(brush);
+			peakstablemodel->item(i, currentcolumn)->setData(QVariant::fromValue(cropDecimalsByteArray(peak->matchedabsoluteintensity)), Qt::DisplayRole);
+			currentcolumn++;
+
+			peakstablemodel->setItem(i, currentcolumn, new QStandardItem());
+			peakstablemodel->item(i, currentcolumn)->setForeground(brush);
+			peakstablemodel->item(i, currentcolumn)->setData(QVariant::fromValue(cropPrecisionToSixDecimalsByteArray(peak->matchedppm)), Qt::DisplayRole);
+			currentcolumn++;
+		}
+		else {
+			currentcolumn += 4;
 		}
 
 		if (parameters->mode == dereplication) {
-			peakstablemodel->setItem(i, 5, new QStandardItem());
-			peakstablemodel->item(i, 5)->setForeground(brush);
-			peakstablemodel->item(i, 5)->setText(peak->description.substr(peak->description.rfind('(') + 1, peak->description.rfind(')') - peak->description.rfind('(') - 1).c_str());
+			peakstablemodel->setItem(i, currentcolumn, new QStandardItem());
+			peakstablemodel->item(i, currentcolumn)->setForeground(brush);
+			QString summary;
+			if (parameters->generateisotopepattern) {
+				summary += "<font color=\"red\">";
+			}
+			summary += peak->description.substr(peak->description.rfind('(') + 1, peak->description.rfind(')') - peak->description.rfind('(') - 1).c_str();
+			if (parameters->generateisotopepattern) {
+				summary += "</font>";
+			}
+			peakstablemodel->item(i, currentcolumn)->setText(summary);
+			currentcolumn++;
 
-			peakstablemodel->setItem(i, 6, new QStandardItem());
-			peakstablemodel->item(i, 6)->setForeground(brush);
-			langle = (int)peak->description.rfind('<');
+			peakstablemodel->setItem(i, currentcolumn, new QStandardItem());
+			peakstablemodel->item(i, currentcolumn)->setForeground(brush);
+			langle = (int)peak->description.rfind("</a>");
 			rangle = (int)peak->description.find('>');
 			if ((langle != string::npos) && (rangle != string::npos)) {
-				peakstablemodel->item(i, 6)->setText(peak->description.substr(rangle + 1, langle - rangle - 1).c_str());
+				peakstablemodel->item(i, currentcolumn)->setText(peak->description.substr(rangle + 1, langle - rangle - 1).c_str());
+				currentcolumn++;
 
 				tmp = (int)peak->description.find('<');
 				stmp = peak->description.substr(tmp, rangle - tmp + 1);
 				stmp = stmp.substr(stmp.find('\"') + 1);
 				stmp = stmp.substr(0, stmp.rfind('\"'));
 
-				peakstablemodel->setItem(i, 7, new QStandardItem());
-				peakstablemodel->item(i, 7)->setForeground(brush);
-				peakstablemodel->item(i, 7)->setText(stmp.c_str());
+				peakstablemodel->setItem(i, currentcolumn, new QStandardItem());
+				peakstablemodel->item(i, currentcolumn)->setForeground(brush);
+				peakstablemodel->item(i, currentcolumn)->setText(stmp.c_str());
+				currentcolumn++;
 			}
 			else {
-				peakstablemodel->item(i, 6)->setText(peak->description.substr(secondspace + 1, peak->description.rfind('(') - secondspace - 2).c_str());		
+				peakstablemodel->item(i, currentcolumn)->setText(peak->description.substr(secondspace + 1, peak->description.rfind('(') - secondspace - 2).c_str());
+				currentcolumn++;
 			}
 		}
 		else {
 			if (peak->description.find(':') + 2 < peak->description.size()) {
-				peakstablemodel->setItem(i, 5, new QStandardItem());
-				peakstablemodel->item(i, 5)->setForeground(brush);
-				peakstablemodel->item(i, 5)->setText(peak->description.substr(peak->description.find(':') + 2).c_str());
+				peakstablemodel->setItem(i, currentcolumn, new QStandardItem());
+				peakstablemodel->item(i, currentcolumn)->setForeground(brush);
+				peakstablemodel->item(i, currentcolumn)->setText(peak->description.substr(peak->description.find(':') + 2).c_str());
+				currentcolumn++;
 			}
 		}
 
@@ -1274,19 +1384,40 @@ void cSpectrumDetailWidget::preparePeaksTable() {
 	}
 
 	// unmatched experimental peaks
-	for (int i = thpeakscount; i < thpeakscount + theoreticalspectrum->getUnmatchedPeaks()->size(); i++) {
-		peak = &((*(theoreticalspectrum->getUnmatchedPeaks()))[i - thpeakscount]);
+	int numberofexperimentalpeaks = theoreticalspectrum->getExperimentalSpectrum().size();
+	int currentrow = thpeakscount;
+	for (int i = 0; i < numberofexperimentalpeaks; i++) {
+		peak = &(theoreticalspectrum->getExperimentalSpectrum()[i]);
 
-		peakstablemodel->setItem(i, 2, new QStandardItem());
-		peakstablemodel->item(i, 2)->setData(QVariant::fromValue(cropPrecisionToSixDecimalsByteArray(peak->mzratio)), Qt::DisplayRole);
+		if (peak->matched > 0) {
+			continue;
+		}
 
-		peakstablemodel->setItem(i, 3, new QStandardItem());
-		peakstablemodel->item(i, 3)->setData(QVariant::fromValue(cropPrecisionToSixDecimalsByteArray(peak->intensity)), Qt::DisplayRole);
+		if ((parameters->mode == dereplication) && (parameters->generateisotopepattern)) {
+			currentcolumn = 3;
+		} 
+		else {
+			currentcolumn = 2;
+		}
 
-		progress.setValue(i);
+		peakstablemodel->setItem(currentrow, currentcolumn, new QStandardItem());
+		peakstablemodel->item(currentrow, currentcolumn)->setData(QVariant::fromValue(cropPrecisionToSixDecimalsByteArray(peak->mzratio)), Qt::DisplayRole);
+		currentcolumn++;
+
+		peakstablemodel->setItem(currentrow, currentcolumn, new QStandardItem());
+		peakstablemodel->item(currentrow, currentcolumn)->setData(QVariant::fromValue(cropPrecisionToSixDecimalsByteArray(peak->relativeintensity)), Qt::DisplayRole);
+		currentcolumn++;
+
+		peakstablemodel->setItem(currentrow, currentcolumn, new QStandardItem());
+		peakstablemodel->item(currentrow, currentcolumn)->setData(QVariant::fromValue(cropDecimalsByteArray(peak->absoluteintensity)), Qt::DisplayRole);
+		currentcolumn++;
+
+		progress.setValue(currentrow);
 		//if (progress.wasCanceled()) {
 		//	break;
 		//}
+
+		currentrow++;
 	}
 
 	proxymodel->setSourceModel(peakstablemodel);
@@ -1297,7 +1428,16 @@ void cSpectrumDetailWidget::preparePeaksTable() {
 		peakstable->resizeColumnToContents(i);
 	}
 
-	progress.setValue(thpeakscount + theoreticalspectrum->getUnmatchedPeaks()->size());
+	if (parameters->mode == dereplication) {
+		if (parameters->generateisotopepattern) {
+			peakstable->setColumnWidth(7, min(400, peakstable->columnWidth(7)));
+		}
+		else {
+			peakstable->setColumnWidth(6, min(400, peakstable->columnWidth(6)));
+		}
+	}
+
+	progress.setValue(thpeakscount + theoreticalspectrum->getUnmatchedPeaksCount());
 
 	tablematches.clear();
 
@@ -1567,12 +1707,14 @@ void cSpectrumDetailWidget::exportTableToCSV() {
 		out << endl;
 
 		QStandardItem* item;
+		string str;
 		for (int i = 0; i < proxymodel->rowCount(); i++) {
 
 			for (int j = 0; j < peakstablemodel->columnCount(); j++) {
 				item = peakstablemodel->itemFromIndex(proxymodel->mapToSource(proxymodel->index(i, j)));
 				if (item) {
-					out << "\"" << item->data(Qt::DisplayRole).toString() << "\"";
+					str = item->data(Qt::DisplayRole).toString().toStdString();
+					out << "\"" << stripHTML(str).c_str() << "\"";
 					if (j < peakstablemodel->columnCount() - 1) {
 						out << ",";
 					}

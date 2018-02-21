@@ -5,10 +5,10 @@
 
 
 cImzML::cImzML() {
-	XMLPlatformUtils::Initialize();
 	profilespectra = false;
 	use_64bit_precision = false;
-	continuous = false;
+
+	imzmlitems.clear();
 
 	parser = new XercesDOMParser();
 	document = 0;
@@ -17,73 +17,71 @@ cImzML::cImzML() {
 
 cImzML::~cImzML() {
 	delete parser;
-	XMLPlatformUtils::Terminate();
 }
 
 
-void cImzML::parse(string& filename) {
+int cImzML::parse(string& filename, int& maxcountx, int& maxcounty, eVendorType& vendor) {
 
 	parser->parse(filename.c_str());
 	document = parser->getDocument();
 
 	DOMElement* root = document->getDocumentElement();
 	if (!root) {
-		return;
+		return 0;
 	}
 
 	profilespectra = false;
 	use_64bit_precision = false;
-	continuous = false;
+	maxcountx = 1;
+	maxcounty = 1;
+	vendor = unknownvendor;
 
 	// childrens of mzML
-	for (XMLSize_t i = 0; i < root->getChildNodes()->getLength(); i++) {
+	DOMNode* currentNode1 = root->getFirstChild();
+	while (currentNode1) {
 		
-		DOMNode* currentNode1 = root->getChildNodes()->item(i);
-		if (currentNode1->getNodeType() && currentNode1->getNodeType() == DOMNode::ELEMENT_NODE) {
+		
+		if (currentNode1->getNodeType() == DOMNode::ELEMENT_NODE) {
 			
 			DOMElement* currentElement1 = dynamic_cast<xercesc::DOMElement*>(currentNode1);
 
-
-			if (XMLString::equals(currentElement1->getTagName(), XMLString::transcode("fileDescription"))) {
+			if (compareElementTagName(currentElement1, "fileDescription")) {
 
 
 				// childrens of fileDescription
-				for (XMLSize_t j = 0; j < currentNode1->getChildNodes()->getLength(); j++) {
+				DOMNode* currentNode2 = currentNode1->getFirstChild();
+				while (currentNode2) {
 
-					DOMNode* currentNode2 = currentNode1->getChildNodes()->item(j);
-					if (currentNode2->getNodeType() && currentNode2->getNodeType() == DOMNode::ELEMENT_NODE) {
+					
+					if (currentNode2->getNodeType() == DOMNode::ELEMENT_NODE) {
 			
 						DOMElement* currentElement2 = dynamic_cast<xercesc::DOMElement*>(currentNode2);
-						if (XMLString::equals(currentElement2->getTagName(), XMLString::transcode("fileContent"))) {
+						if (compareElementTagName(currentElement2, "fileContent")) {
 						
 								
 							// childrens of fileContent
-							for (XMLSize_t k = 0; k < currentNode2->getChildNodes()->getLength(); k++) {
+							DOMNode* currentNode3 = currentNode2->getFirstChild();
+							while (currentNode3) {
 
-								DOMNode* currentNode3 = currentNode2->getChildNodes()->item(k);
-								if (currentNode3->getNodeType() && currentNode3->getNodeType() == DOMNode::ELEMENT_NODE) {
+								
+								if (currentNode3->getNodeType() == DOMNode::ELEMENT_NODE) {
 			
 									DOMElement* currentElement3 = dynamic_cast<xercesc::DOMElement*>(currentNode3);
-									if (XMLString::equals(currentElement3->getTagName(), XMLString::transcode("cvParam"))) {
+									if (compareElementTagName(currentElement3, "cvParam")) {
 											
-										const XMLCh* xmlch_name = currentElement3->getAttribute(XMLString::transcode("name"));
-										string name = XMLString::transcode(xmlch_name);
+										string accession = getAttribute(currentElement3, "accession");
 
-										if (name.compare("continuous") == 0) {											
-
-											continuous = true;
-
-										}
-
-										if (name.compare("profile spectrum") == 0) {											
-
+										// profile spectrum
+										if (accession.compare("MS:1000128") == 0) {											
 											profilespectra = true;
-
 										}
 
 									}
 
 								}
+
+
+								currentNode3 = currentNode3->getNextSibling();
 
 							}
 
@@ -92,49 +90,60 @@ void cImzML::parse(string& filename) {
 
 					}
 
+
+					currentNode2 = currentNode2->getNextSibling();
+
 				}
 
 			}
 
 
-			if (XMLString::equals(currentElement1->getTagName(), XMLString::transcode("referenceableParamGroupList"))) {
+			if (compareElementTagName(currentElement1, "referenceableParamGroupList")) {
 
 
 				// childrens of referenceableParamGroupList
-				for (XMLSize_t j = 0; j < currentNode1->getChildNodes()->getLength(); j++) {
+				DOMNode* currentNode2 = currentNode1->getFirstChild();
+				while (currentNode2) {
 
-					DOMNode* currentNode2 = currentNode1->getChildNodes()->item(j);
-					if (currentNode2->getNodeType() && currentNode2->getNodeType() == DOMNode::ELEMENT_NODE) {
+					
+					if (currentNode2->getNodeType() == DOMNode::ELEMENT_NODE) {
 			
 						DOMElement* currentElement2 = dynamic_cast<xercesc::DOMElement*>(currentNode2);
-						if (XMLString::equals(currentElement2->getTagName(), XMLString::transcode("referenceableParamGroup"))) {
+						if (compareElementTagName(currentElement2, "referenceableParamGroup")) {
 
-							const XMLCh* xmlch_id = currentElement2->getAttribute(XMLString::transcode("id"));
-							string id = XMLString::transcode(xmlch_id);
+							string id = getAttribute(currentElement2, "id");
 							
 							if (id.compare("mzArray") == 0) {			
 									
 								
 								// childrens of referenceableParamGroup
-								for (XMLSize_t k = 0; k < currentNode2->getChildNodes()->getLength(); k++) {
+								DOMNode* currentNode3 = currentNode2->getFirstChild();
+								while (currentNode3) {
 
-									DOMNode* currentNode3 = currentNode2->getChildNodes()->item(k);
-									if (currentNode3->getNodeType() && currentNode3->getNodeType() == DOMNode::ELEMENT_NODE) {
+									
+									if (currentNode3->getNodeType() == DOMNode::ELEMENT_NODE) {
 			
 										DOMElement* currentElement3 = dynamic_cast<xercesc::DOMElement*>(currentNode3);
-										if (XMLString::equals(currentElement3->getTagName(), XMLString::transcode("cvParam"))) {
+										if (compareElementTagName(currentElement3, "cvParam")) {
 											
-											const XMLCh* xmlch_name = currentElement3->getAttribute(XMLString::transcode("name"));
-											string name = XMLString::transcode(xmlch_name);
-											if (name.compare("64-bit float") == 0) {											
+											string accession = getAttribute(currentElement3, "accession");
 
+											// 64-bit float
+											if (accession.compare("MS:1000523") == 0) {											
 												use_64bit_precision = true;
+											}
 
+											// zlib compression detected
+											if (accession.compare("MS:1000574") == 0) {
+												return 1;
 											}
 
 										}
 
 									}
+
+
+									currentNode3 = currentNode3->getNextSibling();
 
 								}
 
@@ -145,25 +154,28 @@ void cImzML::parse(string& filename) {
 									
 								
 								// childrens of referenceableParamGroup
-								for (XMLSize_t k = 0; k < currentNode2->getChildNodes()->getLength(); k++) {
+								DOMNode* currentNode3 = currentNode2->getFirstChild();
+								while (currentNode3) {
 
-									DOMNode* currentNode3 = currentNode2->getChildNodes()->item(k);
-									if (currentNode3->getNodeType() && currentNode3->getNodeType() == DOMNode::ELEMENT_NODE) {
+									
+									if (currentNode3->getNodeType() == DOMNode::ELEMENT_NODE) {
 			
 										DOMElement* currentElement3 = dynamic_cast<xercesc::DOMElement*>(currentNode3);
-										if (XMLString::equals(currentElement3->getTagName(), XMLString::transcode("cvParam"))) {
+										if (compareElementTagName(currentElement3, "cvParam")) {
 											
-											const XMLCh* xmlch_name = currentElement3->getAttribute(XMLString::transcode("name"));
-											string name = XMLString::transcode(xmlch_name);
-											if (name.compare("profile spectrum") == 0) {
+											string accession = getAttribute(currentElement3, "accession");
 
+											// profile spectrum
+											if (accession.compare("MS:1000128") == 0) {
 												profilespectra = true;
-
 											}											
 
 										}
 
 									}
+
+
+									currentNode3 = currentNode3->getNextSibling();
 
 								}
 
@@ -174,84 +186,215 @@ void cImzML::parse(string& filename) {
 
 					}
 
+
+					currentNode2 = currentNode2->getNextSibling();
+
 				}
 
 
 			}
 
 
-			if (XMLString::equals(currentElement1->getTagName(), XMLString::transcode("run"))) {
+			if (compareElementTagName(currentElement1, "softwareList")) {
+
+
+				// childrens of scanSettingsList
+				DOMNode* currentNode2 = currentNode1->getFirstChild();
+				while (currentNode2) {
+
+
+					if (currentNode2->getNodeType() == DOMNode::ELEMENT_NODE) {
+
+						DOMElement* currentElement2 = dynamic_cast<xercesc::DOMElement*>(currentNode2);
+						if (compareElementTagName(currentElement2, "software")) {
+
+
+							// childrens of scanSettings
+							DOMNode* currentNode3 = currentNode2->getFirstChild();
+							while (currentNode3) {
+
+
+								if (currentNode3->getNodeType() == DOMNode::ELEMENT_NODE) {
+
+									DOMElement* currentElement3 = dynamic_cast<xercesc::DOMElement*>(currentNode3);
+									if (compareElementTagName(currentElement3, "cvParam")) {
+
+										string accession = getAttribute(currentElement3, "accession");
+
+										// Bruker software
+										if (accession.compare("MS:1000692") == 0) {
+											vendor = bruker;
+										}
+
+										// MassLynx
+										if (accession.compare("MS:1000534") == 0) {
+											vendor = waters;
+										}
+
+									}
+
+								}
+
+
+								currentNode3 = currentNode3->getNextSibling();
+
+							}
+
+
+						}
+						
+
+					}
+
+
+					currentNode2 = currentNode2->getNextSibling();
+
+				}
+
+
+			}
+
+
+			if (compareElementTagName(currentElement1, "scanSettingsList")) {
+
+
+				// childrens of scanSettingsList
+				DOMNode* currentNode2 = currentNode1->getFirstChild();
+				while (currentNode2) {
+
+
+					if (currentNode2->getNodeType() == DOMNode::ELEMENT_NODE) {
+
+						DOMElement* currentElement2 = dynamic_cast<xercesc::DOMElement*>(currentNode2);
+						if (compareElementTagName(currentElement2, "scanSettings")) {
+
+
+							// childrens of scanSettings
+							DOMNode* currentNode3 = currentNode2->getFirstChild();
+							while (currentNode3) {
+
+
+								if (currentNode3->getNodeType() == DOMNode::ELEMENT_NODE) {
+
+									DOMElement* currentElement3 = dynamic_cast<xercesc::DOMElement*>(currentNode3);
+									if (compareElementTagName(currentElement3, "cvParam")) {
+
+										string accession = getAttribute(currentElement3, "accession");
+										string value = getAttribute(currentElement3, "value");
+
+										// max count of pixel x
+										if (accession.compare("IMS:1000042") == 0) {
+											maxcountx = stoi(value);
+										}
+
+										// max count of pixel y
+										if (accession.compare("IMS:1000043") == 0) {
+											maxcounty = stoi(value);
+										}
+
+									}
+
+								}
+
+
+								currentNode3 = currentNode3->getNextSibling();
+
+							}
+
+
+						}
+
+
+					}
+
+
+					currentNode2 = currentNode2->getNextSibling();
+
+				}
+
+
+			}
+
+
+			if (compareElementTagName(currentElement1, "run")) {
 
 
 				// childrens of run
-				for (XMLSize_t j = 0; j < currentNode1->getChildNodes()->getLength(); j++) {
+				DOMNode* currentNode2 = currentNode1->getFirstChild();
+				while (currentNode2) {
 
-					DOMNode* currentNode2 = currentNode1->getChildNodes()->item(j);
-					if (currentNode2->getNodeType() && currentNode2->getNodeType() == DOMNode::ELEMENT_NODE) {
+					
+					if (currentNode2->getNodeType() == DOMNode::ELEMENT_NODE) {
 			
 						DOMElement* currentElement2 = dynamic_cast<xercesc::DOMElement*>(currentNode2);
-						if (XMLString::equals(currentElement2->getTagName(), XMLString::transcode("spectrumList"))) {
+						if (compareElementTagName(currentElement2, "spectrumList")) {
 
 
 							// childrens of spectrumList
-							for (XMLSize_t k = 0; k < currentNode2->getChildNodes()->getLength(); k++) {
+							DOMNode* currentNode3 = currentNode2->getFirstChild();
+							while (currentNode3) {
 
-								DOMNode* currentNode3 = currentNode2->getChildNodes()->item(k);
-								if (currentNode3->getNodeType() && currentNode3->getNodeType() == DOMNode::ELEMENT_NODE) {
+
+								if (currentNode3->getNodeType() == DOMNode::ELEMENT_NODE) {
 			
 									DOMElement* currentElement3 = dynamic_cast<xercesc::DOMElement*>(currentNode3);
-									if (XMLString::equals(currentElement3->getTagName(), XMLString::transcode("spectrum"))) {
+									if (compareElementTagName(currentElement3, "spectrum")) {
 
 
 										cImzMLItem imzmlitem;
+										imzmlitem.title = getAttribute(currentElement3, "id");
 
 
 										// childrens of spectrum
-										for (XMLSize_t l = 0; l < currentNode3->getChildNodes()->getLength(); l++) {
+										DOMNode* currentNode4 = currentNode3->getFirstChild();
+										while (currentNode4) {
 
-											DOMNode* currentNode4 = currentNode3->getChildNodes()->item(l);
-											if (currentNode4->getNodeType() && currentNode4->getNodeType() == DOMNode::ELEMENT_NODE) {
+											
+											if (currentNode4->getNodeType() == DOMNode::ELEMENT_NODE) {
 			
 												DOMElement* currentElement4 = dynamic_cast<xercesc::DOMElement*>(currentNode4);
-												if (XMLString::equals(currentElement4->getTagName(), XMLString::transcode("scanList"))) {
+												if (compareElementTagName(currentElement4, "scanList")) {
 
 
 													// childrens of scanList
-													for (XMLSize_t m = 0; m < currentNode4->getChildNodes()->getLength(); m++) {
+													DOMNode* currentNode5 = currentNode4->getFirstChild();
+													while (currentNode5) {
 
-														DOMNode* currentNode5 = currentNode4->getChildNodes()->item(m);
-														if (currentNode5->getNodeType() && currentNode5->getNodeType() == DOMNode::ELEMENT_NODE) {
+														
+														if (currentNode5->getNodeType() == DOMNode::ELEMENT_NODE) {
 			
 															DOMElement* currentElement5 = dynamic_cast<xercesc::DOMElement*>(currentNode5);
-															if (XMLString::equals(currentElement5->getTagName(), XMLString::transcode("scan"))) {
+															if (compareElementTagName(currentElement5, "scan")) {
 
 
 																// childrens of scan
-																for (XMLSize_t n = 0; n < currentNode5->getChildNodes()->getLength(); n++) {
+																DOMNode* currentNode6 = currentNode5->getFirstChild();
+																while (currentNode6) {
 
-																	DOMNode* currentNode6 = currentNode5->getChildNodes()->item(n);
-																	if (currentNode6->getNodeType() && currentNode6->getNodeType() == DOMNode::ELEMENT_NODE) {
+																	
+																	if (currentNode6->getNodeType() == DOMNode::ELEMENT_NODE) {
 			
 																		DOMElement* currentElement6 = dynamic_cast<xercesc::DOMElement*>(currentNode6);
-																		if (XMLString::equals(currentElement6->getTagName(), XMLString::transcode("cvParam"))) {
+																		if (compareElementTagName(currentElement6, "cvParam")) {
 
+																			string accession = getAttribute(currentElement6, "accession");
 
-																			const XMLCh* xmlch_name = currentElement6->getAttribute(XMLString::transcode("name"));
-																			string name = XMLString::transcode(xmlch_name);
-
-																			const XMLCh* xmlch_value = currentElement6->getAttribute(XMLString::transcode("value"));
-																			if (name.compare("position x") == 0) {			
-																				imzmlitem.x = atoi(XMLString::transcode(xmlch_value));
+																			// position x
+																			if (accession.compare("IMS:1000050") == 0) {			
+																				imzmlitem.x = atoi(getAttribute(currentElement6, "value").c_str());
 																			}
-
-																			if (name.compare("position y") == 0) {
-																				imzmlitem.y = atoi(XMLString::transcode(xmlch_value));
+																			
+																			// position y
+																			if (accession.compare("IMS:1000051") == 0) {
+																				imzmlitem.y = atoi(getAttribute(currentElement6, "value").c_str());
 																			}
-
 																			
 																		}
 
 																	}
+
+
+																	currentNode6 = currentNode6->getNextSibling();
 
 																}
 
@@ -260,64 +403,75 @@ void cImzML::parse(string& filename) {
 
 														}
 
+
+														currentNode5 = currentNode5->getNextSibling();
+
 													}
 
 
 												}
 
-												if (XMLString::equals(currentElement4->getTagName(), XMLString::transcode("binaryDataArrayList"))) {
+												if (compareElementTagName(currentElement4, "binaryDataArrayList")) {
 
 
 													// childrens of binaryDataArrayList
-													for (XMLSize_t m = 0; m < currentNode4->getChildNodes()->getLength(); m++) {
+													DOMNode* currentNode5 = currentNode4->getFirstChild();
+													while (currentNode5) {
 
-														DOMNode* currentNode5 = currentNode4->getChildNodes()->item(m);
-														if (currentNode5->getNodeType() && currentNode5->getNodeType() == DOMNode::ELEMENT_NODE) {
+														
+														if (currentNode5->getNodeType() == DOMNode::ELEMENT_NODE) {
 			
 															DOMElement* currentElement5 = dynamic_cast<xercesc::DOMElement*>(currentNode5);
-															if (XMLString::equals(currentElement5->getTagName(), XMLString::transcode("binaryDataArray"))) {
+															if (compareElementTagName(currentElement5, "binaryDataArray")) {
 
 
 																// childrens of binaryDataArray
 																bool mzarray = false;
+																bool intensityarray = false;
 																unsigned long long offset = 0;
 																unsigned long long length = 0;
-																for (XMLSize_t n = 0; n < currentNode5->getChildNodes()->getLength(); n++) {
 
-																	DOMNode* currentNode6 = currentNode5->getChildNodes()->item(n);
-																	if (currentNode6->getNodeType() && currentNode6->getNodeType() == DOMNode::ELEMENT_NODE) {
+																DOMNode* currentNode6 = currentNode5->getFirstChild();
+																while (currentNode6) {
+
+																	
+																	if (currentNode6->getNodeType() == DOMNode::ELEMENT_NODE) {
 			
 																		DOMElement* currentElement6 = dynamic_cast<xercesc::DOMElement*>(currentNode6);
-																		if (XMLString::equals(currentElement6->getTagName(), XMLString::transcode("cvParam"))) {
+																		if (compareElementTagName(currentElement6, "referenceableParamGroupRef")) {
 
-
-																			const XMLCh* xmlch_name = currentElement6->getAttribute(XMLString::transcode("name"));
-																			string name = XMLString::transcode(xmlch_name);
-
-																			const XMLCh* xmlch_value = currentElement6->getAttribute(XMLString::transcode("value"));
-																			if (name.compare("external offset") == 0) {			
-																				offset = stoull(XMLString::transcode(xmlch_value));
-																			}
-
-																			if (name.compare("external encoded length") == 0) {
-																				length = stoull(XMLString::transcode(xmlch_value));
-																			}
-
-																			
-																		}
-
-																		if (XMLString::equals(currentElement6->getTagName(), XMLString::transcode("referenceableParamGroupRef"))) {
-
-																			const XMLCh* xmlch_ref = currentElement6->getAttribute(XMLString::transcode("ref"));
-																			string ref = XMLString::transcode(xmlch_ref);
+																			string ref = getAttribute(currentElement6, "ref");
 
 																			if (ref.compare("mzArray") == 0) {
 																				mzarray = true;
 																			}
 
+																			if ((ref.compare("intensities") == 0) || (ref.compare("intensityArray") == 0)){
+																				intensityarray = true;
+																			}
+
+																		}
+
+																		if (compareElementTagName(currentElement6, "cvParam")) {
+
+																			string accession = getAttribute(currentElement6, "accession");
+
+																			// external offset
+																			if (accession.compare("IMS:1000102") == 0) {			
+																				offset = stoull(getAttribute(currentElement6, "value"));
+																			}
+
+																			// external encoded length
+																			if (accession.compare("IMS:1000104") == 0) {
+																				length = stoull(getAttribute(currentElement6, "value"));
+																			}
+																			
 																		}
 
 																	}
+
+
+																	currentNode6 = currentNode6->getNextSibling();
 
 																}
 
@@ -325,7 +479,8 @@ void cImzML::parse(string& filename) {
 																	imzmlitem.mzstart = offset;
 																	imzmlitem.mzlength = length;
 																}
-																else {
+
+																if (intensityarray) {
 																	imzmlitem.intensitystart = offset;
 																	imzmlitem.intensitylength = length;
 																}
@@ -334,12 +489,18 @@ void cImzML::parse(string& filename) {
 
 														}
 
+
+														currentNode5 = currentNode5->getNextSibling();
+
 													}
 
 
 												}
 
 											}
+
+
+											currentNode4 = currentNode4->getNextSibling();
 
 										}
 
@@ -351,12 +512,18 @@ void cImzML::parse(string& filename) {
 
 								}
 
+
+								currentNode3 = currentNode3->getNextSibling();
+
 							}
 
 							
 						}
 
 					}
+
+
+					currentNode2 = currentNode2->getNextSibling();
 
 				}
 
@@ -365,12 +532,17 @@ void cImzML::parse(string& filename) {
 
 		}
 
+
+		currentNode1 = currentNode1->getNextSibling();
+
 	}
+
+	return 0;
 
 }
 
 
-void cImzML::updateRawDataToPeakList(vector<cPeaksList>& peaklists) {
+void cImzML::updateRawDataToPeakList(vector<cPeaksList>& peaklists, string& convertedibdfilename) {
 
 	if (!document) {
 		return;
@@ -390,56 +562,70 @@ void cImzML::updateRawDataToPeakList(vector<cPeaksList>& peaklists) {
 	}
 
 	// childrens of mzML
-	for (XMLSize_t i = 0; i < root->getChildNodes()->getLength(); i++) {
+	DOMNode* currentNode1 = root->getFirstChild();
+	while (currentNode1) {
 		
-		DOMNode* currentNode1 = root->getChildNodes()->item(i);
-		if (currentNode1->getNodeType() && currentNode1->getNodeType() == DOMNode::ELEMENT_NODE) {
+		
+		if (currentNode1->getNodeType() == DOMNode::ELEMENT_NODE) {
 			
 			DOMElement* currentElement1 = dynamic_cast<xercesc::DOMElement*>(currentNode1);
 
 
-			if (XMLString::equals(currentElement1->getTagName(), XMLString::transcode("fileDescription"))) {
+			if (compareElementTagName(currentElement1, "fileDescription")) {
 
 
 				// childrens of fileDescription
-				for (XMLSize_t j = 0; j < currentNode1->getChildNodes()->getLength(); j++) {
+				DOMNode* currentNode2 = currentNode1->getFirstChild();
+				while (currentNode2) {
 
-					DOMNode* currentNode2 = currentNode1->getChildNodes()->item(j);
-					if (currentNode2->getNodeType() && currentNode2->getNodeType() == DOMNode::ELEMENT_NODE) {
+					
+					if (currentNode2->getNodeType() == DOMNode::ELEMENT_NODE) {
 			
 						DOMElement* currentElement2 = dynamic_cast<xercesc::DOMElement*>(currentNode2);
-						if (XMLString::equals(currentElement2->getTagName(), XMLString::transcode("fileContent"))) {
+						if (compareElementTagName(currentElement2, "fileContent")) {
 						
 								
 							// childrens of fileContent
-							for (XMLSize_t k = 0; k < currentNode2->getChildNodes()->getLength(); k++) {
+							DOMNode* currentNode3 = currentNode2->getFirstChild();
+							while (currentNode3) {
 
-								DOMNode* currentNode3 = currentNode2->getChildNodes()->item(k);
-								if (currentNode3->getNodeType() && currentNode3->getNodeType() == DOMNode::ELEMENT_NODE) {
+								
+								if (currentNode3->getNodeType() == DOMNode::ELEMENT_NODE) {
 			
 									DOMElement* currentElement3 = dynamic_cast<xercesc::DOMElement*>(currentNode3);
-									if (XMLString::equals(currentElement3->getTagName(), XMLString::transcode("cvParam"))) {
+									if (compareElementTagName(currentElement3, "cvParam")) {
 											
-										const XMLCh* xmlch_name = currentElement3->getAttribute(XMLString::transcode("name"));
-										string name = XMLString::transcode(xmlch_name);
+										string accession = getAttribute(currentElement3, "accession");
 
-										if (name.compare("continuous") == 0) {											
-
-											currentElement3->setAttribute(XMLString::transcode("accession"), XMLString::transcode("IMS:1000031"));
-											currentElement3->setAttribute(XMLString::transcode("name"), XMLString::transcode("processed"));
-
+										// continuous
+										if (accession.compare("IMS:1000030") == 0) {
+											setAttribute(currentElement3, "accession", "IMS:1000031");
+											setAttribute(currentElement3, "name", "processed");
 										}
 
-										if (name.compare("profile spectrum") == 0) {											
+										// profile spectrum
+										if (accession.compare("MS:1000128") == 0) {											
+											setAttribute(currentElement3, "accession", "MS:1000127");
+											setAttribute(currentElement3, "name", "centroid spectrum");
+										}
 
-											currentElement3->setAttribute(XMLString::transcode("accession"), XMLString::transcode("MS:1000127"));
-											currentElement3->setAttribute(XMLString::transcode("name"), XMLString::transcode("centroid spectrum"));
-
+										// MD5 checksum
+										if (accession.compare("IMS:1000090") == 0) {
+											QFile ibd(convertedibdfilename.c_str());
+											if (ibd.open(QFile::ReadOnly)) {
+												QCryptographicHash hash(QCryptographicHash::Md5);
+												if (hash.addData(&ibd)) {
+													setAttribute(currentElement3, "value", hash.result().toHex().toUpper());
+												}
+											}
 										}
 
 									}
 
 								}
+
+
+								currentNode3 = currentNode3->getNextSibling();
 
 							}
 
@@ -448,50 +634,56 @@ void cImzML::updateRawDataToPeakList(vector<cPeaksList>& peaklists) {
 
 					}
 
+
+					currentNode2 = currentNode2->getNextSibling();
+
 				}
 
 			}
 
 
-			if (XMLString::equals(currentElement1->getTagName(), XMLString::transcode("referenceableParamGroupList"))) {
+			if (compareElementTagName(currentElement1, "referenceableParamGroupList")) {
 
 
 				// childrens of referenceableParamGroupList
-				for (XMLSize_t j = 0; j < currentNode1->getChildNodes()->getLength(); j++) {
+				DOMNode* currentNode2 = currentNode1->getFirstChild();
+				while (currentNode2) {
 
-					DOMNode* currentNode2 = currentNode1->getChildNodes()->item(j);
-					if (currentNode2->getNodeType() && currentNode2->getNodeType() == DOMNode::ELEMENT_NODE) {
+					
+					if (currentNode2->getNodeType() == DOMNode::ELEMENT_NODE) {
 			
 						DOMElement* currentElement2 = dynamic_cast<xercesc::DOMElement*>(currentNode2);
-						if (XMLString::equals(currentElement2->getTagName(), XMLString::transcode("referenceableParamGroup"))) {
+						if (compareElementTagName(currentElement2, "referenceableParamGroup")) {
 
-							const XMLCh* xmlch_id = currentElement2->getAttribute(XMLString::transcode("id"));
-							string id = XMLString::transcode(xmlch_id);
+							string id = getAttribute(currentElement2, "id");
 							
 							if (id.compare("spectrum") == 0) {			
 									
 								
 								// childrens of referenceableParamGroup
-								for (XMLSize_t k = 0; k < currentNode2->getChildNodes()->getLength(); k++) {
+								DOMNode* currentNode3 = currentNode2->getFirstChild();
+								while (currentNode3) {
 
-									DOMNode* currentNode3 = currentNode2->getChildNodes()->item(k);
-									if (currentNode3->getNodeType() && currentNode3->getNodeType() == DOMNode::ELEMENT_NODE) {
+									
+									if (currentNode3->getNodeType() == DOMNode::ELEMENT_NODE) {
 			
 										DOMElement* currentElement3 = dynamic_cast<xercesc::DOMElement*>(currentNode3);
-										if (XMLString::equals(currentElement3->getTagName(), XMLString::transcode("cvParam"))) {
+										if (compareElementTagName(currentElement3, "cvParam")) {
 											
-											const XMLCh* xmlch_name = currentElement3->getAttribute(XMLString::transcode("name"));
-											string name = XMLString::transcode(xmlch_name);
-											if (name.compare("profile spectrum") == 0) {
+											string accession = getAttribute(currentElement3, "accession");
 
-												currentElement3->setAttribute(XMLString::transcode("accession"), XMLString::transcode("MS:1000127"));
-												currentElement3->setAttribute(XMLString::transcode("name"), XMLString::transcode("centroid spectrum"));
-
+											// profile spectrum
+											if (accession.compare("MS:1000128") == 0) {
+												setAttribute(currentElement3, "accession", "MS:1000127");
+												setAttribute(currentElement3, "name", "centroid spectrum");
 											}											
 
 										}
 
 									}
+
+
+									currentNode3 = currentNode3->getNextSibling();
 
 								}
 
@@ -502,132 +694,148 @@ void cImzML::updateRawDataToPeakList(vector<cPeaksList>& peaklists) {
 
 					}
 
+
+					currentNode2 = currentNode2->getNextSibling();
+
 				}
 
 
 			}
 
 
-			if (XMLString::equals(currentElement1->getTagName(), XMLString::transcode("run"))) {
+			if (compareElementTagName(currentElement1, "run")) {
 
 
 				// childrens of run
-				for (XMLSize_t j = 0; j < currentNode1->getChildNodes()->getLength(); j++) {
+				DOMNode* currentNode2 = currentNode1->getFirstChild();
+				while (currentNode2) {
 
-					DOMNode* currentNode2 = currentNode1->getChildNodes()->item(j);
-					if (currentNode2->getNodeType() && currentNode2->getNodeType() == DOMNode::ELEMENT_NODE) {
+					
+					if (currentNode2->getNodeType() == DOMNode::ELEMENT_NODE) {
 			
 						DOMElement* currentElement2 = dynamic_cast<xercesc::DOMElement*>(currentNode2);
-						if (XMLString::equals(currentElement2->getTagName(), XMLString::transcode("spectrumList"))) {
+						if (compareElementTagName(currentElement2, "spectrumList")) {
 
 
 							// childrens of spectrumList
-							for (XMLSize_t k = 0; k < currentNode2->getChildNodes()->getLength(); k++) {
+							DOMNode* currentNode3 = currentNode2->getFirstChild();
+							while (currentNode3) {
 
-								DOMNode* currentNode3 = currentNode2->getChildNodes()->item(k);
-								if (currentNode3->getNodeType() && currentNode3->getNodeType() == DOMNode::ELEMENT_NODE) {
+								
+								if (currentNode3->getNodeType() == DOMNode::ELEMENT_NODE) {
 			
 									DOMElement* currentElement3 = dynamic_cast<xercesc::DOMElement*>(currentNode3);
-									if (XMLString::equals(currentElement3->getTagName(), XMLString::transcode("spectrum"))) {
+									if (compareElementTagName(currentElement3, "spectrum")) {
 
 
 										// childrens of spectrum
-										for (XMLSize_t l = 0; l < currentNode3->getChildNodes()->getLength(); l++) {
+										DOMNode* currentNode4 = currentNode3->getFirstChild();
+										while (currentNode4) {
 
-											DOMNode* currentNode4 = currentNode3->getChildNodes()->item(l);
-											if (currentNode4->getNodeType() && currentNode4->getNodeType() == DOMNode::ELEMENT_NODE) {
+											
+											if (currentNode4->getNodeType() == DOMNode::ELEMENT_NODE) {
 			
 												DOMElement* currentElement4 = dynamic_cast<xercesc::DOMElement*>(currentNode4);
-												if (XMLString::equals(currentElement4->getTagName(), XMLString::transcode("cvParam"))) {
+												if (compareElementTagName(currentElement4, "cvParam")) {
 
+													string accession = getAttribute(currentElement4, "accession");
 
-													const XMLCh* xmlch_name = currentElement4->getAttribute(XMLString::transcode("name"));
-													string name = XMLString::transcode(xmlch_name);
-													if (name.compare("profile spectrum") == 0) {
-												
-														currentElement4->setAttribute(XMLString::transcode("accession"), XMLString::transcode("MS:1000127"));
-														currentElement4->setAttribute(XMLString::transcode("name"), XMLString::transcode("centroid spectrum"));
-
+													// profile spectrum
+													if (accession.compare("MS:1000128") == 0) {											
+														setAttribute(currentElement4, "accession", "MS:1000127");
+														setAttribute(currentElement4, "name", "centroid spectrum");
 													}
-
 
 												}
 
-												if (XMLString::equals(currentElement4->getTagName(), XMLString::transcode("binaryDataArrayList"))) {
+												if (compareElementTagName(currentElement4, "binaryDataArrayList")) {
 
 
 													// childrens of binaryDataArrayList
-													for (XMLSize_t m = 0; m < currentNode4->getChildNodes()->getLength(); m++) {
+													DOMNode* currentNode5 = currentNode4->getFirstChild();
+													while (currentNode5) {
 
-														DOMNode* currentNode5 = currentNode4->getChildNodes()->item(m);
-														if (currentNode5->getNodeType() && currentNode5->getNodeType() == DOMNode::ELEMENT_NODE) {
+														
+														if (currentNode5->getNodeType() == DOMNode::ELEMENT_NODE) {
 			
 															DOMElement* currentElement5 = dynamic_cast<xercesc::DOMElement*>(currentNode5);
-															if (XMLString::equals(currentElement5->getTagName(), XMLString::transcode("binaryDataArray"))) {
+															if (compareElementTagName(currentElement5, "binaryDataArray")) {
 
 
 																// childrens of binaryDataArray
 																bool mzarray = false;
+																bool intensityarray = false;
 																unsigned long long length = 0;
-																for (XMLSize_t n = 0; n < currentNode5->getChildNodes()->getLength(); n++) {
 
-																	DOMNode* currentNode6 = currentNode5->getChildNodes()->item(n);
-																	if (currentNode6->getNodeType() && currentNode6->getNodeType() == DOMNode::ELEMENT_NODE) {
+																DOMNode* currentNode6 = currentNode5->getFirstChild();
+																while (currentNode6) {
+
+																	
+																	if (currentNode6->getNodeType() == DOMNode::ELEMENT_NODE) {
 
 			
 																		DOMElement* currentElement6 = dynamic_cast<xercesc::DOMElement*>(currentNode6);
-																		if (XMLString::equals(currentElement6->getTagName(), XMLString::transcode("referenceableParamGroupRef"))) {
+																		if (compareElementTagName(currentElement6, "referenceableParamGroupRef")) {
 
-																			const XMLCh* xmlch_ref = currentElement6->getAttribute(XMLString::transcode("ref"));
-																			string ref = XMLString::transcode(xmlch_ref);
+																			string ref = getAttribute(currentElement6, "ref");
 
 																			if (ref.compare("mzArray") == 0) {
 																				mzarray = true;
 																			}
 
+																			if ((ref.compare("intensities") == 0) || (ref.compare("intensityArray") == 0)) {
+																				intensityarray = true;
+																			}
+
 																		}
 
-																		if (XMLString::equals(currentElement6->getTagName(), XMLString::transcode("cvParam"))) {
+																		if (compareElementTagName(currentElement6, "cvParam")) {
 
-																			const XMLCh* xmlch_name = currentElement6->getAttribute(XMLString::transcode("name"));
-																			string name = XMLString::transcode(xmlch_name);
+																			string accession = getAttribute(currentElement6, "accession");
 
 																			if (mzarray) {
-																				if (name.compare("external offset") == 0) {
+																				// external offset
+																				if (accession.compare("IMS:1000102") == 0) {
 																					stringstream ss;
 																					ss << offset;
-																					currentElement6->setAttribute(XMLString::transcode("value"), XMLString::transcode(ss.str().c_str()));
+																					setAttribute(currentElement6, "value", ss.str().c_str());
 																				}
 
-																				if (name.compare("external encoded length") == 0) {
+																				// external encoded length
+																				if (accession.compare("IMS:1000104") == 0) {
 																					stringstream ss;
 																					ss << peaklists[currentid].size() * size;
-																					currentElement6->setAttribute(XMLString::transcode("value"), XMLString::transcode(ss.str().c_str()));
+																					setAttribute(currentElement6, "value", ss.str().c_str());
 																				}
 
-																				if (name.compare("external array length") == 0) {
+																				// external array length
+																				if (accession.compare("IMS:1000103") == 0) {
 																					stringstream ss;
 																					ss << peaklists[currentid].size();
-																					currentElement6->setAttribute(XMLString::transcode("value"), XMLString::transcode(ss.str().c_str()));
+																					setAttribute(currentElement6, "value", ss.str().c_str());
 																				}
 																			}
-																			else {
-																				if (name.compare("external offset") == 0) {			
+
+																			if (intensityarray) {
+																				// external offset
+																				if (accession.compare("IMS:1000102") == 0) {			
 																					stringstream ss;
 																					ss << offset + peaklists[currentid].size() * size;
-																					currentElement6->setAttribute(XMLString::transcode("value"), XMLString::transcode(ss.str().c_str()));
+																					setAttribute(currentElement6, "value", ss.str().c_str());
 																				}
 
-																				if (name.compare("external encoded length") == 0) {
+																				// external encoded length
+																				if (accession.compare("IMS:1000104") == 0) {
 																					stringstream ss;
 																					ss << peaklists[currentid].size() * size;
-																					currentElement6->setAttribute(XMLString::transcode("value"), XMLString::transcode(ss.str().c_str()));
+																					setAttribute(currentElement6, "value", ss.str().c_str());
 																				}
 
-																				if (name.compare("external array length") == 0) {
+																				// external array length
+																				if (accession.compare("IMS:1000103") == 0) {
 																					stringstream ss;
 																					ss << peaklists[currentid].size();
-																					currentElement6->setAttribute(XMLString::transcode("value"), XMLString::transcode(ss.str().c_str()));
+																					setAttribute(currentElement6, "value", ss.str().c_str());
 																				}
 																			}
 																			
@@ -636,6 +844,9 @@ void cImzML::updateRawDataToPeakList(vector<cPeaksList>& peaklists) {
 
 																	}
 
+
+																	currentNode6 = currentNode6->getNextSibling();
+
 																}
 
 
@@ -643,12 +854,18 @@ void cImzML::updateRawDataToPeakList(vector<cPeaksList>& peaklists) {
 
 														}
 
+
+														currentNode5 = currentNode5->getNextSibling();
+
 													}
 
 
 												}
 
 											}
+
+
+											currentNode4 = currentNode4->getNextSibling();
 
 										}
 
@@ -661,6 +878,9 @@ void cImzML::updateRawDataToPeakList(vector<cPeaksList>& peaklists) {
 
 								}
 
+
+								currentNode3 = currentNode3->getNextSibling();
+
 							}
 
 							
@@ -668,12 +888,18 @@ void cImzML::updateRawDataToPeakList(vector<cPeaksList>& peaklists) {
 
 					}
 
+
+					currentNode2 = currentNode2->getNextSibling();
+
 				}
 
 
 			}
 
 		}
+
+
+		currentNode1 = currentNode1->getNextSibling();
 
 	}
 
@@ -704,28 +930,27 @@ void cImzML::write(string& filename) {
 #if OS_TYPE == WIN
 	DOMImplementation *implementation = DOMImplementationRegistry::getDOMImplementation(L"LS");
 #else
-	XMLCh *features = XMLString::transcode("LS");
-	DOMImplementation *implementation = DOMImplementationRegistry::getDOMImplementation(features); 
+	XMLCh* features = XMLString::transcode("LS");
+	DOMImplementation *implementation = DOMImplementationRegistry::getDOMImplementation(features);
+	XMLString::release(&features);
 #endif
 	DOMLSSerializer *serializer = ((DOMImplementationLS*)implementation)->createLSSerializer(); 
 
 	if (serializer->getDomConfig()->canSetParameter(XMLUni::fgDOMWRTFormatPrettyPrint, true)) {
 		serializer->getDomConfig()->setParameter(XMLUni::fgDOMWRTFormatPrettyPrint, true); 
 	}
-	serializer->setNewLine(XMLString::transcode("\r\n"));  
+	XMLCh* newline = XMLString::transcode("\r\n");
+	serializer->setNewLine(newline);
+	XMLString::release(&newline);
 
-	XMLCh *outputpath = XMLString::transcode(filename.c_str()); 
-	XMLFormatTarget *formatTarget = new LocalFileFormatTarget(outputpath); 
+	XMLCh* outputpath = XMLString::transcode(filename.c_str()); 
+	XMLFormatTarget *formatTarget = new LocalFileFormatTarget(outputpath);
+	XMLString::release(&outputpath);
+
 	DOMLSOutput *output = ((DOMImplementationLS*)implementation)->createLSOutput(); 
 	output->setByteStream(formatTarget); 
-
 	serializer->write(document, output); 
-
-#if OS_TYPE != WIN
-	XMLString::release(&features);
-#endif
-	serializer->release(); 
-	XMLString::release(&outputpath); 
+	serializer->release();  
 	delete formatTarget; 
 	output->release(); 
 }

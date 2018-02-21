@@ -248,7 +248,7 @@ cSummaryFormula cGraphReaderThread::getCandidateSummaryFormula(string& startsumm
 			formula.setPartial(true);
 		}
 	}
-	string s = "Hplus";
+	string s = "H+";
 	formula.addFormula(s, true);
 	return formula;
 }

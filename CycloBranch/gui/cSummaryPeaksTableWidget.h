@@ -18,10 +18,13 @@
 #include <QStandardItemModel>
 #include <QStandardItem>
 #include <QItemDelegate>
+#include <QMessageBox>
+#include <map>
 #include "core/utilities.h"
 #include "gui/cViewButtonDelegate.h"
 #include "gui/cSummaryPeaksTableProxyModel.h"
 #include "gui/cMainWindowProxyModel.h"
+#include "gui/cHTMLDelegate.h"
 
 using namespace std;
 
@@ -36,6 +39,140 @@ class QCheckBox;
 class QLineEdit;
 class QMenuBar;
 class QMenu;
+
+
+/**
+	\brief Key to reduce the summary table when exporting statistics for MS and MSI data.
+*/
+struct cSummaryTableKeyMS {
+
+	/**
+		\brief Ion type subkey.
+	*/
+	string iontype;
+
+
+	/**
+		\brief Theoretical m/z subkey.
+	*/
+	string theoreticalmz;
+
+
+	/**
+		\brief Summary formula subkey.
+	*/
+	string summaryformula;
+
+
+	/**
+		\brief Compound name subkey.
+	*/
+	string name;
+
+
+	/**
+		\brief Reference subkey.
+	*/
+	string reference;
+
+
+	/**
+		\brief Clear the structure.
+	*/
+	void clear() {
+		iontype.clear();
+		theoreticalmz.clear();
+		summaryformula.clear();
+		name.clear();
+		reference.clear();
+	}
+
+};
+
+
+/**
+	\brief Key to reduce the summary table when exporting statistics for MS/MS data.
+*/
+struct cSummaryTableKeyMSMS {
+
+	/**
+		\brief Theoretical m/z subkey.
+	*/
+	string theoreticalmz;
+
+
+	/**
+		\brief Experimental m/z subkey.
+	*/
+	string experimentalmz;
+
+
+	/**
+		\brief Relative intensity subkey.
+	*/
+	string relint;
+
+
+	/**
+	\brief Absolute intensity subkey.
+	*/
+	string absint;
+
+
+	/**
+		\brief ppm error subkey.
+	*/
+	string ppmerror;
+
+
+	/**
+		\brief Clear the structure.
+	*/
+	void clear() {
+		theoreticalmz.clear();
+		experimentalmz.clear();
+		relint.clear();
+		absint.clear();
+		ppmerror.clear();
+	}
+
+};
+
+
+/**
+	\brief Comparison object for cSummaryTableKeyMS.
+*/
+struct cSummaryTableKeyMS_comp {
+
+	/**
+		\brief Operator to define the order of two items.
+		\param left first key
+		\param right second key
+		\retval bool true if the first object is less than the second object
+	*/
+	bool operator()(const cSummaryTableKeyMS& left, const cSummaryTableKeyMS& right) const {
+		return (left.iontype + left.theoreticalmz + left.summaryformula + left.name + left.reference < right.iontype + right.theoreticalmz + right.summaryformula + right.name + right.reference);
+	}
+
+};
+
+
+/**
+	\brief Comparison object for cSummaryTableKeyMSMS.
+*/
+struct cSummaryTableKeyMSMS_comp {
+
+	/**
+		\brief Operator to define the order of two items.
+		\param left first key
+		\param right second key
+		\retval bool true if the first object is less than the second object
+	*/
+	bool operator()(const cSummaryTableKeyMSMS& left, const cSummaryTableKeyMSMS& right) const {
+		return (left.theoreticalmz + left.experimentalmz + left.relint + left.absint + left.ppmerror < right.theoreticalmz + right.experimentalmz + right.relint + right.absint + right.ppmerror);
+	}
+
+};
 
 
 /**
@@ -74,8 +211,9 @@ public:
 		\param resultsproxymodel proxy model of the tableview in the main application window 
 		\param parameters parameters of the application
 		\param spectralist list of spectra
+		\retval bool true if the table was successfully prepared, false otherwise
 	*/ 
-	void prepareToShow(QStandardItemModel* resultsstandardmodel, cMainWindowProxyModel* resultsproxymodel, cParameters* parameters, cTheoreticalSpectrumList* spectralist);
+	bool prepareToShow(QStandardItemModel* resultsstandardmodel, cMainWindowProxyModel* resultsproxymodel, cParameters* parameters, cTheoreticalSpectrumList* spectralist);
 
 
 	/**
@@ -105,6 +243,7 @@ private:
 
 	QToolBar* toolbarFile;
 	QAction* actionExportCSV;
+	QAction* actionExportStatistics;
 	QAction* actionCloseWindow;
 
 	QToolBar* toolbarHelp;
@@ -125,6 +264,7 @@ private:
 	QWidget* mainwidget;
 
 	QString lastdirexporttocsv;
+	QString lastdirexportstatisticstocsv;
 
 	vector<cCoordinates> coordinates;
 	vector<cCoordinates> coordinates_orig;
@@ -154,6 +294,9 @@ private slots:
 	void exportToCsv();
 
 
+	void exportStatistics();
+
+
 	void showHTMLDocumentation();
 
 
@@ -167,10 +310,18 @@ signals:
 
 	
 	/**
+		\brief Reset the region in imagw window.
+	*/ 
+	void resetRegion();
+
+	
+	/**
 		\brief Send the vector of coordinates.
 		\param coordinates a vector of coordinates x and y
+		\param filterstring a string used to filter the points
+		\param casesensitive true if the string was used as a casesensitive, false otherwise
 	*/ 
-	void sendCoordinates(vector<cCoordinates> coordinates);
+	void sendFilterOptions(vector<cCoordinates> coordinates, string filterstring, bool casesensitive);
 
 
 };

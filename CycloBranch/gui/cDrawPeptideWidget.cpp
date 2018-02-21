@@ -151,7 +151,7 @@ cDrawPeptideWidget::cDrawPeptideWidget(QWidget* parent) {
 	mainbox->addLayout(vbox);
 	setLayout(mainbox);
 
-	resize(1280, 750);
+	resize(1280, 770);
 
 	connect(sequenceline, SIGNAL(textEdited(const QString&)), this, SLOT(sequenceChanged()));
 	connect(sequenceactioncopy, SIGNAL(triggered()), this, SLOT(sequenceCopy()));

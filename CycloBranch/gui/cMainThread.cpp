@@ -174,18 +174,22 @@ void cMainThread::run() {
 		}
 	}
 
-	bool seriesofspectra = false;
-	if (parameters.mode == dereplication) {
-		seriesofspectra = true;
-	}
-
 	if (parameters.peaklistseries.size() == 0) {
 		*os << "Error: no peaklist found. The format of peaklist is likely incorrect." << endl;
 		emitEndSignals();
 		return;
 	}
 
-	for (int i = 0; i < (seriesofspectra?parameters.peaklistseries.size():1); i++) {
+	if ((parameters.mode != dereplication) && (parameters.scannumber > parameters.peaklistseries.size())) {
+		*os << "Number of spectra in the file: " << parameters.peaklistseries.size() << endl;
+		*os << "Error: no peaklist found (scan no. " << parameters.scannumber << ")." << endl;
+		emitEndSignals();
+		return;
+	}
+
+	int startscanno = (parameters.mode == dereplication)?0:parameters.scannumber-1;
+	int endscanno = (parameters.mode == dereplication)?parameters.peaklistseries.size():parameters.scannumber;
+	for (int i = startscanno; i < endscanno; i++) {
 		parameters.peaklistseries[i].sortbyMass();
 		parameters.peaklistseries[i].cropMinimumMZRatio(parameters.minimummz, parameters.fragmentmasserrortolerance);
 
@@ -194,15 +198,26 @@ void cMainThread::run() {
 		}
 
 		if (parameters.peaklistseries[i].normalizeIntenzity() == -1) {
-			*os << "Error: the spectrum no. " << i + 1 << " cannot be normalized because the maximum intensity is <= 0. The spectrum likely does not contain any peak or the format of peaklist is incorrect." << endl;
-			emitEndSignals();
-			return;
+			if (parameters.mode == dereplication) {
+				*os << "Warning: the spectrum no. " << i + 1 << " is empty or the format of peaklist is incorrect." << endl;
+			}
+			else {
+				*os << "Number of spectra in the file: " << parameters.peaklistseries.size() << endl;
+				*os << "Error: the spectrum no. " << i + 1 << " is empty or the format of peaklist is incorrect." << endl;
+				emitEndSignals();
+				return;
+			}
 		}
-		parameters.peaklistseries[i].cropIntenzity(parameters.minimumrelativeintensitythreshold);
+		parameters.peaklistseries[i].cropRelativeIntenzity(parameters.minimumrelativeintensitythreshold);
 		//parameters.peaklistseries[i].maxHighestPeaksInWindow(10, 50);
 
 		if (parameters.mode != dereplication) {
-			*os << "Peaklist no. " << i + 1 << ":" << endl;
+			*os << "Number of spectra in the file: " << parameters.peaklistseries.size() << endl;
+			*os << "Processing spectrum no.: " << i + 1; 
+			if (parameters.peaklistseries[i].getTitle().size() > 0) {
+				*os << " (" << parameters.peaklistseries[i].getTitle() << "):";
+			}
+			*os << endl;
 			*os << parameters.peaklistseries[i].print();
 			if (parameters.masserrortolerancefordeisotoping > 0) {
 				parameters.peaklistseries[i].removeIsotopes(parameters.precursorcharge, parameters.masserrortolerancefordeisotoping, this);
@@ -412,9 +427,9 @@ void cMainThread::run() {
 
 			// check the precursor mass error
 			formula.setFormula(parameters.sequencedatabase[i].getSummaryFormula());
-			formstr = "Hplus";
+			formstr = "H+";
 			formula.addFormula(formstr);
-			formstr = (parameters.precursorcharge > 0)?"":"Hplus-2";
+			formstr = (parameters.precursorcharge > 0)?"":"H-2+-2";
 			formula.addFormula(formstr);
 			formstr = parameters.precursoradduct.empty()?"":"H-1";
 			formula.addFormula(formstr);
@@ -425,7 +440,7 @@ void cMainThread::run() {
 			}
 
 			c.setName(parameters.sequencedatabase[i].getName());
-			formstr = (parameters.precursorcharge > 0)?"Hplus-1":"Hplus";
+			formstr = (parameters.precursorcharge > 0)?"H-1+-1":"H+";
 			formula.addFormula(formstr);
 			c.setSummaryFormula(formula);
 			candidates.getSet().insert(c);
@@ -450,18 +465,35 @@ void cMainThread::run() {
 
 	// database search - MS mode
 	if (parameters.mode == dereplication) {
+		*os << "Generating theoretical peaks... ";
+
+		theoreticalspectrumlist->initialize(*os, parameters, &graph);
+
+		cTheoreticalSpectrum ts;
+		ts.setParameters(&parameters);
+
+		if (parameters.generateisotopepattern) {
+			ts.generateFineMSSpectrum();
+		}
+		else {
+			ts.generateMSSpectrum(true);		
+		}
+
+		// efficient store of theoretical peak descriptions
+		parameters.peakdesctoid.clear();
+		parameters.peakidtodesc.clear();
+		ts.getTheoreticalPeaks()->reducePeakDescriptions(parameters.peakidtodesc, parameters.peakdesctoid);
+
+		*os << "ok" << endl;
 		*os << "Comparing theoretical peaks with the experimental peaklist(s)... " << endl;
 		*os << "Number of experimental peaklists: " << parameters.peaklistseries.size() << endl;
 		*os << "Processing the peaklist no. : " << endl;
 
-		theoreticalspectrumlist->initialize(*os, parameters, &graph);
-		cTheoreticalSpectrum ts;
-		ts.setParameters(&parameters);
-		ts.generateMSSpectrum();
-
 		for (int i = 0; i < parameters.peaklistseries.size(); i++) {
-			*os << i + 1 << " ";
-			if ((i + 1) % 25 == 0) {
+			if ((i + 1) % 100 == 0) {
+				*os << i + 1 << " ";
+			}
+			if ((i + 1) % 2500 == 0) {
 				*os << endl;
 			}
 
@@ -471,12 +503,12 @@ void cMainThread::run() {
 			}
 
 			cTheoreticalSpectrum tstmp;
-			tstmp = ts;
-			tstmp.compareMSSpectrum(parameters.peaklistseries[i]);
+			tstmp.setParameters(&parameters);
+			tstmp.compareMSSpectrum(parameters.peaklistseries[i], ts);
 			theoreticalspectrumlist->add(tstmp);
 		}
 
-		*os << " ok" << endl;
+		*os << " ok" << endl << "Total number of spectra: " << parameters.peaklistseries.size() << endl;
 	}
 	
 
@@ -490,40 +522,6 @@ void cMainThread::run() {
 		*os << " ok" << endl;
 	}
 
-	/*
-	*os << endl << "Explanation list of peaks (m/z ratio: <Result ID 1> <Result ID 2> etc.):" << endl;
-	if (theoreticalspectra.size() > 0) {
-		for (int i = 0; i < theoreticalspectra[0].getExperimentalSpectrum().size(); i++) {
-			*os << parameters.peaklist[i].mzratio << ": ";
-			for (int j = 0; j < theoreticalspectra.size(); j++) {
-				if (theoreticalspectra[j].getExperimentalSpectrum()[i].matched > 0) {
-					*os << j + 1 << " ";
-				}
-			}
-			*os << endl;
-		}
-	}
-	*/
-
-	/*
-	double maxintensity;
-	double mzratio;
-	if (theoreticalspectra.size() > 0) {
-		for (int i = 0; i < theoreticalspectra.size(); i++) {
-			*os << i + 1 << ": ";
-			maxintensity = 0;
-			mzratio = 0;
-			for (int j = 0; j < theoreticalspectra[i].getExperimentalSpectrum().size(); j++) {
-				if ((theoreticalspectra[i].getExperimentalSpectrum()[j].matched == 0) && (theoreticalspectra[i].getExperimentalSpectrum()[j].intensity > maxintensity)) {
-					maxintensity = theoreticalspectra[i].getExperimentalSpectrum()[j].intensity;
-					mzratio = theoreticalspectra[i].getExperimentalSpectrum()[j].mzratio;
-				}
-			}
-			*os << mzratio << " " << maxintensity << endl;
-		}
-	}
-	*/
-	
 	int secs = time.elapsed() / 1000;
 	int mins = (secs / 60) % 60;
 	int hrs =  (secs / 3600);

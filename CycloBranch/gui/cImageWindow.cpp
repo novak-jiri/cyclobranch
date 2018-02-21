@@ -21,7 +21,7 @@ cImageWindow::cImageWindow(QWidget* parent) {
 	menuBar = new QMenuBar(this);
 	menuBar->setNativeMenuBar(false);
 	menuFile = new QMenu(tr("&File"), this);
-	menuZoom = new QMenu(tr("&Zoom"), this);
+	menuView = new QMenu(tr("&View"), this);
 	menuHelp = new QMenu(tr("&Help"), this);
 
 	xfromlabel = new QLabel("X: ");
@@ -75,6 +75,20 @@ cImageWindow::cImageWindow(QWidget* parent) {
 	regionwidget->setLayout(regionhbox);
 	regionwidget->setMaximumWidth(640);
 
+	minxlabel = new QLabel("Left Shift: ");
+
+	minx = new QSpinBox();
+	minx->setRange(-100000, 100000);
+	minx->setSingleStep(1);
+	minx->setValue(0);
+
+	minylabel = new QLabel("Top Shift: ");
+
+	miny = new QSpinBox();
+	miny->setRange(-100000, 100000);
+	miny->setSingleStep(1);
+	miny->setValue(0);
+
 	maxxlabel = new QLabel("Max X: ");
 
 	maxx = new QSpinBox();
@@ -89,33 +103,23 @@ cImageWindow::cImageWindow(QWidget* parent) {
 	maxy->setSingleStep(1);
 	maxy->setValue(500);
 
-	leftmarginlabel = new QLabel("Left Crop: ");
+	setmaxbutton = new QPushButton("Correlate");
+	setmaxbutton->setToolTip("Correlate the points area with optical image.");
 
-	leftmargin = new QSpinBox();
-	leftmargin->setRange(0, 100000);
-	leftmargin->setSingleStep(1);
-	leftmargin->setValue(0);
-
-	topmarginlabel = new QLabel("Top Crop: ");
-
-	topmargin = new QSpinBox();
-	topmargin->setRange(0, 100000);
-	topmargin->setSingleStep(1);
-	topmargin->setValue(0);
-
-	setmaxbutton = new QPushButton("Set");
-	setmaxbutton->setToolTip("Set up the minimum and maximum coordinates corresponding to the bottom-right corner of the image, set up the left margin and the top margin.");
+	setdefaultbutton = new QPushButton("Default");
+	setdefaultbutton->setToolTip("Set the default correlation.");
 
 	maxcoordinateshbox = new QHBoxLayout();
+	maxcoordinateshbox->addWidget(minxlabel);
+	maxcoordinateshbox->addWidget(minx);
+	maxcoordinateshbox->addWidget(minylabel);
+	maxcoordinateshbox->addWidget(miny);
 	maxcoordinateshbox->addWidget(maxxlabel);
 	maxcoordinateshbox->addWidget(maxx);
 	maxcoordinateshbox->addWidget(maxylabel);
 	maxcoordinateshbox->addWidget(maxy);
-	//maxcoordinateshbox->addWidget(leftmarginlabel);
-	//maxcoordinateshbox->addWidget(leftmargin);
-	//maxcoordinateshbox->addWidget(topmarginlabel);
-	//maxcoordinateshbox->addWidget(topmargin);
 	maxcoordinateshbox->addWidget(setmaxbutton);
+	maxcoordinateshbox->addWidget(setdefaultbutton);
 
 	maxcoordinateswidget = new QWidget();
 	maxcoordinateswidget->setLayout(maxcoordinateshbox);
@@ -130,9 +134,10 @@ cImageWindow::cImageWindow(QWidget* parent) {
 	mainwidget = new QWidget();
 	mainwidget->setLayout(mainlayout);
 
-	connect(setmaxbutton, SIGNAL(released()), this, SLOT(setMaxButtonReleased()));
 	connect(setregionbutton, SIGNAL(released()), this, SLOT(setRegionButtonReleased()));
 	connect(resetregionbutton, SIGNAL(released()), this, SLOT(resetSelection()));
+	connect(setmaxbutton, SIGNAL(released()), this, SLOT(setMaxButtonReleased()));
+	connect(setdefaultbutton, SIGNAL(released()), this, SLOT(setDefaultButtonReleased()));
 
 	toolbarFile = addToolBar(tr("File"));
 				
@@ -154,31 +159,41 @@ cImageWindow::cImageWindow(QWidget* parent) {
 	toolbarFile->addAction(actionCloseWindow);
 	connect(actionCloseWindow, SIGNAL(triggered()), this, SLOT(closeWindow()));
 
-	toolbarZoom = addToolBar(tr("Zoom"));
+	toolbarView = addToolBar(tr("View"));
 				
 	actionZoomIn = new QAction(QIcon(":/images/icons/83.png"), tr("Zoom &In"), this);
 	actionZoomIn->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_Plus));
 	actionZoomIn->setToolTip("Zoom In (Ctrl +)");
-	toolbarZoom->addAction(actionZoomIn);
+	toolbarView->addAction(actionZoomIn);
 	connect(actionZoomIn, SIGNAL(triggered()), imagewindowwidget, SLOT(zoomIn()));
 
 	actionZoomOut = new QAction(QIcon(":/images/icons/82.png"), tr("Zoom &Out"), this);
 	actionZoomOut->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_Minus));
 	actionZoomOut->setToolTip("Zoom Out (Ctrl -)");
-	toolbarZoom->addAction(actionZoomOut);
+	toolbarView->addAction(actionZoomOut);
 	connect(actionZoomOut, SIGNAL(triggered()), imagewindowwidget, SLOT(zoomOut()));
 
 	actionZoomReset = new QAction(QIcon(":/images/icons/84.png"), tr("&Reset Zoom"), this);
 	actionZoomReset->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_R));
 	actionZoomReset->setToolTip("Zoom Reset (Ctrl + R)");
-	toolbarZoom->addAction(actionZoomReset);
+	toolbarView->addAction(actionZoomReset);
 	connect(actionZoomReset, SIGNAL(triggered()), imagewindowwidget, SLOT(normalSize()));
 
-	toolbarRegion = addToolBar(tr("Select Region"));
-	toolbarRegion->addWidget(regionwidget);
+	actionColorScale = new QAction(QIcon(":/images/icons/50.png"), tr("&Color Scale"), this);
+	actionColorScale->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_C));
+	actionColorScale->setToolTip("Color Scale (Ctrl + C)");
+	actionColorScale->setCheckable(true);
+	actionColorScale->setChecked(true);
+	toolbarView->addSeparator();
+	toolbarView->addAction(actionColorScale);
+	connect(actionColorScale, SIGNAL(toggled(bool)), imagewindowwidget, SLOT(colorScaleStateChanged(bool)));
 
-	toolbarMaxCoordinates = addToolBar(tr("Coordinates"));
-	toolbarMaxCoordinates->addWidget(maxcoordinateswidget);
+	actionAbsoluteIntensity = new QAction(QIcon(":/images/icons/11.png"), tr("Absolute &Intensity"), this);
+	actionAbsoluteIntensity->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_I));
+	actionAbsoluteIntensity->setToolTip("Absolute Intensity (Ctrl + I)");
+	actionAbsoluteIntensity->setCheckable(true);
+	toolbarView->addAction(actionAbsoluteIntensity);
+	connect(actionAbsoluteIntensity, SIGNAL(toggled(bool)), imagewindowwidget, SLOT(absoluteIntensityStateChanged(bool)));
 
 	toolbarHelp = addToolBar(tr("Help"));
 
@@ -188,21 +203,39 @@ cImageWindow::cImageWindow(QWidget* parent) {
 	toolbarHelp->addAction(actionHTMLDocumentation);
 	connect(actionHTMLDocumentation, SIGNAL(triggered()), this, SLOT(showHTMLDocumentation()));
 
+	addToolBarBreak();
+
+	toolbarRegion = addToolBar(tr("Select Region"));
+	toolbarRegion->addWidget(regionwidget);
+
+	actionCorrelatePointsArea = new QAction(QIcon(":/images/icons/64.png"), tr("Correlate the points area with optical image."), this);
+	actionCorrelatePointsArea->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_T));
+	actionCorrelatePointsArea->setToolTip("Correlate the points area with optical image (Ctrl + T)");
+	actionCorrelatePointsArea->setCheckable(true);
+	actionCorrelatePointsArea->setChecked(false);
+	actionCorrelatePointsArea->setEnabled(true);
+	connect(actionCorrelatePointsArea, SIGNAL(toggled(bool)), imagewindowwidget, SLOT(enableCorrelateSelectionTool(bool)));
+
+	toolbarMaxCoordinates = addToolBar(tr("Correlate Area"));
+	toolbarMaxCoordinates->addAction(actionCorrelatePointsArea);
+	toolbarMaxCoordinates->addWidget(maxcoordinateswidget);
+
 	menuFile->addAction(actionOpenImage);
 	menuFile->addAction(actionSaveImage);
 	menuFile->addSeparator();
 	menuFile->addAction(actionCloseWindow);
 
-	menuZoom->addAction(actionZoomIn);
-	menuZoom->addAction(actionZoomOut);
-	menuZoom->addAction(actionZoomReset);
-	//menuZoom->addSeparator();
-	//menuZoom->addAction(actionViewAllPoints);
+	menuView->addAction(actionZoomIn);
+	menuView->addAction(actionZoomOut);
+	menuView->addAction(actionZoomReset);
+	menuView->addSeparator();
+	menuView->addAction(actionColorScale);
+	menuView->addAction(actionAbsoluteIntensity);
 
 	menuHelp->addAction(actionHTMLDocumentation);
 
 	menuBar->addMenu(menuFile);
-	menuBar->addMenu(menuZoom);
+	menuBar->addMenu(menuView);
 	menuBar->addMenu(menuHelp);
 
 	setMenuBar(menuBar);
@@ -213,10 +246,15 @@ cImageWindow::cImageWindow(QWidget* parent) {
 	connect(imagewindowwidget, SIGNAL(updateFilter(int, int, int, int)), this, SLOT(updateSelection(int, int, int, int)));
 	connect(imagewindowwidget, SIGNAL(updateFilter(int, int, int, int)), this->parent, SLOT(updateSummaryPeaksTableFilter(int, int, int, int)));
 	connect(this, SIGNAL(updateSummaryPeaksTableFilter(int, int, int, int)), this->parent, SLOT(updateSummaryPeaksTableFilter(int, int, int, int)));
+	connect(imagewindowwidget, SIGNAL(updateCorrelation(int, int, int, int)), this, SLOT(updatePointsArea(int, int, int, int)));
 
-	resize(1280, 750);
+	resize(1280, 770);
 
 	lastimagedir = "./";
+
+	maxcountx = 1;
+	maxcounty = 1;
+	vendor = unknownvendor;
 }
 
 
@@ -234,15 +272,16 @@ cImageWindow::~cImageWindow() {
 	delete regionhbox;
 	delete regionwidget;
 
+	delete minxlabel;
+	delete minx;
+	delete minylabel;
+	delete miny;
 	delete maxxlabel;
 	delete maxx;
 	delete maxylabel;
 	delete maxy;
-	delete leftmarginlabel;
-	delete leftmargin;
-	delete topmarginlabel;
-	delete topmargin;
 	delete setmaxbutton;
+	delete setdefaultbutton;
 	delete maxcoordinateshbox;
 	delete maxcoordinateswidget;
 
@@ -258,10 +297,13 @@ cImageWindow::~cImageWindow() {
 	delete actionZoomIn;
 	delete actionZoomOut;
 	delete actionZoomReset;
+	delete actionColorScale;
+	delete actionAbsoluteIntensity;
+	delete actionCorrelatePointsArea;
 	delete actionHTMLDocumentation;
 
 	delete menuFile;
-	delete menuZoom;
+	delete menuView;
 	delete menuHelp;
 
 	delete menuBar;
@@ -274,12 +316,20 @@ void cImageWindow::closeEvent(QCloseEvent *event) {
 }
 
 
+void cImageWindow::setDefaultMaxXY(int maxcountx, int maxcounty, eVendorType vendor) {
+	this->maxcountx = maxcountx;
+	this->maxcounty = maxcounty;
+	this->vendor = vendor;
+	imagewindowwidget->setDefaultMaxXY(maxcountx, maxcounty, vendor);
+}
+
+
 void cImageWindow::keyPressEvent(QKeyEvent *event) {
 	if ((event->key() == Qt::Key_Enter) || (event->key() == Qt::Key_Return)) {
 		if (xfrom->hasFocus() || xto->hasFocus() || yfrom->hasFocus() || yto->hasFocus()) {
 			setregionbutton->click();
 		}
-		if (maxx->hasFocus() || maxy->hasFocus()) {
+		if (minx->hasFocus() || miny->hasFocus() || maxx->hasFocus() || maxy->hasFocus()) {
 			setmaxbutton->click();
 		}
     }
@@ -300,6 +350,13 @@ void cImageWindow::openImage() {
 
 		image->load(filename);
 		imagewindowwidget->setPixmap(image);
+
+		minx->setValue(0);
+		miny->setValue(0);
+		maxx->setValue(maxcountx);
+		maxy->setValue(maxcounty);
+		
+		setMaxButtonReleased();
 	}
 }
 
@@ -314,13 +371,23 @@ void cImageWindow::saveImage() {
 }
 
 
-void cImageWindow::setCoordinates(vector<cCoordinates> coordinates) {
-	imagewindowwidget->setCoordinates(coordinates);
+void cImageWindow::setFilterOptions(vector<cCoordinates> coordinates, string filterstring, bool casesensitive) {
+	imagewindowwidget->setFilterOptions(coordinates, filterstring, casesensitive);
 }
 
 
 void cImageWindow::setMaxButtonReleased() {
-	imagewindowwidget->setMaxXY(maxx->value(), maxy->value(), leftmargin->value(), topmargin->value());
+	imagewindowwidget->setMaxXY(minx->value(), miny->value(), maxx->value(), maxy->value());
+	resetregionbutton->click();
+}
+
+
+void cImageWindow::setDefaultButtonReleased() {
+	minx->setValue(0);
+	miny->setValue(0);
+	maxx->setValue(maxcountx);
+	maxy->setValue(maxcounty);
+	imagewindowwidget->setMaxXY(minx->value(), miny->value(), maxx->value(), maxy->value());
 	resetregionbutton->click();
 }
 
@@ -347,12 +414,25 @@ void cImageWindow::updateSelection(int xmin, int xmax, int ymin, int ymax) {
 }
 
 
-void cImageWindow::resetSelection() {
+void cImageWindow::clearSelection() {
 	xfrom->setValue(0);
 	yfrom->setValue(0);
 	xto->setValue(maxx->value());
 	yto->setValue(maxy->value());
+}
 
+
+void cImageWindow::resetSelection() {
+	clearSelection();
 	emit updateSummaryPeaksTableFilter(xfrom->value(), xto->value(), yfrom->value(), yto->value());
+}
+
+
+void cImageWindow::updatePointsArea(int xmin, int xmax, int ymin, int ymax) {
+	minx->setValue(xmin);
+	maxx->setValue(xmax);
+	miny->setValue(ymin);
+	maxy->setValue(ymax);
+	setMaxButtonReleased();
 }
 

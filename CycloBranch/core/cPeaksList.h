@@ -12,9 +12,9 @@
 #include <vector>
 #include <string>
 #include <algorithm>
+
 #include "core/cPeak.h"
-
-
+#include "core/cMzML.h"
 #include "core/cImzML.h"
 
 
@@ -34,12 +34,30 @@ bool comparePeakMasses(const cPeak& a, const cPeak& b);
 
 
 /**
-	\brief Compare two peaks by intensities.
+	\brief Compare two peaks by relative intensities.
 	\param a first peak
 	\param b second peak
-	\retval bool true when the intensity of the peak \a a is bigger than the intensity of the peak \a b
+	\retval bool true when the relative intensity of the peak \a a is bigger than the relative intensity of the peak \a b
 */
-bool comparePeakIntensitiesDesc(const cPeak& a, const cPeak& b);
+bool compareRelativePeakIntensitiesDesc(const cPeak& a, const cPeak& b);
+
+
+/**
+	\brief Compare two peaks by absolute intensities.
+	\param a first peak
+	\param b second peak
+	\retval bool true when the absolute intensity of the peak \a a is bigger than the absolute intensity of the peak \a b
+*/
+bool compareAbsolutePeakIntensitiesDesc(const cPeak& a, const cPeak& b);
+
+
+/**
+	\brief Compare two peaks by group id.
+	\param a first peak
+	\param b second peak
+	\retval bool true when the group id of the peak \a a is lower than the group id of the peak \a b
+*/
+bool comparePeakGroupId(const cPeak& a, const cPeak& b);
 
 
 /**
@@ -77,6 +95,7 @@ class cPeaksList {
 
 	vector<cPeak> peaks;
 	int x, y;
+	string title;
 
 public:
 
@@ -182,9 +201,21 @@ public:
 
 
 	/**
-		\brief Sort the peaks by intensity in the descending order.
+		\brief Sort the peaks by relative intensity in the descending order.
 	*/ 
-	void sortbyIntensityDesc();
+	void sortbyRelativeIntensityDesc();
+
+
+	/**
+		\brief Sort the peaks by absolute intensity in the descending order.
+	*/ 
+	void sortbyAbsoluteIntensityDesc();
+
+
+	/**
+		\brief Sort the peaks by group id.
+	*/
+	void sortbyGroupId();
 
 
 	/**
@@ -195,10 +226,10 @@ public:
 
 
 	/**
-		\brief Crop relative intensities lower than a threshold.
+		\brief Remove peaks with relative intensities lower than a threshold.
 		\param minimumrelativeintensitythreshold minimum threshold of relative intensity
 	*/ 
-	void cropIntenzity(double minimumrelativeintensitythreshold);
+	void cropRelativeIntenzity(double minimumrelativeintensitythreshold);
 
 
 	/**
@@ -356,6 +387,28 @@ public:
 		\param is an input stream
 	*/ 
 	void load(ifstream& is);
+
+
+	/**
+		\brief Get the title.
+		\retval string title
+	*/ 
+	string& getTitle();
+
+
+	/**
+		\brief Set the title.
+		\param title title
+	*/ 
+	void setTitle(string& title);
+
+
+	/**
+		\brief Reduce redundant descriptions of peaks.
+		\param peakidtodesc map of peak ids to descriptions
+		\param peakdesctoid map of peak descriptions to ids
+	*/
+	void reducePeakDescriptions(map<int, string>& peakidtodesc, map<string, int>& peakdesctoid);
 
 };
 

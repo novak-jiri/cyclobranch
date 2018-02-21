@@ -27,9 +27,8 @@ public:
 
 	/**
 		\brief The constructor.
-		\param parent pointer to a parent widget
 	*/ 
-	cImageWindowWidget(QWidget* parent = (QWidget *)0);
+	cImageWindowWidget();
 
 
 	/**
@@ -53,20 +52,31 @@ public:
 
 
 	/**
-		\brief Set points.
+		\brief Set options which was used to filter the points.
 		\param coordinates a vector of coordinates
+		\param filteredstring a string used to filter the points
+		\param casesensitive true if the string was used as a casesensitive, false otherwise
 	*/ 
-	void setCoordinates(vector<cCoordinates>& coordinates);
+	void setFilterOptions(vector<cCoordinates>& coordinates, string& filteredstring, bool casesensitive);
 
 
 	/**
 		\brief Set the maximum X and Y coordinates.
+		\param minx minimum X coordinate
+		\param miny minimum Y coordinate
 		\param maxx maximum X coordinate
 		\param maxy maximum Y coordinate
-		\param leftmargin left margin
-		\param topmargin top margin
-	*/ 
-	void setMaxXY(int maxx, int maxy, int leftmargin, int topmargin);
+	*/
+	void setMaxXY(int minx, int miny, int maxx, int maxy);
+
+
+	/**
+		\brief Set the default maximum X and Y coordinates - parsed from the imzML file.
+		\param maxcountx maximum X coordinate
+		\param maxcounty maximum Y coordinate
+		\param vendor vendor type
+	*/
+	void setDefaultMaxXY(int maxcountx, int maxcounty, eVendorType vendor);
 
 
 protected:
@@ -104,31 +114,47 @@ signals:
 
 
 	/**
-		\brief The signal is emitted when the selection of points has changed.
+		\brief The signal is emitted when the selection of points has been changed.
 		\param xmin minimum x coordinate
 		\param xmax maximum x coordinate
 		\param ymin minimum y coordinate
 		\param ymax maximum y coordinate
-	*/ 
+	*/
 	void updateFilter(int xmin, int xmax, int ymin, int ymax);
+
+
+	/**
+		\brief The signal is emitted when the points area in the optical image has been changed.
+		\param xmin minimum x coordinate
+		\param xmax maximum x coordinate
+		\param ymin minimum y coordinate
+		\param ymax maximum y coordinate
+	*/
+	void updateCorrelation(int xmin, int xmax, int ymin, int ymax);
 
 
 private:
 
-
+	QWidget* parent;
 	QGraphicsScene* scene;
 	QPixmap* pixmap;
 	vector<cCoordinates> coordinates;
+	string filteredstring;
+	bool casesensitive;
+	bool colorscale;
+	bool absoluteintensity;
 
+	int minx;
+	int miny;
 	int maxx;
 	int maxy;
-	int leftmargin;
-	int topmargin;
+	int maxcountx;
+	int maxcounty;
+	eVendorType vendor;
 	qreal currentscale;
 	qreal factor;
 	bool ispixmapdefined;
-	bool ismaxxydefined;
-	bool enablemouseselection;
+	bool enablecorrelateselectiontool;
 
 	int pressedx;
 	int pressedy;
@@ -157,6 +183,17 @@ private slots:
 
 	void normalSize();
 
+
+	void scrollbarValueChanged(int value);
+
+	
+	void absoluteIntensityStateChanged(bool state);
+
+
+	void colorScaleStateChanged(bool state);
+
+
+	void enableCorrelateSelectionTool(bool enable);
 
 };
 

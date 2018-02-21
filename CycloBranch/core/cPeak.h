@@ -42,27 +42,45 @@ struct cPeak {
 
 
 	/**
-		\brief Intensity.
+		\brief Relative ntensity.
 	*/ 
-	double intensity;
+	double relativeintensity;
+
+
+	/**
+		\brief Absolute intensity.
+	*/ 
+	double absoluteintensity;
 
 
 	/**
 		\brief Description of a peak.
-	*/ 
+	*/
 	string description;
 
-	
+
 	/**
-		\brief A m/z ratio when the peak was matched with an experimental peak.
+		\brief Description id of a peak.
+	*/
+	int descriptionid;
+
+
+	/**
+		\brief m/z ratio when the peak was matched with an experimental peak.
 	*/ 
 	double matchedmz;
 
 
 	/**
-		\brief An intensity when the peak was matched with an experimental peak.
+		\brief Relative intensity when the peak was matched with an experimental peak.
 	*/ 
-	double matchedintensity;
+	double matchedrelativeintensity;
+
+
+	/**
+		\brief Absolute intensity when the peak was matched with an experimental peak.
+	*/ 
+	double matchedabsoluteintensity;
 
 
 	/**
@@ -105,6 +123,12 @@ struct cPeak {
 		\brief An order of a peak in a series (e.g., B_5 in a B series).
 	*/ 
 	int seriesid;
+
+		
+	/**
+		\brief Identifier of a group of peaks.
+	*/ 
+	int groupid;
 
 		
 	/**

@@ -39,8 +39,7 @@ void cPeakListSeries::loadFromPlainTextStream(ifstream &stream) {
 	while (stream.good()) {
 		cPeaksList peaklist;
 		peaklist.loadFromPlainTextStream(stream);
-		
-		if (peaklist.size() > 0) {
+		if ((peaklist.size() > 0) || stream.good()) {
 			peaklists.push_back(peaklist);
 		}
 	}
@@ -56,19 +55,208 @@ void cPeakListSeries::loadFromBAFStream(ifstream &stream) {
 	while (stream.good()) {
 		cPeaksList peaklist;
 		peaklist.loadFromBAFStream(stream);
-		
-		if (peaklist.size() > 0) {
+		if ((peaklist.size() > 0) || stream.good()) {
 			peaklists.push_back(peaklist);
 		}
 	}
 }
 
 
-int cPeakListSeries::loadFromIMZMLStream(string& imzmlfilename, ifstream &ibdstream, double minimumrelativeintensitythreshold, double fwhm, cMainThread* os, bool& terminatecomputation) {
-	*os << endl << endl << "Parsing the imzML file..." << endl;
+int cPeakListSeries::loadFromProfileApexStream(string& filename, ifstream &stream, ifstream &titlestream, double fwhm, cMainThread* os, bool& terminatecomputation) {
+	*os << "Loading the apex data, spectrum no. : ";
+
+	string s;
+	string title;
+	int count = 0;
+	ofstream mgfofstream;
+
+	char tempstring[1024];
+	string peaksstring;
+	peaksstring.reserve(25000000);
+
+	int strip;
+
+	string mgfname = filename.substr(0, (int)filename.size() - 8) + ".";
+	stringstream ss;
+	ss << mgfname << setw(10) << setfill('0') << 0 << ".mgf";
+	mgfofstream.open(ss.str());
+
+	while (stream.good() && !(strstr(s.c_str(),"M/Z"))) {
+		getline(stream,s);
+	}
+	
+	while (stream.good()) {
+		cPeaksList peaklist;
+		peaklist.loadFromBAFStream(stream);
+		if ((peaklist.size() > 0) || stream.good()) {
+
+			if ((count + 1) % 100 == 0) {
+				*os << count + 1 << " ";
+			}
+			if ((count + 1) % 2500 == 0) {
+				*os << endl;
+			}
+
+			getline(titlestream, title);
+
+			mgfofstream << "BEGIN IONS" << endl;
+			mgfofstream << "TITLE=" << title << endl;
+			mgfofstream << "SCAN=" << to_string(count + 1) << endl;
+			mgfofstream << "PEPMASS=1" << endl;
+			mgfofstream << "RTINSECONDS=1" << endl;
+			mgfofstream << "CHARGE=1+" << endl << endl;
+
+			peaksstring.clear();
+			for (int ii = 0; ii < peaklist.size(); ii++) {
+				sprintf_s(tempstring, "%f %f\n\0", peaklist[ii].mzratio, peaklist[ii].absoluteintensity);
+				peaksstring.append(tempstring);
+			}
+			mgfofstream << peaksstring;
+			mgfofstream << "END IONS" << endl << endl;
+
+			if (((count + 1) % 10 == 0) && (count > 0)) {
+				mgfofstream.close();
+				stringstream ss;
+				strip = (count + 1) / 10;
+				ss << mgfname << setw(10) << setfill('0') << strip << ".mgf";
+				mgfofstream.open(ss.str());
+			}
+
+			cPeaksList emptypeaklist;
+			emptypeaklist.setTitle(title);
+			peaklists.push_back(emptypeaklist);
+			count++;
+
+			if (terminatecomputation) {
+				peaklists.clear();
+				mgfofstream.close();
+				return -1;
+			}
+
+		}
+	}
+
+	mgfofstream.close();
+
+	*os << "ok" << endl << "Total number of spectra: " << count << endl << endl << "Converting raw data to peaklists... ";
+
+	string command = "External\\windows\\raw2peaks.bat \"" + mgfname + "\" " + to_string(fwhm);
+	if (system(command.c_str()) != 0) {
+		peaklists.clear();
+		return -2;
+	}
+
+	*os << "ok" << endl << endl;
+
+	ifstream mgfifstream;
+	int oldpeaklistscount = (int)peaklists.size();
+	vector<cPeaksList> temppeaklists;
+	mgfname += "mgf";
+	mgfifstream.open(mgfname);
+	while (mgfifstream.good() && ((int)temppeaklists.size() < oldpeaklistscount)) {
+		cPeaksList peaklist;
+		peaklist.loadFromMGFStream(mgfifstream);
+		temppeaklists.push_back(peaklist);
+	}
+	mgfifstream.close();
+
+	if (oldpeaklistscount != (int)temppeaklists.size()) {
+		peaklists.clear();
+		return -2;
+	}
+
+	for (int i = 0; i < (int)temppeaklists.size(); i++) {
+		temppeaklists[i].setTitle(peaklists[i].getTitle());
+	}
+
+	peaklists = temppeaklists;
+
+	//QFile::remove(mgfname.c_str());
+
+	return 0;
+}
+
+
+int cPeakListSeries::loadFromMZMLStream(string& mzmlfilename, ifstream &mzmlstream, double fwhm, eModeType mode, cMainThread* os, bool& terminatecomputation) {
+	*os << "Loading the mzML file, spectrum no. : ";
+	
+	cMzML mzml;
+	int resultcode = mzml.parse(mzmlfilename, peaklists, mode, os, terminatecomputation);
+	if (resultcode != 0) {
+		peaklists.clear();
+		return resultcode;
+	}
+
+	if (mzml.hasProfileSpectra()) {
+
+		ifstream mgfifstream;
+		string convertedmzmlfilename;
+		string mgfname = mzmlfilename.substr(0, (int)mzmlfilename.size() - 4);
+
+		*os << "ok" << endl << "Total number of spectra: " << peaklists.size() << endl << endl << "Converting raw data to peaklists... ";
+
+		string s;
+		#if OS_TYPE == UNX
+			s = installdir.toStdString() + "External/linux/raw2peaks.sh " + mgfname + "," + to_string(fwhm);
+		#else
+			#if OS_TYPE == OSX
+				s = installdir.toStdString() + "External/macosx/raw2peaks.sh " + mgfname + "," + to_string(fwhm);
+			#else		
+				s = "External\\windows\\raw2peaks.bat \"" + mgfname + "\" " + to_string(fwhm);
+			#endif
+		#endif
+
+		if (system(s.c_str()) != 0) {
+			peaklists.clear();
+			return -2;
+		}
+
+		*os << "ok" << endl << endl;
+
+		int oldpeaklistscount = (int)peaklists.size();
+		vector<cPeaksList> temppeaklists;
+		mgfname += "mgf";
+		mgfifstream.open(mgfname);
+		while (mgfifstream.good() && ((int)temppeaklists.size() < oldpeaklistscount)) {
+			cPeaksList peaklist;
+			peaklist.loadFromMGFStream(mgfifstream);
+			temppeaklists.push_back(peaklist);
+		}
+		mgfifstream.close();
+
+		if (oldpeaklistscount != (int)temppeaklists.size()) {
+			peaklists.clear();
+			return -2;
+		}
+
+		for (int i = 0; i < (int)temppeaklists.size(); i++) {
+			temppeaklists[i].setTitle(peaklists[i].getTitle());
+		}
+
+		peaklists = temppeaklists;
+
+		//QFile::remove(mgfname.c_str());
+
+	}
+	else {
+
+		*os << "ok" << endl << endl;
+
+	}
+
+	return 0;
+}
+
+
+int cPeakListSeries::loadFromIMZMLStream(string& imzmlfilename, ifstream &ibdstream, double fwhm, int& maxcountx, int& maxcounty, eVendorType& vendor, cMainThread* os, bool& terminatecomputation) {
+	*os << "Loading the imzML file... ";
 
 	cImzML imzml;
-	imzml.parse(imzmlfilename);
+	if (imzml.parse(imzmlfilename, maxcountx, maxcounty, vendor)) {
+		return -3;
+	}
+
+	*os << "ok" << endl << endl;
 
 	ofstream mgfofstream;
 	ifstream mgfifstream;
@@ -91,11 +279,13 @@ int cPeakListSeries::loadFromIMZMLStream(string& imzmlfilename, ifstream &ibdstr
 		mgfofstream.open(ss.str());
 	}
 
-	*os << "Loading the peaklist no. : " << endl;
+	*os << "Loading the ibd file, spectrum no. : ";
 
 	for (int i = 0; i < (int)imzml.getItems().size(); i++) {
-		*os << i + 1 << " ";
-		if ((i + 1) % 25 == 0) {
+		if ((i + 1) % 100 == 0) {
+			*os << i + 1 << " ";
+		}
+		if ((i + 1) % 2500 == 0) {
 			*os << endl;
 		}
 
@@ -110,14 +300,14 @@ int cPeakListSeries::loadFromIMZMLStream(string& imzmlfilename, ifstream &ibdstr
 
 		cPeaksList peaklist;
 		peaklist.loadFromIBDStream(imzml.getItems()[i], ibdstream, use_64bit_precision);
-		if ((peaklist.size() > 0) && !rawdata) {
+		if (!rawdata) {
 			peaklists.push_back(peaklist);
 		}
 
 		if (rawdata) {
 			peaksstring.clear();
 			for (int j = 0; j < peaklist.size(); j++) {
-				sprintf_s(tempstring, "%f %f\n\0", peaklist[j].mzratio, peaklist[j].intensity);
+				sprintf_s(tempstring, "%f %f\n\0", peaklist[j].mzratio, peaklist[j].absoluteintensity);
 				peaksstring.append(tempstring);
 			}
 			mgfofstream << peaksstring;
@@ -138,13 +328,13 @@ int cPeakListSeries::loadFromIMZMLStream(string& imzmlfilename, ifstream &ibdstr
 		}
 	}
 
-	*os << " ok" << endl << endl;
+	*os << " ok" << endl << "Total number of spectra: " << imzml.getItems().size() << endl << endl;
 
 	if (rawdata) {
 
 		mgfofstream.close();
 		
-		*os << endl << "Converting raw data to peaklists... ";
+		*os << "Converting raw data to peaklists... ";
 
 		string s;
 		#if OS_TYPE == UNX
@@ -158,8 +348,11 @@ int cPeakListSeries::loadFromIMZMLStream(string& imzmlfilename, ifstream &ibdstr
 		#endif
 
 		if (system(s.c_str()) != 0) {
+			peaklists.clear();
 			return -2;
 		}
+
+		*os << "ok" << endl << endl;
 
 		mgfname += "mgf";
 		mgfifstream.open(mgfname);
@@ -171,6 +364,7 @@ int cPeakListSeries::loadFromIMZMLStream(string& imzmlfilename, ifstream &ibdstr
 		mgfifstream.close();
 
 		if (imzml.getItems().size() != peaklists.size()) {
+			peaklists.clear();
 			return -2;
 		}
 		
@@ -178,16 +372,14 @@ int cPeakListSeries::loadFromIMZMLStream(string& imzmlfilename, ifstream &ibdstr
 
 		for (int i = 0; i < (int)imzml.getItems().size(); i++) {
 			peaklists[i].setCoordinates(imzml.getItems()[i].x, imzml.getItems()[i].y);
+			peaklists[i].setTitle(imzml.getItems()[i].title);
 		}
-
-		imzml.updateRawDataToPeakList(peaklists);
 
 		convertedimzmlfilename = imzmlfilename.substr(0, (int)imzmlfilename.size() - 6);
 		convertedibdfilename = convertedimzmlfilename + "_converted_fwhm_" + to_string(fwhm) + ".ibd";
 		convertedimzmlfilename += "_converted_fwhm_";
 		convertedimzmlfilename += to_string(fwhm);
 		convertedimzmlfilename += ".imzML";
-		imzml.write(convertedimzmlfilename);
 
 		ofstream ofibdstream;
 		char headerbyte;
@@ -207,15 +399,9 @@ int cPeakListSeries::loadFromIMZMLStream(string& imzmlfilename, ifstream &ibdstr
 			
 		ofibdstream.close();
 		
-		int i = 0;
-		while (i < (int)peaklists.size()) {
-			if (peaklists[i].size() == 0) {
-				peaklists.erase(peaklists.begin() + i);
-			}
-			else {
-				i++;
-			}
-		}
+		imzml.updateRawDataToPeakList(peaklists, convertedibdfilename);
+		imzml.write(convertedimzmlfilename);
+
 	}
 
 	return 0;
@@ -258,8 +444,7 @@ void cPeakListSeries::loadFromMGFStream(ifstream &stream) {
 	while (stream.good()) {
 		cPeaksList peaklist;
 		peaklist.loadFromMGFStream(stream);
-		
-		if (peaklist.size() > 0) {
+		if ((peaklist.size() > 0) || stream.good()) {
 			peaklists.push_back(peaklist);
 		}
 	}

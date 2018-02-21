@@ -54,8 +54,17 @@ public:
 	/**
 		\brief Handle the window close event.
 		\param event pointer to QCloseEvent
-	*/ 
+	*/
 	void closeEvent(QCloseEvent *event);
+
+
+	/**
+		\brief Set the default max count of pixel x/y values parsed from an imzML file.
+		\param maxcountx max count of pixel x - parsed from imzML file
+		\param maxcounty max count of pixel y - parsed from imzML file
+		\param vendor vendor type
+	*/
+	void setDefaultMaxXY(int maxcountx, int maxcounty, eVendorType vendor);
 
 
 private:
@@ -64,7 +73,7 @@ private:
 
 	QMenuBar* menuBar;
 	QMenu* menuFile;
-	QMenu* menuZoom;
+	QMenu* menuView;
 	QMenu* menuHelp;
 	
 	QToolBar* toolbarFile;
@@ -72,11 +81,12 @@ private:
 	QAction* actionSaveImage;
 	QAction* actionCloseWindow;
 
-	QToolBar* toolbarZoom;
+	QToolBar* toolbarView;
 	QAction* actionZoomIn;
 	QAction* actionZoomOut;
 	QAction* actionZoomReset;
-	//QAction* actionViewAllPoints;
+	QAction* actionColorScale;
+	QAction* actionAbsoluteIntensity;
 
 	QToolBar* toolbarRegion;
 	QWidget* regionwidget;
@@ -93,17 +103,19 @@ private:
 	QPushButton* resetregionbutton;
 
 	QToolBar* toolbarMaxCoordinates;
+	QAction* actionCorrelatePointsArea;
 	QWidget* maxcoordinateswidget;
 	QHBoxLayout* maxcoordinateshbox;
+	QLabel* minxlabel;
+	QSpinBox* minx;
+	QLabel* minylabel;
+	QSpinBox* miny;
 	QLabel* maxxlabel;
 	QSpinBox* maxx;
 	QLabel* maxylabel;
 	QSpinBox* maxy;
-	QLabel* leftmarginlabel;
-	QSpinBox* leftmargin;
-	QLabel* topmarginlabel;
-	QSpinBox* topmargin;
 	QPushButton* setmaxbutton;
+	QPushButton* setdefaultbutton;
 
 	QToolBar* toolbarHelp;
 	QAction* actionHTMLDocumentation;
@@ -115,6 +127,9 @@ private:
 
 	QString lastimagedir;
 
+	int maxcountx;
+	int maxcounty;
+	eVendorType vendor;
 
 protected:
 
@@ -138,10 +153,13 @@ private slots:
 	void saveImage();
 
 
-	void setCoordinates(vector<cCoordinates> coordinates);
+	void setFilterOptions(vector<cCoordinates> coordinates, string filterstring, bool casesensitive);
 
 
 	void setMaxButtonReleased();
+
+
+	void setDefaultButtonReleased();
 
 
 	void setRegionButtonReleased();
@@ -153,7 +171,13 @@ private slots:
 	void updateSelection(int xmin, int xmax, int ymin, int ymax);
 
 	
+	void clearSelection();
+
+
 	void resetSelection();
+
+
+	void updatePointsArea(int xmin, int xmax, int ymin, int ymax);
 
 
 signals:

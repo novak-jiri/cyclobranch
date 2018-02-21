@@ -104,7 +104,7 @@ class cTheoreticalSpectrum {
 	map<eFragmentIonType, int> matchedions;
 	int peakstested;
 	double experimentalpeaksmatchedratio;
-	cPeaksList unmatchedpeaks;
+	int unmatchedpeakscount;
 	string coveragebyseries;
 	bool valid;
 	double intensityweightedscore;
@@ -140,17 +140,19 @@ class cTheoreticalSpectrum {
 	void addPeakToList(cPeak& peak, int& theoreticalpeaksrealsize);
 
 	// add an adduct to a peak description
-	void addAdductToDescription(string& description);
-
-	// count isotopes of metals
-	int countIsotopesOfMetals(cParameters* parameters);
+	void addAdductToDescription(string& description, vector<string>& metals);
 
 	// add theoretical peaks containing metals
-	void addMetalPeaks(cPeak& peak, int& peaklistrealsize, int charge, bool writedescription);
+	void addMetalPeaks(cPeak& peak, vector<string>& metals, int& peaklistrealsize, int peakcharge, bool writedescription);
 
 	// remove unmatched biometal isotopes
 	void removeUnmatchedMetalIsotopes(cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks, vector<set<int> >& experimentalpeakmatches);
 
+	// remove unmatched isotope patterns
+	void removeUnmatchedIsotopePatterns(cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks, vector<set<int> >& experimentalpeakmatches);
+
+	// normalize theoretical intensities
+	void normalizeTheoreticalIntensities(cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize);
 
 public:
 
@@ -270,16 +272,24 @@ public:
 
 
 	/**
-		\brief Compare theoretical peaks with an experimental spectrum.
+		\brief Generate a simple mass spectrum.
+		\param writedescription if true then string descriptions of peaks are filled
 	*/ 
-	void generateMSSpectrum();
+	void generateMSSpectrum(bool writedescription);
+
+
+	/**
+		\brief Generate a simple mass spectrum with fine isotopic patterns.
+	*/ 
+	void generateFineMSSpectrum();
 
 
 	/**
 		\brief Compare theoretical peaks with an experimental spectrum.
 		\param peaklist reference to an experimental peaklist
+		\param tsfull theoretical spectrum with descriptions of peaks
 	*/ 
-	void compareMSSpectrum(cPeaksList& peaklist);
+	void compareMSSpectrum(cPeaksList& peaklist, cTheoreticalSpectrum& tsfull);
 
 
 	/**
@@ -402,10 +412,10 @@ public:
 
 
 	/**
-		\brief Get a list of unmatched peaks.
-		\retval cPeaksList a pointer to a list of unmatched peaks
+		\brief Get the number of unmatched peaks.
+		\retval number of unmatched peaks
 	*/ 
-	cPeaksList* getUnmatchedPeaks();
+	int getUnmatchedPeaksCount();
 
 
 	/**

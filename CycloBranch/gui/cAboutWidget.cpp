@@ -18,10 +18,10 @@ cAboutWidget::cAboutWidget(QWidget* parent) {
 
 	QString homepage = "Homepage: <a href=\"http://ms.biomed.cas.cz/cyclobranch/\">http://ms.biomed.cas.cz/cyclobranch/</a><br/><br/>";
 
-	QString citation = "If you use CycloBranch in your work, please, cite us using the following reference:<br/><br/>";
+	QString citation = "Any work based on CycloBranch shall cite the following reference:<br/><br/>";
 	citation += "<b>Jiri Novak, Karel Lemr, Kevin A. Schug and Vladimir Havlicek.<br/>";
 	citation += "CycloBranch: De Novo Sequencing of Nonribosomal Peptides from Accurate Product Ion Mass Spectra.<br/>";
-	citation += "<i>J. Am. Soc. Mass Spectrom.</i>, vol. 26, no. 10, pp. 1780-1786, 2015. DOI: 10.1007/s13361-015-1211-1.<br/>";
+	citation += "<i>J. Am. Soc. Mass Spectrom.</i>, vol. 26, no. 10, pp. 1780-1786, 2015. DOI: <a href=\"http://link.springer.com/article/10.1007/s13361-015-1211-1\">10.1007/s13361-015-1211-1</a>.<br/>";
 	citation += "Download citation: [ <a href=\"http://ms.biomed.cas.cz/cyclobranch/docs/cyclobranch_ris.txt\"><b>ris</b></a> ], [ <a href=\"http://ms.biomed.cas.cz/cyclobranch/docs/cyclobranch_bib.txt\"><b>bib</b></a> ]</b><br/><hr/><br/>";
 
 	QString licence = "Licence:<br/><br/> This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.<br/><br/>";

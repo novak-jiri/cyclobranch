@@ -13,6 +13,10 @@
 #include <string>
 #include <vector>
 #include <sstream>
+#include <QFile>
+#include <QCryptographicHash>
+
+#include "core/cMzML.h"
  
 using namespace std;
 using namespace xercesc;
@@ -63,6 +67,12 @@ struct cImzMLItem {
 
 
 	/**
+		\brief Title.
+	*/
+	string title;
+
+
+	/**
 		\brief The constructor.
 	*/ 
 	cImzMLItem() {
@@ -72,6 +82,7 @@ struct cImzMLItem {
 		mzlength = 0;
 		intensitystart = 0;
 		intensitylength = 0;
+		title = "";
 	}
 
 };
@@ -88,7 +99,6 @@ class cImzML {
 
 	bool profilespectra;
 	bool use_64bit_precision;
-	bool continuous;
 	vector<cImzMLItem> imzmlitems;
 
 public:
@@ -109,15 +119,20 @@ public:
 	/**
 		\brief Parse an imzml file.
 		\param filename imzml filename
+		\param maxcountx max count of pixel x - parsed from imzML file
+		\param maxcounty max count of pixel y - parsed from imzML file
+		\param vendor vendor type
+		\retval 0 = success; 1 = failed (zlib compression detected)
 	*/ 
-	void parse(string& filename);
+	int parse(string& filename, int& maxcountx, int& maxcounty, eVendorType& vendor);
  
 
 	/**
 		\brief Update values after conversion of profile spectra into centroid spectra.
 		\param peaklists an updated vector of peaklists
+		\param convertedibdfilename filename of a converted ibd file
 	*/ 
-	void updateRawDataToPeakList(vector<cPeaksList>& peaklists);
+	void updateRawDataToPeakList(vector<cPeaksList>& peaklists, string& convertedibdfilename);
  
 
 	/**
