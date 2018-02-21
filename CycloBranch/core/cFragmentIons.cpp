@@ -4,7 +4,9 @@
 
 cPeriodicTableMap::cPeriodicTableMap() {
 	table["H"] = H;
+	table["Hplus"] = Hplus;
 	table["D"] = D;
+	table["T"] = T;
 	table["Li"] = Li;
 	table["Be"] = Be;
 	table["B"] = B;
@@ -181,12 +183,17 @@ void cFragmentIons::recalculateFragments(bool cyclicnterminus, bool cyclicctermi
 	double cterminusshift = cycliccterminus?-H2O:0;
 	double adductshift = 0;
 
+	string nterminusshiftsummary = cyclicnterminus?"H-2O-1":"";
+	string cterminusshiftsummary = cycliccterminus?"H-2O-1":"";
+	string adductshiftsummary = "";
+
 	if (precursoradduct.compare("") != 0) {
 		cSummaryFormula formula;
 		formula.setFormula(precursoradduct);
 		adductshift = formula.getMass() - H;
+		adductshiftsummary = formula.getSummary() + "H-1";
 	}
-	
+
 	// initialize A-ion
 	fragmentions[a_ion].nterminal = true;
 	fragmentions[a_ion].cterminal = false;
@@ -221,6 +228,7 @@ void cFragmentIons::recalculateFragments(bool cyclicnterminus, bool cyclicctermi
 	fragmentions[b_ion].name = "B";
 	fragmentions[b_ion].massdifference = B_ION + nterminusshift + adductshift;
 	fragmentions[b_ion].parent = b_ion;
+	fragmentions[b_ion].summary = "Hplus" + nterminusshiftsummary + adductshiftsummary;
 
 	// initialize B-H2O ion
 	fragmentions[b_ion_dehydrated].nterminal = true;
@@ -305,6 +313,7 @@ void cFragmentIons::recalculateFragments(bool cyclicnterminus, bool cyclicctermi
 	fragmentions[y_ion].name = "Y";
 	fragmentions[y_ion].massdifference = Y_ION + cterminusshift + adductshift;
 	fragmentions[y_ion].parent = y_ion;
+	fragmentions[y_ion].summary = "H2OHplus" + cterminusshiftsummary + adductshiftsummary;
 
 	// initialize Y-H2O ion
 	fragmentions[y_ion_dehydrated].nterminal = false;
@@ -361,6 +370,7 @@ void cFragmentIons::recalculateFragments(bool cyclicnterminus, bool cyclicctermi
 	fragmentions[precursor_ion].name = "[M+zH]+";
 	fragmentions[precursor_ion].massdifference = PRECURSOR_ION + nterminusshift + cterminusshift + adductshift;
 	fragmentions[precursor_ion].parent = precursor_ion;
+	fragmentions[precursor_ion].summary = "H2OHplus" + nterminusshiftsummary + cterminusshiftsummary + adductshiftsummary;
 
 	// initialize precursor ion - H2O
 	fragmentions[precursor_ion_dehydrated].nterminal = false;
@@ -466,48 +476,6 @@ void cFragmentIons::recalculateFragments(bool cyclicnterminus, bool cyclicctermi
 	fragmentions[cyclic_precursor_ion_co_loss_and_dehydrated_and_deamidated].name = "[M+zH]+ *x-CO";
 	fragmentions[cyclic_precursor_ion_co_loss_and_dehydrated_and_deamidated].massdifference = PRECURSOR_ION_CYCLIC - CO - H2O - NH3 + adductshift;
 	fragmentions[cyclic_precursor_ion_co_loss_and_dehydrated_and_deamidated].parent = cyclic_precursor_ion_co_loss;
-
-	// initialize MS N-terminal ion H+
-	fragmentions[ms_nterminal_ion_hplus].nterminal = true;
-	fragmentions[ms_nterminal_ion_hplus].cterminal = false;
-	fragmentions[ms_nterminal_ion_hplus].name = "N_H+";
-	fragmentions[ms_nterminal_ion_hplus].massdifference = H2O + Hplus;
-	fragmentions[ms_nterminal_ion_hplus].parent = ms_nterminal_ion_hplus;
-
-	// initialize MS N-terminal ion Na+
-	fragmentions[ms_nterminal_ion_naplus].nterminal = true;
-	fragmentions[ms_nterminal_ion_naplus].cterminal = false;
-	fragmentions[ms_nterminal_ion_naplus].name = "N_Na+";
-	fragmentions[ms_nterminal_ion_naplus].massdifference = H2O + Naplus;
-	fragmentions[ms_nterminal_ion_naplus].parent = ms_nterminal_ion_naplus;
-
-	// initialize MS N-terminal ion K+
-	fragmentions[ms_nterminal_ion_kplus].nterminal = true;
-	fragmentions[ms_nterminal_ion_kplus].cterminal = false;
-	fragmentions[ms_nterminal_ion_kplus].name = "N_K+";
-	fragmentions[ms_nterminal_ion_kplus].massdifference = H2O + Kplus;
-	fragmentions[ms_nterminal_ion_kplus].parent = ms_nterminal_ion_kplus;
-
-	// initialize MS C-terminal ion H+
-	fragmentions[ms_cterminal_ion_hplus].nterminal = false;
-	fragmentions[ms_cterminal_ion_hplus].cterminal = true;
-	fragmentions[ms_cterminal_ion_hplus].name = "C_H+";
-	fragmentions[ms_cterminal_ion_hplus].massdifference = H2O + Hplus;
-	fragmentions[ms_cterminal_ion_hplus].parent = ms_cterminal_ion_hplus;
-
-	// initialize MS C-terminal ion Na+
-	fragmentions[ms_cterminal_ion_naplus].nterminal = false;
-	fragmentions[ms_cterminal_ion_naplus].cterminal = true;
-	fragmentions[ms_cterminal_ion_naplus].name = "C_Na+";
-	fragmentions[ms_cterminal_ion_naplus].massdifference = H2O + Naplus;
-	fragmentions[ms_cterminal_ion_naplus].parent = ms_cterminal_ion_naplus;
-
-	// initialize MS C-terminal ion K+
-	fragmentions[ms_cterminal_ion_kplus].nterminal = false;
-	fragmentions[ms_cterminal_ion_kplus].cterminal = true;
-	fragmentions[ms_cterminal_ion_kplus].name = "C_K+";
-	fragmentions[ms_cterminal_ion_kplus].massdifference = H2O + Kplus;
-	fragmentions[ms_cterminal_ion_kplus].parent = ms_cterminal_ion_kplus;
 
 	// initialize ion H+
 	fragmentions[ms_hplus].nterminal = true;
@@ -747,7 +715,7 @@ void cFragmentIons::recalculateFragments(bool cyclicnterminus, bool cyclicctermi
 	fragmentions[ms_MCaH].parent = ms_MCaH;
 	fragmentions[ms_MCaH].positive = true;
 	fragmentions[ms_MCaH].multiplier = 1;
-	fragmentions[ms_MCaH].numberofisotopes = 1;
+	fragmentions[ms_MCaH].numberofisotopes = 0;
 
 	// initialize ion [M+Ca-2H+Na]+
 	fragmentions[ms_MCa2HNa].nterminal = true;
@@ -757,7 +725,7 @@ void cFragmentIons::recalculateFragments(bool cyclicnterminus, bool cyclicctermi
 	fragmentions[ms_MCa2HNa].parent = ms_MCa2HNa;
 	fragmentions[ms_MCa2HNa].positive = true;
 	fragmentions[ms_MCa2HNa].multiplier = 1;
-	fragmentions[ms_MCa2HNa].numberofisotopes = 1;
+	fragmentions[ms_MCa2HNa].numberofisotopes = 0;
 
 	// initialize ion [M+Ca-3H]-
 	fragmentions[ms_MCa3H].nterminal = true;
@@ -767,7 +735,37 @@ void cFragmentIons::recalculateFragments(bool cyclicnterminus, bool cyclicctermi
 	fragmentions[ms_MCa3H].parent = ms_MCa3H;
 	fragmentions[ms_MCa3H].positive = false;
 	fragmentions[ms_MCa3H].multiplier = 1;
-	fragmentions[ms_MCa3H].numberofisotopes = 1;
+	fragmentions[ms_MCa3H].numberofisotopes = 0;
+
+	// initialize ion [M+Cr-2H]+
+	fragmentions[ms_MCr2H].nterminal = true;
+	fragmentions[ms_MCr2H].cterminal = true;
+	fragmentions[ms_MCr2H].name = "[M+Cr-2H]+";
+	fragmentions[ms_MCr2H].massdifference = Cr - 3*H + Hplus;
+	fragmentions[ms_MCr2H].parent = ms_MCr2H;
+	fragmentions[ms_MCr2H].positive = true;
+	fragmentions[ms_MCr2H].multiplier = 1;
+	fragmentions[ms_MCr2H].numberofisotopes = 2;
+
+	// initialize ion [M+Cr-3H+Na]+
+	fragmentions[ms_MCr3HNa].nterminal = true;
+	fragmentions[ms_MCr3HNa].cterminal = true;
+	fragmentions[ms_MCr3HNa].name = "[M+Cr-3H+Na]+";
+	fragmentions[ms_MCr3HNa].massdifference = Cr - 3*H + Naplus;
+	fragmentions[ms_MCr3HNa].parent = ms_MCr3HNa;
+	fragmentions[ms_MCr3HNa].positive = true;
+	fragmentions[ms_MCr3HNa].multiplier = 1;
+	fragmentions[ms_MCr3HNa].numberofisotopes = 2;
+
+	// initialize ion [M+Cr-4H]-
+	fragmentions[ms_MCr4H].nterminal = true;
+	fragmentions[ms_MCr4H].cterminal = true;
+	fragmentions[ms_MCr4H].name = "[M+Cr-4H]-";
+	fragmentions[ms_MCr4H].massdifference = Cr - 3*H - Hplus;
+	fragmentions[ms_MCr4H].parent = ms_MCr4H;
+	fragmentions[ms_MCr4H].positive = false;
+	fragmentions[ms_MCr4H].multiplier = 1;
+	fragmentions[ms_MCr4H].numberofisotopes = 2;
 
 	// initialize ion [M+Mn-H]+
 	fragmentions[ms_MMnH].nterminal = true;
@@ -837,7 +835,7 @@ void cFragmentIons::recalculateFragments(bool cyclicnterminus, bool cyclicctermi
 	fragmentions[ms_MNiH].parent = ms_MNiH;
 	fragmentions[ms_MNiH].positive = true;
 	fragmentions[ms_MNiH].multiplier = 1;
-	fragmentions[ms_MNiH].numberofisotopes = 3;
+	fragmentions[ms_MNiH].numberofisotopes = 2;
 
 	// initialize ion [M+Ni-2H+Na]+
 	fragmentions[ms_MNi2HNa].nterminal = true;
@@ -847,7 +845,7 @@ void cFragmentIons::recalculateFragments(bool cyclicnterminus, bool cyclicctermi
 	fragmentions[ms_MNi2HNa].parent = ms_MNi2HNa;
 	fragmentions[ms_MNi2HNa].positive = true;
 	fragmentions[ms_MNi2HNa].multiplier = 1;
-	fragmentions[ms_MNi2HNa].numberofisotopes = 3;
+	fragmentions[ms_MNi2HNa].numberofisotopes = 2;
 
 	// initialize ion [M+Ni-3H]-
 	fragmentions[ms_MNi3H].nterminal = true;
@@ -857,7 +855,7 @@ void cFragmentIons::recalculateFragments(bool cyclicnterminus, bool cyclicctermi
 	fragmentions[ms_MNi3H].parent = ms_MNi3H;
 	fragmentions[ms_MNi3H].positive = false;
 	fragmentions[ms_MNi3H].multiplier = 1;
-	fragmentions[ms_MNi3H].numberofisotopes = 3;
+	fragmentions[ms_MNi3H].numberofisotopes = 2;
 
 	// initialize ion [M+Cu-H]+
 	fragmentions[ms_MCuH].nterminal = true;
@@ -949,8 +947,6 @@ void cFragmentIons::recalculateFragments(bool cyclicnterminus, bool cyclicctermi
 	fragmentions[ms_MGa4H].multiplier = 1;
 	fragmentions[ms_MGa4H].numberofisotopes = 1;
 
-#if OLIGOKETIDES == 1
-
 	// initialize l0h ion
 	fragmentions[l0h_ion].nterminal = true;
 	fragmentions[l0h_ion].cterminal = false;
@@ -1013,6 +1009,7 @@ void cFragmentIons::recalculateFragments(bool cyclicnterminus, bool cyclicctermi
 	fragmentions[l1h_ion].name = "LB";
 	fragmentions[l1h_ion].massdifference = L1H_ION + adductshift;
 	fragmentions[l1h_ion].parent = l1h_ion;
+	fragmentions[l1h_ion].summary = "Hplus" + adductshiftsummary;
 
 	// initialize l1h-H2O ion
 	fragmentions[l1h_ion_dehydrated].nterminal = true;
@@ -1069,6 +1066,7 @@ void cFragmentIons::recalculateFragments(bool cyclicnterminus, bool cyclicctermi
 	fragmentions[l2h_ion].name = "LB+2H";
 	fragmentions[l2h_ion].massdifference = L2H_ION + adductshift;
 	fragmentions[l2h_ion].parent = l2h_ion;
+	fragmentions[l2h_ion].summary = "H2Hplus" + adductshiftsummary;
 
 	// initialize l2h-H2O ion
 	fragmentions[l2h_ion_dehydrated].nterminal = true;
@@ -1237,6 +1235,7 @@ void cFragmentIons::recalculateFragments(bool cyclicnterminus, bool cyclicctermi
 	fragmentions[l1oh_ion].name = "LY-2H";
 	fragmentions[l1oh_ion].massdifference = L1OH_ION + adductshift;
 	fragmentions[l1oh_ion].parent = l1oh_ion;
+	fragmentions[l1oh_ion].summary = "OHplus" + adductshiftsummary;
 
 	// initialize l1oh-H2O ion
 	fragmentions[l1oh_ion_dehydrated].nterminal = false;
@@ -1293,6 +1292,7 @@ void cFragmentIons::recalculateFragments(bool cyclicnterminus, bool cyclicctermi
 	fragmentions[l2oh_ion].name = "LY";
 	fragmentions[l2oh_ion].massdifference = L2OH_ION + adductshift;
 	fragmentions[l2oh_ion].parent = l2oh_ion;
+	fragmentions[l2oh_ion].summary = "H2OHplus" + adductshiftsummary;
 
 	// initialize l2oh-H2O ion
 	fragmentions[l2oh_ion_dehydrated].nterminal = false;
@@ -1455,230 +1455,233 @@ void cFragmentIons::recalculateFragments(bool cyclicnterminus, bool cyclicctermi
 	fragmentions[r2oh_ion_co_loss_dehydrated_and_deamidated].massdifference = R2OH_ION - CO - H2O - NH3 + adductshift;
 	fragmentions[r2oh_ion_co_loss_dehydrated_and_deamidated].parent = r2oh_ion;
 
-	// initialize linear oligoketide precursor ion (H-...-H)
-	fragmentions[linear_oligoketide_precursor_ion_h_h].nterminal = false;
-	fragmentions[linear_oligoketide_precursor_ion_h_h].cterminal = false;
-	fragmentions[linear_oligoketide_precursor_ion_h_h].name = "[M+zH]+ (H-...-H)";
-	fragmentions[linear_oligoketide_precursor_ion_h_h].massdifference = PRECURSOR_ION_LINEAR_OLIGOKETIDE_H_H + adductshift;
-	fragmentions[linear_oligoketide_precursor_ion_h_h].parent = linear_oligoketide_precursor_ion_h_h;
+	// initialize linear polyketide precursor ion (H-...-H)
+	fragmentions[linear_polyketide_precursor_ion_h_h].nterminal = false;
+	fragmentions[linear_polyketide_precursor_ion_h_h].cterminal = false;
+	fragmentions[linear_polyketide_precursor_ion_h_h].name = "[M+zH]+ (H-...-H)";
+	fragmentions[linear_polyketide_precursor_ion_h_h].massdifference = PRECURSOR_ION_LINEAR_POLYKETIDE_H_H + nterminusshift + cterminusshift + adductshift;
+	fragmentions[linear_polyketide_precursor_ion_h_h].parent = linear_polyketide_precursor_ion_h_h;
+	fragmentions[linear_polyketide_precursor_ion_h_h].summary = "H2Hplus" + nterminusshiftsummary + cterminusshiftsummary + adductshiftsummary;
 
-	// initialize linear oligoketide precursor ion (H-...-H) - H2O
-	fragmentions[linear_oligoketide_precursor_ion_h_h_dehydrated].nterminal = false;
-	fragmentions[linear_oligoketide_precursor_ion_h_h_dehydrated].cterminal = false;
-	fragmentions[linear_oligoketide_precursor_ion_h_h_dehydrated].name = "[M+zH]+ * (H-...-H)";
-	fragmentions[linear_oligoketide_precursor_ion_h_h_dehydrated].massdifference = PRECURSOR_ION_LINEAR_OLIGOKETIDE_H_H - H2O + adductshift;
-	fragmentions[linear_oligoketide_precursor_ion_h_h_dehydrated].parent = linear_oligoketide_precursor_ion_h_h;
+	// initialize linear polyketide precursor ion (H-...-H) - H2O
+	fragmentions[linear_polyketide_precursor_ion_h_h_dehydrated].nterminal = false;
+	fragmentions[linear_polyketide_precursor_ion_h_h_dehydrated].cterminal = false;
+	fragmentions[linear_polyketide_precursor_ion_h_h_dehydrated].name = "[M+zH]+ * (H-...-H)";
+	fragmentions[linear_polyketide_precursor_ion_h_h_dehydrated].massdifference = PRECURSOR_ION_LINEAR_POLYKETIDE_H_H - H2O + nterminusshift + cterminusshift + adductshift;
+	fragmentions[linear_polyketide_precursor_ion_h_h_dehydrated].parent = linear_polyketide_precursor_ion_h_h;
 
-	// initialize linear oligoketide precursor ion (H-...-H) - NH3
-	fragmentions[linear_oligoketide_precursor_ion_h_h_deamidated].nterminal = false;
-	fragmentions[linear_oligoketide_precursor_ion_h_h_deamidated].cterminal = false;
-	fragmentions[linear_oligoketide_precursor_ion_h_h_deamidated].name = "[M+zH]+ x (H-...-H)";
-	fragmentions[linear_oligoketide_precursor_ion_h_h_deamidated].massdifference = PRECURSOR_ION_LINEAR_OLIGOKETIDE_H_H - NH3 + adductshift;
-	fragmentions[linear_oligoketide_precursor_ion_h_h_deamidated].parent = linear_oligoketide_precursor_ion_h_h;
+	// initialize linear polyketide precursor ion (H-...-H) - NH3
+	fragmentions[linear_polyketide_precursor_ion_h_h_deamidated].nterminal = false;
+	fragmentions[linear_polyketide_precursor_ion_h_h_deamidated].cterminal = false;
+	fragmentions[linear_polyketide_precursor_ion_h_h_deamidated].name = "[M+zH]+ x (H-...-H)";
+	fragmentions[linear_polyketide_precursor_ion_h_h_deamidated].massdifference = PRECURSOR_ION_LINEAR_POLYKETIDE_H_H - NH3 + nterminusshift + cterminusshift + adductshift;
+	fragmentions[linear_polyketide_precursor_ion_h_h_deamidated].parent = linear_polyketide_precursor_ion_h_h;
 
-	// initialize linear oligoketide precursor ion (H-...-H) - H2O - NH3
-	fragmentions[linear_oligoketide_precursor_ion_h_h_dehydrated_and_deamidated].nterminal = false;
-	fragmentions[linear_oligoketide_precursor_ion_h_h_dehydrated_and_deamidated].cterminal = false;
-	fragmentions[linear_oligoketide_precursor_ion_h_h_dehydrated_and_deamidated].name = "[M+zH]+ *x (H-...-H)";
-	fragmentions[linear_oligoketide_precursor_ion_h_h_dehydrated_and_deamidated].massdifference = PRECURSOR_ION_LINEAR_OLIGOKETIDE_H_H - H2O - NH3 + adductshift;
-	fragmentions[linear_oligoketide_precursor_ion_h_h_dehydrated_and_deamidated].parent = linear_oligoketide_precursor_ion_h_h;
+	// initialize linear polyketide precursor ion (H-...-H) - H2O - NH3
+	fragmentions[linear_polyketide_precursor_ion_h_h_dehydrated_and_deamidated].nterminal = false;
+	fragmentions[linear_polyketide_precursor_ion_h_h_dehydrated_and_deamidated].cterminal = false;
+	fragmentions[linear_polyketide_precursor_ion_h_h_dehydrated_and_deamidated].name = "[M+zH]+ *x (H-...-H)";
+	fragmentions[linear_polyketide_precursor_ion_h_h_dehydrated_and_deamidated].massdifference = PRECURSOR_ION_LINEAR_POLYKETIDE_H_H - H2O - NH3 + nterminusshift + cterminusshift + adductshift;
+	fragmentions[linear_polyketide_precursor_ion_h_h_dehydrated_and_deamidated].parent = linear_polyketide_precursor_ion_h_h;
 
-	// initialize linear oligoketide precursor ion (H-...-H) - CO
-	fragmentions[linear_oligoketide_precursor_ion_h_h_co_loss].nterminal = false;
-	fragmentions[linear_oligoketide_precursor_ion_h_h_co_loss].cterminal = false;
-	fragmentions[linear_oligoketide_precursor_ion_h_h_co_loss].name = "[M+zH]+ -CO (H-...-H)";
-	fragmentions[linear_oligoketide_precursor_ion_h_h_co_loss].massdifference = PRECURSOR_ION_LINEAR_OLIGOKETIDE_H_H - CO + adductshift;
-	fragmentions[linear_oligoketide_precursor_ion_h_h_co_loss].parent = linear_oligoketide_precursor_ion_h_h_co_loss;
+	// initialize linear polyketide precursor ion (H-...-H) - CO
+	fragmentions[linear_polyketide_precursor_ion_h_h_co_loss].nterminal = false;
+	fragmentions[linear_polyketide_precursor_ion_h_h_co_loss].cterminal = false;
+	fragmentions[linear_polyketide_precursor_ion_h_h_co_loss].name = "[M+zH]+ -CO (H-...-H)";
+	fragmentions[linear_polyketide_precursor_ion_h_h_co_loss].massdifference = PRECURSOR_ION_LINEAR_POLYKETIDE_H_H - CO + nterminusshift + cterminusshift + adductshift;
+	fragmentions[linear_polyketide_precursor_ion_h_h_co_loss].parent = linear_polyketide_precursor_ion_h_h_co_loss;
 
-	// initialize linear oligoketide precursor ion (H-...-H) - CO - H2O
-	fragmentions[linear_oligoketide_precursor_ion_h_h_co_loss_dehydrated].nterminal = false;
-	fragmentions[linear_oligoketide_precursor_ion_h_h_co_loss_dehydrated].cterminal = false;
-	fragmentions[linear_oligoketide_precursor_ion_h_h_co_loss_dehydrated].name = "[M+zH]+ *-CO (H-...-H)";
-	fragmentions[linear_oligoketide_precursor_ion_h_h_co_loss_dehydrated].massdifference = PRECURSOR_ION_LINEAR_OLIGOKETIDE_H_H - CO - H2O + adductshift;
-	fragmentions[linear_oligoketide_precursor_ion_h_h_co_loss_dehydrated].parent = linear_oligoketide_precursor_ion_h_h_co_loss;
+	// initialize linear polyketide precursor ion (H-...-H) - CO - H2O
+	fragmentions[linear_polyketide_precursor_ion_h_h_co_loss_dehydrated].nterminal = false;
+	fragmentions[linear_polyketide_precursor_ion_h_h_co_loss_dehydrated].cterminal = false;
+	fragmentions[linear_polyketide_precursor_ion_h_h_co_loss_dehydrated].name = "[M+zH]+ *-CO (H-...-H)";
+	fragmentions[linear_polyketide_precursor_ion_h_h_co_loss_dehydrated].massdifference = PRECURSOR_ION_LINEAR_POLYKETIDE_H_H - CO - H2O + nterminusshift + cterminusshift + adductshift;
+	fragmentions[linear_polyketide_precursor_ion_h_h_co_loss_dehydrated].parent = linear_polyketide_precursor_ion_h_h_co_loss;
 
-	// initialize linear oligoketide precursor ion (H-...-H) - CO - NH3
-	fragmentions[linear_oligoketide_precursor_ion_h_h_co_loss_deamidated].nterminal = false;
-	fragmentions[linear_oligoketide_precursor_ion_h_h_co_loss_deamidated].cterminal = false;
-	fragmentions[linear_oligoketide_precursor_ion_h_h_co_loss_deamidated].name = "[M+zH]+ x-CO (H-...-H)";
-	fragmentions[linear_oligoketide_precursor_ion_h_h_co_loss_deamidated].massdifference = PRECURSOR_ION_LINEAR_OLIGOKETIDE_H_H - CO - NH3 + adductshift;
-	fragmentions[linear_oligoketide_precursor_ion_h_h_co_loss_deamidated].parent = linear_oligoketide_precursor_ion_h_h_co_loss;
+	// initialize linear polyketide precursor ion (H-...-H) - CO - NH3
+	fragmentions[linear_polyketide_precursor_ion_h_h_co_loss_deamidated].nterminal = false;
+	fragmentions[linear_polyketide_precursor_ion_h_h_co_loss_deamidated].cterminal = false;
+	fragmentions[linear_polyketide_precursor_ion_h_h_co_loss_deamidated].name = "[M+zH]+ x-CO (H-...-H)";
+	fragmentions[linear_polyketide_precursor_ion_h_h_co_loss_deamidated].massdifference = PRECURSOR_ION_LINEAR_POLYKETIDE_H_H - CO - NH3 + nterminusshift + cterminusshift + adductshift;
+	fragmentions[linear_polyketide_precursor_ion_h_h_co_loss_deamidated].parent = linear_polyketide_precursor_ion_h_h_co_loss;
 
-	// initialize linear oligoketide precursor ion (H-...-H) - CO - H2O - NH3
-	fragmentions[linear_oligoketide_precursor_ion_h_h_co_loss_dehydrated_and_deamidated].nterminal = false;
-	fragmentions[linear_oligoketide_precursor_ion_h_h_co_loss_dehydrated_and_deamidated].cterminal = false;
-	fragmentions[linear_oligoketide_precursor_ion_h_h_co_loss_dehydrated_and_deamidated].name = "[M+zH]+ *x-CO (H-...-H)";
-	fragmentions[linear_oligoketide_precursor_ion_h_h_co_loss_dehydrated_and_deamidated].massdifference = PRECURSOR_ION_LINEAR_OLIGOKETIDE_H_H - CO - H2O - NH3 + adductshift;
-	fragmentions[linear_oligoketide_precursor_ion_h_h_co_loss_dehydrated_and_deamidated].parent = linear_oligoketide_precursor_ion_h_h_co_loss;
+	// initialize linear polyketide precursor ion (H-...-H) - CO - H2O - NH3
+	fragmentions[linear_polyketide_precursor_ion_h_h_co_loss_dehydrated_and_deamidated].nterminal = false;
+	fragmentions[linear_polyketide_precursor_ion_h_h_co_loss_dehydrated_and_deamidated].cterminal = false;
+	fragmentions[linear_polyketide_precursor_ion_h_h_co_loss_dehydrated_and_deamidated].name = "[M+zH]+ *x-CO (H-...-H)";
+	fragmentions[linear_polyketide_precursor_ion_h_h_co_loss_dehydrated_and_deamidated].massdifference = PRECURSOR_ION_LINEAR_POLYKETIDE_H_H - CO - H2O - NH3 + nterminusshift + cterminusshift + adductshift;
+	fragmentions[linear_polyketide_precursor_ion_h_h_co_loss_dehydrated_and_deamidated].parent = linear_polyketide_precursor_ion_h_h_co_loss;
 
-	// initialize linear oligoketide precursor ion (H-...-OH)
-	fragmentions[linear_oligoketide_precursor_ion_h_oh].nterminal = false;
-	fragmentions[linear_oligoketide_precursor_ion_h_oh].cterminal = false;
-	fragmentions[linear_oligoketide_precursor_ion_h_oh].name = "[M+zH]+ (H-...-OH)";
-	fragmentions[linear_oligoketide_precursor_ion_h_oh].massdifference = PRECURSOR_ION_LINEAR_OLIGOKETIDE_H_OH + adductshift;
-	fragmentions[linear_oligoketide_precursor_ion_h_oh].parent = linear_oligoketide_precursor_ion_h_oh;
+	// initialize linear polyketide precursor ion (H-...-OH)
+	fragmentions[linear_polyketide_precursor_ion_h_oh].nterminal = false;
+	fragmentions[linear_polyketide_precursor_ion_h_oh].cterminal = false;
+	fragmentions[linear_polyketide_precursor_ion_h_oh].name = "[M+zH]+ (H-...-OH)";
+	fragmentions[linear_polyketide_precursor_ion_h_oh].massdifference = PRECURSOR_ION_LINEAR_POLYKETIDE_H_OH + nterminusshift + cterminusshift + adductshift;
+	fragmentions[linear_polyketide_precursor_ion_h_oh].parent = linear_polyketide_precursor_ion_h_oh;
+	fragmentions[linear_polyketide_precursor_ion_h_oh].summary = "H2OHplus" + nterminusshiftsummary + cterminusshiftsummary + adductshiftsummary;
 
-	// initialize linear oligoketide precursor ion (H-...-OH) - H2O
-	fragmentions[linear_oligoketide_precursor_ion_h_oh_dehydrated].nterminal = false;
-	fragmentions[linear_oligoketide_precursor_ion_h_oh_dehydrated].cterminal = false;
-	fragmentions[linear_oligoketide_precursor_ion_h_oh_dehydrated].name = "[M+zH]+ * (H-...-OH)";
-	fragmentions[linear_oligoketide_precursor_ion_h_oh_dehydrated].massdifference = PRECURSOR_ION_LINEAR_OLIGOKETIDE_H_OH - H2O + adductshift;
-	fragmentions[linear_oligoketide_precursor_ion_h_oh_dehydrated].parent = linear_oligoketide_precursor_ion_h_oh;
+	// initialize linear polyketide precursor ion (H-...-OH) - H2O
+	fragmentions[linear_polyketide_precursor_ion_h_oh_dehydrated].nterminal = false;
+	fragmentions[linear_polyketide_precursor_ion_h_oh_dehydrated].cterminal = false;
+	fragmentions[linear_polyketide_precursor_ion_h_oh_dehydrated].name = "[M+zH]+ * (H-...-OH)";
+	fragmentions[linear_polyketide_precursor_ion_h_oh_dehydrated].massdifference = PRECURSOR_ION_LINEAR_POLYKETIDE_H_OH - H2O + nterminusshift + cterminusshift + adductshift;
+	fragmentions[linear_polyketide_precursor_ion_h_oh_dehydrated].parent = linear_polyketide_precursor_ion_h_oh;
 
-	// initialize linear oligoketide precursor ion (H-...-OH) - NH3
-	fragmentions[linear_oligoketide_precursor_ion_h_oh_deamidated].nterminal = false;
-	fragmentions[linear_oligoketide_precursor_ion_h_oh_deamidated].cterminal = false;
-	fragmentions[linear_oligoketide_precursor_ion_h_oh_deamidated].name = "[M+zH]+ x (H-...-OH)";
-	fragmentions[linear_oligoketide_precursor_ion_h_oh_deamidated].massdifference = PRECURSOR_ION_LINEAR_OLIGOKETIDE_H_OH - NH3 + adductshift;
-	fragmentions[linear_oligoketide_precursor_ion_h_oh_deamidated].parent = linear_oligoketide_precursor_ion_h_oh;
+	// initialize linear polyketide precursor ion (H-...-OH) - NH3
+	fragmentions[linear_polyketide_precursor_ion_h_oh_deamidated].nterminal = false;
+	fragmentions[linear_polyketide_precursor_ion_h_oh_deamidated].cterminal = false;
+	fragmentions[linear_polyketide_precursor_ion_h_oh_deamidated].name = "[M+zH]+ x (H-...-OH)";
+	fragmentions[linear_polyketide_precursor_ion_h_oh_deamidated].massdifference = PRECURSOR_ION_LINEAR_POLYKETIDE_H_OH - NH3 + nterminusshift + cterminusshift + adductshift;
+	fragmentions[linear_polyketide_precursor_ion_h_oh_deamidated].parent = linear_polyketide_precursor_ion_h_oh;
 
-	// initialize linear oligoketide precursor ion (H-...-OH) - H2O - NH3
-	fragmentions[linear_oligoketide_precursor_ion_h_oh_dehydrated_and_deamidated].nterminal = false;
-	fragmentions[linear_oligoketide_precursor_ion_h_oh_dehydrated_and_deamidated].cterminal = false;
-	fragmentions[linear_oligoketide_precursor_ion_h_oh_dehydrated_and_deamidated].name = "[M+zH]+ *x (H-...-OH)";
-	fragmentions[linear_oligoketide_precursor_ion_h_oh_dehydrated_and_deamidated].massdifference = PRECURSOR_ION_LINEAR_OLIGOKETIDE_H_OH - H2O - NH3 + adductshift;
-	fragmentions[linear_oligoketide_precursor_ion_h_oh_dehydrated_and_deamidated].parent = linear_oligoketide_precursor_ion_h_oh;
+	// initialize linear polyketide precursor ion (H-...-OH) - H2O - NH3
+	fragmentions[linear_polyketide_precursor_ion_h_oh_dehydrated_and_deamidated].nterminal = false;
+	fragmentions[linear_polyketide_precursor_ion_h_oh_dehydrated_and_deamidated].cterminal = false;
+	fragmentions[linear_polyketide_precursor_ion_h_oh_dehydrated_and_deamidated].name = "[M+zH]+ *x (H-...-OH)";
+	fragmentions[linear_polyketide_precursor_ion_h_oh_dehydrated_and_deamidated].massdifference = PRECURSOR_ION_LINEAR_POLYKETIDE_H_OH - H2O - NH3 + nterminusshift + cterminusshift + adductshift;
+	fragmentions[linear_polyketide_precursor_ion_h_oh_dehydrated_and_deamidated].parent = linear_polyketide_precursor_ion_h_oh;
 
-	// initialize linear oligoketide precursor ion (H-...-OH) - CO
-	fragmentions[linear_oligoketide_precursor_ion_h_oh_co_loss].nterminal = false;
-	fragmentions[linear_oligoketide_precursor_ion_h_oh_co_loss].cterminal = false;
-	fragmentions[linear_oligoketide_precursor_ion_h_oh_co_loss].name = "[M+zH]+ -CO (H-...-OH)";
-	fragmentions[linear_oligoketide_precursor_ion_h_oh_co_loss].massdifference = PRECURSOR_ION_LINEAR_OLIGOKETIDE_H_OH - CO + adductshift;
-	fragmentions[linear_oligoketide_precursor_ion_h_oh_co_loss].parent = linear_oligoketide_precursor_ion_h_oh_co_loss;
+	// initialize linear polyketide precursor ion (H-...-OH) - CO
+	fragmentions[linear_polyketide_precursor_ion_h_oh_co_loss].nterminal = false;
+	fragmentions[linear_polyketide_precursor_ion_h_oh_co_loss].cterminal = false;
+	fragmentions[linear_polyketide_precursor_ion_h_oh_co_loss].name = "[M+zH]+ -CO (H-...-OH)";
+	fragmentions[linear_polyketide_precursor_ion_h_oh_co_loss].massdifference = PRECURSOR_ION_LINEAR_POLYKETIDE_H_OH - CO + nterminusshift + cterminusshift + adductshift;
+	fragmentions[linear_polyketide_precursor_ion_h_oh_co_loss].parent = linear_polyketide_precursor_ion_h_oh_co_loss;
 
-	// initialize linear oligoketide precursor ion (H-...-OH) - CO - H2O
-	fragmentions[linear_oligoketide_precursor_ion_h_oh_co_loss_dehydrated].nterminal = false;
-	fragmentions[linear_oligoketide_precursor_ion_h_oh_co_loss_dehydrated].cterminal = false;
-	fragmentions[linear_oligoketide_precursor_ion_h_oh_co_loss_dehydrated].name = "[M+zH]+ *-CO (H-...-OH)";
-	fragmentions[linear_oligoketide_precursor_ion_h_oh_co_loss_dehydrated].massdifference = PRECURSOR_ION_LINEAR_OLIGOKETIDE_H_OH - CO - H2O + adductshift;
-	fragmentions[linear_oligoketide_precursor_ion_h_oh_co_loss_dehydrated].parent = linear_oligoketide_precursor_ion_h_oh_co_loss;
+	// initialize linear polyketide precursor ion (H-...-OH) - CO - H2O
+	fragmentions[linear_polyketide_precursor_ion_h_oh_co_loss_dehydrated].nterminal = false;
+	fragmentions[linear_polyketide_precursor_ion_h_oh_co_loss_dehydrated].cterminal = false;
+	fragmentions[linear_polyketide_precursor_ion_h_oh_co_loss_dehydrated].name = "[M+zH]+ *-CO (H-...-OH)";
+	fragmentions[linear_polyketide_precursor_ion_h_oh_co_loss_dehydrated].massdifference = PRECURSOR_ION_LINEAR_POLYKETIDE_H_OH - CO - H2O + nterminusshift + cterminusshift + adductshift;
+	fragmentions[linear_polyketide_precursor_ion_h_oh_co_loss_dehydrated].parent = linear_polyketide_precursor_ion_h_oh_co_loss;
 
-	// initialize linear oligoketide precursor ion (H-...-OH) - CO - NH3
-	fragmentions[linear_oligoketide_precursor_ion_h_oh_co_loss_deamidated].nterminal = false;
-	fragmentions[linear_oligoketide_precursor_ion_h_oh_co_loss_deamidated].cterminal = false;
-	fragmentions[linear_oligoketide_precursor_ion_h_oh_co_loss_deamidated].name = "[M+zH]+ x-CO (H-...-OH)";
-	fragmentions[linear_oligoketide_precursor_ion_h_oh_co_loss_deamidated].massdifference = PRECURSOR_ION_LINEAR_OLIGOKETIDE_H_OH - CO - NH3 + adductshift;
-	fragmentions[linear_oligoketide_precursor_ion_h_oh_co_loss_deamidated].parent = linear_oligoketide_precursor_ion_h_oh_co_loss;
+	// initialize linear polyketide precursor ion (H-...-OH) - CO - NH3
+	fragmentions[linear_polyketide_precursor_ion_h_oh_co_loss_deamidated].nterminal = false;
+	fragmentions[linear_polyketide_precursor_ion_h_oh_co_loss_deamidated].cterminal = false;
+	fragmentions[linear_polyketide_precursor_ion_h_oh_co_loss_deamidated].name = "[M+zH]+ x-CO (H-...-OH)";
+	fragmentions[linear_polyketide_precursor_ion_h_oh_co_loss_deamidated].massdifference = PRECURSOR_ION_LINEAR_POLYKETIDE_H_OH - CO - NH3 + nterminusshift + cterminusshift + adductshift;
+	fragmentions[linear_polyketide_precursor_ion_h_oh_co_loss_deamidated].parent = linear_polyketide_precursor_ion_h_oh_co_loss;
 
-	// initialize linear oligoketide precursor ion (H-...-OH) - CO - H2O - NH3
-	fragmentions[linear_oligoketide_precursor_ion_h_oh_co_loss_dehydrated_and_deamidated].nterminal = false;
-	fragmentions[linear_oligoketide_precursor_ion_h_oh_co_loss_dehydrated_and_deamidated].cterminal = false;
-	fragmentions[linear_oligoketide_precursor_ion_h_oh_co_loss_dehydrated_and_deamidated].name = "[M+zH]+ *x-CO (H-...-OH)";
-	fragmentions[linear_oligoketide_precursor_ion_h_oh_co_loss_dehydrated_and_deamidated].massdifference = PRECURSOR_ION_LINEAR_OLIGOKETIDE_H_OH - CO - H2O - NH3 + adductshift;
-	fragmentions[linear_oligoketide_precursor_ion_h_oh_co_loss_dehydrated_and_deamidated].parent = linear_oligoketide_precursor_ion_h_oh_co_loss;
+	// initialize linear polyketide precursor ion (H-...-OH) - CO - H2O - NH3
+	fragmentions[linear_polyketide_precursor_ion_h_oh_co_loss_dehydrated_and_deamidated].nterminal = false;
+	fragmentions[linear_polyketide_precursor_ion_h_oh_co_loss_dehydrated_and_deamidated].cterminal = false;
+	fragmentions[linear_polyketide_precursor_ion_h_oh_co_loss_dehydrated_and_deamidated].name = "[M+zH]+ *x-CO (H-...-OH)";
+	fragmentions[linear_polyketide_precursor_ion_h_oh_co_loss_dehydrated_and_deamidated].massdifference = PRECURSOR_ION_LINEAR_POLYKETIDE_H_OH - CO - H2O - NH3 + nterminusshift + cterminusshift + adductshift;
+	fragmentions[linear_polyketide_precursor_ion_h_oh_co_loss_dehydrated_and_deamidated].parent = linear_polyketide_precursor_ion_h_oh_co_loss;
 
-	// initialize linear oligoketide precursor ion (HO-...-OH)
-	fragmentions[linear_oligoketide_precursor_ion_oh_oh].nterminal = false;
-	fragmentions[linear_oligoketide_precursor_ion_oh_oh].cterminal = false;
-	fragmentions[linear_oligoketide_precursor_ion_oh_oh].name = "[M+zH]+ (HO-...-OH)";
-	fragmentions[linear_oligoketide_precursor_ion_oh_oh].massdifference = PRECURSOR_ION_LINEAR_OLIGOKETIDE_OH_OH + adductshift;
-	fragmentions[linear_oligoketide_precursor_ion_oh_oh].parent = linear_oligoketide_precursor_ion_oh_oh;
+	// initialize linear polyketide precursor ion (HO-...-OH)
+	fragmentions[linear_polyketide_precursor_ion_oh_oh].nterminal = false;
+	fragmentions[linear_polyketide_precursor_ion_oh_oh].cterminal = false;
+	fragmentions[linear_polyketide_precursor_ion_oh_oh].name = "[M+zH]+ (HO-...-OH)";
+	fragmentions[linear_polyketide_precursor_ion_oh_oh].massdifference = PRECURSOR_ION_LINEAR_POLYKETIDE_OH_OH + nterminusshift + cterminusshift + adductshift;
+	fragmentions[linear_polyketide_precursor_ion_oh_oh].parent = linear_polyketide_precursor_ion_oh_oh;
+	fragmentions[linear_polyketide_precursor_ion_oh_oh].summary = "H2O2Hplus" + nterminusshiftsummary + cterminusshiftsummary + adductshiftsummary;
 
-	// initialize linear oligoketide precursor ion (HO-...-OH) - H2O
-	fragmentions[linear_oligoketide_precursor_ion_oh_oh_dehydrated].nterminal = false;
-	fragmentions[linear_oligoketide_precursor_ion_oh_oh_dehydrated].cterminal = false;
-	fragmentions[linear_oligoketide_precursor_ion_oh_oh_dehydrated].name = "[M+zH]+ * (HO-...-OH)";
-	fragmentions[linear_oligoketide_precursor_ion_oh_oh_dehydrated].massdifference = PRECURSOR_ION_LINEAR_OLIGOKETIDE_OH_OH - H2O + adductshift;
-	fragmentions[linear_oligoketide_precursor_ion_oh_oh_dehydrated].parent = linear_oligoketide_precursor_ion_oh_oh;
+	// initialize linear polyketide precursor ion (HO-...-OH) - H2O
+	fragmentions[linear_polyketide_precursor_ion_oh_oh_dehydrated].nterminal = false;
+	fragmentions[linear_polyketide_precursor_ion_oh_oh_dehydrated].cterminal = false;
+	fragmentions[linear_polyketide_precursor_ion_oh_oh_dehydrated].name = "[M+zH]+ * (HO-...-OH)";
+	fragmentions[linear_polyketide_precursor_ion_oh_oh_dehydrated].massdifference = PRECURSOR_ION_LINEAR_POLYKETIDE_OH_OH - H2O + nterminusshift + cterminusshift + adductshift;
+	fragmentions[linear_polyketide_precursor_ion_oh_oh_dehydrated].parent = linear_polyketide_precursor_ion_oh_oh;
 
-	// initialize linear oligoketide precursor ion (HO-...-OH) - NH3
-	fragmentions[linear_oligoketide_precursor_ion_oh_oh_deamidated].nterminal = false;
-	fragmentions[linear_oligoketide_precursor_ion_oh_oh_deamidated].cterminal = false;
-	fragmentions[linear_oligoketide_precursor_ion_oh_oh_deamidated].name = "[M+zH]+ x (HO-...-OH)";
-	fragmentions[linear_oligoketide_precursor_ion_oh_oh_deamidated].massdifference = PRECURSOR_ION_LINEAR_OLIGOKETIDE_OH_OH - NH3 + adductshift;
-	fragmentions[linear_oligoketide_precursor_ion_oh_oh_deamidated].parent = linear_oligoketide_precursor_ion_oh_oh;
+	// initialize linear polyketide precursor ion (HO-...-OH) - NH3
+	fragmentions[linear_polyketide_precursor_ion_oh_oh_deamidated].nterminal = false;
+	fragmentions[linear_polyketide_precursor_ion_oh_oh_deamidated].cterminal = false;
+	fragmentions[linear_polyketide_precursor_ion_oh_oh_deamidated].name = "[M+zH]+ x (HO-...-OH)";
+	fragmentions[linear_polyketide_precursor_ion_oh_oh_deamidated].massdifference = PRECURSOR_ION_LINEAR_POLYKETIDE_OH_OH - NH3 + nterminusshift + cterminusshift + adductshift;
+	fragmentions[linear_polyketide_precursor_ion_oh_oh_deamidated].parent = linear_polyketide_precursor_ion_oh_oh;
 
-	// initialize linear oligoketide precursor ion (HO-...-OH) - H2O - NH3
-	fragmentions[linear_oligoketide_precursor_ion_oh_oh_dehydrated_and_deamidated].nterminal = false;
-	fragmentions[linear_oligoketide_precursor_ion_oh_oh_dehydrated_and_deamidated].cterminal = false;
-	fragmentions[linear_oligoketide_precursor_ion_oh_oh_dehydrated_and_deamidated].name = "[M+zH]+ *x (HO-...-OH)";
-	fragmentions[linear_oligoketide_precursor_ion_oh_oh_dehydrated_and_deamidated].massdifference = PRECURSOR_ION_LINEAR_OLIGOKETIDE_OH_OH - H2O - NH3 + adductshift;
-	fragmentions[linear_oligoketide_precursor_ion_oh_oh_dehydrated_and_deamidated].parent = linear_oligoketide_precursor_ion_oh_oh;
+	// initialize linear polyketide precursor ion (HO-...-OH) - H2O - NH3
+	fragmentions[linear_polyketide_precursor_ion_oh_oh_dehydrated_and_deamidated].nterminal = false;
+	fragmentions[linear_polyketide_precursor_ion_oh_oh_dehydrated_and_deamidated].cterminal = false;
+	fragmentions[linear_polyketide_precursor_ion_oh_oh_dehydrated_and_deamidated].name = "[M+zH]+ *x (HO-...-OH)";
+	fragmentions[linear_polyketide_precursor_ion_oh_oh_dehydrated_and_deamidated].massdifference = PRECURSOR_ION_LINEAR_POLYKETIDE_OH_OH - H2O - NH3 + nterminusshift + cterminusshift + adductshift;
+	fragmentions[linear_polyketide_precursor_ion_oh_oh_dehydrated_and_deamidated].parent = linear_polyketide_precursor_ion_oh_oh;
 
-	// initialize linear oligoketide precursor ion (HO-...-OH) - CO
-	fragmentions[linear_oligoketide_precursor_ion_oh_oh_co_loss].nterminal = false;
-	fragmentions[linear_oligoketide_precursor_ion_oh_oh_co_loss].cterminal = false;
-	fragmentions[linear_oligoketide_precursor_ion_oh_oh_co_loss].name = "[M+zH]+ -CO (HO-...-OH)";
-	fragmentions[linear_oligoketide_precursor_ion_oh_oh_co_loss].massdifference = PRECURSOR_ION_LINEAR_OLIGOKETIDE_OH_OH - CO + adductshift;
-	fragmentions[linear_oligoketide_precursor_ion_oh_oh_co_loss].parent = linear_oligoketide_precursor_ion_oh_oh_co_loss;
+	// initialize linear polyketide precursor ion (HO-...-OH) - CO
+	fragmentions[linear_polyketide_precursor_ion_oh_oh_co_loss].nterminal = false;
+	fragmentions[linear_polyketide_precursor_ion_oh_oh_co_loss].cterminal = false;
+	fragmentions[linear_polyketide_precursor_ion_oh_oh_co_loss].name = "[M+zH]+ -CO (HO-...-OH)";
+	fragmentions[linear_polyketide_precursor_ion_oh_oh_co_loss].massdifference = PRECURSOR_ION_LINEAR_POLYKETIDE_OH_OH - CO + nterminusshift + cterminusshift + adductshift;
+	fragmentions[linear_polyketide_precursor_ion_oh_oh_co_loss].parent = linear_polyketide_precursor_ion_oh_oh_co_loss;
 
-	// initialize linear oligoketide precursor ion (HO-...-OH) - CO - H2O
-	fragmentions[linear_oligoketide_precursor_ion_oh_oh_co_loss_dehydrated].nterminal = false;
-	fragmentions[linear_oligoketide_precursor_ion_oh_oh_co_loss_dehydrated].cterminal = false;
-	fragmentions[linear_oligoketide_precursor_ion_oh_oh_co_loss_dehydrated].name = "[M+zH]+ *-CO (HO-...-OH)";
-	fragmentions[linear_oligoketide_precursor_ion_oh_oh_co_loss_dehydrated].massdifference = PRECURSOR_ION_LINEAR_OLIGOKETIDE_OH_OH - CO - H2O + adductshift;
-	fragmentions[linear_oligoketide_precursor_ion_oh_oh_co_loss_dehydrated].parent = linear_oligoketide_precursor_ion_oh_oh_co_loss;
+	// initialize linear polyketide precursor ion (HO-...-OH) - CO - H2O
+	fragmentions[linear_polyketide_precursor_ion_oh_oh_co_loss_dehydrated].nterminal = false;
+	fragmentions[linear_polyketide_precursor_ion_oh_oh_co_loss_dehydrated].cterminal = false;
+	fragmentions[linear_polyketide_precursor_ion_oh_oh_co_loss_dehydrated].name = "[M+zH]+ *-CO (HO-...-OH)";
+	fragmentions[linear_polyketide_precursor_ion_oh_oh_co_loss_dehydrated].massdifference = PRECURSOR_ION_LINEAR_POLYKETIDE_OH_OH - CO - H2O + nterminusshift + cterminusshift + adductshift;
+	fragmentions[linear_polyketide_precursor_ion_oh_oh_co_loss_dehydrated].parent = linear_polyketide_precursor_ion_oh_oh_co_loss;
 
-	// initialize linear oligoketide precursor ion (HO-...-OH) - CO - NH3
-	fragmentions[linear_oligoketide_precursor_ion_oh_oh_co_loss_deamidated].nterminal = false;
-	fragmentions[linear_oligoketide_precursor_ion_oh_oh_co_loss_deamidated].cterminal = false;
-	fragmentions[linear_oligoketide_precursor_ion_oh_oh_co_loss_deamidated].name = "[M+zH]+ x-CO (HO-...-OH)";
-	fragmentions[linear_oligoketide_precursor_ion_oh_oh_co_loss_deamidated].massdifference = PRECURSOR_ION_LINEAR_OLIGOKETIDE_OH_OH - CO - NH3 + adductshift;
-	fragmentions[linear_oligoketide_precursor_ion_oh_oh_co_loss_deamidated].parent = linear_oligoketide_precursor_ion_oh_oh_co_loss;
+	// initialize linear polyketide precursor ion (HO-...-OH) - CO - NH3
+	fragmentions[linear_polyketide_precursor_ion_oh_oh_co_loss_deamidated].nterminal = false;
+	fragmentions[linear_polyketide_precursor_ion_oh_oh_co_loss_deamidated].cterminal = false;
+	fragmentions[linear_polyketide_precursor_ion_oh_oh_co_loss_deamidated].name = "[M+zH]+ x-CO (HO-...-OH)";
+	fragmentions[linear_polyketide_precursor_ion_oh_oh_co_loss_deamidated].massdifference = PRECURSOR_ION_LINEAR_POLYKETIDE_OH_OH - CO - NH3 + nterminusshift + cterminusshift + adductshift;
+	fragmentions[linear_polyketide_precursor_ion_oh_oh_co_loss_deamidated].parent = linear_polyketide_precursor_ion_oh_oh_co_loss;
 
-	// initialize linear oligoketide precursor ion (HO-...-OH) - CO - H2O - NH3
-	fragmentions[linear_oligoketide_precursor_ion_oh_oh_co_loss_dehydrated_and_deamidated].nterminal = false;
-	fragmentions[linear_oligoketide_precursor_ion_oh_oh_co_loss_dehydrated_and_deamidated].cterminal = false;
-	fragmentions[linear_oligoketide_precursor_ion_oh_oh_co_loss_dehydrated_and_deamidated].name = "[M+zH]+ *x-CO (HO-...-OH)";
-	fragmentions[linear_oligoketide_precursor_ion_oh_oh_co_loss_dehydrated_and_deamidated].massdifference = PRECURSOR_ION_LINEAR_OLIGOKETIDE_OH_OH - CO - H2O - NH3 + adductshift;
-	fragmentions[linear_oligoketide_precursor_ion_oh_oh_co_loss_dehydrated_and_deamidated].parent = linear_oligoketide_precursor_ion_oh_oh_co_loss;
+	// initialize linear polyketide precursor ion (HO-...-OH) - CO - H2O - NH3
+	fragmentions[linear_polyketide_precursor_ion_oh_oh_co_loss_dehydrated_and_deamidated].nterminal = false;
+	fragmentions[linear_polyketide_precursor_ion_oh_oh_co_loss_dehydrated_and_deamidated].cterminal = false;
+	fragmentions[linear_polyketide_precursor_ion_oh_oh_co_loss_dehydrated_and_deamidated].name = "[M+zH]+ *x-CO (HO-...-OH)";
+	fragmentions[linear_polyketide_precursor_ion_oh_oh_co_loss_dehydrated_and_deamidated].massdifference = PRECURSOR_ION_LINEAR_POLYKETIDE_OH_OH - CO - H2O - NH3 + nterminusshift + cterminusshift + adductshift;
+	fragmentions[linear_polyketide_precursor_ion_oh_oh_co_loss_dehydrated_and_deamidated].parent = linear_polyketide_precursor_ion_oh_oh_co_loss;
 
-	// initialize cyclic oligoketide precursor ion
-	fragmentions[cyclic_oligoketide_precursor_ion].nterminal = false;
-	fragmentions[cyclic_oligoketide_precursor_ion].cterminal = false;
-	fragmentions[cyclic_oligoketide_precursor_ion].name = "[M+zH]+";
-	fragmentions[cyclic_oligoketide_precursor_ion].massdifference = Hplus + adductshift;
-	fragmentions[cyclic_oligoketide_precursor_ion].parent = cyclic_oligoketide_precursor_ion;
+	// initialize cyclic polyketide precursor ion
+	fragmentions[cyclic_polyketide_precursor_ion].nterminal = false;
+	fragmentions[cyclic_polyketide_precursor_ion].cterminal = false;
+	fragmentions[cyclic_polyketide_precursor_ion].name = "[M+zH]+";
+	fragmentions[cyclic_polyketide_precursor_ion].massdifference = Hplus + adductshift;
+	fragmentions[cyclic_polyketide_precursor_ion].parent = cyclic_polyketide_precursor_ion;
+	fragmentions[cyclic_polyketide_precursor_ion].summary = "Hplus" + adductshiftsummary;
 
-	// initialize cyclic oligoketide precursor ion - H2O
-	fragmentions[cyclic_oligoketide_precursor_ion_dehydrated].nterminal = false;
-	fragmentions[cyclic_oligoketide_precursor_ion_dehydrated].cterminal = false;
-	fragmentions[cyclic_oligoketide_precursor_ion_dehydrated].name = "[M+zH]+ *";
-	fragmentions[cyclic_oligoketide_precursor_ion_dehydrated].massdifference = Hplus - H2O + adductshift;
-	fragmentions[cyclic_oligoketide_precursor_ion_dehydrated].parent = cyclic_oligoketide_precursor_ion;
+	// initialize cyclic polyketide precursor ion - H2O
+	fragmentions[cyclic_polyketide_precursor_ion_dehydrated].nterminal = false;
+	fragmentions[cyclic_polyketide_precursor_ion_dehydrated].cterminal = false;
+	fragmentions[cyclic_polyketide_precursor_ion_dehydrated].name = "[M+zH]+ *";
+	fragmentions[cyclic_polyketide_precursor_ion_dehydrated].massdifference = Hplus - H2O + adductshift;
+	fragmentions[cyclic_polyketide_precursor_ion_dehydrated].parent = cyclic_polyketide_precursor_ion;
 
-	// initialize cyclic oligoketide precursor ion - NH3
-	fragmentions[cyclic_oligoketide_precursor_ion_deamidated].nterminal = false;
-	fragmentions[cyclic_oligoketide_precursor_ion_deamidated].cterminal = false;
-	fragmentions[cyclic_oligoketide_precursor_ion_deamidated].name = "[M+zH]+ x";
-	fragmentions[cyclic_oligoketide_precursor_ion_deamidated].massdifference = Hplus - NH3 + adductshift;
-	fragmentions[cyclic_oligoketide_precursor_ion_deamidated].parent = cyclic_oligoketide_precursor_ion;
+	// initialize cyclic polyketide precursor ion - NH3
+	fragmentions[cyclic_polyketide_precursor_ion_deamidated].nterminal = false;
+	fragmentions[cyclic_polyketide_precursor_ion_deamidated].cterminal = false;
+	fragmentions[cyclic_polyketide_precursor_ion_deamidated].name = "[M+zH]+ x";
+	fragmentions[cyclic_polyketide_precursor_ion_deamidated].massdifference = Hplus - NH3 + adductshift;
+	fragmentions[cyclic_polyketide_precursor_ion_deamidated].parent = cyclic_polyketide_precursor_ion;
 
-	// initialize cyclic oligoketide precursor ion - H2O - NH3
-	fragmentions[cyclic_oligoketide_precursor_ion_dehydrated_and_deamidated].nterminal = false;
-	fragmentions[cyclic_oligoketide_precursor_ion_dehydrated_and_deamidated].cterminal = false;
-	fragmentions[cyclic_oligoketide_precursor_ion_dehydrated_and_deamidated].name = "[M+zH]+ *x";
-	fragmentions[cyclic_oligoketide_precursor_ion_dehydrated_and_deamidated].massdifference = Hplus - H2O - NH3 + adductshift;
-	fragmentions[cyclic_oligoketide_precursor_ion_dehydrated_and_deamidated].parent = cyclic_oligoketide_precursor_ion;
+	// initialize cyclic polyketide precursor ion - H2O - NH3
+	fragmentions[cyclic_polyketide_precursor_ion_dehydrated_and_deamidated].nterminal = false;
+	fragmentions[cyclic_polyketide_precursor_ion_dehydrated_and_deamidated].cterminal = false;
+	fragmentions[cyclic_polyketide_precursor_ion_dehydrated_and_deamidated].name = "[M+zH]+ *x";
+	fragmentions[cyclic_polyketide_precursor_ion_dehydrated_and_deamidated].massdifference = Hplus - H2O - NH3 + adductshift;
+	fragmentions[cyclic_polyketide_precursor_ion_dehydrated_and_deamidated].parent = cyclic_polyketide_precursor_ion;
 
-	// initialize cyclic oligoketide precursor ion - CO
-	fragmentions[cyclic_oligoketide_precursor_ion_co_loss].nterminal = false;
-	fragmentions[cyclic_oligoketide_precursor_ion_co_loss].cterminal = false;
-	fragmentions[cyclic_oligoketide_precursor_ion_co_loss].name = "[M+zH]+ -CO";
-	fragmentions[cyclic_oligoketide_precursor_ion_co_loss].massdifference = Hplus - CO + adductshift;
-	fragmentions[cyclic_oligoketide_precursor_ion_co_loss].parent = cyclic_oligoketide_precursor_ion_co_loss;
+	// initialize cyclic polyketide precursor ion - CO
+	fragmentions[cyclic_polyketide_precursor_ion_co_loss].nterminal = false;
+	fragmentions[cyclic_polyketide_precursor_ion_co_loss].cterminal = false;
+	fragmentions[cyclic_polyketide_precursor_ion_co_loss].name = "[M+zH]+ -CO";
+	fragmentions[cyclic_polyketide_precursor_ion_co_loss].massdifference = Hplus - CO + adductshift;
+	fragmentions[cyclic_polyketide_precursor_ion_co_loss].parent = cyclic_polyketide_precursor_ion_co_loss;
 
-	// initialize cyclic oligoketide precursor ion - CO - H2O
-	fragmentions[cyclic_oligoketide_precursor_ion_co_loss_dehydrated].nterminal = false;
-	fragmentions[cyclic_oligoketide_precursor_ion_co_loss_dehydrated].cterminal = false;
-	fragmentions[cyclic_oligoketide_precursor_ion_co_loss_dehydrated].name = "[M+zH]+ *-CO";
-	fragmentions[cyclic_oligoketide_precursor_ion_co_loss_dehydrated].massdifference = Hplus - CO - H2O + adductshift;
-	fragmentions[cyclic_oligoketide_precursor_ion_co_loss_dehydrated].parent = cyclic_oligoketide_precursor_ion_co_loss;
+	// initialize cyclic polyketide precursor ion - CO - H2O
+	fragmentions[cyclic_polyketide_precursor_ion_co_loss_dehydrated].nterminal = false;
+	fragmentions[cyclic_polyketide_precursor_ion_co_loss_dehydrated].cterminal = false;
+	fragmentions[cyclic_polyketide_precursor_ion_co_loss_dehydrated].name = "[M+zH]+ *-CO";
+	fragmentions[cyclic_polyketide_precursor_ion_co_loss_dehydrated].massdifference = Hplus - CO - H2O + adductshift;
+	fragmentions[cyclic_polyketide_precursor_ion_co_loss_dehydrated].parent = cyclic_polyketide_precursor_ion_co_loss;
 
-	// initialize cyclic oligoketide precursor ion - CO - NH3
-	fragmentions[cyclic_oligoketide_precursor_ion_co_loss_deamidated].nterminal = false;
-	fragmentions[cyclic_oligoketide_precursor_ion_co_loss_deamidated].cterminal = false;
-	fragmentions[cyclic_oligoketide_precursor_ion_co_loss_deamidated].name = "[M+zH]+ x-CO";
-	fragmentions[cyclic_oligoketide_precursor_ion_co_loss_deamidated].massdifference = Hplus - CO - NH3 + adductshift;
-	fragmentions[cyclic_oligoketide_precursor_ion_co_loss_deamidated].parent = cyclic_oligoketide_precursor_ion_co_loss;
+	// initialize cyclic polyketide precursor ion - CO - NH3
+	fragmentions[cyclic_polyketide_precursor_ion_co_loss_deamidated].nterminal = false;
+	fragmentions[cyclic_polyketide_precursor_ion_co_loss_deamidated].cterminal = false;
+	fragmentions[cyclic_polyketide_precursor_ion_co_loss_deamidated].name = "[M+zH]+ x-CO";
+	fragmentions[cyclic_polyketide_precursor_ion_co_loss_deamidated].massdifference = Hplus - CO - NH3 + adductshift;
+	fragmentions[cyclic_polyketide_precursor_ion_co_loss_deamidated].parent = cyclic_polyketide_precursor_ion_co_loss;
 
-	// initialize cyclic oligoketide precursor ion - CO - H2O - NH3
-	fragmentions[cyclic_oligoketide_precursor_ion_co_loss_dehydrated_and_deamidated].nterminal = false;
-	fragmentions[cyclic_oligoketide_precursor_ion_co_loss_dehydrated_and_deamidated].cterminal = false;
-	fragmentions[cyclic_oligoketide_precursor_ion_co_loss_dehydrated_and_deamidated].name = "[M+zH]+ *x-CO";
-	fragmentions[cyclic_oligoketide_precursor_ion_co_loss_dehydrated_and_deamidated].massdifference = Hplus - CO - H2O - NH3 + adductshift;
-	fragmentions[cyclic_oligoketide_precursor_ion_co_loss_dehydrated_and_deamidated].parent = cyclic_oligoketide_precursor_ion_co_loss;
-#endif
+	// initialize cyclic polyketide precursor ion - CO - H2O - NH3
+	fragmentions[cyclic_polyketide_precursor_ion_co_loss_dehydrated_and_deamidated].nterminal = false;
+	fragmentions[cyclic_polyketide_precursor_ion_co_loss_dehydrated_and_deamidated].cterminal = false;
+	fragmentions[cyclic_polyketide_precursor_ion_co_loss_dehydrated_and_deamidated].name = "[M+zH]+ *x-CO";
+	fragmentions[cyclic_polyketide_precursor_ion_co_loss_dehydrated_and_deamidated].massdifference = Hplus - CO - H2O - NH3 + adductshift;
+	fragmentions[cyclic_polyketide_precursor_ion_co_loss_dehydrated_and_deamidated].parent = cyclic_polyketide_precursor_ion_co_loss;
 
 	// initialize B-2H ion
 	//fragmentions[b_ion_2H_loss].nterminal = true;
@@ -1741,35 +1744,22 @@ void initializeFragmentIonsForDeNovoGraphOfBranchCyclicPeptides(vector<eFragment
 }
 
 
-#if OLIGOKETIDES == 1
-
-
-void initializeFragmentIonsForDeNovoGraphOfLinearOligoketide(vector<eFragmentIonType>& fragmentions) {
+void initializeFragmentIonsForDeNovoGraphOfLinearPolyketide(vector<eFragmentIonType>& fragmentions) {
 	fragmentions.push_back(l1h_ion);
 	fragmentions.push_back(l2h_ion);
 	fragmentions.push_back(l1oh_ion);
 	fragmentions.push_back(l2oh_ion);
-	fragmentions.push_back(linear_oligoketide_precursor_ion_h_h);
-	fragmentions.push_back(linear_oligoketide_precursor_ion_h_oh);
-	fragmentions.push_back(linear_oligoketide_precursor_ion_oh_oh);
+	fragmentions.push_back(linear_polyketide_precursor_ion_h_h);
+	fragmentions.push_back(linear_polyketide_precursor_ion_h_oh);
+	fragmentions.push_back(linear_polyketide_precursor_ion_oh_oh);
 }
 
 
-void initializeFragmentIonsForDeNovoGraphOfCyclicOligoketide(vector<eFragmentIonType>& fragmentions) {
+void initializeFragmentIonsForDeNovoGraphOfCyclicPolyketide(vector<eFragmentIonType>& fragmentions) {
 	//fragmentions.push_back(l0h_ion);
 	fragmentions.push_back(l1h_ion);
 	fragmentions.push_back(l2h_ion);
-	fragmentions.push_back(cyclic_oligoketide_precursor_ion);
-}
-
-
-#endif
-
-
-void initializeFragmentIonsForDeNovoGraphOfLinearPolysaccharide(vector<eFragmentIonType>& fragmentions) {
-	fragmentions.push_back(ms_nterminal_ion_hplus);
-	//fragmentions.push_back(ms_cterminal_ion_hplus);
-	fragmentions.push_back(precursor_ion);
+	fragmentions.push_back(cyclic_polyketide_precursor_ion);
 }
 
 

@@ -27,16 +27,6 @@ enum eResidueLossType {
 
 
 /**
-	\brief Precursor loss types.
-*/
-enum eKetidePrecursorType {
-	ketide_precursor_h2o = 0,
-	ketide_precursor_h2,
-	ketide_precursor_h2o2
-};
-
-
-/**
 	\brief Get the number of bricks in a composition.
 	\param composition string containing ids of bricks separated by '-'
 	\retval number number of bricks

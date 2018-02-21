@@ -3,8 +3,6 @@
 #include "core/cTheoreticalSpectrumList.h"
 #include "gui/cEventFilter.h"
 
-#include <QTableWidget>
-#include <QTableWidgetItem>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QPushButton>
@@ -18,6 +16,8 @@
 #include <QLineEdit>
 #include <QBrush>
 #include <QTextStream>
+#include <QMenuBar>
+#include <QMenu>
 
 
 cSummaryPeaksTableWidget::cSummaryPeaksTableWidget(QWidget* parent) {
@@ -26,12 +26,10 @@ cSummaryPeaksTableWidget::cSummaryPeaksTableWidget(QWidget* parent) {
 	setWindowTitle("Summary Table of Matched Peaks");
 	setWindowIcon(QIcon(":/images/icons/43.png"));
 
-	close = new QPushButton(tr("Close"));
-	close->setToolTip("Close the window.");
-
-	exportcsv = new QPushButton(tr("Export"));
-	exportcsv->setToolTip("Export the table to CSV.");
-	exportcsv->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_E));
+	menuBar = new QMenuBar(this);
+	menuBar->setNativeMenuBar(false);
+	menuFile = new QMenu(tr("&File"), this);
+	menuHelp = new QMenu(tr("&Help"), this);
 
 	rowsfilterline = new QLineEdit();
 	rowsfilterline->setMinimumWidth(250);
@@ -62,48 +60,77 @@ cSummaryPeaksTableWidget::cSummaryPeaksTableWidget(QWidget* parent) {
 	rowsfilterwidget->setLayout(rowsfilterhbox);
 	rowsfilterwidget->setMaximumWidth(420);
 
-	buttons = new QHBoxLayout();
-	buttons->addWidget(close);
-	buttons->addStretch();
-	buttons->addWidget(rowsfilterwidget);
-	buttons->addStretch();
-	buttons->addWidget(exportcsv);
-
-	database = new QTableWidget(0, 0, this);
+	database = new QTableView(this);
+	databasemodel = new QStandardItemModel(0, 0, this);
+	proxymodel = new cSummaryPeaksTableProxyModel(this);
+	proxymodel->setSourceModel(databasemodel);
+	proxymodel->setDynamicSortFilter(false);
+	database->setModel(proxymodel);
+	database->setSortingEnabled(true);
 	database->setEditTriggers(QAbstractItemView::NoEditTriggers);
 	database->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
 	database->horizontalHeader()->setSectionsMovable(true);
+	database->verticalHeader()->setDefaultSectionSize(25);
 
-	mainlayout = new QVBoxLayout();
-	mainlayout->addWidget(database);
-	mainlayout->addLayout(buttons);
+	toolbarFile = addToolBar(tr("File"));
+				
+	actionExportCSV = new QAction(QIcon(":/images/icons/62.png"), tr("&Export to CSV"), this);
+	actionExportCSV->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_E));
+	actionExportCSV->setToolTip("Export to CSV (Ctrl + E)");
+	toolbarFile->addAction(actionExportCSV);
+	connect(actionExportCSV, SIGNAL(triggered()), this, SLOT(exportToCsv()));
 
-	connect(database->horizontalHeader(), SIGNAL(sectionDoubleClicked(int)), this, SLOT(headerItemDoubleClicked(int)));
-	connect(close, SIGNAL(released()), this, SLOT(closeWindow()));
-	connect(exportcsv, SIGNAL(released()), this, SLOT(exportToCsv()));
+	actionCloseWindow = new QAction(QIcon(":/images/icons/33.png"), tr("&Close"), this);
+	actionCloseWindow->setShortcut(QKeySequence(Qt::Key_Escape));
+	actionCloseWindow->setToolTip("Close (Esc)");
+	toolbarFile->addAction(actionCloseWindow);
+	connect(actionCloseWindow, SIGNAL(triggered()), this, SLOT(closeWindow()));
+
+	toolbarHelp = addToolBar(tr("Help"));
+
+	actionHTMLDocumentation = new QAction(QIcon(":/images/icons/3.png"), tr("&HTML Documentation"), this);
+	actionHTMLDocumentation->setShortcut(QKeySequence(Qt::Key_F1));
+	actionHTMLDocumentation->setToolTip("Show HTML Documentation (F1)");
+	toolbarHelp->addAction(actionHTMLDocumentation);
+	connect(actionHTMLDocumentation, SIGNAL(triggered()), this, SLOT(showHTMLDocumentation()));
+
+	toolbarFilter = addToolBar(tr("Filter"));
+	toolbarFilter->addWidget(rowsfilterwidget);
+
+	menuFile->addAction(actionExportCSV);
+	menuFile->addSeparator();
+	menuFile->addAction(actionCloseWindow);
+
+	menuHelp->addAction(actionHTMLDocumentation);
+
+	menuBar->addMenu(menuFile);
+	menuBar->addMenu(menuHelp);
+
+	setMenuBar(menuBar);
+
 	connect(rowsfilterbutton, SIGNAL(released()), this, SLOT(filterRows()));
 	connect(rowsfilterclearbutton, SIGNAL(released()), this, SLOT(resetFilter()));
 
-	setLayout(mainlayout);
+	mainlayout = new QVBoxLayout();
+	mainlayout->addWidget(database);
 
-	resize(1280, 700);
+	mainwidget = new QWidget();
+	mainwidget->setLayout(mainlayout);
+
+	setCentralWidget(mainwidget);
+
+	resize(1280, 750);
 
 	lastdirexporttocsv = "./";
+
+	coordinates.clear();
+	coordinates_orig.clear();
 }
 
 
 cSummaryPeaksTableWidget::~cSummaryPeaksTableWidget() {
-	deleteTable(false);
+	deleteTable();
 	
-	for (int i = 0; i < database->columnCount(); i++) {
-		delete database->horizontalHeaderItem(i);
-	}
-	
-	database->setColumnCount(0);
-
-	delete close;
-	delete exportcsv;
-
 	delete rowsfilterline;
 	delete rowsfiltercasesensitive;
 	delete rowsfilterbutton;
@@ -111,118 +138,143 @@ cSummaryPeaksTableWidget::~cSummaryPeaksTableWidget() {
 	delete rowsfilterhbox;
 	delete rowsfilterwidget;
 
+	delete databasemodel;
+	delete proxymodel;
 	delete database;
-	delete buttons;
 	delete mainlayout;
+	delete mainwidget;
+
+	delete actionExportCSV;
+	delete actionCloseWindow;
+	delete actionHTMLDocumentation;
+
+	delete menuFile;
+	delete menuHelp;
+
+	delete menuBar;
 }
 
 
 void cSummaryPeaksTableWidget::closeEvent(QCloseEvent *event) {
 	closeWindow();
+	event->accept();
 }
 
 
-void cSummaryPeaksTableWidget::prepareToShow(QTableWidget* tablewidget, cParameters* parameters, cTheoreticalSpectrumList* spectralist) {
-	if (!parameters || !spectralist || ((int)tablewidget->rowCount() != spectralist->size())) {
+void cSummaryPeaksTableWidget::prepareToShow(QStandardItemModel* resultsstandardmodel, cMainWindowProxyModel* resultsproxymodel, cParameters* parameters, cTheoreticalSpectrumList* spectralist) {
+	if (!parameters || !spectralist || (resultsstandardmodel->rowCount() != spectralist->size())) {
 		return;
 	}
 
 
 	this->parameters = parameters;
 
+	resetFilter();
+	deleteTable();
+	proxymodel->initialize(parameters->mode, parameters->peaklistfileformat);
 
-	// delete old data
-	deleteTable(true);
-	for (int i = 0; i < database->columnCount(); i++) {
-		database->setItemDelegateForColumn(i, 0);
-		delete database->horizontalHeaderItem(i);
-	}
-	database->setColumnCount(0);
 
+	coordinates.clear();
+	coordinates_orig.clear();
 
 	// prepare the header
 	if (parameters->mode == dereplication) {
 		if ((parameters->peaklistfileformat == mis) || (parameters->peaklistfileformat == imzML)) {
-			database->setColumnCount(11);
+			databasemodel->setColumnCount(11);
 		}
 		else {
-			database->setColumnCount(9);
+			databasemodel->setColumnCount(9);
 		}
 	}
+	else if (parameters->mode == denovoengine) {
+		databasemodel->setColumnCount(8);
+	}
 	else {
-		database->setColumnCount(7);
+		databasemodel->setColumnCount(7);
 	}
 	
-	database->setHorizontalHeaderItem(0, new QTableWidgetItem());
-	database->horizontalHeaderItem(0)->setText("ID");
+	databasemodel->setHorizontalHeaderItem(0, new QStandardItem());
+	databasemodel->horizontalHeaderItem(0)->setText("ID");
+	database->setItemDelegateForColumn(0, new QItemDelegate());
 
 	int currentcolumn = 1;
 	if (parameters->mode == dereplication) {
 		if ((parameters->peaklistfileformat == mis) || (parameters->peaklistfileformat == imzML)) {
-			database->setHorizontalHeaderItem(currentcolumn, new QTableWidgetItem());
-			database->horizontalHeaderItem(currentcolumn)->setText("Coordinate X");
+			databasemodel->setHorizontalHeaderItem(currentcolumn, new QStandardItem());
+			databasemodel->horizontalHeaderItem(currentcolumn)->setText("Coordinate X");
+			database->setItemDelegateForColumn(currentcolumn, new QItemDelegate());
 			currentcolumn++;
-			database->setHorizontalHeaderItem(currentcolumn, new QTableWidgetItem());
-			database->horizontalHeaderItem(currentcolumn)->setText("Coordinate Y");
+
+			databasemodel->setHorizontalHeaderItem(currentcolumn, new QStandardItem());
+			databasemodel->horizontalHeaderItem(currentcolumn)->setText("Coordinate Y");
+			database->setItemDelegateForColumn(currentcolumn, new QItemDelegate());
 			currentcolumn++;
 		}
-		database->setHorizontalHeaderItem(currentcolumn, new QTableWidgetItem());
-		database->horizontalHeaderItem(currentcolumn)->setText("Ion Type");
-		currentcolumn++;
-	}
-	else {
-		database->setHorizontalHeaderItem(currentcolumn, new QTableWidgetItem());
-		database->horizontalHeaderItem(currentcolumn)->setText("Fragment Type");
+		databasemodel->setHorizontalHeaderItem(currentcolumn, new QStandardItem());
+		databasemodel->horizontalHeaderItem(currentcolumn)->setText("Ion Type");
+		database->setItemDelegateForColumn(currentcolumn, new QItemDelegate());
 		currentcolumn++;
 	}
 
-	database->setHorizontalHeaderItem(currentcolumn, new QTableWidgetItem());
-	database->horizontalHeaderItem(currentcolumn)->setText("Theoretical m/z");
-	database->setItemDelegateForColumn(currentcolumn, &columndelegate);
+	if (parameters->mode == denovoengine) {
+		databasemodel->setHorizontalHeaderItem(currentcolumn, new QStandardItem());
+		databasemodel->horizontalHeaderItem(currentcolumn)->setText("Group ID");
+		database->setItemDelegateForColumn(currentcolumn, new QItemDelegate());
+		currentcolumn++;
+	}
+
+	if (parameters->mode != dereplication) {
+		databasemodel->setHorizontalHeaderItem(currentcolumn, new QStandardItem());
+		databasemodel->horizontalHeaderItem(currentcolumn)->setText("Fragment Type");
+		database->setItemDelegateForColumn(currentcolumn, new QItemDelegate());
+		currentcolumn++;
+	}
+
+	databasemodel->setHorizontalHeaderItem(currentcolumn, new QStandardItem());
+	databasemodel->horizontalHeaderItem(currentcolumn)->setText("Theoretical m/z");
+	database->setItemDelegateForColumn(currentcolumn, new QItemDelegate());
 	currentcolumn++;
 
-	database->setHorizontalHeaderItem(currentcolumn, new QTableWidgetItem());
-	database->horizontalHeaderItem(currentcolumn)->setText("Experimental m/z");
-	database->setItemDelegateForColumn(currentcolumn, &columndelegate);
+	databasemodel->setHorizontalHeaderItem(currentcolumn, new QStandardItem());
+	databasemodel->horizontalHeaderItem(currentcolumn)->setText("Experimental m/z");
+	database->setItemDelegateForColumn(currentcolumn, new QItemDelegate());
 	currentcolumn++;
 
-	database->setHorizontalHeaderItem(currentcolumn, new QTableWidgetItem());
-	database->horizontalHeaderItem(currentcolumn)->setText("Intensity [%]");
-	database->setItemDelegateForColumn(currentcolumn, &columndelegate);
+	databasemodel->setHorizontalHeaderItem(currentcolumn, new QStandardItem());
+	databasemodel->horizontalHeaderItem(currentcolumn)->setText("Intensity [%]");
+	database->setItemDelegateForColumn(currentcolumn, new QItemDelegate());
 	currentcolumn++;
 
-	database->setHorizontalHeaderItem(currentcolumn, new QTableWidgetItem());
-	database->horizontalHeaderItem(currentcolumn)->setText("Error [ppm]");
-	database->setItemDelegateForColumn(currentcolumn, &columndelegate);
+	databasemodel->setHorizontalHeaderItem(currentcolumn, new QStandardItem());
+	databasemodel->horizontalHeaderItem(currentcolumn)->setText("Error [ppm]");
+	database->setItemDelegateForColumn(currentcolumn, new QItemDelegate());
 	currentcolumn++;
 
 	if (parameters->mode == dereplication) {
-		database->setHorizontalHeaderItem(currentcolumn, new QTableWidgetItem());
-		database->horizontalHeaderItem(currentcolumn)->setText("Summary Formula");
+		databasemodel->setHorizontalHeaderItem(currentcolumn, new QStandardItem());
+		databasemodel->horizontalHeaderItem(currentcolumn)->setText("Summary Formula");
+		database->setItemDelegateForColumn(currentcolumn, new QItemDelegate());
 		currentcolumn++;
 
-		database->setHorizontalHeaderItem(currentcolumn, new QTableWidgetItem());
-		database->horizontalHeaderItem(currentcolumn)->setText("Name");
+		databasemodel->setHorizontalHeaderItem(currentcolumn, new QStandardItem());
+		databasemodel->horizontalHeaderItem(currentcolumn)->setText("Name");
+		database->setItemDelegateForColumn(currentcolumn, new QItemDelegate());
 		currentcolumn++;
 
-		database->setHorizontalHeaderItem(currentcolumn, new QTableWidgetItem());
-		database->horizontalHeaderItem(currentcolumn)->setText("Reference");
+		databasemodel->setHorizontalHeaderItem(currentcolumn, new QStandardItem());
+		databasemodel->horizontalHeaderItem(currentcolumn)->setText("Reference");
+		database->setItemDelegateForColumn(currentcolumn, new cViewButtonDelegate());
 		currentcolumn++;
 	}
 	else {
-		database->setHorizontalHeaderItem(currentcolumn, new QTableWidgetItem());
-		database->horizontalHeaderItem(currentcolumn)->setText("Sequence");
+		databasemodel->setHorizontalHeaderItem(currentcolumn, new QStandardItem());
+		databasemodel->horizontalHeaderItem(currentcolumn)->setText("Sequence");
+		database->setItemDelegateForColumn(currentcolumn, new QItemDelegate());
 		currentcolumn++;
 	}	
 
-	database->horizontalHeader()->setStretchLastSection(true);
-	for (int i = 0; i < database->columnCount(); i++) {
+	for (int i = 0; i < databasemodel->columnCount(); i++) {
 		database->resizeColumnToContents(i);
-	}
-
-	headersort.resize(database->columnCount());
-	for (int i = 0; i < database->columnCount(); i++) {
-		headersort[i] = -1;
 	}
 
 
@@ -231,15 +283,19 @@ void cSummaryPeaksTableWidget::prepareToShow(QTableWidget* tablewidget, cParamet
 	cEventFilter filter;
 	int spectracount = spectralist->size();
 
-	progress = new QProgressDialog("Preparing the table...", "Cancel", 0, spectracount, this);
+	progress = new QProgressDialog("Preparing the data...", "Cancel", 0, spectracount, this);
 	progress->setMinimumWidth(250);
 	progress->installEventFilter(&filter);
 	progress->setMinimumDuration(0);
 	progress->setWindowModality(Qt::WindowModal);
 	progress->setValue(0);
 
+	database->setModel(0);
+	proxymodel->setSourceModel(0);
+	database->setSortingEnabled(false);
+
 	int thpeakscount;
-	int secondspace, langle, rangle, tmp1, tmp2;
+	int secondspace, langle, rangle, tmp;
 	cPeaksList* thpeaks;
 	cPeak* peak;
 	bool isred;
@@ -252,12 +308,11 @@ void cSummaryPeaksTableWidget::prepareToShow(QTableWidget* tablewidget, cParamet
 
 	for (int i = 0; i < spectracount; i++) {
 
-		if (tablewidget->isRowHidden(i)) {
-			progress->setValue(i);
+		if (!resultsproxymodel->mapFromSource(resultsstandardmodel->index(i, 0)).isValid()) {
 			continue;
 		}
 
-		spectrumindex = tablewidget->item(i, 1)->data(Qt::DisplayRole).toInt() - 1;
+		spectrumindex = resultsstandardmodel->item(i, 1)->data(Qt::DisplayRole).toInt() - 1;
 
 		if ((*spectralist)[spectrumindex].getNumberOfMatchedPeaks() == 0) {
 			progress->setValue(i);
@@ -294,98 +349,131 @@ void cSummaryPeaksTableWidget::prepareToShow(QTableWidget* tablewidget, cParamet
 				continue;
 			}
 
-			currentrow = database->rowCount();
+			currentrow = databasemodel->rowCount();
 			currentcolumn = 0;
 
-			database->insertRow(currentrow);
-			database->setRowHeight(currentrow, 20);
+			databasemodel->insertRow(currentrow);
 
-			database->setItem(currentrow, currentcolumn, widgetitemallocator.getNewItem());
-			database->item(currentrow, currentcolumn)->setForeground(brush);
-			database->item(currentrow, currentcolumn)->setData(Qt::DisplayRole, spectrumindex + 1);
+			databasemodel->setItem(currentrow, currentcolumn, new QStandardItem());
+			databasemodel->item(currentrow, currentcolumn)->setForeground(brush);
+			databasemodel->item(currentrow, currentcolumn)->setData(QVariant::fromValue(spectrumindex + 1), Qt::DisplayRole);
 			currentcolumn++;
 
 			if (parameters->mode == dereplication) {
 				if ((parameters->peaklistfileformat == mis) || (parameters->peaklistfileformat == imzML)) {
-					database->setItem(currentrow, currentcolumn, widgetitemallocator.getNewItem());
-					database->item(currentrow, currentcolumn)->setForeground(brush);
-					database->item(currentrow, currentcolumn)->setData(Qt::DisplayRole, (*spectralist)[spectrumindex].getExperimentalSpectrum().getCoordinateX());
+					databasemodel->setItem(currentrow, currentcolumn, new QStandardItem());
+					databasemodel->item(currentrow, currentcolumn)->setForeground(brush);
+					databasemodel->item(currentrow, currentcolumn)->setData(QVariant::fromValue((*spectralist)[spectrumindex].getExperimentalSpectrum().getCoordinateX()), Qt::DisplayRole);
 					currentcolumn++;
-					database->setItem(currentrow, currentcolumn, widgetitemallocator.getNewItem());
-					database->item(currentrow, currentcolumn)->setForeground(brush);
-					database->item(currentrow, currentcolumn)->setData(Qt::DisplayRole, (*spectralist)[spectrumindex].getExperimentalSpectrum().getCoordinateY());
-					currentcolumn++;		
+					
+					databasemodel->setItem(currentrow, currentcolumn, new QStandardItem());
+					databasemodel->item(currentrow, currentcolumn)->setForeground(brush);
+					databasemodel->item(currentrow, currentcolumn)->setData(QVariant::fromValue((*spectralist)[spectrumindex].getExperimentalSpectrum().getCoordinateY()), Qt::DisplayRole);
+					currentcolumn++;
+
+					coordinates.push_back(cCoordinates((*spectralist)[spectrumindex].getExperimentalSpectrum().getCoordinateX(), (*spectralist)[spectrumindex].getExperimentalSpectrum().getCoordinateY(), spectrumindex + 1, cropPrecisionToSixDecimalsByteArray(peak->matchedmz).toDouble(), cropPrecisionToSixDecimalsByteArray(peak->matchedintensity).toDouble()));
 				}
 				secondspace = (int)peak->description.find(' ', peak->description.find(' ') + 1);
-				database->setItem(currentrow, currentcolumn, widgetitemallocator.getNewItem());
-				database->item(currentrow, currentcolumn)->setForeground(brush);
-				database->item(currentrow, currentcolumn)->setText(peak->description.substr(0, secondspace).c_str());
+				databasemodel->setItem(currentrow, currentcolumn, new QStandardItem());
+				databasemodel->item(currentrow, currentcolumn)->setForeground(brush);
+				databasemodel->item(currentrow, currentcolumn)->setText(peak->description.substr(0, secondspace).c_str());
 				currentcolumn++;		
 			}
-			else {
-				database->setItem(currentrow, currentcolumn, widgetitemallocator.getNewItem());
-				database->item(currentrow, currentcolumn)->setForeground(brush);
-				database->item(currentrow, currentcolumn)->setText(peak->description.substr(0, peak->description.find(':')).c_str());
+
+			if (parameters->mode == denovoengine) {
+				databasemodel->setItem(currentrow, currentcolumn, new QStandardItem());
+				databasemodel->item(currentrow, currentcolumn)->setForeground(brush);
+				databasemodel->item(currentrow, currentcolumn)->setData(QVariant::fromValue((*spectralist)[spectrumindex].getPathId() + 1), Qt::DisplayRole);
 				currentcolumn++;		
 			}
 		
-			database->setItem(currentrow, currentcolumn, widgetitemallocator.getNewItem());
-			database->item(currentrow, currentcolumn)->setForeground(brush);
-			database->item(currentrow, currentcolumn)->setData(Qt::DisplayRole, cropPrecisionToSixDecimals(peak->mzratio));
+			if (parameters->mode != dereplication) {
+				databasemodel->setItem(currentrow, currentcolumn, new QStandardItem());
+				databasemodel->item(currentrow, currentcolumn)->setForeground(brush);
+				databasemodel->item(currentrow, currentcolumn)->setText(peak->description.substr(0, peak->description.find(':')).c_str());
+				currentcolumn++;		
+			}
+		
+			databasemodel->setItem(currentrow, currentcolumn, new QStandardItem());
+			databasemodel->item(currentrow, currentcolumn)->setForeground(brush);
+			databasemodel->item(currentrow, currentcolumn)->setData(QVariant::fromValue(cropPrecisionToSixDecimalsByteArray(peak->mzratio)), Qt::DisplayRole);
 			currentcolumn++;
 
-			database->setItem(currentrow, currentcolumn, widgetitemallocator.getNewItem());
-			database->item(currentrow, currentcolumn)->setForeground(brush);
-			database->item(currentrow, currentcolumn)->setData(Qt::DisplayRole, cropPrecisionToSixDecimals(peak->matchedmz));
+			databasemodel->setItem(currentrow, currentcolumn, new QStandardItem());
+			databasemodel->item(currentrow, currentcolumn)->setForeground(brush);
+			databasemodel->item(currentrow, currentcolumn)->setData(QVariant::fromValue(cropPrecisionToSixDecimalsByteArray(peak->matchedmz)), Qt::DisplayRole);
 			currentcolumn++;
 
-			database->setItem(currentrow, currentcolumn, widgetitemallocator.getNewItem());
-			database->item(currentrow, currentcolumn)->setForeground(brush);
-			database->item(currentrow, currentcolumn)->setData(Qt::DisplayRole, cropPrecisionToSixDecimals(peak->matchedintensity));
+			databasemodel->setItem(currentrow, currentcolumn, new QStandardItem());
+			databasemodel->item(currentrow, currentcolumn)->setForeground(brush);
+			databasemodel->item(currentrow, currentcolumn)->setData(QVariant::fromValue(cropPrecisionToSixDecimalsByteArray(peak->matchedintensity)), Qt::DisplayRole);
 			currentcolumn++;
 
-			database->setItem(currentrow, currentcolumn, widgetitemallocator.getNewItem());
-			database->item(currentrow, currentcolumn)->setForeground(brush);
-			database->item(currentrow, currentcolumn)->setData(Qt::DisplayRole, cropPrecisionToSixDecimals(peak->matchedppm));
+			databasemodel->setItem(currentrow, currentcolumn, new QStandardItem());
+			databasemodel->item(currentrow, currentcolumn)->setForeground(brush);
+			databasemodel->item(currentrow, currentcolumn)->setData(QVariant::fromValue(cropPrecisionToSixDecimalsByteArray(peak->matchedppm)), Qt::DisplayRole);
 			currentcolumn++;
 
 			if (parameters->mode == dereplication) {
-				database->setItem(currentrow, currentcolumn, widgetitemallocator.getNewItem());
-				database->item(currentrow, currentcolumn)->setForeground(brush);
-				database->item(currentrow, currentcolumn)->setText(peak->description.substr(peak->description.rfind('(') + 1, peak->description.rfind(')') - peak->description.rfind('(') - 1).c_str());
+				databasemodel->setItem(currentrow, currentcolumn, new QStandardItem());
+				databasemodel->item(currentrow, currentcolumn)->setForeground(brush);
+				databasemodel->item(currentrow, currentcolumn)->setText(peak->description.substr(peak->description.rfind('(') + 1, peak->description.rfind(')') - peak->description.rfind('(') - 1).c_str());
 				currentcolumn++;		
 
 				langle = (int)peak->description.rfind('<');
 				rangle = (int)peak->description.find('>');
 				if ((langle != string::npos) && (rangle != string::npos)) {
-					database->setItem(currentrow, currentcolumn, widgetitemallocator.getNewItem());
-					database->item(currentrow, currentcolumn)->setForeground(brush);
-					database->item(currentrow, currentcolumn)->setText(peak->description.substr(rangle + 1, langle - rangle - 1).c_str());
+					databasemodel->setItem(currentrow, currentcolumn, new QStandardItem());
+					databasemodel->item(currentrow, currentcolumn)->setForeground(brush);
+					databasemodel->item(currentrow, currentcolumn)->setText(peak->description.substr(rangle + 1, langle - rangle - 1).c_str());
+					if ((parameters->peaklistfileformat == mis) || (parameters->peaklistfileformat == imzML)) {
+						if (databasemodel->item(currentrow, currentcolumn)->text().length() > 40) {
+							coordinates.back().name = databasemodel->item(currentrow, currentcolumn)->text().toStdString().substr(0, 37) + "...";
+						}
+						else {
+							coordinates.back().name = databasemodel->item(currentrow, currentcolumn)->text().toStdString();
+						}
+					}
 					currentcolumn++;		
 
-					tmp1 = (int)peak->description.find('<');
-					tmp2 = (int)peak->description.rfind('>');
-					stmp = peak->description.substr(tmp1, rangle - tmp1 + 1) + "view" + peak->description.substr(langle, tmp2 - langle + 1);
-					database->setCellWidget(currentrow, currentcolumn, new QLabel(stmp.c_str()));
-					((QLabel *)database->cellWidget(currentrow, currentcolumn))->setTextFormat(Qt::RichText);
-					((QLabel *)database->cellWidget(currentrow, currentcolumn))->setTextInteractionFlags(Qt::TextBrowserInteraction);
-					((QLabel *)database->cellWidget(currentrow, currentcolumn))->setOpenExternalLinks(true);
+					tmp = (int)peak->description.find('<');
+					stmp = peak->description.substr(tmp, rangle - tmp + 1);
+					stmp = stmp.substr(stmp.find('\"') + 1);
+					stmp = stmp.substr(0, stmp.rfind('\"'));
+
+					databasemodel->setItem(currentrow, currentcolumn, new QStandardItem());
+					databasemodel->item(currentrow, currentcolumn)->setForeground(brush);
+					databasemodel->item(currentrow, currentcolumn)->setText(stmp.c_str());
 					currentcolumn++;		
 				}
 				else {
-					database->setItem(currentrow, currentcolumn, widgetitemallocator.getNewItem());
-					database->item(currentrow, currentcolumn)->setForeground(brush);
-					database->item(currentrow, currentcolumn)->setText(peak->description.substr(secondspace + 1, peak->description.rfind('(') - secondspace - 2).c_str());
+					databasemodel->setItem(currentrow, currentcolumn, new QStandardItem());
+					databasemodel->item(currentrow, currentcolumn)->setForeground(brush);
+					databasemodel->item(currentrow, currentcolumn)->setText(peak->description.substr(secondspace + 1, peak->description.rfind('(') - secondspace - 2).c_str());
+					if ((parameters->peaklistfileformat == mis) || (parameters->peaklistfileformat == imzML)) {
+						if (databasemodel->item(currentrow, currentcolumn)->text().length() > 40) {
+							coordinates.back().name = databasemodel->item(currentrow, currentcolumn)->text().toStdString().substr(0, 37) + "...";
+						}
+						else {
+							coordinates.back().name = databasemodel->item(currentrow, currentcolumn)->text().toStdString();
+						}
+					}
+					currentcolumn++;		
+
+					databasemodel->setItem(currentrow, currentcolumn, new QStandardItem());
+					databasemodel->item(currentrow, currentcolumn)->setForeground(brush);
+					databasemodel->item(currentrow, currentcolumn)->setText("");
 					currentcolumn++;		
 				}
 			}
 			else {
+				databasemodel->setItem(currentrow, currentcolumn, new QStandardItem());
+				databasemodel->item(currentrow, currentcolumn)->setForeground(brush);
+				databasemodel->item(currentrow, currentcolumn)->setText("");
 				if (peak->description.find(':') + 2 < peak->description.size()) {
-					database->setItem(currentrow, currentcolumn, widgetitemallocator.getNewItem());
-					database->item(currentrow, currentcolumn)->setForeground(brush);
-					database->item(currentrow, currentcolumn)->setText(peak->description.substr(peak->description.find(':') + 2).c_str());
-					currentcolumn++;		
+					databasemodel->item(currentrow, currentcolumn)->setText(peak->description.substr(peak->description.find(':') + 2).c_str());
 				}
+				currentcolumn++;		
 			}
 
 		}
@@ -396,15 +484,29 @@ void cSummaryPeaksTableWidget::prepareToShow(QTableWidget* tablewidget, cParamet
 				
         progress->setValue(i);
         if (progress->wasCanceled()) {
-			deleteTable(true);
+			deleteTable();
 			emit tableCancelled();
 			break;
         }
 
 	}
 
-	for (int i = 0; i < database->columnCount(); i++) {
-		database->resizeColumnToContents(i);
+	proxymodel->setSourceModel(databasemodel);
+	database->setModel(proxymodel);
+	proxymodel->setSortRole(Qt::InitialSortOrderRole);
+	database->setSortingEnabled(true);
+
+	if (!progress->wasCanceled()) {
+		for (int i = 0; i < databasemodel->columnCount(); i++) {
+			database->resizeColumnToContents(i);
+		}
+	}
+
+	if ((parameters->mode == dereplication) && !progress->wasCanceled()) {
+		if ((parameters->peaklistfileformat == mis) || (parameters->peaklistfileformat == imzML)) {
+			emit sendCoordinates(coordinates);
+			coordinates_orig = coordinates;
+		}
 	}
 
 	progress->setValue(spectracount);
@@ -412,76 +514,38 @@ void cSummaryPeaksTableWidget::prepareToShow(QTableWidget* tablewidget, cParamet
 }
 
 
-void cSummaryPeaksTableWidget::deleteTable(bool enableprogress) {
-	QProgressDialog* progress;
-	cEventFilter filter;
-	int rowcount = database->rowCount();
-
-	if (enableprogress) {
-		progress = new QProgressDialog("Clearing the table...", 0, 0, rowcount, this);
-		progress->setMinimumWidth(250);
-		progress->installEventFilter(&filter);
-		progress->setMinimumDuration(0);
-		progress->setWindowModality(Qt::WindowModal);
-		progress->setValue(0);
-	}
-
-	widgetitemallocator.reset();
-
-	for (int i = 0; i < rowcount; i++) {
-		if (parameters->mode == dereplication) {
-			if ((parameters->peaklistfileformat == mis) || (parameters->peaklistfileformat == imzML)) {
-				delete database->cellWidget(rowcount - i - 1, 10);
-			}
-			else {
-				delete database->cellWidget(rowcount - i - 1, 8);
-			}
+void cSummaryPeaksTableWidget::deleteTable() {
+	for (int i = 0; i < databasemodel->columnCount(); i++) {
+		if (database->itemDelegateForColumn(i)) {
+			delete database->itemDelegateForColumn(i);
 		}
-
-        if (enableprogress) {
-            progress->setValue(i);
-        }
-    }
-	
-	database->setRowCount(0);
-
-	if (enableprogress) {
-		progress->setValue(rowcount);
-		delete progress;
 	}
+	databasemodel->clear();
+}
+
+
+void cSummaryPeaksTableWidget::updateFilterBySelectedRegion(int xmin, int xmax, int ymin, int ymax) {
+	proxymodel->setRegion(xmin, xmax, ymin, ymax);
+	filterRows();
 }
 
 
 void cSummaryPeaksTableWidget::keyPressEvent(QKeyEvent *event) {
-    if (event->key() == Qt::Key_Escape) {
-		closeWindow();
-    }
-
 	if ((event->key() == Qt::Key_Enter) || (event->key() == Qt::Key_Return)) {
 		if (rowsfilterline->hasFocus()) {
 			filterRows();
 		}
     }
 
-	if (event->key() == Qt::Key_F1) {
-		#if OS_TYPE == WIN
-			QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo("docs/html/summarypeakstable.html").absoluteFilePath()));
-		#else
-			QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo(installdir + "docs/html/summarypeakstable.html").absoluteFilePath()));
-		#endif
-	}
-
 	if ((event->modifiers() == Qt::ControlModifier) && (event->key() == Qt::Key_F)) {
 		rowsfilterline->setFocus();
 	}
 
-	if ((event->modifiers() == Qt::ControlModifier) && (event->key() == Qt::Key_N)) {
+	if ((event->modifiers() == Qt::ControlModifier) && (event->key() == Qt::Key_T)) {
 		rowsfiltercasesensitive->setChecked(!rowsfiltercasesensitive->isChecked());
 	}
 
-	if ((event->modifiers() == Qt::ControlModifier) && (event->key() == Qt::Key_E)) {
-		exportToCsv();
-	}
+	event->accept();
 }
 
 
@@ -490,30 +554,12 @@ void cSummaryPeaksTableWidget::closeWindow() {
 }
 
 
-void cSummaryPeaksTableWidget::headerItemDoubleClicked(int index) {
-	if (headersort[index] == -1) {
-		database->sortByColumn(index, Qt::AscendingOrder);
-		headersort[index] = 1;
-		return;
-	}
-
-	if (headersort[index] == 0) {
-		database->sortByColumn(index, Qt::AscendingOrder);
-		headersort[index] = 1;
-	}
-	else {
-		database->sortByColumn(index, Qt::DescendingOrder);
-		headersort[index] = 0;
-	}
-}
-
-
 void cSummaryPeaksTableWidget::filterRows() {
 	Qt::CaseSensitivity casesensitive = rowsfiltercasesensitive->isChecked()?Qt::CaseSensitive:Qt::CaseInsensitive;
 	QString str = rowsfilterline->text();
-	int rowcount = database->rowCount();
+	int rowcount = databasemodel->rowCount();
 	bool match;
-	int i, j;
+	int i, j, x, y;
 
 	QProgressDialog progress("Updating...", "Cancel", 0, rowcount, this);
 	progress.setMinimumWidth(250);
@@ -522,10 +568,14 @@ void cSummaryPeaksTableWidget::filterRows() {
 	progress.setMinimumDuration(0);
 	progress.setWindowModality(Qt::WindowModal);
 
+	coordinates.clear();
+
 	for (i = 0; i < rowcount; i++) {
+		x = databasemodel->item(i, 1)->data(Qt::DisplayRole).toInt();
+		y = databasemodel->item(i, 2)->data(Qt::DisplayRole).toInt();
 
 		match = false;
-		for (j = 0; j < database->columnCount(); j++) {
+		for (j = 0; j < databasemodel->columnCount(); j++) {
 			// ignore non-text fields
 			if (parameters->mode == dereplication) {
 				if ((parameters->peaklistfileformat == mis) || (parameters->peaklistfileformat == imzML)) {
@@ -540,12 +590,25 @@ void cSummaryPeaksTableWidget::filterRows() {
 				}
 			}
 
-			if (database->item(i, j)->text().contains(str, casesensitive)) {
+			if (databasemodel->item(i, j) && databasemodel->item(i, j)->text().contains(str, casesensitive)) {
+				if (parameters->mode == dereplication) {
+					if ((parameters->peaklistfileformat == mis) || (parameters->peaklistfileformat == imzML)) {
+						if (((proxymodel->xmin == -1) && (proxymodel->xmax == -1) && (proxymodel->ymin == -1) && (proxymodel->ymax == -1)) || ((x >= proxymodel->xmin) && (x <= proxymodel->xmax) && (y >= proxymodel->ymin) && (y <= proxymodel->ymax))) {
+							coordinates.push_back(cCoordinates(databasemodel->item(i, 1)->text().toInt(), databasemodel->item(i, 2)->text().toInt(), databasemodel->item(i, 0)->text().toInt(), databasemodel->item(i, 5)->data(Qt::DisplayRole).toDouble(), databasemodel->item(i, 6)->data(Qt::DisplayRole).toDouble()));
+							if (databasemodel->item(i, 9)->text().length() > 40) {
+								coordinates.back().name = databasemodel->item(i, 9)->text().toStdString().substr(0, 37) + "...";
+							}
+							else {
+								coordinates.back().name = databasemodel->item(i, 9)->text().toStdString();
+							}
+						}
+					}
+				}
+
 				match = true;
 				break;
 			}
 		}
-		database->setRowHidden(i, !match);
 		progress.setValue(i);
 
 		if (progress.wasCanceled()) {
@@ -555,13 +618,25 @@ void cSummaryPeaksTableWidget::filterRows() {
 
 	}
 
+	if ((parameters->mode == dereplication) && !progress.wasCanceled()) {
+		if ((parameters->peaklistfileformat == mis) || (parameters->peaklistfileformat == imzML)) {
+			emit sendCoordinates(coordinates);
+		}
+	}
+
+	proxymodel->setFilterKeyColumn(-1);
+	proxymodel->setFilterCaseSensitivity(casesensitive);
+	proxymodel->setFilterFixedString(str);
+
 	progress.setValue(rowcount);
 }
 
 
 void cSummaryPeaksTableWidget::resetFilter() {
 	rowsfilterline->setText("");
-	int rowcount = database->rowCount();
+
+	int rowcount = databasemodel->rowCount();
+	int i, x, y;
 
 	QProgressDialog progress("Updating...", 0, 0, rowcount, this);
 	progress.setMinimumWidth(250);
@@ -570,10 +645,34 @@ void cSummaryPeaksTableWidget::resetFilter() {
 	progress.setMinimumDuration(0);
 	progress.setWindowModality(Qt::WindowModal);
 
-	for (int i = 0; i < rowcount; i++) {
-		database->setRowHidden(i, false);
-		progress.setValue(i);
+	if (parameters->mode == dereplication) {
+		if ((parameters->peaklistfileformat == mis) || (parameters->peaklistfileformat == imzML)) {
+			coordinates.clear();
+			for (i = 0; i < rowcount; i++) {
+				x = databasemodel->item(i, 1)->data(Qt::DisplayRole).toInt();
+				y = databasemodel->item(i, 2)->data(Qt::DisplayRole).toInt();
+
+				if (((proxymodel->xmin == -1) && (proxymodel->xmax == -1) && (proxymodel->ymin == -1) && (proxymodel->ymax == -1)) || ((x >= proxymodel->xmin) && (x <= proxymodel->xmax) && (y >= proxymodel->ymin) && (y <= proxymodel->ymax))) {
+					coordinates.push_back(cCoordinates(x, y, databasemodel->item(i, 0)->text().toInt(), databasemodel->item(i, 5)->data(Qt::DisplayRole).toDouble(), databasemodel->item(i, 6)->data(Qt::DisplayRole).toDouble()));
+					if (databasemodel->item(i, 9)->text().length() > 40) {
+						coordinates.back().name = databasemodel->item(i, 9)->text().toStdString().substr(0, 37) + "...";
+					}
+					else {
+						coordinates.back().name = databasemodel->item(i, 9)->text().toStdString();
+					}
+				}
+
+				progress.setValue(i);
+			}
+			emit sendCoordinates(coordinates);
+		}
 	}
+
+	database->horizontalHeader()->setSortIndicator(-1, Qt::AscendingOrder);
+	proxymodel->sort(-1);
+
+	proxymodel->setFilterKeyColumn(-1);
+	proxymodel->setFilterFixedString("");
 
 	progress.setValue(rowcount);
 }
@@ -585,7 +684,7 @@ void cSummaryPeaksTableWidget::exportToCsv() {
 	if (!filename.isEmpty()) {
 		lastdirexporttocsv = filename;
 
-		QProgressDialog progress("Exporting CSV file...", "Cancel", 0, database->rowCount(), this);
+		QProgressDialog progress("Exporting CSV file...", "Cancel", 0, proxymodel->rowCount(), this);
 		progress.setMinimumWidth(250);
 		cEventFilter filter;
 		progress.installEventFilter(&filter);
@@ -600,35 +699,27 @@ void cSummaryPeaksTableWidget::exportToCsv() {
 
 		QTextStream out(&file);
 
-		for (int i = 0; i < database->columnCount(); i++) {
-			out << "\"" << database->horizontalHeaderItem(i)->text() << "\"";
-			if (i < database->columnCount() - 1) {
+		for (int i = 0; i < databasemodel->columnCount(); i++) {
+			out << "\"" << databasemodel->horizontalHeaderItem(i)->text() << "\"";
+			if (i < databasemodel->columnCount() - 1) {
 				out << ",";
 			}
 		}
 		out << endl;
 
-		for (int i = 0; i < database->rowCount(); i++) {
+		QStandardItem* item;
+		for (int i = 0; i < proxymodel->rowCount(); i++) {
 
-			if (database->isRowHidden(i)) {
-				continue;
-			}
-
-			for (int j = 0; j < database->columnCount(); j++) {
-				if (database->item(i, j)) {
-					out << "\"" << database->item(i, j)->data(Qt::DisplayRole).toString() << "\"";
-					if (j < database->columnCount() - 1) {
-						out << ",";
-					}
-				}
-				else if (database->cellWidget(i, j)) {
-					out << "\"" << ((QLabel *)(database->cellWidget(i, j)))->text() << "\"";
-					if (j < database->columnCount() - 1) {
+			for (int j = 0; j < databasemodel->columnCount(); j++) {
+				item = databasemodel->itemFromIndex(proxymodel->mapToSource(proxymodel->index(i, j)));
+				if (item) {
+					out << "\"" << item->data(Qt::DisplayRole).toString() << "\"";
+					if (j < databasemodel->columnCount() - 1) {
 						out << ",";
 					}
 				}
 				else {
-					if (j < database->columnCount() - 1) {
+					if (j < databasemodel->columnCount() - 1) {
 						out << ",";
 					}
 				}
@@ -640,6 +731,7 @@ void cSummaryPeaksTableWidget::exportToCsv() {
 				removefile = true;
 				break;
 			}
+
 		}
 		
 		file.close();
@@ -648,7 +740,16 @@ void cSummaryPeaksTableWidget::exportToCsv() {
 			file.remove();
 		}
 
-		progress.setValue(database->rowCount());
+		progress.setValue(proxymodel->rowCount());
 	}
+}
+
+
+void cSummaryPeaksTableWidget::showHTMLDocumentation() {
+	#if OS_TYPE == WIN
+		QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo("docs/html/summarypeakstable.html").absoluteFilePath()));
+	#else
+		QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo(installdir + "docs/html/summarypeakstable.html").absoluteFilePath()));
+	#endif
 }
 

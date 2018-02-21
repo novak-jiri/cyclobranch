@@ -92,9 +92,10 @@ public:
 		\param stream reference to an input file stream
 		\param errormessage reference to a string where an error message might be stored
 		\param ignoreerrors if true errors are ignored
+		\param skiph2blocks ignore ketide 2H loss blocks
 		\retval int 0 when the database was successfully loaded, -1 when an error occurred (\a errormessage is filled up)
 	*/ 
-	int loadFromPlainTextStream(ifstream &stream, string& errormessage, bool ignoreerrors);
+	int loadFromPlainTextStream(ifstream &stream, string& errormessage, bool ignoreerrors, bool skiph2blocks);
 
 
 	/**
@@ -211,6 +212,14 @@ public:
 
 
 	/**
+		\brief Calculate the summary formula of a composition.
+		\param brickid brick id
+		\retval string summary formula
+	*/
+	string calculateSummaryFromComposition(int brickid);
+
+
+	/**
 		\brief Store the structure into an output stream.
 		\param os an output stream
 	*/ 
@@ -224,18 +233,13 @@ public:
 	void load(ifstream& is);
 
 
-#if OLIGOKETIDES == 1
-
-
 	/**
 		\brief Check if the numbers of H2 loss and H2O loss blocks are correct.
 		\param brickseries a tested combination of building blocks
+		\param regularblocksorder check regular order of ketide blocks
 		\retval bool true when the numbers of blocks are correct
 	*/ 
-	bool checkKetideBlocks(cBrick& brickseries);
-
-
-#endif
+	bool checkKetideBlocks(cBrick& brickseries, bool regularblocksorder);
 
 
 };

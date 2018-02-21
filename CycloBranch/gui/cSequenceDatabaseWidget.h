@@ -1,6 +1,6 @@
 /**
 	\file cSequenceDatabaseWidget.h
-	\brief Visualization of the database of sequences.
+	\brief An editor of sequences database.
 */
 
 
@@ -11,31 +11,34 @@
 #include <QDesktopServices>
 #include <QUrl>
 #include <QFileInfo>
+#include <QMainWindow>
+#include <QToolBar>
+#include <QAction>
+#include <QTableView>
+#include <QStandardItemModel>
+#include <QStandardItem>
 #include <fstream>
 #include "core/utilities.h"
 #include "core/cSequenceDatabase.h"
-#include "core/cAllocator.h"
-#include "gui/cDelegate.h"
-
-
-using namespace std;
-using namespace boost;
+#include "gui/cSequenceDatabaseProxyModel.h"
+#include "gui/cViewButtonDelegate.h"
+#include "gui/cCheckBoxDelegate.h"
+#include "gui/cComboBoxDelegate.h"
 
 
 // forward declaration
 class QHBoxLayout;
 class QVBoxLayout;
-class QTableWidget;
-class QTableWidgetItem;
 class QPushButton;
 class QLineEdit;
-class QCheckBox;
+class QMenuBar;
+class QMenu;
 
 
 /**
-	\brief Visualization of the database of sequences.
+	\brief An editor of sequences database.
 */
-class cSequenceDatabaseWidget : public QWidget
+class cSequenceDatabaseWidget : public QMainWindow
 {
 	Q_OBJECT
 
@@ -63,23 +66,42 @@ public:
 
 
 	/**
-		\brief Insert a new row, set its peptide type and sequence.
+		\brief Import a new sequence.
 		\param peptidetypeindex an index of current peptide type
 		\param sequence sequence
 	*/ 
-	void insertRow(int peptidetypeindex, QString sequence);
+	void importSequence(int peptidetypeindex, QString sequence);
 
 
 private:
 
-	QWidget* parent;
-	QPushButton* insertrow;
-	QPushButton* removechecked;
-	QPushButton* close;
-	QPushButton* load;
-	QPushButton* save;
-	QPushButton* saveas;
+	QString editorname;
 
+	QWidget* parent;
+
+	QMenuBar* menuBar;
+	QMenu* menuFile;
+	QMenu* menuEdit;
+	QMenu* menuHelp;
+
+	QToolBar* toolbarFile;
+	QAction* actionNewDatabase;
+	QAction* actionOpenDatabase;
+	QAction* actionSaveDatabase;
+	QAction* actionSaveDatabaseAs;
+	QAction* actionImportDatabase;
+	QAction* actionCloseWindow;
+
+	QToolBar* toolbarEdit;
+	QAction* actionAddRow;
+	QAction* actionRemoveSelectedRows;
+	QAction* actionSelectAll;
+	QAction* actionUnselectAll;
+
+	QToolBar* toolbarHelp;
+	QAction* actionHTMLDocumentation;
+
+	QToolBar* toolbarFilter;
 	QWidget* rowsfilterwidget;
 	QHBoxLayout* rowsfilterhbox;
 	QLineEdit* rowsfilterline;
@@ -87,9 +109,11 @@ private:
 	QPushButton* rowsfilterbutton;
 	QPushButton* rowsfilterclearbutton;
 
-	QTableWidget* database;
-	QHBoxLayout* buttons;
+	QTableView* database;
+	QStandardItemModel* databasemodel;
+	cSequenceDatabaseProxyModel* proxymodel;
 	QVBoxLayout* mainlayout;
+	QWidget* mainwidget;
 
 	QString databasefile;
 	QString lastdir;
@@ -97,16 +121,11 @@ private:
 	ofstream outputstream;
 	cSequenceDatabase sequences;
 
-	vector<int> headersort;
-	cDelegate columndelegate;
-
-	cAllocator<QTableWidgetItem> widgetitemallocator;
-
 	bool datamodified;
 
-	void deleteTable(bool enableprogress);
+	void deleteTable();
 
-	void removeRow(int row);
+	void resetHeader();
 
 	bool checkTable();
 
@@ -131,7 +150,7 @@ private slots:
 
 	void closeWindow();
 
-	void loadDatabase();
+	void openDatabase();
 
 	bool saveDatabase();
 
@@ -139,17 +158,27 @@ private slots:
 
 	void addRow();
 
-	void removeCheckedRows();
+	void removeSelectedRows();
 
-	void itemChanged(QTableWidgetItem* item);
+	void itemChanged(QStandardItem* item);
 
-	void headerItemDoubleClicked(int index);
+	void headerItemClicked(int index);
 
 	void filterRows();
 
 	void resetFilter();
 
-	void comboBoxModified(int index);
+	void createNewDatabase();
+
+	void importDatabase();
+
+	void selectAll();
+
+	void unselectAll();
+
+	void showHTMLDocumentation();
+
+	void editItem(const QModelIndex& index);
 
 };
 

@@ -104,15 +104,39 @@ struct cEdge {
 
 
 	/**
-		\brief Id of a terminal modification (at the end of a spectrum).
+		\brief summary formula as a string
 	*/
-	int endmodifID;
+	string summary;
+
+
+	/**
+		\brief Id of a terminal modification (at the beginning of a spectrum).
+	*/
+	int startmodifID;
 
 
 	/**
 		\brief Id of a terminal modification of a branched peptide (in the middle of a spectrum).
 	*/
 	int middlemodifID;
+
+
+	/**
+		\brief Id of a terminal modification (at the end of a spectrum).
+	*/
+	int endmodifID;
+
+
+	/**
+		\brief Source ion name.
+	*/
+	eFragmentIonType sourceion;
+
+
+	/**
+		\brief Target ion name.
+	*/
+	eFragmentIonType targetion;
 
 
 	/**
@@ -135,8 +159,12 @@ struct cEdge {
 		targetcharge = 1;
 		targetintensity = 0;
 		composition = "";
-		endmodifID = 0;
+		summary = "";
+		startmodifID = 0;
 		middlemodifID = 0;
+		endmodifID = 0;
+		sourceion = fragmentIonTypeEnd;
+		targetion = fragmentIonTypeEnd;
 	}
 
 };
@@ -153,7 +181,7 @@ struct hash_cEdge {
 		\retval size_t hashed edge
 	*/
 	size_t operator()(const cEdge& e) const {
-		return std::hash<int>()(e.targetnode) ^ std::hash<int>()(e.brickid);
+		return std::hash<int>()(e.targetnode) ^ std::hash<int>()(e.brickid) ^ std::hash<int>()((int)(e.sourceion)) ^ std::hash<int>()((int)(e.targetion));
 	}
 
 };

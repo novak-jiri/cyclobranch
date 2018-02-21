@@ -7,17 +7,9 @@ bool cMainThread::checkModifications(cParameters& parameters, cSequence& sequenc
 	middlemodifid = 0;
 	errormessage = "";
 
-	if ((sequence.getPeptideType() == linear) || (sequence.getPeptideType() == branched) || (sequence.getPeptideType() == branchcyclic) || (sequence.getPeptideType() == linearpolysaccharide)
-#if OLIGOKETIDES == 1
-		|| (sequence.getPeptideType() == linearoligoketide)
-#endif
-		) {
+	if ((sequence.getPeptideType() == linear) || (sequence.getPeptideType() == branched) || (sequence.getPeptideType() == branchcyclic) || (sequence.getPeptideType() == linearpolyketide)) {
 
-		if ((sequence.getPeptideType() == linear) || (sequence.getPeptideType() == branched) || (sequence.getPeptideType() == linearpolysaccharide)
-#if OLIGOKETIDES == 1
-			|| (sequence.getPeptideType() == linearoligoketide)
-#endif
-			) {
+		if ((sequence.getPeptideType() == linear) || (sequence.getPeptideType() == branched) || (sequence.getPeptideType() == linearpolyketide)) {
 			startmodifid = -1;
 			endmodifid = -1;
 		}
@@ -28,11 +20,7 @@ bool cMainThread::checkModifications(cParameters& parameters, cSequence& sequenc
 
 		for (int i = 0; i < (int)parameters.searchedmodifications.size(); i++) {
 
-			if ((sequence.getPeptideType() == linear) || (sequence.getPeptideType() == branched) || (sequence.getPeptideType() == linearpolysaccharide)
-#if OLIGOKETIDES == 1
-				|| (sequence.getPeptideType() == linearoligoketide)
-#endif			
-				) {
+			if ((sequence.getPeptideType() == linear) || (sequence.getPeptideType() == branched) || (sequence.getPeptideType() == linearpolyketide)) {
 				if (parameters.searchedmodifications[i].name.compare(sequence.getNTterminalModification()) == 0) {
 					startmodifid = i;
 				}
@@ -248,7 +236,10 @@ void cMainThread::run() {
 
 			parseBranch(parameters.peptidetype, parameters.searchedsequence, v, branchstart, branchend);
 			// startmodifid, endmodifid and middlemodifid were filled up by checkModifications
-			c.setCandidate(v, netmp, startmodifid, endmodifid, middlemodifid, branchstart, branchend);
+			c.setCandidate(v, netmp, fragmentIonTypeEnd, startmodifid, endmodifid, middlemodifid, branchstart, branchend);
+			cSummaryFormula formula = c.calculateSummaryFormula(parameters, parameters.peptidetype, parameters.precursormass);
+			c.setSummaryFormula(formula);
+	
 			candidates.getSet().insert(c);
 		
 			graphreaderisworking = false;
@@ -268,7 +259,7 @@ void cMainThread::run() {
 
 		emit setGraph(graph.printGraph());
 
-		// blind paths are removed
+		// incomplete paths are removed
 		// note: paths finishing in precursor minus X are removed, however, precursor peak is always present thus any candidate should not be lost
 		if (parameters.blindedges == 1) {
 			if (graph.removeEdgesFormingPathsNotStartingFromFirstNode(terminatecomputation) == -1) {
@@ -282,7 +273,7 @@ void cMainThread::run() {
 			}
 		}
 
-		// blind paths are connected
+		// incomplete paths are connected
 		if (parameters.blindedges == 2) {
 			if (graph.connectEdgesFormingPathsNotStartingFromFirstNode(terminatecomputation) == -1) {
 				emitEndSignals();
@@ -339,9 +330,10 @@ void cMainThread::run() {
 
 	// database search - MS/MS mode
 	if (parameters.mode == databasesearch) {
-		string composition;
+		string composition, formstr;
 		vector<string> v;
 		cCandidate c;
+		cSummaryFormula formula;
 		vector<nodeEdge> netmp;
 		int startmodifid, endmodifid, middlemodifid, branchstart, branchend;
 
@@ -382,14 +374,12 @@ void cMainThread::run() {
 			parseBranch(parameters.sequencedatabase[i].getPeptideType(), composition, v, branchstart, branchend);
 
 			// set candidate
-			c.setCandidate(v, netmp, startmodifid, endmodifid, middlemodifid, branchstart, branchend);
+			c.setCandidate(v, netmp, fragmentIonTypeEnd, startmodifid, endmodifid, middlemodifid, branchstart, branchend);
 
-#if OLIGOKETIDES == 1
+			if (!calculatesummaries && ((parameters.sequencedatabase[i].getPeptideType() == linearpolyketide) || (parameters.sequencedatabase[i].getPeptideType() == cyclicpolyketide))) {
 
-			if (!calculatesummaries && ((parameters.sequencedatabase[i].getPeptideType() == linearoligoketide) || (parameters.sequencedatabase[i].getPeptideType() == cyclicoligoketide))) {
-
-				if (!c.checkKetideSequence(parameters.bricksdatabase, parameters.sequencedatabase[i].getPeptideType())) {
-					if (parameters.sequencedatabase[i].getPeptideType() == linearoligoketide) {
+				if (!c.checkKetideSequence(parameters.bricksdatabase, parameters.sequencedatabase[i].getPeptideType(), parameters.regularblocksorder)) {
+					if (parameters.sequencedatabase[i].getPeptideType() == linearpolyketide) {
 						*os << "Ignored sequence: " << parameters.sequencedatabase[i].getName() << " " << parameters.sequencedatabase[i].getSequence() << "; the order of building blocks is not correct." << endl;
 					}
 					else {
@@ -401,28 +391,47 @@ void cMainThread::run() {
 				eResidueLossType leftresiduelosstype = c.getLeftResidueType(parameters.bricksdatabase);
 				eResidueLossType rightresiduelosstype = c.getRightResidueType(parameters.bricksdatabase);
 
-				if (((leftresiduelosstype == h2_loss) && (c.getStartModifID() > 0) && parameters.searchedmodifications[c.getStartModifID()].cterminal) 
-					|| ((leftresiduelosstype == h2o_loss) && (c.getStartModifID() > 0) && parameters.searchedmodifications[c.getStartModifID()].nterminal)
-					|| ((rightresiduelosstype == h2_loss) && (c.getEndModifID() > 0) && parameters.searchedmodifications[c.getEndModifID()].cterminal)
-					|| ((rightresiduelosstype == h2o_loss) && (c.getEndModifID() > 0) && parameters.searchedmodifications[c.getEndModifID()].nterminal)) {
-					*os << "Ignored sequence: " << parameters.sequencedatabase[i].getName() << " " << parameters.sequencedatabase[i].getSequence() << "; the N-terminal modification is attached to C-terminus or vice versa." << endl;
-					continue;
+				if (parameters.peptidetype == linearpolyketide) {
+					if (((leftresiduelosstype == h2_loss) && (c.getStartModifID() > 0) && parameters.searchedmodifications[c.getStartModifID()].cterminal) 
+						|| ((rightresiduelosstype == h2_loss) && (c.getEndModifID() > 0) && parameters.searchedmodifications[c.getEndModifID()].cterminal)) {
+						*os << "Ignored sequence: " << parameters.sequencedatabase[i].getName() << " " << parameters.sequencedatabase[i].getSequence() << "; the C-terminal modification is attached to the N-terminus." << endl;
+						continue;
+					}
+				}
+				else {
+					if (((leftresiduelosstype == h2_loss) && (c.getStartModifID() > 0) && parameters.searchedmodifications[c.getStartModifID()].cterminal) 
+						|| ((leftresiduelosstype == h2o_loss) && (c.getStartModifID() > 0) && parameters.searchedmodifications[c.getStartModifID()].nterminal)
+						|| ((rightresiduelosstype == h2_loss) && (c.getEndModifID() > 0) && parameters.searchedmodifications[c.getEndModifID()].cterminal)
+						|| ((rightresiduelosstype == h2o_loss) && (c.getEndModifID() > 0) && parameters.searchedmodifications[c.getEndModifID()].nterminal)) {
+						*os << "Ignored sequence: " << parameters.sequencedatabase[i].getName() << " " << parameters.sequencedatabase[i].getSequence() << "; the N-terminal modification is attached to the C-terminus or vice versa." << endl;
+						continue;
+					}
 				}
 
 			}
 
-#endif
-			
 			// check the precursor mass error
-			if (!calculatesummaries && !parameters.similaritysearch && !isInPpmMassErrorTolerance(charge(uncharge(parameters.precursormass, parameters.precursorcharge), (parameters.precursorcharge > 0)?1:-1), c.getPrecursorMass(parameters.bricksdatabase, &parameters), parameters.precursormasserrortolerance)) {
+			formula.setFormula(parameters.sequencedatabase[i].getSummaryFormula());
+			formstr = "Hplus";
+			formula.addFormula(formstr);
+			formstr = (parameters.precursorcharge > 0)?"":"Hplus-2";
+			formula.addFormula(formstr);
+			formstr = parameters.precursoradduct.empty()?"":"H-1";
+			formula.addFormula(formstr);
+			formstr = parameters.precursoradduct;
+			formula.addFormula(formstr);
+			if (!calculatesummaries && !parameters.similaritysearch && !isInPpmMassErrorTolerance(charge(uncharge(parameters.precursormass, parameters.precursorcharge), (parameters.precursorcharge > 0)?1:-1), formula.getMass(), parameters.precursormasserrortolerance)) {
 				continue;
 			}
 
 			c.setName(parameters.sequencedatabase[i].getName());
+			formstr = (parameters.precursorcharge > 0)?"Hplus-1":"Hplus";
+			formula.addFormula(formstr);
+			c.setSummaryFormula(formula);
 			candidates.getSet().insert(c);
 
 			if (calculatesummaries) {
-				*os << i + 1 << " " << c.getSummaryFormula(parameters, parameters.sequencedatabase[i].getPeptideType()).getSummary() << endl;
+				*os << i + 1 << " " << c.calculateSummaryFormula(parameters, parameters.sequencedatabase[i].getPeptideType()).getSummary() << endl;
 			}
 		}
 		

@@ -121,20 +121,13 @@ string cSpectrumDetailWidget::getDetailsAsHTMLString() {
 				s += "<br/><br/>";
 				s += "Branch Modification: " + bname + "<br/>";
 				break;
-#if OLIGOKETIDES == 1
-			case linearoligoketide:
+			case linearpolyketide:
 				s += "<br/><br/>";
 				s += "Left Modification: " + lname + "<br/>";
 				s += "Right Modification: " + rname + "<br/>";
 				break;
-			case cyclicoligoketide:
+			case cyclicpolyketide:
 				s += "<br/>";
-				break;
-#endif
-			case linearpolysaccharide:
-				s += "<br/><br/>";
-				s += "N-terminal Modification: " + lname + "<br/>";
-				s += "C-terminal Modification: " + rname + "<br/>";
 				break;
 			case other:
 				break;
@@ -370,7 +363,12 @@ string cSpectrumDetailWidget::getPartialPeaksTableAsHTMLString(int id) {
 				secondspace = (int)peak->description.find(' ', peak->description.find(' ') + 1);
 				s += printHTMLTableCell(peak->description.substr(0, secondspace), isred);
 			}
-			else {
+			
+			if (parameters->mode == denovoengine) {
+				s += printHTMLTableCell(to_string(theoreticalspectrum->getPathId() + 1), isred);
+			}
+
+			if (parameters->mode != dereplication) {
 				s += printHTMLTableCell(peak->description.substr(0, peak->description.find(':')), isred);
 			}
 		
@@ -434,30 +432,15 @@ cSpectrumDetailWidget::~cSpectrumDetailWidget() {
 
 		delete textbrowser;
 
-		//QProgressDialog progress("Clearing the peaklist...", /*"Cancel"*/0, 0, peakstable->rowCount(), this);
-		//progress.setMinimumWidth(250);
-		//cEventFilter filter;
-		//progress.installEventFilter(&filter);
-		//progress.setMinimumDuration(0);
-		//progress.setWindowModality(Qt::WindowModal);
-
-		widgetitemallocator.reset();
-
-		if (parameters->mode == dereplication) {
-			for (int i = 0; i < peakstable->rowCount(); i++) {
-				if (peakstable->cellWidget(i, 7)) {
-					delete peakstable->cellWidget(i, 7);
-				}
-
-				//progress.setValue(i);
-				//if (progress.wasCanceled()) {
-				//	break;
-				//}
+		for (int i = 0; i < peakstablemodel->columnCount(); i++) {
+			if (peakstable->itemDelegateForColumn(i)) {
+				delete peakstable->itemDelegateForColumn(i);
 			}
 		}
+		peakstablemodel->clear();
 
-		//progress.setValue(peakstable->rowCount());
-
+		delete peakstablemodel;
+		delete proxymodel;
 		delete peakstable;
 
 		delete labelmz;
@@ -483,15 +466,11 @@ cSpectrumDetailWidget::~cSpectrumDetailWidget() {
 			switch (parameters->peptidetype)
 			{
 			case linear:
-#if OLIGOKETIDES == 1
-			case linearoligoketide:
-#endif
+			case linearpolyketide:
 				delete linearwidget;
 				break;
 			case cyclic:
-#if OLIGOKETIDES == 1
-			case cyclicoligoketide:
-#endif
+			case cyclicpolyketide:
 				delete cyclicwidget;
 				break;
 			case branched:
@@ -499,8 +478,6 @@ cSpectrumDetailWidget::~cSpectrumDetailWidget() {
 				break;
 			case branchcyclic:
 				delete branchcyclicwidget;
-				break;
-			case linearpolysaccharide:
 				break;
 			case other:
 				break;
@@ -536,6 +513,7 @@ cSpectrumDetailWidget::~cSpectrumDetailWidget() {
 
 void cSpectrumDetailWidget::closeEvent(QCloseEvent *event) {
 	hide();
+	event->accept();
 }
 
 
@@ -557,15 +535,11 @@ void cSpectrumDetailWidget::prepareToShow(ePeptideType peptidetype) {
 			switch (peptidetype)
 			{
 			case linear:
-#if OLIGOKETIDES == 1
-			case linearoligoketide:
-#endif
+			case linearpolyketide:
 				linearwidget = new cLinearWidget();
 				break;
 			case cyclic:
-#if OLIGOKETIDES == 1
-			case cyclicoligoketide:
-#endif
+			case cyclicpolyketide:
 				cyclicwidget = new cCyclicWidget();
 				break;
 			case branched:
@@ -573,8 +547,6 @@ void cSpectrumDetailWidget::prepareToShow(ePeptideType peptidetype) {
 				break;
 			case branchcyclic:
 				branchcyclicwidget = new cBranchCyclicWidget();
-				break;
-			case linearpolysaccharide:
 				break;
 			case other:
 				break;
@@ -692,7 +664,13 @@ void cSpectrumDetailWidget::prepareToShow(ePeptideType peptidetype) {
 		textbrowser->setAcceptRichText(true);
 		textbrowser->setOpenExternalLinks(true);
 		
-		peakstable = new QTableWidget(0, 0, this);
+		peakstable = new QTableView(this);
+		peakstablemodel = new QStandardItemModel(0, 0, this);
+		proxymodel = new cSpectrumDetailProxyModel(this);
+		proxymodel->setSourceModel(peakstablemodel);
+		proxymodel->setDynamicSortFilter(false);
+		peakstable->setModel(proxymodel);
+		peakstable->setSortingEnabled(true);
 
 		labelmz = new QLabel(tr("View m/z (from - to): "));
 
@@ -779,11 +757,7 @@ void cSpectrumDetailWidget::prepareToShow(ePeptideType peptidetype) {
 		if (parameters && ((parameters->mode == denovoengine) || (parameters->mode == singlecomparison) || (parameters->mode == databasesearch))) {
 
 			// cyclic
-#if OLIGOKETIDES == 1
-			if (theoreticalspectrum && ((parameters->peptidetype == cyclic) || (parameters->peptidetype == cyclicoligoketide))) {
-#else
-			if (theoreticalspectrum && (parameters->peptidetype == cyclic)) {
-#endif
+			if (theoreticalspectrum && ((parameters->peptidetype == cyclic) || (parameters->peptidetype == cyclicpolyketide))) {
 				int r = (int)theoreticalspectrum->getCandidate().getAcronyms().size();
 				int hint = (int)theoreticalspectrum->getVisualCoverage().size()/(2*r);
 				
@@ -881,15 +855,11 @@ void cSpectrumDetailWidget::prepareToShow(ePeptideType peptidetype) {
 			switch (peptidetype)
 			{
 			case linear:
-#if OLIGOKETIDES == 1
-			case linearoligoketide:
-#endif
+			case linearpolyketide:
 				hsplitter1->addWidget(linearwidget);
 				break;
 			case cyclic:
-#if OLIGOKETIDES == 1
-			case cyclicoligoketide:
-#endif
+			case cyclicpolyketide:
 				hsplitter1->addWidget(cyclicwidget);
 				break;
 			case branched:
@@ -897,8 +867,6 @@ void cSpectrumDetailWidget::prepareToShow(ePeptideType peptidetype) {
 				break;
 			case branchcyclic:
 				hsplitter1->addWidget(branchcyclicwidget);
-				break;
-			case linearpolysaccharide:
 				break;
 			case other:
 				break;
@@ -924,7 +892,7 @@ void cSpectrumDetailWidget::prepareToShow(ePeptideType peptidetype) {
 		finddialog = new cFindDialog(this);
 		exportdialog = new cExportDialog(this);
 
-		resize(1280, 700);
+		resize(1280, 750);
 
 		if (parameters && theoreticalspectrum) {
 
@@ -933,15 +901,11 @@ void cSpectrumDetailWidget::prepareToShow(ePeptideType peptidetype) {
 				switch (peptidetype)
 				{
 				case linear:
-#if OLIGOKETIDES == 1
-				case linearoligoketide:
-#endif
+				case linearpolyketide:
 					linearwidget->initialize(parameters, theoreticalspectrum);
 					break;
 				case cyclic:
-#if OLIGOKETIDES == 1
-				case cyclicoligoketide:
-#endif
+				case cyclicpolyketide:
 					cyclicwidget->initialize(parameters, theoreticalspectrum);
 					break;
 				case branched:
@@ -949,8 +913,6 @@ void cSpectrumDetailWidget::prepareToShow(ePeptideType peptidetype) {
 					break;
 				case branchcyclic:
 					branchcyclicwidget->initialize(parameters, theoreticalspectrum);
-					break;
-				case linearpolysaccharide:
 					break;
 				case other:
 					break;
@@ -999,39 +961,37 @@ void cSpectrumDetailWidget::findAll(const QString& str, QTextDocument::FindFlags
 	textbrowser->setExtraSelections(extraSelections);
 
 
-	// table
 	cTablePosition tpos;
-	for (int i = 0; i < peakstable->rowCount(); i++) {
+	QStandardItem* item;
+	for (int i = 0; i < proxymodel->rowCount(); i++) {
 
-		if (peakstable->isRowHidden(i)) {
-			continue;
-		}
+		for (int j = 0; j < ((parameters->mode == dereplication)?peakstablemodel->columnCount() - 1:peakstablemodel->columnCount()); j++) {
+			item = peakstablemodel->itemFromIndex(proxymodel->mapToSource(proxymodel->index(i, j)));
 
-		for (int j = 0; j < peakstable->columnCount(); j++) {
-			if (!peakstable->item(i, j)) {
+			if (!item) {
 				continue;
 			}
 
-			peakstable->item(i, j)->setBackgroundColor(Qt::white);
+			item->setBackground(QBrush(Qt::white));
 
 			if (str.isEmpty()) {
 				continue;
 			}
 
 			if (opt & QTextDocument::FindWholeWords) {
-				if (peakstable->item(i, j)->text().compare(str, (opt & QTextDocument::FindCaseSensitively)?Qt::CaseSensitive:Qt::CaseInsensitive) == 0) {
+				if (item->text().compare(str, (opt & QTextDocument::FindCaseSensitively)?Qt::CaseSensitive:Qt::CaseInsensitive) == 0) {
 					tpos.row = i;
 					tpos.column = j;
 					tablematches.push_back(tpos);
-					peakstable->item(i, j)->setBackgroundColor(color);
+					item->setBackground(QBrush(color));
 				}
 			}
 			else {
-				if (peakstable->item(i, j)->text().contains(str, (opt & QTextDocument::FindCaseSensitively)?Qt::CaseSensitive:Qt::CaseInsensitive)) {
+				if (item->text().contains(str, (opt & QTextDocument::FindCaseSensitively)?Qt::CaseSensitive:Qt::CaseInsensitive)) {
 					tpos.row = i;
 					tpos.column = j;
 					tablematches.push_back(tpos);		
-					peakstable->item(i, j)->setBackgroundColor(color);
+					item->setBackground(QBrush(color));
 				}
 			}	
 		}
@@ -1065,8 +1025,8 @@ void cSpectrumDetailWidget::findAll(const QString& str, QTextDocument::FindFlags
 
 	if (tablematches.size() > 0) {
 		peakstable->setFocus();
-		peakstable->scrollToItem(peakstable->item(tablematches[0].row, tablematches[0].column));
-		peakstable->item(tablematches[0].row, tablematches[0].column)->setSelected(true);
+		peakstable->scrollTo(proxymodel->index(tablematches[0].row, tablematches[0].column));
+		peakstable->selectionModel()->select(proxymodel->index(tablematches[0].row, tablematches[0].column), QItemSelectionModel::Select);
 	}
 
 }
@@ -1090,6 +1050,72 @@ void cSpectrumDetailWidget::keyPressEvent(QKeyEvent *event) {
 	if ((event->key() == Qt::Key_Enter) || (event->key() == Qt::Key_Return)) {
 		setMZInterval();
     }
+
+	if ((event->key() == Qt::Key_F1) && parameters) {
+		#if OS_TYPE == WIN
+			if (parameters->mode == dereplication) {
+				QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo("docs/html/dereplication.html").absoluteFilePath()));
+			}
+			else {
+				switch (parameters->peptidetype) {
+				case linear:
+					QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo("docs/html/lineardetail.html").absoluteFilePath()));
+					break;
+				case cyclic:
+					QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo("docs/html/cyclicdetail.html").absoluteFilePath()));
+					break;
+				case branched:
+					QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo("docs/html/brancheddetail.html").absoluteFilePath()));
+					break;
+				case branchcyclic:
+					QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo("docs/html/branchcyclicdetail.html").absoluteFilePath()));
+					break;
+				case linearpolyketide:
+					QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo("docs/html/linearketidedetail.html").absoluteFilePath()));
+					break;
+				case cyclicpolyketide:
+					QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo("docs/html/cyclicketidedetail.html").absoluteFilePath()));
+					break;
+				case other:
+					break;
+				default:
+					break;
+				}
+			}
+		#else
+			if (parameters->mode == dereplication) {
+				QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo(installdir + "docs/html/dereplication.html").absoluteFilePath()));
+			}
+			else {
+				switch (parameters->peptidetype) {
+				case linear:
+					QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo(installdir + "docs/html/lineardetail.html").absoluteFilePath()));
+					break;
+				case cyclic:
+					QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo(installdir + "docs/html/cyclicdetail.html").absoluteFilePath()));
+					break;
+				case branched:
+					QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo(installdir + "docs/html/brancheddetail.html").absoluteFilePath()));
+					break;
+				case branchcyclic:
+					QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo(installdir + "docs/html/branchcyclicdetail.html").absoluteFilePath()));
+					break;
+				case linearpolyketide:
+					QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo(installdir + "docs/html/linearketidedetail.html").absoluteFilePath()));
+					break;
+				case cyclicpolyketide:
+					QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo(installdir + "docs/html/cyclicketidedetail.html").absoluteFilePath()));
+					break;
+				case other:
+					break;
+				default:
+					break;
+				}
+			}
+		#endif
+	}
+
+	event->accept();
 }
 
 
@@ -1098,48 +1124,44 @@ void cSpectrumDetailWidget::preparePeaksTable() {
 	peakstable->setEditTriggers(QAbstractItemView::NoEditTriggers);
 	peakstable->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
 	peakstable->horizontalHeader()->setSectionsMovable(true);
-	//peakstable->setSelectionMode(QAbstractItemView::SingleSelection);
+	peakstable->setSelectionMode(QAbstractItemView::SingleSelection);
+	peakstable->verticalHeader()->setDefaultSectionSize(25);
 
 	if (parameters->mode == dereplication) {
-		peakstable->setColumnCount(8);
+		peakstablemodel->setColumnCount(8);
 	}
 	else {
-		peakstable->setColumnCount(6);
+		peakstablemodel->setColumnCount(6);
 	}
 
-	for (int i = 0; i < peakstable->columnCount(); i++) {
-		peakstable->setHorizontalHeaderItem(i, widgetitemallocator.getNewItem());
+	for (int i = 0; i < peakstablemodel->columnCount(); i++) {
+		peakstablemodel->setHorizontalHeaderItem(i, new QStandardItem());
 	}
 
-	peakstable->horizontalHeaderItem(1)->setText("Theoretical m/z");
-	peakstable->setItemDelegateForColumn(1, &columndelegate);
-
-	peakstable->horizontalHeaderItem(2)->setText("Experimental m/z");
-	peakstable->setItemDelegateForColumn(2, &columndelegate);
-
-	peakstable->horizontalHeaderItem(3)->setText("Intensity [%]");
-	peakstable->setItemDelegateForColumn(3, &columndelegate);
-
-	peakstable->horizontalHeaderItem(4)->setText("Error [ppm]");
-	peakstable->setItemDelegateForColumn(4, &columndelegate);
+	peakstablemodel->horizontalHeaderItem(1)->setText("Theoretical m/z");
+	peakstablemodel->horizontalHeaderItem(2)->setText("Experimental m/z");
+	peakstablemodel->horizontalHeaderItem(3)->setText("Intensity [%]");
+	peakstablemodel->horizontalHeaderItem(4)->setText("Error [ppm]");
 
 	if (parameters->mode == dereplication) {
-		peakstable->horizontalHeaderItem(0)->setText("Ion Type");
-		peakstable->horizontalHeaderItem(5)->setText("Summary Formula");
-		peakstable->horizontalHeaderItem(6)->setText("Name");
-		peakstable->horizontalHeaderItem(7)->setText("Reference");
+		peakstablemodel->horizontalHeaderItem(0)->setText("Ion Type");
+		peakstablemodel->horizontalHeaderItem(5)->setText("Summary Formula");
+		peakstablemodel->horizontalHeaderItem(6)->setText("Name");
+		peakstablemodel->horizontalHeaderItem(7)->setText("Reference");
+		peakstable->setItemDelegateForColumn(7, new cViewButtonDelegate());
 	}
 	else {
-		peakstable->horizontalHeaderItem(0)->setText("Fragment Type");
-		peakstable->horizontalHeaderItem(5)->setText("Sequence");
+		peakstablemodel->horizontalHeaderItem(0)->setText("Fragment Type");
+		peakstablemodel->horizontalHeaderItem(5)->setText("Sequence");
 	}
 
-	connect(peakstable->horizontalHeader(), SIGNAL(sectionDoubleClicked(int)), this, SLOT(headerItemDoubleClicked(int)));
+	connect(peakstable->horizontalHeader(), SIGNAL(sectionClicked(int)), this, SLOT(headerItemClicked(int)));
 
 	cPeaksList* thpeaks;
 	int thpeakscount;
 	cPeak* peak;
-	int secondspace, langle, rangle, tmp1, tmp2;
+	int secondspace, langle, rangle, tmp;
+	string stmp;
 	QBrush brush;
 
 	if (parameters->mode == dereplication) {
@@ -1157,7 +1179,7 @@ void cSpectrumDetailWidget::preparePeaksTable() {
 		thpeakscount = theoreticalspectrum->getTheoreticalPeaks()->size();
 	}
 	
-	peakstable->setRowCount(thpeakscount + theoreticalspectrum->getUnmatchedPeaks()->size());
+	peakstablemodel->setRowCount(thpeakscount + theoreticalspectrum->getUnmatchedPeaks()->size());
 
 	QProgressDialog progress("Preparing the peaklist...", /*"Cancel"*/0, 0, thpeakscount + theoreticalspectrum->getUnmatchedPeaks()->size(), parent);
 	progress.setMinimumWidth(250);
@@ -1166,9 +1188,12 @@ void cSpectrumDetailWidget::preparePeaksTable() {
 	progress.setMinimumDuration(0);
 	progress.setWindowModality(Qt::WindowModal);
 
+	peakstable->setModel(0);
+	proxymodel->setSourceModel(0);
+	peakstable->setSortingEnabled(false);
+
 	// theoretical peaks
 	for (int i = 0; i < thpeakscount; i++) {
-		peakstable->setRowHeight(i, 20);
 		peak = &((*thpeaks)[i]);
 
 		if (peak->matchedmz > 0) {
@@ -1181,62 +1206,64 @@ void cSpectrumDetailWidget::preparePeaksTable() {
 		if (parameters->mode == dereplication) {
 			secondspace = (int)peak->description.find(' ', peak->description.find(' ') + 1);
 
-			peakstable->setItem(i, 0, widgetitemallocator.getNewItem());
-			peakstable->item(i, 0)->setForeground(brush);
-			peakstable->item(i, 0)->setText(peak->description.substr(0, secondspace).c_str());
+			peakstablemodel->setItem(i, 0, new QStandardItem());
+			peakstablemodel->item(i, 0)->setForeground(brush);
+			peakstablemodel->item(i, 0)->setText(peak->description.substr(0, secondspace).c_str());
 		}
 		else {
-			peakstable->setItem(i, 0, widgetitemallocator.getNewItem());
-			peakstable->item(i, 0)->setForeground(brush);
-			peakstable->item(i, 0)->setText(peak->description.substr(0, peak->description.find(':')).c_str());
+			peakstablemodel->setItem(i, 0, new QStandardItem());
+			peakstablemodel->item(i, 0)->setForeground(brush);
+			peakstablemodel->item(i, 0)->setText(peak->description.substr(0, peak->description.find(':')).c_str());
 		}
 		
-		peakstable->setItem(i, 1, widgetitemallocator.getNewItem());
-		peakstable->item(i, 1)->setForeground(brush);
-		peakstable->item(i, 1)->setData(Qt::DisplayRole, cropPrecisionToSixDecimals(peak->mzratio));
+		peakstablemodel->setItem(i, 1, new QStandardItem());
+		peakstablemodel->item(i, 1)->setForeground(brush);
+		peakstablemodel->item(i, 1)->setData(QVariant::fromValue(cropPrecisionToSixDecimalsByteArray(peak->mzratio)), Qt::DisplayRole);
 
 		if (peak->matchedmz > 0) {
-			peakstable->setItem(i, 2, widgetitemallocator.getNewItem());
-			peakstable->item(i, 2)->setForeground(brush);
-			peakstable->item(i, 2)->setData(Qt::DisplayRole, cropPrecisionToSixDecimals(peak->matchedmz));
+			peakstablemodel->setItem(i, 2, new QStandardItem());
+			peakstablemodel->item(i, 2)->setForeground(brush);
+			peakstablemodel->item(i, 2)->setData(QVariant::fromValue(cropPrecisionToSixDecimalsByteArray(peak->matchedmz)), Qt::DisplayRole);
 
-			peakstable->setItem(i, 3, widgetitemallocator.getNewItem());
-			peakstable->item(i, 3)->setForeground(brush);
-			peakstable->item(i, 3)->setData(Qt::DisplayRole, cropPrecisionToSixDecimals(peak->matchedintensity));
+			peakstablemodel->setItem(i, 3, new QStandardItem());
+			peakstablemodel->item(i, 3)->setForeground(brush);
+			peakstablemodel->item(i, 3)->setData(QVariant::fromValue(cropPrecisionToSixDecimalsByteArray(peak->matchedintensity)), Qt::DisplayRole);
 
-			peakstable->setItem(i, 4, widgetitemallocator.getNewItem());
-			peakstable->item(i, 4)->setForeground(brush);
-			peakstable->item(i, 4)->setData(Qt::DisplayRole, cropPrecisionToSixDecimals(peak->matchedppm));
+			peakstablemodel->setItem(i, 4, new QStandardItem());
+			peakstablemodel->item(i, 4)->setForeground(brush);
+			peakstablemodel->item(i, 4)->setData(QVariant::fromValue(cropPrecisionToSixDecimalsByteArray(peak->matchedppm)), Qt::DisplayRole);
 		}
 
 		if (parameters->mode == dereplication) {
-			peakstable->setItem(i, 5, widgetitemallocator.getNewItem());
-			peakstable->item(i, 5)->setForeground(brush);
-			peakstable->item(i, 5)->setText(peak->description.substr(peak->description.rfind('(') + 1, peak->description.rfind(')') - peak->description.rfind('(') - 1).c_str());
+			peakstablemodel->setItem(i, 5, new QStandardItem());
+			peakstablemodel->item(i, 5)->setForeground(brush);
+			peakstablemodel->item(i, 5)->setText(peak->description.substr(peak->description.rfind('(') + 1, peak->description.rfind(')') - peak->description.rfind('(') - 1).c_str());
 
-			peakstable->setItem(i, 6, widgetitemallocator.getNewItem());
-			peakstable->item(i, 6)->setForeground(brush);
+			peakstablemodel->setItem(i, 6, new QStandardItem());
+			peakstablemodel->item(i, 6)->setForeground(brush);
 			langle = (int)peak->description.rfind('<');
 			rangle = (int)peak->description.find('>');
 			if ((langle != string::npos) && (rangle != string::npos)) {
-				peakstable->item(i, 6)->setText(peak->description.substr(rangle + 1, langle - rangle - 1).c_str());
+				peakstablemodel->item(i, 6)->setText(peak->description.substr(rangle + 1, langle - rangle - 1).c_str());
 
-				tmp1 = (int)peak->description.find('<');
-				tmp2 = (int)peak->description.rfind('>');
-				peakstable->setCellWidget(i, 7, new QLabel((peak->description.substr(tmp1, rangle - tmp1 + 1) + "view" + peak->description.substr(langle, tmp2 - langle + 1)).c_str()));
-				((QLabel *)peakstable->cellWidget(i, 7))->setTextFormat(Qt::RichText);
-				((QLabel *)peakstable->cellWidget(i, 7))->setTextInteractionFlags(Qt::TextBrowserInteraction);
-				((QLabel *)peakstable->cellWidget(i, 7))->setOpenExternalLinks(true);
+				tmp = (int)peak->description.find('<');
+				stmp = peak->description.substr(tmp, rangle - tmp + 1);
+				stmp = stmp.substr(stmp.find('\"') + 1);
+				stmp = stmp.substr(0, stmp.rfind('\"'));
+
+				peakstablemodel->setItem(i, 7, new QStandardItem());
+				peakstablemodel->item(i, 7)->setForeground(brush);
+				peakstablemodel->item(i, 7)->setText(stmp.c_str());
 			}
 			else {
-				peakstable->item(i, 6)->setText(peak->description.substr(secondspace + 1, peak->description.rfind('(') - secondspace - 2).c_str());		
+				peakstablemodel->item(i, 6)->setText(peak->description.substr(secondspace + 1, peak->description.rfind('(') - secondspace - 2).c_str());		
 			}
 		}
 		else {
 			if (peak->description.find(':') + 2 < peak->description.size()) {
-				peakstable->setItem(i, 5, widgetitemallocator.getNewItem());
-				peakstable->item(i, 5)->setForeground(brush);
-				peakstable->item(i, 5)->setText(peak->description.substr(peak->description.find(':') + 2).c_str());
+				peakstablemodel->setItem(i, 5, new QStandardItem());
+				peakstablemodel->item(i, 5)->setForeground(brush);
+				peakstablemodel->item(i, 5)->setText(peak->description.substr(peak->description.find(':') + 2).c_str());
 			}
 		}
 
@@ -1248,14 +1275,13 @@ void cSpectrumDetailWidget::preparePeaksTable() {
 
 	// unmatched experimental peaks
 	for (int i = thpeakscount; i < thpeakscount + theoreticalspectrum->getUnmatchedPeaks()->size(); i++) {
-		peakstable->setRowHeight(i, 20);
 		peak = &((*(theoreticalspectrum->getUnmatchedPeaks()))[i - thpeakscount]);
 
-		peakstable->setItem(i, 2, widgetitemallocator.getNewItem());
-		peakstable->item(i, 2)->setData(Qt::DisplayRole, cropPrecisionToSixDecimals(peak->mzratio));
+		peakstablemodel->setItem(i, 2, new QStandardItem());
+		peakstablemodel->item(i, 2)->setData(QVariant::fromValue(cropPrecisionToSixDecimalsByteArray(peak->mzratio)), Qt::DisplayRole);
 
-		peakstable->setItem(i, 3, widgetitemallocator.getNewItem());
-		peakstable->item(i, 3)->setData(Qt::DisplayRole, cropPrecisionToSixDecimals(peak->intensity));
+		peakstablemodel->setItem(i, 3, new QStandardItem());
+		peakstablemodel->item(i, 3)->setData(QVariant::fromValue(cropPrecisionToSixDecimalsByteArray(peak->intensity)), Qt::DisplayRole);
 
 		progress.setValue(i);
 		//if (progress.wasCanceled()) {
@@ -1263,12 +1289,11 @@ void cSpectrumDetailWidget::preparePeaksTable() {
 		//}
 	}
 
-	peakstableheadersort.resize(peakstable->columnCount());
-	for (int i = 0; i < peakstable->columnCount(); i++) {
-		peakstableheadersort[i] = -1;
-	}
+	proxymodel->setSourceModel(peakstablemodel);
+	peakstable->setModel(proxymodel);
+	peakstable->setSortingEnabled(true);
 
-	for (int i = 0; i < peakstable->columnCount(); i++) {
+	for (int i = 0; i < peakstablemodel->columnCount(); i++) {
 		peakstable->resizeColumnToContents(i);
 	}
 
@@ -1373,9 +1398,7 @@ void cSpectrumDetailWidget::exportPeptide() {
 
 		switch ((ePeptideType)parameters->peptidetype) {
 			case linear:
-#if OLIGOKETIDES == 1
-			case linearoligoketide:
-#endif
+			case linearpolyketide:
 				rx = ".+\\.pdf$";
 				if (!selected && (regex_search(filename.toStdString(), rx))) {
 					linearwidget->exportToPDF(filename, false);
@@ -1403,9 +1426,7 @@ void cSpectrumDetailWidget::exportPeptide() {
 				}
 				break;
 			case cyclic:
-#if OLIGOKETIDES == 1
-			case cyclicoligoketide:
-#endif
+			case cyclicpolyketide:
 				rx = ".+\\.pdf$";
 				if (!selected && (regex_search(filename.toStdString(), rx))) {
 					cyclicwidget->exportToPDF(filename, false);
@@ -1486,8 +1507,6 @@ void cSpectrumDetailWidget::exportPeptide() {
 					selected = true;
 				}
 				break;
-			case linearpolysaccharide:
-				break;
 			case other:
 				break;
 			default:
@@ -1524,7 +1543,7 @@ void cSpectrumDetailWidget::exportTableToCSV() {
 	
 	if (!filename.isEmpty()) {
 
-		QProgressDialog progress("Exporting the CSV file...", "Cancel", 0, peakstable->rowCount(), this);
+		QProgressDialog progress("Exporting the CSV file...", "Cancel", 0, proxymodel->rowCount(), this);
 		progress.setMinimumWidth(250);
 		cEventFilter filter;
 		progress.installEventFilter(&filter);
@@ -1539,35 +1558,27 @@ void cSpectrumDetailWidget::exportTableToCSV() {
 
 		QTextStream out(&file);
 
-		for (int i = 0; i < peakstable->columnCount(); i++) {
-			out << "\"" << peakstable->horizontalHeaderItem(i)->text() << "\"";
-			if (i < peakstable->columnCount() - 1) {
+		for (int i = 0; i < peakstablemodel->columnCount(); i++) {
+			out << "\"" << peakstablemodel->horizontalHeaderItem(i)->text() << "\"";
+			if (i < peakstablemodel->columnCount() - 1) {
 				out << ",";
 			}
 		}
 		out << endl;
 
-		for (int i = 0; i < peakstable->rowCount(); i++) {
+		QStandardItem* item;
+		for (int i = 0; i < proxymodel->rowCount(); i++) {
 
-			if (peakstable->isRowHidden(i)) {
-				continue;
-			}
-
-			for (int j = 0; j < peakstable->columnCount(); j++) {
-				if (peakstable->item(i, j)) {
-					out << "\"" << peakstable->item(i, j)->data(Qt::DisplayRole).toString() << "\"";
-					if (j < peakstable->columnCount() - 1) {
-						out << ",";
-					}
-				}
-				else if (peakstable->cellWidget(i, j)) {
-					out << "\"" << ((QLabel *)(peakstable->cellWidget(i, j)))->text() << "\"";
-					if (j < peakstable->columnCount() - 1) {
+			for (int j = 0; j < peakstablemodel->columnCount(); j++) {
+				item = peakstablemodel->itemFromIndex(proxymodel->mapToSource(proxymodel->index(i, j)));
+				if (item) {
+					out << "\"" << item->data(Qt::DisplayRole).toString() << "\"";
+					if (j < peakstablemodel->columnCount() - 1) {
 						out << ",";
 					}
 				}
 				else {
-					if (j < peakstable->columnCount() - 1) {
+					if (j < peakstablemodel->columnCount() - 1) {
 						out << ",";
 					}
 				}
@@ -1587,7 +1598,7 @@ void cSpectrumDetailWidget::exportTableToCSV() {
 			file.remove();
 		}
 
-		progress.setValue(peakstable->rowCount());
+		progress.setValue(proxymodel->rowCount());
 
 	}
 }
@@ -1603,8 +1614,8 @@ void cSpectrumDetailWidget::movePrevious() {
 
 	if (currentfinditem < (int)tablematches.size()) {
 		peakstable->setFocus();
-		peakstable->scrollToItem(peakstable->item(tablematches[currentfinditem].row, tablematches[currentfinditem].column));
-		peakstable->item(tablematches[currentfinditem].row, tablematches[currentfinditem].column)->setSelected(true);
+		peakstable->scrollTo(proxymodel->index(tablematches[currentfinditem].row, tablematches[currentfinditem].column));
+		peakstable->selectionModel()->select(proxymodel->index(tablematches[currentfinditem].row, tablematches[currentfinditem].column), QItemSelectionModel::Select);
 	}
 	else {
 		textbrowser->setFocus();
@@ -1623,8 +1634,8 @@ void cSpectrumDetailWidget::moveNext() {
 
 	if (currentfinditem < (int)tablematches.size()) {
 		peakstable->setFocus();
-		peakstable->scrollToItem(peakstable->item(tablematches[currentfinditem].row, tablematches[currentfinditem].column));
-		peakstable->item(tablematches[currentfinditem].row, tablematches[currentfinditem].column)->setSelected(true);
+		peakstable->scrollTo(proxymodel->index(tablematches[currentfinditem].row, tablematches[currentfinditem].column));
+		peakstable->selectionModel()->select(proxymodel->index(tablematches[currentfinditem].row, tablematches[currentfinditem].column), QItemSelectionModel::Select);
 	}
 	else {
 		textbrowser->setFocus();
@@ -1633,65 +1644,21 @@ void cSpectrumDetailWidget::moveNext() {
 }
 
 
-void cSpectrumDetailWidget::headerItemDoubleClicked(int index) {
+void cSpectrumDetailWidget::headerItemClicked(int index) {
 	findAll("", 0, false);
-
-	if (peakstableheadersort[index] == -1) {
-		peakstable->sortByColumn(index, Qt::DescendingOrder);
-		peakstableheadersort[index] = 0;
-		return;
-	}
-
-	if (peakstableheadersort[index] == 0) {
-		peakstable->sortByColumn(index, Qt::AscendingOrder);
-		peakstableheadersort[index] = 1;
-	}
-	else {
-		peakstable->sortByColumn(index, Qt::DescendingOrder);
-		peakstableheadersort[index] = 0;
-	}
 }
 
 
 void cSpectrumDetailWidget::filterPeaksTable() {
 	findAll("", 0, false);
 
-	int rowcount = peakstable->rowCount();
-	int i;
-	bool hide;
-	cPeaksList* thpeaks = theoreticalspectrum->getTheoreticalPeaks();
-
-	QProgressDialog progress("Updating...", 0, 0, rowcount, this);
-	progress.setMinimumWidth(250);
-	cEventFilter filter;
-	progress.installEventFilter(&filter);
-	progress.setMinimumDuration(0);
-	progress.setWindowModality(Qt::WindowModal);
-
 	bool hm = actionHideMatched->isChecked();
 	bool hu = actionHideUnmatched->isChecked();
 	bool hs = actionHideScrambled->isChecked();
 
-	for (i = 0; i < rowcount; i++) {
-		hide = false;
-
-		if (hm && peakstable->item(i, 1) && peakstable->item(i, 2)) {
-			hide = true;
-		}
-		
-		if (hu && ((peakstable->item(i, 1) == 0) || (peakstable->item(i, 2) == 0))) {
-			hide = true;
-		}
-		
-		if (hs && peakstable->item(i, 0) && peakstable->item(i, 0)->text().contains("scrambled")) {
-			hide = true;
-		}
-		
-		peakstable->setRowHidden(i, hide);
-		progress.setValue(i);
-	}
-
-	progress.setValue(rowcount);
+	proxymodel->setFlags(hm, hu, hs);
+	proxymodel->setFilterKeyColumn(-1);
+	proxymodel->setFilterFixedString("scrambled");
 }
 
 

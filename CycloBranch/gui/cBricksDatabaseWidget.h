@@ -1,6 +1,6 @@
 /**
 	\file cBricksDatabaseWidget.h
-	\brief Visualization of the database of building blocks.
+	\brief An editor of building blocks database.
 */
 
 
@@ -11,23 +11,27 @@
 #include <QDesktopServices>
 #include <QUrl>
 #include <QFileInfo>
+#include <QMainWindow>
+#include <QToolBar>
+#include <QAction>
+#include <QTableView>
+#include <QStandardItemModel>
+#include <QStandardItem>
 #include <fstream>
 #include "core/utilities.h"
 #include "core/cBricksDatabase.h"
-#include "core/cAllocator.h"
-#include "gui/cDelegate.h"
-
-using namespace std;
+#include "gui/cBricksDatabaseProxyModel.h"
+#include "gui/cMultipleButtonDelegate.h"
+#include "gui/cCheckBoxDelegate.h"
 
 
 // forward declaration
 class QHBoxLayout;
 class QVBoxLayout;
-class QTableWidget;
-class QTableWidgetItem;
 class QPushButton;
-class QCheckBox;
 class QLineEdit;
+class QMenuBar;
+class QMenu;
 
 
 /**
@@ -40,9 +44,9 @@ int numberOfOccurrences(const string& s, char c);
 
 
 /**
-	\brief Visualization of the database of building blocks.
+	\brief An editor of building blocks database.
 */
-class cBricksDatabaseWidget : public QWidget
+class cBricksDatabaseWidget : public QMainWindow
 {
 	Q_OBJECT
 
@@ -71,14 +75,33 @@ public:
 
 private:
 
-	QWidget* parent;
-	QPushButton* insertrow;
-	QPushButton* removechecked;
-	QPushButton* close;
-	QPushButton* load;
-	QPushButton* save;
-	QPushButton* saveas;
+	QString editorname;
 
+	QWidget* parent;
+
+	QMenuBar* menuBar;
+	QMenu* menuFile;
+	QMenu* menuEdit;
+	QMenu* menuHelp;
+
+	QToolBar* toolbarFile;
+	QAction* actionNewDatabase;
+	QAction* actionOpenDatabase;
+	QAction* actionSaveDatabase;
+	QAction* actionSaveDatabaseAs;
+	QAction* actionImportDatabase;
+	QAction* actionCloseWindow;
+
+	QToolBar* toolbarEdit;
+	QAction* actionAddRow;
+	QAction* actionRemoveSelectedRows;
+	QAction* actionSelectAll;
+	QAction* actionUnselectAll;
+
+	QToolBar* toolbarHelp;
+	QAction* actionHTMLDocumentation;
+
+	QToolBar* toolbarFilter;
 	QWidget* rowsfilterwidget;
 	QHBoxLayout* rowsfilterhbox;
 	QLineEdit* rowsfilterline;
@@ -86,9 +109,11 @@ private:
 	QPushButton* rowsfilterbutton;
 	QPushButton* rowsfilterclearbutton;
 
-	QTableWidget* database;
-	QHBoxLayout* buttons;
+	QTableView* database;
+	QStandardItemModel* databasemodel;
+	cBricksDatabaseProxyModel* proxymodel;
 	QVBoxLayout* mainlayout;
+	QWidget* mainwidget;
 
 	QString databasefile;
 	QString lastdir;
@@ -96,16 +121,11 @@ private:
 	ofstream outputstream;
 	cBricksDatabase bricks;
 
-	vector<int> headersort;
-	cDelegate columndelegate;
-
-	cAllocator<QTableWidgetItem> widgetitemallocator;
-
 	bool datamodified;
 
-	void deleteTable(bool enableprogress);
+	void deleteTable();
 
-	void removeRow(int row);
+	void resetHeader();
 
 	bool checkTable();
 
@@ -127,7 +147,7 @@ private slots:
 
 	void closeWindow();
 
-	void loadDatabase();
+	void openDatabase();
 
 	bool saveDatabase();
 
@@ -135,16 +155,27 @@ private slots:
 
 	void addRow();
 
-	void removeCheckedRows();
+	void removeSelectedRows();
 
-	void itemChanged(QTableWidgetItem* item);
+	void itemChanged(QStandardItem* item);
 
-	void headerItemDoubleClicked(int index);
+	void headerItemClicked(int index);
 
 	void filterRows();
 
 	void resetFilter();
 
+	void createNewDatabase();
+
+	void importDatabase();
+
+	void selectAll();
+
+	void unselectAll();
+
+	void showHTMLDocumentation();
+
 };
 
 #endif
+

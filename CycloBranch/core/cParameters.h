@@ -142,6 +142,12 @@ public:
 
 
 	/**
+		\brief True when the precursor adduct contains Cr.
+    */
+    bool precursorAdductHasCr;
+
+
+	/**
 		\brief True when the precursor adduct contains Fe.
     */
     bool precursorAdductHasFe;
@@ -211,6 +217,12 @@ public:
 		\brief Minimum mz.
     */
     double minimummz;
+
+
+	/**
+		\brief FWHM.
+    */
+    double fwhm;
 
 
 	/**
@@ -316,6 +328,12 @@ public:
 
 
 	/**
+		\brief True when the order of polyketide blocks is regular.
+    */
+    bool regularblocksorder;
+
+
+	/**
 		\brief Maximum number of reported hits.
     */
     int hitsreported;
@@ -370,7 +388,7 @@ public:
 
 
 	/**
-		\brief The identifier of an action with edges forming blind paths.
+		\brief The identifier of an action with edges forming incomplete paths.
     */
     int blindedges;
 

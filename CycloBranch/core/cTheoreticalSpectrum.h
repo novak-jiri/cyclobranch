@@ -113,6 +113,7 @@ class cTheoreticalSpectrum {
 	int validposition;
 	int reversevalidposition;
 	int seriescompleted;
+	int pathid;
 
 	// remove false hits, i.e., b-H2O without existing b-ion
 	void clearFalseHits(map<eFragmentIonType, vector<int> >& series, vector<eFragmentIonType>& fragmentions);
@@ -244,11 +245,8 @@ public:
 	int compareBranchCyclic(cPeaksList& sortedpeaklist, cBricksDatabase& bricksdatabasewithcombinations, bool writedescription, regex& sequencetag, regex& searchedsequence);
 
 
-#if OLIGOKETIDES == 1
-
-
 	/**
-		\brief Compare the theoretical spectrum of a linear oligoketide with an experimental spectrum.
+		\brief Compare the theoretical spectrum of a linear polyketide with an experimental spectrum.
 		\param sortedpeaklist reference to an experimental peaklist
 		\param bricksdatabasewithcombinations reference to a database of bricks with combinations of bricks
 		\param writedescription if true then string descriptions of peaks are filled
@@ -256,11 +254,11 @@ public:
 		\param searchedsequence reference to a regex of a searched sequence
 		\retval int number theoretical peaks generated; -2 when the sequence tag does not match the peptide sequence candidate
 	*/ 
-	int compareLinearOligoketide(cPeaksList& sortedpeaklist, cBricksDatabase& bricksdatabasewithcombinations, bool writedescription, regex& sequencetag, regex& searchedsequence);
+	int compareLinearPolyketide(cPeaksList& sortedpeaklist, cBricksDatabase& bricksdatabasewithcombinations, bool writedescription, regex& sequencetag, regex& searchedsequence);
 
 
 	/**
-		\brief Compare the theoretical spectrum of a cyclic oligoketide with an experimental spectrum.
+		\brief Compare the theoretical spectrum of a cyclic polyketide with an experimental spectrum.
 		\param sortedpeaklist reference to an experimental peaklist
 		\param bricksdatabasewithcombinations reference to a database of bricks with combinations of bricks
 		\param writedescription if true then string descriptions of peaks are filled
@@ -268,22 +266,7 @@ public:
 		\param searchedsequence reference to a regex of a searched sequence
 		\retval int number theoretical peaks generated; -2 when the sequence tag does not match the peptide sequence candidate
 	*/ 
-	int compareCyclicOligoketide(cPeaksList& sortedpeaklist, cBricksDatabase& bricksdatabasewithcombinations, bool writedescription, regex& sequencetag, regex& searchedsequence);
-
-
-#endif
-
-
-	/**
-		\brief Compare the theoretical spectrum of a linear polysaccharide with an experimental spectrum.
-		\param sortedpeaklist reference to an experimental peaklist
-		\param bricksdatabasewithcombinations reference to a database of bricks with combinations of bricks
-		\param writedescription if true then string descriptions of peaks are filled
-		\param sequencetag reference to a regex of a sequence tag
-		\param searchedsequence reference to a regex of a searched sequence
-		\retval int number theoretical peaks generated; -2 when the sequence tag does not match the peptide sequence candidate
-	*/ 
-	int compareLinearPolysaccharide(cPeaksList& sortedpeaklist, cBricksDatabase& bricksdatabasewithcombinations, bool writedescription, regex& sequencetag, regex& searchedsequence);
+	int compareCyclicPolyketide(cPeaksList& sortedpeaklist, cBricksDatabase& bricksdatabasewithcombinations, bool writedescription, regex& sequencetag, regex& searchedsequence);
 
 
 	/**
@@ -347,11 +330,12 @@ public:
 		\param splittingsites reference to a vector of splitting sites of a cyclic peptide
 		\param searchedmodifications reference to a vector of searched modifications
 		\param peptidetype the type of searched peptide
+		\param regularblocksorder check regular order of ketide blocks
 		\param trotation a pointer to a T-permutation of a branched peptide
 		\param leftresiduelosstype a residue type of the leftmost building block
 		\param hasfirstblockartificial true when the first block is artificial, false otherwise
 	*/ 
-	void generateNTerminalFragmentIons(int maxcharge, int& peaklistrealsize, vector<int>& intcomposition, eFragmentIonType fragmentiontype, cBricksDatabase& bricksdatabase, bool writedescription, int rotationid, vector<splitSite>& splittingsites, vector<fragmentDescription>& searchedmodifications, ePeptideType peptidetype, TRotationInfo* trotation = 0, eResidueLossType leftresiduelosstype = h2o_loss, bool hasfirstblockartificial = false);
+	void generateNTerminalFragmentIons(int maxcharge, int& peaklistrealsize, vector<int>& intcomposition, eFragmentIonType fragmentiontype, cBricksDatabase& bricksdatabase, bool writedescription, int rotationid, vector<splitSite>& splittingsites, vector<fragmentDescription>& searchedmodifications, ePeptideType peptidetype, bool regularblocksorder, TRotationInfo* trotation = 0, eResidueLossType leftresiduelosstype = h2o_loss, bool hasfirstblockartificial = false);
 	
 
 	/**
@@ -366,11 +350,12 @@ public:
 		\param splittingsites reference to a vector of splitting sites of a cyclic peptide
 		\param searchedmodifications reference to a vector of searched modifications
 		\param peptidetype the type of searched peptide
+		\param regularblocksorder check regular order of ketide blocks
 		\param trotation a pointer to a T-permutation of a branched peptide
 		\param rightresiduelosstype a residue type of the rightmost building block
 		\param haslastblockartificial true when the last block is artificial, false otherwise
 	*/ 
-	void generateCTerminalFragmentIons(int maxcharge, int& peaklistrealsize, vector<int>& intcomposition, eFragmentIonType fragmentiontype, cBricksDatabase& bricksdatabase, bool writedescription, int rotationid, vector<splitSite>& splittingsites, vector<fragmentDescription>& searchedmodifications, ePeptideType peptidetype, TRotationInfo* trotation = 0, eResidueLossType rightresiduelosstype = h2o_loss, bool haslastblockartificial = false);
+	void generateCTerminalFragmentIons(int maxcharge, int& peaklistrealsize, vector<int>& intcomposition, eFragmentIonType fragmentiontype, cBricksDatabase& bricksdatabase, bool writedescription, int rotationid, vector<splitSite>& splittingsites, vector<fragmentDescription>& searchedmodifications, ePeptideType peptidetype, bool regularblocksorder, TRotationInfo* trotation = 0, eResidueLossType rightresiduelosstype = h2o_loss, bool haslastblockartificial = false);
 
 
 	/**
@@ -385,14 +370,6 @@ public:
 		\param size the number of peaks
 	*/ 
 	void resizePeakList(int size);
-
-
-	/**
-		\brief Get the precursor mass of the peptide sequence candidate.
-		\param brickdatabasewithcombinations reference to an input database of bricks with combinations of bricks
-		\retval double precursor mass of the candidate
-	*/ 
-	double getPrecursorMass(cBricksDatabase& brickdatabasewithcombinations);
 
 
 	/**
@@ -485,6 +462,20 @@ public:
 		\param numberofcompletedseries number of completed series
 	*/ 
 	void setNumberOfCompletedSeries(int numberofcompletedseries);
+
+
+	/**
+		\brief Set path id.
+		\param pathid id of a path
+	*/ 
+	void setPathId(int pathid);
+
+
+	/**
+		\brief Get path id.
+		\retval int id of a path
+	*/ 
+	int getPathId() const;
 
 
 	/**

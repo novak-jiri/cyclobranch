@@ -9,7 +9,6 @@
 #include <QTextStream>
 #include <QTextEdit>
 #include <QSplitter>
-#include <QTableWidget>
 #include <QHeaderView>
 #include <QAbstractItemView>
 #include <QScrollBar>
@@ -77,10 +76,10 @@ cMainWindow::cMainWindow() {
 	actionDrawPeptide->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_P));
 
 	actionNorine = new QAction(QIcon(":/images/icons/25.png"), tr("&Norine"), this);
-	actionNorine->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_N));
+	actionNorine->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_1));
 
 	actionSmilesToMonomers = new QAction(QIcon(":/images/icons/5.png"), tr("Smiles2Monome&rs"), this);
-	actionSmilesToMonomers->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_T));
+	actionSmilesToMonomers->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_2));
 
 
 	actionShowIsomers = new QAction(QIcon(":/images/icons/95.png"), tr("Show &Isomers"), this);
@@ -178,9 +177,10 @@ cMainWindow::cMainWindow() {
 	toolbarFilter = addToolBar(tr("Filter"));
 	toolbarFilter->addWidget(rowsfilterwidget);
 
+	results = new QTableView(this);
+	resultsmodel = new QStandardItemModel(0, 0, this);
+	resultsproxymodel = new cMainWindowProxyModel(this);
 
-	// widgets
-	results = new QTableWidget(0, 0, this);
 	logWindow = new QTextEdit(this);
 	splitter = new QSplitter(this);
 
@@ -228,6 +228,7 @@ cMainWindow::cMainWindow() {
 	connect(rowsfilterclearbutton, SIGNAL(released()), this, SLOT(resetFilter()));
 
 	connect(summarytableofmatchedpeaks, SIGNAL(tableCancelled()), this, SLOT(summaryPeaksTableCancelled()));
+	connect(summarytableofmatchedpeaks, SIGNAL(sendCoordinates(vector<cCoordinates>)), imagewindow, SLOT(setCoordinates(vector<cCoordinates>)));
 
 	// add subitems to the items in main menu
 	// menuFile->addAction(actionOpen);
@@ -272,11 +273,16 @@ cMainWindow::cMainWindow() {
 	// enable the menu
 	setMenuBar(menuBar);
 
+	resultsproxymodel->setSourceModel(resultsmodel);
+	resultsproxymodel->setDynamicSortFilter(false);
+	results->setModel(resultsproxymodel);
+	results->setSelectionBehavior(QAbstractItemView::SelectItems);
+	results->setSelectionMode(QAbstractItemView::SingleSelection);
 	results->setEditTriggers(QAbstractItemView::NoEditTriggers);
 	results->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
 	results->horizontalHeader()->setSectionsMovable(true);
-	connect(results->horizontalHeader(), SIGNAL(sectionDoubleClicked(int)), this, SLOT(headerItemDoubleClicked(int)));
-	connect(results, SIGNAL(cellDoubleClicked(int, int)), this, SLOT(resultsCellClicked(int, int)));
+	results->setSortingEnabled(true);
+	connect(results, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(rowDoubleClicked(const QModelIndex&)));
 
 	logWindow->setReadOnly(true);
 
@@ -299,11 +305,11 @@ cMainWindow::cMainWindow() {
 	setCentralWidget(splitter);
 
 	// set the size of main window
-	resize(1280, 700);
+	resize(1280, 750);
 
 	resultsbasecolumncount = 9;
 	resultsspecificcolumncount = 0;
-	dbsearchspecificcolumncount = 0;
+	searchspecificcolumncount = 0;
 
 	theoreticalspectrumlist.clear();
 	spectradetails.clear();
@@ -329,8 +335,11 @@ cMainWindow::~cMainWindow() {
 	delete rowsfilterhbox;
 	delete rowsfilterwidget;
 
+	delete resultsmodel;
+	delete resultsproxymodel;
 	delete results;
-    delete logWindow;
+    
+	delete logWindow;
 	delete splitter;
 		
 	delete about;
@@ -382,8 +391,8 @@ void cMainWindow::keyPressEvent(QKeyEvent *event) {
 			filterResults();
 		}
 		else {
-			if ((results->currentRow() >= 0) && !results->isRowHidden(results->currentRow())) {		
-				resultsCellClicked(results->currentRow(), 0);
+			if ((results->selectionModel()->selectedRows().count() > 0) && (results->selectionModel()->selectedRows()[0].row() >= 0) && resultsproxymodel->mapFromSource(results->selectionModel()->selectedRows()[0]).isValid()) {		
+				rowDoubleClicked(results->selectionModel()->selectedRows()[0]);
 			}
 		}
     }
@@ -392,9 +401,11 @@ void cMainWindow::keyPressEvent(QKeyEvent *event) {
 		rowsfilterline->setFocus();
 	}
 
-	if ((event->modifiers() == Qt::ControlModifier) && (event->key() == Qt::Key_N)) {
+	if ((event->modifiers() == Qt::ControlModifier) && (event->key() == Qt::Key_T)) {
 		rowsfiltercasesensitive->setChecked(!rowsfiltercasesensitive->isChecked());
 	}
+
+	event->accept();
 }
 
 
@@ -405,7 +416,7 @@ void cMainWindow::closeEvent(QCloseEvent *event) {
 
 
 void cMainWindow::preparePeptideSequence(int row, string& peptidesequence, bool reportisomers) {
-	int spectrumindex = results->item(row, 1)->data(Qt::DisplayRole).toInt() - 1;
+	int spectrumindex = resultsmodel->item(row, 1)->data(Qt::DisplayRole).toInt() - 1;
 	string tmpsequence;
 	bool copy;
 
@@ -432,99 +443,97 @@ void cMainWindow::preparePeptideSequence(int row, string& peptidesequence, bool 
 }
 
 
-void cMainWindow::reportSpectrum(int id, cTheoreticalSpectrum& theoreticalspectrum, bool reportisomers) {
+void cMainWindow::reportSpectrum(int row, cTheoreticalSpectrum& theoreticalspectrum, bool reportisomers) {
 	string peptidesequence;
 	cSummaryFormula formula;
 
-	int row = results->rowCount();
-    results->insertRow(row);
+	resultsmodel->setItem(row, 0, new QStandardItem());
+	resultsmodel->item(row, 0)->setText("");
 	
-	results->setItem(row, 0, widgetitemallocator.getNewItem());
-	
-	results->setItem(row, 1, widgetitemallocator.getNewItem());
-	results->item(row, 1)->setData(Qt::DisplayRole, results->rowCount());
+	resultsmodel->setItem(row, 1, new QStandardItem());
+	resultsmodel->item(row, 1)->setData(QVariant::fromValue(row + 1), Qt::DisplayRole);
 
 	if ((parameters.mode == denovoengine) || (parameters.mode == singlecomparison) || (parameters.mode == databasesearch)) {
 
-		if (parameters.mode == databasesearch) {
-			results->setItem(row, 2, widgetitemallocator.getNewItem());
-			results->item(row, 2)->setText(theoreticalspectrum.getCandidate().getName().c_str());
+		if (parameters.mode == denovoengine) {
+			resultsmodel->setItem(row, 2, new QStandardItem());
+			resultsmodel->item(row, 2)->setData(QVariant::fromValue(theoreticalspectrum.getPathId() + 1), Qt::DisplayRole);
 		}
 
-		results->setItem(row, 2 + dbsearchspecificcolumncount, widgetitemallocator.getNewItem());
+		if (parameters.mode == databasesearch) {
+			resultsmodel->setItem(row, 2, new QStandardItem());
+			resultsmodel->item(row, 2)->setText(theoreticalspectrum.getCandidate().getName().c_str());
+		}
+
+		resultsmodel->setItem(row, 2 + searchspecificcolumncount, new QStandardItem());
 		preparePeptideSequence(row, peptidesequence, reportisomers);
-		results->item(row, 2 + dbsearchspecificcolumncount)->setText(peptidesequence.c_str());
+		resultsmodel->item(row, 2 + searchspecificcolumncount)->setText(peptidesequence.c_str());
 
-		formula = theoreticalspectrum.getCandidate().getSummaryFormula(parameters, parameters.peptidetype);
+		formula = theoreticalspectrum.getCandidate().getSummaryFormula();
 
-		results->setItem(row, 3 + dbsearchspecificcolumncount, widgetitemallocator.getNewItem());
-		results->item(row, 3 + dbsearchspecificcolumncount)->setData(Qt::DisplayRole, formula.isPartial()?string(formula.getSummary() + " (partial)").c_str():formula.getSummary().c_str());
+		resultsmodel->setItem(row, 3 + searchspecificcolumncount, new QStandardItem());
+		resultsmodel->item(row, 3 + searchspecificcolumncount)->setText(formula.isPartial()?string(formula.getSummary() + " (partial)").c_str():formula.getSummary().c_str());
 
-		results->setItem(row, 4 + dbsearchspecificcolumncount, widgetitemallocator.getNewItem());
-		results->item(row, 4 + dbsearchspecificcolumncount)->setData(Qt::DisplayRole, cropPrecisionToSixDecimals(formula.getMass()));
+		resultsmodel->setItem(row, 4 + searchspecificcolumncount, new QStandardItem());
+		resultsmodel->item(row, 4 + searchspecificcolumncount)->setData(QVariant::fromValue(cropPrecisionToSixDecimalsByteArray(formula.getMass())), Qt::DisplayRole);
 
-		results->setItem(row, 5 + dbsearchspecificcolumncount, widgetitemallocator.getNewItem());
-		results->item(row, 5 + dbsearchspecificcolumncount)->setData(Qt::DisplayRole, getNumberOfBricks(theoreticalspectrum.getCandidate().getComposition()));
+		resultsmodel->setItem(row, 5 + searchspecificcolumncount, new QStandardItem());
+		resultsmodel->item(row, 5 + searchspecificcolumncount)->setData(QVariant::fromValue(getNumberOfBricks(theoreticalspectrum.getCandidate().getComposition())), Qt::DisplayRole);
 
 		switch (parameters.peptidetype)
 		{
 		case linear:
-#if OLIGOKETIDES == 1
-		case linearoligoketide:
-#endif
-		case linearpolysaccharide:
-			results->setItem(row, 6 + dbsearchspecificcolumncount, widgetitemallocator.getNewItem());
-			results->item(row, 6 + dbsearchspecificcolumncount)->setText(parameters.searchedmodifications[theoreticalspectrum.getCandidate().getStartModifID()].name.c_str());
-			results->setItem(row, 7 + dbsearchspecificcolumncount, widgetitemallocator.getNewItem());
-			results->item(row, 7 + dbsearchspecificcolumncount)->setText(parameters.searchedmodifications[theoreticalspectrum.getCandidate().getEndModifID()].name.c_str());
+		case linearpolyketide:
+			resultsmodel->setItem(row, 6 + searchspecificcolumncount, new QStandardItem());
+			resultsmodel->item(row, 6 + searchspecificcolumncount)->setText(parameters.searchedmodifications[theoreticalspectrum.getCandidate().getStartModifID()].name.c_str());
+			resultsmodel->setItem(row, 7 + searchspecificcolumncount, new QStandardItem());
+			resultsmodel->item(row, 7 + searchspecificcolumncount)->setText(parameters.searchedmodifications[theoreticalspectrum.getCandidate().getEndModifID()].name.c_str());
 			break;
 		case branched:
-			results->setItem(row, 6 + dbsearchspecificcolumncount, widgetitemallocator.getNewItem());
-			results->item(row, 6 + dbsearchspecificcolumncount)->setText(parameters.searchedmodifications[theoreticalspectrum.getCandidate().getStartModifID()].name.c_str());
-			results->setItem(row, 7 + dbsearchspecificcolumncount, widgetitemallocator.getNewItem());
-			results->item(row, 7 + dbsearchspecificcolumncount)->setText(parameters.searchedmodifications[theoreticalspectrum.getCandidate().getMiddleModifID()].name.c_str());
-			results->setItem(row, 8 + dbsearchspecificcolumncount, widgetitemallocator.getNewItem());
-			results->item(row, 8 + dbsearchspecificcolumncount)->setText(parameters.searchedmodifications[theoreticalspectrum.getCandidate().getEndModifID()].name.c_str());
+			resultsmodel->setItem(row, 6 + searchspecificcolumncount, new QStandardItem());
+			resultsmodel->item(row, 6 + searchspecificcolumncount)->setText(parameters.searchedmodifications[theoreticalspectrum.getCandidate().getStartModifID()].name.c_str());
+			resultsmodel->setItem(row, 7 + searchspecificcolumncount, new QStandardItem());
+			resultsmodel->item(row, 7 + searchspecificcolumncount)->setText(parameters.searchedmodifications[theoreticalspectrum.getCandidate().getMiddleModifID()].name.c_str());
+			resultsmodel->setItem(row, 8 + searchspecificcolumncount, new QStandardItem());
+			resultsmodel->item(row, 8 + searchspecificcolumncount)->setText(parameters.searchedmodifications[theoreticalspectrum.getCandidate().getEndModifID()].name.c_str());
 			break;
 		case cyclic:
-#if OLIGOKETIDES == 1
-		case cyclicoligoketide:
-#endif
-			results->setItem(row, 6 + dbsearchspecificcolumncount, widgetitemallocator.getNewItem());
-			results->item(row, 6 + dbsearchspecificcolumncount)->setData(Qt::DisplayRole, theoreticalspectrum.getNumberOfMatchedBricks());	
+		case cyclicpolyketide:
+			resultsmodel->setItem(row, 6 + searchspecificcolumncount, new QStandardItem());
+			resultsmodel->item(row, 6 + searchspecificcolumncount)->setData(QVariant::fromValue(theoreticalspectrum.getNumberOfMatchedBricks()), Qt::DisplayRole);	
 			break;
 		case branchcyclic:
-			results->setItem(row, 6 + dbsearchspecificcolumncount, widgetitemallocator.getNewItem());
-			results->item(row, 6 + dbsearchspecificcolumncount)->setText(parameters.searchedmodifications[theoreticalspectrum.getCandidate().getMiddleModifID()].name.c_str());
+			resultsmodel->setItem(row, 6 + searchspecificcolumncount, new QStandardItem());
+			resultsmodel->item(row, 6 + searchspecificcolumncount)->setText(parameters.searchedmodifications[theoreticalspectrum.getCandidate().getMiddleModifID()].name.c_str());
 			break;
 		case other:
 		default:
 			break;
 		}
 
-		results->setItem(row, 6 + dbsearchspecificcolumncount + resultsspecificcolumncount, widgetitemallocator.getNewItem());
-		results->item(row, 6 + dbsearchspecificcolumncount + resultsspecificcolumncount)->setData(Qt::DisplayRole, theoreticalspectrum.getNumberOfMatchedPeaks());
+		resultsmodel->setItem(row, 6 + searchspecificcolumncount + resultsspecificcolumncount, new QStandardItem());
+		resultsmodel->item(row, 6 + searchspecificcolumncount + resultsspecificcolumncount)->setData(QVariant::fromValue(theoreticalspectrum.getNumberOfMatchedPeaks()), Qt::DisplayRole);
 
-		results->setItem(row, 7 + dbsearchspecificcolumncount + resultsspecificcolumncount, widgetitemallocator.getNewItem());
-		results->item(row, 7 + dbsearchspecificcolumncount + resultsspecificcolumncount)->setData(Qt::DisplayRole, cropPrecisionToSixDecimals(theoreticalspectrum.getRatioOfMatchedPeaks()*100));
+		resultsmodel->setItem(row, 7 + searchspecificcolumncount + resultsspecificcolumncount, new QStandardItem());
+		resultsmodel->item(row, 7 + searchspecificcolumncount + resultsspecificcolumncount)->setData(QVariant::fromValue(cropPrecisionToSixDecimalsByteArray(theoreticalspectrum.getRatioOfMatchedPeaks()*100)), Qt::DisplayRole);
 
-		results->setItem(row, 8 + dbsearchspecificcolumncount + resultsspecificcolumncount, widgetitemallocator.getNewItem());
-		results->item(row, 8 + dbsearchspecificcolumncount + resultsspecificcolumncount)->setData(Qt::DisplayRole, cropPrecisionToSixDecimals(theoreticalspectrum.getWeightedIntensityScore()));
+		resultsmodel->setItem(row, 8 + searchspecificcolumncount + resultsspecificcolumncount, new QStandardItem());
+		resultsmodel->item(row, 8 + searchspecificcolumncount + resultsspecificcolumncount)->setData(QVariant::fromValue(cropPrecisionToSixDecimalsByteArray(theoreticalspectrum.getWeightedIntensityScore())), Qt::DisplayRole);
 
 		for (int i = 0; i < (int)parameters.fragmentionsfortheoreticalspectra.size(); i++) {
-			results->setItem(row, resultsbasecolumncount  + dbsearchspecificcolumncount + resultsspecificcolumncount + i, widgetitemallocator.getNewItem());
-			results->item(row, resultsbasecolumncount + dbsearchspecificcolumncount + resultsspecificcolumncount + i)->setData(Qt::DisplayRole, theoreticalspectrum.getNumberOfMatchedPeaks(parameters.fragmentionsfortheoreticalspectra[i]));
+			resultsmodel->setItem(row, resultsbasecolumncount  + searchspecificcolumncount + resultsspecificcolumncount + i, new QStandardItem());
+			resultsmodel->item(row, resultsbasecolumncount + searchspecificcolumncount + resultsspecificcolumncount + i)->setData(QVariant::fromValue(theoreticalspectrum.getNumberOfMatchedPeaks(parameters.fragmentionsfortheoreticalspectra[i])), Qt::DisplayRole);
 		}
 
 		if ((parameters.peptidetype == cyclic) && parameters.enablescrambling) {
-			results->setItem(row, results->columnCount() - 1, widgetitemallocator.getNewItem());
-			results->item(row, results->columnCount() - 1)->setData(Qt::DisplayRole, theoreticalspectrum.getNumberOfScrambledPeaks());
+			resultsmodel->setItem(row, resultsmodel->columnCount() - 1, new QStandardItem());
+			resultsmodel->item(row, resultsmodel->columnCount() - 1)->setData(QVariant::fromValue(theoreticalspectrum.getNumberOfScrambledPeaks()), Qt::DisplayRole);
 		}
 
 		if (theoreticalspectrum.isValid()) {
-			results->item(row, 0)->setData(Qt::DisplayRole, "*");
-			for (int i = 0; i < results->columnCount(); i++) {
-				results->item(row, i)->setBackground(Qt::yellow);
+			resultsmodel->item(row, 0)->setText("*");
+			for (int i = 0; i < resultsmodel->columnCount(); i++) {
+				resultsmodel->item(row, i)->setBackground(Qt::yellow);
 			}
 		}
 
@@ -532,31 +541,31 @@ void cMainWindow::reportSpectrum(int id, cTheoreticalSpectrum& theoreticalspectr
 
 
 	if (parameters.mode == dereplication) {
-		results->setItem(row, 2, widgetitemallocator.getNewItem());
-		results->item(row, 2)->setData(Qt::DisplayRole, theoreticalspectrum.getNumberOfMatchedPeaks());
+		resultsmodel->setItem(row, 2, new QStandardItem());
+		resultsmodel->item(row, 2)->setData(QVariant::fromValue(theoreticalspectrum.getNumberOfMatchedPeaks()), Qt::DisplayRole);
 
-		results->setItem(row, 3, widgetitemallocator.getNewItem());
-		results->item(row, 3)->setData(Qt::DisplayRole, cropPrecisionToSixDecimals(theoreticalspectrum.getRatioOfMatchedPeaks()*100));
+		resultsmodel->setItem(row, 3, new QStandardItem());
+		resultsmodel->item(row, 3)->setData(QVariant::fromValue(cropPrecisionToSixDecimalsByteArray(theoreticalspectrum.getRatioOfMatchedPeaks()*100)), Qt::DisplayRole);
 
-		results->setItem(row, 4, widgetitemallocator.getNewItem());
-		results->item(row, 4)->setData(Qt::DisplayRole, cropPrecisionToSixDecimals(theoreticalspectrum.getWeightedIntensityScore()));
+		resultsmodel->setItem(row, 4, new QStandardItem());
+		resultsmodel->item(row, 4)->setData(QVariant::fromValue(cropPrecisionToSixDecimalsByteArray(theoreticalspectrum.getWeightedIntensityScore())), Qt::DisplayRole);
 
 		if ((parameters.peaklistfileformat == mis) || (parameters.peaklistfileformat == imzML)) {
-			results->setItem(row, 5, widgetitemallocator.getNewItem());
-			results->item(row, 5)->setData(Qt::DisplayRole, theoreticalspectrum.getExperimentalSpectrum().getCoordinateX());	
+			resultsmodel->setItem(row, 5, new QStandardItem());
+			resultsmodel->item(row, 5)->setData(QVariant::fromValue(theoreticalspectrum.getExperimentalSpectrum().getCoordinateX()), Qt::DisplayRole);	
 
-			results->setItem(row, 6, widgetitemallocator.getNewItem());
-			results->item(row, 6)->setData(Qt::DisplayRole, theoreticalspectrum.getExperimentalSpectrum().getCoordinateY());		
+			resultsmodel->setItem(row, 6, new QStandardItem());
+			resultsmodel->item(row, 6)->setData(QVariant::fromValue(theoreticalspectrum.getExperimentalSpectrum().getCoordinateY()), Qt::DisplayRole);		
 		}
 	}
 
 
-	spectradetails[id].initialize(&parameters, theoreticalspectrum, this);
+	spectradetails[row].initialize(&parameters, theoreticalspectrum, this);
 	if (parameters.mode == dereplication) {
-		spectradetails[id].setWindowTitle(("Experimental Spectrum No. " + to_string(row+1)).c_str());
+		spectradetails[row].setWindowTitle(("Experimental Spectrum No. " + to_string(row + 1)).c_str());
 	}
 	else {
-		spectradetails[id].setWindowTitle(("Theoretical Spectrum No. " + to_string(row+1)).c_str());
+		spectradetails[row].setWindowTitle(("Theoretical Spectrum No. " + to_string(row + 1)).c_str());
 	}
 }
 
@@ -609,21 +618,27 @@ void cMainWindow::setAndShowDrawPeptideWidget(int peptidetypeindex, QString sequ
 }
 
 
-void cMainWindow::showSummaryTableOfMatchedPeaks() {
-	summarytableofmatchedpeaks->show();
-	summarytableofmatchedpeaks->activateWindow();
+void cMainWindow::prepareSummaryTableOfMatchedPeaks() {
 	if (!summarytableisprepared) {
 		summarytableisprepared = true;
 		rowsfilterwidget->setEnabled(false);
-		summarytableofmatchedpeaks->prepareToShow(results, &parameters, &theoreticalspectrumlist);
+		summarytableofmatchedpeaks->prepareToShow(resultsmodel, resultsproxymodel, &parameters, &theoreticalspectrumlist);
 		rowsfilterwidget->setEnabled(true);
 	}
+}
+
+
+void cMainWindow::showSummaryTableOfMatchedPeaks() {
+	summarytableofmatchedpeaks->show();
+	summarytableofmatchedpeaks->activateWindow();
+	prepareSummaryTableOfMatchedPeaks();
 }
 
 
 void cMainWindow::showImageWindow() {
 	imagewindow->show();
 	imagewindow->activateWindow();
+	prepareSummaryTableOfMatchedPeaks();
 }
 
 
@@ -646,6 +661,8 @@ void cMainWindow::run() {
 
 	logWindow->clear();
 	
+	resetFilter();
+
 	deleteResults();
 	
 	theoreticalspectrumlist.clear();
@@ -658,8 +675,12 @@ void cMainWindow::run() {
 	if (regex_search(localparameters.peaklistfilename, rx)) {
 		string convertedimzml = localparameters.peaklistfilename.substr(0, (int)localparameters.peaklistfilename.size() - 6);
 		string convertedibd = convertedimzml;
-		convertedimzml += "_converted.imzML";
-		convertedibd += "_converted.ibd";
+		convertedimzml += "_converted_fwhm_";
+		convertedimzml += to_string(localparameters.fwhm);
+		convertedimzml += ".imzML";
+		convertedibd += "_converted_fwhm_";
+		convertedibd += to_string(localparameters.fwhm);
+		convertedibd += ".ibd";
 
 		if (QFile::exists(convertedimzml.c_str()) && QFile::exists(convertedibd.c_str())) {
 			QMessageBox::StandardButton reply;
@@ -685,9 +706,10 @@ void cMainWindow::run() {
 	connect(thread, SIGNAL(setGraph(string)), this, SLOT(setGraph(string)));
 	connect(this, SIGNAL(stopComputation()), thread, SLOT(stopComputation()));
 
-	summarytableofmatchedpeaks->deleteTable(true);
+	summarytableofmatchedpeaks->deleteTable();
 	summarytableofmatchedpeaks->hide();
 	summarytableisprepared = false;
+	imagewindow->hide();
 
 	thread->start();
 }
@@ -736,6 +758,12 @@ void cMainWindow::enableButtonsHandlingResults(bool enable) {
 	
 	if (parameters.mode == dereplication) {
 		actionShowIsomers->setEnabled(false);
+		if ((parameters.peaklistfileformat == mis) || (parameters.peaklistfileformat == imzML)) {
+			actionImageWindow->setEnabled(enable);
+		}
+		else {
+			actionImageWindow->setEnabled(false);
+		}
 	}
 	else {
 		actionShowIsomers->setEnabled(enable);
@@ -757,19 +785,14 @@ void cMainWindow::reportSpectra() {
 	switch (parameters.peptidetype)
 	{
 	case linear:
-#if OLIGOKETIDES == 1
-	case linearoligoketide:
-#endif
-	case linearpolysaccharide:
+	case linearpolyketide:
 		resultsspecificcolumncount = 2;
 		break;
 	case branched:
 		resultsspecificcolumncount = 3;
 		break;
 	case cyclic:
-#if OLIGOKETIDES == 1
-	case cyclicoligoketide:
-#endif
+	case cyclicpolyketide:
 		resultsspecificcolumncount = 1;
 		break;
 	case branchcyclic:
@@ -781,106 +804,130 @@ void cMainWindow::reportSpectra() {
 	}
 
 
-	if (parameters.mode == databasesearch) {
-		dbsearchspecificcolumncount = 1;
+	if ((parameters.mode == denovoengine) || (parameters.mode == databasesearch)) {
+		searchspecificcolumncount = 1;
 	}
 	else {
-		dbsearchspecificcolumncount = 0;
+		searchspecificcolumncount = 0;
 	}
 
 
 	if ((parameters.mode == denovoengine) || (parameters.mode == singlecomparison) || (parameters.mode == databasesearch)) { 
 
-		results->setColumnCount(resultsbasecolumncount + dbsearchspecificcolumncount + resultsspecificcolumncount + (int)parameters.fragmentionsfortheoreticalspectra.size());
+		resultsmodel->setColumnCount(resultsbasecolumncount + searchspecificcolumncount + resultsspecificcolumncount + (int)parameters.fragmentionsfortheoreticalspectra.size());
 
 		if ((parameters.peptidetype == cyclic) && parameters.enablescrambling) {
-			results->setColumnCount(results->columnCount() + 1);
+			resultsmodel->setColumnCount(resultsmodel->columnCount() + 1);
 		}
 
-		results->setHorizontalHeaderItem(0, widgetitemallocator.getNewItem());
-		results->horizontalHeaderItem(0)->setText("*");
+		resultsmodel->setHorizontalHeaderItem(0, new QStandardItem());
+		resultsmodel->horizontalHeaderItem(0)->setText("*");
+		results->setItemDelegateForColumn(0, new QItemDelegate());
 
-		results->setHorizontalHeaderItem(1, widgetitemallocator.getNewItem());
-		results->horizontalHeaderItem(1)->setText("Result ID");
+		resultsmodel->setHorizontalHeaderItem(1, new QStandardItem());
+		resultsmodel->horizontalHeaderItem(1)->setText("Result ID");
+		results->setItemDelegateForColumn(1, new QItemDelegate());
 
+		if (parameters.mode == denovoengine) {
+			resultsmodel->setHorizontalHeaderItem(2, new QStandardItem());
+			resultsmodel->horizontalHeaderItem(2)->setText("Group ID");
+			results->setItemDelegateForColumn(2, new QItemDelegate());
+		}
+		
 		if (parameters.mode == databasesearch) {
-			results->setHorizontalHeaderItem(2, widgetitemallocator.getNewItem());
-			results->horizontalHeaderItem(2)->setText("Name");
+			resultsmodel->setHorizontalHeaderItem(2, new QStandardItem());
+			resultsmodel->horizontalHeaderItem(2)->setText("Name");
+			results->setItemDelegateForColumn(2, new QItemDelegate());
 		}
 		
-		results->setHorizontalHeaderItem(2 + dbsearchspecificcolumncount, widgetitemallocator.getNewItem());
-		results->horizontalHeaderItem(2 + dbsearchspecificcolumncount)->setText("Peptide Sequence");
+		resultsmodel->setHorizontalHeaderItem(2 + searchspecificcolumncount, new QStandardItem());
+		resultsmodel->horizontalHeaderItem(2 + searchspecificcolumncount)->setText("Peptide Sequence");
+		results->setItemDelegateForColumn(2 + searchspecificcolumncount, new QItemDelegate());
 		
-		results->setHorizontalHeaderItem(3 + dbsearchspecificcolumncount, widgetitemallocator.getNewItem());
-		results->horizontalHeaderItem(3 + dbsearchspecificcolumncount)->setText("Summary Formula");
+		resultsmodel->setHorizontalHeaderItem(3 + searchspecificcolumncount, new QStandardItem());
+		resultsmodel->horizontalHeaderItem(3 + searchspecificcolumncount)->setText("Summary Formula");
+		results->setItemDelegateForColumn(3 + searchspecificcolumncount, new QItemDelegate());
 		
-		results->setHorizontalHeaderItem(4 + dbsearchspecificcolumncount, widgetitemallocator.getNewItem());
-		results->horizontalHeaderItem(4 + dbsearchspecificcolumncount)->setText("Monoisotopic Mass");
-		results->setItemDelegateForColumn(4 + dbsearchspecificcolumncount, &columndelegate);
+		resultsmodel->setHorizontalHeaderItem(4 + searchspecificcolumncount, new QStandardItem());
+		resultsmodel->horizontalHeaderItem(4 + searchspecificcolumncount)->setText("Monoisotopic Mass");
+		results->setItemDelegateForColumn(4 + searchspecificcolumncount, new QItemDelegate());
 		
-		results->setHorizontalHeaderItem(5 + dbsearchspecificcolumncount, widgetitemallocator.getNewItem());
-		results->horizontalHeaderItem(5 + dbsearchspecificcolumncount)->setText("Number of Bricks");
+		resultsmodel->setHorizontalHeaderItem(5 + searchspecificcolumncount, new QStandardItem());
+		resultsmodel->horizontalHeaderItem(5 + searchspecificcolumncount)->setText("Number of Bricks");
+		results->setItemDelegateForColumn(5 + searchspecificcolumncount, new QItemDelegate());
 
 		switch (parameters.peptidetype)
 		{
 		case linear:
-		case linearpolysaccharide:
-			results->setHorizontalHeaderItem(6 + dbsearchspecificcolumncount, widgetitemallocator.getNewItem());
-			results->horizontalHeaderItem(6 + dbsearchspecificcolumncount)->setText("N-terminal Modification");
-			results->setHorizontalHeaderItem(7 + dbsearchspecificcolumncount, widgetitemallocator.getNewItem());
-			results->horizontalHeaderItem(7 + dbsearchspecificcolumncount)->setText("C-terminal Modification");
+			resultsmodel->setHorizontalHeaderItem(6 + searchspecificcolumncount, new QStandardItem());
+			resultsmodel->horizontalHeaderItem(6 + searchspecificcolumncount)->setText("N-terminal Modification");
+			results->setItemDelegateForColumn(6 + searchspecificcolumncount, new QItemDelegate());
+
+			resultsmodel->setHorizontalHeaderItem(7 + searchspecificcolumncount, new QStandardItem());
+			resultsmodel->horizontalHeaderItem(7 + searchspecificcolumncount)->setText("C-terminal Modification");
+			results->setItemDelegateForColumn(7 + searchspecificcolumncount, new QItemDelegate());
 			break;
 		case branched:
-			results->setHorizontalHeaderItem(6 + dbsearchspecificcolumncount, widgetitemallocator.getNewItem());
-			results->horizontalHeaderItem(6 + dbsearchspecificcolumncount)->setText("N-terminal Modification");
-			results->setHorizontalHeaderItem(7 + dbsearchspecificcolumncount, widgetitemallocator.getNewItem());
-			results->horizontalHeaderItem(7 + dbsearchspecificcolumncount)->setText("Branch Modification");
-			results->setHorizontalHeaderItem(8 + dbsearchspecificcolumncount, widgetitemallocator.getNewItem());
-			results->horizontalHeaderItem(8 + dbsearchspecificcolumncount)->setText("C-terminal Modification");
+			resultsmodel->setHorizontalHeaderItem(6 + searchspecificcolumncount, new QStandardItem());
+			resultsmodel->horizontalHeaderItem(6 + searchspecificcolumncount)->setText("N-terminal Modification");
+			results->setItemDelegateForColumn(6 + searchspecificcolumncount, new QItemDelegate());
+
+			resultsmodel->setHorizontalHeaderItem(7 + searchspecificcolumncount, new QStandardItem());
+			resultsmodel->horizontalHeaderItem(7 + searchspecificcolumncount)->setText("Branch Modification");
+			results->setItemDelegateForColumn(7 + searchspecificcolumncount, new QItemDelegate());
+
+			resultsmodel->setHorizontalHeaderItem(8 + searchspecificcolumncount, new QStandardItem());
+			resultsmodel->horizontalHeaderItem(8 + searchspecificcolumncount)->setText("C-terminal Modification");
+			results->setItemDelegateForColumn(8 + searchspecificcolumncount, new QItemDelegate());
 			break;
 		case cyclic:
-#if OLIGOKETIDES == 1
-		case cyclicoligoketide:
-#endif
-			results->setHorizontalHeaderItem(6 + dbsearchspecificcolumncount, widgetitemallocator.getNewItem());
-			results->horizontalHeaderItem(6 + dbsearchspecificcolumncount)->setText("Matched Bricks");
+		case cyclicpolyketide:
+			resultsmodel->setHorizontalHeaderItem(6 + searchspecificcolumncount, new QStandardItem());
+			resultsmodel->horizontalHeaderItem(6 + searchspecificcolumncount)->setText("Matched Bricks");
+			results->setItemDelegateForColumn(6 + searchspecificcolumncount, new QItemDelegate());
 			break;
 		case branchcyclic:
-			results->setHorizontalHeaderItem(6 + dbsearchspecificcolumncount, widgetitemallocator.getNewItem());
-			results->horizontalHeaderItem(6 + dbsearchspecificcolumncount)->setText("Branch Modification");
+			resultsmodel->setHorizontalHeaderItem(6 + searchspecificcolumncount, new QStandardItem());
+			resultsmodel->horizontalHeaderItem(6 + searchspecificcolumncount)->setText("Branch Modification");
+			results->setItemDelegateForColumn(6 + searchspecificcolumncount, new QItemDelegate());
 			break;
-#if OLIGOKETIDES == 1
-		case linearoligoketide:
-			results->setHorizontalHeaderItem(6 + dbsearchspecificcolumncount, widgetitemallocator.getNewItem());
-			results->horizontalHeaderItem(6 + dbsearchspecificcolumncount)->setText("Left Terminal Modification");
-			results->setHorizontalHeaderItem(7 + dbsearchspecificcolumncount, widgetitemallocator.getNewItem());
-			results->horizontalHeaderItem(7 + dbsearchspecificcolumncount)->setText("Right Terminal Modification");
+		case linearpolyketide:
+			resultsmodel->setHorizontalHeaderItem(6 + searchspecificcolumncount, new QStandardItem());
+			resultsmodel->horizontalHeaderItem(6 + searchspecificcolumncount)->setText("Left Terminal Modification");
+			results->setItemDelegateForColumn(6 + searchspecificcolumncount, new QItemDelegate());
+
+			resultsmodel->setHorizontalHeaderItem(7 + searchspecificcolumncount, new QStandardItem());
+			resultsmodel->horizontalHeaderItem(7 + searchspecificcolumncount)->setText("Right Terminal Modification");
+			results->setItemDelegateForColumn(7 + searchspecificcolumncount, new QItemDelegate());
+
 			break;
-#endif
 		case other:
 		default:
 			break;
 		}
 		
-		results->setHorizontalHeaderItem(6 + dbsearchspecificcolumncount + resultsspecificcolumncount, widgetitemallocator.getNewItem());
-		results->horizontalHeaderItem(6 + dbsearchspecificcolumncount + resultsspecificcolumncount)->setText("Matched Peaks");
+		resultsmodel->setHorizontalHeaderItem(6 + searchspecificcolumncount + resultsspecificcolumncount, new QStandardItem());
+		resultsmodel->horizontalHeaderItem(6 + searchspecificcolumncount + resultsspecificcolumncount)->setText("Matched Peaks");
+		results->setItemDelegateForColumn(6 + searchspecificcolumncount + resultsspecificcolumncount, new QItemDelegate());
 
-		results->setHorizontalHeaderItem(7 + dbsearchspecificcolumncount + resultsspecificcolumncount, widgetitemallocator.getNewItem());
-		results->horizontalHeaderItem(7 + dbsearchspecificcolumncount + resultsspecificcolumncount)->setText("Ratio of Matched Peaks [%]");
-		results->setItemDelegateForColumn(7 + dbsearchspecificcolumncount + resultsspecificcolumncount, &columndelegate);
+		resultsmodel->setHorizontalHeaderItem(7 + searchspecificcolumncount + resultsspecificcolumncount, new QStandardItem());
+		resultsmodel->horizontalHeaderItem(7 + searchspecificcolumncount + resultsspecificcolumncount)->setText("Ratio of Matched Peaks [%]");
+		results->setItemDelegateForColumn(7 + searchspecificcolumncount + resultsspecificcolumncount, new QItemDelegate());
 				
-		results->setHorizontalHeaderItem(8 + dbsearchspecificcolumncount + resultsspecificcolumncount, widgetitemallocator.getNewItem());
-		results->horizontalHeaderItem(8 + dbsearchspecificcolumncount + resultsspecificcolumncount)->setText("Sum of Relative Intensities");
-		results->setItemDelegateForColumn(8 + dbsearchspecificcolumncount + resultsspecificcolumncount, &columndelegate);
+		resultsmodel->setHorizontalHeaderItem(8 + searchspecificcolumncount + resultsspecificcolumncount, new QStandardItem());
+		resultsmodel->horizontalHeaderItem(8 + searchspecificcolumncount + resultsspecificcolumncount)->setText("Sum of Relative Intensities");
+		results->setItemDelegateForColumn(8 + searchspecificcolumncount + resultsspecificcolumncount, new QItemDelegate());
 
 		for (int i = 0; i < (int)parameters.fragmentionsfortheoreticalspectra.size(); i++) {
-			results->setHorizontalHeaderItem(resultsbasecolumncount + dbsearchspecificcolumncount + resultsspecificcolumncount + i, widgetitemallocator.getNewItem());
-			results->horizontalHeaderItem(resultsbasecolumncount + dbsearchspecificcolumncount + resultsspecificcolumncount + i)->setText(parameters.fragmentdefinitions[(eFragmentIonType)parameters.fragmentionsfortheoreticalspectra[i]].name.c_str());
+			resultsmodel->setHorizontalHeaderItem(resultsbasecolumncount + searchspecificcolumncount + resultsspecificcolumncount + i, new QStandardItem());
+			resultsmodel->horizontalHeaderItem(resultsbasecolumncount + searchspecificcolumncount + resultsspecificcolumncount + i)->setText(parameters.fragmentdefinitions[(eFragmentIonType)parameters.fragmentionsfortheoreticalspectra[i]].name.c_str());
+			results->setItemDelegateForColumn(resultsbasecolumncount + searchspecificcolumncount + resultsspecificcolumncount + i, new QItemDelegate());
 		}
 
 		if ((parameters.peptidetype == cyclic) && parameters.enablescrambling) {
-			results->setHorizontalHeaderItem(results->columnCount() - 1, widgetitemallocator.getNewItem());
-			results->horizontalHeaderItem(results->columnCount() - 1)->setText("Scrambled Peaks");
+			resultsmodel->setHorizontalHeaderItem(resultsmodel->columnCount() - 1, new QStandardItem());
+			resultsmodel->horizontalHeaderItem(resultsmodel->columnCount() - 1)->setText("Scrambled Peaks");
+			results->setItemDelegateForColumn(resultsmodel->columnCount() - 1, new QItemDelegate());
 		}
 
 	}
@@ -888,45 +935,45 @@ void cMainWindow::reportSpectra() {
 
 	if (parameters.mode == dereplication) {
 		if ((parameters.peaklistfileformat == mis) || (parameters.peaklistfileformat == imzML)) {
-			results->setColumnCount(7);
+			resultsmodel->setColumnCount(7);
 		}
 		else {
-			results->setColumnCount(5);
+			resultsmodel->setColumnCount(5);
 		}
 
-		results->setHorizontalHeaderItem(0, widgetitemallocator.getNewItem());
-		results->horizontalHeaderItem(0)->setText("*");
+		resultsmodel->setHorizontalHeaderItem(0, new QStandardItem());
+		resultsmodel->horizontalHeaderItem(0)->setText("*");
+		results->setItemDelegateForColumn(0, new QItemDelegate());
 
-		results->setHorizontalHeaderItem(1, widgetitemallocator.getNewItem());
-		results->horizontalHeaderItem(1)->setText("Spectrum ID");
+		resultsmodel->setHorizontalHeaderItem(1, new QStandardItem());
+		resultsmodel->horizontalHeaderItem(1)->setText("Spectrum ID");
+		results->setItemDelegateForColumn(1, new QItemDelegate());
 
-		results->setHorizontalHeaderItem(2, widgetitemallocator.getNewItem());
-		results->horizontalHeaderItem(2)->setText("Matched Peaks");
+		resultsmodel->setHorizontalHeaderItem(2, new QStandardItem());
+		resultsmodel->horizontalHeaderItem(2)->setText("Matched Peaks");
+		results->setItemDelegateForColumn(2, new QItemDelegate());
 
-		results->setHorizontalHeaderItem(3, widgetitemallocator.getNewItem());
-		results->horizontalHeaderItem(3)->setText("Ratio of Matched Peaks [%]");
-		results->setItemDelegateForColumn(3, &columndelegate);
+		resultsmodel->setHorizontalHeaderItem(3, new QStandardItem());
+		resultsmodel->horizontalHeaderItem(3)->setText("Ratio of Matched Peaks [%]");
+		results->setItemDelegateForColumn(3, new QItemDelegate());
 
-		results->setHorizontalHeaderItem(4, widgetitemallocator.getNewItem());
-		results->horizontalHeaderItem(4)->setText("Sum of Relative Intensities");
-		results->setItemDelegateForColumn(4, &columndelegate);
+		resultsmodel->setHorizontalHeaderItem(4, new QStandardItem());
+		resultsmodel->horizontalHeaderItem(4)->setText("Sum of Relative Intensities");
+		results->setItemDelegateForColumn(4, new QItemDelegate());
 
 		if ((parameters.peaklistfileformat == mis) || (parameters.peaklistfileformat == imzML)) {
-			results->setHorizontalHeaderItem(5, widgetitemallocator.getNewItem());
-			results->horizontalHeaderItem(5)->setText("Coordinate X");
+			resultsmodel->setHorizontalHeaderItem(5, new QStandardItem());
+			resultsmodel->horizontalHeaderItem(5)->setText("Coordinate X");
+			results->setItemDelegateForColumn(5, new QItemDelegate());
 
-			results->setHorizontalHeaderItem(6, widgetitemallocator.getNewItem());
-			results->horizontalHeaderItem(6)->setText("Coordinate Y");
+			resultsmodel->setHorizontalHeaderItem(6, new QStandardItem());
+			resultsmodel->horizontalHeaderItem(6)->setText("Coordinate Y");
+			results->setItemDelegateForColumn(6, new QItemDelegate());
 		}
 	}
 
 
 	results->resizeColumnsToContents();
-
-	resultsheadersort.resize(results->columnCount());
-	for (int i = 0; i < results->columnCount(); i++) {
-		resultsheadersort[i] = -1;
-	}
 
 	QProgressDialog progress("Preparing the report...", /*"Cancel"*/0, 0, theoreticalspectrumlist.size(), this);
 	progress.setMinimumWidth(250);
@@ -935,8 +982,13 @@ void cMainWindow::reportSpectra() {
 	progress.setMinimumDuration(0);
 	progress.setWindowModality(Qt::WindowModal);
 
+	results->setModel(0);
+	resultsproxymodel->setSourceModel(0);
+	results->setSortingEnabled(false);
+	
 	spectradetails.clear();
 	spectradetails.resize(theoreticalspectrumlist.size());
+	resultsmodel->setRowCount(theoreticalspectrumlist.size());
 	bool reportisomers = actionShowIsomers->isChecked();
 	for (int i = 0; i < theoreticalspectrumlist.size(); i++) {
 		reportSpectrum(i, theoreticalspectrumlist[i], reportisomers);
@@ -946,7 +998,12 @@ void cMainWindow::reportSpectra() {
 		//}
 	}
 
-	for (int i = 0; i < results->columnCount(); i++) {
+	resultsproxymodel->setSourceModel(resultsmodel);
+	results->setModel(resultsproxymodel);
+	resultsproxymodel->setSortRole(Qt::InitialSortOrderRole);
+	results->setSortingEnabled(true);
+
+	for (int i = 0; i < resultsmodel->columnCount(); i++) {
 		results->resizeColumnToContents(i);
 	}
 
@@ -969,14 +1026,14 @@ void cMainWindow::updateSpectra() {
 		progress.setMinimumDuration(0);
 		progress.setWindowModality(Qt::WindowModal);
 
-		for (int i = 0; i < results->rowCount(); i++) {
+		for (int i = 0; i < resultsmodel->rowCount(); i++) {
 			preparePeptideSequence(i, peptidesequence, reportisomers);
-			results->item(i, 2 + dbsearchspecificcolumncount)->setText(peptidesequence.c_str());
+			resultsmodel->item(i, 2 + searchspecificcolumncount)->setText(peptidesequence.c_str());
 
 			progress.setValue(i);
 		}
 
-		for (int i = 0; i < results->columnCount(); i++) {
+		for (int i = 0; i < resultsmodel->columnCount(); i++) {
 			results->resizeColumnToContents(i);
 		}
 
@@ -988,39 +1045,27 @@ void cMainWindow::updateSpectra() {
 
 
 void cMainWindow::deleteResults() {
-	widgetitemallocator.reset();
-	results->setColumnCount(0);
-	results->setRowCount(0);
+	for (int i = 0; i < resultsmodel->columnCount(); i++) {
+		if (results->itemDelegateForColumn(i)) {
+			delete results->itemDelegateForColumn(i);
+		}
+	}
+	resultsmodel->clear();
+	resultsmodel->setColumnCount(0);
+	resultsmodel->setRowCount(0);
 }
 
 
-void cMainWindow::resultsCellClicked(int row, int column) {
-	spectradetails[results->item(row, 1)->data(Qt::DisplayRole).toInt() - 1].prepareToShow(parameters.peptidetype);
-	spectradetails[results->item(row, 1)->data(Qt::DisplayRole).toInt() - 1].show();
-	spectradetails[results->item(row, 1)->data(Qt::DisplayRole).toInt() - 1].activateWindow();
+void cMainWindow::rowDoubleClicked(const QModelIndex& item) {
+	int row = resultsproxymodel->mapToSource(item).row();
+	spectradetails[resultsmodel->item(row, 1)->data(Qt::DisplayRole).toInt() - 1].prepareToShow(parameters.peptidetype);
+	spectradetails[resultsmodel->item(row, 1)->data(Qt::DisplayRole).toInt() - 1].show();
+	spectradetails[resultsmodel->item(row, 1)->data(Qt::DisplayRole).toInt() - 1].activateWindow();
 }
 
 
 void cMainWindow::setGraph(string s) {
 	graph->setHTML(s);
-}
-
-
-void cMainWindow::headerItemDoubleClicked(int index) {
-	if (resultsheadersort[index] == -1) {
-		results->sortByColumn(index, Qt::DescendingOrder);
-		resultsheadersort[index] = 0;
-		return;
-	}
-
-	if (resultsheadersort[index] == 0) {
-		results->sortByColumn(index, Qt::AscendingOrder);
-		resultsheadersort[index] = 1;
-	}
-	else {
-		results->sortByColumn(index, Qt::DescendingOrder);
-		resultsheadersort[index] = 0;
-	}
 }
 
 
@@ -1030,7 +1075,7 @@ void cMainWindow::exportToCsv() {
 	if (!filename.isEmpty()) {
 		lastdirexporttocsv = filename;
 
-		QProgressDialog progress("Exporting CSV file...", "Cancel", 0, results->rowCount(), this);
+		QProgressDialog progress("Exporting CSV file...", "Cancel", 0, resultsproxymodel->rowCount(), this);
 		progress.setMinimumWidth(250);
 		cEventFilter filter;
 		progress.installEventFilter(&filter);
@@ -1045,23 +1090,21 @@ void cMainWindow::exportToCsv() {
 
 		QTextStream out(&file);
 
-		for (int i = 0; i < results->columnCount(); i++) {
-			out << "\"" << results->horizontalHeaderItem(i)->text() << "\"";
-			if (i < results->columnCount() - 1) {
+		for (int i = 0; i < resultsmodel->columnCount(); i++) {
+			out << "\"" << resultsmodel->horizontalHeaderItem(i)->text() << "\"";
+			if (i < resultsmodel->columnCount() - 1) {
 				out << ",";
 			}
 		}
 		out << endl;
 
-		for (int i = 0; i < results->rowCount(); i++) {
+		QStandardItem* item;
+		for (int i = 0; i < resultsproxymodel->rowCount(); i++) {
 
-			if (results->isRowHidden(i)) {
-				continue;
-			}
-
-			for (int j = 0; j < results->columnCount(); j++) {
-				out << "\"" << results->item(i, j)->data(Qt::DisplayRole).toString() << "\"";
-				if (j < results->columnCount() - 1) {
+			for (int j = 0; j < resultsmodel->columnCount(); j++) {
+				item = resultsmodel->itemFromIndex(resultsproxymodel->mapToSource(resultsproxymodel->index(i, j)));
+				out << "\"" << item->data(Qt::DisplayRole).toString() << "\"";
+				if (j < resultsmodel->columnCount() - 1) {
 					out << ",";
 				}
 			}
@@ -1080,7 +1123,7 @@ void cMainWindow::exportToCsv() {
 			file.remove();
 		}
 
-		progress.setValue(results->rowCount());
+		progress.setValue(resultsproxymodel->rowCount());
 	}
 }
 
@@ -1096,7 +1139,7 @@ void cMainWindow::exportToHTML() {
 	if (!filename.isEmpty()) {			
 		lastdirexporttohtml = filename;
 
-		QProgressDialog progress("Exporting HTML report...", "Cancel", 0, results->rowCount(), this);
+		QProgressDialog progress("Exporting HTML report...", "Cancel", 0, resultsproxymodel->rowCount(), this);
 		progress.setMinimumWidth(250);
 		cEventFilter filter;
 		progress.installEventFilter(&filter);
@@ -1111,9 +1154,10 @@ void cMainWindow::exportToHTML() {
 
 		QTextStream out(&file);
 
-		if (results->rowCount() > 0) {
+		if (resultsmodel->rowCount() > 0) {
 
 			bool matchedrow;
+			QStandardItem* item;
 			string title = appname.toStdString() + " " + appversion.toStdString() + " - Output Report";
 
 			out << "<html>\n";
@@ -1152,30 +1196,27 @@ void cMainWindow::exportToHTML() {
 				out << "<h2>Output Report Table</h2>\n";
 
 				out << "<p><table class=\"tablesorter\" cellpadding=\"0\" cellspacing=\"0\" border=\"1\" width=\"100%\">\n<thead><tr>\n";
-				for (int i = 0; i < results->columnCount(); i++) {
-					out << "<th><b>" << results->horizontalHeaderItem(i)->text() << "</b></th>\n";
+				for (int i = 0; i < resultsmodel->columnCount(); i++) {
+					out << "<th><b>" << resultsmodel->horizontalHeaderItem(i)->text() << "</b></th>\n";
 				}
 				out << "</tr></thead><tbody>\n";
 
-				for (int i = 0; i < results->rowCount(); i++) {
-
-					if (results->isRowHidden(i)) {
-						continue;
-					}
+				for (int i = 0; i < resultsproxymodel->rowCount(); i++) {
 
 					out << "<tr>\n";
 			
 					matchedrow = false;
-					if (results->item(i, 0)->data(Qt::DisplayRole).toString().compare("*") == 0) {
+					if (resultsmodel->itemFromIndex(resultsproxymodel->mapToSource(resultsproxymodel->index(i, 0)))->data(Qt::DisplayRole).toString().compare("*") == 0) {
 						matchedrow = true;
 					}
 
-					for (int j = 0; j < results->columnCount(); j++) {
+					for (int j = 0; j < resultsmodel->columnCount(); j++) {
+						item = resultsmodel->itemFromIndex(resultsproxymodel->mapToSource(resultsproxymodel->index(i, j)));
 						out << "<td";
 						if (matchedrow) {
 							out << " bgcolor=\"yellow\"";
 						}
-						out << ">" << results->item(i, j)->data(Qt::DisplayRole).toString() << "</td>\n";
+						out << ">" << item->data(Qt::DisplayRole).toString() << "</td>\n";
 					}
 
 					out << "</tr>\n";
@@ -1200,6 +1241,9 @@ void cMainWindow::exportToHTML() {
 						columncount = 9;
 					}
 				}
+				else if (parameters.mode == denovoengine) {
+					columncount = 8;
+				}
 				else {
 					columncount = 7;
 				}
@@ -1215,7 +1259,12 @@ void cMainWindow::exportToHTML() {
 					}
 					out << "<th width=\"" << tdwidth.c_str() << "%\"><b>Ion Type</b></th>";
 				}
-				else {
+
+				if (parameters.mode == denovoengine) {
+					out << "<th width=\"" << tdwidth.c_str() << "%\"><b>Group ID</b></th>";
+				}
+
+				if (parameters.mode != dereplication) {
 					out << "<th width=\"" << tdwidth.c_str() << "%\"><b>Fragment Type</b></th>";
 				}
 
@@ -1236,13 +1285,9 @@ void cMainWindow::exportToHTML() {
 				out << "</tr></thead><tbody>";
 
 				int spectrumindex;
-				for (int i = 0; i < results->rowCount(); i++) {
+				for (int i = 0; i < resultsproxymodel->rowCount(); i++) {
 
-					if (results->isRowHidden(i)) {
-						continue;
-					}
-
-					spectrumindex = results->item(i, 1)->data(Qt::DisplayRole).toInt() - 1;
+					spectrumindex = resultsmodel->itemFromIndex(resultsproxymodel->mapToSource(resultsproxymodel->index(i, 1)))->data(Qt::DisplayRole).toInt() - 1;
 
 					if (spectradetails[spectrumindex].getTheoreticalSpectrum().getNumberOfMatchedPeaks() == 0) {
 						continue;
@@ -1261,13 +1306,9 @@ void cMainWindow::exportToHTML() {
 				out << "<h2>Individual Rows in Output Report Table</h2>\n";
 
 				int spectrumindex;
-				for (int i = 0; i < results->rowCount(); i++) {
+				for (int i = 0; i < resultsproxymodel->rowCount(); i++) {
 
-					if (results->isRowHidden(i)) {
-						continue;
-					}
-
-					spectrumindex = results->item(i, 1)->data(Qt::DisplayRole).toInt() - 1;
+					spectrumindex = resultsmodel->itemFromIndex(resultsproxymodel->mapToSource(resultsproxymodel->index(i, 1)))->data(Qt::DisplayRole).toInt() - 1;
 
 					if ((spectradetails[spectrumindex].getTheoreticalSpectrum().getNumberOfMatchedPeaks() == 0) && !htmlexportdialog->checkboxunmatchedtheoretical->isChecked() && !htmlexportdialog->checkboxunmatchedexperimental->isChecked()) {
 						continue;
@@ -1314,7 +1355,7 @@ void cMainWindow::exportToHTML() {
 			file.remove();
 		}
 
-		progress.setValue(results->rowCount());
+		progress.setValue(resultsproxymodel->rowCount());
 
 	}
 
@@ -1438,9 +1479,9 @@ void cMainWindow::openResultsFile() {
 			QString appinfo = appname + " " + appversion;
 			if (appinfo.toStdString().compare(s) != 0) {
 				QMessageBox msgBox;
-				QString errstr = "The results file cannot be read because it was created by different version ";
+				QString errstr = "The results file cannot be opened because it was created in the different version of " + appname + " (";
 				errstr += s.c_str();
-				errstr += ".";
+				errstr += ").";
 				msgBox.setText(errstr);
 				msgBox.exec();
 
@@ -1450,7 +1491,7 @@ void cMainWindow::openResultsFile() {
 
 			deleteResults();
 
-			summarytableofmatchedpeaks->deleteTable(true);
+			summarytableofmatchedpeaks->deleteTable();
 			summarytableofmatchedpeaks->hide();
 			summarytableisprepared = false;
 			
@@ -1474,6 +1515,12 @@ void cMainWindow::openResultsFile() {
 
 			if (parameters.mode == dereplication) {
 				actionShowIsomers->setEnabled(false);
+				if ((parameters.peaklistfileformat == mis) || (parameters.peaklistfileformat == imzML)) {
+					actionImageWindow->setEnabled(true);
+				}
+				else {
+					actionImageWindow->setEnabled(false);
+				}
 			}
 			else {
 				actionShowIsomers->setEnabled(true);
@@ -1522,7 +1569,7 @@ void cMainWindow::setTag(int peptidetypeindex, QString tag) {
 
 void cMainWindow::insertSequence(int peptidetypeindex, QString sequence) {
 	showSequenceDatabase();
-	sequencedatabasewidget->insertRow(peptidetypeindex, sequence);
+	sequencedatabasewidget->importSequence(peptidetypeindex, sequence);
 }
 
 
@@ -1544,66 +1591,28 @@ void cMainWindow::quitApplication() {
 
 
 void cMainWindow::filterResults() {
-	summarytableofmatchedpeaks->deleteTable(true);
+	summarytableofmatchedpeaks->deleteTable();
 	summarytableofmatchedpeaks->hide();
 	summarytableisprepared = false;
 
-	Qt::CaseSensitivity casesensitive = rowsfiltercasesensitive->isChecked()?Qt::CaseSensitive:Qt::CaseInsensitive;
-	QString str = rowsfilterline->text();
-	int rowcount = results->rowCount();
-	bool match;
-	int i, j;
-
-	QProgressDialog progress("Updating the report...", "Cancel", 0, rowcount, this);
-	progress.setMinimumWidth(250);
-	cEventFilter filter;
-	progress.installEventFilter(&filter);
-	progress.setMinimumDuration(0);
-	progress.setWindowModality(Qt::WindowModal);
-
-	for (i = 0; i < rowcount; i++) {
-		match = false;
-		for (j = 0; j < results->columnCount(); j++) {
-			if (results->item(i, j)->text().contains(str, casesensitive)) {
-				match = true;
-				break;
-			}
-		}
-		results->setRowHidden(i, !match);
-		progress.setValue(i);
-
-		if (progress.wasCanceled()) {
-			resetFilter();
-			break;
-		}
-
-	}
-
-	progress.setValue(rowcount);
+	resultsproxymodel->setFilterKeyColumn(-1);
+	resultsproxymodel->setFilterCaseSensitivity(rowsfiltercasesensitive->isChecked()?Qt::CaseSensitive:Qt::CaseInsensitive);
+	resultsproxymodel->setFilterFixedString(rowsfilterline->text());
 }
 
 
 void cMainWindow::resetFilter() {
-	summarytableofmatchedpeaks->deleteTable(true);
+	summarytableofmatchedpeaks->deleteTable();
 	summarytableofmatchedpeaks->hide();
 	summarytableisprepared = false;
 
 	rowsfilterline->setText("");
-	int rowcount = results->rowCount();
 
-	QProgressDialog progress("Updating the report...", 0, 0, rowcount, this);
-	progress.setMinimumWidth(250);
-	cEventFilter filter;
-	progress.installEventFilter(&filter);
-	progress.setMinimumDuration(0);
-	progress.setWindowModality(Qt::WindowModal);
+	results->horizontalHeader()->setSortIndicator(-1, Qt::AscendingOrder);
+	resultsproxymodel->sort(-1);
 
-	for (int i = 0; i < rowcount; i++) {
-		results->setRowHidden(i, false);
-		progress.setValue(i);
-	}
-
-	progress.setValue(rowcount);
+	resultsproxymodel->setFilterKeyColumn(-1);
+	resultsproxymodel->setFilterFixedString("");
 }
 
 
@@ -1620,6 +1629,12 @@ void cMainWindow::gotoSmiles2Monomers() {
 void cMainWindow::summaryPeaksTableCancelled() {
 	summarytableisprepared = false;
 }
+
+
+void cMainWindow::updateSummaryPeaksTableFilter(int xmin, int xmax, int ymin, int ymax) {
+	summarytableofmatchedpeaks->updateFilterBySelectedRegion(xmin, xmax, ymin, ymax);
+}
+
 
 /*
 void cMainWindow::showContextMenu(const QPoint &pt) {

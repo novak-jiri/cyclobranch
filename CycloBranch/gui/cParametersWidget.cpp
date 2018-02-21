@@ -63,28 +63,25 @@ cParametersWidget::cParametersWidget(QWidget* parent) {
 	peptidetype->addItem(tr("Cyclic"));
 	peptidetype->addItem(tr("Branched"));
 	peptidetype->addItem(tr("Branch-cyclic"));
-#if OLIGOKETIDES == 1
-	peptidetype->addItem(tr("Linear oligoketide"));
-	peptidetype->addItem(tr("Cyclic oligoketide"));
-#endif
-	peptidetype->addItem(tr("Linear polysaccharide (beta version)"));
+	peptidetype->addItem(tr("Linear polyketide"));
+	peptidetype->addItem(tr("Cyclic polyketide"));
 	//peptidetype->addItem(tr("Other"));
 	peaklistformlayout->addRow(tr("Peptide Type: "), peptidetype);
 
 	peaklistline = new QLineEdit();
 	peaklistbutton = new QPushButton("Select");
 	#if OS_TYPE != WIN
-		peaklistline->setToolTip("Select the peaklist. Following formats are supported: txt, mgf, mzML, mzXML, imzML.");
-		peaklistbutton->setToolTip("Select the peaklist. Following formats are supported: txt, mgf, mzML, mzXML, imzML.");
+		peaklistline->setToolTip("Select a file. Supported formats:\ntxt (peaklists),\nmgf (peaklists),\nmzML (peaklists),\nmzXML (peaklists),\nimzML (profile spectra or peaklists).");
+		peaklistbutton->setToolTip("Select a file. Supported formats:\ntxt (peaklists),\nmgf (peaklists),\nmzML (peaklists),\nmzXML (peaklists),\nimzML (profile spectra or peaklists).");
 	#else
-		peaklistline->setToolTip("Select the peaklist. Following formats are supported: txt, mgf, mzML, mzXML, baf, mis, imzML.");
-		peaklistbutton->setToolTip("Select the peaklist. Following formats are supported: txt, mgf, mzML, mzXML, baf, mis, imzML.");
+		peaklistline->setToolTip("Select a file. Supported formats:\ntxt (peaklists),\nmgf (peaklists),\nmzML (peaklists),\nmzXML (peaklists),\nbaf (profile spectra),\nimzML (profile spectra or peaklists),\nmis (deprecated).");
+		peaklistbutton->setToolTip("Select a file. Supported formats:\ntxt (peaklists),\nmgf (peaklists),\nmzML (peaklists),\nmzXML (peaklists),\nbaf (profile spectra),\nimzML (profile spectra or peaklists),\nmis (deprecated).");
 	#endif
 	peaklistbutton->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_P));
 	peaklistlayout = new QHBoxLayout();
 	peaklistlayout->addWidget(peaklistline);
 	peaklistlayout->addWidget(peaklistbutton);
-	peaklistformlayout->addRow(tr("Peaklist File: "), peaklistlayout);
+	peaklistformlayout->addRow(tr("File: "), peaklistlayout);
 
 	precursormass = new QDoubleSpinBox();
 	precursormass->setToolTip("Enter the precursor mass-to-charge (m/z) ratio (a precursor m/z ratio in the peaklist file is ignored). The value will be automatically decharged.");
@@ -98,7 +95,7 @@ cParametersWidget::cParametersWidget(QWidget* parent) {
 	peaklistformlayout->addRow(tr("Precursor Ion Adduct: "), precursoradduct);
 
 	precursorcharge = new QSpinBox();
-	precursorcharge->setToolTip("Enter the precursor charge (a precursor charge in the peaklist file is ignored). Negative values are allowed.\nWhen mode is set up to \"Compare Peaklist with Database - MS data\", the value determines the maximum charge of generated peaks.");
+	precursorcharge->setToolTip("Enter the precursor charge (a precursor charge in the peaklist file is ignored). Negative values are allowed.\nWhen mode is set up to \"Compare Peaklist(s) with Database - MS or MSI data\", the value determines the maximum charge of generated peaks.");
 	precursorcharge->setRange(-100, 100);
 	precursorcharge->setSingleStep(1);
 	peaklistformlayout->addRow(tr("Charge: "), precursorcharge);
@@ -132,6 +129,7 @@ cParametersWidget::cParametersWidget(QWidget* parent) {
 	minimumrelativeintensitythreshold->setDecimals(3);
 	minimumrelativeintensitythreshold->setRange(0, 100);
 	minimumrelativeintensitythreshold->setSingleStep(1);
+	minimumrelativeintensitythreshold->setSuffix(" %");
 	peaklistformlayout->addRow(tr("Minimum Threshold of Relative Intensity: "), minimumrelativeintensitythreshold);
 
 	minimummz = new QDoubleSpinBox();
@@ -141,7 +139,14 @@ cParametersWidget::cParametersWidget(QWidget* parent) {
 	minimummz->setSingleStep(1);
 	peaklistformlayout->addRow(tr("Minimum m/z Ratio: "), minimummz);
 
-	peaklistgroupbox = new QGroupBox("Peaklist");
+	fwhm = new QDoubleSpinBox();
+	fwhm->setToolTip("Full width at half maximum. The value is used if the profile spectra are converted into peaklists (imzML).");
+	fwhm->setDecimals(6);
+	fwhm->setRange(0, 1);
+	fwhm->setSingleStep(0.01);
+	peaklistformlayout->addRow(tr("FWHM: "), fwhm);
+
+	peaklistgroupbox = new QGroupBox("Spectrum");
 	peaklistgroupbox->setLayout(peaklistformlayout);
 
 
@@ -203,27 +208,31 @@ cParametersWidget::cParametersWidget(QWidget* parent) {
 	miscformlayout = new QFormLayout();
 
 	blindedges = new QComboBox();
-	blindedges->setToolTip("An operation which is performed with edges in the de novo graph forming exclusively blind paths:\nnone (edges are kept - useful when you would like to see the whole de novo graph in 'View -> Graph');\nremove (edges are removed - speeds up the search);\nconnect (edges are connected - useful when you are looking for sequence tags).");
-	blindedges->addItem(tr("none (you can see a complete de novo graph)"));
+	blindedges->setToolTip("The operation to be performed with edges forming incomplete paths:\nkeep (edges are kept - useful when you would like to see the whole de novo graph in 'View -> Graph');\nremove (edges are removed - speeds up the search);\nconnect (edges are connected - useful when you are looking for sequence tags).");
+	blindedges->addItem(tr("keep (you can see a complete de novo graph)"));
 	blindedges->addItem(tr("remove (speed up the search)"));
 	blindedges->addItem(tr("connect (allow detection of sequence tags)"));
-	miscformlayout->addRow(tr("Action with Blind Paths in De Novo Graph: "), blindedges);
+	miscformlayout->addRow(tr("Incomplete Paths in De Novo Graph: "), blindedges);
 
 	cyclicnterminus = new QCheckBox();
-	cyclicnterminus->setToolTip("N-terminal cyclization of a linear peptide is assumed when checked. H<sub>2</sub>O is subtracted from all theoretical N-terminal fragment ions and the theoretical precursor mass.");
+	cyclicnterminus->setToolTip("The water molecule is subtracted from all theoretical N-terminal fragment ions and the theoretical precursor mass.\nThis feature is useful when a linear peptide includes a small cycle close to the N-terminus.\nIf the linear polyketide is selected as the peptide type, the water molecule is subtracted only from the precursor ion.");
 	miscformlayout->addRow(tr("Cyclic N-terminus: "), cyclicnterminus);
 
 	cycliccterminus = new QCheckBox();
-	cycliccterminus->setToolTip("C-terminal cyclization of a linear peptide is assumed when checked. H<sub>2</sub>O is subtracted from all theoretical C-terminal fragment ions and the theoretical precursor mass.");
+	cycliccterminus->setToolTip("The water molecule is subtracted from all theoretical C-terminal fragment ions and the theoretical precursor mass.\nThis feature is useful when a linear peptide includes a small cycle close to the C-terminus.\nIf the linear polyketide is selected as the peptide type, the water molecule is subtracted only from the precursor ion.");
 	miscformlayout->addRow(tr("Cyclic C-terminus: "), cycliccterminus);
 
 	enablescrambling = new QCheckBox();
-	enablescrambling->setToolTip("When checked, scrambled fragment ions of cyclic peptides are generated in theoretical spectra.");
+	enablescrambling->setToolTip("Generate scrambled fragment ions of cyclic peptides in theoretical spectra.");
 	miscformlayout->addRow(tr("Enable Scrambling: "), enablescrambling);
 
 	similaritysearch = new QCheckBox();
-	similaritysearch->setToolTip("It enables similarity search when a peaklist is searched against a database of sequences.\nThis feature disables filtering of peptide sequence candidates by precursor mass.\nIt may be useful to determine a peptide family when a similar peptide is contained in the database.");
+	similaritysearch->setToolTip("Enable the similarity search when a peaklist is searched against a database of sequences.\nThis feature disables filtering of peptide sequence candidates by precursor mass and can be useful to determine a peptide family when a similar peptide is included in a database of sequences.");
 	miscformlayout->addRow(tr("Enable Similarity Search: "), similaritysearch);
+
+	regularblocksorder = new QCheckBox();
+	regularblocksorder->setToolTip("Keep only polyketide sequence candidates whose ketide building blocks are in the regular order [water eliminating block]-[2H eliminating block]-[water eliminating block]-[2H eliminating block], etc.");
+	miscformlayout->addRow(tr("Regular Order of Ketide Blocks: "), regularblocksorder);
 
 	miscgroupbox = new QGroupBox("Miscellaneous");
 	miscgroupbox->setLayout(miscformlayout);
@@ -232,12 +241,13 @@ cParametersWidget::cParametersWidget(QWidget* parent) {
 	applicationformlayout = new QFormLayout();
 	
 	mode = new QComboBox();
-	mode->setToolTip("De Novo Search Engine (identification mode) - the default mode of the application.\nCompare Peaklist with Spectrum of Searched Sequence (annotation mode) - a theoretical spectrum is generated for an input \"Searched Peptide Sequence\" and it is compared with the peaklist.\nCompare Peaklist with Database - MS/MS data (identification mode) - a peaklist is compared with theoretical spectra generated from a database of sequences.\nCompare Peaklist with Database - MS data (identification mode) - a peaklist is compared with theoretical peaks generated from a database of compounds/sequences.");
+	mode->setToolTip("'De Novo Search Engine' - the default mode of the application.\n'Compare Peaklist with Spectrum of Searched Sequence' - a theoretical spectrum is generated for the input 'Searched Peptide Sequence' and is compared with the peaklist.\n'Compare Peaklist with Database - MS/MS data' - a peaklist is compared with theoretical spectra generated from a database of sequences.\n'Compare Peaklist(s) with Database - MS or MSI data' - dereplication; compounds search; the peaklists are compared with theoretical peaks generated from a database of compounds/sequences.");
 	mode->addItem(tr("De Novo Search Engine"));
 	mode->addItem(tr("Compare Peaklist with Spectrum of Searched Sequence"));
 	mode->addItem(tr("Compare Peaklist with Database - MS/MS data"));
-	mode->addItem(tr("Compare Peaklist with Database - MS data"));
+	mode->addItem(tr("Compare Peaklist(s) with Database - MS or MSI data"));
 	applicationformlayout->addRow(tr("Mode: "), mode);
+	oldmodetype = (eModeType)mode->currentIndex();
 
 	sequencedatabaseline = new QLineEdit();
 	sequencedatabaseline->setToolTip("Select the txt file containing a database of sequences.");
@@ -350,7 +360,7 @@ cParametersWidget::cParametersWidget(QWidget* parent) {
 
 	setLayout(vlayout);
 
-	resize(1280, 700);
+	resize(1280, 750);
 
 	connect(load, SIGNAL(released()), this, SLOT(loadSettings()));
 	connect(save, SIGNAL(released()), this, SLOT(saveSettings()));
@@ -413,6 +423,7 @@ cParametersWidget::~cParametersWidget() {
 	delete masserrortolerancefordeisotoping;
 	delete minimumrelativeintensitythreshold;
 	delete minimummz;
+	delete fwhm;
 	delete peaklistformlayout;
 	delete peaklistgroupbox;
 
@@ -435,6 +446,7 @@ cParametersWidget::~cParametersWidget() {
 	delete cycliccterminus;
 	delete enablescrambling;
 	delete similaritysearch;
+	delete regularblocksorder;
 	delete miscformlayout;
 	delete miscgroupbox;
 
@@ -491,6 +503,7 @@ void cParametersWidget::setAndRestoreParameters(cParameters& parameters) {
 
 void cParametersWidget::closeEvent(QCloseEvent *event) {
 	restoreParameters();
+	event->accept();
 }
 
 
@@ -521,11 +534,13 @@ void cParametersWidget::keyPressEvent(QKeyEvent *event) {
 
 	if (event->key() == Qt::Key_F1) {
 		#if OS_TYPE == WIN
-			QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo("docs/html/basicconfiguration.html").absoluteFilePath()));
+			QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo("docs/html/settings.html").absoluteFilePath()));
 		#else
-			QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo(installdir + "docs/html/basicconfiguration.html").absoluteFilePath()));
+			QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo(installdir + "docs/html/settings.html").absoluteFilePath()));
 		#endif
 	}
+
+	event->accept();
 }
 
 
@@ -551,11 +566,12 @@ void cParametersWidget::loadSettings() {
 		masserrortolerancefordeisotoping->setValue(settings.value("masserrortolerancefordeisotoping", 5.0).toDouble());
 		minimumrelativeintensitythreshold->setValue(settings.value("minimumrelativeintensitythreshold", 0).toDouble());
 		minimummz->setValue(settings.value("minimummz", 150).toDouble());
+		fwhm->setValue(settings.value("fwhm", 0.1).toDouble());
 
 		brickdatabaseline->setText(settings.value("brickdatabase", "").toString());
-		maximumbricksincombinationbegin->setValue(settings.value("maximumbricksincombinationbegin", 3).toInt());
-		maximumbricksincombinationmiddle->setValue(settings.value("maximumbricksincombinationmiddle", 2).toInt());
-		maximumbricksincombinationend->setValue(settings.value("maximumbricksincombinationend", 3).toInt());
+		maximumbricksincombinationbegin->setValue(settings.value("maximumbricksincombinationbegin", 1).toInt());
+		maximumbricksincombinationmiddle->setValue(settings.value("maximumbricksincombinationmiddle", 1).toInt());
+		maximumbricksincombinationend->setValue(settings.value("maximumbricksincombinationend", 1).toInt());
 		maximumcumulativemass->setValue(settings.value("maximumcumulativemass", 0).toDouble());
 		settings.value("generatebrickspermutations", 1).toInt() == 0 ? generatebrickspermutations->setChecked(false) : generatebrickspermutations->setChecked(true);
 		modificationsline->setText(settings.value("modificationsfile", "").toString());
@@ -565,6 +581,7 @@ void cParametersWidget::loadSettings() {
 		settings.value("cycliccterminus", 0).toInt() == 0 ? cycliccterminus->setChecked(false) : cycliccterminus->setChecked(true);
 		settings.value("enablescrambling", 0).toInt() == 0 ? enablescrambling->setChecked(false) : enablescrambling->setChecked(true);
 		settings.value("similaritysearch", 0).toInt() == 0 ? similaritysearch->setChecked(false) : similaritysearch->setChecked(true);
+		settings.value("regularblocksorder", 0).toInt() == 0 ? regularblocksorder->setChecked(false) : regularblocksorder->setChecked(true);
 
 		mode->setCurrentIndex(settings.value("mode", 0).toInt());
 		sequencedatabaseline->setText(settings.value("sequencedatabase", "").toString());
@@ -612,6 +629,7 @@ void cParametersWidget::saveSettings() {
 	settings.setValue("masserrortolerancefordeisotoping", masserrortolerancefordeisotoping->value());
 	settings.setValue("minimumrelativeintensitythreshold", minimumrelativeintensitythreshold->value());
 	settings.setValue("minimummz", minimummz->value());
+	settings.setValue("fwhm", fwhm->value());
 
 	settings.setValue("brickdatabase", brickdatabaseline->text());
 	settings.setValue("maximumbricksincombinationbegin", maximumbricksincombinationbegin->value());
@@ -626,6 +644,7 @@ void cParametersWidget::saveSettings() {
 	cycliccterminus->isChecked() ? settings.setValue("cycliccterminus", 1) : settings.setValue("cycliccterminus", 0);
 	enablescrambling->isChecked() ? settings.setValue("enablescrambling", 1) : settings.setValue("enablescrambling", 0);
 	similaritysearch->isChecked() ? settings.setValue("similaritysearch", 1) : settings.setValue("similaritysearch", 0);
+	regularblocksorder->isChecked() ? settings.setValue("regularblocksorder", 1) : settings.setValue("regularblocksorder", 0);
 
 	settings.setValue("mode", mode->currentIndex());
 	settings.setValue("sequencedatabase", sequencedatabaseline->text());
@@ -731,6 +750,13 @@ bool cParametersWidget::updateParameters() {
 		return false;
 	}
 
+	if ((precursormass->value() == 0) && (((eModeType)mode->currentIndex() == denovoengine) || ((eModeType)mode->currentIndex() == singlecomparison) || ((eModeType)mode->currentIndex() == databasesearch))) {
+		errstr = "The precursor m/z ratio cannot be zero!";
+		msgBox.setText(errstr);
+		msgBox.exec();
+		return false;
+	}
+
 	if (precursorcharge->value() == 0) {
 		errstr = "The charge cannot be zero!";
 		msgBox.setText(errstr);
@@ -757,6 +783,7 @@ bool cParametersWidget::updateParameters() {
 	parameters.masserrortolerancefordeisotoping = masserrortolerancefordeisotoping->value();
 	parameters.minimumrelativeintensitythreshold = minimumrelativeintensitythreshold->value();
 	parameters.minimummz = minimummz->value();
+	parameters.fwhm = fwhm->value();
 
 	parameters.bricksdatabasefilename = brickdatabaseline->text().toStdString();
 	parameters.maximumbricksincombinationbegin = maximumbricksincombinationbegin->value();
@@ -772,6 +799,7 @@ bool cParametersWidget::updateParameters() {
 	parameters.cycliccterminus = cycliccterminus->isChecked();
 	parameters.enablescrambling = enablescrambling->isChecked();
 	parameters.similaritysearch = similaritysearch->isChecked();
+	parameters.regularblocksorder = regularblocksorder->isChecked();
 
 	parameters.mode = (eModeType)mode->currentIndex();
 	parameters.sequencedatabasefilename = sequencedatabaseline->text().toStdString();
@@ -796,16 +824,11 @@ bool cParametersWidget::updateParameters() {
 		case branchcyclic:
 			start = a_ion;
 			break;
-#if OLIGOKETIDES == 1
-		case linearoligoketide:
+		case linearpolyketide:
 			start = l1h_ion;
 			break;
-		case cyclicoligoketide:
+		case cyclicpolyketide:
 			start = l1h_ion; // l0h_ion;
-			break;
-#endif
-		case linearpolysaccharide:
-			start = ms_nterminal_ion_hplus;
 			break;
 		case other:
 		default:
@@ -853,6 +876,7 @@ void cParametersWidget::restoreParameters() {
 	masserrortolerancefordeisotoping->setValue(parameters.masserrortolerancefordeisotoping);
 	minimumrelativeintensitythreshold->setValue(parameters.minimumrelativeintensitythreshold);
 	minimummz->setValue(parameters.minimummz);
+	fwhm->setValue(parameters.fwhm);
 
 	brickdatabaseline->setText(parameters.bricksdatabasefilename.c_str());
 	maximumbricksincombinationbegin->setValue(parameters.maximumbricksincombinationbegin);
@@ -867,6 +891,7 @@ void cParametersWidget::restoreParameters() {
 	cycliccterminus->setChecked(parameters.cycliccterminus);
 	enablescrambling->setChecked(parameters.enablescrambling);
 	similaritysearch->setChecked(parameters.similaritysearch);
+	regularblocksorder->setChecked(parameters.regularblocksorder);
 
 	mode->setCurrentIndex(parameters.mode);
 	sequencedatabaseline->setText(parameters.sequencedatabasefilename.c_str());
@@ -888,16 +913,11 @@ void cParametersWidget::restoreParameters() {
 		case branchcyclic:
 			start = a_ion;
 			break;
-#if OLIGOKETIDES == 1
-		case linearoligoketide:
+		case linearpolyketide:
 			start = l1h_ion;
 			break;
-		case cyclicoligoketide:
+		case cyclicpolyketide:
 			start = l1h_ion; // l0h_ion;
-			break;
-#endif
-		case linearpolysaccharide:
-			start = ms_nterminal_ion_hplus;
 			break;
 		case other:
 		default:
@@ -930,7 +950,9 @@ void cParametersWidget::restoreParameters() {
 
 void cParametersWidget::updateSettingsWhenPeptideTypeChanged(int index) {
 
-	resetFragmentIonTypes();
+	if (!(((eModeType)mode->currentIndex() != oldmodetype) && ((eModeType)mode->currentIndex() != dereplication) && (oldmodetype != dereplication))) {
+		resetFragmentIonTypes();
+	}
 
 	switch ((ePeptideType)index)
 	{
@@ -940,6 +962,7 @@ void cParametersWidget::updateSettingsWhenPeptideTypeChanged(int index) {
 		cyclicnterminus->setDisabled(false);
 		cycliccterminus->setDisabled(false);
 		enablescrambling->setDisabled(true);
+		regularblocksorder->setDisabled(true);
 		searchedsequenceNtermmodif->setDisabled(false);
 		searchedsequenceCtermmodif->setDisabled(false);
 		searchedsequenceTmodif->setDisabled(true);
@@ -950,6 +973,7 @@ void cParametersWidget::updateSettingsWhenPeptideTypeChanged(int index) {
 		cyclicnterminus->setDisabled(true);
 		cycliccterminus->setDisabled(true);
 		enablescrambling->setDisabled(false);
+		regularblocksorder->setDisabled(true);
 		searchedsequenceNtermmodif->setDisabled(true);
 		searchedsequenceCtermmodif->setDisabled(true);
 		searchedsequenceTmodif->setDisabled(true);
@@ -960,6 +984,7 @@ void cParametersWidget::updateSettingsWhenPeptideTypeChanged(int index) {
 		cyclicnterminus->setDisabled(true);
 		cycliccterminus->setDisabled(true);
 		enablescrambling->setDisabled(true);
+		regularblocksorder->setDisabled(true);
 		searchedsequenceNtermmodif->setDisabled(false);
 		searchedsequenceCtermmodif->setDisabled(false);
 		searchedsequenceTmodif->setDisabled(false);
@@ -970,43 +995,35 @@ void cParametersWidget::updateSettingsWhenPeptideTypeChanged(int index) {
 		cyclicnterminus->setDisabled(true);
 		cycliccterminus->setDisabled(true);
 		enablescrambling->setDisabled(true);
+		regularblocksorder->setDisabled(true);
 		searchedsequenceNtermmodif->setDisabled(true);
 		searchedsequenceCtermmodif->setDisabled(true);
 		searchedsequenceTmodif->setDisabled(false);
 		break;
-#if OLIGOKETIDES == 1
-	case linearoligoketide:
+	case linearpolyketide:
 		modificationsline->setDisabled(false);
 		modificationsbutton->setDisabled(false);
-		cyclicnterminus->setDisabled(true);
-		cycliccterminus->setDisabled(true);
+		cyclicnterminus->setDisabled(false);
+		cycliccterminus->setDisabled(false);
 		enablescrambling->setDisabled(true);
+		regularblocksorder->setDisabled(false);
 		searchedsequenceNtermmodif->setDisabled(false);
 		searchedsequenceCtermmodif->setDisabled(false);
 		searchedsequenceTmodif->setDisabled(true);
 		break;
-	case cyclicoligoketide:
+	case cyclicpolyketide:
 		modificationsline->setDisabled(true);
 		modificationsbutton->setDisabled(true);
 		cyclicnterminus->setDisabled(true);
 		cycliccterminus->setDisabled(true);
 		enablescrambling->setDisabled(true);
+		regularblocksorder->setDisabled(false);
 		searchedsequenceNtermmodif->setDisabled(true);
 		searchedsequenceCtermmodif->setDisabled(true);
 		searchedsequenceTmodif->setDisabled(true);
 		break;
-#endif
-	case linearpolysaccharide:
-		modificationsline->setDisabled(false);
-		modificationsbutton->setDisabled(false);
-		cyclicnterminus->setDisabled(true);
-		cycliccterminus->setDisabled(true);
-		enablescrambling->setDisabled(true);
-		searchedsequenceNtermmodif->setDisabled(false);
-		searchedsequenceCtermmodif->setDisabled(false);
-		searchedsequenceTmodif->setDisabled(true);
-		break;
 	case other:
+		break;
 	default:
 		break;
 	}
@@ -1023,6 +1040,7 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 		precursoradduct->setDisabled(false);
 		precursorcharge->setDisabled(false);
 		precursormasserrortolerance->setDisabled(false);
+		fwhm->setDisabled(true);
 		brickdatabaseline->setDisabled(false);
 		brickdatabasebutton->setDisabled(false);
 		maximumbricksincombinationbegin->setDisabled(false);
@@ -1053,6 +1071,7 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 		precursoradduct->setDisabled(false);
 		precursorcharge->setDisabled(false);
 		precursormasserrortolerance->setDisabled(false);
+		fwhm->setDisabled(true);
 		brickdatabaseline->setDisabled(false);
 		brickdatabasebutton->setDisabled(false);
 		maximumbricksincombinationbegin->setDisabled(true);
@@ -1083,6 +1102,7 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 		precursoradduct->setDisabled(false);
 		precursorcharge->setDisabled(false);
 		precursormasserrortolerance->setDisabled(false);
+		fwhm->setDisabled(true);
 		brickdatabaseline->setDisabled(false);
 		brickdatabasebutton->setDisabled(false);
 		maximumbricksincombinationbegin->setDisabled(true);
@@ -1113,6 +1133,7 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 		precursoradduct->setDisabled(true);
 		precursorcharge->setDisabled(false);
 		precursormasserrortolerance->setDisabled(true);
+		fwhm->setDisabled(false);
 		brickdatabaseline->setDisabled(true);
 		brickdatabasebutton->setDisabled(true);
 		maximumbricksincombinationbegin->setDisabled(true);
@@ -1150,6 +1171,7 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 		break;
 	}
 
+	oldmodetype = (eModeType)mode->currentIndex();
 }
 
 
@@ -1176,21 +1198,16 @@ void cParametersWidget::resetFragmentIonTypes() {
 			start = a_ion;
 			end = z_ion_dehydrated_and_deamidated;
 			break;
-#if OLIGOKETIDES == 1
-		case linearoligoketide:
+		case linearpolyketide:
 			start = l1h_ion;
 			end = r2oh_ion_co_loss_dehydrated_and_deamidated;
 			break;
-		case cyclicoligoketide:
+		case cyclicpolyketide:
 			start = l1h_ion; // l0h_ion;
 			end = l2h_ion_co_loss_dehydrated_and_deamidated;
 			break;
-#endif
-		case linearpolysaccharide:
-			start = ms_nterminal_ion_hplus;
-			end = ms_cterminal_ion_kplus;
-			break;
 		case other:
+			break;
 		default:
 			break;
 		}
@@ -1223,26 +1240,20 @@ void cParametersWidget::resetFragmentIonTypes() {
 					fragmentiontypes->getList()->item(i-start)->setSelected(true);
 				}
 				break;
-#if OLIGOKETIDES == 1
-			case linearoligoketide:
+			case linearpolyketide:
 				if (((eFragmentIonType)i == l1h_ion) || ((eFragmentIonType)i == l2h_ion) || ((eFragmentIonType)i == r1h_ion) || ((eFragmentIonType)i == r2h_ion) ||
 					((eFragmentIonType)i == l1oh_ion) || ((eFragmentIonType)i == l2oh_ion) || ((eFragmentIonType)i == r1oh_ion) || ((eFragmentIonType)i == r2oh_ion)
 					) {
 					fragmentiontypes->getList()->item(i-start)->setSelected(true);
 				}
 				break;
-			case cyclicoligoketide:
+			case cyclicpolyketide:
 				if (/*((eFragmentIonType)i == l0h_ion) ||*/ ((eFragmentIonType)i == l1h_ion) || ((eFragmentIonType)i == l2h_ion)) {
 					fragmentiontypes->getList()->item(i-start)->setSelected(true);
 				}
 				break;
-#endif
-			case linearpolysaccharide:
-				if (((eFragmentIonType)i == ms_nterminal_ion_hplus) || ((eFragmentIonType)i == ms_cterminal_ion_hplus)) {
-					fragmentiontypes->getList()->item(i-start)->setSelected(true);
-				}
-				break;
 			case other:
+				break;
 			default:
 				break;
 			}

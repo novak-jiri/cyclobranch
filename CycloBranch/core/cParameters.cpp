@@ -25,6 +25,7 @@ void cParameters::clear() {
 	precursorAdductHasK = false;
 	precursorAdductHasCa = false;
 	precursorAdductHasMn = false;
+	precursorAdductHasCr = false;
 	precursorAdductHasFe = false;
 	precursorAdductHasCo = false;
 	precursorAdductHasNi = false;
@@ -37,11 +38,12 @@ void cParameters::clear() {
 	masserrortolerancefordeisotoping = 5;
 	minimumrelativeintensitythreshold = 0;
 	minimummz = 150;
+	fwhm = 0.1;
 	bricksdatabasefilename = "";
 	bricksdatabase.clear();
-	maximumbricksincombinationbegin = 3;
-	maximumbricksincombinationmiddle = 2;
-	maximumbricksincombinationend = 3;
+	maximumbricksincombinationbegin = 1;
+	maximumbricksincombinationmiddle = 1;
+	maximumbricksincombinationend = 1;
 	maximumbricksincombination = max(max(maximumbricksincombinationbegin, maximumbricksincombinationmiddle), maximumbricksincombinationend);
 	maximumcumulativemass = 0;
 	generatebrickspermutations = true;
@@ -55,6 +57,7 @@ void cParameters::clear() {
 	cycliccterminus = false;
 	enablescrambling = false;
 	similaritysearch = false;
+	regularblocksorder = false;
 	hitsreported = 1000;
 	sequencetag = "";
 	originalsequencetag = "";
@@ -177,7 +180,7 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 							errormessage = "The file cannot be converted.\n";
 							errormessage += "Does the file '" + peaklistfilename + "' exist ?\n";
 							errormessage += "Is the directory with the file '" + peaklistfilename + "' writable ?\n";
-							errormessage += "Do you have FileConverter installed (OpenMS 1.11) ?\n";
+							errormessage += "Do you have FileConverter installed (OpenMS must be installed) ?\n";
 							errormessage += "Do you have 'any2mgf.sh' file located in '" + installdir.toStdString() + "External/macosx' folder ?\n";
 							errormessage += "Is the file 'any2mgf.sh' executable ? \n";
 						}
@@ -188,7 +191,7 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 							errormessage = "The file cannot be converted.\n";
 							errormessage += "Does the file '" + peaklistfilename + "' exist ?\n";
 							errormessage += "Is the directory with the file '" + peaklistfilename + "' writable ?\n";
-							errormessage += "Do you have FileConverter installed (OpenMS 1.11) ?\n";
+							errormessage += "Do you have FileConverter installed (OpenMS must be installed) ?\n";
 							errormessage += "Do you have a path to FileConverter in your PATH variable (e.g., 'C:/Program Files/OpenMS-1.11/bin') ?\n";
 							errormessage += "Do you have 'any2mgf.bat' file located in the '" + appname.toStdString() + "/External/windows' folder ?\n";
 						}
@@ -290,7 +293,7 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 					#endif
 					break;
 				case imzML:
-					errtype = peaklistseries.loadFromIMZMLStream(peaklistfilename, peakliststream, minimumrelativeintensitythreshold, os, terminatecomputation);
+					errtype = peaklistseries.loadFromIMZMLStream(peaklistfilename, peakliststream, minimumrelativeintensitythreshold, fwhm, os, terminatecomputation);
 					if (errtype == -1) {
 						error = true;
 						errormessage = "Aborted by user.\n";
@@ -302,7 +305,7 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 							errormessage += "Does the file '" + peaklistfilename + "' exist ?\n";
 							errormessage += "Is the directory with the file '" + peaklistfilename + "' writable ?\n";
 							errormessage += "Do you have enough space on your hard drive ?\n";
-							errormessage += "Do you have OpenMS 1.11 installed (sudo apt-get install topp) ?\n";
+							errormessage += "Do you have OpenMS installed (sudo apt-get install topp) ?\n";
 							errormessage += "Do you have 'raw2peaks.sh' file located in '" + installdir.toStdString() + "External/linux' folder ?\n";
 							errormessage += "Is the file 'raw2peaks.sh' executable (sudo chmod +x " + installdir.toStdString() + "External/linux/raw2peaks.sh) ? \n";
 						#else
@@ -311,7 +314,7 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 								errormessage += "Does the file '" + peaklistfilename + "' exist ?\n";
 								errormessage += "Is the directory with the file '" + peaklistfilename + "' writable ?\n";
 								errormessage += "Do you have enough space on your hard drive ?\n";
-								errormessage += "Do you have OpenMS 1.11 installed ?\n";
+								errormessage += "Do you have OpenMS installed ?\n";
 								errormessage += "Do you have 'raw2peaks.sh' file located in '" + installdir.toStdString() + "External/macosx' folder ?\n";
 								errormessage += "Is the file 'raw2peaks.sh' executable (sudo chmod +x " + installdir.toStdString() + "External/macosx/raw2peaks.sh) ? \n";
 							#else		
@@ -319,7 +322,7 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 								errormessage += "Does the file '" + peaklistfilename + "' exist ?\n";
 								errormessage += "Is the directory with the file '" + peaklistfilename + "' writable ?\n";
 								errormessage += "Do you have enough space on your hard drive ?\n";
-								errormessage += "Do you have OpenMS 1.11 installed ?\n";
+								errormessage += "Do you have OpenMS installed ?\n";
 								errormessage += "Do you have a path to OpenMS binaries folder in your PATH variable (e.g., 'C:/Program Files/OpenMS-1.11/bin') ?\n";
 								errormessage += "Do you have 'raw2peaks.bat' file located in the '" + appname.toStdString() + "/External/windows' folder ?\n";
 							#endif
@@ -351,7 +354,8 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 			if (os) {
 				*os << "Loading the database of bricks... ";
 			}
-			if (bricksdatabase.loadFromPlainTextStream(bricksdatabasestream, errormessage, false) == -1) {
+			bool skiph2blocks = !((peptidetype == linearpolyketide) || (peptidetype == cyclicpolyketide));
+			if (bricksdatabase.loadFromPlainTextStream(bricksdatabasestream, errormessage, false, skiph2blocks) == -1) {
 				error = true;
 			}
 			else {
@@ -442,6 +446,7 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 		precursorAdductHasK = false;
 		precursorAdductHasCa = false;
 		precursorAdductHasMn = false;
+		precursorAdductHasCr = false;
 		precursorAdductHasFe = false;
 		precursorAdductHasCo = false;
 		precursorAdductHasNi = false;
@@ -476,6 +481,10 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 		rx = "Mn";
 		if (regex_search(precursoradduct, rx)) {
 			precursorAdductHasMn = true;
+		}
+		rx = "Cr";
+		if (regex_search(precursoradduct, rx)) {
+			precursorAdductHasCr = true;
 		}
 		rx = "Fe";
 		if (regex_search(precursoradduct, rx)) {
@@ -543,16 +552,11 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 		case branchcyclic:
 			initializeFragmentIonsForDeNovoGraphOfBranchCyclicPeptides(fragmentionsfordenovograph);
 			break;
-#if OLIGOKETIDES == 1
-		case linearoligoketide:
-			initializeFragmentIonsForDeNovoGraphOfLinearOligoketide(fragmentionsfordenovograph);
+		case linearpolyketide:
+			initializeFragmentIonsForDeNovoGraphOfLinearPolyketide(fragmentionsfordenovograph);
 			break;
-		case cyclicoligoketide:
-			initializeFragmentIonsForDeNovoGraphOfCyclicOligoketide(fragmentionsfordenovograph);
-			break;
-#endif
-		case linearpolysaccharide:
-			initializeFragmentIonsForDeNovoGraphOfLinearPolysaccharide(fragmentionsfordenovograph);
+		case cyclicpolyketide:
+			initializeFragmentIonsForDeNovoGraphOfCyclicPolyketide(fragmentionsfordenovograph);
 			break;
 		case other:
 			error = true;
@@ -612,16 +616,11 @@ string cParameters::printToString() {
 	case branchcyclic:
 		s += "Branch-cyclic\n";
 		break;
-#if OLIGOKETIDES == 1
-	case linearoligoketide:
-		s += "Linear oligoketide\n";
+	case linearpolyketide:
+		s += "Linear polyketide\n";
 		break;
-	case cyclicoligoketide:
-		s += "Cyclic oligoketide\n";
-		break;
-#endif
-	case linearpolysaccharide:
-		s += "Linear polysaccharide (beta version)\n";
+	case cyclicpolyketide:
+		s += "Cyclic polyketide\n";
 		break;
 	case other:
 		s += "Other\n";
@@ -638,6 +637,7 @@ string cParameters::printToString() {
 	s += "Fragment Mass Error Tolerance for Deisotoping: " + to_string(masserrortolerancefordeisotoping) + "\n";
 	s += "Minimum Threshold of Relative Intensity: " + to_string(minimumrelativeintensitythreshold) + "\n";
 	s += "Minimum m/z Ratio: " + to_string(minimummz) + "\n";
+	s += "FWHM: " + to_string(fwhm) + "\n";
 	s += "Brick Database File: " + bricksdatabasefilename + "\n";
 	s += "Maximum Number of Combined Blocks (start, middle, end): " + to_string(maximumbricksincombinationbegin) + ", " + to_string(maximumbricksincombinationmiddle) + ", " + to_string(maximumbricksincombinationend) + "\n";
 	s += "Maximum Cumulative Mass of Blocks: " + to_string(maximumcumulativemass) + "\n";
@@ -648,10 +648,10 @@ string cParameters::printToString() {
 
 	s += "N-/C-terminal Modifications File: " + modificationsfilename + "\n";
 
-	s += "Action with Blind Paths in De Novo Graph: ";
+	s += "Incomplete Paths in De Novo Graph: ";
 	switch (blindedges) {
 	case 0:
-		s += "none (you can see a complete de novo graph)";
+		s += "keep (you can see a complete de novo graph)";
 		break;
 	case 1:
 		s += "remove (speed up the search)";
@@ -680,6 +680,10 @@ string cParameters::printToString() {
 	s += similaritysearch ? "on" : "off";
 	s += "\n";
 
+	s += "Regular Order of Ketide Blocks: ";
+	s += regularblocksorder ? "on" : "off";
+	s += "\n";
+
 	s += "Mode: ";
 	switch ((eModeType)mode) {
 	case denovoengine:
@@ -692,7 +696,7 @@ string cParameters::printToString() {
 		s += "Compare Peaklist with Database - MS/MS data";
 		break;
 	case dereplication:
-		s += "Compare Peaklist with Database - MS data";
+		s += "Compare Peaklist(s) with Database - MS or MSI data";
 		break;
 	default:
 		break;
@@ -768,7 +772,7 @@ void cParameters::setOutputStream(cMainThread& os) {
 
 
 void cParameters::updateFragmentDefinitions() {
-	if (peptidetype == linear) {
+	if ((peptidetype == linear) || (peptidetype == linearpolyketide)) {
 		fragmentdefinitions.recalculateFragments(cyclicnterminus, cycliccterminus, precursoradduct);
 	}
 	else {
@@ -798,6 +802,7 @@ void cParameters::store(ofstream& os) {
 	os.write((char *)&precursorAdductHasK, sizeof(bool));
 	os.write((char *)&precursorAdductHasCa, sizeof(bool));
 	os.write((char *)&precursorAdductHasMn, sizeof(bool));
+	os.write((char *)&precursorAdductHasCr, sizeof(bool));
 	os.write((char *)&precursorAdductHasFe, sizeof(bool));
 	os.write((char *)&precursorAdductHasCo, sizeof(bool));
 	os.write((char *)&precursorAdductHasNi, sizeof(bool));
@@ -811,6 +816,7 @@ void cParameters::store(ofstream& os) {
 	os.write((char *)&masserrortolerancefordeisotoping, sizeof(double));
 	os.write((char *)&minimumrelativeintensitythreshold, sizeof(double));
 	os.write((char *)&minimummz, sizeof(double));
+	os.write((char *)&fwhm, sizeof(double));
 
 	storeString(bricksdatabasefilename, os);
 	bricksdatabase.store(os);
@@ -837,6 +843,7 @@ void cParameters::store(ofstream& os) {
 	os.write((char *)&cycliccterminus, sizeof(bool));
 	os.write((char *)&enablescrambling, sizeof(bool));
 	os.write((char *)&similaritysearch, sizeof(bool));
+	os.write((char *)&regularblocksorder, sizeof(bool));
 	os.write((char *)&hitsreported, sizeof(int));
 
 	storeString(sequencetag, os);
@@ -890,6 +897,7 @@ void cParameters::load(ifstream& is) {
 	is.read((char *)&precursorAdductHasK, sizeof(bool));
 	is.read((char *)&precursorAdductHasCa, sizeof(bool));
 	is.read((char *)&precursorAdductHasMn, sizeof(bool));
+	is.read((char *)&precursorAdductHasCr, sizeof(bool));
 	is.read((char *)&precursorAdductHasFe, sizeof(bool));
 	is.read((char *)&precursorAdductHasCo, sizeof(bool));
 	is.read((char *)&precursorAdductHasNi, sizeof(bool));
@@ -903,6 +911,7 @@ void cParameters::load(ifstream& is) {
 	is.read((char *)&masserrortolerancefordeisotoping, sizeof(double));
 	is.read((char *)&minimumrelativeintensitythreshold, sizeof(double));
 	is.read((char *)&minimummz, sizeof(double));
+	is.read((char *)&fwhm, sizeof(double));
 
 	loadString(bricksdatabasefilename, is);
 	bricksdatabase.load(is);
@@ -929,6 +938,7 @@ void cParameters::load(ifstream& is) {
 	is.read((char *)&cycliccterminus, sizeof(bool));
 	is.read((char *)&enablescrambling, sizeof(bool));
 	is.read((char *)&similaritysearch, sizeof(bool));
+	is.read((char *)&regularblocksorder, sizeof(bool));
 	is.read((char *)&hitsreported, sizeof(int));
 
 	loadString(sequencetag, is);

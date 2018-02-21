@@ -195,6 +195,8 @@ void cSpectrumSceneWidget::wheelEvent(QWheelEvent *event) {
 	else {
 		zoomOut();
 	}
+
+	event->accept();
 }
 
 
@@ -208,6 +210,8 @@ void cSpectrumSceneWidget::mouseMoveEvent(QMouseEvent *event) {
 
 		updateZoomGroup();
 	}
+
+	event->accept();
 }
 
 
@@ -253,6 +257,8 @@ void cSpectrumSceneWidget::mouseReleaseEvent(QMouseEvent *event) {
 			redrawScene();
 		}
 	}
+
+	event->accept();
 }
 
 
@@ -287,6 +293,8 @@ void cSpectrumSceneWidget::mousePressEvent(QMouseEvent *event) {
 			redrawScene();
 		}
 	}
+	
+	event->accept();
 }
 
 
@@ -295,6 +303,8 @@ void cSpectrumSceneWidget::showEvent(QShowEvent *event) {
 		normalSize();
 		firstshow = false;
 	}
+
+	event->accept();
 }
 
 

@@ -82,8 +82,9 @@ public:
 	/**
 		\brief Add a formula to the existing one.
 		\param formula a chemical formula
+		\param remove if true then the formula is removed; if false then the formula is added
 	*/
-	void addFormula(string& formula);
+	void addFormula(string& formula, bool remove = false);
 
 	
 	/**

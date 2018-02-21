@@ -1,8 +1,6 @@
 #include "gui/cModificationsWidget.h"
 #include "gui/cEventFilter.h"
 
-#include <QTableWidget>
-#include <QTableWidgetItem>
 #include <QVBoxLayout>
 #include <QDialogButtonBox>
 #include <QPushButton>
@@ -11,39 +9,26 @@
 #include <QMessageBox>
 #include <QLabel>
 #include <QProgressDialog>
-#include <QCheckBox>
 #include <QKeyEvent>
 #include <QIcon>
 #include <QLineEdit>
+#include <QMenuBar>
+#include <QMenu>
 
 
 cModificationsWidget::cModificationsWidget(QWidget* parent) {
 	this->parent = parent;
 
-	setWindowTitle("Modifications Editor");
+	editorname = "Modifications Editor";
+
+	setWindowTitle(editorname);
 	setWindowIcon(QIcon(":/images/icons/61.png"));
 
-	insertrow = new QPushButton(tr("Add Row"));
-	insertrow->setToolTip("Add a new row.");
-	insertrow->setShortcut(QKeySequence(Qt::Key_Insert));
-
-	removechecked = new QPushButton(tr(" Remove Rows "));
-	removechecked->setToolTip("Remove selected rows.");
-	removechecked->setShortcut(QKeySequence(Qt::Key_Delete));
-
-	close = new QPushButton(tr("Close"));
-	close->setToolTip("Close the window.");
-
-	load = new QPushButton(tr("Load"));
-	load->setToolTip("Load modifications.");
-	load->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_L));
-
-	save = new QPushButton(QString(" Save "));
-	save->setToolTip("Save modifications in the current file. When a file has not been loaded yet, the \"Save As ...\" file dialog is opened.");
-
-	saveas = new QPushButton(tr("Save As..."));
-	saveas->setToolTip("Save modifications into a file.");
-	saveas->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_D));
+	menuBar = new QMenuBar(this);
+	menuBar->setNativeMenuBar(false);
+	menuFile = new QMenu(tr("&File"), this);
+	menuEdit = new QMenu(tr("&Edit"), this);
+	menuHelp = new QMenu(tr("&Help"), this);
 
 	rowsfilterline = new QLineEdit();
 	rowsfilterline->setMinimumWidth(250);
@@ -74,55 +59,129 @@ cModificationsWidget::cModificationsWidget(QWidget* parent) {
 	rowsfilterwidget->setLayout(rowsfilterhbox);
 	rowsfilterwidget->setMaximumWidth(420);
 
-	buttons = new QHBoxLayout();
-	buttons->addWidget(close);
-	buttons->addStretch();
-	buttons->addWidget(insertrow);
-	buttons->addWidget(removechecked);
-	buttons->addStretch();
-	buttons->addWidget(rowsfilterwidget);
-	buttons->addStretch();
-	buttons->addWidget(load);
-	buttons->addWidget(save);
-	buttons->addWidget(saveas);
+	database = new QTableView(this);
+	databasemodel = new QStandardItemModel(0, 0, this);
+	proxymodel = new cModificationsProxyModel(this);
+	proxymodel->setSourceModel(databasemodel);
+	proxymodel->setDynamicSortFilter(false);
+	database->setModel(proxymodel);
+	database->setSortingEnabled(true);
 
-	database = new QTableWidget(0, 0, this);
-	database->setColumnCount(6);
-	database->setHorizontalHeaderItem(0, new QTableWidgetItem(""));
-	database->setHorizontalHeaderItem(1, new QTableWidgetItem("Name"));
-	database->setHorizontalHeaderItem(2, new QTableWidgetItem("Summary Formula"));
-	database->setHorizontalHeaderItem(3, new QTableWidgetItem("Monoisotopic Mass"));
-	database->setItemDelegateForColumn(3, &columndelegate);
-	database->setHorizontalHeaderItem(4, new QTableWidgetItem("N-terminal"));
-	database->setHorizontalHeaderItem(5, new QTableWidgetItem("C-terminal"));
-	database->horizontalHeader()->setStretchLastSection(true);
-	for (int i = 0; i < database->columnCount(); i++) {
-		database->resizeColumnToContents(i);
-	}
-
-	headersort.resize(database->columnCount());
-	for (int i = 0; i < database->columnCount(); i++) {
-		headersort[i] = -1;
-	}
-
+	resetHeader();
+	
 	mainlayout = new QVBoxLayout();
 	mainlayout->addWidget(database);
-	mainlayout->addLayout(buttons);
 
-	connect(database->horizontalHeader(), SIGNAL(sectionDoubleClicked(int)), this, SLOT(headerItemDoubleClicked(int)));
-	connect(database, SIGNAL(itemChanged(QTableWidgetItem *)), this, SLOT(itemChanged(QTableWidgetItem *)));
-	connect(insertrow, SIGNAL(released()), this, SLOT(addRow()));
-	connect(removechecked, SIGNAL(released()), this, SLOT(removeCheckedRows()));
-	connect(close, SIGNAL(released()), this, SLOT(closeWindow()));
-	connect(load, SIGNAL(released()), this, SLOT(loadDatabase()));
-	connect(save, SIGNAL(released()), this, SLOT(saveDatabase()));
-	connect(saveas, SIGNAL(released()), this, SLOT(saveDatabaseAs()));
+	mainwidget = new QWidget();
+	mainwidget->setLayout(mainlayout);
+
+	toolbarFile = addToolBar(tr("File"));
+
+	actionNewDatabase = new QAction(QIcon(":/images/icons/2.png"), tr("&New Database"), this);
+	actionNewDatabase->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_N));
+	actionNewDatabase->setToolTip("New Database (Ctrl + N)");
+	toolbarFile->addAction(actionNewDatabase);
+	connect(actionNewDatabase, SIGNAL(triggered()), this, SLOT(createNewDatabase()));
+
+	actionOpenDatabase = new QAction(QIcon(":/images/icons/52.png"), tr("&Open Database"), this);
+	actionOpenDatabase->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_O));
+	actionOpenDatabase->setToolTip("Open Database (Ctrl + O)");
+	toolbarFile->addAction(actionOpenDatabase);
+	connect(actionOpenDatabase, SIGNAL(triggered()), this, SLOT(openDatabase()));
+
+	actionSaveDatabase = new QAction(QIcon(":/images/icons/22.png"), tr("&Save Database..."), this);
+	actionSaveDatabase->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_S));
+	actionSaveDatabase->setToolTip("Save Database... (Ctrl + S)");
+	toolbarFile->addAction(actionSaveDatabase);
+	connect(actionSaveDatabase, SIGNAL(triggered()), this, SLOT(saveDatabase()));
+
+	actionSaveDatabaseAs = new QAction(QIcon(":/images/icons/86.png"), tr("Save &Database As..."), this);
+	actionSaveDatabaseAs->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_D));
+	actionSaveDatabaseAs->setToolTip("Save Database As... (Ctrl + D)");
+	toolbarFile->addAction(actionSaveDatabaseAs);
+	connect(actionSaveDatabaseAs, SIGNAL(triggered()), this, SLOT(saveDatabaseAs()));
+
+	actionImportDatabase = new QAction(QIcon(":/images/icons/63.png"), tr("&Import Database"), this);
+	actionImportDatabase->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_I));
+	actionImportDatabase->setToolTip("Import Database (Ctrl + I)");
+	toolbarFile->addAction(actionImportDatabase);
+	connect(actionImportDatabase, SIGNAL(triggered()), this, SLOT(importDatabase()));
+
+	actionCloseWindow = new QAction(QIcon(":/images/icons/33.png"), tr("&Close"), this);
+	actionCloseWindow->setShortcut(QKeySequence(Qt::Key_Escape));
+	actionCloseWindow->setToolTip("Close (Esc)");
+	toolbarFile->addAction(actionCloseWindow);
+	connect(actionCloseWindow, SIGNAL(triggered()), this, SLOT(closeWindow()));
+
+	toolbarEdit = addToolBar(tr("Edit"));
+
+	actionAddRow = new QAction(QIcon(":/images/icons/13.png"), tr("&Insert Row"), this);
+	actionAddRow->setShortcut(QKeySequence(Qt::Key_Insert));
+	actionAddRow->setToolTip("Insert Row (Insert)");
+	toolbarEdit->addAction(actionAddRow);
+	connect(actionAddRow, SIGNAL(triggered()), this, SLOT(addRow()));
+
+	actionRemoveSelectedRows = new QAction(QIcon(":/images/icons/14.png"), tr("&Remove Selected Rows"), this);
+	actionRemoveSelectedRows->setShortcut(QKeySequence(Qt::Key_Delete));
+	actionRemoveSelectedRows->setToolTip("Remove Selected Rows (Delete)");
+	toolbarEdit->addAction(actionRemoveSelectedRows);
+	connect(actionRemoveSelectedRows, SIGNAL(triggered()), this, SLOT(removeSelectedRows()));
+
+	actionSelectAll = new QAction(QIcon(":/images/icons/38.png"), tr("Select &All"), this);
+	actionSelectAll->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_A));
+	actionSelectAll->setToolTip("Select all rows (Ctrl + A)");
+	toolbarEdit->addAction(actionSelectAll);
+	connect(actionSelectAll, SIGNAL(triggered()), this, SLOT(selectAll()));
+
+	actionUnselectAll = new QAction(QIcon(":/images/icons/38b.png"), tr("&Unselect All"), this);
+	actionUnselectAll->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_U));
+	actionUnselectAll->setToolTip("Unselect all rows (Ctrl + U)");
+	toolbarEdit->addAction(actionUnselectAll);
+	connect(actionUnselectAll, SIGNAL(triggered()), this, SLOT(unselectAll()));
+
+	toolbarHelp = addToolBar(tr("Help"));
+
+	actionHTMLDocumentation = new QAction(QIcon(":/images/icons/3.png"), tr("&HTML Documentation"), this);
+	actionHTMLDocumentation->setShortcut(QKeySequence(Qt::Key_F1));
+	actionHTMLDocumentation->setToolTip("Show HTML Documentation (F1)");
+	toolbarHelp->addAction(actionHTMLDocumentation);
+	connect(actionHTMLDocumentation, SIGNAL(triggered()), this, SLOT(showHTMLDocumentation()));
+	
+	toolbarFilter = addToolBar(tr("Filter"));
+	toolbarFilter->addWidget(rowsfilterwidget);
+
+	menuFile->addAction(actionNewDatabase);
+	menuFile->addAction(actionOpenDatabase);
+	menuFile->addSeparator();
+	menuFile->addAction(actionSaveDatabase);
+	menuFile->addAction(actionSaveDatabaseAs);
+	menuFile->addSeparator();
+	menuFile->addAction(actionImportDatabase);
+	menuFile->addSeparator();
+	menuFile->addAction(actionCloseWindow);
+
+	menuEdit->addAction(actionAddRow);
+	menuEdit->addAction(actionRemoveSelectedRows);
+	menuEdit->addSeparator();
+	menuEdit->addAction(actionSelectAll);
+	menuEdit->addAction(actionUnselectAll);
+
+	menuHelp->addAction(actionHTMLDocumentation);
+
+	menuBar->addMenu(menuFile);
+	menuBar->addMenu(menuEdit);
+	menuBar->addMenu(menuHelp);
+
+	setMenuBar(menuBar);
+
+	connect(database->horizontalHeader(), SIGNAL(sectionClicked(int)), this, SLOT(headerItemClicked(int)));
+	connect(databasemodel, SIGNAL(itemChanged(QStandardItem*)), this, SLOT(itemChanged(QStandardItem*)));
 	connect(rowsfilterbutton, SIGNAL(released()), this, SLOT(filterRows()));
 	connect(rowsfilterclearbutton, SIGNAL(released()), this, SLOT(resetFilter()));
 
-	setLayout(mainlayout);
+	setCentralWidget(mainwidget);
 
-	resize(1280, 700);
+	resize(1280, 750);
 
 	databasefile = "";
 
@@ -139,20 +198,11 @@ cModificationsWidget::cModificationsWidget(QWidget* parent) {
 
 
 cModificationsWidget::~cModificationsWidget() {
-	deleteTable(false);
+	deleteTable();
 
-	for (int i = 0; i < database->columnCount(); i++) {
-		delete database->horizontalHeaderItem(i);
-	}
-
-	database->setColumnCount(0);
-
-	delete insertrow;
-	delete removechecked;
-	delete close;
-	delete load;
-	delete save;
-	delete saveas;
+	delete databasemodel;
+	delete proxymodel;
+	delete database;
 
 	delete rowsfilterline;
 	delete rowsfiltercasesensitive;
@@ -161,68 +211,74 @@ cModificationsWidget::~cModificationsWidget() {
 	delete rowsfilterhbox;
 	delete rowsfilterwidget;
 
-	delete database;
-	delete buttons;
 	delete mainlayout;
+	delete mainwidget;
+
+	delete actionNewDatabase;
+	delete actionOpenDatabase;
+	delete actionSaveDatabase;
+	delete actionSaveDatabaseAs;
+	delete actionImportDatabase;
+	delete actionCloseWindow;
+	delete actionAddRow;
+	delete actionRemoveSelectedRows;
+	delete actionSelectAll;
+	delete actionUnselectAll;
+	delete actionHTMLDocumentation;
+
+	delete menuFile;
+	delete menuEdit;
+	delete menuHelp;
+
+	delete menuBar;
 }
 
 
 void cModificationsWidget::closeEvent(QCloseEvent *event) {
 	closeWindow();
+	event->accept();
 }
 
 
-void cModificationsWidget::deleteTable(bool enableprogress) {
-	QProgressDialog* progress;
-	cEventFilter filter;
-	int rowcount = database->rowCount();
-
-	if (enableprogress) {
-		progress = new QProgressDialog("Clearing the table...", 0, 0, rowcount, this);
-		progress->setMinimumWidth(250);
-		progress->installEventFilter(&filter);
-		progress->setMinimumDuration(0);
-		progress->setWindowModality(Qt::WindowModal);
-		progress->setValue(0);
-	}
-
-	widgetitemallocator.reset();
-
-	for (int i = 0; i < rowcount; i++) {
-		delete database->cellWidget(rowcount - i - 1, 4);
-		delete database->cellWidget(rowcount - i - 1, 5);
-
-		if (enableprogress) {
-			progress->setValue(i);
+void cModificationsWidget::deleteTable() {
+	for (int i = 0; i < databasemodel->columnCount(); i++) {
+		if (database->itemDelegateForColumn(i)) {
+			delete database->itemDelegateForColumn(i);
 		}
 	}
-	
-	database->setRowCount(0);
 
-	if (enableprogress) {
-		progress->setValue(rowcount);
-		delete progress;
-	}
+	databasemodel->clear();
+	databasemodel->setRowCount(0);
 }
 
 
-void cModificationsWidget::removeRow(int row) {
-	for (int i = 0; i < database->columnCount(); i++) {
-		if ((i == 4) || (i == 5)) {
-			delete database->cellWidget(row, i);
-		}
-		else {
-			database->takeItem(row, i);
-		}
+void cModificationsWidget::resetHeader() {
+	databasemodel->setColumnCount(6);
+
+	databasemodel->setHorizontalHeaderItem(0, new QStandardItem());
+	database->setItemDelegateForColumn(0, new cCheckBoxDelegate());
+	databasemodel->setHorizontalHeaderItem(1, new QStandardItem("Name"));
+	databasemodel->setHorizontalHeaderItem(2, new QStandardItem("Summary Formula"));
+	databasemodel->setHorizontalHeaderItem(3, new QStandardItem("Monoisotopic Mass"));
+	databasemodel->setHorizontalHeaderItem(4, new QStandardItem("N-terminal"));
+	database->setItemDelegateForColumn(4, new cCheckBoxDelegate());
+	databasemodel->setHorizontalHeaderItem(5, new QStandardItem("C-terminal"));
+	database->setItemDelegateForColumn(5, new cCheckBoxDelegate());
+
+	database->horizontalHeader()->setStretchLastSection(true);
+	for (int i = 0; i < databasemodel->columnCount(); i++) {
+		database->resizeColumnToContents(i);
 	}
-	database->removeRow(row);
+	database->setColumnWidth(1, 400);
+	database->setColumnWidth(2, 400);
+	database->setColumnWidth(4, (database->horizontalHeader()->sectionSize(4) + database->horizontalHeader()->sectionSize(5)) / 2);
 }
 
 
 bool cModificationsWidget::checkTable() {
 	// check summary formulas
-	for (int i = 0; i < database->rowCount(); i++) {
-		if (!checkFormula(i, database->item(i, 2)->text().toStdString())) {
+	for (int i = 0; i < databasemodel->rowCount(); i++) {
+		if (!checkFormula(i, databasemodel->item(i, 2)->text().toStdString())) {
 			return false;
 		}
 	}
@@ -245,8 +301,8 @@ bool cModificationsWidget::checkFormula(int row, const string& summary) {
 		msgBox.exec();
 		return false;
 	}
-	if (database->item(row, 3)) {
-		database->item(row, 3)->setData(Qt::DisplayRole, cropPrecisionToSixDecimals(formula.getMass()));
+	if (databasemodel->item(row, 3)) {
+		databasemodel->item(row, 3)->setData(QVariant::fromValue(cropPrecisionToSixDecimalsByteArray(formula.getMass())), Qt::DisplayRole);
 	}
 	return true;
 }
@@ -260,46 +316,32 @@ void cModificationsWidget::setDataModified(bool datamodified) {
 	this->datamodified = datamodified;
 
 	if (datamodified) {
-		save->setText("*" + save->text());
+		setWindowTitle("*" + windowTitle());
 	}
 	else {
-		if ((save->text().size() > 0) && (save->text().at(0) == '*')) {
-			save->setText(save->text().toStdString().substr(1).c_str());
+		if ((windowTitle().size() > 0) && (windowTitle().at(0) == '*')) {
+			setWindowTitle(windowTitle().toStdString().substr(1).c_str());
 		}
 	}
 }
 
 
 void cModificationsWidget::keyPressEvent(QKeyEvent *event) {
-    if (event->key() == Qt::Key_Escape) {
-		closeWindow();
-    }
-
 	if ((event->key() == Qt::Key_Enter) || (event->key() == Qt::Key_Return)) {
 		if (rowsfilterline->hasFocus()) {
 			filterRows();
 		}
     }
 
-	if (event->key() == Qt::Key_F1) {
-		#if OS_TYPE == WIN
-			QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo("docs/html/modificationseditor.html").absoluteFilePath()));
-		#else
-			QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo(installdir + "docs/html/modificationseditor.html").absoluteFilePath()));
-		#endif
-	}
-
 	if ((event->modifiers() == Qt::ControlModifier) && (event->key() == Qt::Key_F)) {
 		rowsfilterline->setFocus();
 	}
 
-	if ((event->modifiers() == Qt::ControlModifier) && (event->key() == Qt::Key_N)) {
+	if ((event->modifiers() == Qt::ControlModifier) && (event->key() == Qt::Key_T)) {
 		rowsfiltercasesensitive->setChecked(!rowsfiltercasesensitive->isChecked());
 	}
 
-	if ((event->modifiers() == Qt::ControlModifier) && (event->key() == Qt::Key_S)) {
-		saveDatabase();
-	}
+	event->accept();
 }
 
 
@@ -319,15 +361,15 @@ void cModificationsWidget::closeWindow() {
 }
 
 
-void cModificationsWidget::loadDatabase() {
-	QString filename = QFileDialog::getOpenFileName(this, tr("Load Modifications"), lastdir, tr("Modifications (*.txt)"));
+void cModificationsWidget::openDatabase() {
+	QString filename = QFileDialog::getOpenFileName(this, tr("Open Database"), lastdir, tr("Database of Modifications (*.txt)"));
 
 	if (!filename.isEmpty()) {
 		lastdir = filename;
 		string errormessage;
 		
 		databasefile = filename;
-		save->setText(QString(" Save '") + QString(databasefile.toStdString().substr(databasefile.toStdString().rfind('/') + 1, databasefile.toStdString().size()).c_str()) + QString("' "));
+		setWindowTitle(editorname + QString(" - ") + QString(databasefile.toStdString().substr(databasefile.toStdString().rfind('/') + 1, databasefile.toStdString().size()).c_str()));
 		
 		inputstream.open(filename.toStdString().c_str());
 
@@ -338,10 +380,12 @@ void cModificationsWidget::loadDatabase() {
 		}
 		else {
 
+			deleteTable();
+			resetHeader();
+			resetFilter();
+
 			modifications.clear();
 			loadModificationsFromPlainTextStream(inputstream, modifications, errormessage, true);
-
-			deleteTable(true);
 
 			QProgressDialog progress("Loading Modifications...", "Cancel", 0, (int)modifications.size(), this);
 			progress.setMinimumWidth(250);
@@ -350,47 +394,59 @@ void cModificationsWidget::loadDatabase() {
 			progress.setMinimumDuration(0);
 			progress.setWindowModality(Qt::WindowModal);
 
-			database->setRowCount((int)modifications.size());
+			database->setModel(0);
+			proxymodel->setSourceModel(0);
+			database->setSortingEnabled(false);
+
+			databasemodel->setRowCount((int)modifications.size());
 			for (int i = 0; i < (int)modifications.size(); i++) {
-				QCheckBox* checkbox = new QCheckBox();
-				database->setCellWidget(i, 0, checkbox);
 
-				database->setItem(i, 1, widgetitemallocator.getNewItem());
-				database->item(i, 1)->setText(modifications[i].name.c_str());
+				databasemodel->setItem(i, 0, new QStandardItem());
+				databasemodel->item(i, 0)->setFlags(databasemodel->item(i, 0)->flags() & ~Qt::ItemIsEditable);
 
-				database->setItem(i, 2, widgetitemallocator.getNewItem());
-				database->item(i, 2)->setText(modifications[i].summary.c_str());
+				databasemodel->setItem(i, 1, new QStandardItem());
+				databasemodel->item(i, 1)->setText(modifications[i].name.c_str());
 
-				database->setItem(i, 3, widgetitemallocator.getNewItem());
-				database->item(i, 3)->setData(Qt::DisplayRole, cropPrecisionToSixDecimals(modifications[i].massdifference));
+				databasemodel->setItem(i, 2, new QStandardItem());
+				databasemodel->item(i, 2)->setText(modifications[i].summary.c_str());
 
-				checkbox = new QCheckBox();
-				connect(checkbox, SIGNAL(stateChanged(int)), this, SLOT(checkBoxModified(int)));
+				databasemodel->setItem(i, 3, new QStandardItem());
+				databasemodel->item(i, 3)->setData(QVariant::fromValue(cropPrecisionToSixDecimalsByteArray(modifications[i].massdifference)), Qt::DisplayRole);
+
+				databasemodel->setItem(i, 4, new QStandardItem());
+				databasemodel->item(i, 4)->setFlags(databasemodel->item(i, 4)->flags() & ~Qt::ItemIsEditable);
 				if (modifications[i].nterminal) {
-					checkbox->setChecked(true);
+					databasemodel->item(i, 4)->setData(QVariant::fromValue(true), Qt::DisplayRole);
 				}
-				database->setCellWidget(i, 4, checkbox);
 
-				checkbox = new QCheckBox();
-				connect(checkbox, SIGNAL(stateChanged(int)), this, SLOT(checkBoxModified(int)));
+				databasemodel->setItem(i, 5, new QStandardItem());
+				databasemodel->item(i, 5)->setFlags(databasemodel->item(i, 5)->flags() & ~Qt::ItemIsEditable);
 				if (modifications[i].cterminal) {
-					checkbox->setChecked(true);
+					databasemodel->item(i, 5)->setData(QVariant::fromValue(true), Qt::DisplayRole);
 				}
-				database->setCellWidget(i, 5, checkbox);
 
 				progress.setValue(i);
 				if (progress.wasCanceled()) {
-					deleteTable(true);
+					deleteTable();
+					resetHeader();
 					modifications.clear();
 					databasefile = "";
-					save->setText(" Save ");
+					setWindowTitle(editorname);
 					break;
 				}
 			}
 
-			for (int i = 0; i < database->columnCount(); i++) {
+			proxymodel->setSourceModel(databasemodel);
+			database->setModel(proxymodel);
+			proxymodel->setSortRole(Qt::InitialSortOrderRole);
+			database->setSortingEnabled(true);
+
+			for (int i = 0; i < databasemodel->columnCount(); i++) {
 				database->resizeColumnToContents(i);
 			}
+			database->setColumnWidth(1, 400);
+			database->setColumnWidth(2, 400);
+			database->setColumnWidth(4, (database->horizontalHeader()->sectionSize(4) + database->horizontalHeader()->sectionSize(5)) / 2);
 
 			progress.setValue((int)modifications.size());
 
@@ -423,7 +479,7 @@ bool cModificationsWidget::saveDatabase() {
 	}
 	else {
 
-		QProgressDialog progress("Saving Modifications...", 0, 0, database->rowCount(), this);
+		QProgressDialog progress("Saving Modifications...", 0, 0, proxymodel->rowCount(), this);
 		progress.setMinimumWidth(250);
 		cEventFilter filter;
 		progress.installEventFilter(&filter);
@@ -433,36 +489,31 @@ bool cModificationsWidget::saveDatabase() {
 		fragmentDescription modification;
 		modifications.clear();
 
-		removeCheckedRows();
-
-		for (int i = 0; i < database->rowCount(); i++) {
-
-			if (database->isRowHidden(i)) {
-				progress.setValue(i);
-				continue;
-			}
+		for (int i = 0; i < proxymodel->rowCount(); i++) {
 
 			modification.clear();
-			for (int j = 0; j < database->columnCount(); j++) {
+			for (int j = 0; j < proxymodel->columnCount(); j++) {
 				switch (j)
 				{
 				case 0:
 					// nothing to do
 					break;
 				case 1:
-					modification.name = database->item(i,j)->text().toStdString();
+					modification.name = proxymodel->index(i, j).data(Qt::DisplayRole).toString().toStdString();
+					modification.name = removeWhiteSpacesExceptSpaces(modification.name);
 					break;
 				case 2:
-					modification.summary = database->item(i,j)->text().toStdString();
+					modification.summary = proxymodel->index(i, j).data(Qt::DisplayRole).toString().toStdString();
+					modification.summary = removeWhiteSpacesExceptSpaces(modification.summary);
 					break;
 				case 3:
-					modification.massdifference = database->item(i,j)->data(Qt::DisplayRole).toDouble();
+					modification.massdifference = proxymodel->index(i, j).data(Qt::DisplayRole).toDouble();
 					break;
 				case 4:
-					modification.nterminal = ((QCheckBox *)database->cellWidget(i, j))->isChecked();
+					modification.nterminal = proxymodel->index(i, j).data(Qt::DisplayRole).toBool();
 					break;
 				case 5:
-					modification.cterminal = ((QCheckBox *)database->cellWidget(i, j))->isChecked();
+					modification.cterminal = proxymodel->index(i, j).data(Qt::DisplayRole).toBool();
 					break;
 				default:
 					break;
@@ -493,13 +544,13 @@ bool cModificationsWidget::saveDatabaseAs() {
 		return false;
 	}
 
-	QString filename = QFileDialog::getSaveFileName(this, tr("Save Modifications As..."), lastdir, tr("Modifications (*.txt)"));
+	QString filename = QFileDialog::getSaveFileName(this, tr("Save Database As..."), lastdir, tr("Database of Modifications (*.txt)"));
 
 	if (!filename.isEmpty()) {
 		lastdir = filename;
 	
 		databasefile = filename;
-		save->setText(QString(" Save '") + QString(databasefile.toStdString().substr(databasefile.toStdString().rfind('/') + 1, databasefile.toStdString().size()).c_str()) + QString("' "));
+		setWindowTitle(editorname + QString(" - ") + QString(databasefile.toStdString().substr(databasefile.toStdString().rfind('/') + 1, databasefile.toStdString().size()).c_str()));
 		return saveDatabase();
 	}
 
@@ -508,33 +559,33 @@ bool cModificationsWidget::saveDatabaseAs() {
 
 
 void cModificationsWidget::addRow() {
-	int row = database->rowCount();
-	database->insertRow(row);
+	resetFilter();
 
-	database->setCellWidget(row, 0, new QCheckBox());
-	database->setItem(row, 1, widgetitemallocator.getNewItem());
-	database->setItem(row, 2, widgetitemallocator.getNewItem());
-	database->setItem(row, 3, widgetitemallocator.getNewItem());
-	
-	QCheckBox* checkbox;
-	
-	checkbox = new QCheckBox();
-	connect(checkbox, SIGNAL(stateChanged(int)), this, SLOT(checkBoxModified(int)));
-	database->setCellWidget(row, 4, checkbox);
-	
-	checkbox = new QCheckBox();
-	connect(checkbox, SIGNAL(stateChanged(int)), this, SLOT(checkBoxModified(int)));
-	database->setCellWidget(row, 5, checkbox);
+	int row = databasemodel->rowCount();
+	databasemodel->insertRow(row);
 
-	setDataModified(true);
+	databasemodel->setItem(row, 0, new QStandardItem());
+	databasemodel->item(row, 0)->setFlags(databasemodel->item(row, 0)->flags() & ~Qt::ItemIsEditable);
+
+	databasemodel->setItem(row, 1, new QStandardItem());
+	databasemodel->setItem(row, 2, new QStandardItem());
+	databasemodel->setItem(row, 3, new QStandardItem());
+
+	databasemodel->setItem(row, 4, new QStandardItem());
+	databasemodel->item(row, 4)->setFlags(databasemodel->item(row, 4)->flags() & ~Qt::ItemIsEditable);
+
+	databasemodel->setItem(row, 5, new QStandardItem());
+	databasemodel->item(row, 5)->setFlags(databasemodel->item(row, 5)->flags() & ~Qt::ItemIsEditable);
+	
+	database->scrollToBottom();
 }
 
 
-void cModificationsWidget::removeCheckedRows() {
+void cModificationsWidget::removeSelectedRows() {
 	int i = 0;
-	while (i < database->rowCount()) {
-		if (((QCheckBox *)(database->cellWidget(i, 0)))->isChecked()) {
-			removeRow(i);
+	while (i < proxymodel->rowCount()) {
+		if (proxymodel->index(i, 0).data(Qt::DisplayRole).toBool()) {
+			proxymodel->removeRow(i);
 			setDataModified(true);
 		}
 		else {
@@ -544,99 +595,188 @@ void cModificationsWidget::removeCheckedRows() {
 }
 
 
-void cModificationsWidget::itemChanged(QTableWidgetItem* item) {
+void cModificationsWidget::itemChanged(QStandardItem* item) {
+	if (!item) {
+		return;
+	}
+
 	// recalculate mass when formula is changed
 	if (item->column() == 2) {
 		checkFormula(item->row(), item->text().toStdString());
 	}
 	
-	setDataModified(true);
+	if (item->column() > 0) {
+		setDataModified(true);
+	}
 }
 
 
-void cModificationsWidget::headerItemDoubleClicked(int index) {
+void cModificationsWidget::headerItemClicked(int index) {
 	setDataModified(true);
-
-	if (headersort[index] == -1) {
-		database->sortByColumn(index, Qt::AscendingOrder);
-		headersort[index] = 1;
-		return;
-	}
-
-	if (headersort[index] == 0) {
-		database->sortByColumn(index, Qt::AscendingOrder);
-		headersort[index] = 1;
-	}
-	else {
-		database->sortByColumn(index, Qt::DescendingOrder);
-		headersort[index] = 0;
-	}
 }
 
 
 void cModificationsWidget::filterRows() {
-	Qt::CaseSensitivity casesensitive = rowsfiltercasesensitive->isChecked()?Qt::CaseSensitive:Qt::CaseInsensitive;
-	QString str = rowsfilterline->text();
-	int rowcount = database->rowCount();
-	bool match;
-	int i, j;
-
-	QProgressDialog progress("Updating...", "Cancel", 0, rowcount, this);
-	progress.setMinimumWidth(250);
-	cEventFilter filter;
-	progress.installEventFilter(&filter);
-	progress.setMinimumDuration(0);
-	progress.setWindowModality(Qt::WindowModal);
-
-	for (i = 0; i < rowcount; i++) {
-
-		match = false;
-		for (j = 0; j < database->columnCount(); j++) {
-			// ignore non-text fields
-			if ((j == 0) || (j == 4) || (j == 5)) {
-				continue;
-			}
-
-			if (database->item(i, j)->text().contains(str, casesensitive)) {
-				match = true;
-				break;
-			}
-		}
-		database->setRowHidden(i, !match);
-		progress.setValue(i);
-
-		if (progress.wasCanceled()) {
-			resetFilter();
-			break;
-		}
-
-	}
-
-	progress.setValue(rowcount);
+	proxymodel->setFilterKeyColumn(-1);
+	proxymodel->setFilterCaseSensitivity(rowsfiltercasesensitive->isChecked()?Qt::CaseSensitive:Qt::CaseInsensitive);
+	proxymodel->setFilterFixedString(rowsfilterline->text());
 }
 
 
 void cModificationsWidget::resetFilter() {
 	rowsfilterline->setText("");
-	int rowcount = database->rowCount();
 
-	QProgressDialog progress("Updating...", 0, 0, rowcount, this);
-	progress.setMinimumWidth(250);
-	cEventFilter filter;
-	progress.installEventFilter(&filter);
-	progress.setMinimumDuration(0);
-	progress.setWindowModality(Qt::WindowModal);
+	database->horizontalHeader()->setSortIndicator(-1, Qt::AscendingOrder);
+	proxymodel->sort(-1);
 
-	for (int i = 0; i < rowcount; i++) {
-		database->setRowHidden(i, false);
-		progress.setValue(i);
-	}
-
-	progress.setValue(rowcount);
+	proxymodel->setFilterKeyColumn(-1);
+	proxymodel->setFilterFixedString("");
 }
 
 
-void cModificationsWidget::checkBoxModified(int state) {
-	setDataModified(true);
+void cModificationsWidget::createNewDatabase() {
+	if (datamodified) {
+		QMessageBox::StandardButton reply;
+		reply = QMessageBox::question(this, appname, "Save changes ?", QMessageBox::Yes|QMessageBox::No);
+	
+		if (reply == QMessageBox::Yes) {
+			if (!saveDatabase()) {
+				return;
+			}
+		}
+	}
+
+	deleteTable();
+	resetHeader();
+	resetFilter();
+	modifications.clear();
+	databasefile = "";
+	setWindowTitle(editorname);
+
+	setDataModified(false);
+}
+
+
+void cModificationsWidget::importDatabase() {
+	QString filename = QFileDialog::getOpenFileName(this, tr("Import Database"), lastdir, tr("Database of Modifications (*.txt)"));
+
+	if (!filename.isEmpty()) {
+		lastdir = filename;
+		string errormessage;
+		
+		inputstream.open(filename.toStdString().c_str());
+
+		if (!inputstream.good()) {
+			QMessageBox msgBox;
+			msgBox.setText("Cannot open the file '" + filename + "'.");
+			msgBox.exec();
+		}
+		else {
+			resetFilter();
+
+			vector<fragmentDescription> importedmodifications;
+			loadModificationsFromPlainTextStream(inputstream, importedmodifications, errormessage, true);
+
+			QProgressDialog progress("Importing the Database of Modifications...", "Cancel", 0, (int)importedmodifications.size(), this);
+			progress.setMinimumWidth(250);
+			cEventFilter filter;
+			progress.installEventFilter(&filter);
+			progress.setMinimumDuration(0);
+			progress.setWindowModality(Qt::WindowModal);
+
+			database->setModel(0);
+			proxymodel->setSourceModel(0);
+			database->setSortingEnabled(false);
+
+			int originalrowcount = databasemodel->rowCount();
+			databasemodel->setRowCount(originalrowcount + (int)importedmodifications.size());
+			for (int i = 0; i < (int)importedmodifications.size(); i++) {
+
+				databasemodel->setItem(i + originalrowcount, 0, new QStandardItem());
+				databasemodel->item(i + originalrowcount, 0)->setFlags(databasemodel->item(i + originalrowcount, 0)->flags() & ~Qt::ItemIsEditable);
+
+				databasemodel->setItem(i + originalrowcount, 1, new QStandardItem());
+				databasemodel->item(i + originalrowcount, 1)->setText(importedmodifications[i].name.c_str());
+
+				databasemodel->setItem(i + originalrowcount, 2, new QStandardItem());
+				databasemodel->item(i + originalrowcount, 2)->setText(importedmodifications[i].summary.c_str());
+
+				databasemodel->setItem(i + originalrowcount, 3, new QStandardItem());
+				databasemodel->item(i + originalrowcount, 3)->setData(QVariant::fromValue(cropPrecisionToSixDecimalsByteArray(importedmodifications[i].massdifference)), Qt::DisplayRole);
+
+				databasemodel->setItem(i + originalrowcount, 4, new QStandardItem());
+				databasemodel->item(i + originalrowcount, 4)->setFlags(databasemodel->item(i + originalrowcount, 4)->flags() & ~Qt::ItemIsEditable);
+				if (importedmodifications[i].nterminal) {
+					databasemodel->item(i + originalrowcount, 4)->setData(QVariant::fromValue(true), Qt::DisplayRole);
+				}
+
+				databasemodel->setItem(i + originalrowcount, 5, new QStandardItem());
+				databasemodel->item(i + originalrowcount, 5)->setFlags(databasemodel->item(i + originalrowcount, 5)->flags() & ~Qt::ItemIsEditable);
+				if (importedmodifications[i].cterminal) {
+					databasemodel->item(i + originalrowcount, 5)->setData(QVariant::fromValue(true), Qt::DisplayRole);
+				}
+
+				modifications.push_back(importedmodifications[i]);
+
+				progress.setValue(i);
+				if (progress.wasCanceled()) {
+					deleteTable();
+					resetHeader();
+					modifications.clear();
+					databasefile = "";
+					setWindowTitle(editorname);
+					break;
+				}
+			}
+
+			proxymodel->setSourceModel(databasemodel);
+			database->setModel(proxymodel);
+			proxymodel->setSortRole(Qt::InitialSortOrderRole);
+			database->setSortingEnabled(true);
+
+			for (int i = 0; i < databasemodel->columnCount(); i++) {
+				database->resizeColumnToContents(i);
+			}
+			database->setColumnWidth(1, 400);
+			database->setColumnWidth(2, 400);
+			database->setColumnWidth(4, (database->horizontalHeader()->sectionSize(4) + database->horizontalHeader()->sectionSize(5)) / 2);
+
+			if (progress.wasCanceled()) {
+				setDataModified(false);
+			}
+			else {
+				setDataModified(true);
+			}
+
+			progress.setValue((int)importedmodifications.size());
+
+		}
+
+		inputstream.close();
+
+	}
+}
+
+
+void cModificationsWidget::selectAll() {
+	for (int i = 0; i < proxymodel->rowCount(); i++) {
+		databasemodel->itemFromIndex(proxymodel->mapToSource(proxymodel->index(i, 0)))->setData(QVariant::fromValue(true), Qt::DisplayRole);
+	}
+}
+
+
+void cModificationsWidget::unselectAll() {
+	for (int i = 0; i < proxymodel->rowCount(); i++) {
+		databasemodel->itemFromIndex(proxymodel->mapToSource(proxymodel->index(i, 0)))->setData(QVariant::fromValue(false), Qt::DisplayRole);
+	}
+}
+
+
+void cModificationsWidget::showHTMLDocumentation() {
+	#if OS_TYPE == WIN
+		QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo("docs/html/modificationseditor.html").absoluteFilePath()));
+	#else
+		QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo(installdir + "docs/html/modificationseditor.html").absoluteFilePath()));
+	#endif
 }
 

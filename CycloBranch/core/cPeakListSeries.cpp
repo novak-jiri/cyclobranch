@@ -64,7 +64,7 @@ void cPeakListSeries::loadFromBAFStream(ifstream &stream) {
 }
 
 
-int cPeakListSeries::loadFromIMZMLStream(string& imzmlfilename, ifstream &ibdstream, double minimumrelativeintensitythreshold, cMainThread* os, bool& terminatecomputation) {
+int cPeakListSeries::loadFromIMZMLStream(string& imzmlfilename, ifstream &ibdstream, double minimumrelativeintensitythreshold, double fwhm, cMainThread* os, bool& terminatecomputation) {
 	*os << endl << endl << "Parsing the imzML file..." << endl;
 
 	cImzML imzml;
@@ -75,8 +75,14 @@ int cPeakListSeries::loadFromIMZMLStream(string& imzmlfilename, ifstream &ibdstr
 	string mgfname;
 	string convertedimzmlfilename;
 	string convertedibdfilename;
+
+	char tempstring[1024];
+	string peaksstring;
+	peaksstring.reserve(25000000);
+
 	int strip;
 	bool rawdata = imzml.hasProfileSpectra();
+	bool use_64bit_precision = imzml.use64BitPrecision();
 
 	if (rawdata) {
 		mgfname = imzmlfilename.substr(0, (int)imzmlfilename.size() - 5);
@@ -103,15 +109,18 @@ int cPeakListSeries::loadFromIMZMLStream(string& imzmlfilename, ifstream &ibdstr
 		}
 
 		cPeaksList peaklist;
-		peaklist.loadFromIBDStream(imzml.getItems()[i], ibdstream);
+		peaklist.loadFromIBDStream(imzml.getItems()[i], ibdstream, use_64bit_precision);
 		if ((peaklist.size() > 0) && !rawdata) {
 			peaklists.push_back(peaklist);
 		}
 
 		if (rawdata) {
+			peaksstring.clear();
 			for (int j = 0; j < peaklist.size(); j++) {
-				mgfofstream << peaklist[j].mzratio << " " << peaklist[j].intensity << endl;
+				sprintf_s(tempstring, "%f %f\n\0", peaklist[j].mzratio, peaklist[j].intensity);
+				peaksstring.append(tempstring);
 			}
+			mgfofstream << peaksstring;
 			mgfofstream << "END IONS" << endl << endl;
 
 			if (((i + 1) % 100 == 0) && (i > 0)) {
@@ -139,12 +148,12 @@ int cPeakListSeries::loadFromIMZMLStream(string& imzmlfilename, ifstream &ibdstr
 
 		string s;
 		#if OS_TYPE == UNX
-			s = installdir.toStdString() + "External/linux/raw2peaks.sh " + mgfname;
+			s = installdir.toStdString() + "External/linux/raw2peaks.sh " + mgfname + "," + to_string(fwhm);
 		#else
 			#if OS_TYPE == OSX
-				s = installdir.toStdString() + "External/macosx/raw2peaks.sh " + mgfname;
+				s = installdir.toStdString() + "External/macosx/raw2peaks.sh " + mgfname + "," + to_string(fwhm);
 			#else		
-				s = "External\\windows\\raw2peaks.bat \"" + mgfname + "\"";
+				s = "External\\windows\\raw2peaks.bat \"" + mgfname + "\" " + to_string(fwhm);
 			#endif
 		#endif
 
@@ -160,12 +169,13 @@ int cPeakListSeries::loadFromIMZMLStream(string& imzmlfilename, ifstream &ibdstr
 			peaklists.push_back(peaklist);
 		}
 		mgfifstream.close();
-		QFile::remove(mgfname.c_str());
 
 		if (imzml.getItems().size() != peaklists.size()) {
 			return -2;
 		}
 		
+		QFile::remove(mgfname.c_str());
+
 		for (int i = 0; i < (int)imzml.getItems().size(); i++) {
 			peaklists[i].setCoordinates(imzml.getItems()[i].x, imzml.getItems()[i].y);
 		}
@@ -173,8 +183,10 @@ int cPeakListSeries::loadFromIMZMLStream(string& imzmlfilename, ifstream &ibdstr
 		imzml.updateRawDataToPeakList(peaklists);
 
 		convertedimzmlfilename = imzmlfilename.substr(0, (int)imzmlfilename.size() - 6);
-		convertedibdfilename = convertedimzmlfilename + "_converted.ibd";
-		convertedimzmlfilename += "_converted.imzML";
+		convertedibdfilename = convertedimzmlfilename + "_converted_fwhm_" + to_string(fwhm) + ".ibd";
+		convertedimzmlfilename += "_converted_fwhm_";
+		convertedimzmlfilename += to_string(fwhm);
+		convertedimzmlfilename += ".imzML";
 		imzml.write(convertedimzmlfilename);
 
 		ofstream ofibdstream;
@@ -190,7 +202,7 @@ int cPeakListSeries::loadFromIMZMLStream(string& imzmlfilename, ifstream &ibdstr
 			
 		// write peaklists
 		for (int i = 0; i < (int)peaklists.size(); i++) {
-			peaklists[i].storeToIBDStream(ofibdstream);
+			peaklists[i].storeToIBDStream(ofibdstream, use_64bit_precision);
 		}
 			
 		ofibdstream.close();

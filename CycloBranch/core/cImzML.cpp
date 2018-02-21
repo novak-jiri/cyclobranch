@@ -7,6 +7,8 @@
 cImzML::cImzML() {
 	XMLPlatformUtils::Initialize();
 	profilespectra = false;
+	use_64bit_precision = false;
+	continuous = false;
 
 	parser = new XercesDOMParser();
 	document = 0;
@@ -30,6 +32,8 @@ void cImzML::parse(string& filename) {
 	}
 
 	profilespectra = false;
+	use_64bit_precision = false;
+	continuous = false;
 
 	// childrens of mzML
 	for (XMLSize_t i = 0; i < root->getChildNodes()->getLength(); i++) {
@@ -38,6 +42,59 @@ void cImzML::parse(string& filename) {
 		if (currentNode1->getNodeType() && currentNode1->getNodeType() == DOMNode::ELEMENT_NODE) {
 			
 			DOMElement* currentElement1 = dynamic_cast<xercesc::DOMElement*>(currentNode1);
+
+
+			if (XMLString::equals(currentElement1->getTagName(), XMLString::transcode("fileDescription"))) {
+
+
+				// childrens of fileDescription
+				for (XMLSize_t j = 0; j < currentNode1->getChildNodes()->getLength(); j++) {
+
+					DOMNode* currentNode2 = currentNode1->getChildNodes()->item(j);
+					if (currentNode2->getNodeType() && currentNode2->getNodeType() == DOMNode::ELEMENT_NODE) {
+			
+						DOMElement* currentElement2 = dynamic_cast<xercesc::DOMElement*>(currentNode2);
+						if (XMLString::equals(currentElement2->getTagName(), XMLString::transcode("fileContent"))) {
+						
+								
+							// childrens of fileContent
+							for (XMLSize_t k = 0; k < currentNode2->getChildNodes()->getLength(); k++) {
+
+								DOMNode* currentNode3 = currentNode2->getChildNodes()->item(k);
+								if (currentNode3->getNodeType() && currentNode3->getNodeType() == DOMNode::ELEMENT_NODE) {
+			
+									DOMElement* currentElement3 = dynamic_cast<xercesc::DOMElement*>(currentNode3);
+									if (XMLString::equals(currentElement3->getTagName(), XMLString::transcode("cvParam"))) {
+											
+										const XMLCh* xmlch_name = currentElement3->getAttribute(XMLString::transcode("name"));
+										string name = XMLString::transcode(xmlch_name);
+
+										if (name.compare("continuous") == 0) {											
+
+											continuous = true;
+
+										}
+
+										if (name.compare("profile spectrum") == 0) {											
+
+											profilespectra = true;
+
+										}
+
+									}
+
+								}
+
+							}
+
+				
+						}
+
+					}
+
+				}
+
+			}
 
 
 			if (XMLString::equals(currentElement1->getTagName(), XMLString::transcode("referenceableParamGroupList"))) {
@@ -55,6 +112,35 @@ void cImzML::parse(string& filename) {
 							const XMLCh* xmlch_id = currentElement2->getAttribute(XMLString::transcode("id"));
 							string id = XMLString::transcode(xmlch_id);
 							
+							if (id.compare("mzArray") == 0) {			
+									
+								
+								// childrens of referenceableParamGroup
+								for (XMLSize_t k = 0; k < currentNode2->getChildNodes()->getLength(); k++) {
+
+									DOMNode* currentNode3 = currentNode2->getChildNodes()->item(k);
+									if (currentNode3->getNodeType() && currentNode3->getNodeType() == DOMNode::ELEMENT_NODE) {
+			
+										DOMElement* currentElement3 = dynamic_cast<xercesc::DOMElement*>(currentNode3);
+										if (XMLString::equals(currentElement3->getTagName(), XMLString::transcode("cvParam"))) {
+											
+											const XMLCh* xmlch_name = currentElement3->getAttribute(XMLString::transcode("name"));
+											string name = XMLString::transcode(xmlch_name);
+											if (name.compare("64-bit float") == 0) {											
+
+												use_64bit_precision = true;
+
+											}
+
+										}
+
+									}
+
+								}
+
+
+							}
+
 							if (id.compare("spectrum") == 0) {			
 									
 								
@@ -281,7 +367,6 @@ void cImzML::parse(string& filename) {
 
 	}
 
-
 }
 
 
@@ -299,6 +384,11 @@ void cImzML::updateRawDataToPeakList(vector<cPeaksList>& peaklists) {
 	unsigned long long offset = 16;
 	int currentid = 0;
 
+	int size = 4;
+	if (use_64bit_precision) {
+		size = 8;
+	}
+
 	// childrens of mzML
 	for (XMLSize_t i = 0; i < root->getChildNodes()->getLength(); i++) {
 		
@@ -306,6 +396,61 @@ void cImzML::updateRawDataToPeakList(vector<cPeaksList>& peaklists) {
 		if (currentNode1->getNodeType() && currentNode1->getNodeType() == DOMNode::ELEMENT_NODE) {
 			
 			DOMElement* currentElement1 = dynamic_cast<xercesc::DOMElement*>(currentNode1);
+
+
+			if (XMLString::equals(currentElement1->getTagName(), XMLString::transcode("fileDescription"))) {
+
+
+				// childrens of fileDescription
+				for (XMLSize_t j = 0; j < currentNode1->getChildNodes()->getLength(); j++) {
+
+					DOMNode* currentNode2 = currentNode1->getChildNodes()->item(j);
+					if (currentNode2->getNodeType() && currentNode2->getNodeType() == DOMNode::ELEMENT_NODE) {
+			
+						DOMElement* currentElement2 = dynamic_cast<xercesc::DOMElement*>(currentNode2);
+						if (XMLString::equals(currentElement2->getTagName(), XMLString::transcode("fileContent"))) {
+						
+								
+							// childrens of fileContent
+							for (XMLSize_t k = 0; k < currentNode2->getChildNodes()->getLength(); k++) {
+
+								DOMNode* currentNode3 = currentNode2->getChildNodes()->item(k);
+								if (currentNode3->getNodeType() && currentNode3->getNodeType() == DOMNode::ELEMENT_NODE) {
+			
+									DOMElement* currentElement3 = dynamic_cast<xercesc::DOMElement*>(currentNode3);
+									if (XMLString::equals(currentElement3->getTagName(), XMLString::transcode("cvParam"))) {
+											
+										const XMLCh* xmlch_name = currentElement3->getAttribute(XMLString::transcode("name"));
+										string name = XMLString::transcode(xmlch_name);
+
+										if (name.compare("continuous") == 0) {											
+
+											currentElement3->setAttribute(XMLString::transcode("accession"), XMLString::transcode("IMS:1000031"));
+											currentElement3->setAttribute(XMLString::transcode("name"), XMLString::transcode("processed"));
+
+										}
+
+										if (name.compare("profile spectrum") == 0) {											
+
+											currentElement3->setAttribute(XMLString::transcode("accession"), XMLString::transcode("MS:1000127"));
+											currentElement3->setAttribute(XMLString::transcode("name"), XMLString::transcode("centroid spectrum"));
+
+										}
+
+									}
+
+								}
+
+							}
+
+				
+						}
+
+					}
+
+				}
+
+			}
 
 
 			if (XMLString::equals(currentElement1->getTagName(), XMLString::transcode("referenceableParamGroupList"))) {
@@ -339,6 +484,7 @@ void cImzML::updateRawDataToPeakList(vector<cPeaksList>& peaklists) {
 											string name = XMLString::transcode(xmlch_name);
 											if (name.compare("profile spectrum") == 0) {
 
+												currentElement3->setAttribute(XMLString::transcode("accession"), XMLString::transcode("MS:1000127"));
 												currentElement3->setAttribute(XMLString::transcode("name"), XMLString::transcode("centroid spectrum"));
 
 											}											
@@ -392,6 +538,21 @@ void cImzML::updateRawDataToPeakList(vector<cPeaksList>& peaklists) {
 											if (currentNode4->getNodeType() && currentNode4->getNodeType() == DOMNode::ELEMENT_NODE) {
 			
 												DOMElement* currentElement4 = dynamic_cast<xercesc::DOMElement*>(currentNode4);
+												if (XMLString::equals(currentElement4->getTagName(), XMLString::transcode("cvParam"))) {
+
+
+													const XMLCh* xmlch_name = currentElement4->getAttribute(XMLString::transcode("name"));
+													string name = XMLString::transcode(xmlch_name);
+													if (name.compare("profile spectrum") == 0) {
+												
+														currentElement4->setAttribute(XMLString::transcode("accession"), XMLString::transcode("MS:1000127"));
+														currentElement4->setAttribute(XMLString::transcode("name"), XMLString::transcode("centroid spectrum"));
+
+													}
+
+
+												}
+
 												if (XMLString::equals(currentElement4->getTagName(), XMLString::transcode("binaryDataArrayList"))) {
 
 
@@ -440,7 +601,7 @@ void cImzML::updateRawDataToPeakList(vector<cPeaksList>& peaklists) {
 
 																				if (name.compare("external encoded length") == 0) {
 																					stringstream ss;
-																					ss << peaklists[currentid].size() * 8;
+																					ss << peaklists[currentid].size() * size;
 																					currentElement6->setAttribute(XMLString::transcode("value"), XMLString::transcode(ss.str().c_str()));
 																				}
 
@@ -453,13 +614,13 @@ void cImzML::updateRawDataToPeakList(vector<cPeaksList>& peaklists) {
 																			else {
 																				if (name.compare("external offset") == 0) {			
 																					stringstream ss;
-																					ss << offset + peaklists[currentid].size() * 8;
+																					ss << offset + peaklists[currentid].size() * size;
 																					currentElement6->setAttribute(XMLString::transcode("value"), XMLString::transcode(ss.str().c_str()));
 																				}
 
 																				if (name.compare("external encoded length") == 0) {
 																					stringstream ss;
-																					ss << peaklists[currentid].size() * 8;
+																					ss << peaklists[currentid].size() * size;
 																					currentElement6->setAttribute(XMLString::transcode("value"), XMLString::transcode(ss.str().c_str()));
 																				}
 
@@ -492,7 +653,7 @@ void cImzML::updateRawDataToPeakList(vector<cPeaksList>& peaklists) {
 										}
 
 
-										offset += peaklists[currentid].size() * 8 * 2;
+										offset += peaklists[currentid].size() * size * 2;
 										currentid++;
 
 
@@ -527,6 +688,11 @@ vector<cImzMLItem>& cImzML::getItems() {
 
 bool cImzML::hasProfileSpectra() {
 	return profilespectra;
+}
+
+
+bool cImzML::use64BitPrecision() {
+	return use_64bit_precision;
 }
 
 

@@ -12,8 +12,11 @@
 #include <QUrl>
 #include <QFileInfo>
 #include <QFile>
+#include <QTableView>
+#include <QStandardItemModel>
+#include <QStandardItem>
+#include <QItemDelegate>
 #include "core/utilities.h"
-#include "core/cAllocator.h"
 #include "core/cTheoreticalSpectrum.h"
 #include "gui/cAboutWidget.h"
 #include "gui/cGraphWidget.h"
@@ -25,9 +28,9 @@
 #include "gui/cDrawPeptideWidget.h"
 #include "gui/cSummaryPeaksTableWidget.h"
 #include "gui/cMainThread.h"
-#include "gui/cDelegate.h"
 #include "gui/cHTMLExportDialog.h"
 #include "gui/cImageWindow.h"
+#include "gui/cMainWindowProxyModel.h"
 
 
 // forward declaration
@@ -118,7 +121,9 @@ private:
 	QPushButton* rowsfilterbutton;
 	QPushButton* rowsfilterclearbutton;
 
-	QTableWidget* results;
+	QTableView* results;
+	QStandardItemModel* resultsmodel;
+	cMainWindowProxyModel* resultsproxymodel;
 	cTheoreticalSpectrumList theoreticalspectrumlist;
 	vector<cSpectrumDetailWidget> spectradetails;
 
@@ -140,10 +145,7 @@ private:
 
 	int resultsbasecolumncount;
 	int resultsspecificcolumncount;
-	int dbsearchspecificcolumncount;
-
-	vector<int> resultsheadersort;
-	cDelegate columndelegate;
+	int searchspecificcolumncount;
 
 	QString lastdirexporttocsv;
 	QString lastdirexporttohtml;
@@ -152,15 +154,13 @@ private:
 
 	bool summarytableisprepared;
 
-	cAllocator<QTableWidgetItem> widgetitemallocator;
-
 	bool quitapp;
 
 	void closeEvent(QCloseEvent *event);
 
 	void preparePeptideSequence(int row, string& peptidesequence, bool reportisomers);
 
-	void reportSpectrum(int id, cTheoreticalSpectrum& theoreticalspectrum, bool reportisomers);
+	void reportSpectrum(int row, cTheoreticalSpectrum& theoreticalspectrum, bool reportisomers);
 
 	void deleteResults();
 
@@ -180,6 +180,8 @@ private slots:
 	void showDrawPeptideWidget();
 
 	void setAndShowDrawPeptideWidget(int peptidetypeindex, QString sequence);
+
+	void prepareSummaryTableOfMatchedPeaks();
 
 	void showSummaryTableOfMatchedPeaks();
 
@@ -207,11 +209,9 @@ private slots:
 
 	void updateSpectra();
 
-	void resultsCellClicked(int row, int column);
+	void rowDoubleClicked(const QModelIndex& item);
 
 	void setGraph(string s);
-
-	void headerItemDoubleClicked(int);
 
 	void exportToCsv();
 
@@ -242,6 +242,8 @@ private slots:
 	void gotoSmiles2Monomers();
 
 	void summaryPeaksTableCancelled();
+
+	void updateSummaryPeaksTableFilter(int xmin, int xmax, int ymin, int ymax);
 
 	//void showContextMenu(const QPoint &pt);
 

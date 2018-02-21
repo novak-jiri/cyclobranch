@@ -8,9 +8,12 @@
 #define _UTILITIES_H
 
 #include <fstream>
+#include <iostream>
 #include <vector>
 #include <string>
 #include <QString>
+#include <QByteArray>
+#include <QMetaType>
 #include <boost/regex.hpp>
 
 class cBrick;
@@ -36,9 +39,6 @@ class cBrick;
 #endif
 
 
-#define OLIGOKETIDES 1
-
-
 using namespace std;
 using namespace boost;
 
@@ -51,15 +51,9 @@ enum ePeptideType {
 	cyclic = 1,
 	branched = 2,
 	branchcyclic = 3,
-#if OLIGOKETIDES == 1
-	linearoligoketide = 4,
-	cyclicoligoketide = 5,
-	linearpolysaccharide = 6,
-	other = 7
-#else
-	linearpolysaccharide = 4,
-	other = 5
-#endif
+	linearpolyketide = 4,
+	cyclicpolyketide = 5,
+	other = 6
 };
 
 
@@ -172,6 +166,140 @@ string getStringFromPeptideType(ePeptideType peptidetype);
 	\retval double a value with the limited precision
 */
 double cropPrecisionToSixDecimals(double value);
+
+
+/**
+	\brief Crop a precision of a double to six decimal places.
+	\param value an input value
+	\retval QByteArray a value with the limited precision
+*/
+QByteArray cropPrecisionToSixDecimalsByteArray(double value);
+
+
+/**
+	\brief Store coordinates x and y.
+*/
+struct cCoordinates {
+
+	/**
+		\brief x coordinate
+	*/ 
+	int x;
+
+
+	/**
+		\brief y coordinate
+	*/
+	int y;
+
+
+	/**
+		\brief scan id
+	*/ 
+	int id;
+
+
+	/**
+		\brief m/z ratio
+	*/ 
+	double mzratio;
+
+
+	/**
+		\brief intensity
+	*/ 
+	double intensity;
+
+
+	/**
+		\brief name of compound
+	*/ 
+	string name;
+
+
+	/**
+		\brief The constructor.
+	*/ 
+	cCoordinates() {
+		x = 0;
+		y = 0;
+		id = 0;
+		mzratio = 0;
+		intensity = 0;
+		name = "";
+	}
+
+
+	/**
+		\brief The constructor.
+		\param x coordinate x
+		\param y coordinate y
+		\param id scan id
+		\param mzratio m/z ratio
+		\param intensity intensity
+		\param name the name of item
+	*/ 
+	cCoordinates(int x, int y, int id, double mzratio, double intensity, string name = "") {
+		this->x = x;
+		this->y = y;
+		this->id = id;
+		this->mzratio = mzratio;
+		this->intensity = intensity;
+		this->name = name;
+	}
+
+
+	/**
+		\brief Set the coordinates.
+		\param x coordinate x
+		\param y coordinate y
+		\param id scan id
+		\param mzratio m/z ratio
+		\param intensity intensity
+		\param name the name of item
+	*/ 
+	void set(int x, int y, int id, double mzratio, double intensity, string name = "") {
+		this->x = x;
+		this->y = y;
+		this->id = id;
+		this->mzratio = mzratio;
+		this->intensity = intensity;
+		this->name = name;
+	}
+
+};
+
+
+/**
+	\brief Register vector<cCoordinates> by Qt.
+*/
+Q_DECLARE_METATYPE(vector<cCoordinates>);
+
+
+/**
+	\brief The structure defining a hash function of cCoordinates.
+*/
+struct hash_cCoordinates {
+
+	/**
+		\brief Hash cCoordinates.
+		\param coordinates cCoordinates
+		\retval size_t hashed cCoordinates
+	*/
+	size_t operator()(const cCoordinates& coordinates) const {
+		return std::hash<int>()(coordinates.x) ^ std::hash<int>()(coordinates.y) ^ std::hash<int>()(coordinates.id);
+	}
+
+};
+
+
+/**
+	\brief Overloaded operator ==.
+	\param a first candidate
+	\param b second candidate
+	\retval bool true when cCoordinates are equal
+*/
+bool operator == (cCoordinates const& a, cCoordinates const& b);
 
 
 #endif

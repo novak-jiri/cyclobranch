@@ -136,7 +136,9 @@ class cCandidate {
 	int branchstart;
 	int branchend;
 	vector<nodeEdge> path;
+	eFragmentIonType startiontype;
 	string name;
+	cSummaryFormula summary;
 
 	vector<string> composition;
 	string internalcomposition;
@@ -173,50 +175,54 @@ public:
 		\brief The constructor.
 		\param composition reference to a vector of strings where each string is a sequence of ids of bricks separated by '-' (each string corresponds to an edge in the de novo graph)
 		\param path reference to a path in the de novo graph which corresponds to a peptide sequence candidate
+		\param startiontype start ion type in the de novo graph
 		\param startmodifID id of a terminal modification (at the beginning of a spectrum)
 		\param endmodifID id of a terminal modification (at the end of a spectrum)
 		\param middlemodifID id of a terminal modification of a branched peptide (in the middle of a spectrum)
 		\param middlepos position in \a composition corresponding to a branch of a branched peptide
 	*/ 
-	cCandidate(vector<string>& composition, vector<nodeEdge>& path, int startmodifID, int endmodifID, int middlemodifID, int middlepos);
+	cCandidate(vector<string>& composition, vector<nodeEdge>& path, eFragmentIonType startiontype, int startmodifID, int endmodifID, int middlemodifID, int middlepos);
 
 
 	/**
 		\brief The constructor.
 		\param composition reference to a vector of strings where each string is a sequence of ids of bricks separated by '-' (each string corresponds to an edge in the de novo graph)
 		\param path reference to a path in the de novo graph which corresponds to a peptide sequence candidate
+		\param startiontype start ion type in the de novo graph
 		\param startmodifID id of a terminal modification (at the beginning of a spectrum)
 		\param endmodifID id of a terminal modification (at the end of a spectrum)
 		\param middlemodifID id of a terminal modification of a branched peptide (in the middle of a spectrum)
 		\param branchstart position of a brick where a branch of a branched peptide starts (it is assumed that all strings in \a composition are concatenated)
 		\param branchend position of a brick where a branch of a branched peptide ends (it is assumed that all strings in \a composition are concatenated)
 	*/ 
-	cCandidate(vector<string>& composition, vector<nodeEdge>& path, int startmodifID, int endmodifID, int middlemodifID, int branchstart, int branchend);
+	cCandidate(vector<string>& composition, vector<nodeEdge>& path, eFragmentIonType startiontype, int startmodifID, int endmodifID, int middlemodifID, int branchstart, int branchend);
 
 
 	/**
 		\brief Set a peptide sequence candidate.
 		\param composition reference to a vector of strings where each string is a sequence of ids of bricks separated by '-' (each string corresponds to an edge in the de novo graph)
 		\param path reference to a path in the de novo graph which corresponds to a peptide sequence candidate
+		\param startiontype start ion type in the de novo graph
 		\param startmodifID id of a terminal modification (at the beginning of a spectrum)
 		\param endmodifID id of a terminal modification (at the end of a spectrum)
 		\param middlemodifID id of a terminal modification of a branched peptide (in the middle of a spectrum)
 		\param middlepos position in \a composition corresponding to a branch of a branched peptide
 	*/ 
-	void setCandidate(vector<string>& composition, vector<nodeEdge>& path, int startmodifID, int endmodifID, int middlemodifID, int middlepos);
+	void setCandidate(vector<string>& composition, vector<nodeEdge>& path, eFragmentIonType startiontype, int startmodifID, int endmodifID, int middlemodifID, int middlepos);
 
 
 	/**
 		\brief Set a peptide sequence candidate.
 		\param composition reference to a vector of strings where each string is a sequence of ids of bricks separated by '-' (each string corresponds to an edge in the de novo graph)
 		\param path reference to a path in the de novo graph which corresponds to a peptide sequence candidate
+		\param startiontype start ion type in the de novo graph
 		\param startmodifID id of a terminal modification (at the beginning of a spectrum)
 		\param endmodifID id of a terminal modification (at the end of a spectrum)
 		\param middlemodifID id of a terminal modification of a branched peptide (in the middle of a spectrum)
 		\param branchstart position of a brick where a branch of a branched peptide starts (it is assumed that all strings in \a composition are concatenated)
 		\param branchend position of a brick where a branch of a branched peptide ends (it is assumed that all strings in \a composition are concatenated)
 	*/ 
-	void setCandidate(vector<string>& composition, vector<nodeEdge>& path, int startmodifID, int endmodifID, int middlemodifID, int branchstart, int branchend);
+	void setCandidate(vector<string>& composition, vector<nodeEdge>& path, eFragmentIonType startiontype, int startmodifID, int endmodifID, int middlemodifID, int branchstart, int branchend);
 	
 
 	/**
@@ -307,12 +313,12 @@ public:
 
 
 	/**
-		\brief Get the precursor mass of the peptide sequence candidate.
+		\brief Calculate the precursor mass of the peptide sequence candidate.
 		\param brickdatabasewithcombinations reference to an input database of bricks with combinations of bricks
 		\param parameters a pointer to the parameters of the application
 		\retval double precursor mass of the candidate
 	*/ 
-	double getPrecursorMass(cBricksDatabase& brickdatabasewithcombinations, cParameters* parameters);
+	double calculatePrecursorMass(cBricksDatabase& brickdatabasewithcombinations, cParameters* parameters);
 
 
 	/**
@@ -445,12 +451,27 @@ public:
 
 
 	/**
-		\brief Get the summary formula of the peptide sequence candidate.
+		\brief Calculate the summary formula of the peptide sequence candidate.
 		\param parameters a reference to the parameters of the application
 		\param peptidetype the type of peptide
-		\retval cSummaryFormula the summary formula
+		\param precursormass experimantal precursor mass
+		\retval string summary formula
 	*/ 
-	cSummaryFormula getSummaryFormula(cParameters& parameters, ePeptideType peptidetype);
+	cSummaryFormula calculateSummaryFormula(cParameters& parameters, ePeptideType peptidetype, double precursormass = 0);
+
+
+	/**
+		\brief Get the summary formula of the peptide sequence candidate.
+		\retval cSummaryFormula summary formula
+	*/ 
+	cSummaryFormula& getSummaryFormula();
+
+
+	/**
+		\brief Set the summary formula of the peptide sequence candidate.
+		\param summary summary formula
+	*/ 
+	void setSummaryFormula(cSummaryFormula& summary);
 
 
 	/**
@@ -569,22 +590,27 @@ public:
 
 
 	/**
-		\brief Get the precursor type.
-		\param bricksdatabase a database of building blocks
-		\retval eKetidePrecursorType the type of precursor ion
+		\brief Set start ion type used in the de novo graph.
+		\param iontype fragment ion type
 	*/ 
-	eKetidePrecursorType getKetidePrecursorType(cBricksDatabase& bricksdatabase);
+	void setStartIonType(eFragmentIonType iontype);
 
 
-#if OLIGOKETIDES == 1
+	/**
+		\brief Get start ion type used in the de novo graph.
+		\retval eFragmentIonType fragment ion type
+	*/ 
+	eFragmentIonType getStartIonType();
+
 
 	/**
 		\brief Check if the order of blocks is correct.
 		\param bricksdatabase a database of building blocks
 		\param peptidetype the type of peptide
+		\param regularblocksorder check regular order of ketide blocks
 		\retval bool true when the order of blocks is correct; false otherwise
 	*/ 
-	bool checkKetideSequence(cBricksDatabase& bricksdatabase, ePeptideType peptidetype);
+	bool checkKetideSequence(cBricksDatabase& bricksdatabase, ePeptideType peptidetype, bool regularblocksorder);
 
 
 	/**
@@ -607,12 +633,11 @@ public:
 		\brief Check if the numbers of H2 loss and H2O loss blocks are correct.
 		\param bricksdatabase a database of building blocks
 		\param peptidetype the type of peptide
+		\param regularblocksorder check regular order of ketide blocks
 		\retval bool true when the numbers of blocks are correct
 	*/ 
-	bool checkKetideBlocks(cBricksDatabase& bricksdatabase, ePeptideType peptidetype);
+	bool checkKetideBlocks(cBricksDatabase& bricksdatabase, ePeptideType peptidetype, bool regularblocksorder);
 
-
-#endif
 
 };
 

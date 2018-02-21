@@ -27,6 +27,7 @@ const double Kplus = 38.963158;
 const double Liplus = 7.015455;
 const double H = 1.0078250321;
 const double D = 2.014102;
+const double T = 3.016049;
 const double Li = 7.016004;
 const double Be = 9.012182;
 const double B = 11.009306;
@@ -132,25 +133,22 @@ const double Lr = 262.109802;
 const double R = 0;
 const double X = 0;
 const double e = H - Hplus;
-//const double neutron = D - H;
 
-const double Li6 = 6.015122;
-const double Mg25 = 24.985837;
-const double Mg26 = 25.982593;
-const double K41 = 40.961825;
-const double Ca44 = 43.95548;
-const double Fe54 = 53.939612;
-//const double Fe57 = 56.935396;
-//const double Fe58 = 57.933278;
-const double Ni60 = 59.930788;
-const double Ni61 = 60.931061;
-const double Ni62 = 61.928346;
-//const double Ni64 = 63.927968;
-const double Cu65 = 64.927793;
-const double Zn66 = 65.926034;
-const double Zn67 = 66.927129;
-const double Zn68 = 67.924846;
-const double Ga71 = 70.9247;
+// if isotopes are changed then fragmentions[xxx].numberofisotopes must be also fixed !
+const double Li6 = 6.015122;		// 7.5%
+const double Mg25 = 24.985837;		// 10%
+const double Mg26 = 25.982593;		// 11.01%
+const double K41 = 40.961825;		// 6.73%
+const double Cr50 = 49.946046;		// 4.345%
+const double Cr53 = 52.940651;		// 9.501%
+const double Fe54 = 53.939612;		// 5.8%
+const double Ni60 = 59.930788;		// 26.223%
+const double Ni62 = 61.928346;		// 3.634%
+const double Cu65 = 64.927793;		// 30.85%
+const double Zn66 = 65.926034;		// 27.9%
+const double Zn67 = 66.927129;		// 4.1%
+const double Zn68 = 67.924846;		// 18.8%
+const double Ga71 = 70.9247;		// 39.89%
 
 
 /**
@@ -201,21 +199,19 @@ const double Z_ION = Hplus + O - N - H;
 const double PRECURSOR_ION = Hplus + H2O;
 const double PRECURSOR_ION_CYCLIC = Hplus;
 
-#if OLIGOKETIDES == 1
-	const double L0H_ION = Hplus - 2 * H;
-	const double L1H_ION = Hplus;
-	const double L2H_ION = Hplus + 2 * H;
-	const double R1H_ION = Hplus;
-	const double R2H_ION = Hplus + 2 * H;
-	const double L1OH_ION = Hplus + O;
-	const double L2OH_ION = Hplus + H2O;
-	const double R1OH_ION = Hplus + O;
-	const double R2OH_ION = Hplus + H2O;
+const double L0H_ION = Hplus - 2 * H;
+const double L1H_ION = Hplus;
+const double L2H_ION = Hplus + 2 * H;
+const double R1H_ION = Hplus;
+const double R2H_ION = Hplus + 2 * H;
+const double L1OH_ION = Hplus + O;
+const double L2OH_ION = Hplus + H2O;
+const double R1OH_ION = Hplus + O;
+const double R2OH_ION = Hplus + H2O;
 
-	const double PRECURSOR_ION_LINEAR_OLIGOKETIDE_H_H = Hplus + 2 * H;
-	const double PRECURSOR_ION_LINEAR_OLIGOKETIDE_H_OH = Hplus + H2O;
-	const double PRECURSOR_ION_LINEAR_OLIGOKETIDE_OH_OH = Hplus + 2 * H + 2 * O;
-#endif
+const double PRECURSOR_ION_LINEAR_POLYKETIDE_H_H = Hplus + 2 * H;
+const double PRECURSOR_ION_LINEAR_POLYKETIDE_H_OH = Hplus + H2O;
+const double PRECURSOR_ION_LINEAR_POLYKETIDE_OH_OH = Hplus + 2 * H + 2 * O;
 
 
 /**
@@ -286,12 +282,6 @@ enum eFragmentIonType {
 	cyclic_precursor_ion_co_loss_and_dehydrated,
 	cyclic_precursor_ion_co_loss_and_deamidated,
 	cyclic_precursor_ion_co_loss_and_dehydrated_and_deamidated,
-	ms_nterminal_ion_hplus,
-	ms_nterminal_ion_naplus,
-	ms_nterminal_ion_kplus,
-	ms_cterminal_ion_hplus,
-	ms_cterminal_ion_naplus,
-	ms_cterminal_ion_kplus,
 	ms_hplus,
 	ms_naplus,
 	ms_kplus,
@@ -318,6 +308,9 @@ enum eFragmentIonType {
 	ms_MCaH,
 	ms_MCa2HNa,
 	ms_MCa3H,
+	ms_MCr2H,
+	ms_MCr3HNa,
+	ms_MCr4H,
 	ms_MMnH,
 	ms_MMn2HNa,
 	ms_MMn3H,
@@ -336,7 +329,6 @@ enum eFragmentIonType {
 	ms_MGa2H,
 	ms_MGa3HNa,
 	ms_MGa4H,
-#if OLIGOKETIDES == 1
 	l0h_ion,
 	l0h_ion_dehydrated,
 	l0h_ion_deamidated,
@@ -409,40 +401,38 @@ enum eFragmentIonType {
 	r2oh_ion_co_loss_dehydrated,
 	r2oh_ion_co_loss_deamidated,
 	r2oh_ion_co_loss_dehydrated_and_deamidated,
-	linear_oligoketide_precursor_ion_h_h,
-	linear_oligoketide_precursor_ion_h_h_dehydrated,
-	linear_oligoketide_precursor_ion_h_h_deamidated,
-	linear_oligoketide_precursor_ion_h_h_dehydrated_and_deamidated,
-	linear_oligoketide_precursor_ion_h_h_co_loss,
-	linear_oligoketide_precursor_ion_h_h_co_loss_dehydrated,
-	linear_oligoketide_precursor_ion_h_h_co_loss_deamidated,
-	linear_oligoketide_precursor_ion_h_h_co_loss_dehydrated_and_deamidated,
-	linear_oligoketide_precursor_ion_h_oh,
-	linear_oligoketide_precursor_ion_h_oh_dehydrated,
-	linear_oligoketide_precursor_ion_h_oh_deamidated,
-	linear_oligoketide_precursor_ion_h_oh_dehydrated_and_deamidated,
-	linear_oligoketide_precursor_ion_h_oh_co_loss,
-	linear_oligoketide_precursor_ion_h_oh_co_loss_dehydrated,
-	linear_oligoketide_precursor_ion_h_oh_co_loss_deamidated,
-	linear_oligoketide_precursor_ion_h_oh_co_loss_dehydrated_and_deamidated,
-	linear_oligoketide_precursor_ion_oh_oh,
-	linear_oligoketide_precursor_ion_oh_oh_dehydrated,
-	linear_oligoketide_precursor_ion_oh_oh_deamidated,
-	linear_oligoketide_precursor_ion_oh_oh_dehydrated_and_deamidated,
-	linear_oligoketide_precursor_ion_oh_oh_co_loss,
-	linear_oligoketide_precursor_ion_oh_oh_co_loss_dehydrated,
-	linear_oligoketide_precursor_ion_oh_oh_co_loss_deamidated,
-	linear_oligoketide_precursor_ion_oh_oh_co_loss_dehydrated_and_deamidated,
-	cyclic_oligoketide_precursor_ion,
-	cyclic_oligoketide_precursor_ion_dehydrated,
-	cyclic_oligoketide_precursor_ion_deamidated,
-	cyclic_oligoketide_precursor_ion_dehydrated_and_deamidated,
-	cyclic_oligoketide_precursor_ion_co_loss,
-	cyclic_oligoketide_precursor_ion_co_loss_dehydrated,
-	cyclic_oligoketide_precursor_ion_co_loss_deamidated,
-	cyclic_oligoketide_precursor_ion_co_loss_dehydrated_and_deamidated,
-#endif
-	//b_ion_2H_loss,
+	linear_polyketide_precursor_ion_h_h,
+	linear_polyketide_precursor_ion_h_h_dehydrated,
+	linear_polyketide_precursor_ion_h_h_deamidated,
+	linear_polyketide_precursor_ion_h_h_dehydrated_and_deamidated,
+	linear_polyketide_precursor_ion_h_h_co_loss,
+	linear_polyketide_precursor_ion_h_h_co_loss_dehydrated,
+	linear_polyketide_precursor_ion_h_h_co_loss_deamidated,
+	linear_polyketide_precursor_ion_h_h_co_loss_dehydrated_and_deamidated,
+	linear_polyketide_precursor_ion_h_oh,
+	linear_polyketide_precursor_ion_h_oh_dehydrated,
+	linear_polyketide_precursor_ion_h_oh_deamidated,
+	linear_polyketide_precursor_ion_h_oh_dehydrated_and_deamidated,
+	linear_polyketide_precursor_ion_h_oh_co_loss,
+	linear_polyketide_precursor_ion_h_oh_co_loss_dehydrated,
+	linear_polyketide_precursor_ion_h_oh_co_loss_deamidated,
+	linear_polyketide_precursor_ion_h_oh_co_loss_dehydrated_and_deamidated,
+	linear_polyketide_precursor_ion_oh_oh,
+	linear_polyketide_precursor_ion_oh_oh_dehydrated,
+	linear_polyketide_precursor_ion_oh_oh_deamidated,
+	linear_polyketide_precursor_ion_oh_oh_dehydrated_and_deamidated,
+	linear_polyketide_precursor_ion_oh_oh_co_loss,
+	linear_polyketide_precursor_ion_oh_oh_co_loss_dehydrated,
+	linear_polyketide_precursor_ion_oh_oh_co_loss_deamidated,
+	linear_polyketide_precursor_ion_oh_oh_co_loss_dehydrated_and_deamidated,
+	cyclic_polyketide_precursor_ion,
+	cyclic_polyketide_precursor_ion_dehydrated,
+	cyclic_polyketide_precursor_ion_deamidated,
+	cyclic_polyketide_precursor_ion_dehydrated_and_deamidated,
+	cyclic_polyketide_precursor_ion_co_loss,
+	cyclic_polyketide_precursor_ion_co_loss_dehydrated,
+	cyclic_polyketide_precursor_ion_co_loss_deamidated,
+	cyclic_polyketide_precursor_ion_co_loss_dehydrated_and_deamidated,
 	fragmentIonTypeEnd
 };
 
@@ -675,31 +665,18 @@ void initializeFragmentIonsForDeNovoGraphOfTPeptides(vector<eFragmentIonType>& f
 void initializeFragmentIonsForDeNovoGraphOfBranchCyclicPeptides(vector<eFragmentIonType>& fragmentions);
 
 
-#if OLIGOKETIDES == 1
+/**
+	\brief Initialize fragment ion types for the de novo graph of a linear polyketide
+	\param fragmentions reference to a vector of fragment ion types
+*/ 
+void initializeFragmentIonsForDeNovoGraphOfLinearPolyketide(vector<eFragmentIonType>& fragmentions);
 
 
 /**
-	\brief Initialize fragment ion types for the de novo graph of a linear oligoketide
+	\brief Initialize fragment ion types for the de novo graph of a cyclic polyketide
 	\param fragmentions reference to a vector of fragment ion types
 */ 
-void initializeFragmentIonsForDeNovoGraphOfLinearOligoketide(vector<eFragmentIonType>& fragmentions);
-
-
-/**
-	\brief Initialize fragment ion types for the de novo graph of a cyclic oligoketide
-	\param fragmentions reference to a vector of fragment ion types
-*/ 
-void initializeFragmentIonsForDeNovoGraphOfCyclicOligoketide(vector<eFragmentIonType>& fragmentions);
-
-
-#endif
-
-
-/**
-	\brief Initialize fragment ion types for the de novo graph of a linear polysaccharide
-	\param fragmentions reference to a vector of fragment ion types
-*/ 
-void initializeFragmentIonsForDeNovoGraphOfLinearPolysaccharide(vector<eFragmentIonType>& fragmentions);
+void initializeFragmentIonsForDeNovoGraphOfCyclicPolyketide(vector<eFragmentIonType>& fragmentions);
 
 
 /**

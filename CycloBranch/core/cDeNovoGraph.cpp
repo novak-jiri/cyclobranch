@@ -137,13 +137,14 @@ void cDeNovoGraph::initialize(cMainThread& os, cParameters& parameters) {
 
 int cDeNovoGraph::createGraph(bool& terminatecomputation) {
 	cDeNovoGraphNode node;
+	cSummaryFormula formula;
+	cSummaryFormula tmpformula;
 	double mass;
 	double termmass;
-	int left, right, middle;
-	cEdge e, e1, e2;
+	int left, right, middle, targetnode, i;
+	cEdge e;
 	double unchargedprecursormass = charge(uncharge(parameters->precursormass, parameters->precursorcharge), (parameters->precursorcharge > 0)?1:-1);
 	double unchargedmz;
-	int i;
 	
 	sortedpeaklist = parameters->peaklistseries[0];
 	// insert the single charged precursor, if neccessary
@@ -170,16 +171,37 @@ int cDeNovoGraph::createGraph(bool& terminatecomputation) {
 	*os << "Number of nodes when deamidated ions are removed: " << sortedpeaklist.size() << endl;	
 
 	double negativeshift = (parameters->precursorcharge > 0)?0:-2*Hplus;
+	string negativeshiftsummary = (parameters->precursorcharge > 0)?"":"Hplus-2";
 
 	// insert system nodes
 	switch (parameters->peptidetype)
 	{
 	case cyclic:
 		node.clear();
+		node.setMZRatio(0);
+		node.setIntensity(0);
+		node.addIonAnnotation(b_ion);
+		graph.push_back(node);
+
+		node.clear();
 		node.setMZRatio(parameters->fragmentdefinitions[b_ion].massdifference + negativeshift);
 		node.setIntensity(0);
 		node.addIonAnnotation(b_ion);
 		graph.push_back(node);
+
+		e.clear();
+		e.composition = "0";
+		tmpformula.clear();
+		tmpformula.addFormula(parameters->fragmentdefinitions[b_ion].summary);
+		tmpformula.addFormula(negativeshiftsummary);
+		e.summary = tmpformula.getSummary();
+		e.targetnode = 1;
+		e.targetion = b_ion;
+		e.massdifference = graph[e.targetnode].getMZRatio();
+		graph[0].insertTempEdge(e);
+
+		lastsystemnode = (int)graph.size() - 1;
+		startnode = 1;
 		break;
 	case linear:
 	case branched:
@@ -204,43 +226,80 @@ int cDeNovoGraph::createGraph(bool& terminatecomputation) {
 
 		e.clear();
 		e.composition = "0";
+		tmpformula.clear();
+		tmpformula.addFormula(parameters->fragmentdefinitions[b_ion].summary);
+		tmpformula.addFormula(negativeshiftsummary);
+		e.summary = tmpformula.getSummary();
 		e.targetnode = 1;
+		e.targetion = b_ion;
+		e.massdifference = graph[e.targetnode].getMZRatio();
 		graph[0].insertTempEdge(e);
 
 		e.clear();
 		e.composition = "0";
+		tmpformula.clear();
+		tmpformula.addFormula(parameters->fragmentdefinitions[y_ion].summary);
+		tmpformula.addFormula(negativeshiftsummary);
+		e.summary = tmpformula.getSummary();
 		e.targetnode = 2;
+		e.targetion = y_ion;
+		e.massdifference = graph[e.targetnode].getMZRatio();
 		graph[0].insertTempEdge(e);
 
-		for (i = 1; i < (int)parameters->searchedmodifications.size(); i++) {
-			node.clear();
-			
-			e.clear();
-			e.composition = "0";
-			e.targetnode = i + 2;
+		targetnode = 2;
 
+		for (i = 1; i < (int)parameters->searchedmodifications.size(); i++) {
+			
 			if (parameters->searchedmodifications[i].nterminal) {
+				node.clear();
 				node.setMZRatio(parameters->fragmentdefinitions[b_ion].massdifference + parameters->searchedmodifications[i].massdifference + negativeshift);
 				node.setIntensity(0);
 				node.addIonAnnotation(b_ion);
+				graph.push_back(node);
+
+				e.clear();
+				e.composition = "0";	
+				e.startmodifID = i;
+				tmpformula.clear();
+				tmpformula.addFormula(parameters->fragmentdefinitions[b_ion].summary);
+				tmpformula.addFormula(parameters->searchedmodifications[i].summary);
+				tmpformula.addFormula(negativeshiftsummary);
+				e.summary = tmpformula.getSummary();
+				targetnode++;
+				e.targetnode = targetnode;
+				e.targetion = b_ion;
+				e.massdifference = graph[e.targetnode].getMZRatio();
+				
+				graph[0].insertTempEdge(e);
 			}
 
 			if (parameters->searchedmodifications[i].cterminal) {
+				node.clear();
 				node.setMZRatio(parameters->fragmentdefinitions[y_ion].massdifference + parameters->searchedmodifications[i].massdifference + negativeshift);
 				node.setIntensity(0);
 				node.addIonAnnotation(y_ion);
+				graph.push_back(node);
+
+				e.clear();
+				e.composition = "0";
+				e.startmodifID = i;
+				tmpformula.clear();
+				tmpformula.addFormula(parameters->fragmentdefinitions[y_ion].summary);
+				tmpformula.addFormula(parameters->searchedmodifications[i].summary);
+				tmpformula.addFormula(negativeshiftsummary);
+				e.summary = tmpformula.getSummary();
+				targetnode++;
+				e.targetnode = targetnode;
+				e.targetion = y_ion;
+				e.massdifference = graph[e.targetnode].getMZRatio();
+
+				graph[0].insertTempEdge(e);
 			}
 
-			graph.push_back(node);
-			graph[0].insertTempEdge(e);
 		}
 
 		lastsystemnode = (int)graph.size() - 1;
 		startnode = 1;
-
-		// to do - problem with e.targetnode
-		//sort(graph.begin() + 1, graph.end(), compareNodes);
-
 		break;
 	case branchcyclic:
 		node.clear();
@@ -264,44 +323,85 @@ int cDeNovoGraph::createGraph(bool& terminatecomputation) {
 
 		e.clear();
 		e.composition = "0";
+		tmpformula.clear();
+		tmpformula.addFormula(parameters->fragmentdefinitions[b_ion].summary);
+		tmpformula.addFormula(negativeshiftsummary);
+		e.summary = tmpformula.getSummary();
 		e.targetnode = 1;
+		e.targetion = b_ion;
+		e.massdifference = graph[e.targetnode].getMZRatio();
 		graph[0].insertTempEdge(e);
 
 		//e.clear();
 		//e.composition = "0";
+		//tmpformula.clear();
+		//tmpformula.addFormula(parameters->fragmentdefinitions[y_ion].summary);
+		//tmpformula.addFormula(negativeshiftsummary);
+		//e.summary = tmpformula.getSummary();
 		//e.targetnode = 2;
+		//e.targetion = y_ion;
+		//e.massdifference = graph[e.targetnode].getMZRatio();
 		//graph[0].insertTempEdge(e);
 
 		/*
+		
+		targetnode = 2;
+
 		for (i = 1; i < (int)parameters->searchedmodifications.size(); i++) {
-			node.clear();
-			
-			e.clear();
-			e.composition = "0";
-			e.targetnode = i + 2;
 
 			if (parameters->searchedmodifications[i].nterminal) {
+				node.clear();
 				node.setMZRatio(parameters->fragmentdefinitions[b_ion].massdifference + parameters->searchedmodifications[i].massdifference + negativeshift);
 				node.setIntensity(0);
 				node.addIonAnnotation(b_ion);
+				graph.push_back(node);
+
+				e.clear();
+				e.composition = "0";	
+				e.startmodifID = i;
+				tmpformula.clear();
+				tmpformula.addFormula(parameters->fragmentdefinitions[b_ion].summary);
+				tmpformula.addFormula(parameters->searchedmodifications[i].summary);
+				tmpformula.addFormula(negativeshiftsummary);
+				e.summary = tmpformula.getSummary();
+				targetnode++;
+				e.targetnode = targetnode;
+				e.targetion = b_ion;
+				e.massdifference = graph[e.targetnode].getMZRatio();
+				
+				graph[0].insertTempEdge(e);
 			}
 
 			if (parameters->searchedmodifications[i].cterminal) {
+				node.clear();
 				node.setMZRatio(parameters->fragmentdefinitions[y_ion].massdifference + parameters->searchedmodifications[i].massdifference + negativeshift);
 				node.setIntensity(0);
 				node.addIonAnnotation(y_ion);
+				graph.push_back(node);
+
+				e.clear();
+				e.composition = "0";
+				e.startmodifID = i;
+				tmpformula.clear();
+				tmpformula.addFormula(parameters->fragmentdefinitions[y_ion].summary);
+				tmpformula.addFormula(parameters->searchedmodifications[i].summary);
+				tmpformula.addFormula(negativeshiftsummary);
+				e.summary = tmpformula.getSummary();
+				targetnode++;
+				e.targetnode = targetnode;
+				e.targetion = y_ion;
+				e.massdifference = graph[e.targetnode].getMZRatio();
+
+				graph[0].insertTempEdge(e);
 			}
 
-			graph.push_back(node);
-			graph[0].insertTempEdge(e);
 		}
 		*/
 
 		lastsystemnode = (int)graph.size() - 1;
 		startnode = 1;
 		break;
-#if OLIGOKETIDES == 1
-	case linearoligoketide:
+	case linearpolyketide:
 		node.clear();
 		node.setMZRatio(0);
 		node.setIntensity(0);
@@ -337,27 +437,49 @@ int cDeNovoGraph::createGraph(bool& terminatecomputation) {
 
 		e.clear();
 		e.composition = "0";
+		tmpformula.clear();
+		tmpformula.addFormula(parameters->fragmentdefinitions[l1h_ion].summary);
+		tmpformula.addFormula(negativeshiftsummary);
+		e.summary = tmpformula.getSummary();
 		e.targetnode = 1;
+		e.targetion = l1h_ion;
+		e.massdifference = graph[e.targetnode].getMZRatio();
 		graph[0].insertTempEdge(e);
 
 		e.clear();
 		e.composition = "0";
+		tmpformula.clear();
+		tmpformula.addFormula(parameters->fragmentdefinitions[l2h_ion].summary);
+		tmpformula.addFormula(negativeshiftsummary);
+		e.summary = tmpformula.getSummary();
 		e.targetnode = 2;
+		e.targetion = l2h_ion;
+		e.massdifference = graph[e.targetnode].getMZRatio();
 		graph[0].insertTempEdge(e);
 
 		e.clear();
 		e.composition = "0";
+		tmpformula.clear();
+		tmpformula.addFormula(parameters->fragmentdefinitions[l1oh_ion].summary);
+		tmpformula.addFormula(negativeshiftsummary);
+		e.summary = tmpformula.getSummary();
 		e.targetnode = 3;
+		e.targetion = l1oh_ion;
+		e.massdifference = graph[e.targetnode].getMZRatio();
 		graph[0].insertTempEdge(e);
 
 		e.clear();
 		e.composition = "0";
+		tmpformula.clear();
+		tmpformula.addFormula(parameters->fragmentdefinitions[l2oh_ion].summary);
+		tmpformula.addFormula(negativeshiftsummary);
+		e.summary = tmpformula.getSummary();
 		e.targetnode = 4;
+		e.targetion = l2oh_ion;
+		e.massdifference = graph[e.targetnode].getMZRatio();
 		graph[0].insertTempEdge(e);
 
-		e.clear();
-		e.composition = "0";
-		e.targetnode = 4;
+		targetnode = 4;
 
 		for (i = 1; i < (int)parameters->searchedmodifications.size(); i++) {	
 
@@ -367,7 +489,20 @@ int cDeNovoGraph::createGraph(bool& terminatecomputation) {
 				node.setIntensity(0);
 				node.addIonAnnotation(l1h_ion);
 				graph.push_back(node);
-				e.targetnode++;
+
+				e.clear();
+				e.composition = "0";	
+				e.startmodifID = i;
+				tmpformula.clear();
+				tmpformula.addFormula(parameters->fragmentdefinitions[l1h_ion].summary);
+				tmpformula.addFormula(parameters->searchedmodifications[i].summary);
+				tmpformula.addFormula(negativeshiftsummary);
+				e.summary = tmpformula.getSummary();
+				targetnode++;
+				e.targetnode = targetnode;
+				e.targetion = l1h_ion;
+				e.massdifference = graph[e.targetnode].getMZRatio();
+
 				graph[0].insertTempEdge(e);
 
 				node.clear();
@@ -375,7 +510,20 @@ int cDeNovoGraph::createGraph(bool& terminatecomputation) {
 				node.setIntensity(0);
 				node.addIonAnnotation(l2h_ion);
 				graph.push_back(node);
-				e.targetnode++;
+
+				e.clear();
+				e.composition = "0";
+				e.startmodifID = i;
+				tmpformula.clear();
+				tmpformula.addFormula(parameters->fragmentdefinitions[l2h_ion].summary);
+				tmpformula.addFormula(parameters->searchedmodifications[i].summary);
+				tmpformula.addFormula(negativeshiftsummary);
+				e.summary = tmpformula.getSummary();
+				targetnode++;
+				e.targetnode = targetnode;
+				e.targetion = l2h_ion;
+				e.massdifference = graph[e.targetnode].getMZRatio();
+
 				graph[0].insertTempEdge(e);
 			}
 
@@ -385,7 +533,20 @@ int cDeNovoGraph::createGraph(bool& terminatecomputation) {
 				node.setIntensity(0);
 				node.addIonAnnotation(l1oh_ion);
 				graph.push_back(node);
-				e.targetnode++;
+
+				e.clear();
+				e.composition = "0";
+				e.startmodifID = i;
+				tmpformula.clear();
+				tmpformula.addFormula(parameters->fragmentdefinitions[l1oh_ion].summary);
+				tmpformula.addFormula(parameters->searchedmodifications[i].summary);
+				tmpformula.addFormula(negativeshiftsummary);
+				e.summary = tmpformula.getSummary();
+				targetnode++;
+				e.targetnode = targetnode;
+				e.targetion = l1oh_ion;
+				e.massdifference = graph[e.targetnode].getMZRatio();
+
 				graph[0].insertTempEdge(e);
 
 				node.clear();
@@ -393,16 +554,29 @@ int cDeNovoGraph::createGraph(bool& terminatecomputation) {
 				node.setIntensity(0);
 				node.addIonAnnotation(l2oh_ion);
 				graph.push_back(node);
-				e.targetnode++;
+
+				e.clear();
+				e.composition = "0";
+				e.startmodifID = i;
+				tmpformula.clear();
+				tmpformula.addFormula(parameters->fragmentdefinitions[l2oh_ion].summary);
+				tmpformula.addFormula(parameters->searchedmodifications[i].summary);
+				tmpformula.addFormula(negativeshiftsummary);
+				e.summary = tmpformula.getSummary();
+				targetnode++;
+				e.targetnode = targetnode;
+				e.targetion = l2oh_ion;
+				e.massdifference = graph[e.targetnode].getMZRatio();
+
 				graph[0].insertTempEdge(e);
-			}		
+			}
 	
 		}
 
 		lastsystemnode = (int)graph.size() - 1;
 		startnode = 1;
 		break;
-	case cyclicoligoketide:
+	case cyclicpolyketide:
 		node.clear();
 		node.setMZRatio(0);
 		node.setIntensity(0);
@@ -431,75 +605,30 @@ int cDeNovoGraph::createGraph(bool& terminatecomputation) {
 
 		e.clear();
 		e.composition = "0";
+		tmpformula.clear();
+		tmpformula.addFormula(parameters->fragmentdefinitions[l1h_ion].summary);
+		tmpformula.addFormula(negativeshiftsummary);
+		e.summary = tmpformula.getSummary();
 		e.targetnode = 1;
+		e.targetion = l1h_ion;
+		e.massdifference = graph[e.targetnode].getMZRatio();
 		graph[0].insertTempEdge(e);
 
 		e.clear();
 		e.composition = "0";
+		tmpformula.clear();
+		tmpformula.addFormula(parameters->fragmentdefinitions[l2h_ion].summary);
+		tmpformula.addFormula(negativeshiftsummary);
+		e.summary = tmpformula.getSummary();
 		e.targetnode = 2;
+		e.targetion = l2h_ion;
+		e.massdifference = graph[e.targetnode].getMZRatio();
 		graph[0].insertTempEdge(e);
 
-		e.clear();
+		/*e.clear();
 		e.composition = "0";
 		e.targetnode = 3;
-		graph[0].insertTempEdge(e);
-
-		lastsystemnode = (int)graph.size() - 1;
-		startnode = 1;
-		break;
-#endif
-	case linearpolysaccharide:
-		node.clear();
-		node.setMZRatio(0);
-		node.setIntensity(0);
-		node.addIonAnnotation(ms_nterminal_ion_hplus);
-		//node.addIonAnnotation(ms_cterminal_ion_hplus);
-		graph.push_back(node);
-
-		node.clear();
-		node.setMZRatio(H2O + Hplus + negativeshift);
-		node.setIntensity(0);
-		node.addIonAnnotation(ms_nterminal_ion_hplus);
-		graph.push_back(node);
-
-		//node.clear();
-		//node.setMZRatio(H2O + Hplus + negativeshift);
-		//node.setIntensity(0);
-		//node.addIonAnnotation(ms_cterminal_ion_hplus);
-		//graph.push_back(node);
-
-		e.clear();
-		e.composition = "0";
-		e.targetnode = 1;
-		graph[0].insertTempEdge(e);
-
-		//e.clear();
-		//e.composition = "0";
-		//e.targetnode = 2;
-		//graph[0].insertTempEdge(e);
-
-		for (i = 1; i < (int)parameters->searchedmodifications.size(); i++) {
-			node.clear();
-			
-			e.clear();
-			e.composition = "0";
-			e.targetnode = i + 1;//2;
-
-			//if (parameters->searchedmodifications[i].nterminal) {
-				node.setMZRatio(H2O + Hplus + parameters->searchedmodifications[i].massdifference + negativeshift);
-				node.setIntensity(0);
-				node.addIonAnnotation(ms_nterminal_ion_hplus);
-			//}
-
-			//if (parameters->searchedmodifications[i].cterminal) {
-			//	node.setMZRatio(H2O + Hplus + parameters->searchedmodifications[i].massdifference + negativeshift);
-			//	node.setIntensity(0);
-			//	node.addIonAnnotation(ms_cterminal_ion_hplus);
-			//}
-
-			graph.push_back(node);
-			graph[0].insertTempEdge(e);
-		}
+		graph[0].insertTempEdge(e);*/
 
 		lastsystemnode = (int)graph.size() - 1;
 		startnode = 1;
@@ -512,6 +641,7 @@ int cDeNovoGraph::createGraph(bool& terminatecomputation) {
 		return -1;
 	}
 
+	// sort(graph.begin() + startnode, graph.end(), compareNodes);
 
 	// initialize nodes by mzratios from a sorted peak list
 	for (i = 0; i < sortedpeaklist.size(); i++) {
@@ -584,11 +714,9 @@ int cDeNovoGraph::createGraph(bool& terminatecomputation) {
 			b.setMass(bricksdatabasewithcombinations.getMassOfComposition(combarray, numberofbasicbricks));
 			b.setComposition(compositionname, true);
 
-#if OLIGOKETIDES == 1
-			if (((parameters->peptidetype == linearoligoketide) || (parameters->peptidetype == cyclicoligoketide)) && !bricksdatabasewithcombinations.checkKetideBlocks(b)) {
+			if (((parameters->peptidetype == linearpolyketide) || (parameters->peptidetype == cyclicpolyketide)) && !bricksdatabasewithcombinations.checkKetideBlocks(b, parameters->regularblocksorder)) {
 				continue;
 			}
-#endif
 
 			bricksdatabasewithcombinations.push_back(b);
 		}
@@ -623,10 +751,8 @@ int cDeNovoGraph::createGraph(bool& terminatecomputation) {
 			for (int k = 0; k < (int)parameters->fragmentionsfordenovograph.size(); k++) { 
 				
 				if (/*!graph[i].ionannotation[parameters->fragmentionsfordenovograph[k]] ||*/ (parameters->fragmentionsfordenovograph[k] == precursor_ion)
-#if OLIGOKETIDES == 1
-					|| (parameters->fragmentionsfordenovograph[k] == linear_oligoketide_precursor_ion_h_h) || (parameters->fragmentionsfordenovograph[k] == linear_oligoketide_precursor_ion_h_oh) 
-					|| (parameters->fragmentionsfordenovograph[k] == linear_oligoketide_precursor_ion_oh_oh) || (parameters->fragmentionsfordenovograph[k] == cyclic_oligoketide_precursor_ion)
-#endif
+					|| (parameters->fragmentionsfordenovograph[k] == linear_polyketide_precursor_ion_h_h) || (parameters->fragmentionsfordenovograph[k] == linear_polyketide_precursor_ion_h_oh) 
+					|| (parameters->fragmentionsfordenovograph[k] == linear_polyketide_precursor_ion_oh_oh) || (parameters->fragmentionsfordenovograph[k] == cyclic_polyketide_precursor_ion)
 					) {
 					continue;
 				}
@@ -634,23 +760,14 @@ int cDeNovoGraph::createGraph(bool& terminatecomputation) {
 				for (int m = 0; m < (int)parameters->fragmentionsfordenovograph.size(); m++) {
 					
 					// test for incompatible ion series
-					if (
-#if OLIGOKETIDES == 1
-						(
-#endif
-						!((parameters->fragmentdefinitions[parameters->fragmentionsfordenovograph[k]].nterminal == parameters->fragmentdefinitions[parameters->fragmentionsfordenovograph[m]].nterminal) && 
-						(parameters->fragmentdefinitions[parameters->fragmentionsfordenovograph[k]].cterminal == parameters->fragmentdefinitions[parameters->fragmentionsfordenovograph[m]].cterminal)) 
-#if OLIGOKETIDES == 1
-						||
-						(((parameters->peptidetype == linearoligoketide) || (parameters->peptidetype == cyclicoligoketide)) && 
+					if ((!((parameters->fragmentdefinitions[parameters->fragmentionsfordenovograph[k]].nterminal == parameters->fragmentdefinitions[parameters->fragmentionsfordenovograph[m]].nterminal) && 
+						(parameters->fragmentdefinitions[parameters->fragmentionsfordenovograph[k]].cterminal == parameters->fragmentdefinitions[parameters->fragmentionsfordenovograph[m]].cterminal)) ||
+						(((parameters->peptidetype == linearpolyketide) || (parameters->peptidetype == cyclicpolyketide)) && 
 						!(/*((parameters->fragmentionsfordenovograph[k] == l0h_ion) && (parameters->fragmentionsfordenovograph[m] == l0h_ion)) ||*/ ((parameters->fragmentionsfordenovograph[k] == l1h_ion) && (parameters->fragmentionsfordenovograph[m] == l1h_ion)) || ((parameters->fragmentionsfordenovograph[k] == l2h_ion) && (parameters->fragmentionsfordenovograph[m] == l2h_ion))
-						|| ((parameters->fragmentionsfordenovograph[k] == l1oh_ion) && (parameters->fragmentionsfordenovograph[m] == l1oh_ion)) || ((parameters->fragmentionsfordenovograph[k] == l2oh_ion) && (parameters->fragmentionsfordenovograph[m] == l2oh_ion))))
-						)						
-						&& (parameters->fragmentionsfordenovograph[m] != linear_oligoketide_precursor_ion_h_h) && (parameters->fragmentionsfordenovograph[m] != linear_oligoketide_precursor_ion_h_oh)
-						&& (parameters->fragmentionsfordenovograph[m] != linear_oligoketide_precursor_ion_oh_oh) && (parameters->fragmentionsfordenovograph[m] != cyclic_oligoketide_precursor_ion)
-#endif
-						&& (parameters->fragmentionsfordenovograph[m] != precursor_ion)
-						) {
+						|| ((parameters->fragmentionsfordenovograph[k] == l1oh_ion) && (parameters->fragmentionsfordenovograph[m] == l1oh_ion)) || ((parameters->fragmentionsfordenovograph[k] == l2oh_ion) && (parameters->fragmentionsfordenovograph[m] == l2oh_ion)))))						
+						&& (parameters->fragmentionsfordenovograph[m] != linear_polyketide_precursor_ion_h_h) && (parameters->fragmentionsfordenovograph[m] != linear_polyketide_precursor_ion_h_oh)
+						&& (parameters->fragmentionsfordenovograph[m] != linear_polyketide_precursor_ion_oh_oh) && (parameters->fragmentionsfordenovograph[m] != cyclic_polyketide_precursor_ion)
+						&& (parameters->fragmentionsfordenovograph[m] != precursor_ion)) {
 						continue;
 					}
 
@@ -658,40 +775,26 @@ int cDeNovoGraph::createGraph(bool& terminatecomputation) {
 					for (int n = 0; n < (int)parameters->searchedmodifications.size(); n++) {
 
 						if ((n > 0) && (parameters->fragmentionsfordenovograph[m] != precursor_ion)
-#if OLIGOKETIDES == 1
-							&& (parameters->fragmentionsfordenovograph[m] != linear_oligoketide_precursor_ion_h_h) && (parameters->fragmentionsfordenovograph[m] != linear_oligoketide_precursor_ion_h_oh)
-							&& (parameters->fragmentionsfordenovograph[m] != linear_oligoketide_precursor_ion_oh_oh) && (parameters->fragmentionsfordenovograph[m] != cyclic_oligoketide_precursor_ion)
-#endif			
-							) {
+							&& (parameters->fragmentionsfordenovograph[m] != linear_polyketide_precursor_ion_h_h) && (parameters->fragmentionsfordenovograph[m] != linear_polyketide_precursor_ion_h_oh)
+							&& (parameters->fragmentionsfordenovograph[m] != linear_polyketide_precursor_ion_oh_oh) && (parameters->fragmentionsfordenovograph[m] != cyclic_polyketide_precursor_ion)) {
 							continue;
 						}
 
 						// middle modifications for branched and branch-cyclic peptides
 						for (int p = 0; p < (int)parameters->searchedmodifications.size(); p++) {
 
-							if ((p > 0) && ((parameters->peptidetype == linear) || (parameters->peptidetype == cyclic) || (parameters->peptidetype == linearpolysaccharide)
-#if OLIGOKETIDES == 1
-								|| (parameters->peptidetype == linearoligoketide) || (parameters->peptidetype == cyclicoligoketide)
-#endif						
-								)) {
+							if ((p > 0) && ((parameters->peptidetype == linear) || (parameters->peptidetype == cyclic)
+								|| (parameters->peptidetype == linearpolyketide) || (parameters->peptidetype == cyclicpolyketide))) {
 								continue;
 							}
 
 							termmass = 0;
 
-#if OLIGOKETIDES == 1
 							if ((parameters->fragmentionsfordenovograph[m] == precursor_ion) 
-								|| (parameters->fragmentionsfordenovograph[m] == linear_oligoketide_precursor_ion_h_h) || (parameters->fragmentionsfordenovograph[m] == linear_oligoketide_precursor_ion_h_oh)
-								|| (parameters->fragmentionsfordenovograph[m] == linear_oligoketide_precursor_ion_oh_oh) || (parameters->fragmentionsfordenovograph[m] == cyclic_oligoketide_precursor_ion)) {
-#else
-							if (parameters->fragmentionsfordenovograph[m] == precursor_ion) {
-#endif
+								|| (parameters->fragmentionsfordenovograph[m] == linear_polyketide_precursor_ion_h_h) || (parameters->fragmentionsfordenovograph[m] == linear_polyketide_precursor_ion_h_oh)
+								|| (parameters->fragmentionsfordenovograph[m] == linear_polyketide_precursor_ion_oh_oh) || (parameters->fragmentionsfordenovograph[m] == cyclic_polyketide_precursor_ion)) {
 
-								if ((parameters->peptidetype == linear) || (parameters->peptidetype == linearpolysaccharide)
-#if OLIGOKETIDES == 1
-									|| (parameters->peptidetype == linearoligoketide)
-#endif
-									) {
+								if ((parameters->peptidetype == linear) || (parameters->peptidetype == linearpolyketide)) {
 									if ((n > 0) && ((parameters->fragmentdefinitions[parameters->fragmentionsfordenovograph[k]].nterminal && parameters->searchedmodifications[n].nterminal) || (parameters->fragmentdefinitions[parameters->fragmentionsfordenovograph[k]].cterminal && parameters->searchedmodifications[n].cterminal))) {
 										continue;
 									}
@@ -708,6 +811,10 @@ int cDeNovoGraph::createGraph(bool& terminatecomputation) {
 							}
 
 							for (int z1 = 1; z1 <= abs(parameters->precursorcharge); z1++) {
+
+								if ((z1 > 1) && (i <= lastsystemnode)) {
+									break;
+								}
 
 								for (int z2 = 1; z2 <= abs(parameters->precursorcharge); z2++) {
 
@@ -766,20 +873,30 @@ int cDeNovoGraph::createGraph(bool& terminatecomputation) {
 												}
 
 												// irrelevant connection with precursor
-#if OLIGOKETIDES == 1
 												if (((parameters->fragmentionsfordenovograph[m] == precursor_ion) 
-													|| (parameters->fragmentionsfordenovograph[m] == linear_oligoketide_precursor_ion_h_h) || (parameters->fragmentionsfordenovograph[m] == linear_oligoketide_precursor_ion_h_oh)
-													|| (parameters->fragmentionsfordenovograph[m] == linear_oligoketide_precursor_ion_oh_oh) || (parameters->fragmentionsfordenovograph[m] == cyclic_oligoketide_precursor_ion)) 
+													|| (parameters->fragmentionsfordenovograph[m] == linear_polyketide_precursor_ion_h_h) || (parameters->fragmentionsfordenovograph[m] == linear_polyketide_precursor_ion_h_oh)
+													|| (parameters->fragmentionsfordenovograph[m] == linear_polyketide_precursor_ion_oh_oh) || (parameters->fragmentionsfordenovograph[m] == cyclic_polyketide_precursor_ion)) 
 													&& (middle != (int)graph.size() - 1) && (i != (int)graph.size() - 1)) {
-#else
-												if ((parameters->fragmentionsfordenovograph[m] == precursor_ion) && (middle != (int)graph.size() - 1) && (i != (int)graph.size() - 1)) {
-#endif
 													middle++;
 													continue;
 												}
 																								
 												// create an edge
 												cEdge e;
+
+												formula.clear();
+												string sumstr = bricksdatabasewithcombinations.calculateSummaryFromComposition(j);
+												formula.addFormula(sumstr);
+												formula.addFormula(parameters->fragmentdefinitions[parameters->fragmentionsfordenovograph[k]].summary, true);
+												formula.addFormula(parameters->fragmentdefinitions[parameters->fragmentionsfordenovograph[m]].summary);
+
+												if ((parameters->peptidetype == branched) || (parameters->peptidetype == branchcyclic)) {
+													formula.addFormula(parameters->searchedmodifications[p].summary);
+												}
+
+												if (termmass != 0) {
+													formula.addFormula(parameters->searchedmodifications[n].summary);
+												}
 									
 												if (i == (int)graph.size() - 1) {
 													e.targetnode = i;
@@ -790,8 +907,11 @@ int cDeNovoGraph::createGraph(bool& terminatecomputation) {
 													e.targetcharge = (parameters->precursorcharge > 0)?z1:-z1;
 													e.targetintensity = graph[i].getIntensity();
 													e.composition = bricksdatabasewithcombinations[j].getComposition();
+													e.summary = formula.getSummary();
 													e.endmodifID = n;
 													e.middlemodifID = p;
+													e.sourceion = parameters->fragmentionsfordenovograph[k];
+													e.targetion = parameters->fragmentionsfordenovograph[m];
 
 													// insert the new edge and/or attach the annotation to the source node if the edge exists
 													graph[middle].insertTempEdge(e);
@@ -805,12 +925,12 @@ int cDeNovoGraph::createGraph(bool& terminatecomputation) {
 													e.targetcharge = (parameters->precursorcharge > 0)?z2:-z2;
 													e.targetintensity = graph[middle].getIntensity();
 													e.composition = bricksdatabasewithcombinations[j].getComposition();
+													e.summary = formula.getSummary();
 													e.endmodifID = n;
 													e.middlemodifID = p;
 
 													// insert the new edge and/or attach the annotation to the source node if the edge exists
 													graph[i].insertTempEdge(e);
-
 												}
 
 												usedbrick = true;
@@ -865,7 +985,7 @@ int cDeNovoGraph::createGraph(bool& terminatecomputation) {
 
 
 int cDeNovoGraph::removeEdgesFormingPathsNotFinishingInPrecursor(bool& terminatecomputation) {
-	*os << "Removing edges forming blind paths (not finishing in the precursor)... ";
+	*os << "Removing edges forming incomplete paths (not finishing in the precursor)... ";
 	double neutralprecursormass = uncharge(parameters->precursormass, parameters->precursorcharge);
 	bool removed = true;
 	bool isprecursor;
@@ -912,7 +1032,7 @@ int cDeNovoGraph::removeEdgesFormingPathsNotFinishingInPrecursor(bool& terminate
 	
 
 int cDeNovoGraph::removeEdgesFormingPathsNotStartingFromFirstNode(bool& terminatecomputation) {
-	*os << "Removing edges forming blind paths (not starting from the first node)... ";
+	*os << "Removing edges forming incomplete paths (not starting from the first node)... ";
 	bool removed = true;
 	int edgesremoved = 0;
 	bool match;
@@ -957,7 +1077,7 @@ int cDeNovoGraph::removeEdgesFormingPathsNotStartingFromFirstNode(bool& terminat
 
 int cDeNovoGraph::connectEdgesFormingPathsNotFinishingInPrecursor(bool& terminatecomputation) {
 	*os << "Connecting edges with the precursor's node to generate sequence tags... ";
-	//*os << "Connecting edges forming blind paths (not finishing in the precursor)... ";
+	//*os << "Connecting edges forming incomplete paths (not finishing in the precursor)... ";
 	int edgescreated = 0;
 	int precursorposition = (int)graph.size() - 1;
 
@@ -996,6 +1116,7 @@ int cDeNovoGraph::connectEdgesFormingPathsNotFinishingInPrecursor(bool& terminat
 			b.setArtificial(true);
 			bricksdatabasewithcombinations.push_back(b);
 
+
 			// -H2O brick (1)
 			b.setName(to_string(e.massdifference - H2O));
 			b.setAcronyms(to_string(e.massdifference - H2O));
@@ -1016,8 +1137,6 @@ int cDeNovoGraph::connectEdgesFormingPathsNotFinishingInPrecursor(bool& terminat
 			b.setArtificial(true);
 			bricksdatabasewithcombinations.push_back(b);
 
-#if OLIGOKETIDES == 1
-
 			// -H2 brick (3)
 			b.setName(to_string(e.massdifference - 2*H));
 			b.setAcronyms(to_string(e.massdifference - 2*H));
@@ -1037,7 +1156,7 @@ int cDeNovoGraph::connectEdgesFormingPathsNotFinishingInPrecursor(bool& terminat
 			b.setComposition(to_string((int)bricksdatabasewithcombinations.size() + 1), false);
 			b.setArtificial(true);
 			bricksdatabasewithcombinations.push_back(b);
-
+/*
 			// +O brick (5)
 			b.setName(to_string(e.massdifference + O));
 			b.setAcronyms(to_string(e.massdifference + O));
@@ -1077,8 +1196,8 @@ int cDeNovoGraph::connectEdgesFormingPathsNotFinishingInPrecursor(bool& terminat
 			b.setComposition(to_string((int)bricksdatabasewithcombinations.size() + 1), false);
 			b.setArtificial(true);
 			bricksdatabasewithcombinations.push_back(b);
+*/
 
-#endif
 		//}
 
 	}
@@ -1093,7 +1212,7 @@ int cDeNovoGraph::connectEdgesFormingPathsNotFinishingInPrecursor(bool& terminat
 
 int cDeNovoGraph::connectEdgesFormingPathsNotStartingFromFirstNode(bool& terminatecomputation) {
 	*os << "Connecting edges with the starting node to generate sequence tags... ";
-	//*os << "Connecting edges forming blind paths (not starting from the first node)... ";
+	//*os << "Connecting edges forming incomplete paths (not starting from the first node)... ";
 	int edgescreated = 0;
 	//bool match;
 
@@ -1241,7 +1360,7 @@ void cDeNovoGraph::printPaths(cMainThread* os, cDeNovoGraphNode& node, vector<st
 		path.push_back(s);
 
 		vector<nodeEdge> tmp;
-		cCandidate candidate(composition, tmp, 0, 0, 0, -1);
+		cCandidate candidate(composition, tmp, fragmentIonTypeEnd, 0, 0, 0, -1);
 	
 		*os << "bricks: " << getNumberOfBricks(candidate.getComposition()) << " edges: " << composition.size() << " composition: ";
 		*os << candidate.getComposition();
@@ -1261,7 +1380,7 @@ void cDeNovoGraph::printPaths(cMainThread* os, cDeNovoGraphNode& node, vector<st
 
 
 string cDeNovoGraph::printGraph() {
-	const int edgesmaxreport = 100;
+	const int edgesmaxreport = 200;
 	string s, s2;
 	string g = "";
 
@@ -1304,6 +1423,9 @@ string cDeNovoGraph::printGraph() {
 			if (graph[i][j].endmodifID > 0) {
 				g += ", terminal modification: " + parameters->searchedmodifications[graph[i][j].endmodifID].name;
 			}
+			g += ", summary: " + graph[i][j].summary;
+			//g += ", source annotation" + to_string(graph[i][j].sourceion);
+			//g += ", target annotation" + to_string(graph[i][j].targetion);
 			//g += graph[i][j].printSourceAnnotation(fragmentdefinitions);
 			//g += "->";
 			//g += graph[i][j].printTargetAnnotation(fragmentdefinitions);

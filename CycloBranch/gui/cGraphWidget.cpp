@@ -25,7 +25,7 @@ cGraphWidget::cGraphWidget() {
 
 	setLayout(layout);
 
-	resize(1280, 700);
+	resize(1280, 750);
 }
 
 
@@ -49,6 +49,7 @@ string cGraphWidget::getHTML() {
 
 void cGraphWidget::closeEvent(QCloseEvent *event) {
 	hide();
+	event->accept();
 }
 
 
@@ -70,10 +71,12 @@ void cGraphWidget::keyPressEvent(QKeyEvent *event) {
 
 	if (event->key() == Qt::Key_F1) {
 		#if OS_TYPE == WIN
-			QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo("docs/html/menubar.html").absoluteFilePath()));
+			QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo("docs/html/mainwindow.html").absoluteFilePath()));
 		#else
-			QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo(installdir + "docs/html/menubar.html").absoluteFilePath()));
+			QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo(installdir + "docs/html/mainwindow.html").absoluteFilePath()));
 		#endif
 	}
+
+	event->accept();
 }
 

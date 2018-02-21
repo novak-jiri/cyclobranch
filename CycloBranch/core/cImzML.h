@@ -87,6 +87,8 @@ class cImzML {
 	DOMDocument* document;
 
 	bool profilespectra;
+	bool use_64bit_precision;
+	bool continuous;
 	vector<cImzMLItem> imzmlitems;
 
 public:
@@ -130,6 +132,13 @@ public:
 		\retval bool true if the file contains profile spectra
 	*/ 
 	bool hasProfileSpectra();
+
+
+	/**
+		\brief Check the precision of data.
+		\retval bool if true, 64bit precision is used; if false, 32bit precision is used
+	*/ 
+	bool use64BitPrecision();
 
 
 	/**

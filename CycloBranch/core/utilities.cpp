@@ -4,7 +4,7 @@
 
 
 QString appname = "CycloBranch";
-QString appversion = "v. 1.1.170 (64-bit)";
+QString appversion = "v. 1.1.570 (64-bit)";
 
 
 #if OS_TYPE == UNX
@@ -74,16 +74,11 @@ bool checkRegex(ePeptideType peptidetype, string& sequence, string& errormessage
 	switch (peptidetype)
 	{
 	case linear:
-	case linearpolysaccharide:
-#if OLIGOKETIDES == 1
-	case linearoligoketide:
-#endif
+	case linearpolyketide:
 		rx = "^\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])*$";
 		break;
 	case cyclic:
-#if OLIGOKETIDES == 1
-	case cyclicoligoketide:
-#endif
+	case cyclicpolyketide:
 		rx = "^\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])+$";
 		break;
 	case branched:
@@ -186,16 +181,11 @@ ePeptideType getPeptideTypeFromString(string& s) {
 	if (s.compare("branch-cyclic") == 0) {
 		return branchcyclic;
 	}
-#if OLIGOKETIDES == 1
-	if (s.compare("linear-oligoketide") == 0) {
-		return linearoligoketide;
+	if (s.compare("linear-polyketide") == 0) {
+		return linearpolyketide;
 	}
-	if (s.compare("cyclic-oligoketide") == 0) {
-		return cyclicoligoketide;
-	}
-#endif
-	if (s.compare("linear-polysaccharide") == 0) {
-		return linearpolysaccharide;
+	if (s.compare("cyclic-polyketide") == 0) {
+		return cyclicpolyketide;
 	}
 	if (s.compare("other") == 0) {
 		return other;
@@ -220,16 +210,11 @@ string getStringFromPeptideType(ePeptideType peptidetype) {
 	case branchcyclic:
 		return "branch-cyclic";
 		break;
-#if OLIGOKETIDES == 1
-	case linearoligoketide:
-		return "linear-oligoketide";
+	case linearpolyketide:
+		return "linear-polyketide";
 		break;
-	case cyclicoligoketide:
-		return "cyclic-oligoketide";
-		break;
-#endif
-	case linearpolysaccharide:
-		return "linear-polysaccharide";
+	case cyclicpolyketide:
+		return "cyclic-polyketide";
 		break;
 	case other:
 		return "other";
@@ -248,5 +233,18 @@ double cropPrecisionToSixDecimals(double value) {
 	sprintf_s(buffer, "%.6f\0", value);
 	sscanf_s(buffer, "%lf", &val);
 	return val;
+}
+
+
+QByteArray cropPrecisionToSixDecimalsByteArray(double value) {
+	char buffer[50];
+	sprintf_s(buffer, "%.6f\0", value);
+	QByteArray bytearray = buffer;
+	return bytearray;
+}
+
+
+bool operator == (cCoordinates const& a, cCoordinates const& b) {
+	return ((a.x == b.x) && (a.y == b.y) && (a.id == b.id));
 }
 

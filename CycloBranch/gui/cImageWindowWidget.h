@@ -8,16 +8,17 @@
 #define _CIMAGEWINDOWWIDGET_H
 
 #include <QWidget>
-#include <QPainter>
-#include <QPaintEvent>
+#include <QGraphicsView>
 #include <QPixmap>
 #include <QImage>
+#include <unordered_set>
+#include "core/utilities.h"
 
 
 /**
 	\brief Image window widget.
 */
-class cImageWindowWidget : public QWidget
+class cImageWindowWidget : public QGraphicsView
 {
 	Q_OBJECT
 
@@ -44,22 +45,118 @@ public:
 	void setPixmap(QImage* image);
 
 
-private:
+	/**
+		\brief Get the image.
+		\retval QImage image
+	*/ 
+	QImage getImage();
 
-	QPixmap* pixmap;
+
+	/**
+		\brief Set points.
+		\param coordinates a vector of coordinates
+	*/ 
+	void setCoordinates(vector<cCoordinates>& coordinates);
 
 
-	void paint(QPainter& painter);
+	/**
+		\brief Set the maximum X and Y coordinates.
+		\param maxx maximum X coordinate
+		\param maxy maximum Y coordinate
+		\param leftmargin left margin
+		\param topmargin top margin
+	*/ 
+	void setMaxXY(int maxx, int maxy, int leftmargin, int topmargin);
 
 
 protected:
 
 
 	/**
-		\brief Handle the paint event.
-		\param event pointer to QPaintEvent
+		\brief Handle the mouse wheel event.
+		\param event pointer to QWheelEvent
 	*/ 
-	void paintEvent(QPaintEvent *event);
+	void wheelEvent(QWheelEvent *event);
+
+
+	/**
+		\brief Handle the mouse press event.
+		\param event pointer to QMouseEvent
+	*/ 
+	void mousePressEvent(QMouseEvent *event);
+
+
+	/**
+		\brief Handle the mouse move event.
+		\param event pointer to QMouseEvent
+	*/ 
+	void mouseMoveEvent(QMouseEvent *event);
+
+
+	/**
+		\brief Handle the mouse release event.
+		\param event pointer to QMouseEvent
+	*/ 
+	void mouseReleaseEvent(QMouseEvent *event);
+
+
+signals:
+
+
+	/**
+		\brief The signal is emitted when the selection of points has changed.
+		\param xmin minimum x coordinate
+		\param xmax maximum x coordinate
+		\param ymin minimum y coordinate
+		\param ymax maximum y coordinate
+	*/ 
+	void updateFilter(int xmin, int xmax, int ymin, int ymax);
+
+
+private:
+
+
+	QGraphicsScene* scene;
+	QPixmap* pixmap;
+	vector<cCoordinates> coordinates;
+
+	int maxx;
+	int maxy;
+	int leftmargin;
+	int topmargin;
+	qreal currentscale;
+	qreal factor;
+	bool ispixmapdefined;
+	bool ismaxxydefined;
+	bool enablemouseselection;
+
+	int pressedx;
+	int pressedy;
+	int currentx;
+	int currenty;
+	int currentwidth;
+	int currentheight;
+
+	QGraphicsItemGroup* selectiongroup;
+	QGraphicsRectItem* selectionrect;
+	QGraphicsSimpleTextItem* selectionsimpletextitem;
+
+	void redrawScene();
+
+	void updateSelectionGroup();
+
+
+private slots:
+
+
+	void zoomIn();
+
+
+	void zoomOut();
+
+
+	void normalSize();
+
 
 };
 

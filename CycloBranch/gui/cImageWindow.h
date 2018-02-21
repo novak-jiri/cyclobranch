@@ -7,8 +7,10 @@
 #ifndef _CIMAGEWINDOW_H
 #define _CIMAGEWINDOW_H
 
-#include <QWidget>
+#include <QMainWindow>
 #include <QDesktopServices>
+#include <QToolBar>
+#include <QAction>
 #include "core/utilities.h"
 #include "gui/cImageWindowWidget.h"
 
@@ -18,12 +20,18 @@ class QHBoxLayout;
 class QVBoxLayout;
 class QPushButton;
 class QImage;
+class QLabel;
+class QSpinBox;
+class QAction;
+class QToolBar;
+class QMenuBar;
+class QMenu;
 
 
 /**
 	\brief Image window.
 */
-class cImageWindow : public QWidget
+class cImageWindow : public QMainWindow
 {
 	Q_OBJECT
 
@@ -53,13 +61,57 @@ public:
 private:
 
 	QWidget* parent;
-	QPushButton* close;
-	QPushButton* loadimagebutton;
+
+	QMenuBar* menuBar;
+	QMenu* menuFile;
+	QMenu* menuZoom;
+	QMenu* menuHelp;
+	
+	QToolBar* toolbarFile;
+	QAction* actionOpenImage;
+	QAction* actionSaveImage;
+	QAction* actionCloseWindow;
+
+	QToolBar* toolbarZoom;
+	QAction* actionZoomIn;
+	QAction* actionZoomOut;
+	QAction* actionZoomReset;
+	//QAction* actionViewAllPoints;
+
+	QToolBar* toolbarRegion;
+	QWidget* regionwidget;
+	QHBoxLayout* regionhbox;
+	QLabel* xfromlabel;
+	QSpinBox* xfrom;
+	QLabel* xtolabel;
+	QSpinBox* xto;
+	QLabel* yfromlabel;
+	QSpinBox* yfrom;
+	QLabel* ytolabel;
+	QSpinBox* yto;
+	QPushButton* setregionbutton;
+	QPushButton* resetregionbutton;
+
+	QToolBar* toolbarMaxCoordinates;
+	QWidget* maxcoordinateswidget;
+	QHBoxLayout* maxcoordinateshbox;
+	QLabel* maxxlabel;
+	QSpinBox* maxx;
+	QLabel* maxylabel;
+	QSpinBox* maxy;
+	QLabel* leftmarginlabel;
+	QSpinBox* leftmargin;
+	QLabel* topmarginlabel;
+	QSpinBox* topmargin;
+	QPushButton* setmaxbutton;
+
+	QToolBar* toolbarHelp;
+	QAction* actionHTMLDocumentation;
 
 	QImage* image;
 	cImageWindowWidget* imagewindowwidget;
-	QHBoxLayout* buttons;
 	QVBoxLayout* mainlayout;
+	QWidget* mainwidget;
 
 	QString lastimagedir;
 
@@ -79,7 +131,42 @@ private slots:
 
 	void closeWindow();
 
-	void loadImage();
+
+	void openImage();
+
+
+	void saveImage();
+
+
+	void setCoordinates(vector<cCoordinates> coordinates);
+
+
+	void setMaxButtonReleased();
+
+
+	void setRegionButtonReleased();
+
+
+	void showHTMLDocumentation();
+
+
+	void updateSelection(int xmin, int xmax, int ymin, int ymax);
+
+	
+	void resetSelection();
+
+
+signals:
+
+
+	/**
+		\brief The signal is emitted when the region selection was changed.
+		\param xmin minimum x coordinate
+		\param xmax maximum x coordinate
+		\param ymin minimum y coordinate
+		\param ymax maximum y coordinate
+	*/ 
+	void updateSummaryPeaksTableFilter(int xmin, int xmax, int ymin, int ymax); 
 
 };
 

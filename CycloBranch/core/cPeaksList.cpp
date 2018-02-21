@@ -127,48 +127,97 @@ void cPeaksList::loadFromBAFStream(ifstream &stream) {
 }
 
 
-void cPeaksList::loadFromIBDStream(cImzMLItem& imzmlitem, ifstream &ibdstream) {
-	unsigned long long start;
-	double value;
+void cPeaksList::loadFromIBDStream(cImzMLItem& imzmlitem, ifstream &ibdstream, bool use_64bit_precision) {
+	if (use_64bit_precision) {
+		unsigned long long start;
+		double value;
 
-	peaks.resize(imzmlitem.mzlength/8);
+		peaks.resize(imzmlitem.mzlength/8);
 
-	start = imzmlitem.mzstart;
-	ibdstream.seekg(start, ibdstream.beg);
-	for (int i = 0; i < (int)imzmlitem.mzlength/8; i++) {
-		if (ibdstream.good()) {
-			ibdstream.read((char*)&value, 8);
-			peaks[i].mzratio = value;
+		start = imzmlitem.mzstart;
+		ibdstream.seekg(start, ibdstream.beg);
+		for (int i = 0; i < (int)imzmlitem.mzlength/8; i++) {
+			if (ibdstream.good()) {
+				ibdstream.read((char*)&value, 8);
+				peaks[i].mzratio = value;
+			}
 		}
-	}
 
-	if (imzmlitem.mzlength != imzmlitem.intensitylength) {
-		return;
-	}
-
-	start = imzmlitem.intensitystart;
-	ibdstream.seekg(start, ibdstream.beg);
-	for (int i = 0; i < (int)imzmlitem.intensitylength/8; i++) {
-		if (ibdstream.good()) {
-			ibdstream.read((char*)&value, 8);
-			peaks[i].intensity = value;
+		if (imzmlitem.mzlength != imzmlitem.intensitylength) {
+			return;
 		}
-	}
 
-	x = imzmlitem.x;
-	y = imzmlitem.y;
+		start = imzmlitem.intensitystart;
+		ibdstream.seekg(start, ibdstream.beg);
+		for (int i = 0; i < (int)imzmlitem.intensitylength/8; i++) {
+			if (ibdstream.good()) {
+				ibdstream.read((char*)&value, 8);
+				peaks[i].intensity = value;
+			}
+		}
+
+		x = imzmlitem.x;
+		y = imzmlitem.y;
+	}
+	else {
+		unsigned start;
+		float value;
+
+		peaks.resize(imzmlitem.mzlength/4);
+
+		start = imzmlitem.mzstart;
+		ibdstream.seekg(start, ibdstream.beg);
+		for (int i = 0; i < (int)imzmlitem.mzlength/4; i++) {
+			if (ibdstream.good()) {
+				ibdstream.read((char*)&value, 4);
+				peaks[i].mzratio = value;
+			}
+		}
+
+		if (imzmlitem.mzlength != imzmlitem.intensitylength) {
+			return;
+		}
+
+		start = imzmlitem.intensitystart;
+		ibdstream.seekg(start, ibdstream.beg);
+		for (int i = 0; i < (int)imzmlitem.intensitylength/4; i++) {
+			if (ibdstream.good()) {
+				ibdstream.read((char*)&value, 4);
+				peaks[i].intensity = value;
+			}
+		}
+
+		x = imzmlitem.x;
+		y = imzmlitem.y;
+	}
 }
 
 
-void cPeaksList::storeToIBDStream(ofstream &ibdstream) {
-	// store m/z values
-	for (int i = 0; i < (int)peaks.size(); i++) {
-		ibdstream.write((char *)&(peaks[i].mzratio), 8);
-	}
+void cPeaksList::storeToIBDStream(ofstream &ibdstream, bool use_64bit_precision) {
+	if (use_64bit_precision) {
+		// store m/z values
+		for (int i = 0; i < (int)peaks.size(); i++) {
+			ibdstream.write((char *)&(peaks[i].mzratio), 8);
+		}
 
-	// store intensities
-	for (int i = 0; i < (int)peaks.size(); i++) {
-		ibdstream.write((char *)&(peaks[i].intensity), 8);
+		// store intensities
+		for (int i = 0; i < (int)peaks.size(); i++) {
+			ibdstream.write((char *)&(peaks[i].intensity), 8);
+		}
+	}
+	else {
+		float value;
+		// store m/z values
+		for (int i = 0; i < (int)peaks.size(); i++) {
+			value = peaks[i].mzratio;
+			ibdstream.write((char *)&value, 4);
+		}
+
+		// store intensities
+		for (int i = 0; i < (int)peaks.size(); i++) {
+			value = peaks[i].intensity;
+			ibdstream.write((char *)&value, 4);
+		}
 	}
 }
 

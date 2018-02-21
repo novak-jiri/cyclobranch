@@ -30,6 +30,7 @@ int main(int argc, char** argv) {
 	qRegisterMetaType<vector<fragmentDescription> >("vector<fragmentDescription>");
 	qRegisterMetaType<string>("string");
 	qRegisterMetaType<cFragmentIons>("cFragmentIons");
+	qRegisterMetaType<vector<cCoordinates> >("vector<cCoordinates>");
 
 	QPixmap pixmap(":/images/splash.png");
 	QSplashScreen splash(pixmap);

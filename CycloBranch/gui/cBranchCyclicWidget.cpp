@@ -144,6 +144,7 @@ void cBranchCyclicWidget::paintEvent(QPaintEvent *event) {
 	painter.begin(this);
 	paint(painter);
 	painter.end();
+	event->accept();
 }
 
 

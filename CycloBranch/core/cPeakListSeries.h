@@ -85,11 +85,12 @@ public:
 		\param imzmlfilename imzML filename
 		\param ibdstream ibd binary file stream
 		\param minimumrelativeintensitythreshold a minimum threshold of relative intensity
+		\param fwhm FWHM
 		\param os pointer to the main thread of the application (output stream)
 		\param terminatecomputation reference to a variable determining that the computation must be stopped
 		\retval int 0 = success; -1 = aborted by user, -2 = error
 	*/ 
-	int loadFromIMZMLStream(string& imzmlfilename, ifstream &ibdstream, double minimumrelativeintensitythreshold, cMainThread* os, bool& terminatecomputation);
+	int loadFromIMZMLStream(string& imzmlfilename, ifstream &ibdstream, double minimumrelativeintensitythreshold, double fwhm, cMainThread* os, bool& terminatecomputation);
 
 
 	/**

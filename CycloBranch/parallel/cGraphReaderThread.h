@@ -44,7 +44,11 @@ private:
 	int scanmode;
 	bool* terminatecomputation;
 
-	int getCandidatesIter(bool cterminalstartingnode, cCandidateSet* candidates, int nodeid, vector<string>& composition, double precursormass, int startmodifID, int endmodifID, int middlemodifID, int middlepos, vector<nodeEdge>& perspectivepath, double cummass, bool* terminatecomputation);
+	int getCandidatesIter(eFragmentIonType startiontype, cCandidateSet* candidates, int nodeid, vector<string>& composition, double precursormass, int startmodifID, int endmodifID, int middlemodifID, int middlepos, vector<nodeEdge>& perspectivepath, double cummass, string& startsummary, bool* terminatecomputation);
+
+	double getCandidatePrecursorMass(string& startsummary, vector<nodeEdge>& perspectivepath);
+
+	cSummaryFormula getCandidateSummaryFormula(string& startsummary, vector<nodeEdge>& perspectivepath);
 
 public:
 

@@ -99,6 +99,7 @@ void cBranchedWidget::paintEvent(QPaintEvent *event) {
 	painter.begin(this);
 	paint(painter);
 	painter.end();
+	event->accept();
 }
 
 

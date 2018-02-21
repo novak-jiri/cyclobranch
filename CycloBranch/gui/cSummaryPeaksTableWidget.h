@@ -11,10 +11,17 @@
 #include <QDesktopServices>
 #include <QUrl>
 #include <QFileInfo>
-//#include <fstream>
+#include <QMainWindow>
+#include <QToolBar>
+#include <QAction>
+#include <QTableView>
+#include <QStandardItemModel>
+#include <QStandardItem>
+#include <QItemDelegate>
 #include "core/utilities.h"
-#include "core/cAllocator.h"
-#include "gui/cDelegate.h"
+#include "gui/cViewButtonDelegate.h"
+#include "gui/cSummaryPeaksTableProxyModel.h"
+#include "gui/cMainWindowProxyModel.h"
 
 using namespace std;
 
@@ -24,17 +31,17 @@ class cParameters;
 class cTheoreticalSpectrumList;
 class QHBoxLayout;
 class QVBoxLayout;
-class QTableWidget;
-class QTableWidgetItem;
 class QPushButton;
 class QCheckBox;
 class QLineEdit;
+class QMenuBar;
+class QMenu;
 
 
 /**
 	\brief Summary table of matched peaks.
 */
-class cSummaryPeaksTableWidget : public QWidget
+class cSummaryPeaksTableWidget : public QMainWindow
 {
 	Q_OBJECT
 
@@ -63,27 +70,47 @@ public:
 
 	/**
 		\brief Prepare the widget to show.
-		\param tablewidget a pointer to the main window table widget with the results 
+		\param resultsstandardmodel standard model of the tableview in the main application window 
+		\param resultsproxymodel proxy model of the tableview in the main application window 
 		\param parameters parameters of the application
 		\param spectralist list of spectra
 	*/ 
-	void prepareToShow(QTableWidget* tablewidget, cParameters* parameters, cTheoreticalSpectrumList* spectralist);
+	void prepareToShow(QStandardItemModel* resultsstandardmodel, cMainWindowProxyModel* resultsproxymodel, cParameters* parameters, cTheoreticalSpectrumList* spectralist);
 
 
 	/**
 		\brief Delete the table content.
-		\param enableprogress if true, the progress dialog is shown; if false, the dialog is hidden
 	*/ 
-	void deleteTable(bool enableprogress);
+	void deleteTable();
+
+
+	/**
+		\brief Update the filter using an image region.
+		\param xmin minimum x coordinate
+		\param xmax maximum x coordinate
+		\param ymin minimum y coordinate
+		\param ymax maximum y coordinate
+	*/ 
+	void updateFilterBySelectedRegion(int xmin, int xmax, int ymin, int ymax);
 
 
 private:
 
 	cParameters* parameters;
 	QWidget* parent;
-	QPushButton* close;
-	QPushButton* exportcsv;
 
+	QMenuBar* menuBar;
+	QMenu* menuFile;
+	QMenu* menuHelp;
+
+	QToolBar* toolbarFile;
+	QAction* actionExportCSV;
+	QAction* actionCloseWindow;
+
+	QToolBar* toolbarHelp;
+	QAction* actionHTMLDocumentation;
+
+	QToolBar* toolbarFilter;
 	QWidget* rowsfilterwidget;
 	QHBoxLayout* rowsfilterhbox;
 	QLineEdit* rowsfilterline;
@@ -91,16 +118,16 @@ private:
 	QPushButton* rowsfilterbutton;
 	QPushButton* rowsfilterclearbutton;
 
-	QTableWidget* database;
-	QHBoxLayout* buttons;
+	QTableView* database;
+	QStandardItemModel* databasemodel;
+	cSummaryPeaksTableProxyModel* proxymodel;
 	QVBoxLayout* mainlayout;
-
-	vector<int> headersort;
-	cDelegate columndelegate;
+	QWidget* mainwidget;
 
 	QString lastdirexporttocsv;
 
-	cAllocator<QTableWidgetItem> widgetitemallocator;
+	vector<cCoordinates> coordinates;
+	vector<cCoordinates> coordinates_orig;
 
 
 protected:
@@ -118,9 +145,6 @@ private slots:
 	void closeWindow();
 
 
-	void headerItemDoubleClicked(int index);
-
-
 	void filterRows();
 
 
@@ -130,6 +154,9 @@ private slots:
 	void exportToCsv();
 
 
+	void showHTMLDocumentation();
+
+
 signals:
 
 
@@ -137,6 +164,13 @@ signals:
 		\brief The table was not generated because the process was cancelled.
 	*/ 
 	void tableCancelled();
+
+	
+	/**
+		\brief Send the vector of coordinates.
+		\param coordinates a vector of coordinates x and y
+	*/ 
+	void sendCoordinates(vector<cCoordinates> coordinates);
 
 
 };

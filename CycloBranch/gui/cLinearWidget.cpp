@@ -120,6 +120,7 @@ void cLinearWidget::paintEvent(QPaintEvent *event) {
 	painter.begin(this);
 	paint(painter);
 	painter.end();
+	event->accept();
 }
 
 
@@ -176,50 +177,32 @@ void cLinearWidget::paint(QPainter& painter) {
 		int len = (int)theoreticalspectrum->getVisualCoverage()[0].series.size();
 
 		for (int i = 0; i < (int)parameters->fragmentionsfortheoreticalspectra.size(); i++) {
-#if OLIGOKETIDES == 1
 			if (((parameters->peptidetype == linear) && (parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].nterminal)) ||
-				((parameters->peptidetype == linearoligoketide) && ((parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].parent == l1h_ion) || (parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].parent == l2h_ion)
-				|| (parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].parent == l1oh_ion) || (parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].parent == l2oh_ion))))
-			{
-#else
-			if (parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].nterminal) {
-#endif
+				((parameters->peptidetype == linearpolyketide) && ((parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].parent == l1h_ion) || (parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].parent == l2h_ion)
+				|| (parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].parent == l1oh_ion) || (parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].parent == l2oh_ion)))) {
 				for (int j = 0; j < len; j++) {
 					if (theoreticalspectrum->getVisualCoverage()[i].series[j] > 0) {
-#if OLIGOKETIDES == 1
-						if (parameters->peptidetype == linearoligoketide) {
+						if (parameters->peptidetype == linearpolyketide) {
 							name = parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].name.substr(0, 2) + to_string(j + 1) + parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].name.substr(2);
 						}
 						else {
-#endif
 							name = parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].name[0] + to_string(j + 1) + parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].name.substr(1);
-#if OLIGOKETIDES == 1
 						}
-#endif
 						insertLabel(labels, leftmargin + horizontalstep/4 + horizontalstep/8 + horizontalstep*j + horizontalstep/2, topmargin - 35, name, false);
 					}
 				}
 			}
-#if OLIGOKETIDES == 1
 			if (((parameters->peptidetype == linear) && (parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].cterminal)) ||
-				((parameters->peptidetype == linearoligoketide) && ((parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].parent == r1h_ion) || (parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].parent == r2h_ion)
-				|| (parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].parent == r1oh_ion) || (parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].parent == r2oh_ion))))
-			{
-#else
-			if (parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].cterminal) {
-#endif
+				((parameters->peptidetype == linearpolyketide) && ((parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].parent == r1h_ion) || (parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].parent == r2h_ion)
+				|| (parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].parent == r1oh_ion) || (parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].parent == r2oh_ion)))) {
 				for (int j = len - 1; j >= 0; j--) {
 					if (theoreticalspectrum->getVisualCoverage()[i].series[len - j - 1] > 0) {
-#if OLIGOKETIDES == 1
-						if (parameters->peptidetype == linearoligoketide) {
+						if (parameters->peptidetype == linearpolyketide) {
 							name = parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].name.substr(0, 2) + to_string(len - j) + parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].name.substr(2);
 						}
 						else {
-#endif
 							name = parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].name[0] + to_string(len - j) + parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].name.substr(1);
-#if OLIGOKETIDES == 1
 						}
-#endif
 						insertLabel(labels, leftmargin + horizontalstep*(j + 1), topmargin + 35, name, false);
 					}
 				}

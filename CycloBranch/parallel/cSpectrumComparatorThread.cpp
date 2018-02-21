@@ -13,6 +13,12 @@ bool compareBandAllIonsDesc(const cTheoreticalSpectrum& a, const cTheoreticalSpe
 	if (a.getNumberOfMatchedPeaks() > b.getNumberOfMatchedPeaks()) {
 		return true;
 	}
+	if (a.getNumberOfMatchedPeaks() < b.getNumberOfMatchedPeaks()) {
+		return false;
+	}
+	if (a.getPathId() < b.getPathId()) {
+		return true;
+	}
 	return false;
 }
 
@@ -25,6 +31,12 @@ bool compareBBwaterLossAndAllIonsDesc(const cTheoreticalSpectrum& a, const cTheo
 		return false;
 	}
 	if (a.getNumberOfMatchedPeaks() > b.getNumberOfMatchedPeaks()) {
+		return true;
+	}
+	if (a.getNumberOfMatchedPeaks() < b.getNumberOfMatchedPeaks()) {
+		return false;
+	}
+	if (a.getPathId() < b.getPathId()) {
 		return true;
 	}
 	return false;
@@ -41,6 +53,12 @@ bool compareBBammoniaLossAndAllIonsDesc(const cTheoreticalSpectrum& a, const cTh
 	if (a.getNumberOfMatchedPeaks() > b.getNumberOfMatchedPeaks()) {
 		return true;
 	}
+	if (a.getNumberOfMatchedPeaks() < b.getNumberOfMatchedPeaks()) {
+		return false;
+	}
+	if (a.getPathId() < b.getPathId()) {
+		return true;
+	}
 	return false;
 }
 
@@ -53,6 +71,12 @@ bool compareYBandAllIonsDesc(const cTheoreticalSpectrum& a, const cTheoreticalSp
 		return false;
 	}
 	if (a.getNumberOfMatchedPeaks() > b.getNumberOfMatchedPeaks()) {
+		return true;
+	}
+	if (a.getNumberOfMatchedPeaks() < b.getNumberOfMatchedPeaks()) {
+		return false;
+	}
+	if (a.getPathId() < b.getPathId()) {
 		return true;
 	}
 	return false;
@@ -69,22 +93,55 @@ bool compareYandAllIonsDesc(const cTheoreticalSpectrum& a, const cTheoreticalSpe
 	if (a.getNumberOfMatchedPeaks() > b.getNumberOfMatchedPeaks()) {
 		return true;
 	}
+	if (a.getNumberOfMatchedPeaks() < b.getNumberOfMatchedPeaks()) {
+		return false;
+	}
+	if (a.getPathId() < b.getPathId()) {
+		return true;
+	}
 	return false;
 }
 
 
 bool compareWeightedIntensityDesc(const cTheoreticalSpectrum& a, const cTheoreticalSpectrum& b) {
-	return (a.getWeightedIntensityScore() > b.getWeightedIntensityScore());
+	if (a.getWeightedIntensityScore() > b.getWeightedIntensityScore()) {
+		return true;
+	}
+	if (a.getWeightedIntensityScore() < b.getWeightedIntensityScore()) {
+		return false;
+	}
+	if (a.getPathId() < b.getPathId()) {
+		return true;
+	}
+	return false;
 }
 
 
 bool compareNumberOfMatchedPeaksDesc(const cTheoreticalSpectrum& a, const cTheoreticalSpectrum& b) {
-	return (a.getNumberOfMatchedPeaks() > b.getNumberOfMatchedPeaks());
+	if (a.getNumberOfMatchedPeaks() > b.getNumberOfMatchedPeaks()) {
+		return true;
+	}
+	if (a.getNumberOfMatchedPeaks() < b.getNumberOfMatchedPeaks()) {
+		return false;
+	}
+	if (a.getPathId() < b.getPathId()) {
+		return true;
+	}
+	return false;
 }
 
 
 bool compareNumberOfMatchedBricksDesc(const cTheoreticalSpectrum& a, const cTheoreticalSpectrum& b) {
-	return (a.getNumberOfMatchedBricks() > b.getNumberOfMatchedBricks());
+	if (a.getNumberOfMatchedBricks() > b.getNumberOfMatchedBricks()) {
+		return true;
+	}
+	if (a.getNumberOfMatchedBricks() < b.getNumberOfMatchedBricks()) {
+		return false;
+	}
+	if (a.getPathId() < b.getPathId()) {
+		return true;
+	}
+	return false;
 }
 
 
@@ -117,6 +174,8 @@ void cSpectrumComparatorThread::run() {
 	tsp.resizePeakList(5000);
 	int theoreticalpeaksrealsize = 0;
 
+	double unchargedprecursormass = charge(uncharge(parameters->precursormass, parameters->precursorcharge), (parameters->precursorcharge > 0)?1:-1);
+
 	for (auto i = permutations.getSet().begin(); i != permutations.getSet().end(); ++i) {
 
 		if (*terminatecomputation) {
@@ -127,6 +186,12 @@ void cSpectrumComparatorThread::run() {
 		tsp.clear(false); // hot
 		tsp.setParameters(parameters);
 		tsp.setCandidate((cCandidate&)*i);
+
+		if ((parameters->peptidetype == linearpolyketide) || (parameters->peptidetype == cyclicpolyketide)) {
+			if (!tsp.getCandidate().checkKetideBlocks(*bricksdatabasewithcombinations, parameters->peptidetype, parameters->regularblocksorder)) {
+				continue;
+			}
+		}
 
 		switch (parameters->peptidetype)
 		{
@@ -142,16 +207,11 @@ void cSpectrumComparatorThread::run() {
 		case branchcyclic:
 			theoreticalpeaksrealsize = tsp.compareBranchCyclic(peaklist, *bricksdatabasewithcombinations, false, *rxsequencetag, *rxsearchedsequence);
 			break;
-#if OLIGOKETIDES == 1
-		case linearoligoketide:
-			theoreticalpeaksrealsize = tsp.compareLinearOligoketide(peaklist, *bricksdatabasewithcombinations, false, *rxsequencetag, *rxsearchedsequence);
+		case linearpolyketide:
+			theoreticalpeaksrealsize = tsp.compareLinearPolyketide(peaklist, *bricksdatabasewithcombinations, false, *rxsequencetag, *rxsearchedsequence);
 			break;
-		case cyclicoligoketide:
-			theoreticalpeaksrealsize = tsp.compareCyclicOligoketide(peaklist, *bricksdatabasewithcombinations, false, *rxsequencetag, *rxsearchedsequence);
-			break;
-#endif
-		case linearpolysaccharide:
-			theoreticalpeaksrealsize = tsp.compareLinearPolysaccharide(peaklist, *bricksdatabasewithcombinations, false, *rxsequencetag, *rxsearchedsequence);
+		case cyclicpolyketide:
+			theoreticalpeaksrealsize = tsp.compareCyclicPolyketide(peaklist, *bricksdatabasewithcombinations, false, *rxsequencetag, *rxsearchedsequence);
 			break;
 		case other:
 			break;

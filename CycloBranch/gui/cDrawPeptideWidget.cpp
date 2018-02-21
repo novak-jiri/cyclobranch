@@ -42,11 +42,8 @@ cDrawPeptideWidget::cDrawPeptideWidget(QWidget* parent) {
 	peptidetypecombobox->addItem(tr("Cyclic"));
 	peptidetypecombobox->addItem(tr("Branched"));
 	peptidetypecombobox->addItem(tr("Branch-cyclic"));
-#if OLIGOKETIDES == 1
-	peptidetypecombobox->addItem(tr("Linear oligoketide"));
-	peptidetypecombobox->addItem(tr("Cyclic oligoketide"));
-#endif
-	//peptidetypecombobox->addItem(tr("Linear polysaccharide (beta version)"));
+	peptidetypecombobox->addItem(tr("Linear polyketide"));
+	peptidetypecombobox->addItem(tr("Cyclic polyketide"));
 	//peptidetypecombobox->addItem(tr("Other"));
 	drawpeptideformlayout->addRow(tr("Peptide Type: "), peptidetypecombobox);
 
@@ -154,7 +151,7 @@ cDrawPeptideWidget::cDrawPeptideWidget(QWidget* parent) {
 	mainbox->addLayout(vbox);
 	setLayout(mainbox);
 
-	resize(1280, 700);
+	resize(1280, 750);
 
 	connect(sequenceline, SIGNAL(textEdited(const QString&)), this, SLOT(sequenceChanged()));
 	connect(sequenceactioncopy, SIGNAL(triggered()), this, SLOT(sequenceCopy()));
@@ -230,6 +227,7 @@ cDrawPeptideWidget::~cDrawPeptideWidget() {
 
 void cDrawPeptideWidget::closeEvent(QCloseEvent *event) {
 	hide();
+	event->accept();
 }
 
 
@@ -254,6 +252,8 @@ void cDrawPeptideWidget::keyPressEvent(QKeyEvent *event) {
 			QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo(installdir + "docs/html/drawpeptide.html").absoluteFilePath()));
 		#endif
 	}
+
+	event->accept();
 }
 
 
@@ -290,16 +290,12 @@ void cDrawPeptideWidget::separateBlocksChanged(int state) {
 void cDrawPeptideWidget::numberOfBackboneBlocksChanged(int numberofblocks) {
 	switch ((ePeptideType)peptidetypecombobox->currentIndex()) {
 		case linear:
-#if OLIGOKETIDES == 1
-		case linearoligoketide:
-#endif
+		case linearpolyketide:
 			numberofblocksbackbone->setRange(1, 100);
 			branchposition->setRange(1, 1);
 			break;
 		case cyclic:
-#if OLIGOKETIDES == 1
-		case cyclicoligoketide:
-#endif
+		case cyclicpolyketide:
 			numberofblocksbackbone->setRange(2, 100);
 			branchposition->setRange(1, 1);
 			break;
@@ -310,8 +306,6 @@ void cDrawPeptideWidget::numberOfBackboneBlocksChanged(int numberofblocks) {
 		case branchcyclic:
 			numberofblocksbackbone->setRange(2, 100);
 			branchposition->setRange(1, numberofblocks);
-			break;
-		case linearpolysaccharide:
 			break;
 		case other:
 			break;
@@ -371,16 +365,12 @@ void cDrawPeptideWidget::peptideTypeChanged(int index) {
 
 	switch ((ePeptideType)index) {
 		case linear:
-#if OLIGOKETIDES == 1
-		case linearoligoketide:
-#endif
+		case linearpolyketide:
 			linearwidget->show();
 			numberOfBackboneBlocksChanged(max(backboneblocks->count(), 1));
 			break;
 		case cyclic:
-#if OLIGOKETIDES == 1
-		case cyclicoligoketide:
-#endif
+		case cyclicpolyketide:
 			cyclicwidget->show();
 			numberOfBackboneBlocksChanged(max(backboneblocks->count(), 2));
 			break;
@@ -391,8 +381,6 @@ void cDrawPeptideWidget::peptideTypeChanged(int index) {
 		case branchcyclic:
 			branchcyclicwidget->show();
 			numberOfBackboneBlocksChanged(max(backboneblocks->count(), 2));
-			break;
-		case linearpolysaccharide:
 			break;
 		case other:
 			break;
@@ -447,11 +435,8 @@ void cDrawPeptideWidget::blocksChanged() {
 
 	ePeptideType peptidetype = (ePeptideType)peptidetypecombobox->currentIndex();
 
-	if ((peptidetype == linear) || (peptidetype == linearpolysaccharide) || ((backbonecount > 1) && (peptidetype == cyclic))
-#if OLIGOKETIDES == 1
-		|| (peptidetype == linearoligoketide) || ((backbonecount > 1) && (peptidetype == cyclicoligoketide))
-#endif		
-		) {
+	if ((peptidetype == linear) || ((backbonecount > 1) && (peptidetype == cyclic))
+		|| (peptidetype == linearpolyketide) || ((backbonecount > 1) && (peptidetype == cyclicpolyketide))) {
 		for (int i = 0; i < backbonecount; i++) {
 			if (i > 0) {
 				s += "-";
@@ -588,11 +573,8 @@ void cDrawPeptideWidget::sequenceChanged() {
 		b.setComposition(theoreticalspectrum.getCandidate().getComposition(), false);
 		b.explodeToIntComposition(intcomposition);
 
-		if ((peptidetype == linear) || (peptidetype == linearpolysaccharide) || (peptidetype == cyclic)
-#if OLIGOKETIDES == 1
-			|| (peptidetype == linearoligoketide) || (peptidetype == cyclicoligoketide)
-#endif				
-			) {
+		if ((peptidetype == linear) || (peptidetype == cyclic)
+			|| (peptidetype == linearpolyketide) || (peptidetype == cyclicpolyketide)) {
 			numberofblocksbackbone->setValue((int)v.size());
 			for (int i = 0; i < backboneblocks->count(); i++) {
 				if (i < (int)v.size()) {
@@ -651,32 +633,28 @@ void cDrawPeptideWidget::drawPeptide(vector<string>& composition, cBricksDatabas
 
 	switch ((ePeptideType)peptidetypecombobox->currentIndex()) {
 		case linear:
-#if OLIGOKETIDES == 1
-		case linearoligoketide:
-#endif
-			theoreticalspectrum.getCandidate().setCandidate(composition, netmp, 0, 0, 0, -1, -1);
+		case linearpolyketide:
+			theoreticalspectrum.getCandidate().setCandidate(composition, netmp, fragmentIonTypeEnd, 0, 0, 0, -1, -1);
 			theoreticalspectrum.getCandidate().setAcronyms(bricksdb);
 			linearwidget->initialize(0, &theoreticalspectrum);
 			linearwidget->repaint();
 			break;
 		case cyclic:
-#if OLIGOKETIDES == 1
-		case cyclicoligoketide:
-#endif
-			theoreticalspectrum.getCandidate().setCandidate(composition, netmp, 0, 0, 0, -1, -1);
+		case cyclicpolyketide:
+			theoreticalspectrum.getCandidate().setCandidate(composition, netmp, fragmentIonTypeEnd, 0, 0, 0, -1, -1);
 			theoreticalspectrum.getCandidate().setAcronyms(bricksdb);
 			cyclicwidget->initialize(0, &theoreticalspectrum);
 			cyclicwidget->repaint();
 			break;
 		case branched:
-			theoreticalspectrum.getCandidate().setCandidate(composition, netmp, 0, 0, 0, branchstart, branchend);
+			theoreticalspectrum.getCandidate().setCandidate(composition, netmp, fragmentIonTypeEnd, 0, 0, 0, branchstart, branchend);
 			theoreticalspectrum.getCandidate().setBackboneAcronyms(bricksdb);
 			theoreticalspectrum.getCandidate().setBranchAcronyms(bricksdb);
 			branchedwidget->initialize(0, &theoreticalspectrum);
 			branchedwidget->repaint();
 			break;
 		case branchcyclic:
-			theoreticalspectrum.getCandidate().setCandidate(composition, netmp, 0, 0, 0, branchstart, branchend);
+			theoreticalspectrum.getCandidate().setCandidate(composition, netmp, fragmentIonTypeEnd, 0, 0, 0, branchstart, branchend);
 
 			// normalize the candidate
 			theoreticalspectrum.getCandidate().getBranchCyclicRotations(branchcyclicrotations, false);
@@ -686,7 +664,7 @@ void cDrawPeptideWidget::drawPeptide(vector<string>& composition, cBricksDatabas
 					vector<string> v;
 					v.push_back(branchcyclicrotations[i].getComposition());
 					vector<nodeEdge> cpath = theoreticalspectrum.getCandidate().getPath();
-					theoreticalspectrum.getCandidate().setCandidate(v, cpath, theoreticalspectrum.getCandidate().getStartModifID(), theoreticalspectrum.getCandidate().getEndModifID(), theoreticalspectrum.getCandidate().getMiddleModifID(), branchcyclicrotations[i].getBranchStart(), branchcyclicrotations[i].getBranchEnd());
+					theoreticalspectrum.getCandidate().setCandidate(v, cpath, theoreticalspectrum.getCandidate().getStartIonType(), theoreticalspectrum.getCandidate().getStartModifID(), theoreticalspectrum.getCandidate().getEndModifID(), theoreticalspectrum.getCandidate().getMiddleModifID(), branchcyclicrotations[i].getBranchStart(), branchcyclicrotations[i].getBranchEnd());
 					break;
 				}
 			}
@@ -695,8 +673,6 @@ void cDrawPeptideWidget::drawPeptide(vector<string>& composition, cBricksDatabas
 			theoreticalspectrum.getCandidate().setBranchAcronyms(bricksdb);
 			branchcyclicwidget->initialize(0, &theoreticalspectrum);
 			branchcyclicwidget->repaint();
-			break;
-		case linearpolysaccharide:
 			break;
 		case other:
 			break;

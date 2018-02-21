@@ -116,15 +116,21 @@ void cSummaryFormula::setPartial(bool partial) {
 }
 
 
-void cSummaryFormula::addFormula(string& formula) {
+void cSummaryFormula::addFormula(string& formula, bool remove) {
 	if ((int)formula.size() == 0) {
 		return;
 	}
 
 	map<string, int> atoms;
 	atoms.clear();
-	explodeSummary(atoms, this->formula);
+
 	explodeSummary(atoms, formula);
+	if (remove) {
+		for (auto it = atoms.begin(); it != atoms.end(); ++it) {
+			it->second = -it->second;
+		}
+	}
+	explodeSummary(atoms, this->formula);
 
 	this->formula = "";
 	for (auto it = atoms.begin(); it != atoms.end(); ++it) {

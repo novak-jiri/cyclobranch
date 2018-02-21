@@ -14,7 +14,7 @@ void nodeEdge::load(ifstream& is) {
 
 
 bool operator == (cEdge const& a, cEdge const& b) {
-	return (a.targetnode == b.targetnode) && (a.brickid == b.brickid);
+	return (a.targetnode == b.targetnode) && (a.brickid == b.brickid) && (a.sourceion == b.sourceion) && (a.targetion == b.targetion);
 }
 
 
@@ -125,4 +125,5 @@ void cDeNovoGraphNode::addIonAnnotation(eFragmentIonType iontype) {
 bool cDeNovoGraphNode::checkIonAnnotation(eFragmentIonType iontype) {
 	return ionannotation[iontype];
 }
+
 

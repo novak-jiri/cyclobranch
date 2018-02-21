@@ -8,13 +8,17 @@
 #define _CSPECTRUMDETAILWIDGET_H
 
 #include <QWidget>
+#include <QDesktopServices>
+#include <QUrl>
+#include <QFileInfo>
 #include <QMainWindow>
 #include <QTextDocument>
-#include <QTableWidget>
+#include <QTableView>
+#include <QStandardItemModel>
+#include <QStandardItem>
 #include <QHeaderView>
 #include <QProgressDialog>
 #include <QTextStream>
-#include "core/cAllocator.h"
 #include "core/cTheoreticalSpectrum.h"
 #include "gui/cLinearWidget.h"
 #include "gui/cCyclicWidget.h"
@@ -24,7 +28,8 @@
 #include "gui/cFindDialog.h"
 #include "gui/cExportDialog.h"
 #include "gui/cEventFilter.h"
-#include "gui/cDelegate.h"
+#include "gui/cViewButtonDelegate.h"
+#include "gui/cSpectrumDetailProxyModel.h"
 
 
 // forward declaration
@@ -229,11 +234,11 @@ private:
 
 	QTextBrowser* textbrowser;
 
-	QTableWidget* peakstable;
-	vector<int> peakstableheadersort;
-	cAllocator<QTableWidgetItem> widgetitemallocator;
+	QTableView* peakstable;
+	QStandardItemModel* peakstablemodel;
+	cSpectrumDetailProxyModel* proxymodel;
+
 	vector<cTablePosition> tablematches;
-	cDelegate columndelegate;
 
 	cLinearWidget* linearwidget;
 	cCyclicWidget* cyclicwidget;
@@ -287,7 +292,7 @@ private slots:
 
 	void moveNext();
 
-	void headerItemDoubleClicked(int);
+	void headerItemClicked(int);
 
 	void filterPeaksTable();
 

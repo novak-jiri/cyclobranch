@@ -1,6 +1,6 @@
 /**
 	\file cModificationsWidget.h
-	\brief Editor of N-terminal and C-terminal modifications.
+	\brief An editor of N-/C-terminal modifications database.
 */
 
 
@@ -11,31 +11,33 @@
 #include <QDesktopServices>
 #include <QUrl>
 #include <QFileInfo>
+#include <QMainWindow>
+#include <QToolBar>
+#include <QAction>
+#include <QTableView>
+#include <QStandardItemModel>
+#include <QStandardItem>
 #include <fstream>
 #include "core/utilities.h"
 #include "core/cFragmentIons.h"
 #include "core/cSummaryFormula.h"
-#include "core/cAllocator.h"
-#include "gui/cDelegate.h"
-
-
-using namespace std;
+#include "gui/cModificationsProxyModel.h"
+#include "gui/cCheckBoxDelegate.h"
 
 
 // forward declaration
 class QHBoxLayout;
 class QVBoxLayout;
-class QTableWidget;
-class QTableWidgetItem;
 class QPushButton;
 class QLineEdit;
-class QCheckBox;
+class QMenuBar;
+class QMenu;
 
 
 /**
-	\brief Editor of N-terminal and C-terminal modifications.
+	\brief An editor of N-/C-terminal modifications database.
 */
-class cModificationsWidget : public QWidget
+class cModificationsWidget : public QMainWindow
 {
 	Q_OBJECT
 
@@ -64,14 +66,33 @@ public:
 
 private:
 
-	QWidget* parent;
-	QPushButton* insertrow;
-	QPushButton* removechecked;
-	QPushButton* close;
-	QPushButton* load;
-	QPushButton* save;
-	QPushButton* saveas;
+	QString editorname;
 
+	QWidget* parent;
+
+	QMenuBar* menuBar;
+	QMenu* menuFile;
+	QMenu* menuEdit;
+	QMenu* menuHelp;
+
+	QToolBar* toolbarFile;
+	QAction* actionNewDatabase;
+	QAction* actionOpenDatabase;
+	QAction* actionSaveDatabase;
+	QAction* actionSaveDatabaseAs;
+	QAction* actionImportDatabase;
+	QAction* actionCloseWindow;
+
+	QToolBar* toolbarEdit;
+	QAction* actionAddRow;
+	QAction* actionRemoveSelectedRows;
+	QAction* actionSelectAll;
+	QAction* actionUnselectAll;
+
+	QToolBar* toolbarHelp;
+	QAction* actionHTMLDocumentation;
+
+	QToolBar* toolbarFilter;
 	QWidget* rowsfilterwidget;
 	QHBoxLayout* rowsfilterhbox;
 	QLineEdit* rowsfilterline;
@@ -79,9 +100,11 @@ private:
 	QPushButton* rowsfilterbutton;
 	QPushButton* rowsfilterclearbutton;
 
-	QTableWidget* database;
-	QHBoxLayout* buttons;
+	QTableView* database;
+	QStandardItemModel* databasemodel;
+	cModificationsProxyModel* proxymodel;
 	QVBoxLayout* mainlayout;
+	QWidget* mainwidget;
 
 	QString databasefile;
 	QString lastdir;
@@ -89,16 +112,11 @@ private:
 	ofstream outputstream;
 	vector<fragmentDescription> modifications;
 
-	vector<int> headersort;
-	cDelegate columndelegate;
-
-	cAllocator<QTableWidgetItem> widgetitemallocator;
-
 	bool datamodified;
 
-	void deleteTable(bool enableprogress);
+	void deleteTable();
 
-	void removeRow(int row);
+	void resetHeader();
 
 	bool checkTable();
 
@@ -120,7 +138,7 @@ private slots:
 
 	void closeWindow();
 
-	void loadDatabase();
+	void openDatabase();
 
 	bool saveDatabase();
 
@@ -128,17 +146,25 @@ private slots:
 
 	void addRow();
 
-	void removeCheckedRows();
+	void removeSelectedRows();
 
-	void itemChanged(QTableWidgetItem* item);
+	void itemChanged(QStandardItem* item);
 
-	void headerItemDoubleClicked(int index);
+	void headerItemClicked(int index);
 
 	void filterRows();
 
 	void resetFilter();
 
-	void checkBoxModified(int state);
+	void createNewDatabase();
+
+	void importDatabase();
+
+	void selectAll();
+
+	void unselectAll();
+
+	void showHTMLDocumentation();
 
 };
 

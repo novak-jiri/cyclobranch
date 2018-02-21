@@ -139,15 +139,17 @@ public:
 		\brief Load the spectrum from .ibd file.
 		\param imzmlitem cImzML containing the offset in the ibd file
 		\param ibdstream an input binary file stream
+		\param use_64bit_precision if true, 64bit precision is used; if false, 32bit precision is used
 	*/ 
-	void loadFromIBDStream(cImzMLItem& imzmlitem, ifstream &ibdstream);
+	void loadFromIBDStream(cImzMLItem& imzmlitem, ifstream &ibdstream, bool use_64bit_precision);
 
 
 	/**
 		\brief Store the spectrum into .ibd file.
 		\param ibdstream an output binary file stream
+		\param use_64bit_precision if true, 64bit precision is used; if false, 32bit precision is used
 	*/ 
-	void storeToIBDStream(ofstream &ibdstream);
+	void storeToIBDStream(ofstream &ibdstream, bool use_64bit_precision);
 
 
 	/**

@@ -256,16 +256,11 @@ int cTheoreticalSpectrumList::parallelCompareAndStore(cCandidateSet& candidates,
 		case branchcyclic:
 			theoreticalpeaksrealsize = tsp.compareBranchCyclic(peaklist, *bricksdb, true, rxsequencetag, rxsearchedsequence);
 			break;
-#if OLIGOKETIDES == 1
-		case linearoligoketide:
-			theoreticalpeaksrealsize = tsp.compareLinearOligoketide(peaklist, *bricksdb, true, rxsequencetag, rxsearchedsequence);
+		case linearpolyketide:
+			theoreticalpeaksrealsize = tsp.compareLinearPolyketide(peaklist, *bricksdb, true, rxsequencetag, rxsearchedsequence);
 			break;
-		case cyclicoligoketide:
-			theoreticalpeaksrealsize = tsp.compareCyclicOligoketide(peaklist, *bricksdb, true, rxsequencetag, rxsearchedsequence);
-			break;
-#endif
-		case linearpolysaccharide:
-			theoreticalpeaksrealsize = tsp.compareLinearPolysaccharide(peaklist, *bricksdb, true, rxsequencetag, rxsearchedsequence);
+		case cyclicpolyketide:
+			theoreticalpeaksrealsize = tsp.compareCyclicPolyketide(peaklist, *bricksdb, true, rxsequencetag, rxsearchedsequence);
 			break;
 		case other:
 		default:
@@ -285,6 +280,8 @@ int cTheoreticalSpectrumList::parallelCompareAndStore(cCandidateSet& candidates,
 	//computeNumbersOfCompletedSeries();
 
 	// sort peaks in theoretical spectra by mass and set real names of peptides
+	vector<string> paths;
+	string tmps;
 	for (int i = 0; i < (int)theoreticalspectra.size(); i++) {
 		theoreticalspectra[i].sortByMass();
 		theoreticalspectra[i].getCandidate().setRealPeptideName(*bricksdb, parameters->peptidetype);
@@ -296,9 +293,22 @@ int cTheoreticalSpectrumList::parallelCompareAndStore(cCandidateSet& candidates,
 		}
 		if (parameters->mode == denovoengine) {
 			theoreticalspectra[i].getCandidate().setPath(*graph, parameters);
+			tmps = theoreticalspectra[i].getCandidate().getPathAsString();
+			auto it = std::find(paths.begin(), paths.end(), tmps);
+			if (it == paths.end()) {
+				theoreticalspectra[i].setPathId((int)paths.size());
+				paths.push_back(tmps);
+			}
+			else {
+				theoreticalspectra[i].setPathId(it - paths.begin());
+			}
 		}
 		// parameters must not be used by viewer, they are not stored/loaded
 		theoreticalspectra[i].setParameters(0);
+	}
+
+	if (parameters->mode == denovoengine) {
+		sortAndFitSize();
 	}
 		
 	// -1 = partial results, aborted by user

@@ -139,6 +139,7 @@ private:
 	QDoubleSpinBox* masserrortolerancefordeisotoping;
 	QDoubleSpinBox* minimumrelativeintensitythreshold;
 	QDoubleSpinBox* minimummz;
+	QDoubleSpinBox* fwhm;
 
 	QFormLayout* brickdatabaseformlayout;
 	QGroupBox* brickdatabasegroupbox;
@@ -161,10 +162,12 @@ private:
 	QCheckBox* cycliccterminus;
 	QCheckBox* enablescrambling;
 	QCheckBox* similaritysearch;
+	QCheckBox* regularblocksorder;
 
 	QFormLayout* applicationformlayout;
 	QGroupBox* applicationgroupbox;
 	QComboBox* mode;
+	eModeType oldmodetype;
 	QLineEdit* sequencedatabaseline;
 	QPushButton* sequencedatabasebutton;
 	QHBoxLayout* sequencedatabaselayout;

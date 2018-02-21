@@ -122,16 +122,14 @@ cBricksDatabase::cBricksDatabase() {
 }
 
 
-int cBricksDatabase::loadFromPlainTextStream(ifstream &stream, string& errormessage, bool ignoreerrors) {
+int cBricksDatabase::loadFromPlainTextStream(ifstream &stream, string& errormessage, bool ignoreerrors, bool skiph2blocks) {
 	string s;
 	cBrick b;
 	size_t pos;
 	double mass;
 
-#if OLIGOKETIDES == 1
 	regex rx;
 	string name;
-#endif
 
 	bool error = false;
 	errormessage = "";
@@ -165,14 +163,12 @@ int cBricksDatabase::loadFromPlainTextStream(ifstream &stream, string& errormess
 			break;
 		}
 
-#if OLIGOKETIDES == 1
 		name = b.getName();
 
 		rx = "^\\(-2H\\) ";
 		if (regex_search(name, rx)) {
 			b.setResidueLossType(h2_loss);
 		}
-#endif
 
 		// load acronyms
 		pos = s.find('\t');
@@ -213,7 +209,7 @@ int cBricksDatabase::loadFromPlainTextStream(ifstream &stream, string& errormess
 		b.setReferences(s);
 
 		// store brick
-		if (ignoreerrors || (!ignoreerrors && !b.empty())) {
+		if ((ignoreerrors || (!ignoreerrors && !b.empty())) && (!skiph2blocks || (skiph2blocks && (b.getResidueLossType() == h2o_loss)))) {
 
 			// calculate mass from the summary
 			formula.clear();
@@ -525,6 +521,19 @@ void cBricksDatabase::removeLastBrick() {
 }
 
 
+string cBricksDatabase::calculateSummaryFromComposition(int brickid) {
+	cSummaryFormula formula;
+	vector<int> items;
+	bricks[brickid].explodeToIntComposition(items);
+
+	for (int i = 0; i < (int)items.size(); i++) {
+		formula.addFormula(bricks[items[i] - 1].getSummary());
+	}
+
+	return formula.getSummary();
+}
+
+
 void cBricksDatabase::store(ofstream& os) {
 	int size;
 
@@ -549,15 +558,16 @@ void cBricksDatabase::load(ifstream& is) {
 }
 
 
-#if OLIGOKETIDES == 1
-
-
-bool cBricksDatabase::checkKetideBlocks(cBrick& brickseries) {
+bool cBricksDatabase::checkKetideBlocks(cBrick& brickseries, bool regularblocksorder) {
 	vector<int> intcomposition;
 	brickseries.explodeToIntComposition(intcomposition);
 
 	if (intcomposition.size() == 0) {
 		return false;
+	}
+
+	if (!regularblocksorder) {
+		return true;
 	}
 
 	int h2_blocks = 0;
@@ -584,5 +594,3 @@ bool cBricksDatabase::checkKetideBlocks(cBrick& brickseries) {
 	return false;
 }
 
-
-#endif

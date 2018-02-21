@@ -41,7 +41,8 @@ void cCandidate::getPermutationsIter(cCandidateSet& permutations, vector<string>
 		}
 	}
 	else {
-		cCandidate c(currentcandidate, path, startmodifID, endmodifID, middlemodifID, branchstart, branchend);
+		cCandidate c(currentcandidate, path, startiontype, startmodifID, endmodifID, middlemodifID, branchstart, branchend);
+		c.setSummaryFormula(summary);
 		permutations.getSet().insert(c);
 	}
 }
@@ -175,7 +176,7 @@ void cCandidate::getPartialBranchCyclicRotations(const string& composition, vect
 			vector<string> v;
 			vector<nodeEdge> ne;
 			v.push_back(s);
-			cCandidate c(v, ne, startmodifID, endmodifID, middlemodifID, (branchstart + count - i) % count, (branchend + count - i) % count);
+			cCandidate c(v, ne, startiontype, startmodifID, endmodifID, middlemodifID, (branchstart + count - i) % count, (branchend + count - i) % count);
 			branchcyclicrotations.push_back(c);
 			//cout << s << endl;
 		}
@@ -188,19 +189,19 @@ cCandidate::cCandidate() {
 }
 
 
-cCandidate::cCandidate(vector<string>& composition, vector<nodeEdge>& path, int startmodifID, int endmodifID, int middlemodifID, int middlepos) {
+cCandidate::cCandidate(vector<string>& composition, vector<nodeEdge>& path, eFragmentIonType startiontype, int startmodifID, int endmodifID, int middlemodifID, int middlepos) {
 	clear();
-	setCandidate(composition, path, startmodifID, endmodifID, middlemodifID, middlepos);
+	setCandidate(composition, path, startiontype, startmodifID, endmodifID, middlemodifID, middlepos);
 }
 
 
-cCandidate::cCandidate(vector<string>& composition, vector<nodeEdge>& path, int startmodifID, int endmodifID, int middlemodifID, int branchstart, int branchend) {
+cCandidate::cCandidate(vector<string>& composition, vector<nodeEdge>& path, eFragmentIonType startiontype, int startmodifID, int endmodifID, int middlemodifID, int branchstart, int branchend) {
 	clear();
-	setCandidate(composition, path, startmodifID, endmodifID, middlemodifID, branchstart, branchend);
+	setCandidate(composition, path, startiontype, startmodifID, endmodifID, middlemodifID, branchstart, branchend);
 }
 
 
-void cCandidate::setCandidate(vector<string>& composition, vector<nodeEdge>& path, int startmodifID, int endmodifID, int middlemodifID, int middlepos) {
+void cCandidate::setCandidate(vector<string>& composition, vector<nodeEdge>& path, eFragmentIonType startiontype, int startmodifID, int endmodifID, int middlemodifID, int middlepos) {
 	clear();
 
 	this->composition = composition;
@@ -210,6 +211,7 @@ void cCandidate::setCandidate(vector<string>& composition, vector<nodeEdge>& pat
 	this->endmodifID = endmodifID;
 	this->middlemodifID = middlemodifID;
 	this->path = path;
+	this->startiontype = startiontype;
 
 	if (middlepos == -1) {
 		middlemodifID = 0;
@@ -226,7 +228,7 @@ void cCandidate::setCandidate(vector<string>& composition, vector<nodeEdge>& pat
 }
 
 
-void cCandidate::setCandidate(vector<string>& composition, vector<nodeEdge>& path, int startmodifID, int endmodifID, int middlemodifID, int branchstart, int branchend) {
+void cCandidate::setCandidate(vector<string>& composition, vector<nodeEdge>& path, eFragmentIonType startiontype, int startmodifID, int endmodifID, int middlemodifID, int branchstart, int branchend) {
 	clear();
 
 	this->composition = composition;
@@ -238,6 +240,7 @@ void cCandidate::setCandidate(vector<string>& composition, vector<nodeEdge>& pat
 	this->branchstart = branchstart;
 	this->branchend = branchend;
 	this->path = path;
+	this->startiontype = startiontype;
 }
 
 
@@ -251,7 +254,9 @@ void cCandidate::clear() {
 	branchstart = -1;
 	branchend = -1;
 	path.clear();
+	startiontype = fragmentIonTypeEnd;
 	name = "";
+	summary.clear();
 
 	realpeptidename = "";
 	acronympeptidename = "";
@@ -733,17 +738,20 @@ void cCandidate::getPermutationsOfBranches(vector<TRotationInfo>& tpermutations)
 }
 
 
-double cCandidate::getPrecursorMass(cBricksDatabase& brickdatabasewithcombinations, cParameters* parameters) {
+double cCandidate::calculatePrecursorMass(cBricksDatabase& brickdatabasewithcombinations, cParameters* parameters) {
 	cBrick b;
 	vector<int> bricks;
 	b.setComposition(internalcomposition, false);
 	b.explodeToIntComposition(bricks);
+
+	if (parameters->peptidetype == linearpolyketide) {
+		return 0;
+	}
 	
 	double mass = 0;
 	switch (parameters->peptidetype)
 	{
 	case linear:
-	case linearpolysaccharide:
 		mass = parameters->fragmentdefinitions[precursor_ion].massdifference + parameters->searchedmodifications[startmodifID].massdifference + parameters->searchedmodifications[endmodifID].massdifference;
 		break;
 	case cyclic: 
@@ -755,29 +763,12 @@ double cCandidate::getPrecursorMass(cBricksDatabase& brickdatabasewithcombinatio
 	case branchcyclic:
 		mass = parameters->fragmentdefinitions[cyclic_precursor_ion].massdifference + parameters->searchedmodifications[middlemodifID].massdifference;
 		break;
-#if OLIGOKETIDES == 1
-	case linearoligoketide:
-		switch (getKetidePrecursorType(brickdatabasewithcombinations))
-		{
-		case ketide_precursor_h2o:
-			mass = parameters->fragmentdefinitions[linear_oligoketide_precursor_ion_h_oh].massdifference;
-			break;
-		case ketide_precursor_h2:
-			mass = parameters->fragmentdefinitions[linear_oligoketide_precursor_ion_h_h].massdifference;
-			break;
-		case ketide_precursor_h2o2:
-			mass = parameters->fragmentdefinitions[linear_oligoketide_precursor_ion_oh_oh].massdifference;
-			break;
-		default:
-			mass = 0;
-			break;
-		}
-		mass += parameters->searchedmodifications[startmodifID].massdifference + parameters->searchedmodifications[endmodifID].massdifference;
+	case linearpolyketide:
+		// not supported because of terminal ambiguities H- -OH, H- -H, OH- -OH
 		break;
-	case cyclicoligoketide:
-		mass = parameters->fragmentdefinitions[cyclic_oligoketide_precursor_ion].massdifference;
+	case cyclicpolyketide:
+		mass = parameters->fragmentdefinitions[cyclic_polyketide_precursor_ion].massdifference;
 		break;
-#endif
 	case other:
 		break;
 	default:
@@ -794,11 +785,14 @@ double cCandidate::getPrecursorMass(cBricksDatabase& brickdatabasewithcombinatio
 
 bool cCandidate::isEqualTo(cCandidate& candidate) {
 	if ((internalcomposition.compare(candidate.internalcomposition) == 0)
+		&& (summary.getSummary().compare(candidate.summary.getSummary()) == 0) 
+		&& (summary.isPartial() == candidate.summary.isPartial())
 		&& (startmodifID == candidate.startmodifID)
 		&& (endmodifID == candidate.endmodifID)
 		&& (middlemodifID == candidate.middlemodifID)
 		&& (branchstart == candidate.branchstart)
-		&& (branchend == candidate.branchend)) {
+		&& (branchend == candidate.branchend)
+		&& (startiontype == candidate.startiontype)) {
 		return true;
 	}
 	return false;
@@ -992,7 +986,7 @@ void cCandidate::getBranchCyclicRotations(vector<cCandidate>& branchcyclicrotati
 }
 
 
-cSummaryFormula cCandidate::getSummaryFormula(cParameters& parameters, ePeptideType peptidetype) {
+cSummaryFormula cCandidate::calculateSummaryFormula(cParameters& parameters, ePeptideType peptidetype, double precursormass) {
 	cBrick b;
 	vector<int> bricks;
 	b.setComposition(internalcomposition, false);
@@ -1001,10 +995,13 @@ cSummaryFormula cCandidate::getSummaryFormula(cParameters& parameters, ePeptideT
 	cSummaryFormula formula;
 	string summary;
 
+	if ((peptidetype == linearpolyketide) && (precursormass == 0)) {
+		return formula;
+	}
+
 	switch (peptidetype)
 	{
 	case linear:
-	case linearpolysaccharide:
 		summary = "H2O";
 		formula.addFormula(summary);
 		formula.addFormula(parameters.searchedmodifications[startmodifID].summary);
@@ -1022,38 +1019,31 @@ cSummaryFormula cCandidate::getSummaryFormula(cParameters& parameters, ePeptideT
 	case branchcyclic:
 		formula.addFormula(parameters.searchedmodifications[middlemodifID].summary);
 		break;
-#if OLIGOKETIDES == 1
-	case linearoligoketide:
-		switch (getKetidePrecursorType(parameters.bricksdatabase))
-		{
-		case ketide_precursor_h2o:
-			summary = "H2O";
-			break;
-		case ketide_precursor_h2:
-			summary = "H2";
-			break;
-		case ketide_precursor_h2o2:
-			summary = "H2O2";
-			break;
-		default:
-			break;
-		}
-
-		if (hasFirstBrickArtificial(parameters.bricksdatabase) || hasLastBrickArtificial(parameters.bricksdatabase)) {
-			summary = "";
-		}
-
-		formula.addFormula(summary);
+	case linearpolyketide:
 		formula.addFormula(parameters.searchedmodifications[startmodifID].summary);
 		formula.addFormula(parameters.searchedmodifications[endmodifID].summary);
 		break;
-	case cyclicoligoketide:
+	case cyclicpolyketide:
 		break;
-#endif
 	case other:
 		break;
 	default:
 		break;
+	}
+
+	summary = parameters.precursoradduct.empty()?"":"H-1";
+	formula.addFormula(summary);
+	formula.addFormula(parameters.precursoradduct);
+
+	if ((peptidetype == linear) || (peptidetype == linearpolyketide)) {
+		if (parameters.cyclicnterminus) {
+			summary = "H2O";
+			formula.addFormula(summary, true);
+		}
+		if (parameters.cycliccterminus) {
+			summary = "H2O";
+			formula.addFormula(summary, true);
+		}
 	}
 
 	bool partial = false;
@@ -1068,7 +1058,69 @@ cSummaryFormula cCandidate::getSummaryFormula(cParameters& parameters, ePeptideT
 
 	formula.setPartial(partial);
 
+	if (!partial && (peptidetype == linearpolyketide)) {
+		summary = "H2O2";
+		formula.addFormula(summary);
+		
+		cSummaryFormula tempformula;
+		tempformula.setFormula(formula.getSummary());
+		summary = "Hplus";
+		tempformula.addFormula(summary);
+		summary = (parameters.precursorcharge > 0)?"":"Hplus-2";
+		tempformula.addFormula(summary);
+
+		precursormass = charge(uncharge(precursormass, parameters.precursorcharge), (parameters.precursorcharge > 0)?1:-1);
+
+		double tempmass = tempformula.getMass();
+		double bestmz = fabs(precursormass - tempmass);
+		int bestcase = 1;
+
+		summary = "O-1";
+
+		tempformula.addFormula(summary);
+		tempmass = tempformula.getMass();
+		if (fabs(precursormass - tempmass) < bestmz) {
+			bestmz = fabs(precursormass - tempmass);
+			bestcase = 2;
+		}
+	
+		tempformula.addFormula(summary);
+		tempmass = tempformula.getMass();
+		if (fabs(precursormass - tempmass) < bestmz) {
+			bestmz = fabs(precursormass - tempmass);
+			bestcase = 3;
+		}
+
+		if (bestcase == 1) {
+			return formula;
+		}
+
+		if (bestcase == 2) {
+			summary = "O-1";
+			formula.addFormula(summary);
+			return formula;
+		}
+
+		if (bestcase == 3) {
+			summary = "O-2";
+			formula.addFormula(summary);
+			return formula;
+		}
+	
+	}
+
 	return formula;
+}
+
+
+cSummaryFormula& cCandidate::getSummaryFormula() {
+	return summary;
+}
+
+
+
+void cCandidate::setSummaryFormula(cSummaryFormula& summary) {
+	this->summary = summary;
 }
 
 
@@ -1087,7 +1139,9 @@ void cCandidate::store(ofstream& os) {
 		path[i].store(os);
 	}
 
+	os.write((char *)&startiontype, sizeof(eFragmentIonType));
 	storeString(name, os);
+	summary.store(os);
 	storeStringVector(composition, os);
 	storeString(internalcomposition, os);
 
@@ -1117,7 +1171,9 @@ void cCandidate::load(ifstream& is) {
 		path[i].load(is);
 	}
 
+	is.read((char *)&startiontype, sizeof(eFragmentIonType));
 	loadString(name, is);
+	summary.load(is);
 	loadStringVector(composition, is);
 	loadString(internalcomposition, is);
 
@@ -1238,6 +1294,7 @@ void cCandidate::setPath(cDeNovoGraph& graph, cParameters* parameters) {
 		if (currentedge->endmodifID > 0) {
 			stringpath += ", terminal modification: " + parameters->searchedmodifications[currentedge->endmodifID].name;
 		}
+		stringpath += ", summary: " + currentedge->summary;
 		//path += currentedge->printSourceAnnotation(fragmentdefinitions);
 		//path += "->";
 		//path += currentedge->printTargetAnnotation(fragmentdefinitions);
@@ -1256,11 +1313,8 @@ void cCandidate::setRealPeptideName(cBricksDatabase& bricksdatabase, ePeptideTyp
 	{
 	case linear:
 	case cyclic:
-#if OLIGOKETIDES == 1
-	case linearoligoketide:
-	case cyclicoligoketide:
-#endif
-	case linearpolysaccharide:
+	case linearpolyketide:
+	case cyclicpolyketide:
 		realpeptidename = bricksdatabase.getRealName(internalcomposition);
 		break;
 	case branched:
@@ -1280,11 +1334,8 @@ void cCandidate::setAcronymPeptideNameWithHTMLReferences(cBricksDatabase& bricks
 	{
 	case linear:
 	case cyclic:
-#if OLIGOKETIDES == 1
-	case linearoligoketide:
-	case cyclicoligoketide:
-#endif
-	case linearpolysaccharide:
+	case linearpolyketide:
+	case cyclicpolyketide:
 		acronympeptidename = bricksdatabase.getAcronymName(internalcomposition, true);
 		break;
 	case branched:
@@ -1309,55 +1360,17 @@ string& cCandidate::getAcronymPeptideNameWithHTMLReferences() {
 }
 
 
-eKetidePrecursorType cCandidate::getKetidePrecursorType(cBricksDatabase& bricksdatabase) {
-	cBrick b;
-	b.setComposition(internalcomposition, false);
-	vector<int> intcomposition;
-	b.explodeToIntComposition(intcomposition);
-
-	/*
-	if (intcomposition.size() == 0) {
-		return ketide_precursor_h2o;
-	}
-
-	if ((bricksdatabase[intcomposition[0] - 1].getResidueLossType() == h2_loss) && (bricksdatabase[intcomposition.back() - 1].getResidueLossType() == h2_loss)) {
-		return ketide_precursor_h2;
-	}
-
-	if ((bricksdatabase[intcomposition[0] - 1].getResidueLossType() == h2o_loss) && (bricksdatabase[intcomposition.back() - 1].getResidueLossType() == h2o_loss)) {
-		return ketide_precursor_h2o2;
-	}
-
-	return ketide_precursor_h2o;
-	*/
-
-	int h2_blocks = 0;
-	int h2o_blocks = 0;
-	for (int i = 0; i < (int)intcomposition.size(); i++) {
-		if (bricksdatabase[intcomposition[i] - 1].getResidueLossType() == h2_loss) {
-			h2_blocks++;
-		}
-		if (bricksdatabase[intcomposition[i] - 1].getResidueLossType() == h2o_loss) {
-			h2o_blocks++;
-		}
-	}
-
-	if (h2_blocks == h2o_blocks) {
-		return ketide_precursor_h2o;
-	}
-
-	if (h2_blocks > h2o_blocks) {
-		return ketide_precursor_h2;
-	}
-
-	return ketide_precursor_h2o2;
+void cCandidate::setStartIonType(eFragmentIonType iontype) {
+	startiontype = iontype;
 }
 
 
-#if OLIGOKETIDES == 1
+eFragmentIonType cCandidate::getStartIonType() {
+	return startiontype;
+}
 
 
-bool cCandidate::checkKetideSequence(cBricksDatabase& bricksdatabase, ePeptideType peptidetype) {
+bool cCandidate::checkKetideSequence(cBricksDatabase& bricksdatabase, ePeptideType peptidetype, bool regularblocksorder) {
 	
 	cBrick b;
 	b.setComposition(internalcomposition, false);
@@ -1384,8 +1397,17 @@ bool cCandidate::checkKetideSequence(cBricksDatabase& bricksdatabase, ePeptideTy
 	bool hasfirstblockartificial = hasFirstBrickArtificial(bricksdatabase);
 	bool haslastblockartificial = hasLastBrickArtificial(bricksdatabase);
 
-	// cyclic oligoketide has always an even number of blocks
-	if ((peptidetype == cyclicoligoketide) && !hasfirstblockartificial && !haslastblockartificial && ((int)intcomposition.size() % 2 == 1)) {
+	// linear polyketide has at least 2 building blocks
+	if ((peptidetype == linearpolyketide) && !hasfirstblockartificial && !haslastblockartificial && ((int)intcomposition.size() < 2)) {
+		return false;
+	}
+
+	if (!regularblocksorder) {
+		return true;
+	}
+
+	// cyclic polyketide has always an even number of blocks
+	if ((peptidetype == cyclicpolyketide) && !hasfirstblockartificial && !haslastblockartificial && ((int)intcomposition.size() % 2 == 1)) {
 		return false;
 	}
 
@@ -1429,7 +1451,7 @@ eResidueLossType cCandidate::getRightResidueType(cBricksDatabase& bricksdatabase
 }
 
 
-bool cCandidate::checkKetideBlocks(cBricksDatabase& bricksdatabase, ePeptideType peptidetype) {
+bool cCandidate::checkKetideBlocks(cBricksDatabase& bricksdatabase, ePeptideType peptidetype, bool regularblocksorder) {
 	cBrick b;
 	b.setComposition(internalcomposition, false);
 	vector<int> intcomposition;
@@ -1439,11 +1461,15 @@ bool cCandidate::checkKetideBlocks(cBricksDatabase& bricksdatabase, ePeptideType
 		return false;
 	}
 
+	if (!regularblocksorder) {
+		return true;
+	}
+
 	bool hasfirstblockartificial = hasFirstBrickArtificial(bricksdatabase);
 	bool haslastblockartificial = hasLastBrickArtificial(bricksdatabase);
 
-	// cyclic oligoketide has always an even number of blocks
-	if ((peptidetype == cyclicoligoketide) && !hasfirstblockartificial && !haslastblockartificial && ((int)intcomposition.size() % 2 == 1)) {
+	// cyclic polyketide has always an even number of blocks
+	if ((peptidetype == cyclicpolyketide) && !hasfirstblockartificial && !haslastblockartificial && ((int)intcomposition.size() % 2 == 1)) {
 		return false;
 	}
 
@@ -1462,17 +1488,8 @@ bool cCandidate::checkKetideBlocks(cBricksDatabase& bricksdatabase, ePeptideType
 		return true;
 	}
 
-	/*
-	if ((h2_blocks == 0) && (h2o_blocks == (int)intcomposition.size())) {
-		return true;
-	}
-	*/
-
 	return false;
 }
-
-
-#endif
 
 
 bool operator == (cCandidate const& a, cCandidate const& b) {

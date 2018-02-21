@@ -21,8 +21,7 @@ ICON = images/cb.icns
 
 # Input
 RESOURCES = images.qrc
-HEADERS += core/cAllocator.h \
-           core/cBrick.h \
+HEADERS += core/cBrick.h \
            core/cBricksDatabase.h \
            core/cCandidate.h \
            core/cCandidateSet.h \
@@ -43,9 +42,11 @@ HEADERS += core/cAllocator.h \
            gui/cAboutWidget.h \
            gui/cBranchCyclicWidget.h \
            gui/cBranchedWidget.h \
+           gui/cBricksDatabaseProxyModel.h \
            gui/cBricksDatabaseWidget.h \
+           gui/cCheckBoxDelegate.h \
+           gui/cComboBoxDelegate.h \
            gui/cCyclicWidget.h \
-           gui/cDelegate.h \
            gui/cDrawPeptideWidget.h \
            gui/cEventFilter.h \
            gui/cExportDialog.h \
@@ -58,12 +59,19 @@ HEADERS += core/cAllocator.h \
            gui/cLinearWidget.h \
            gui/cMainThread.h \
            gui/cMainWindow.h \
+           gui/cMainWindowProxyModel.h \
+           gui/cModificationsProxyModel.h \
            gui/cModificationsWidget.h \
+           gui/cMultipleButtonDelegate.h \
            gui/cParametersWidget.h \
+           gui/cSequenceDatabaseProxyModel.h \
            gui/cSequenceDatabaseWidget.h \
+           gui/cSpectrumDetailProxyModel.h \
            gui/cSpectrumDetailWidget.h \
            gui/cSpectrumSceneWidget.h \
+           gui/cSummaryPeaksTableProxyModel.h \
            gui/cSummaryPeaksTableWidget.h \
+           gui/cViewButtonDelegate.h \
            parallel/cGraphReaderThread.h \
            parallel/cSpectrumComparatorThread.h
 SOURCES += core/cBrick.cpp \
@@ -87,9 +95,11 @@ SOURCES += core/cBrick.cpp \
            gui/cAboutWidget.cpp \
            gui/cBranchCyclicWidget.cpp \
            gui/cBranchedWidget.cpp \
+           gui/cBricksDatabaseProxyModel.cpp \
            gui/cBricksDatabaseWidget.cpp \
+           gui/cCheckBoxDelegate.cpp \
+           gui/cComboBoxDelegate.cpp \
            gui/cCyclicWidget.cpp \
-           gui/cDelegate.cpp \
            gui/cDrawPeptideWidget.cpp \
            gui/cEventFilter.cpp \
            gui/cExportDialog.cpp \
@@ -102,12 +112,19 @@ SOURCES += core/cBrick.cpp \
            gui/cLinearWidget.cpp \
            gui/cMainThread.cpp \
            gui/cMainWindow.cpp \
+           gui/cMainWindowProxyModel.cpp \
+           gui/cModificationsProxyModel.cpp \
            gui/cModificationsWidget.cpp \
+           gui/cMultipleButtonDelegate.cpp \
            gui/cParametersWidget.cpp \
+           gui/cSequenceDatabaseProxyModel.cpp \
            gui/cSequenceDatabaseWidget.cpp \
+           gui/cSpectrumDetailProxyModel.cpp \
            gui/cSpectrumDetailWidget.cpp \
            gui/cSpectrumSceneWidget.cpp \
+           gui/cSummaryPeaksTableProxyModel.cpp \
            gui/cSummaryPeaksTableWidget.cpp \
+           gui/cViewButtonDelegate.cpp\
            parallel/cGraphReaderThread.cpp \
            parallel/cSpectrumComparatorThread.cpp \
            main.cpp

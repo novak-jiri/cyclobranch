@@ -64,6 +64,7 @@ cAboutWidget::~cAboutWidget() {
 
 void cAboutWidget::closeEvent(QCloseEvent *event) {
 	accept();
+	event->accept();
 }
 
 
@@ -71,6 +72,7 @@ void cAboutWidget::keyPressEvent(QKeyEvent *event) {
     if (event->key() == Qt::Key_Escape) {
 		hide();
     }
+	event->accept();
 }
 
 
