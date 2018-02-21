@@ -12,6 +12,7 @@
 #include <string>
 #include <vector>
 #include <algorithm>
+#include <map>
 #include "core/utilities.h"
 
 using namespace std;
@@ -42,6 +43,7 @@ class cBrick {
 	vector<string> acronyms;
 	vector<string> references;
 	string summary;
+	map<string, int> summarymap;
 	double mass;
 	string composition;
 	bool artificial;
@@ -87,6 +89,13 @@ public:
 		\retval reference to a string
 	*/ 
 	string& getSummary();
+
+
+	/**
+		\brief Access to a map which stores a summary molecular formula of the brick.
+		\retval map<string, int> reference to a map
+	*/
+	map<string, int>& getSummaryMap();
 
 
 	/**
@@ -142,8 +151,14 @@ public:
 	/**
 		\brief Set the summary molecular formula of the brick.
 		\param summary reference to a string
-	*/ 
+	*/
 	void setSummary(const string& summary);
+
+
+	/**
+		\brief Create an internal map of atoms from the summary formula.
+	*/
+	void createSummaryMap();
 
 
 	/**

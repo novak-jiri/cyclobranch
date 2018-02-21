@@ -16,8 +16,15 @@
 #include "core/cParameters.h"
 #include "core/cDeNovoGraph.h"
 #include "core/cTheoreticalSpectrum.h"
+#include "core/cIsotopePatternCache.h"
 
 using namespace std;
+
+
+/**
+	\brief Global isotope pattern cache.
+*/
+extern cIsotopePatternCache isotopepatterncache;
 
 
 /**

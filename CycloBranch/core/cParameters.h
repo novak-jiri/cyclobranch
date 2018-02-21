@@ -355,15 +355,15 @@ public:
 
 
 	/**
-		\brief A map of peak ids to descriptions.
+		\brief A vector of peak descriptions.
 	*/
-	map<int, string> peakidtodesc;
+	vector<string> peakidtodesc;
 
 
 	/**
-		\brief A map of peak descriptions to ids.
+		\brief A vector of isotope formula descriptions.
 	*/
-	map<string, int> peakdesctoid;
+	vector<string> isotopeformulaidtodesc;
 
 
 	/**
@@ -379,9 +379,15 @@ public:
 
 
 	/**
-		\brief Pixel size.
+		\brief Pixel size x - parsed from imzML file.
 	*/
-	int pixelsize;
+	int defaultpixelsizex;
+
+
+	/**
+		\brief Pixel size y - parsed from imzML file.
+	*/
+	int defaultpixelsizey;
 
 
 	/**

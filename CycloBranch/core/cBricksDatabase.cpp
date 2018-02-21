@@ -1,6 +1,5 @@
 #include "core/cBricksDatabase.h"
 
-
 #include "gui/cMainThread.h"
 
 
@@ -184,6 +183,7 @@ int cBricksDatabase::loadFromPlainTextStream(ifstream &stream, string& errormess
 		pos = s.find('\t');
 		if (pos != string::npos) {
 			b.setSummary(s.substr(0, pos));
+			b.createSummaryMap();
 			s = s.substr(pos + 1);
 		}
 		else {

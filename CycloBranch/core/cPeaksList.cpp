@@ -47,11 +47,6 @@ void cPeaksList::clear() {
 
 void cPeaksList::attach(cPeaksList& peaklist) {
 	peaks.insert(peaks.end(), peaklist.peaks.begin(), peaklist.peaks.end());
-	/*
-	for (int i = 0; i < (int)peaklist.peaks.size(); i++) {
-		peaks.push_back(peaklist.peaks[i]);
-	}
-	*/
 }
 
 
@@ -522,34 +517,6 @@ int cPeaksList::find(double mzratio, double fragmentmasserrortolerance) {
 }
 
 
-void cPeaksList::findObsolete(double mzratio) {
-	int left, right, middle;
-
-	left = 0;
-	right = (int)peaks.size() - 1;
-	while (left <= right) {
-		middle = (left + right) / 2;
-		if (abs(mzratio - peaks[middle].mzratio) < 0.00000001) {
-			while ((middle > 0) && (abs(mzratio - peaks[middle - 1].mzratio) < 0.00000001)) {
-				middle--;
-			}
-			while ((middle < (int)peaks.size()) && (abs(mzratio - peaks[middle].mzratio) < 0.00000001)) {
-				peaks[middle].removeme = true;
-				middle++;
-			}
-			return;
-		}
-		if (mzratio < peaks[middle].mzratio) {
-			right = middle - 1;
-		}
-		else {
-			left = middle + 1;
-		}
-	}
-
-}
-
-
 void cPeaksList::remove(int position) {
 	if (position < (int)peaks.size()) {
 		peaks.erase(peaks.begin() + position);	
@@ -589,7 +556,6 @@ void cPeaksList::removeChargeVariants(int maximumcharge, double fragmentmasserro
 	}
 
 	removeObsolete();
-
 }
 
 
@@ -790,9 +756,11 @@ void cPeaksList::setTitle(string& title) {
 }
 
 
-void cPeaksList::reducePeakDescriptions(map<int, string>& peakidtodesc, map<string, int>& peakdesctoid) {
+void cPeaksList::reducePeakDescriptions(unordered_map<string, int>& peakdesctoid) {
+	//static int test = 0;
 	int descid;
 	for (int i = 0; i < (int)peaks.size(); i++) {
+		//test++;
 		if (peakdesctoid.count(peaks[i].description) > 0) {
 			peaks[i].descriptionid = peakdesctoid[peaks[i].description];
 		}
@@ -800,10 +768,29 @@ void cPeaksList::reducePeakDescriptions(map<int, string>& peakidtodesc, map<stri
 			descid = (int)peakdesctoid.size();
 			peaks[i].descriptionid = descid;
 			peakdesctoid.insert(make_pair(peaks[i].description, descid));
-			peakidtodesc.insert(make_pair(descid, peaks[i].description));
 		}
 		peaks[i].description.clear();
 	}
+	//cout << "desc: " << test << " " << peakdesctoid.size() << endl;
+}
+
+
+void cPeaksList::reduceIsotopeFormulaDescriptions(unordered_map<string, int>& isotopeformuladesctoid) {
+	//static int test = 0;
+	int descid;
+	for (int i = 0; i < (int)peaks.size(); i++) {
+		//test++;
+		if (isotopeformuladesctoid.count(peaks[i].isotopeformula) > 0) {
+			peaks[i].isotopeformulaid = isotopeformuladesctoid[peaks[i].isotopeformula];
+		}
+		else {
+			descid = (int)isotopeformuladesctoid.size();
+			peaks[i].isotopeformulaid = descid;
+			isotopeformuladesctoid.insert(make_pair(peaks[i].isotopeformula, descid));
+		}
+		peaks[i].isotopeformula.clear();
+	}
+	//cout << "isotope: " << test << " " << isotopeformuladesctoid.size() << endl;
 }
 
 

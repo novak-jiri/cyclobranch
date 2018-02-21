@@ -113,13 +113,14 @@ public:
 		\param fwhm FWHM
 		\param defaultmaxx max count of pixel x - parsed from imzML file
 		\param defaultmaxy max count of pixel y - parsed from imzML file
-		\param pixelsize pixel size
+		\param defaultpixelsizex pixel size x - parsed from imzML file
+		\param defaultpixelsizey pixel size y - parsed from imzML file
 		\param vendor vendor type
 		\param os pointer to the main thread of the application (output stream)
 		\param terminatecomputation reference to a variable determining that the computation must be stopped
 		\retval int 0 = success; -1 = aborted by user, -2 = error
 	*/ 
-	int loadFromIMZMLStream(string& imzmlfilename, ifstream &ibdstream, double fwhm, int& defaultmaxx, int& defaultmaxy, int& pixelsize, eVendorType& vendor, cMainThread* os, bool& terminatecomputation);
+	int loadFromIMZMLStream(string& imzmlfilename, ifstream &ibdstream, double fwhm, int& defaultmaxx, int& defaultmaxy, int& defaultpixelsizex, int& defaultpixelsizey, eVendorType& vendor, cMainThread* os, bool& terminatecomputation);
 
 
 	/**

@@ -189,6 +189,17 @@ string cSequence::getNameWithReferenceAsHTMLString() {
 			}
 		}
 
+		// PAMDB (undocumented)
+		if (!correctreference) {
+			rx = "^PAMDB[0-9]+$";
+			if (regex_search(reference, rx)) {
+				s += "<a href=\"http://pseudomonas.umaryland.edu/PAMDB?MetID=" + reference + "\">";
+				s += name;
+				s += "</a>";
+				correctreference = true;
+			}
+		}
+
 	}
 	catch (regex_error& /*e*/) {
 		// nothing to do

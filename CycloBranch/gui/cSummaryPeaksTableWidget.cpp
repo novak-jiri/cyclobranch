@@ -264,12 +264,22 @@ bool cSummaryPeaksTableWidget::prepareToShow(QStandardItemModel* resultsstandard
 		}
 	}
 	else if (parameters->mode == denovoengine) {
-		databasemodel->setColumnCount(9);
+		if (parameters->generateisotopepattern) {
+			databasemodel->setColumnCount(11);
+		}
+		else {
+			databasemodel->setColumnCount(10);
+		}
 	}
 	else {
-		databasemodel->setColumnCount(8);
+		if (parameters->generateisotopepattern) {
+			databasemodel->setColumnCount(10);
+		}
+		else {
+			databasemodel->setColumnCount(9);
+		}
 	}
-	
+
 	databasemodel->setHorizontalHeaderItem(0, new QStandardItem());
 	databasemodel->horizontalHeaderItem(0)->setText("ID");
 	database->setItemDelegateForColumn(0, new QItemDelegate());
@@ -320,7 +330,7 @@ bool cSummaryPeaksTableWidget::prepareToShow(QStandardItemModel* resultsstandard
 	database->setItemDelegateForColumn(currentcolumn, new QItemDelegate());
 	currentcolumn++;
 
-	if ((parameters->mode == dereplication) && (parameters->generateisotopepattern)) {
+	if (parameters->generateisotopepattern) {
 		databasemodel->setHorizontalHeaderItem(currentcolumn, new QStandardItem());
 		databasemodel->horizontalHeaderItem(currentcolumn)->setText("Theoretical Intensity [%]");
 		database->setItemDelegateForColumn(currentcolumn, new QItemDelegate());
@@ -382,10 +392,20 @@ bool cSummaryPeaksTableWidget::prepareToShow(QStandardItemModel* resultsstandard
 	}
 	else {
 		databasemodel->setHorizontalHeaderItem(currentcolumn, new QStandardItem());
+		databasemodel->horizontalHeaderItem(currentcolumn)->setText("Summary Formula");
+		if (parameters->generateisotopepattern) {
+			database->setItemDelegateForColumn(currentcolumn, new cHTMLDelegate());
+		}
+		else {
+			database->setItemDelegateForColumn(currentcolumn, new QItemDelegate());
+		}
+		currentcolumn++;
+
+		databasemodel->setHorizontalHeaderItem(currentcolumn, new QStandardItem());
 		databasemodel->horizontalHeaderItem(currentcolumn)->setText("Sequence");
 		database->setItemDelegateForColumn(currentcolumn, new QItemDelegate());
 		currentcolumn++;
-	}	
+	}
 
 	rowsfiltercombobox->clear();
 	for (int i = 0; i < databasemodel->columnCount(); i++) {
@@ -436,7 +456,7 @@ bool cSummaryPeaksTableWidget::prepareToShow(QStandardItemModel* resultsstandard
 
 		spectrumindex = resultsstandardmodel->item(i, 1)->data(Qt::DisplayRole).toInt() - 1;
 
-		if ((parameters->mode == dereplication) && (parameters->peaklistfileformat != mis) && (parameters->peaklistfileformat != imzML)) {		
+		if ((parameters->mode == dereplication) && (parameters->peaklistfileformat != mis) && (parameters->peaklistfileformat != imzML)) {
 			addEICPeak(eicchromatogram, (*spectralist)[spectrumindex].getExperimentalSpectrum());
 		}
 
@@ -451,8 +471,13 @@ bool cSummaryPeaksTableWidget::prepareToShow(QStandardItemModel* resultsstandard
 		// theoretical peaks
 		for (int j = 0; j < thpeakscount; j++) {
 			peak = &((*thpeaks)[j]);
+
 			if (peak->descriptionid != -1) {
 				peak->description = parameters->peakidtodesc[peak->descriptionid];
+			}
+
+			if (peak->isotopeformulaid != -1) {
+				peak->isotopeformula = parameters->isotopeformulaidtodesc[peak->isotopeformulaid];
 			}
 
 			if (peak->matchedmz == 0) {
@@ -475,7 +500,7 @@ bool cSummaryPeaksTableWidget::prepareToShow(QStandardItemModel* resultsstandard
 					databasemodel->item(currentrow, currentcolumn)->setForeground(brush);
 					databasemodel->item(currentrow, currentcolumn)->setData(QVariant::fromValue((*spectralist)[spectrumindex].getExperimentalSpectrum().getCoordinateX()), Qt::DisplayRole);
 					currentcolumn++;
-					
+
 					databasemodel->setItem(currentrow, currentcolumn, new QStandardItem());
 					databasemodel->item(currentrow, currentcolumn)->setForeground(brush);
 					databasemodel->item(currentrow, currentcolumn)->setData(QVariant::fromValue((*spectralist)[spectrumindex].getExperimentalSpectrum().getCoordinateY()), Qt::DisplayRole);
@@ -487,29 +512,29 @@ bool cSummaryPeaksTableWidget::prepareToShow(QStandardItemModel* resultsstandard
 				databasemodel->setItem(currentrow, currentcolumn, new QStandardItem());
 				databasemodel->item(currentrow, currentcolumn)->setForeground(brush);
 				databasemodel->item(currentrow, currentcolumn)->setText(peak->description.substr(0, secondspace).c_str());
-				currentcolumn++;		
+				currentcolumn++;
 			}
 
 			if (parameters->mode == denovoengine) {
 				databasemodel->setItem(currentrow, currentcolumn, new QStandardItem());
 				databasemodel->item(currentrow, currentcolumn)->setForeground(brush);
 				databasemodel->item(currentrow, currentcolumn)->setData(QVariant::fromValue((*spectralist)[spectrumindex].getPathId() + 1), Qt::DisplayRole);
-				currentcolumn++;		
+				currentcolumn++;
 			}
-		
+
 			if (parameters->mode != dereplication) {
 				databasemodel->setItem(currentrow, currentcolumn, new QStandardItem());
 				databasemodel->item(currentrow, currentcolumn)->setForeground(brush);
 				databasemodel->item(currentrow, currentcolumn)->setText(peak->description.substr(0, peak->description.find(':')).c_str());
-				currentcolumn++;		
+				currentcolumn++;
 			}
-		
+
 			databasemodel->setItem(currentrow, currentcolumn, new QStandardItem());
 			databasemodel->item(currentrow, currentcolumn)->setForeground(brush);
 			databasemodel->item(currentrow, currentcolumn)->setData(QVariant::fromValue(cropPrecisionToSixDecimalsByteArray(peak->mzratio)), Qt::DisplayRole);
 			currentcolumn++;
 
-			if ((parameters->mode == dereplication) && (parameters->generateisotopepattern)) {
+			if (parameters->generateisotopepattern) {
 				databasemodel->setItem(currentrow, currentcolumn, new QStandardItem());
 				databasemodel->item(currentrow, currentcolumn)->setForeground(brush);
 				databasemodel->item(currentrow, currentcolumn)->setData(QVariant::fromValue(cropPrecisionToSixDecimalsByteArray(peak->relativeintensity)), Qt::DisplayRole);
@@ -552,7 +577,7 @@ bool cSummaryPeaksTableWidget::prepareToShow(QStandardItemModel* resultsstandard
 				databasemodel->setItem(currentrow, currentcolumn, new QStandardItem());
 				databasemodel->item(currentrow, currentcolumn)->setForeground(brush);
 				databasemodel->item(currentrow, currentcolumn)->setText(peak->description.substr(peak->description.rfind('(') + 1, peak->description.rfind(')') - peak->description.rfind('(') - 1).c_str());
-				currentcolumn++;		
+				currentcolumn++;
 
 				langle = (int)peak->description.rfind("</a>");
 				rangle = (int)peak->description.find('>');
@@ -569,7 +594,7 @@ bool cSummaryPeaksTableWidget::prepareToShow(QStandardItemModel* resultsstandard
 							coordinates.back().name += databasemodel->item(currentrow, currentcolumn)->text().toStdString();
 						}
 					}
-					currentcolumn++;		
+					currentcolumn++;
 
 					tmp = (int)peak->description.find('<');
 					stmp = peak->description.substr(tmp, rangle - tmp + 1);
@@ -579,7 +604,7 @@ bool cSummaryPeaksTableWidget::prepareToShow(QStandardItemModel* resultsstandard
 					databasemodel->setItem(currentrow, currentcolumn, new QStandardItem());
 					databasemodel->item(currentrow, currentcolumn)->setForeground(brush);
 					databasemodel->item(currentrow, currentcolumn)->setText(stmp.c_str());
-					currentcolumn++;		
+					currentcolumn++;
 				}
 				else {
 					databasemodel->setItem(currentrow, currentcolumn, new QStandardItem());
@@ -594,15 +619,25 @@ bool cSummaryPeaksTableWidget::prepareToShow(QStandardItemModel* resultsstandard
 							coordinates.back().name += databasemodel->item(currentrow, currentcolumn)->text().toStdString();
 						}
 					}
-					currentcolumn++;		
+					currentcolumn++;
 
 					databasemodel->setItem(currentrow, currentcolumn, new QStandardItem());
 					databasemodel->item(currentrow, currentcolumn)->setForeground(brush);
 					databasemodel->item(currentrow, currentcolumn)->setText("");
-					currentcolumn++;		
+					currentcolumn++;
 				}
 			}
 			else {
+				databasemodel->setItem(currentrow, currentcolumn, new QStandardItem());
+				databasemodel->item(currentrow, currentcolumn)->setForeground(brush);
+				if (parameters->generateisotopepattern) {
+					databasemodel->item(currentrow, currentcolumn)->setText(peak->isotopeformula.c_str());
+				}
+				else {
+					databasemodel->item(currentrow, currentcolumn)->setText(peak->formula.getFancySummary(peak->charge).c_str());
+				}
+				currentcolumn++;
+
 				databasemodel->setItem(currentrow, currentcolumn, new QStandardItem());
 				databasemodel->item(currentrow, currentcolumn)->setForeground(brush);
 				databasemodel->item(currentrow, currentcolumn)->setText("");
@@ -613,17 +648,17 @@ bool cSummaryPeaksTableWidget::prepareToShow(QStandardItemModel* resultsstandard
 					}
 					databasemodel->item(currentrow, currentcolumn)->setText(fragmentname.c_str());
 				}
-				currentcolumn++;		
+				currentcolumn++;
 			}
 
 		}
 
-        progress->setValue(i);
-        if (progress->wasCanceled()) {
+		progress->setValue(i);
+		if (progress->wasCanceled()) {
 			deleteTable();
 			emit tableCancelled();
 			break;
-        }
+		}
 
 	}
 
@@ -636,30 +671,40 @@ bool cSummaryPeaksTableWidget::prepareToShow(QStandardItemModel* resultsstandard
 		for (int i = 0; i < databasemodel->columnCount(); i++) {
 			database->resizeColumnToContents(i);
 		}
-	}
 
-	if ((parameters->mode == dereplication) && !progress->wasCanceled()) {
-		if ((parameters->peaklistfileformat == mis) || (parameters->peaklistfileformat == imzML)) {
-			emit resetRegion();
-			emit sendFilterOptionsToImageWindow(coordinates, rowsfiltercombobox->currentText().toStdString(), rowsfiltercomparatorcombobox->currentText().toStdString(), rowsfilterline->text().toStdString(), rowsfiltercasesensitive->isChecked(), rowsfilterwholeword->isChecked());
+		if (parameters->mode == dereplication) {
+			if ((parameters->peaklistfileformat == mis) || (parameters->peaklistfileformat == imzML)) {
+				emit resetRegion();
+				emit sendFilterOptionsToImageWindow(coordinates, rowsfiltercombobox->currentText().toStdString(), rowsfiltercomparatorcombobox->currentText().toStdString(), rowsfilterline->text().toStdString(), rowsfiltercasesensitive->isChecked(), rowsfilterwholeword->isChecked());
 
-			if (parameters->generateisotopepattern) {
-				database->setColumnWidth(12, min(400, database->columnWidth(12)));
+				if (parameters->generateisotopepattern) {
+					database->setColumnWidth(12, min(400, database->columnWidth(12)));
+				}
+				else {
+					database->setColumnWidth(9, min(400, database->columnWidth(9)));
+				}
 			}
 			else {
+				eicchromatogram.normalizeIntenzity();
+				origeicchromatogram = eicchromatogram;
+				emit sendFilterOptionsToChromatogram(eicchromatogram);
+
+				if (parameters->generateisotopepattern) {
+					database->setColumnWidth(10, min(400, database->columnWidth(10)));
+				}
+				else {
+					database->setColumnWidth(7, min(400, database->columnWidth(7)));
+				}
+			}
+		}
+		else if (parameters->mode == denovoengine) {
+			if (parameters->generateisotopepattern) {
 				database->setColumnWidth(9, min(400, database->columnWidth(9)));
 			}
 		}
 		else {
-			eicchromatogram.normalizeIntenzity();
-			origeicchromatogram = eicchromatogram;
-			emit sendFilterOptionsToChromatogram(eicchromatogram);
-
 			if (parameters->generateisotopepattern) {
-				database->setColumnWidth(10, min(400, database->columnWidth(10)));
-			}
-			else {
-				database->setColumnWidth(7, min(400, database->columnWidth(7)));
+				database->setColumnWidth(8, min(400, database->columnWidth(8)));
 			}
 		}
 	}
@@ -1042,10 +1087,12 @@ void cSummaryPeaksTableWidget::exportStatistics() {
 		int idcol;
 		int xcol, ycol;
 		int relintcol, absintcol;
-		int scorecol, qvaluecol;
+		int scorecol, fdrcol;
 
 		int experimentalmzcol;
 		int ppmcol;
+
+		int thintcol;
 
 		if (parameters->mode == dereplication) {
 
@@ -1057,7 +1104,7 @@ void cSummaryPeaksTableWidget::exportStatistics() {
 					namecol = 13;
 					referencecol = 14;
 					scorecol = 10;
-					qvaluecol = 11;
+					fdrcol = 11;
 					idcol = 0;
 					xcol = 1;
 					ycol = 2;
@@ -1085,7 +1132,7 @@ void cSummaryPeaksTableWidget::exportStatistics() {
 					namecol = 11;
 					referencecol = 12;
 					scorecol = 8;
-					qvaluecol = 9;
+					fdrcol = 9;
 					idcol = 0;
 					relintcol = 5;
 					absintcol = 6;
@@ -1104,18 +1151,42 @@ void cSummaryPeaksTableWidget::exportStatistics() {
 
 		}
 		else if (parameters->mode == denovoengine) {
-			theoreticalmzcol = 3;
-			experimentalmzcol = 4;
-			relintcol = 5;
-			absintcol = 6;
-			ppmcol = 7;
+			if (parameters->generateisotopepattern) {
+				theoreticalmzcol = 3;
+				thintcol = 4;
+				experimentalmzcol = 5;
+				relintcol = 6;
+				absintcol = 7;
+				ppmcol = 8;
+				summaryformulacol = 9;
+			}
+			else {
+				theoreticalmzcol = 3;
+				experimentalmzcol = 4;
+				relintcol = 5;
+				absintcol = 6;
+				ppmcol = 7;
+				summaryformulacol = 8;
+			}
 		}
 		else {
-			theoreticalmzcol = 2;
-			experimentalmzcol = 3;
-			relintcol = 4;
-			absintcol = 5;
-			ppmcol = 6;
+			if (parameters->generateisotopepattern) {
+				theoreticalmzcol = 2;
+				thintcol = 3;
+				experimentalmzcol = 4;
+				relintcol = 5;
+				absintcol = 6;
+				ppmcol = 7;
+				summaryformulacol = 8;
+			}
+			else {
+				theoreticalmzcol = 2;
+				experimentalmzcol = 3;
+				relintcol = 4;
+				absintcol = 5;
+				ppmcol = 6;
+				summaryformulacol = 7;
+			}
 		}
 
 		map<cSummaryTableKeyMS, vector<int>, cIonSummaryTableKeyMS_comp> ionmapms;
@@ -1132,6 +1203,10 @@ void cSummaryPeaksTableWidget::exportStatistics() {
 
 				keyms.clear();
 
+				item = databasemodel->itemFromIndex(proxymodel->mapToSource(proxymodel->index(i, idcol)));
+				if (item) {
+					keyms.id = item->text().toStdString();
+				}
 				item = databasemodel->itemFromIndex(proxymodel->mapToSource(proxymodel->index(i, iontypecol)));
 				if (item) {
 					keyms.iontype = item->text().toStdString();
@@ -1151,6 +1226,16 @@ void cSummaryPeaksTableWidget::exportStatistics() {
 				item = databasemodel->itemFromIndex(proxymodel->mapToSource(proxymodel->index(i, referencecol)));
 				if (item) {
 					keyms.reference = item->text().toStdString();
+				}
+				if (parameters->generateisotopepattern) {
+					item = databasemodel->itemFromIndex(proxymodel->mapToSource(proxymodel->index(i, scorecol)));
+					if (item) {
+						keyms.score = item->text().toStdString();
+					}
+					item = databasemodel->itemFromIndex(proxymodel->mapToSource(proxymodel->index(i, fdrcol)));
+					if (item) {
+						keyms.fdr = item->text().toStdString();
+					}
 				}
 
 				auto obj = ionmapms.find(keyms);
@@ -1184,6 +1269,10 @@ void cSummaryPeaksTableWidget::exportStatistics() {
 				if (item) {
 					keymsms.theoreticalmz = item->text().toStdString();
 				}
+				item = databasemodel->itemFromIndex(proxymodel->mapToSource(proxymodel->index(i, thintcol)));
+				if (item) {
+					keymsms.thint = item->text().toStdString();
+				}
 				item = databasemodel->itemFromIndex(proxymodel->mapToSource(proxymodel->index(i, experimentalmzcol)));
 				if (item) {
 					keymsms.experimentalmz = item->text().toStdString();
@@ -1199,6 +1288,10 @@ void cSummaryPeaksTableWidget::exportStatistics() {
 				item = databasemodel->itemFromIndex(proxymodel->mapToSource(proxymodel->index(i, ppmcol)));
 				if (item) {
 					keymsms.ppmerror = item->text().toStdString();
+				}
+				item = databasemodel->itemFromIndex(proxymodel->mapToSource(proxymodel->index(i, summaryformulacol)));
+				if (item) {
+					keymsms.summary = item->text().toStdString();
 				}
 
 				auto obj = mapmsms.find(keymsms);
@@ -1226,11 +1319,11 @@ void cSummaryPeaksTableWidget::exportStatistics() {
 		double relintmax, relintavg, relintmed, relintcur;
 		double absintmax, absintavg, absintmed, absintcur;
 		double scoremin, scoreavg, scoremed, scoremax, scorecur;
-		double qvaluemin, qvalueavg, qvaluemed, qvaluemax, qvaluecur;
+		double fdrmin, fdravg, fdrmed, fdrmax, fdrcur;
 		vector<double> relintmedianvector;
 		vector<double> absintmedianvector;
 		vector<double> scoremedianvector;
-		vector<double> qvaluemedianvector;
+		vector<double> fdrmedianvector;
 
 		if (parameters->mode == dereplication) {
 
@@ -1274,65 +1367,79 @@ void cSummaryPeaksTableWidget::exportStatistics() {
 
 				out << "\"Whole Pattern Statistics\"" << endl << endl;
 
-				out << "\"Name\",\"Pattern Type\",";
+				out << "\"Name\",\"Pattern Type\",\"Number of Patterns\",";
 				out << "\"Minimum Score\",\"Average Score\",\"Median Score\",\"Maximum Score\",";
 				out << "\"Minimum FDR\",\"Average FDR\",\"Median FDR\",\"Maximum FDR\",";
 				out << "\"Reference\"" << endl;
 
-				for (auto it = envelopestatisticsms.begin(); it != envelopestatisticsms.end(); ++it) {
+				scoremin = DBL_MAX;
+				scoremax = 0;
+				scoreavg = 0;
+				scoremedianvector.clear();
+
+				fdrmin = DBL_MAX;
+				fdrmax = 0;
+				fdravg = 0;
+				fdrmedianvector.clear();
+
+				int envelopesstatisticssize = (int)envelopestatisticsms.size();
+				int cnt = 0;
+				for (int i = 0; i < envelopesstatisticssize; i++) {
+
+					scorecur = QString(envelopestatisticsms[i].first.score.c_str()).toDouble();
+					if (scorecur > scoremax) {
+						scoremax = scorecur;
+					}
+					if (scorecur < scoremin) {
+						scoremin = scorecur;
+					}
+					scoreavg += scorecur;
+					scoremedianvector.push_back(scorecur);
+
+					fdrcur = QString(envelopestatisticsms[i].first.fdr.c_str()).toDouble();
+					if (fdrcur > fdrmax) {
+						fdrmax = fdrcur;
+					}
+					if (fdrcur < fdrmin) {
+						fdrmin = fdrcur;
+					}
+					fdravg += fdrcur;
+					fdrmedianvector.push_back(fdrcur);
+
+					cnt++;
+
+					if ((i + 1 < envelopesstatisticssize) && (envelopestatisticsms[i].first.iontype.compare(envelopestatisticsms[i + 1].first.iontype) == 0)
+						&& (envelopestatisticsms[i].first.name.compare(envelopestatisticsms[i + 1].first.name) == 0)
+						&& (envelopestatisticsms[i].first.reference.compare(envelopestatisticsms[i + 1].first.reference) == 0)) {
+						continue;
+					}
+
+					scoreavg /= (double)cnt;
+					fdravg /= (double)cnt;
+
+					scoremed = median(scoremedianvector);
+					fdrmed = median(fdrmedianvector);
+
+					out << "\"" << envelopestatisticsms[i].first.name.c_str() << "\",\"" << envelopestatisticsms[i].first.iontype.c_str() << "\",\"" << cnt << "\",\"";
+
+					stringstream ss;
+					ss << std::fixed << std::setprecision(6) << scoremin << "\",\"" << scoreavg << "\",\"" << scoremed << "\",\"" << scoremax << "\",\"";
+					ss << std::fixed << std::setprecision(6) << fdrmin << "\",\"" << fdravg << "\",\"" << fdrmed << "\",\"" << fdrmax << "\",\"";
+					out << ss.str().c_str();
+
+					out << envelopestatisticsms[i].first.reference.c_str() << "\"" << endl;
 
 					scoremin = DBL_MAX;
 					scoremax = 0;
 					scoreavg = 0;
 					scoremedianvector.clear();
 
-					qvaluemin = DBL_MAX;
-					qvaluemax = 0;
-					qvalueavg = 0;
-					qvaluemedianvector.clear();
+					fdrmin = DBL_MAX;
+					fdrmax = 0;
+					fdravg = 0;
+					fdrmedianvector.clear();
 
-					for (auto it2 = it->second.begin(); it2 != it->second.end(); ++it2) {
-						item = databasemodel->itemFromIndex(proxymodel->mapToSource(proxymodel->index(*it2, scorecol)));
-						if (item) {
-							scorecur = item->data(Qt::DisplayRole).toDouble();
-							if (scorecur > scoremax) {
-								scoremax = scorecur;
-							}
-							if (scorecur < scoremin) {
-								scoremin = scorecur;
-							}
-							scoreavg += scorecur;
-							scoremedianvector.push_back(scorecur);
-						}
-
-						item = databasemodel->itemFromIndex(proxymodel->mapToSource(proxymodel->index(*it2, qvaluecol)));
-						if (item) {
-							qvaluecur = item->data(Qt::DisplayRole).toDouble();
-							if (qvaluecur > qvaluemax) {
-								qvaluemax = qvaluecur;
-							}
-							if (qvaluecur < qvaluemin) {
-								qvaluemin = qvaluecur;
-							}
-							qvalueavg += qvaluecur;
-							qvaluemedianvector.push_back(qvaluecur);
-						}
-					}
-
-					scoreavg /= (double)it->second.size();
-					qvalueavg /= (double)it->second.size();
-
-					scoremed = median(scoremedianvector);
-					qvaluemed = median(qvaluemedianvector);
-
-					out << "\"" << it->first.name.c_str() << "\",\"" << it->first.iontype.c_str() << "\",\"";
-
-					stringstream ss;
-					ss << std::fixed << std::setprecision(6) << scoremin << "\",\"" << scoreavg << "\",\"" << scoremed << "\",\"" << scoremax << "\",\"";
-					ss << std::fixed << std::setprecision(6) << qvaluemin << "\",\"" << qvalueavg << "\",\"" << qvaluemed << "\",\"" << qvaluemax << "\",\"";
-					out << ss.str().c_str();
-
-					out << it->first.reference.c_str() << "\"" << endl;
+					cnt = 0;
 
 				}
 
@@ -1466,7 +1573,11 @@ void cSummaryPeaksTableWidget::exportStatistics() {
 		}
 		else {
 
-			out << "\"Number of Matches\",\"Theoretical m/z\",\"Experimental m/z\",\"Relative Intensity [%]\",\"Absolute Intensity\",\"Error [ppm]\"" << endl;
+			out << "\"Number of Matches\",\"Theoretical m/z\",";
+			if (parameters->generateisotopepattern) {
+				out << "\"Theoretical Intensity [%]\",";
+			}
+			out << "\"Experimental m/z\",\"Relative Intensity [%]\",\"Absolute Intensity\",\"Error [ppm]\",\"Summary Formula\"" << endl;
 
 			vector< pair<cSummaryTableKeyMSMS, vector<int> > > statisticsmsms;
 
@@ -1480,7 +1591,11 @@ void cSummaryPeaksTableWidget::exportStatistics() {
 			sort(statisticsmsms.begin(), statisticsmsms.end(), cmpmsms);
 
 			for (auto it = statisticsmsms.begin(); it != statisticsmsms.end(); ++it) {
-				out << "\"" << it->second.size() << "\",\"" << it->first.theoreticalmz.c_str() << "\",\"" << it->first.experimentalmz.c_str() << "\",\"" << it->first.relint.c_str() << "\",\"" << it->first.absint.c_str() << "\",\"" << it->first.ppmerror.c_str() << "\"" << endl;
+				out << "\"" << it->second.size() << "\",\"" << it->first.theoreticalmz.c_str() << "\",";
+				if (parameters->generateisotopepattern) {
+					out << "\"" << it->first.thint.c_str() << "\",";
+				}
+				out << "\"" << it->first.experimentalmz.c_str() << "\",\"" << it->first.relint.c_str() << "\",\"" << it->first.absint.c_str() << "\",\"" << it->first.ppmerror.c_str() << "\",\"" << stripHTML(it->first.summary).c_str() << "\"" << endl;
 			}
 
 		}

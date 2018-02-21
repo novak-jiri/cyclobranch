@@ -13,6 +13,11 @@ void nodeEdge::load(ifstream& is) {
 }
 
 
+bool operator == (nodeEdge const& a, nodeEdge const& b) {
+	return (a.nodeid == b.nodeid) && (a.edgeid == b.edgeid);
+}
+
+
 bool operator == (cEdge const& a, cEdge const& b) {
 	return (a.targetnode == b.targetnode) && (a.brickid == b.brickid) && (a.sourceion == b.sourceion) && (a.targetion == b.targetion);
 }

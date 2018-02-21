@@ -48,6 +48,12 @@ class QMenu;
 struct cSummaryTableKeyMS {
 
 	/**
+		\brief Identification ID subkey.
+	*/
+	string id;
+
+
+	/**
 		\brief Ion type subkey.
 	*/
 	string iontype;
@@ -78,14 +84,29 @@ struct cSummaryTableKeyMS {
 
 
 	/**
+		\brief Score subkey.
+	*/
+	string score;
+
+
+	/**
+		\brief FDR subkey.
+	*/
+	string fdr;
+
+
+	/**
 		\brief Clear the structure.
 	*/
 	void clear() {
+		id.clear();
 		iontype.clear();
 		theoreticalmz.clear();
 		summaryformula.clear();
 		name.clear();
 		reference.clear();
+		score.clear();
+		fdr.clear();
 	}
 
 };
@@ -100,6 +121,12 @@ struct cSummaryTableKeyMSMS {
 		\brief Theoretical m/z subkey.
 	*/
 	string theoreticalmz;
+
+
+	/**
+		\brief Theoretical intensity subkey.
+	*/
+	string thint;
 
 
 	/**
@@ -127,14 +154,22 @@ struct cSummaryTableKeyMSMS {
 
 
 	/**
+		\brief summary formula subkey.
+	*/
+	string summary;
+
+
+	/**
 		\brief Clear the structure.
 	*/
 	void clear() {
 		theoreticalmz.clear();
+		thint.clear();
 		experimentalmz.clear();
 		relint.clear();
 		absint.clear();
 		ppmerror.clear();
+		summary.clear();
 	}
 
 };
@@ -170,7 +205,7 @@ struct cEnvelopeSummaryTableKeyMS_comp {
 		\retval bool true if the first object is less than the second object
 	*/
 	bool operator()(const cSummaryTableKeyMS& left, const cSummaryTableKeyMS& right) const {
-		return (left.iontype + left.name + left.reference < right.iontype + right.name + right.reference);
+		return (left.id + left.iontype + left.name + left.reference < right.id + right.iontype + right.name + right.reference);
 	}
 
 };
@@ -188,7 +223,7 @@ struct cSummaryTableKeyMSMS_comp {
 		\retval bool true if the first object is less than the second object
 	*/
 	bool operator()(const cSummaryTableKeyMSMS& left, const cSummaryTableKeyMSMS& right) const {
-		return (left.theoreticalmz + left.experimentalmz + left.relint + left.absint + left.ppmerror < right.theoreticalmz + right.experimentalmz + right.relint + right.absint + right.ppmerror);
+		return (left.theoreticalmz + left.thint + left.experimentalmz + left.relint + left.absint + left.ppmerror + left.summary < right.theoreticalmz + right.thint + right.experimentalmz + right.relint + right.absint + right.ppmerror + right.summary);
 	}
 
 };

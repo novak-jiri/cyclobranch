@@ -153,7 +153,7 @@ cParametersWidget::cParametersWidget(QWidget* parent) {
 	peaklistformlayout->addRow(tr("Minimum m/z Ratio: "), minimummz);
 
 	fwhm = new QDoubleSpinBox();
-	fwhm->setToolTip("Full width at half maximum. The value is used if the profile spectra are converted into peaklists (mzML and imzML) and if full isotope patterns of compounds are generated (MS and MSI).");
+	fwhm->setToolTip("Full width at half maximum. The value is used if the profile spectra are converted into peaklists (mzML and imzML) and if the full isotope patterns of compounds are generated.");
 	fwhm->setDecimals(6);
 	fwhm->setRange(0, 1);
 	fwhm->setSingleStep(0.01);
@@ -311,7 +311,7 @@ cParametersWidget::cParametersWidget(QWidget* parent) {
 
 	generateisotopepattern = new QCheckBox();
 	generateisotopepattern->setChecked(true);
-	generateisotopepattern->setToolTip("Full isotope patters of compounds are generated in theoretical spectra (MS and MSI).\nThe FWHM value is used when theoretical patterns are generated.");
+	generateisotopepattern->setToolTip("The full isotope patterns of compounds are generated in theoretical spectra.\nThe FWHM value is used for this purpose. If checked, the deisotoping is disabled automatically.");
 	applicationformlayout->addRow(tr("Generate Full Isotope Patterns: "), generateisotopepattern);
 
 	minimumpatternsize = new QSpinBox();
@@ -618,10 +618,12 @@ void cParametersWidget::loadSettings() {
 		settings.value("regularblocksorder", 0).toInt() == 0 ? regularblocksorder->setChecked(false) : regularblocksorder->setChecked(true);
 
 		mode->setCurrentIndex(settings.value("mode", 0).toInt());
+		updateSettingsWhenModeChanged(mode->currentIndex());
+
 		sequencedatabaseline->setText(settings.value("sequencedatabase", "").toString());
 		maximumnumberofthreads->setValue(settings.value("maximumnumberofthreads", 1).toInt());
 		scoretype->setCurrentIndex(settings.value("scoretype", (int)matched_peaks).toInt());
-		hitsreported->setValue(settings.value("hitsreported", 1000).toInt());
+		hitsreported->setValue(settings.value("hitsreported", 100).toInt());
 		sequencetag->setText(settings.value("sequencetag", "").toString());
 		
 		for (int i = 0; i < fragmentiontypes->getList()->count(); i++) {
@@ -630,14 +632,13 @@ void cParametersWidget::loadSettings() {
 		}
 
 		settings.value("clearhitswithoutparent", 0).toInt() == 0 ? clearhitswithoutparent->setChecked(false) : clearhitswithoutparent->setChecked(true);
-		settings.value("generateisotopepattern", 1).toInt() == 0 ? generateisotopepattern->setChecked(false) : generateisotopepattern->setChecked(true);
+		settings.value("generateisotopepattern", 0).toInt() == 0 ? generateisotopepattern->setChecked(false) : generateisotopepattern->setChecked(true);
 		minimumpatternsize->setValue(settings.value("minimumpatternsize", 1).toInt());
 
 		searchedsequenceline->setText(settings.value("searchedsequence", "").toString());
 		searchedsequenceNtermmodif->setText(settings.value("searchedsequenceNtermmodif", "").toString());
 		searchedsequenceCtermmodif->setText(settings.value("searchedsequenceCtermmodif", "").toString());
 		searchedsequenceTmodif->setText(settings.value("searchedsequenceTmodif", "").toString());
-
 	}
 
 }
@@ -1106,7 +1107,7 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 		sequencetag->setDisabled(false);
 		fragmentiontypes->setDisabled(false);
 		clearhitswithoutparent->setDisabled(false);
-		generateisotopepattern->setDisabled(true);
+		generateisotopepattern->setDisabled(false);
 		minimumpatternsize->setDisabled(true);
 		searchedsequenceline->setDisabled(false);
 		searchedsequencebutton->setDisabled(false);
@@ -1140,7 +1141,7 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 		sequencetag->setDisabled(true);
 		fragmentiontypes->setDisabled(false);
 		clearhitswithoutparent->setDisabled(false);
-		generateisotopepattern->setDisabled(true);
+		generateisotopepattern->setDisabled(false);
 		minimumpatternsize->setDisabled(true);
 		searchedsequenceline->setDisabled(false);
 		searchedsequencebutton->setDisabled(false);
@@ -1174,7 +1175,7 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 		sequencetag->setDisabled(false);
 		fragmentiontypes->setDisabled(false);
 		clearhitswithoutparent->setDisabled(false);
-		generateisotopepattern->setDisabled(true);
+		generateisotopepattern->setDisabled(false);
 		minimumpatternsize->setDisabled(true);
 		searchedsequenceline->setDisabled(false);
 		searchedsequencebutton->setDisabled(false);
@@ -1239,30 +1240,30 @@ void cParametersWidget::resetFragmentIonTypes() {
 	
 	if ((eModeType)mode->currentIndex() == dereplication) {
 		start = ms_Hplus;
-		end = ms_NH4plus;
+		end = ms_MGa4H;
 	}
 	else {
 		switch ((ePeptideType)peptidetype->currentIndex()) {
 		case linear:
 		case branched:
 			start = a_ion;
-			end = z_ion_dehydrated_and_deamidated;
+			end = z_ion_dehydrated_deamidated_deamidated_deamidated;
 			break;
 		case cyclic:
 			start = a_ion;
-			end = c_ion_dehydrated_and_deamidated;
+			end = c_ion_dehydrated_deamidated_deamidated_deamidated;
 			break;
 		case branchcyclic:
 			start = a_ion;
-			end = z_ion_dehydrated_and_deamidated;
+			end = z_ion_dehydrated_deamidated_deamidated_deamidated;
 			break;
 		case linearpolyketide:
 			start = l1h_ion;
-			end = r2oh_ion_co_loss_dehydrated_and_deamidated;
+			end = r2oh_ion_co_loss_dehydrated_deamidated;
 			break;
 		case cyclicpolyketide:
 			start = l1h_ion; // l0h_ion;
-			end = l2h_ion_co_loss_dehydrated_and_deamidated;
+			end = l2h_ion_co_loss_dehydrated_deamidated;
 			break;
 		case other:
 			break;

@@ -204,12 +204,24 @@ void cSpectrumSceneWidget::wheelEvent(QWheelEvent *event) {
 void cSpectrumSceneWidget::mouseMoveEvent(QMouseEvent *event) {
 	QGraphicsView::mouseMoveEvent(event);
 
-	if (enablemousemzselection && (pressedx != -1) && (pressedy != -1)) {
+	if ((pressedx != -1) && (pressedy != -1)) {
 		QPointF p = mapToScene(event->x(), event->y());
 		currentx = (int)p.x();
 		currenty = (int)p.y();
 
-		updateZoomGroup();
+		if (enablemousemzselection) {
+			updateZoomGroup();
+		}
+		else {
+			calculateMinMaxMZ();
+
+			emit updateMZInterval(minmzratio, maxmzratio);
+
+			pressedx = currentx;
+			pressedy = currenty;
+
+			redrawScene();
+		}
 	}
 
 	event->accept();
@@ -219,44 +231,22 @@ void cSpectrumSceneWidget::mouseMoveEvent(QMouseEvent *event) {
 void cSpectrumSceneWidget::mouseReleaseEvent(QMouseEvent *event) {
 	QGraphicsView::mouseReleaseEvent(event);
 
-	if (enablemousemzselection) {
-		if (pressedx == currentx) {
-			pressedx = -1;
-			currentx = -1;
+	if (pressedx == currentx) {
+		pressedx = -1;
+		currentx = -1;
 
-			redrawScene();
-		}
+		redrawScene();
+	}
     
-		if ((event->button() == Qt::LeftButton) && (pressedx != -1) && (pressedy != -1)) {
-			if (pressedx < leftmargin) {
-				pressedx = leftmargin;
-			}
+	if ((event->button() == Qt::LeftButton) && (pressedx != -1) && (pressedy != -1)) {
+		calculateMinMaxMZ();
 
-			if (pressedx > origwidth - rightmargin) {
-				pressedx = origwidth - rightmargin;
-			}
+		emit updateMZInterval(minmzratio, maxmzratio);
 
-			if (currentx < leftmargin) {
-				currentx = leftmargin;
-			}
+		pressedx = -1;
+		pressedy = -1;
 
-			if (currentx > origwidth - rightmargin) {
-				currentx = origwidth - rightmargin;
-			}
-
-			double tmpminmzratio = getMZRatioFromXPosition((pressedx < currentx)?pressedx:currentx, origwidth);
-			double tmpmaxmzratio = getMZRatioFromXPosition((pressedx < currentx)?currentx:pressedx, origwidth);
-
-			minmzratio = tmpminmzratio;
-			maxmzratio = tmpmaxmzratio;
-
-			emit updateMZInterval(minmzratio, maxmzratio);
-
-			pressedx = -1;
-			pressedy = -1;
-
-			redrawScene();
-		}
+		redrawScene();
 	}
 
 	event->accept();
@@ -266,25 +256,27 @@ void cSpectrumSceneWidget::mouseReleaseEvent(QMouseEvent *event) {
 void cSpectrumSceneWidget::mousePressEvent(QMouseEvent *event) {
 	QGraphicsView::mousePressEvent(event);
 
-	if (enablemousemzselection) {
-		if (event->button() == Qt::LeftButton) {
-			QPointF p = mapToScene(event->x(), event->y());
-			pressedx = (int)p.x();
-			pressedy = (int)p.y();
+	if (event->button() == Qt::LeftButton) {
+		QPointF p = mapToScene(event->x(), event->y());
+		pressedx = (int)p.x();
+		pressedy = (int)p.y();
 
-			currentx = pressedx;
-			currenty = pressedy;
+		currentx = pressedx;
+		currenty = pressedy;
 
+		if (enablemousemzselection) {
 			updateZoomGroup();
 		}
+	}
 
-		if (event->button() == Qt::RightButton) {
-			pressedx = -1;
-			pressedy = -1;
+	if (event->button() == Qt::RightButton) {
+		pressedx = -1;
+		pressedy = -1;
 
-			redrawScene();
-		}
+		redrawScene();
+	}
 
+	if (enablemousemzselection) {
 		if (event->button() == Qt::MiddleButton) {
 			pressedx = -1;
 			pressedy = -1;
@@ -478,7 +470,7 @@ void cSpectrumSceneWidget::redrawScene() {
 				visiblepeaks[visiblepeakscount].description += parameters->peakidtodesc[thpeaks[*it].descriptionid].substr(0, parameters->peakidtodesc[thpeaks[*it].descriptionid].rfind(':'));
 			}
 			else {
-				visiblepeaks[visiblepeakscount].description += thpeaks[*it].description.substr(0, thpeaks[*it].description.find(':'));
+				visiblepeaks[visiblepeakscount].description += parameters->peakidtodesc[thpeaks[*it].descriptionid].substr(0, parameters->peakidtodesc[thpeaks[*it].descriptionid].find(':'));
 			}
 		}
 
@@ -671,6 +663,43 @@ void cSpectrumSceneWidget::updateZoomGroup() {
 	zoomsimpletextitem->setPos(QPointF(pressedx, pressedy - 2));
 
 	zoomgroup->setVisible(true);
+}
+
+
+void cSpectrumSceneWidget::calculateMinMaxMZ() {
+	if (pressedx < leftmargin) {
+		pressedx = leftmargin;
+	}
+
+	if (pressedx > origwidth - rightmargin) {
+		pressedx = origwidth - rightmargin;
+	}
+
+	if (currentx < leftmargin) {
+		currentx = leftmargin;
+	}
+
+	if (currentx > origwidth - rightmargin) {
+		currentx = origwidth - rightmargin;
+	}
+
+	double tmpminmzratio = getMZRatioFromXPosition((pressedx < currentx) ? pressedx : currentx, origwidth);
+	double tmpmaxmzratio = getMZRatioFromXPosition((pressedx < currentx) ? currentx : pressedx, origwidth);
+
+	if (enablemousemzselection) {
+		minmzratio = tmpminmzratio;
+		maxmzratio = tmpmaxmzratio;
+	}
+	else {
+		if (pressedx > currentx) {
+			minmzratio = min(minmzratio + tmpmaxmzratio - tmpminmzratio, theoreticalspectrum->getExperimentalSpectrum().getMaximumMZRatio());
+			maxmzratio = min(maxmzratio + tmpmaxmzratio - tmpminmzratio, theoreticalspectrum->getExperimentalSpectrum().getMaximumMZRatio());
+		}
+		else {
+			minmzratio = max(0.0, minmzratio - tmpmaxmzratio + tmpminmzratio);
+			maxmzratio = max(0.0, maxmzratio - tmpmaxmzratio + tmpminmzratio);
+		}
+	}
 }
 
 

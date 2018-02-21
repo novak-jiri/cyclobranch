@@ -9,8 +9,9 @@
 
 #include <vector>
 #include <set>
-#include <string>
+#include <unordered_set>
 #include <map>
+#include <string>
 #include <QMetaType>
 
 #include "core/cParameters.h"
@@ -162,7 +163,7 @@ class cTheoreticalSpectrum {
 	void removeUnmatchedMetalIsotopes(cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks);
 
 	// remove unmatched isotope patterns
-	void removeUnmatchedIsotopePatterns(cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks, cPeaksList& outputtheoreticalpeaks);
+	void removeUnmatchedIsotopePatterns(cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks, cPeaksList& outputtheoreticalpeaks, bool storeunmatchedpeaks);
 
 	// calculate envelope scores
 	void calculateEnvelopeScores(cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks);
@@ -187,6 +188,9 @@ class cTheoreticalSpectrum {
 
 	// calculate the angle distance
 	double getAngleDistance(cPeaksList& theoreticalpeaks, int start, int stop);
+
+	// generate isotope patterns of fragment ions
+	void generateFragmentIsotopePatterns(int& theoreticalpeaksrealsize, bool writedescription);
 
 public:
 
@@ -475,7 +479,7 @@ public:
 
 
 	/**
-		\brief Check whether the theoretical spectrum corresponds to a searched sequence.
+		\brief Check if the candidate sequence corresponds to the searched sequence.
 		\retval bool if true then the theoretical spectrum corresponds to a searched sequence
 	*/ 
 	bool isValid();
@@ -493,6 +497,13 @@ public:
 		\retval int reverted position of sequence
 	*/ 
 	int getReverseValidPosition();
+
+
+	/**
+		\brief Set a flag determining if the candidate sequence corresponds to the searched sequence.
+		\param searchedsequence searched sequence
+	*/
+	void setValidSequence(regex& searchedsequence);
 
 
 	/**

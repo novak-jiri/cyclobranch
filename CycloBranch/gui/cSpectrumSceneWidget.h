@@ -196,6 +196,9 @@ private:
 	void updateZoomGroup();
 
 
+	void calculateMinMaxMZ();
+
+
 signals:
 
 

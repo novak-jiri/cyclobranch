@@ -248,11 +248,11 @@ int cPeakListSeries::loadFromMZMLStream(string& mzmlfilename, ifstream &mzmlstre
 }
 
 
-int cPeakListSeries::loadFromIMZMLStream(string& imzmlfilename, ifstream &ibdstream, double fwhm, int& defaultmaxx, int& defaultmaxy, int& pixelsize, eVendorType& vendor, cMainThread* os, bool& terminatecomputation) {
+int cPeakListSeries::loadFromIMZMLStream(string& imzmlfilename, ifstream &ibdstream, double fwhm, int& defaultmaxx, int& defaultmaxy, int& defaultpixelsizex, int& defaultpixelsizey, eVendorType& vendor, cMainThread* os, bool& terminatecomputation) {
 	*os << "Loading the imzML file... ";
 
 	cImzML imzml;
-	if (imzml.parse(imzmlfilename, defaultmaxx, defaultmaxy, pixelsize, vendor)) {
+	if (imzml.parse(imzmlfilename, defaultmaxx, defaultmaxy, defaultpixelsizex, defaultpixelsizey, vendor)) {
 		return -3;
 	}
 

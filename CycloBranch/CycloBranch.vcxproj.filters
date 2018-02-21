@@ -452,6 +452,9 @@
     <ClCompile Include="gui\cChromatogramWindowWidget.cpp">
       <Filter>Source Files\gui</Filter>
     </ClCompile>
+    <ClCompile Include="core\cIsotopePatternCache.cpp">
+      <Filter>Source Files\core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="gui\cAboutWidget.h">
@@ -628,6 +631,9 @@
       <Filter>Header Files\core</Filter>
     </ClInclude>
     <ClInclude Include="core\cMzML.h">
+      <Filter>Header Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="core\cIsotopePatternCache.h">
       <Filter>Header Files\core</Filter>
     </ClInclude>
   </ItemGroup>

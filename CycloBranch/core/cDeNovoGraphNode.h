@@ -51,6 +51,15 @@ struct nodeEdge {
 
 
 /**
+	\brief Overloaded operator ==.
+	\param a first nodeEdge
+	\param b second nodeEdge
+	\retval bool true when nodeEdges are equal
+*/
+bool operator == (nodeEdge const& a, nodeEdge const& b);
+
+
+/**
 	\brief The structure representing an outgoing edge from a node.
 */
 struct cEdge {

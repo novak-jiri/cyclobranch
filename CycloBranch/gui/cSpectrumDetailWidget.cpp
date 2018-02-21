@@ -174,7 +174,12 @@ string cSpectrumDetailWidget::getPeaksTableAsHTMLString(bool unmatchedtheoretica
 			}
 		}
 		else {
-			columncount = 7;
+			if (parameters->generateisotopepattern) {
+				columncount = 9;
+			}
+			else {
+				columncount = 8;
+			}
 		}
 
 		tdwidth = to_string(100/columncount);
@@ -193,7 +198,7 @@ string cSpectrumDetailWidget::getPeaksTableAsHTMLString(bool unmatchedtheoretica
 
 		s += "<th width=\"" + tdwidth + "%\"><b>Theoretical m/z</b></th>";
 
-		if ((parameters->mode == dereplication) && (parameters->generateisotopepattern)) {
+		if (parameters->generateisotopepattern) {
 			s += "<th width=\"" + tdwidth + "%\"><b>Theoretical Intensity [%]</b></th>";
 		}
 
@@ -212,6 +217,7 @@ string cSpectrumDetailWidget::getPeaksTableAsHTMLString(bool unmatchedtheoretica
 			s += "<th width=\"" + tdwidth + "%\"><b>Reference</b></th>";
 		}
 		else {
+			s += "<th width=\"" + tdwidth + "%\"><b>Summary Formula</b></th>";
 			s += "<th width=\"" + tdwidth + "%\"><b>Sequence</b></th>";
 		}
 
@@ -225,8 +231,13 @@ string cSpectrumDetailWidget::getPeaksTableAsHTMLString(bool unmatchedtheoretica
 		// theoretical peaks
 		for (int i = 0; i < thpeakscount; i++) {
 			peak = &((*thpeaks)[i]);
+			
 			if (peak->descriptionid != -1) {
 				peak->description = parameters->peakidtodesc[peak->descriptionid];
+			}
+
+			if (peak->isotopeformulaid != -1) {
+				peak->isotopeformula = parameters->isotopeformulaidtodesc[peak->isotopeformulaid];
 			}
 
 			if (peak->matchedmz > 0) {
@@ -252,8 +263,13 @@ string cSpectrumDetailWidget::getPeaksTableAsHTMLString(bool unmatchedtheoretica
 		
 			s += printHTMLTableCell(to_string(cropPrecisionToSixDecimals(peak->mzratio)), isred);
 
-			if ((parameters->mode == dereplication) && (parameters->generateisotopepattern)) {
-				s += printHTMLTableCell(to_string(cropPrecisionToSixDecimals(peak->relativeintensity)), isred);
+			if (parameters->generateisotopepattern) {
+				if (peak->relativeintensity > 0) {
+					s += printHTMLTableCell(to_string(cropPrecisionToSixDecimals(peak->relativeintensity)), isred);
+				}
+				else {
+					s += "<td></td>";
+				}
 			}
 
 			if (peak->matchedmz > 0) {
@@ -296,6 +312,13 @@ string cSpectrumDetailWidget::getPeaksTableAsHTMLString(bool unmatchedtheoretica
 				}
 			}
 			else {
+				if (parameters->generateisotopepattern) {
+					s += printHTMLTableCell(peak->isotopeformula, isred);
+				}
+				else {
+					s += printHTMLTableCell(peak->formula.getFancySummary(peak->charge).c_str(), isred);
+				}
+
 				pos = peak->description.find(':');
 				if ((pos != string::npos) && (pos + 2 < peak->description.size())) {
 					desc = peak->description.substr(pos + 2);
@@ -322,15 +345,15 @@ string cSpectrumDetailWidget::getPeaksTableAsHTMLString(bool unmatchedtheoretica
 				}
 				s += "<tr>";
 				s += "<td></td><td></td>";
-				if ((parameters->mode == dereplication) && (parameters->generateisotopepattern)) {
+				if (parameters->generateisotopepattern) {
 					s += "<td></td>";
 				}
 				s += printHTMLTableCell(to_string(cropPrecisionToSixDecimals(peak->mzratio)), false);
 				s += printHTMLTableCell(to_string(cropPrecisionToSixDecimals(peak->relativeintensity)), false);
 				s += printHTMLTableCell(QVariant(cropDecimalsByteArray(peak->absoluteintensity)).toString().toStdString(), false);
-				s += "<td></td><td></td>";
+				s += "<td></td><td></td><td></td>";
 				if (parameters->mode == dereplication) {
-					s += "<td></td><td></td>";
+					s += "<td></td>";
 					if (parameters->generateisotopepattern) {
 						s += "<td></td><td></td>";
 					}
@@ -377,8 +400,13 @@ string cSpectrumDetailWidget::getPartialPeaksTableAsHTMLString(int id, bool expo
 		// theoretical peaks
 		for (int i = 0; i < thpeakscount; i++) {
 			peak = &((*thpeaks)[i]);
+
 			if (peak->descriptionid != -1) {
 				peak->description = parameters->peakidtodesc[peak->descriptionid];
+			}
+
+			if (peak->isotopeformulaid != -1) {
+				peak->isotopeformula = parameters->isotopeformulaidtodesc[peak->isotopeformulaid];
 			}
 
 			if (peak->matchedmz > 0) {
@@ -393,18 +421,12 @@ string cSpectrumDetailWidget::getPartialPeaksTableAsHTMLString(int id, bool expo
 			}
 
 			s += "<tr>";
-			s += "<td>";
-			s += to_string(id + 1);
-			s += "</td>";
+			s += printHTMLTableCell(to_string(id + 1), isred);
 		
 			if (parameters->mode == dereplication) {
 				if ((parameters->peaklistfileformat == mis) || (parameters->peaklistfileformat == imzML)) {
-					s += "<td>";
-					s += to_string(theoreticalspectrum->getExperimentalSpectrum().getCoordinateX());
-					s += "</td>";			
-					s += "<td>";
-					s += to_string(theoreticalspectrum->getExperimentalSpectrum().getCoordinateY());
-					s += "</td>";			
+					s += printHTMLTableCell(to_string(theoreticalspectrum->getExperimentalSpectrum().getCoordinateX()), isred);
+					s += printHTMLTableCell(to_string(theoreticalspectrum->getExperimentalSpectrum().getCoordinateY()), isred);
 				}
 				secondspace = (int)peak->description.find(' ', peak->description.find(' ') + 1);
 				s += printHTMLTableCell(peak->description.substr(0, secondspace), isred);
@@ -420,7 +442,7 @@ string cSpectrumDetailWidget::getPartialPeaksTableAsHTMLString(int id, bool expo
 		
 			s += printHTMLTableCell(to_string(cropPrecisionToSixDecimals(peak->mzratio)), isred);
 
-			if ((parameters->mode == dereplication) && (parameters->generateisotopepattern)) {
+			if (parameters->generateisotopepattern) {
 				s += printHTMLTableCell(to_string(cropPrecisionToSixDecimals(peak->relativeintensity)), isred);
 			}
 
@@ -464,6 +486,13 @@ string cSpectrumDetailWidget::getPartialPeaksTableAsHTMLString(int id, bool expo
 				}
 			}
 			else {
+				if (parameters->generateisotopepattern) {
+					s += printHTMLTableCell(peak->isotopeformula, isred);
+				}
+				else {
+					s += printHTMLTableCell(peak->formula.getFancySummary(peak->charge).c_str(), isred);
+				}
+
 				pos = peak->description.find(':');
 				if ((pos != string::npos) && (pos + 2 < peak->description.size())) {
 					desc = peak->description.substr(pos + 2);
@@ -877,6 +906,7 @@ void cSpectrumDetailWidget::prepareToShow(ePeptideType peptidetype, QAction* act
 				connect(rotation, SIGNAL(currentIndexChanged(int)), spectrumscene, SLOT(rotationChanged(int)));
 				connect(rotation, SIGNAL(currentIndexChanged(QString)), spectrumscene, SLOT(rotationChanged(QString)));
 				connect(rotation, SIGNAL(currentIndexChanged(int)), cyclicwidget, SLOT(rotationChanged(int)));
+				connect(rotation, SIGNAL(currentIndexChanged(int)), this, SLOT(filterTableAfterRotationChanged(int)));
 
 				toolbarRotation = addToolBar(tr("Ring break up point"));
 				toolbarRotation->addWidget(widgetrotation);
@@ -894,6 +924,7 @@ void cSpectrumDetailWidget::prepareToShow(ePeptideType peptidetype, QAction* act
 
 				connect(trotation, SIGNAL(currentIndexChanged(int)), spectrumscene, SLOT(trotationChanged(int)));
 				connect(trotation, SIGNAL(currentIndexChanged(int)), branchedwidget, SLOT(trotationChanged(int)));
+				connect(trotation, SIGNAL(currentIndexChanged(int)), this, SLOT(filterTableAfterTRotationChanged(int)));
 
 				toolbarTrotation = addToolBar(tr("Linearized sequence"));
 				toolbarTrotation->addWidget(widgettrotation);
@@ -917,6 +948,7 @@ void cSpectrumDetailWidget::prepareToShow(ePeptideType peptidetype, QAction* act
 				connect(rotation, SIGNAL(currentIndexChanged(int)), spectrumscene, SLOT(rotationChanged(int)));
 				connect(rotation, SIGNAL(currentIndexChanged(QString)), spectrumscene, SLOT(rotationChanged(QString)));
 				connect(rotation, SIGNAL(currentIndexChanged(int)), branchcyclicwidget, SLOT(rotationChanged(int)));
+				connect(rotation, SIGNAL(currentIndexChanged(int)), this, SLOT(filterTableAfterRotationChanged(int)));
 
 				toolbarRotation = addToolBar(tr("Ring break up point"));
 				toolbarRotation->addWidget(widgetrotation);
@@ -931,7 +963,8 @@ void cSpectrumDetailWidget::prepareToShow(ePeptideType peptidetype, QAction* act
 
 				connect(trotation, SIGNAL(currentIndexChanged(int)), spectrumscene, SLOT(trotationChanged(int)));
 				connect(trotation, SIGNAL(currentIndexChanged(int)), branchcyclicwidget, SLOT(trotationChanged(int)));
-				
+				connect(trotation, SIGNAL(currentIndexChanged(int)), this, SLOT(filterTableAfterTRotationChanged(int)));
+								
 				toolbarTrotation = addToolBar(tr("Linearized sequence"));
 				toolbarTrotation->addWidget(widgettrotation);
 			}
@@ -1201,7 +1234,12 @@ void cSpectrumDetailWidget::preparePeaksTable() {
 		}
 	}
 	else {
-		peakstablemodel->setColumnCount(7);
+		if (parameters->generateisotopepattern) {
+			peakstablemodel->setColumnCount(9);
+		}
+		else {
+			peakstablemodel->setColumnCount(8);
+		}
 	}
 
 	for (int i = 0; i < peakstablemodel->columnCount(); i++) {
@@ -1225,7 +1263,7 @@ void cSpectrumDetailWidget::preparePeaksTable() {
 	peakstablemodel->horizontalHeaderItem(currentcolumn)->setText("Theoretical m/z");
 	currentcolumn++;
 
-	if ((parameters->mode == dereplication) && (parameters->generateisotopepattern)) {
+	if (parameters->generateisotopepattern) {
 		peakstablemodel->horizontalHeaderItem(currentcolumn)->setText("Theoretical Intensity [%]");
 		currentcolumn++;
 	}
@@ -1266,6 +1304,12 @@ void cSpectrumDetailWidget::preparePeaksTable() {
 		currentcolumn++;
 	}
 	else {
+		peakstablemodel->horizontalHeaderItem(currentcolumn)->setText("Summary Formula");
+		if (parameters->generateisotopepattern) {
+			peakstable->setItemDelegateForColumn(currentcolumn, new cHTMLDelegate());
+		}
+		currentcolumn++;
+
 		peakstablemodel->horizontalHeaderItem(currentcolumn)->setText("Sequence");
 		currentcolumn++;
 	}
@@ -1299,8 +1343,13 @@ void cSpectrumDetailWidget::preparePeaksTable() {
 	// theoretical peaks
 	for (int i = 0; i < thpeakscount; i++) {
 		peak = &((*thpeaks)[i]);
+
 		if (peak->descriptionid != -1) {
 			peak->description = parameters->peakidtodesc[peak->descriptionid];
+		}
+
+		if (peak->isotopeformulaid != -1) {
+			peak->isotopeformula = parameters->isotopeformulaidtodesc[peak->isotopeformulaid];
 		}
 
 		if (peak->matchedmz > 0) {
@@ -1330,10 +1379,12 @@ void cSpectrumDetailWidget::preparePeaksTable() {
 		peakstablemodel->item(i, currentcolumn)->setData(QVariant::fromValue(cropPrecisionToSixDecimalsByteArray(peak->mzratio)), Qt::DisplayRole);
 		currentcolumn++;
 
-		if ((parameters->mode == dereplication) && (parameters->generateisotopepattern)) {
-			peakstablemodel->setItem(i, currentcolumn, new QStandardItem());
-			peakstablemodel->item(i, currentcolumn)->setForeground(brush);
-			peakstablemodel->item(i, currentcolumn)->setData(QVariant::fromValue(cropPrecisionToSixDecimalsByteArray(peak->relativeintensity)), Qt::DisplayRole);
+		if (parameters->generateisotopepattern) {
+			if (peak->relativeintensity > 0) {
+				peakstablemodel->setItem(i, currentcolumn, new QStandardItem());
+				peakstablemodel->item(i, currentcolumn)->setForeground(brush);
+				peakstablemodel->item(i, currentcolumn)->setData(QVariant::fromValue(cropPrecisionToSixDecimalsByteArray(peak->relativeintensity)), Qt::DisplayRole);
+			}
 			currentcolumn++;
 		}
 
@@ -1419,6 +1470,24 @@ void cSpectrumDetailWidget::preparePeaksTable() {
 			}
 		}
 		else {
+			peakstablemodel->setItem(i, currentcolumn, new QStandardItem());
+			peakstablemodel->item(i, currentcolumn)->setForeground(brush);
+			if (parameters->generateisotopepattern) {
+				QString summary;
+				if (peak->matched > 0) {
+					summary += "<font color=\"red\">";
+				}
+				summary += peak->isotopeformula.c_str();
+				if (peak->matched > 0) {
+					summary += "</font>";
+				}
+				peakstablemodel->item(i, currentcolumn)->setText(summary);
+			}
+			else {
+				peakstablemodel->item(i, currentcolumn)->setText(peak->formula.getFancySummary(peak->charge).c_str());
+			}
+			currentcolumn++;
+
 			pos = peak->description.find(':');
 			if ((pos != string::npos) && (pos + 2 < peak->description.size())) {
 				peakstablemodel->setItem(i, currentcolumn, new QStandardItem());
@@ -1448,7 +1517,7 @@ void cSpectrumDetailWidget::preparePeaksTable() {
 			continue;
 		}
 
-		if ((parameters->mode == dereplication) && (parameters->generateisotopepattern)) {
+		if (parameters->generateisotopepattern) {
 			currentcolumn = 3;
 		} 
 		else {
@@ -1489,6 +1558,11 @@ void cSpectrumDetailWidget::preparePeaksTable() {
 		}
 		else {
 			peakstable->setColumnWidth(6, min(400, peakstable->columnWidth(6)));
+		}
+	}
+	else {
+		if (parameters->generateisotopepattern) {
+			peakstable->setColumnWidth(7, min(400, peakstable->columnWidth(7)));
 		}
 	}
 
@@ -1848,10 +1922,35 @@ void cSpectrumDetailWidget::filterPeaksTable() {
 	bool hm = actionHideMatched->isChecked();
 	bool hu = actionHideUnmatched->isChecked();
 	bool hs = actionHideScrambled->isChecked();
+	bool hr = false;
+	bool ht = false;
 
-	proxymodel->setFlags(hm, hu, hs);
+	QString pattern;
+
+	if (parameters && ((parameters->mode == denovoengine) || (parameters->mode == singlecomparison) || (parameters->mode == databasesearch))) {
+		if ((parameters->peptidetype == cyclic) || (parameters->peptidetype == branchcyclic) || (parameters->peptidetype == cyclicpolyketide)) {
+			if (rotation->currentIndex() > 0) {
+				pattern += rotation->currentText() + "_";
+				hr = true;
+			}
+		}
+		if ((parameters->peptidetype == branched) || (parameters->peptidetype == branchcyclic)) {
+			if (trotation->currentIndex() > 0) {
+				pattern += QString::number(trotation->currentIndex()) + "_";
+				ht = true;
+			}
+		}
+	}
+
+	if (hs) {
+		if (pattern.isEmpty()) {
+			pattern = "^((?!scrambled).)*$";
+		}
+	}
+
+	proxymodel->setFlags(hm, hu, hs, hr, ht);
 	proxymodel->setFilterKeyColumn(-1);
-	proxymodel->setFilterFixedString("scrambled");
+	proxymodel->setFilterRegExp(pattern);
 }
 
 
@@ -1869,6 +1968,16 @@ void cSpectrumDetailWidget::hideUnmatchedPeaks(bool hide) {
 
 void cSpectrumDetailWidget::hideScrambledPeaks(bool hide) {
 	spectrumscene->hideScrambledPeaks(hide);
+	filterPeaksTable();
+}
+
+
+void cSpectrumDetailWidget::filterTableAfterRotationChanged(int index) {
+	filterPeaksTable();
+}
+
+
+void cSpectrumDetailWidget::filterTableAfterTRotationChanged(int index) {
 	filterPeaksTable();
 }
 
@@ -1917,8 +2026,13 @@ void cSpectrumDetailWidget::showIsomersStateChanged() {
 
 		for (int i = 0; i < thpeakscount; i++) {
 			peak = &((*thpeaks)[i]);
+
 			if (peak->descriptionid != -1) {
 				peak->description = parameters->peakidtodesc[peak->descriptionid];
+			}
+
+			if (peak->isotopeformulaid != -1) {
+				peak->isotopeformula = parameters->isotopeformulaidtodesc[peak->isotopeformulaid];
 			}
 
 			pos = peak->description.find(':');

@@ -155,6 +155,7 @@
     <ClCompile Include="core\cDeNovoGraphNode.cpp" />
     <ClCompile Include="core\cFragmentIons.cpp" />
     <ClCompile Include="core\cImzML.cpp" />
+    <ClCompile Include="core\cIsotopePatternCache.cpp" />
     <ClCompile Include="core\cMzML.cpp" />
     <ClCompile Include="core\cParameters.cpp" />
     <ClCompile Include="core\cPeak.cpp" />
@@ -529,6 +530,7 @@
     <ClInclude Include="core\cDeNovoGraphNode.h" />
     <ClInclude Include="core\cFragmentIons.h" />
     <ClInclude Include="core\cImzML.h" />
+    <ClInclude Include="core\cIsotopePatternCache.h" />
     <ClInclude Include="core\cMzML.h" />
     <ClInclude Include="core\cParameters.h" />
     <ClInclude Include="core\cPeak.h" />

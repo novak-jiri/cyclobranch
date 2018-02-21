@@ -15,6 +15,14 @@
 
 class cTheoreticalSpectrumList;
 
+/**
+	\brief Compare two paths of a peptide sequence candidate as a string.
+	\param a first theoretical spectrum
+	\param b second theoretical spectrum
+	\retval bool true if the path of \a a is smaller than the path of \a b
+*/
+bool comparePaths(vector<nodeEdge>& a, vector<nodeEdge>& b);
+
 
 /**
 	\brief Compare scores of two theoretical spectra (number of b-ions and all ions secondly).
@@ -103,7 +111,7 @@ private:
 	cParameters* parameters;
 	regex* rxsequencetag;
 	regex* rxsearchedsequence;
-	double worstscore;
+	double lastavailableworstscore;
 	bool* terminatecomputation;
 	cBricksDatabase* bricksdatabasewithcombinations;
 
@@ -119,10 +127,10 @@ public:
 		\param parameters pointer to program parameters
 		\param rxsequencetag pointer to a regular expression of a sequence tag
 		\param rxsearchedsequence pointer to a regular expression of a searched sequence
-		\param worstscore worst score in the resulting set of theoretical spectra
+		\param currentworstscore worst score in the resulting set of theoretical spectra
 		\param terminatecomputation reference to a variable determining that the thread must be stopped
 	*/ 
-	void initialize(cCandidate& candidate, cPeaksList& peaklist, cBricksDatabase* bricksdatabasewithcombinations, cTheoreticalSpectrumList* theoreticalspectrumlist, cParameters* parameters, regex* rxsequencetag, regex* rxsearchedsequence, double worstscore, bool* terminatecomputation);
+	void initialize(cCandidate& candidate, cPeaksList& peaklist, cBricksDatabase* bricksdatabasewithcombinations, cTheoreticalSpectrumList* theoreticalspectrumlist, cParameters* parameters, regex* rxsequencetag, regex* rxsearchedsequence, double currentworstscore, bool* terminatecomputation);
 
 
 protected:

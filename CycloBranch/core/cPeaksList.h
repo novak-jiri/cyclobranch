@@ -275,13 +275,6 @@ public:
 
 
 	/**
-		\brief Find all peaks having a specified \a mzratio and mark them with the flag \a removeme == true.
-		\param mzratio mz ratio of peaks which will be marked
-	*/ 
-	void findObsolete(double mzratio);
-
-
-	/**
 		\brief Remove a peak.
 		\param position position of a peak
 	*/ 
@@ -397,10 +390,16 @@ public:
 
 	/**
 		\brief Reduce redundant descriptions of peaks.
-		\param peakidtodesc map of peak ids to descriptions
 		\param peakdesctoid map of peak descriptions to ids
 	*/
-	void reducePeakDescriptions(map<int, string>& peakidtodesc, map<string, int>& peakdesctoid);
+	void reducePeakDescriptions(unordered_map<string, int>& peakdesctoid);
+
+
+	/**
+		\brief Reduce redundant descriptions of isotope formulas.
+		\param isotopeformuladesctoid map of isotope formula descriptions to ids
+	*/
+	void reduceIsotopeFormulaDescriptions(unordered_map<string, int>& isotopeformuladesctoid);
 
 
 	/**

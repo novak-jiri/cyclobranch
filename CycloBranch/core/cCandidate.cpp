@@ -885,7 +885,7 @@ bool cCandidate::compare(cCandidate& candidate) {
 }
 
 
-vector<nodeEdge> cCandidate::getPath() {
+vector<nodeEdge>& cCandidate::getPath() {
 	return path;
 }
 

@@ -391,7 +391,7 @@ public:
 		\brief Get a path in the de novo graph corresponding to the peptide sequence candidate.
 		\retval vector<nodeEdge> vector of pairs node and edge
 	*/ 
-	vector<nodeEdge> getPath();
+	vector<nodeEdge>& getPath();
 
 
 	/**

@@ -336,6 +336,12 @@ private slots:
 	void hideScrambledPeaks(bool hide);
 
 
+	void filterTableAfterRotationChanged(int index);
+
+
+	void filterTableAfterTRotationChanged(int index);
+
+
 	void showIsomersStateChanged();
 
 

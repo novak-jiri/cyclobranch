@@ -186,12 +186,24 @@ void cChromatogramWindowWidget::wheelEvent(QWheelEvent *event) {
 void cChromatogramWindowWidget::mouseMoveEvent(QMouseEvent *event) {
 	QGraphicsView::mouseMoveEvent(event);
 
-	if (enablemouseselection && (pressedx != -1) && (pressedy != -1)) {
+	if ((pressedx != -1) && (pressedy != -1)) {
 		QPointF p = mapToScene(event->x(), event->y());
 		currentx = (int)p.x();
 		currenty = (int)p.y();
 
-		updateZoomGroup();
+		if (enablemouseselection) {
+			updateZoomGroup();
+		}
+		else {
+			calculateMinMaxScan();
+
+			emit updateScanIDInterval(minscan, maxscan);
+
+			pressedx = currentx;
+			pressedy = currenty;
+
+			redrawScene();
+		}
 	}
 
 	event->accept();
@@ -201,48 +213,22 @@ void cChromatogramWindowWidget::mouseMoveEvent(QMouseEvent *event) {
 void cChromatogramWindowWidget::mouseReleaseEvent(QMouseEvent *event) {
 	QGraphicsView::mouseReleaseEvent(event);
 
-	if (enablemouseselection) {
-		if (pressedx == currentx) {
-			pressedx = -1;
-			currentx = -1;
+	if (pressedx == currentx) {
+		pressedx = -1;
+		currentx = -1;
 
-			redrawScene();
-		}
+		redrawScene();
+	}
 
-		if ((event->button() == Qt::LeftButton) && (pressedx != -1) && (pressedy != -1)) {
-			if (pressedx < leftmargin) {
-				pressedx = leftmargin;
-			}
+	if ((event->button() == Qt::LeftButton) && (pressedx != -1) && (pressedy != -1)) {
+		calculateMinMaxScan();
 
-			if (pressedx > origwidth - rightmargin) {
-				pressedx = origwidth - rightmargin;
-			}
+		emit updateScanIDInterval(minscan, maxscan);
 
-			if (currentx < leftmargin) {
-				currentx = leftmargin;
-			}
+		pressedx = -1;
+		pressedy = -1;
 
-			if (currentx > origwidth - rightmargin) {
-				currentx = origwidth - rightmargin;
-			}
-
-			int tmpminscan = getScanIDFromXPosition((pressedx < currentx) ? pressedx : currentx, origwidth);
-			int tmpmaxscan = getScanIDFromXPosition((pressedx < currentx) ? currentx : pressedx, origwidth);
-
-			if (tmpminscan != tmpmaxscan) {
-
-				minscan = tmpminscan;
-				maxscan = tmpmaxscan;
-
-				emit updateScanIDInterval(minscan, maxscan);
-
-			}
-
-			pressedx = -1;
-			pressedy = -1;
-
-			redrawScene();
-		}
+		redrawScene();
 	}
 
 	event->accept();
@@ -252,25 +238,27 @@ void cChromatogramWindowWidget::mouseReleaseEvent(QMouseEvent *event) {
 void cChromatogramWindowWidget::mousePressEvent(QMouseEvent *event) {
 	QGraphicsView::mousePressEvent(event);
 
-	if (enablemouseselection) {
-		if (event->button() == Qt::LeftButton) {
-			QPointF p = mapToScene(event->x(), event->y());
-			pressedx = (int)p.x();
-			pressedy = (int)p.y();
+	if (event->button() == Qt::LeftButton) {
+		QPointF p = mapToScene(event->x(), event->y());
+		pressedx = (int)p.x();
+		pressedy = (int)p.y();
 
-			currentx = pressedx;
-			currenty = pressedy;
+		currentx = pressedx;
+		currenty = pressedy;
 
+		if (enablemouseselection) {
 			updateZoomGroup();
 		}
+	}
 
-		if (event->button() == Qt::RightButton) {
-			pressedx = -1;
-			pressedy = -1;
+	if (event->button() == Qt::RightButton) {
+		pressedx = -1;
+		pressedy = -1;
 
-			redrawScene();
-		}
+		redrawScene();
+	}
 
+	if (enablemouseselection) {
 		if (event->button() == Qt::MiddleButton) {
 			pressedx = -1;
 			pressedy = -1;
@@ -613,6 +601,45 @@ void cChromatogramWindowWidget::updateZoomGroup() {
 	zoomsimpletextitem->setPos(QPointF(pressedx, pressedy - 2));
 
 	zoomgroup->setVisible(true);
+}
+
+
+void cChromatogramWindowWidget::calculateMinMaxScan() {
+	if (pressedx < leftmargin) {
+		pressedx = leftmargin;
+	}
+
+	if (pressedx > origwidth - rightmargin) {
+		pressedx = origwidth - rightmargin;
+	}
+
+	if (currentx < leftmargin) {
+		currentx = leftmargin;
+	}
+
+	if (currentx > origwidth - rightmargin) {
+		currentx = origwidth - rightmargin;
+	}
+
+	int tmpminscan = getScanIDFromXPosition((pressedx < currentx) ? pressedx : currentx, origwidth);
+	int tmpmaxscan = getScanIDFromXPosition((pressedx < currentx) ? currentx : pressedx, origwidth);
+
+	if (enablemouseselection) {
+		if (tmpminscan != tmpmaxscan) {
+			minscan = tmpminscan;
+			maxscan = tmpmaxscan;
+		}
+	}
+	else {
+		if (pressedx > currentx) {
+			minscan = min(minscan + tmpmaxscan - tmpminscan, max(1, ticchromatogram.size()));
+			maxscan = min(maxscan + tmpmaxscan - tmpminscan, max(1, ticchromatogram.size()));
+		}
+		else {
+			minscan = max(1, minscan - tmpmaxscan + tmpminscan);
+			maxscan = max(1, maxscan - tmpmaxscan + tmpminscan);
+		}
+	}
 }
 
 

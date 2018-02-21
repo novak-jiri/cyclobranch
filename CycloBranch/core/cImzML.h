@@ -122,11 +122,12 @@ public:
 		\param filename imzml filename
 		\param defaultmaxx max count of pixel x - parsed from imzML file
 		\param defaultmaxy max count of pixel y - parsed from imzML file
-		\param pixelsize pixel size
+		\param defaultpixelsizex pixel size x - parsed from imzML file
+		\param defaultpixelsizey pixel size y - parsed from imzML file
 		\param vendor vendor type
 		\retval 0 = success; 1 = failed (zlib compression detected)
 	*/ 
-	int parse(string& filename, int& defaultmaxx, int& defaultmaxy, int& pixelsize, eVendorType& vendor);
+	int parse(string& filename, int& defaultmaxx, int& defaultmaxy, int& defaultpixelsizex, int& defaultpixelsizey, eVendorType& vendor);
  
 
 	/**

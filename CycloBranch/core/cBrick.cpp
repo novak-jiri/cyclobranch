@@ -1,5 +1,7 @@
 #include "core/cBrick.h"
 
+#include "core/cSummaryFormula.h"
+
 
 int getNumberOfBricks(const string& composition) {
 	if (composition.size() == 0) {
@@ -26,6 +28,7 @@ void cBrick::clear() {
 	acronyms.clear();
 	references.clear();
 	summary = "";
+	summarymap.clear();
 	mass = 0;
 	composition = "";
 	artificial = false;
@@ -51,6 +54,11 @@ void cBrick::setName(const string& name) {
 
 string& cBrick::getSummary() {
 	return summary;
+}
+
+
+map<string, int>& cBrick::getSummaryMap() {
+	return summarymap;
 }
 
 
@@ -103,6 +111,12 @@ void cBrick::setComposition(const string& composition, bool normalize) {
 
 void cBrick::setSummary(const string& summary) {
 	this->summary = summary;
+}
+
+
+void cBrick::createSummaryMap() {
+	summarymap.clear();
+	addStringFormulaToMap(summary, summarymap);
 }
 
 
@@ -360,6 +374,7 @@ void cBrick::store(ofstream& os) {
 	storeStringVector(acronyms, os);
 	storeStringVector(references, os);
 	storeString(summary, os);
+	storeStringIntMap(summarymap, os);
 	os.write((char *)&mass, sizeof(double));
 	storeString(composition, os);
 	os.write((char *)&artificial, sizeof(bool));
@@ -372,6 +387,7 @@ void cBrick::load(ifstream& is) {
 	loadStringVector(acronyms, is);
 	loadStringVector(references, is);
 	loadString(summary, is);
+	loadStringIntMap(summarymap, is);
 	is.read((char *)&mass, sizeof(double));
 	loadString(composition, is);
 	is.read((char *)&artificial, sizeof(bool));

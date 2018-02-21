@@ -6,7 +6,7 @@ TEMPLATE = app
 TARGET = CycloBranch
 QT += core gui widgets printsupport svg
 INCLUDEPATH += . core gui parallel
-QMAKE_CXXFLAGS += -std=c++0x -DLINUX -m64
+QMAKE_CXXFLAGS += -std=c++11 -DLINUX -m64
 QMAKE_LIBS += -lboost_regex -lxerces-c
 OBJECTS_DIR = build/
 MOC_DIR = moc/
@@ -21,6 +21,7 @@ HEADERS += core/cBrick.h \
            core/cDeNovoGraphNode.h \
            core/cFragmentIons.h \
            core/cImzML.h \
+           core/cIsotopePatternCache.h \
            core/cMzML.h \
            core/cParameters.h \
            core/cPeak.h \
@@ -78,6 +79,7 @@ SOURCES += core/cBrick.cpp \
            core/cDeNovoGraphNode.cpp \
            core/cFragmentIons.cpp \
            core/cImzML.cpp \
+           core/cIsotopePatternCache.cpp \
            core/cMzML.cpp \
            core/cParameters.cpp \
            core/cPeak.cpp \

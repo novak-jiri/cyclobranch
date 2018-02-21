@@ -6,7 +6,7 @@ TEMPLATE = app
 TARGET = CycloBranch
 QT += core gui widgets printsupport svg
 INCLUDEPATH += . core gui parallel /usr/local/opt/boost/include /usr/local/opt/xerces-c/include
-QMAKE_CXXFLAGS += -std=c++0x -DMACOSX -m64
+QMAKE_CXXFLAGS += -std=c++11 -DMACOSX -m64
 QMAKE_LIBS += -lboost_regex -lxerces-c
 QMAKE_LIBDIR = /usr/local/opt/boost/lib /usr/local/opt/xerces-c/lib
 OBJECTS_DIR = build/
@@ -23,6 +23,7 @@ HEADERS += core/cBrick.h \
            core/cDeNovoGraphNode.h \
            core/cFragmentIons.h \
            core/cImzML.h \
+           core/cIsotopePatternCache.h \
            core/cMzML.h \
            core/cParameters.h \
            core/cPeak.h \
@@ -80,6 +81,7 @@ SOURCES += core/cBrick.cpp \
            core/cDeNovoGraphNode.cpp \
            core/cFragmentIons.cpp \
            core/cImzML.cpp \
+           core/cIsotopePatternCache.cpp \
            core/cMzML.cpp \
            core/cParameters.cpp \
            core/cPeak.cpp \

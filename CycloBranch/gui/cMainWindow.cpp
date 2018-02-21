@@ -677,7 +677,7 @@ void cMainWindow::showSummaryTableOfMatchedPeaks() {
 
 void cMainWindow::showImageWindow() {
 	if (prepareSummaryTableOfMatchedPeaks()) {
-		imagewindow->setDefaultMaxXY(parameters.defaultmaxx, parameters.defaultmaxy, parameters.pixelsize, parameters.vendor);
+		imagewindow->setDefaultMaxXY(parameters.defaultmaxx, parameters.defaultmaxy, parameters.defaultpixelsizex, parameters.defaultpixelsizey, parameters.vendor);
 		imagewindow->show();
 		imagewindow->activateWindow();
 		if (imagewindow->isMinimized()) {
@@ -1381,10 +1381,20 @@ void cMainWindow::exportToHTML() {
 					}
 				}
 				else if (parameters.mode == denovoengine) {
-					columncount = 9;
+					if (parameters.generateisotopepattern) {
+						columncount = 11;
+					}
+					else {
+						columncount = 10;
+					}
 				}
 				else {
-					columncount = 8;
+					if (parameters.generateisotopepattern) {
+						columncount = 10;
+					}
+					else {
+						columncount = 9;
+					}
 				}
 
 				tdwidth = to_string(100/columncount);
@@ -1414,7 +1424,7 @@ void cMainWindow::exportToHTML() {
 
 				out << "<th width=\"" << tdwidth.c_str() << "%\"><b>Theoretical m/z</b></th>";
 
-				if ((parameters.mode == dereplication) && (parameters.generateisotopepattern)) {
+				if (parameters.generateisotopepattern) {
 					out << "<th width=\"" << tdwidth.c_str() << "%\"><b>Theoretical Intensity [%]</b></th>";
 				}
 
@@ -1433,6 +1443,7 @@ void cMainWindow::exportToHTML() {
 					out << "<th width=\"" << tdwidth.c_str() << "%\"><b>Reference</b></th>";
 				}
 				else {
+					out << "<th width=\"" << tdwidth.c_str() << "%\"><b>Summary Formula</b></th>";
 					out << "<th width=\"" << tdwidth.c_str() << "%\"><b>Sequence</b></th>";
 				}
 

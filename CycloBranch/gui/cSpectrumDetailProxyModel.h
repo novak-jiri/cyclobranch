@@ -22,7 +22,7 @@ class cSpectrumDetailProxyModel : public QSortFilterProxyModel {
 
 private:
 
-	bool hidematched, hideunmatched, hidescrambled;
+	bool hidematched, hideunmatched, hidescrambled, hiderotations, hidetrotations;
 
 public:
 
@@ -39,8 +39,10 @@ public:
 		\param hidematched hide matched peaks
 		\param hideunmatched hide unmatched peaks
 		\param hidescrambled hide scrambled peaks
-	*/ 
-	void setFlags(bool hidematched, bool hideunmatched, bool hidescrambled);
+		\param hiderotations hide rotations of a cyclic peptide or branch-cyclic peptide or cyclic polyketide
+		\param hidetrotations hide trotations of a branched or branch-cyclic peptide
+	*/
+	void setFlags(bool hidematched, bool hideunmatched, bool hidescrambled, bool hiderotations, bool hidetrotations);
 
 
 protected:

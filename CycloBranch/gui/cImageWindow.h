@@ -178,10 +178,11 @@ public:
 		\brief Set the default max count of pixel x/y values parsed from an imzML file.
 		\param defaultmaxx max count of pixel x - parsed from imzML file
 		\param defaultmaxy max count of pixel y - parsed from imzML file
-		\param pixelsize pixel size
+		\param defaultpixelsizex pixel size x - parsed from imzML file
+		\param defaultpixelsizey pixel size y - parsed from imzML file
 		\param vendor vendor type
 	*/
-	void setDefaultMaxXY(int defaultmaxx, int defaultmaxy, int pixelsize, eVendorType vendor);
+	void setDefaultMaxXY(int defaultmaxx, int defaultmaxy, int defaultpixelsizex, int defaultpixelsizey, eVendorType vendor);
 
 
 	/**
@@ -243,6 +244,10 @@ private:
 	QSpinBox* maxx;
 	QLabel* maxylabel;
 	QSpinBox* maxy;
+	QLabel* pixelsizexlabel;
+	QSpinBox* pixelsizexspinbox;
+	QLabel* pixelsizeylabel;
+	QSpinBox* pixelsizeyspinbox;
 	QPushButton* setmaxbutton;
 	QPushButton* setdefaultbutton;
 
@@ -296,7 +301,10 @@ private:
 
 	int defaultmaxx;
 	int defaultmaxy;
-	int pixelsize;
+
+	int defaultpixelsizex;
+	int defaultpixelsizey;
+
 	eVendorType vendor;
 
 	void colorSpinBoxes(int layerid);

@@ -4,7 +4,7 @@
 
 
 QString appname = "CycloBranch";
-QString appversion = "v. 1.2.495 (64-bit)";
+QString appversion = "v. 1.2.660 (64-bit)";
 
 
 #if OS_TYPE == UNX
@@ -46,6 +46,69 @@ void loadStringVector(vector<string>& v, ifstream& is) {
 	v.resize(size);
 	for (int i = 0; i < (int)v.size(); i++) {
 		loadString(v[i], is);
+	}
+}
+
+
+void storeStringIntMap(map<string, int>& map, ofstream& os) {
+	int size;
+	string s;
+
+	size = (int)map.size();
+	os.write((char *)&size, sizeof(int));
+	for (auto it = map.begin(); it != map.end(); ++it) {
+		s = it->first;
+		storeString(s, os);
+		os.write((char *)&it->second, sizeof(int));
+	}
+}
+
+
+void loadStringIntMap(map<string, int>& map, ifstream& is) {
+	int size, value;
+	string s;
+
+	is.read((char *)&size, sizeof(int));
+	map.clear();
+	for (int i = 0; i < size; i++) {
+		loadString(s, is);
+		is.read((char *)&value, sizeof(int));
+		map[s] = value;
+	}
+}
+
+
+void storeIntStringMap(map<int, string>& map, ofstream& os) {
+	int size = (int)map.size();
+	os.write((char *)&size, sizeof(int));
+	for (auto it = map.begin(); it != map.end(); ++it) {
+		os.write((char *)&it->first, sizeof(int));
+		storeString(it->second, os);
+	}
+}
+
+
+void loadIntStringMap(map<int, string>& map, ifstream& is) {
+	int size, value;
+	string s;
+
+	is.read((char *)&size, sizeof(int));
+	map.clear();
+	for (int i = 0; i < size; i++) {
+		is.read((char *)&value, sizeof(int));
+		loadString(s, is);
+		map[value] = s;
+	}
+}
+
+
+void convertStringIntUnorderedMapToStringVector(unordered_map<string, int>& map, vector<string>& vector) {
+	vector.resize(map.size());
+	unordered_map<string, int>::iterator it;
+	while (map.begin() != map.end()) {
+		it = map.begin();
+		vector[it->second] = it->first;
+		map.erase(it);
 	}
 }
 

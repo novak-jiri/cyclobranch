@@ -1,5 +1,6 @@
 #include "core/cTheoreticalSpectrum.h"
 #include "core/cDeNovoGraph.h"
+#include "core/cIsotopePatternCache.h"
 
 #include "gui/cMainThread.h"
 
@@ -168,15 +169,32 @@ void cTheoreticalSpectrum::generatePrecursorIon(vector<int>& intcomposition, cBr
 	set<int> usedmodifications;
 	usedmodifications.insert(0);
 
+	map<string, int> atoms, tempmap;
+	atoms.clear();
+
+	bool disablesummary = false;
+	if ((parameters->mode == denovoengine) && (parameters->blindedges == 2)) {
+		for (int i = 0; i < (int)intcomposition.size(); i++) {
+			if (bricksdatabasewithcombinations[intcomposition[i] - 1].isArtificial()) {
+				disablesummary = true;
+				break;
+			}
+		}
+	}
+
 	peak.isotope = false;
 
 	switch (parameters->peptidetype)
 	{
 	case linear:
 		peak.mzratio = parameters->searchedmodifications[candidate.getStartModifID()].massdifference + parameters->searchedmodifications[candidate.getEndModifID()].massdifference;
+		if (!disablesummary && (parameters->generateisotopepattern || writedescription)) {
+			addStringFormulaToMap(parameters->searchedmodifications[candidate.getStartModifID()].summary, atoms);
+			addStringFormulaToMap(parameters->searchedmodifications[candidate.getEndModifID()].summary, atoms);
+		}
 		peak.seriesid = 0;
 		starttype = (int)precursor_ion;
-		endtype = (int)precursor_ion_co_loss_and_dehydrated_and_deamidated;
+		endtype = (int)precursor_ion_co_loss_co_loss_dehydrated_deamidated_deamidated_deamidated;
 		usedmodifications.insert(candidate.getStartModifID());
 		usedmodifications.insert(candidate.getEndModifID());
 		break;
@@ -184,26 +202,38 @@ void cTheoreticalSpectrum::generatePrecursorIon(vector<int>& intcomposition, cBr
 		peak.mzratio = 0;
 		peak.seriesid = (int)intcomposition.size() - 1;
 		starttype = (int)cyclic_precursor_ion;
-		endtype = (int)cyclic_precursor_ion_co_loss_and_dehydrated_and_deamidated;
+		endtype = (int)cyclic_precursor_ion_co_loss_co_loss_dehydrated_deamidated_deamidated_deamidated;
 		break;
 	case branched:
 		peak.mzratio = parameters->searchedmodifications[candidate.getStartModifID()].massdifference + parameters->searchedmodifications[candidate.getEndModifID()].massdifference + parameters->searchedmodifications[candidate.getMiddleModifID()].massdifference;
+		if (!disablesummary && (parameters->generateisotopepattern || writedescription)) {
+			addStringFormulaToMap(parameters->searchedmodifications[candidate.getStartModifID()].summary, atoms);
+			addStringFormulaToMap(parameters->searchedmodifications[candidate.getEndModifID()].summary, atoms);
+			addStringFormulaToMap(parameters->searchedmodifications[candidate.getMiddleModifID()].summary, atoms);
+		}
 		peak.seriesid = 0;
 		starttype = (int)precursor_ion;
-		endtype = (int)precursor_ion_co_loss_and_dehydrated_and_deamidated;
+		endtype = (int)precursor_ion_co_loss_co_loss_dehydrated_deamidated_deamidated_deamidated;
 		usedmodifications.insert(candidate.getStartModifID());
 		usedmodifications.insert(candidate.getEndModifID());
 		usedmodifications.insert(candidate.getMiddleModifID());
 		break;
 	case branchcyclic:
 		peak.mzratio = parameters->searchedmodifications[candidate.getMiddleModifID()].massdifference;
+		if (!disablesummary && (parameters->generateisotopepattern || writedescription)) {
+			addStringFormulaToMap(parameters->searchedmodifications[candidate.getMiddleModifID()].summary, atoms);
+		}
 		peak.seriesid = 0;
 		starttype = (int)cyclic_precursor_ion;
-		endtype = (int)cyclic_precursor_ion_co_loss_and_dehydrated_and_deamidated;
+		endtype = (int)cyclic_precursor_ion_co_loss_co_loss_dehydrated_deamidated_deamidated_deamidated;
 		usedmodifications.insert(candidate.getMiddleModifID());
 		break;
 	case linearpolyketide:
 		peak.mzratio = parameters->searchedmodifications[candidate.getStartModifID()].massdifference + parameters->searchedmodifications[candidate.getEndModifID()].massdifference;
+		if (!disablesummary && (parameters->generateisotopepattern || writedescription)) {
+			addStringFormulaToMap(parameters->searchedmodifications[candidate.getStartModifID()].summary, atoms);
+			addStringFormulaToMap(parameters->searchedmodifications[candidate.getEndModifID()].summary, atoms);
+		}
 		peak.seriesid = 0;
 		usedmodifications.insert(candidate.getStartModifID());
 		usedmodifications.insert(candidate.getEndModifID());
@@ -212,7 +242,7 @@ void cTheoreticalSpectrum::generatePrecursorIon(vector<int>& intcomposition, cBr
 		peak.mzratio = 0;
 		peak.seriesid = (int)intcomposition.size() - 1;
 		starttype = (int)cyclic_polyketide_precursor_ion;
-		endtype = (int)cyclic_polyketide_precursor_ion_co_loss_dehydrated_and_deamidated;
+		endtype = (int)cyclic_polyketide_precursor_ion_co_loss_dehydrated_deamidated;
 		break;
 	case other:
 		break;
@@ -222,6 +252,9 @@ void cTheoreticalSpectrum::generatePrecursorIon(vector<int>& intcomposition, cBr
 
 	for (int i = 0; i < (int)intcomposition.size(); i++) {
 		peak.mzratio += bricksdatabasewithcombinations[intcomposition[i] - 1].getMass();
+		if (!disablesummary && (parameters->generateisotopepattern || writedescription)) {
+			mergeMaps(bricksdatabasewithcombinations[intcomposition[i] - 1].getSummaryMap(), atoms);
+		}
 	}
 
 	if (parameters->peptidetype == linearpolyketide) {
@@ -247,17 +280,17 @@ void cTheoreticalSpectrum::generatePrecursorIon(vector<int>& intcomposition, cBr
 
 		if (bestmatch == 1) {
 			starttype = (int)linear_polyketide_precursor_ion_oh_oh;
-			endtype = (int)linear_polyketide_precursor_ion_oh_oh_co_loss_dehydrated_and_deamidated;
+			endtype = (int)linear_polyketide_precursor_ion_oh_oh_co_loss_dehydrated_deamidated;
 		}
 
 		if (bestmatch == 2) {
 			starttype = (int)linear_polyketide_precursor_ion_h_oh;
-			endtype = (int)linear_polyketide_precursor_ion_h_oh_co_loss_dehydrated_and_deamidated;
+			endtype = (int)linear_polyketide_precursor_ion_h_oh_co_loss_dehydrated_deamidated;
 		}
 
 		if (bestmatch == 3) {
 			starttype = (int)linear_polyketide_precursor_ion_h_h;
-			endtype = (int)linear_polyketide_precursor_ion_h_h_co_loss_dehydrated_and_deamidated;
+			endtype = (int)linear_polyketide_precursor_ion_h_h_co_loss_dehydrated_deamidated;
 		}
 	}
 	
@@ -267,6 +300,16 @@ void cTheoreticalSpectrum::generatePrecursorIon(vector<int>& intcomposition, cBr
 			for (int k = 1; k <= abs(parameters->precursorcharge); k++) {
 				peak.mzratio = tempratio + parameters->fragmentdefinitions[(eFragmentIonType)i].massdifference - parameters->searchedmodifications[*j].massdifference;
 				peak.iontype = (eFragmentIonType)i;
+				peak.mzratio = charge(uncharge(peak.mzratio, 1), (parameters->precursorcharge > 0) ? k : -k);
+				peak.charge = (parameters->precursorcharge > 0) ? k : -k;
+
+				if (!disablesummary && (parameters->generateisotopepattern || writedescription)) {
+					tempmap = atoms;
+					mergeMaps(parameters->fragmentdefinitions[(eFragmentIonType)i].summarymap, tempmap);
+					rechargeMap(peak.charge, tempmap);
+					peak.formula.setFromMap(tempmap, false);
+					peak.formula.addFormula(parameters->searchedmodifications[*j].summary, true);
+				}
 
 				if (writedescription) {
 					string str;
@@ -337,11 +380,26 @@ void cTheoreticalSpectrum::generatePrecursorIon(vector<int>& intcomposition, cBr
 					}
 				}
 
-				peak.mzratio = charge(uncharge(peak.mzratio, 1), (parameters->precursorcharge > 0)?k:-k);
-				peak.charge = (parameters->precursorcharge > 0)?k:-k;
-			
-				addPeakToList(peak, theoreticalpeaksrealsize);
-				addMetalPeaks(peak, parameters->metaladducts, theoreticalpeaksrealsize, k, writedescription);
+				if (writedescription) {
+					if (peak.formula.hasAllElementsPositive()) {
+						addPeakToList(peak, theoreticalpeaksrealsize);
+						if (!parameters->generateisotopepattern) {
+							addMetalPeaks(peak, parameters->metaladducts, theoreticalpeaksrealsize, k, writedescription);
+						}
+					}
+				}
+				else {
+					if (parameters->generateisotopepattern) {
+						if (peak.formula.hasAllElementsPositive()) {
+							addPeakToList(peak, theoreticalpeaksrealsize);
+						}
+					}
+					else {
+						addPeakToList(peak, theoreticalpeaksrealsize);
+						addMetalPeaks(peak, parameters->metaladducts, theoreticalpeaksrealsize, k, writedescription);
+					}
+				}
+
 			}
 		}
 	}
@@ -349,38 +407,41 @@ void cTheoreticalSpectrum::generatePrecursorIon(vector<int>& intcomposition, cBr
 
 
 void cTheoreticalSpectrum::generateScrambledIons(cBricksDatabase& bricksdatabase, bool writedescription, int& theoreticalpeaksrealsize) {
-	unordered_set<string> scrambledsequences, commonsequences;
-	vector<int> intcomposition;
-	scrambledsequences.clear();
-	//int minimumsizeofscrambledsequences = 2;
 	cBrick b;
-
 	b.setComposition(candidate.getComposition(), false);
 	vector<string> stringcomposition;
 	b.explodeToStringComposition(stringcomposition);
 
-	if (stringcomposition.size() > 32) {
-		// max 2^32 subsequences is tested
+	vector<int> intcomposition;
+
+	if (stringcomposition.size() > 30) {
+		// max 2^30 subsequences is tested
 		return;
 	}
 
+	unordered_set<string> scrambledsequences;
+	scrambledsequences.clear();
+
 	int numberofbricks = (int)stringcomposition.size();
+	int stop = (1 << numberofbricks) - 1;
+
 	string subseq;
-	bool single;
+	int brickscount;
+
 	// generate all possible combinations of blocks
-	for (int i = 1; i < (int)pow(2, numberofbricks) - 1; i++) {
+	for (int i = 1; i < stop; i++) {
 			subseq = "";
-			single = true;
+			brickscount = 0;
 			for (int j = 0; j < numberofbricks; j++) {
 				if ((i >> j) % 2 == 1) {
-					if ((int)subseq.size() > 0) {
+					if (brickscount > 0) {
 						subseq += "-";
-						single = false;
 					}
 					subseq += stringcomposition[j];
+					brickscount++;
 				}
 			}
-			if (!single) {
+			if ((brickscount > 1) && (brickscount < numberofbricks - 1)) {
 				scrambledsequences.insert(subseq);
 			}
 	}
@@ -388,28 +449,87 @@ void cTheoreticalSpectrum::generateScrambledIons(cBricksDatabase& bricksdatabase
 	// select and normalize scrambled sequences
 	selectAndNormalizeScrambledSequences(scrambledsequences);
 
+	unordered_set<unsigned long long> theoreticalmzratios;
+	for (int i = 0; i < theoreticalpeaksrealsize; i++) {
+		theoreticalmzratios.insert((unsigned long long)(theoreticalpeaks[i].mzratio*(double)1000000));
+	}
+
 	cPeaksList scrambledpeaks;
 	scrambledpeaks.resize(5000);
 	int scrambledspeaksrealsize = 0;
 
+	cPeak peak;
+	map<string, int> atoms;
+
+	double tempmzratio;
+	map<string, int> tempmap;
+	bool tempmapready, disablesummary;
+	
 	// generate scrambled peaks from sequences
-	for (int i = 0; i < (int)parameters->fragmentionsfortheoreticalspectra.size(); i++) {
-		for (auto it = scrambledsequences.begin(); it != scrambledsequences.end(); ++it) {
-			b.setComposition((string &)*it, false);
-			intcomposition.clear();
-			b.explodeToIntComposition(intcomposition);
-			cPeak peak;
+	for (auto it = scrambledsequences.begin(); it != scrambledsequences.end(); ++it) {
+
+		b.setComposition((string &)*it, false);
+		intcomposition.clear();
+		b.explodeToIntComposition(intcomposition);
+
+		tempmzratio = 0;
+		for (int i = 0; i < (int)intcomposition.size(); i++) {
+			tempmzratio += bricksdatabase[intcomposition[i] - 1].getMass();
+		}
+
+		disablesummary = false;
+		if ((parameters->mode == denovoengine) && (parameters->blindedges == 2)) {
+			for (int i = 0; i < (int)intcomposition.size(); i++) {
+				if (bricksdatabase[intcomposition[i] - 1].isArtificial()) {
+					disablesummary = true;
+					break;
+				}
+			}
+		}
+
+		tempmapready = false;
+			
+		for (int i = 0; i < (int)parameters->fragmentionsfortheoreticalspectra.size(); i++) {
+
+			peak.clear();
 			peak.iontype = (eFragmentIonType)parameters->fragmentionsfortheoreticalspectra[i];
 			peak.mzratio = parameters->fragmentdefinitions[peak.iontype].massdifference;
-			peak.removeme = false;
-			peak.scrambled = true;
-			for (int i = 0; i < (int)intcomposition.size(); i++) {
-				peak.mzratio += bricksdatabase[intcomposition[i] - 1].getMass();
-			}
-			
+			peak.mzratio += tempmzratio;
+
+			peak.charge = 1;
 			if (parameters->precursorcharge < 0) {
 				peak.mzratio = charge(uncharge(peak.mzratio, 1), -1);
+				peak.charge = -1;
 			}
+
+			// skip scrambled peaks whose m/z ratios collide with common fragment ions
+			if (theoreticalmzratios.find((unsigned long long)(peak.mzratio*(double)1000000)) != theoreticalmzratios.end()) {
+				continue;
+			}
+
+			if (!disablesummary && (parameters->generateisotopepattern || writedescription)) {
+
+				if (!tempmapready) {
+					tempmap.clear();
+
+					for (int j = 0; j < (int)intcomposition.size(); j++) {
+						mergeMaps(bricksdatabase[intcomposition[j] - 1].getSummaryMap(), tempmap);
+					}
+
+					tempmapready = true;
+				}
+
+				atoms = tempmap;
+				mergeMaps(parameters->fragmentdefinitions[peak.iontype].summarymap, atoms);
+						
+				if (peak.charge == -1) {
+					rechargeMap(-1, atoms);
+				}
+
+				peak.formula.setFromMap(atoms, false);
+			}
+			
+			peak.scrambled = true;
 
 			if (writedescription) {
 
@@ -425,13 +545,15 @@ void cTheoreticalSpectrum::generateScrambledIons(cBricksDatabase& bricksdatabase
 				if (parameters->fragmentdefinitions[peak.iontype].name.size() > 1) {
 					peak.description += parameters->fragmentdefinitions[peak.iontype].name.substr(1, parameters->fragmentdefinitions[peak.iontype].name.length() - 1);
 				}
+				addAdductToDescription(peak.description, parameters->metaladducts);
 				peak.description += ": ";
-				for (int i = 0; i < (int)intcomposition.size(); i++) {
-					peak.description += "[" + bricksdatabase[intcomposition[i] - 1].getAcronymsAsString() + "]";
-					if (i < (int)intcomposition.size() - 1) {
+				for (int j = 0; j < (int)intcomposition.size(); j++) {
+					peak.description += "[" + bricksdatabase[intcomposition[j] - 1].getAcronymsAsString() + "]";
+					if (j < (int)intcomposition.size() - 1) {
 						peak.description += '-';
 					}
 				}
+
 			}
 
 			if (scrambledpeaks.size() > scrambledspeaksrealsize) {
@@ -441,20 +563,34 @@ void cTheoreticalSpectrum::generateScrambledIons(cBricksDatabase& bricksdatabase
 				scrambledpeaks.add(peak);
 			}
 			scrambledspeaksrealsize++;
+		
 		}
+	
 	}
-	scrambledpeaks.resize(scrambledspeaksrealsize);
 
-	// find and erase all scrambled peaks whose mz ratios collide with common fragment ions
-	scrambledpeaks.sortbyMass();
-	for (int i = 0; i < theoreticalpeaksrealsize; i++) {
-	 	scrambledpeaks.findObsolete(theoreticalpeaks[i].mzratio);
-	}
-	scrambledpeaks.removeObsolete();
+	scrambledpeaks.resize(scrambledspeaksrealsize);
 
 	// attach scrambled peaks to common peaks
 	for (int i = 0; i < (int)scrambledpeaks.size(); i++) {
-		addPeakToList(scrambledpeaks[i], theoreticalpeaksrealsize);
+		if (writedescription) {
+			if (scrambledpeaks[i].formula.hasAllElementsPositive()) {
+				addPeakToList(scrambledpeaks[i], theoreticalpeaksrealsize);
+				if (!parameters->generateisotopepattern) {
+					addMetalPeaks(scrambledpeaks[i], parameters->metaladducts, theoreticalpeaksrealsize, 1, writedescription);
+				}
+			}
+		}
+		else {
+			if (parameters->generateisotopepattern) {
+				if (scrambledpeaks[i].formula.hasAllElementsPositive()) {
+					addPeakToList(scrambledpeaks[i], theoreticalpeaksrealsize);
+				}
+			}
+			else {
+				addPeakToList(scrambledpeaks[i], theoreticalpeaksrealsize);
+				addMetalPeaks(scrambledpeaks[i], parameters->metaladducts, theoreticalpeaksrealsize, 1, writedescription);
+			}
+		}
 	}
 
 }
@@ -472,9 +608,14 @@ void cTheoreticalSpectrum::selectAndNormalizeScrambledSequences(unordered_set<st
 	for (auto it = temp.begin(); it != temp.end(); ++it) {
 		if ((twocompositions.find((string& )*it) == string::npos) && (reversedtwocompositions.find((string& )*it) == string::npos)) {
 			b.setComposition((string& )*it, true);
+			scrambledsequences.insert(b.getComposition());
+
+			/*
+			b.setComposition((string&)*it, false);
 			if (scrambledsequences.count(b.getReverseComposition()) == 0) {
 				scrambledsequences.insert(b.getComposition());
 			}
+			*/
 		}
 	}
 }
@@ -492,12 +633,51 @@ eFragmentIonType cTheoreticalSpectrum::selectHigherPriorityIonTypeCID(eFragmentI
 			break;
 		case a_ion_dehydrated:
 		case a_ion_deamidated:
-			if ((theoreticalpeakiontype == b_ion) || (theoreticalpeakiontype == b_ion_dehydrated) || (theoreticalpeakiontype == b_ion_deamidated) || (theoreticalpeakiontype == a_ion)) {
+			if ((theoreticalpeakiontype == b_ion) 
+				|| (theoreticalpeakiontype == b_ion_dehydrated) || (theoreticalpeakiontype == b_ion_deamidated) 
+				|| (theoreticalpeakiontype == a_ion)) {
 				experimentalpeakiontype = theoreticalpeakiontype;
 			}
 			break;
-		case a_ion_dehydrated_and_deamidated:
-			if ((theoreticalpeakiontype == b_ion) || (theoreticalpeakiontype == b_ion_dehydrated) || (theoreticalpeakiontype == b_ion_deamidated) || (theoreticalpeakiontype == b_ion_dehydrated_and_deamidated) || (theoreticalpeakiontype == a_ion) || (theoreticalpeakiontype == a_ion_dehydrated) || (theoreticalpeakiontype == a_ion_deamidated)) {
+		case a_ion_dehydrated_dehydrated:
+		case a_ion_deamidated_deamidated:
+		case a_ion_dehydrated_deamidated:
+			if ((theoreticalpeakiontype == b_ion) 
+				|| (theoreticalpeakiontype == b_ion_dehydrated) || (theoreticalpeakiontype == b_ion_deamidated) 
+				|| (theoreticalpeakiontype == b_ion_dehydrated_dehydrated) || (theoreticalpeakiontype == b_ion_deamidated_deamidated) || (theoreticalpeakiontype == b_ion_dehydrated_deamidated) 
+				|| (theoreticalpeakiontype == a_ion) 
+				|| (theoreticalpeakiontype == a_ion_dehydrated) || (theoreticalpeakiontype == a_ion_deamidated)) {
+				experimentalpeakiontype = theoreticalpeakiontype;
+			}
+			break;
+		case a_ion_dehydrated_dehydrated_dehydrated:
+		case a_ion_deamidated_deamidated_deamidated:
+		case a_ion_dehydrated_dehydrated_deamidated:
+		case a_ion_dehydrated_deamidated_deamidated:
+			if ((theoreticalpeakiontype == b_ion)
+				|| (theoreticalpeakiontype == b_ion_dehydrated) || (theoreticalpeakiontype == b_ion_deamidated)
+				|| (theoreticalpeakiontype == b_ion_dehydrated_dehydrated) || (theoreticalpeakiontype == b_ion_deamidated_deamidated) || (theoreticalpeakiontype == b_ion_dehydrated_deamidated)
+				|| (theoreticalpeakiontype == b_ion_dehydrated_dehydrated_dehydrated) || (theoreticalpeakiontype == b_ion_deamidated_deamidated_deamidated) || (theoreticalpeakiontype == b_ion_dehydrated_dehydrated_deamidated) || (theoreticalpeakiontype == b_ion_dehydrated_deamidated_deamidated)
+				|| (theoreticalpeakiontype == a_ion) 
+				|| (theoreticalpeakiontype == a_ion_dehydrated) || (theoreticalpeakiontype == a_ion_deamidated)
+				|| (theoreticalpeakiontype == a_ion_dehydrated_dehydrated) || (theoreticalpeakiontype == a_ion_deamidated_deamidated) || (theoreticalpeakiontype == a_ion_dehydrated_deamidated)) {
+				experimentalpeakiontype = theoreticalpeakiontype;
+			}
+			break;
+		case a_ion_dehydrated_dehydrated_dehydrated_dehydrated:
+		case a_ion_deamidated_deamidated_deamidated_deamidated:
+		case a_ion_dehydrated_dehydrated_dehydrated_deamidated:
+		case a_ion_dehydrated_dehydrated_deamidated_deamidated:
+		case a_ion_dehydrated_deamidated_deamidated_deamidated:
+			if ((theoreticalpeakiontype == b_ion)
+				|| (theoreticalpeakiontype == b_ion_dehydrated) || (theoreticalpeakiontype == b_ion_deamidated)
+				|| (theoreticalpeakiontype == b_ion_dehydrated_dehydrated) || (theoreticalpeakiontype == b_ion_deamidated_deamidated) || (theoreticalpeakiontype == b_ion_dehydrated_deamidated)
+				|| (theoreticalpeakiontype == b_ion_dehydrated_dehydrated_dehydrated) || (theoreticalpeakiontype == b_ion_deamidated_deamidated_deamidated) || (theoreticalpeakiontype == b_ion_dehydrated_dehydrated_deamidated) || (theoreticalpeakiontype == b_ion_dehydrated_deamidated_deamidated)
+				|| (theoreticalpeakiontype == b_ion_dehydrated_dehydrated_dehydrated_dehydrated) || (theoreticalpeakiontype == b_ion_deamidated_deamidated_deamidated_deamidated) || (theoreticalpeakiontype == b_ion_dehydrated_dehydrated_dehydrated_deamidated) || (theoreticalpeakiontype == b_ion_dehydrated_dehydrated_deamidated_deamidated) || (theoreticalpeakiontype == b_ion_dehydrated_deamidated_deamidated_deamidated)
+				|| (theoreticalpeakiontype == a_ion)
+				|| (theoreticalpeakiontype == a_ion_dehydrated) || (theoreticalpeakiontype == a_ion_deamidated)
+				|| (theoreticalpeakiontype == a_ion_dehydrated_dehydrated) || (theoreticalpeakiontype == a_ion_deamidated_deamidated) || (theoreticalpeakiontype == a_ion_dehydrated_deamidated)
+				|| (theoreticalpeakiontype == a_ion_dehydrated_dehydrated_dehydrated) || (theoreticalpeakiontype == a_ion_deamidated_deamidated_deamidated) || (theoreticalpeakiontype == a_ion_dehydrated_dehydrated_deamidated) || (theoreticalpeakiontype == a_ion_dehydrated_deamidated_deamidated)) {
 				experimentalpeakiontype = theoreticalpeakiontype;
 			}
 			break;
@@ -509,70 +689,358 @@ eFragmentIonType cTheoreticalSpectrum::selectHigherPriorityIonTypeCID(eFragmentI
 				experimentalpeakiontype = theoreticalpeakiontype;
 			}
 			break;
-		case b_ion_dehydrated_and_deamidated:
-			if ((theoreticalpeakiontype == b_ion) || (theoreticalpeakiontype == b_ion_dehydrated) || (theoreticalpeakiontype == b_ion_deamidated)) {
+		case b_ion_dehydrated_dehydrated:
+		case b_ion_deamidated_deamidated:
+		case b_ion_dehydrated_deamidated:
+			if ((theoreticalpeakiontype == b_ion) 
+				|| (theoreticalpeakiontype == b_ion_dehydrated) || (theoreticalpeakiontype == b_ion_deamidated)) {
+				experimentalpeakiontype = theoreticalpeakiontype;
+			}
+			break;
+		case b_ion_dehydrated_dehydrated_dehydrated:
+		case b_ion_deamidated_deamidated_deamidated:
+		case b_ion_dehydrated_dehydrated_deamidated:
+		case b_ion_dehydrated_deamidated_deamidated:
+			if ((theoreticalpeakiontype == b_ion)
+				|| (theoreticalpeakiontype == b_ion_dehydrated) || (theoreticalpeakiontype == b_ion_deamidated)
+				|| (theoreticalpeakiontype == b_ion_dehydrated_dehydrated) || (theoreticalpeakiontype == b_ion_deamidated_deamidated) || (theoreticalpeakiontype == b_ion_dehydrated_deamidated)) {
+				experimentalpeakiontype = theoreticalpeakiontype;
+			}
+			break;
+		case b_ion_dehydrated_dehydrated_dehydrated_dehydrated:
+		case b_ion_deamidated_deamidated_deamidated_deamidated:
+		case b_ion_dehydrated_dehydrated_dehydrated_deamidated:
+		case b_ion_dehydrated_dehydrated_deamidated_deamidated:
+		case b_ion_dehydrated_deamidated_deamidated_deamidated:
+			if ((theoreticalpeakiontype == b_ion)
+				|| (theoreticalpeakiontype == b_ion_dehydrated) || (theoreticalpeakiontype == b_ion_deamidated)
+				|| (theoreticalpeakiontype == b_ion_dehydrated_dehydrated) || (theoreticalpeakiontype == b_ion_deamidated_deamidated) || (theoreticalpeakiontype == b_ion_dehydrated_deamidated)
+				|| (theoreticalpeakiontype == b_ion_dehydrated_dehydrated_dehydrated) || (theoreticalpeakiontype == b_ion_deamidated_deamidated_deamidated) || (theoreticalpeakiontype == b_ion_dehydrated_dehydrated_deamidated) || (theoreticalpeakiontype == b_ion_dehydrated_deamidated_deamidated)) {
 				experimentalpeakiontype = theoreticalpeakiontype;
 			}
 			break;
 		case c_ion:
-			if ((theoreticalpeakiontype == y_ion) || (theoreticalpeakiontype == b_ion) || (theoreticalpeakiontype == a_ion)) {
+			if ((theoreticalpeakiontype == y_ion) 
+				|| (theoreticalpeakiontype == b_ion) 
+				|| (theoreticalpeakiontype == a_ion)) {
 				experimentalpeakiontype = theoreticalpeakiontype;
 			}
 			break;
 		case c_ion_dehydrated:
 		case c_ion_deamidated:
-			if ((theoreticalpeakiontype == c_ion) || (theoreticalpeakiontype == y_ion) || (theoreticalpeakiontype == y_ion_dehydrated) || (theoreticalpeakiontype == y_ion_deamidated) || (theoreticalpeakiontype == b_ion) || (theoreticalpeakiontype == b_ion_dehydrated) || (theoreticalpeakiontype == b_ion_deamidated) || (theoreticalpeakiontype == a_ion) || (theoreticalpeakiontype == a_ion_dehydrated) || (theoreticalpeakiontype == a_ion_deamidated)) {
+			if ((theoreticalpeakiontype == c_ion) 
+				|| (theoreticalpeakiontype == y_ion) 
+				|| (theoreticalpeakiontype == y_ion_dehydrated) || (theoreticalpeakiontype == y_ion_deamidated) 
+				|| (theoreticalpeakiontype == b_ion) 
+				|| (theoreticalpeakiontype == b_ion_dehydrated) || (theoreticalpeakiontype == b_ion_deamidated) 
+				|| (theoreticalpeakiontype == a_ion) 
+				|| (theoreticalpeakiontype == a_ion_dehydrated) || (theoreticalpeakiontype == a_ion_deamidated)) {
 				experimentalpeakiontype = theoreticalpeakiontype;
 			}
 			break;
-		case c_ion_dehydrated_and_deamidated:
-			if ((theoreticalpeakiontype == c_ion) || (theoreticalpeakiontype == c_ion_dehydrated) || (theoreticalpeakiontype == c_ion_deamidated) || (theoreticalpeakiontype == y_ion) || (theoreticalpeakiontype == y_ion_dehydrated) || (theoreticalpeakiontype == y_ion_deamidated) || (theoreticalpeakiontype == y_ion_dehydrated_and_deamidated) || (theoreticalpeakiontype == b_ion) || (theoreticalpeakiontype == b_ion_dehydrated) || (theoreticalpeakiontype == b_ion_deamidated) || (theoreticalpeakiontype == b_ion_dehydrated_and_deamidated) || (theoreticalpeakiontype == a_ion) || (theoreticalpeakiontype == a_ion_dehydrated) || (theoreticalpeakiontype == a_ion_deamidated) || (theoreticalpeakiontype == a_ion_dehydrated_and_deamidated)) {
+		case c_ion_dehydrated_dehydrated:
+		case c_ion_deamidated_deamidated:
+		case c_ion_dehydrated_deamidated:
+			if ((theoreticalpeakiontype == c_ion) 
+				|| (theoreticalpeakiontype == c_ion_dehydrated) || (theoreticalpeakiontype == c_ion_deamidated) 
+				|| (theoreticalpeakiontype == y_ion) 
+				|| (theoreticalpeakiontype == y_ion_dehydrated) || (theoreticalpeakiontype == y_ion_deamidated) 
+				|| (theoreticalpeakiontype == y_ion_dehydrated_dehydrated) || (theoreticalpeakiontype == y_ion_deamidated_deamidated) || (theoreticalpeakiontype == y_ion_dehydrated_deamidated) 
+				|| (theoreticalpeakiontype == b_ion) 
+				|| (theoreticalpeakiontype == b_ion_dehydrated) || (theoreticalpeakiontype == b_ion_deamidated) 
+				|| (theoreticalpeakiontype == b_ion_dehydrated_dehydrated) || (theoreticalpeakiontype == b_ion_deamidated_deamidated) || (theoreticalpeakiontype == b_ion_dehydrated_deamidated) 
+				|| (theoreticalpeakiontype == a_ion) 
+				|| (theoreticalpeakiontype == a_ion_dehydrated) || (theoreticalpeakiontype == a_ion_deamidated) 
+				|| (theoreticalpeakiontype == a_ion_dehydrated_dehydrated) || (theoreticalpeakiontype == a_ion_deamidated_deamidated) || (theoreticalpeakiontype == a_ion_dehydrated_deamidated)) {
+				experimentalpeakiontype = theoreticalpeakiontype;
+			}
+			break;
+		case c_ion_dehydrated_dehydrated_dehydrated:
+		case c_ion_deamidated_deamidated_deamidated:
+		case c_ion_dehydrated_dehydrated_deamidated:
+		case c_ion_dehydrated_deamidated_deamidated:
+			if ((theoreticalpeakiontype == c_ion)
+				|| (theoreticalpeakiontype == c_ion_dehydrated) || (theoreticalpeakiontype == c_ion_deamidated)
+				|| (theoreticalpeakiontype == c_ion_dehydrated_dehydrated) || (theoreticalpeakiontype == c_ion_deamidated_deamidated) || (theoreticalpeakiontype == c_ion_dehydrated_deamidated)
+				|| (theoreticalpeakiontype == y_ion)
+				|| (theoreticalpeakiontype == y_ion_dehydrated) || (theoreticalpeakiontype == y_ion_deamidated)
+				|| (theoreticalpeakiontype == y_ion_dehydrated_dehydrated) || (theoreticalpeakiontype == y_ion_deamidated_deamidated) || (theoreticalpeakiontype == y_ion_dehydrated_deamidated)
+				|| (theoreticalpeakiontype == y_ion_dehydrated_dehydrated_dehydrated) || (theoreticalpeakiontype == y_ion_deamidated_deamidated_deamidated) || (theoreticalpeakiontype == y_ion_dehydrated_dehydrated_deamidated) || (theoreticalpeakiontype == y_ion_dehydrated_deamidated_deamidated)
+				|| (theoreticalpeakiontype == b_ion)
+				|| (theoreticalpeakiontype == b_ion_dehydrated) || (theoreticalpeakiontype == b_ion_deamidated)
+				|| (theoreticalpeakiontype == b_ion_dehydrated_dehydrated) || (theoreticalpeakiontype == b_ion_deamidated_deamidated) || (theoreticalpeakiontype == b_ion_dehydrated_deamidated)
+				|| (theoreticalpeakiontype == b_ion_dehydrated_dehydrated_dehydrated) || (theoreticalpeakiontype == b_ion_deamidated_deamidated_deamidated) || (theoreticalpeakiontype == b_ion_dehydrated_dehydrated_deamidated) || (theoreticalpeakiontype == b_ion_dehydrated_deamidated_deamidated)
+				|| (theoreticalpeakiontype == a_ion)
+				|| (theoreticalpeakiontype == a_ion_dehydrated) || (theoreticalpeakiontype == a_ion_deamidated)
+				|| (theoreticalpeakiontype == a_ion_dehydrated_dehydrated) || (theoreticalpeakiontype == a_ion_deamidated_deamidated) || (theoreticalpeakiontype == a_ion_dehydrated_deamidated)
+				|| (theoreticalpeakiontype == a_ion_dehydrated_dehydrated_dehydrated) || (theoreticalpeakiontype == a_ion_deamidated_deamidated_deamidated) || (theoreticalpeakiontype == a_ion_dehydrated_dehydrated_deamidated) || (theoreticalpeakiontype == a_ion_dehydrated_deamidated_deamidated)) {
+				experimentalpeakiontype = theoreticalpeakiontype;
+			}
+			break;
+		case c_ion_dehydrated_dehydrated_dehydrated_dehydrated:
+		case c_ion_deamidated_deamidated_deamidated_deamidated:
+		case c_ion_dehydrated_dehydrated_dehydrated_deamidated:
+		case c_ion_dehydrated_dehydrated_deamidated_deamidated:
+		case c_ion_dehydrated_deamidated_deamidated_deamidated:
+			if ((theoreticalpeakiontype == c_ion)
+				|| (theoreticalpeakiontype == c_ion_dehydrated) || (theoreticalpeakiontype == c_ion_deamidated)
+				|| (theoreticalpeakiontype == c_ion_dehydrated_dehydrated) || (theoreticalpeakiontype == c_ion_deamidated_deamidated) || (theoreticalpeakiontype == c_ion_dehydrated_deamidated)
+				|| (theoreticalpeakiontype == c_ion_dehydrated_dehydrated_dehydrated) || (theoreticalpeakiontype == c_ion_deamidated_deamidated_deamidated) || (theoreticalpeakiontype == c_ion_dehydrated_dehydrated_deamidated) || (theoreticalpeakiontype == c_ion_dehydrated_deamidated_deamidated)
+				|| (theoreticalpeakiontype == y_ion)
+				|| (theoreticalpeakiontype == y_ion_dehydrated) || (theoreticalpeakiontype == y_ion_deamidated)
+				|| (theoreticalpeakiontype == y_ion_dehydrated_dehydrated) || (theoreticalpeakiontype == y_ion_deamidated_deamidated) || (theoreticalpeakiontype == y_ion_dehydrated_deamidated)
+				|| (theoreticalpeakiontype == y_ion_dehydrated_dehydrated_dehydrated) || (theoreticalpeakiontype == y_ion_deamidated_deamidated_deamidated) || (theoreticalpeakiontype == y_ion_dehydrated_dehydrated_deamidated) || (theoreticalpeakiontype == y_ion_dehydrated_deamidated_deamidated)
+				|| (theoreticalpeakiontype == y_ion_dehydrated_dehydrated_dehydrated_dehydrated) || (theoreticalpeakiontype == y_ion_deamidated_deamidated_deamidated_deamidated) || (theoreticalpeakiontype == y_ion_dehydrated_dehydrated_dehydrated_deamidated) || (theoreticalpeakiontype == y_ion_dehydrated_dehydrated_deamidated_deamidated) || (theoreticalpeakiontype == y_ion_dehydrated_deamidated_deamidated_deamidated)
+				|| (theoreticalpeakiontype == b_ion)
+				|| (theoreticalpeakiontype == b_ion_dehydrated) || (theoreticalpeakiontype == b_ion_deamidated)
+				|| (theoreticalpeakiontype == b_ion_dehydrated_dehydrated) || (theoreticalpeakiontype == b_ion_deamidated_deamidated) || (theoreticalpeakiontype == b_ion_dehydrated_deamidated)
+				|| (theoreticalpeakiontype == b_ion_dehydrated_dehydrated_dehydrated) || (theoreticalpeakiontype == b_ion_deamidated_deamidated_deamidated) || (theoreticalpeakiontype == b_ion_dehydrated_dehydrated_deamidated) || (theoreticalpeakiontype == b_ion_dehydrated_deamidated_deamidated)
+				|| (theoreticalpeakiontype == b_ion_dehydrated_dehydrated_dehydrated_dehydrated) || (theoreticalpeakiontype == b_ion_deamidated_deamidated_deamidated_deamidated) || (theoreticalpeakiontype == b_ion_dehydrated_dehydrated_dehydrated_deamidated) || (theoreticalpeakiontype == b_ion_dehydrated_dehydrated_deamidated_deamidated) || (theoreticalpeakiontype == b_ion_dehydrated_deamidated_deamidated_deamidated)
+				|| (theoreticalpeakiontype == a_ion)
+				|| (theoreticalpeakiontype == a_ion_dehydrated) || (theoreticalpeakiontype == a_ion_deamidated)
+				|| (theoreticalpeakiontype == a_ion_dehydrated_dehydrated) || (theoreticalpeakiontype == a_ion_deamidated_deamidated) || (theoreticalpeakiontype == a_ion_dehydrated_deamidated)
+				|| (theoreticalpeakiontype == a_ion_dehydrated_dehydrated_dehydrated) || (theoreticalpeakiontype == a_ion_deamidated_deamidated_deamidated) || (theoreticalpeakiontype == a_ion_dehydrated_dehydrated_deamidated) || (theoreticalpeakiontype == a_ion_dehydrated_deamidated_deamidated)
+				|| (theoreticalpeakiontype == a_ion_dehydrated_dehydrated_dehydrated_dehydrated) || (theoreticalpeakiontype == a_ion_deamidated_deamidated_deamidated_deamidated) || (theoreticalpeakiontype == a_ion_dehydrated_dehydrated_dehydrated_deamidated) || (theoreticalpeakiontype == a_ion_dehydrated_dehydrated_deamidated_deamidated) || (theoreticalpeakiontype == a_ion_dehydrated_deamidated_deamidated_deamidated)) {
 				experimentalpeakiontype = theoreticalpeakiontype;
 			}
 			break;
 		case x_ion:
-			if ((theoreticalpeakiontype == y_ion) || (theoreticalpeakiontype == b_ion) || (theoreticalpeakiontype == a_ion)) {
+			if ((theoreticalpeakiontype == y_ion) 
+				|| (theoreticalpeakiontype == b_ion) 
+				|| (theoreticalpeakiontype == a_ion)) {
 				experimentalpeakiontype = theoreticalpeakiontype;
 			}
 			break;
 		case x_ion_dehydrated:
 		case x_ion_deamidated:
-			if ((theoreticalpeakiontype == x_ion) || (theoreticalpeakiontype == y_ion) || (theoreticalpeakiontype == y_ion_dehydrated) || (theoreticalpeakiontype == y_ion_deamidated) || (theoreticalpeakiontype == b_ion) || (theoreticalpeakiontype == b_ion_dehydrated) || (theoreticalpeakiontype == b_ion_deamidated) || (theoreticalpeakiontype == a_ion) || (theoreticalpeakiontype == a_ion_dehydrated) || (theoreticalpeakiontype == a_ion_deamidated)) {
+			if ((theoreticalpeakiontype == x_ion) 
+				|| (theoreticalpeakiontype == y_ion) 
+				|| (theoreticalpeakiontype == y_ion_dehydrated) || (theoreticalpeakiontype == y_ion_deamidated) 
+				|| (theoreticalpeakiontype == b_ion) 
+				|| (theoreticalpeakiontype == b_ion_dehydrated) || (theoreticalpeakiontype == b_ion_deamidated) 
+				|| (theoreticalpeakiontype == a_ion) 
+				|| (theoreticalpeakiontype == a_ion_dehydrated) || (theoreticalpeakiontype == a_ion_deamidated)) {
 				experimentalpeakiontype = theoreticalpeakiontype;
 			}
 			break;
-		case x_ion_dehydrated_and_deamidated:
-			if ((theoreticalpeakiontype == x_ion) || (theoreticalpeakiontype == x_ion_dehydrated) || (theoreticalpeakiontype == x_ion_deamidated) || (theoreticalpeakiontype == y_ion) || (theoreticalpeakiontype == y_ion_dehydrated) || (theoreticalpeakiontype == y_ion_deamidated) || (theoreticalpeakiontype == y_ion_dehydrated_and_deamidated) || (theoreticalpeakiontype == b_ion) || (theoreticalpeakiontype == b_ion_dehydrated) || (theoreticalpeakiontype == b_ion_deamidated) || (theoreticalpeakiontype == b_ion_dehydrated_and_deamidated) || (theoreticalpeakiontype == a_ion) || (theoreticalpeakiontype == a_ion_dehydrated) || (theoreticalpeakiontype == a_ion_deamidated) || (theoreticalpeakiontype == a_ion_dehydrated_and_deamidated)) {
+		case x_ion_dehydrated_dehydrated:
+		case x_ion_deamidated_deamidated:
+		case x_ion_dehydrated_deamidated:
+			if ((theoreticalpeakiontype == x_ion) 
+				|| (theoreticalpeakiontype == x_ion_dehydrated) || (theoreticalpeakiontype == x_ion_deamidated) 
+				|| (theoreticalpeakiontype == y_ion) 
+				|| (theoreticalpeakiontype == y_ion_dehydrated) || (theoreticalpeakiontype == y_ion_deamidated) 
+				|| (theoreticalpeakiontype == y_ion_dehydrated_dehydrated) || (theoreticalpeakiontype == y_ion_deamidated_deamidated) || (theoreticalpeakiontype == y_ion_dehydrated_deamidated)
+				|| (theoreticalpeakiontype == b_ion) 
+				|| (theoreticalpeakiontype == b_ion_dehydrated) || (theoreticalpeakiontype == b_ion_deamidated) 
+				|| (theoreticalpeakiontype == b_ion_dehydrated_dehydrated) || (theoreticalpeakiontype == b_ion_deamidated_deamidated) || (theoreticalpeakiontype == b_ion_dehydrated_deamidated)
+				|| (theoreticalpeakiontype == a_ion) 
+				|| (theoreticalpeakiontype == a_ion_dehydrated) || (theoreticalpeakiontype == a_ion_deamidated) 
+				|| (theoreticalpeakiontype == a_ion_dehydrated_dehydrated) || (theoreticalpeakiontype == a_ion_deamidated_deamidated) || (theoreticalpeakiontype == a_ion_dehydrated_deamidated)) {
+				experimentalpeakiontype = theoreticalpeakiontype;
+			}
+			break;
+		case x_ion_dehydrated_dehydrated_dehydrated:
+		case x_ion_deamidated_deamidated_deamidated:
+		case x_ion_dehydrated_dehydrated_deamidated:
+		case x_ion_dehydrated_deamidated_deamidated:
+			if ((theoreticalpeakiontype == x_ion)
+				|| (theoreticalpeakiontype == x_ion_dehydrated) || (theoreticalpeakiontype == x_ion_deamidated)
+				|| (theoreticalpeakiontype == x_ion_dehydrated_dehydrated) || (theoreticalpeakiontype == x_ion_deamidated_deamidated) || (theoreticalpeakiontype == x_ion_dehydrated_deamidated)
+				|| (theoreticalpeakiontype == y_ion)
+				|| (theoreticalpeakiontype == y_ion_dehydrated) || (theoreticalpeakiontype == y_ion_deamidated)
+				|| (theoreticalpeakiontype == y_ion_dehydrated_dehydrated) || (theoreticalpeakiontype == y_ion_deamidated_deamidated) || (theoreticalpeakiontype == y_ion_dehydrated_deamidated)
+				|| (theoreticalpeakiontype == y_ion_dehydrated_dehydrated_dehydrated) || (theoreticalpeakiontype == y_ion_deamidated_deamidated_deamidated) || (theoreticalpeakiontype == y_ion_dehydrated_dehydrated_deamidated) || (theoreticalpeakiontype == y_ion_dehydrated_deamidated_deamidated)
+				|| (theoreticalpeakiontype == b_ion)
+				|| (theoreticalpeakiontype == b_ion_dehydrated) || (theoreticalpeakiontype == b_ion_deamidated)
+				|| (theoreticalpeakiontype == b_ion_dehydrated_dehydrated) || (theoreticalpeakiontype == b_ion_deamidated_deamidated) || (theoreticalpeakiontype == b_ion_dehydrated_deamidated)
+				|| (theoreticalpeakiontype == b_ion_dehydrated_dehydrated_dehydrated) || (theoreticalpeakiontype == b_ion_deamidated_deamidated_deamidated) || (theoreticalpeakiontype == b_ion_dehydrated_dehydrated_deamidated) || (theoreticalpeakiontype == b_ion_dehydrated_deamidated_deamidated)
+				|| (theoreticalpeakiontype == a_ion)
+				|| (theoreticalpeakiontype == a_ion_dehydrated) || (theoreticalpeakiontype == a_ion_deamidated)
+				|| (theoreticalpeakiontype == a_ion_dehydrated_dehydrated) || (theoreticalpeakiontype == a_ion_deamidated_deamidated) || (theoreticalpeakiontype == a_ion_dehydrated_deamidated)
+				|| (theoreticalpeakiontype == a_ion_dehydrated_dehydrated_dehydrated) || (theoreticalpeakiontype == a_ion_deamidated_deamidated_deamidated) || (theoreticalpeakiontype == a_ion_dehydrated_dehydrated_deamidated) || (theoreticalpeakiontype == a_ion_dehydrated_deamidated_deamidated)) {
+				experimentalpeakiontype = theoreticalpeakiontype;
+			}
+			break;
+		case x_ion_dehydrated_dehydrated_dehydrated_dehydrated:
+		case x_ion_deamidated_deamidated_deamidated_deamidated:
+		case x_ion_dehydrated_dehydrated_dehydrated_deamidated:
+		case x_ion_dehydrated_dehydrated_deamidated_deamidated:
+		case x_ion_dehydrated_deamidated_deamidated_deamidated:
+			if ((theoreticalpeakiontype == x_ion)
+				|| (theoreticalpeakiontype == x_ion_dehydrated) || (theoreticalpeakiontype == x_ion_deamidated)
+				|| (theoreticalpeakiontype == x_ion_dehydrated_dehydrated) || (theoreticalpeakiontype == x_ion_deamidated_deamidated) || (theoreticalpeakiontype == x_ion_dehydrated_deamidated)
+				|| (theoreticalpeakiontype == x_ion_dehydrated_dehydrated_dehydrated) || (theoreticalpeakiontype == x_ion_deamidated_deamidated_deamidated) || (theoreticalpeakiontype == x_ion_dehydrated_dehydrated_deamidated) || (theoreticalpeakiontype == x_ion_dehydrated_deamidated_deamidated)
+				|| (theoreticalpeakiontype == y_ion)
+				|| (theoreticalpeakiontype == y_ion_dehydrated) || (theoreticalpeakiontype == y_ion_deamidated)
+				|| (theoreticalpeakiontype == y_ion_dehydrated_dehydrated) || (theoreticalpeakiontype == y_ion_deamidated_deamidated) || (theoreticalpeakiontype == y_ion_dehydrated_deamidated)
+				|| (theoreticalpeakiontype == y_ion_dehydrated_dehydrated_dehydrated) || (theoreticalpeakiontype == y_ion_deamidated_deamidated_deamidated) || (theoreticalpeakiontype == y_ion_dehydrated_dehydrated_deamidated) || (theoreticalpeakiontype == y_ion_dehydrated_deamidated_deamidated)
+				|| (theoreticalpeakiontype == y_ion_dehydrated_dehydrated_dehydrated_dehydrated) || (theoreticalpeakiontype == y_ion_deamidated_deamidated_deamidated_deamidated) || (theoreticalpeakiontype == y_ion_dehydrated_dehydrated_dehydrated_deamidated) || (theoreticalpeakiontype == y_ion_dehydrated_dehydrated_deamidated_deamidated) || (theoreticalpeakiontype == y_ion_dehydrated_deamidated_deamidated_deamidated)
+				|| (theoreticalpeakiontype == b_ion)
+				|| (theoreticalpeakiontype == b_ion_dehydrated) || (theoreticalpeakiontype == b_ion_deamidated)
+				|| (theoreticalpeakiontype == b_ion_dehydrated_dehydrated) || (theoreticalpeakiontype == b_ion_deamidated_deamidated) || (theoreticalpeakiontype == b_ion_dehydrated_deamidated)
+				|| (theoreticalpeakiontype == b_ion_dehydrated_dehydrated_dehydrated) || (theoreticalpeakiontype == b_ion_deamidated_deamidated_deamidated) || (theoreticalpeakiontype == b_ion_dehydrated_dehydrated_deamidated) || (theoreticalpeakiontype == b_ion_dehydrated_deamidated_deamidated)
+				|| (theoreticalpeakiontype == b_ion_dehydrated_dehydrated_dehydrated_dehydrated) || (theoreticalpeakiontype == b_ion_deamidated_deamidated_deamidated_deamidated) || (theoreticalpeakiontype == b_ion_dehydrated_dehydrated_dehydrated_deamidated) || (theoreticalpeakiontype == b_ion_dehydrated_dehydrated_deamidated_deamidated) || (theoreticalpeakiontype == b_ion_dehydrated_deamidated_deamidated_deamidated)
+				|| (theoreticalpeakiontype == a_ion)
+				|| (theoreticalpeakiontype == a_ion_dehydrated) || (theoreticalpeakiontype == a_ion_deamidated)
+				|| (theoreticalpeakiontype == a_ion_dehydrated_dehydrated) || (theoreticalpeakiontype == a_ion_deamidated_deamidated) || (theoreticalpeakiontype == a_ion_dehydrated_deamidated)
+				|| (theoreticalpeakiontype == a_ion_dehydrated_dehydrated_dehydrated) || (theoreticalpeakiontype == a_ion_deamidated_deamidated_deamidated) || (theoreticalpeakiontype == a_ion_dehydrated_dehydrated_deamidated) || (theoreticalpeakiontype == a_ion_dehydrated_deamidated_deamidated)
+				|| (theoreticalpeakiontype == a_ion_dehydrated_dehydrated_dehydrated_dehydrated) || (theoreticalpeakiontype == a_ion_deamidated_deamidated_deamidated_deamidated) || (theoreticalpeakiontype == a_ion_dehydrated_dehydrated_dehydrated_deamidated) || (theoreticalpeakiontype == a_ion_dehydrated_dehydrated_deamidated_deamidated) || (theoreticalpeakiontype == a_ion_dehydrated_deamidated_deamidated_deamidated)) {
 				experimentalpeakiontype = theoreticalpeakiontype;
 			}
 			break;
 		case y_ion:
-			if ((theoreticalpeakiontype == b_ion) || (theoreticalpeakiontype == a_ion)) {
+			if ((theoreticalpeakiontype == b_ion) 
+				|| (theoreticalpeakiontype == a_ion)) {
 				experimentalpeakiontype = theoreticalpeakiontype;
 			}
 			break;
 		case y_ion_dehydrated:
 		case y_ion_deamidated:
-			if ((theoreticalpeakiontype == y_ion) || (theoreticalpeakiontype == b_ion) || (theoreticalpeakiontype == b_ion_dehydrated) || (theoreticalpeakiontype == b_ion_deamidated) || (theoreticalpeakiontype == a_ion)  || (theoreticalpeakiontype == a_ion_dehydrated) || (theoreticalpeakiontype == a_ion_deamidated)) {
+			if ((theoreticalpeakiontype == y_ion) 
+				|| (theoreticalpeakiontype == b_ion) 
+				|| (theoreticalpeakiontype == b_ion_dehydrated) || (theoreticalpeakiontype == b_ion_deamidated) 
+				|| (theoreticalpeakiontype == a_ion)  
+				|| (theoreticalpeakiontype == a_ion_dehydrated) || (theoreticalpeakiontype == a_ion_deamidated)) {
 				experimentalpeakiontype = theoreticalpeakiontype;
 			}
 			break;
-		case y_ion_dehydrated_and_deamidated:
-			experimentalpeakiontype = theoreticalpeakiontype;
+		case y_ion_dehydrated_dehydrated:
+		case y_ion_deamidated_deamidated:
+		case y_ion_dehydrated_deamidated:
+			if ((theoreticalpeakiontype == y_ion)
+				|| (theoreticalpeakiontype == y_ion_dehydrated) || (theoreticalpeakiontype == y_ion_deamidated)
+				|| (theoreticalpeakiontype == b_ion)
+				|| (theoreticalpeakiontype == b_ion_dehydrated) || (theoreticalpeakiontype == b_ion_deamidated)
+				|| (theoreticalpeakiontype == b_ion_dehydrated_dehydrated) || (theoreticalpeakiontype == b_ion_deamidated_deamidated) || (theoreticalpeakiontype == b_ion_dehydrated_deamidated)
+				|| (theoreticalpeakiontype == a_ion)
+				|| (theoreticalpeakiontype == a_ion_dehydrated) || (theoreticalpeakiontype == a_ion_deamidated)
+				|| (theoreticalpeakiontype == a_ion_dehydrated_dehydrated) || (theoreticalpeakiontype == a_ion_deamidated_deamidated) || (theoreticalpeakiontype == a_ion_dehydrated_deamidated)) {
+				experimentalpeakiontype = theoreticalpeakiontype;
+			}
+			break;
+		case y_ion_dehydrated_dehydrated_dehydrated:
+		case y_ion_deamidated_deamidated_deamidated:
+		case y_ion_dehydrated_dehydrated_deamidated:
+		case y_ion_dehydrated_deamidated_deamidated:
+			if ((theoreticalpeakiontype == y_ion)
+				|| (theoreticalpeakiontype == y_ion_dehydrated) || (theoreticalpeakiontype == y_ion_deamidated)
+				|| (theoreticalpeakiontype == y_ion_dehydrated_dehydrated) || (theoreticalpeakiontype == y_ion_deamidated_deamidated) || (theoreticalpeakiontype == y_ion_dehydrated_deamidated)
+				|| (theoreticalpeakiontype == b_ion)
+				|| (theoreticalpeakiontype == b_ion_dehydrated) || (theoreticalpeakiontype == b_ion_deamidated)
+				|| (theoreticalpeakiontype == b_ion_dehydrated_dehydrated) || (theoreticalpeakiontype == b_ion_deamidated_deamidated) || (theoreticalpeakiontype == b_ion_dehydrated_deamidated)
+				|| (theoreticalpeakiontype == b_ion_dehydrated_dehydrated_dehydrated) || (theoreticalpeakiontype == b_ion_deamidated_deamidated_deamidated) || (theoreticalpeakiontype == b_ion_dehydrated_dehydrated_deamidated) || (theoreticalpeakiontype == b_ion_dehydrated_deamidated_deamidated)
+				|| (theoreticalpeakiontype == a_ion)
+				|| (theoreticalpeakiontype == a_ion_dehydrated) || (theoreticalpeakiontype == a_ion_deamidated)
+				|| (theoreticalpeakiontype == a_ion_dehydrated_dehydrated) || (theoreticalpeakiontype == a_ion_deamidated_deamidated) || (theoreticalpeakiontype == a_ion_dehydrated_deamidated)
+				|| (theoreticalpeakiontype == a_ion_dehydrated_dehydrated_dehydrated) || (theoreticalpeakiontype == a_ion_deamidated_deamidated_deamidated) || (theoreticalpeakiontype == a_ion_dehydrated_dehydrated_deamidated) || (theoreticalpeakiontype == a_ion_dehydrated_deamidated_deamidated)) {
+				experimentalpeakiontype = theoreticalpeakiontype;
+			}
+			break;
+		case y_ion_dehydrated_dehydrated_dehydrated_dehydrated:
+		case y_ion_deamidated_deamidated_deamidated_deamidated:
+		case y_ion_dehydrated_dehydrated_dehydrated_deamidated:
+		case y_ion_dehydrated_dehydrated_deamidated_deamidated:
+		case y_ion_dehydrated_deamidated_deamidated_deamidated:
+			if ((theoreticalpeakiontype == y_ion)
+				|| (theoreticalpeakiontype == y_ion_dehydrated) || (theoreticalpeakiontype == y_ion_deamidated)
+				|| (theoreticalpeakiontype == y_ion_dehydrated_dehydrated) || (theoreticalpeakiontype == y_ion_deamidated_deamidated) || (theoreticalpeakiontype == y_ion_dehydrated_deamidated)
+				|| (theoreticalpeakiontype == y_ion_dehydrated_dehydrated_dehydrated) || (theoreticalpeakiontype == y_ion_deamidated_deamidated_deamidated) || (theoreticalpeakiontype == y_ion_dehydrated_dehydrated_deamidated) || (theoreticalpeakiontype == y_ion_dehydrated_deamidated_deamidated)
+				|| (theoreticalpeakiontype == b_ion)
+				|| (theoreticalpeakiontype == b_ion_dehydrated) || (theoreticalpeakiontype == b_ion_deamidated)
+				|| (theoreticalpeakiontype == b_ion_dehydrated_dehydrated) || (theoreticalpeakiontype == b_ion_deamidated_deamidated) || (theoreticalpeakiontype == b_ion_dehydrated_deamidated)
+				|| (theoreticalpeakiontype == b_ion_dehydrated_dehydrated_dehydrated) || (theoreticalpeakiontype == b_ion_deamidated_deamidated_deamidated) || (theoreticalpeakiontype == b_ion_dehydrated_dehydrated_deamidated) || (theoreticalpeakiontype == b_ion_dehydrated_deamidated_deamidated)
+				|| (theoreticalpeakiontype == b_ion_dehydrated_dehydrated_dehydrated_dehydrated) || (theoreticalpeakiontype == b_ion_deamidated_deamidated_deamidated_deamidated) || (theoreticalpeakiontype == b_ion_dehydrated_dehydrated_dehydrated_deamidated) || (theoreticalpeakiontype == b_ion_dehydrated_dehydrated_deamidated_deamidated) || (theoreticalpeakiontype == b_ion_dehydrated_deamidated_deamidated_deamidated)
+				|| (theoreticalpeakiontype == a_ion)
+				|| (theoreticalpeakiontype == a_ion_dehydrated) || (theoreticalpeakiontype == a_ion_deamidated)
+				|| (theoreticalpeakiontype == a_ion_dehydrated_dehydrated) || (theoreticalpeakiontype == a_ion_deamidated_deamidated) || (theoreticalpeakiontype == a_ion_dehydrated_deamidated)
+				|| (theoreticalpeakiontype == a_ion_dehydrated_dehydrated_dehydrated) || (theoreticalpeakiontype == a_ion_deamidated_deamidated_deamidated) || (theoreticalpeakiontype == a_ion_dehydrated_dehydrated_deamidated) || (theoreticalpeakiontype == a_ion_dehydrated_deamidated_deamidated)
+				|| (theoreticalpeakiontype == a_ion_dehydrated_dehydrated_dehydrated_dehydrated) || (theoreticalpeakiontype == a_ion_deamidated_deamidated_deamidated_deamidated) || (theoreticalpeakiontype == a_ion_dehydrated_dehydrated_dehydrated_deamidated) || (theoreticalpeakiontype == a_ion_dehydrated_dehydrated_deamidated_deamidated) || (theoreticalpeakiontype == a_ion_dehydrated_deamidated_deamidated_deamidated)) {
+				experimentalpeakiontype = theoreticalpeakiontype;
+			}
 			break;
 		case z_ion:
-			if ((theoreticalpeakiontype == y_ion) || (theoreticalpeakiontype == b_ion) || (theoreticalpeakiontype == a_ion)) {
+			if ((theoreticalpeakiontype == y_ion) 
+				|| (theoreticalpeakiontype == b_ion) 
+				|| (theoreticalpeakiontype == a_ion)) {
 				experimentalpeakiontype = theoreticalpeakiontype;
 			}
 			break;
 		case z_ion_dehydrated:
 		case z_ion_deamidated:
-			if ((theoreticalpeakiontype == z_ion) || (theoreticalpeakiontype == y_ion) || (theoreticalpeakiontype == y_ion_dehydrated) || (theoreticalpeakiontype == y_ion_deamidated) || (theoreticalpeakiontype == b_ion) || (theoreticalpeakiontype == b_ion_dehydrated) || (theoreticalpeakiontype == b_ion_deamidated) || (theoreticalpeakiontype == a_ion) || (theoreticalpeakiontype == a_ion_dehydrated) || (theoreticalpeakiontype == a_ion_deamidated)) {
+			if ((theoreticalpeakiontype == z_ion) 
+				|| (theoreticalpeakiontype == y_ion) 
+				|| (theoreticalpeakiontype == y_ion_dehydrated) || (theoreticalpeakiontype == y_ion_deamidated) 
+				|| (theoreticalpeakiontype == b_ion) 
+				|| (theoreticalpeakiontype == b_ion_dehydrated) || (theoreticalpeakiontype == b_ion_deamidated) 
+				|| (theoreticalpeakiontype == a_ion) 
+				|| (theoreticalpeakiontype == a_ion_dehydrated) || (theoreticalpeakiontype == a_ion_deamidated)) {
 				experimentalpeakiontype = theoreticalpeakiontype;
 			}
 			break;
-		case z_ion_dehydrated_and_deamidated:
-			if ((theoreticalpeakiontype == z_ion) || (theoreticalpeakiontype == z_ion_dehydrated) || (theoreticalpeakiontype == z_ion_deamidated) || (theoreticalpeakiontype == y_ion) || (theoreticalpeakiontype == y_ion_dehydrated) || (theoreticalpeakiontype == y_ion_deamidated) || (theoreticalpeakiontype == y_ion_dehydrated_and_deamidated) || (theoreticalpeakiontype == b_ion) || (theoreticalpeakiontype == b_ion_dehydrated) || (theoreticalpeakiontype == b_ion_deamidated) || (theoreticalpeakiontype == b_ion_dehydrated_and_deamidated) || (theoreticalpeakiontype == a_ion) || (theoreticalpeakiontype == a_ion_dehydrated) || (theoreticalpeakiontype == a_ion_deamidated) || (theoreticalpeakiontype == a_ion_dehydrated_and_deamidated)) {
+		case z_ion_dehydrated_dehydrated:
+		case z_ion_deamidated_deamidated:
+		case z_ion_dehydrated_deamidated:
+			if ((theoreticalpeakiontype == z_ion) 
+				|| (theoreticalpeakiontype == z_ion_dehydrated) || (theoreticalpeakiontype == z_ion_deamidated) 
+				|| (theoreticalpeakiontype == y_ion) 
+				|| (theoreticalpeakiontype == y_ion_dehydrated) || (theoreticalpeakiontype == y_ion_deamidated) 
+				|| (theoreticalpeakiontype == y_ion_dehydrated_dehydrated) || (theoreticalpeakiontype == y_ion_deamidated_deamidated) || (theoreticalpeakiontype == y_ion_dehydrated_deamidated)
+				|| (theoreticalpeakiontype == b_ion) 
+				|| (theoreticalpeakiontype == b_ion_dehydrated) || (theoreticalpeakiontype == b_ion_deamidated) 
+				|| (theoreticalpeakiontype == b_ion_dehydrated_dehydrated) || (theoreticalpeakiontype == b_ion_deamidated_deamidated) || (theoreticalpeakiontype == b_ion_dehydrated_deamidated)
+				|| (theoreticalpeakiontype == a_ion) 
+				|| (theoreticalpeakiontype == a_ion_dehydrated) || (theoreticalpeakiontype == a_ion_deamidated) 
+				|| (theoreticalpeakiontype == a_ion_dehydrated_dehydrated) || (theoreticalpeakiontype == a_ion_deamidated_deamidated) || (theoreticalpeakiontype == a_ion_dehydrated_deamidated)) {
+				experimentalpeakiontype = theoreticalpeakiontype;
+			}
+			break;
+		case z_ion_dehydrated_dehydrated_dehydrated:
+		case z_ion_deamidated_deamidated_deamidated:
+		case z_ion_dehydrated_dehydrated_deamidated:
+		case z_ion_dehydrated_deamidated_deamidated:
+			if ((theoreticalpeakiontype == z_ion)
+				|| (theoreticalpeakiontype == z_ion_dehydrated) || (theoreticalpeakiontype == z_ion_deamidated)
+				|| (theoreticalpeakiontype == z_ion_dehydrated_dehydrated) || (theoreticalpeakiontype == z_ion_deamidated_deamidated) || (theoreticalpeakiontype == z_ion_dehydrated_deamidated)
+				|| (theoreticalpeakiontype == y_ion)
+				|| (theoreticalpeakiontype == y_ion_dehydrated) || (theoreticalpeakiontype == y_ion_deamidated)
+				|| (theoreticalpeakiontype == y_ion_dehydrated_dehydrated) || (theoreticalpeakiontype == y_ion_deamidated_deamidated) || (theoreticalpeakiontype == y_ion_dehydrated_deamidated)
+				|| (theoreticalpeakiontype == y_ion_dehydrated_dehydrated_dehydrated) || (theoreticalpeakiontype == y_ion_deamidated_deamidated_deamidated) || (theoreticalpeakiontype == y_ion_dehydrated_dehydrated_deamidated) || (theoreticalpeakiontype == y_ion_dehydrated_deamidated_deamidated)
+				|| (theoreticalpeakiontype == b_ion)
+				|| (theoreticalpeakiontype == b_ion_dehydrated) || (theoreticalpeakiontype == b_ion_deamidated)
+				|| (theoreticalpeakiontype == b_ion_dehydrated_dehydrated) || (theoreticalpeakiontype == b_ion_deamidated_deamidated) || (theoreticalpeakiontype == b_ion_dehydrated_deamidated)
+				|| (theoreticalpeakiontype == b_ion_dehydrated_dehydrated_dehydrated) || (theoreticalpeakiontype == b_ion_deamidated_deamidated_deamidated) || (theoreticalpeakiontype == b_ion_dehydrated_dehydrated_deamidated) || (theoreticalpeakiontype == b_ion_dehydrated_deamidated_deamidated)
+				|| (theoreticalpeakiontype == a_ion)
+				|| (theoreticalpeakiontype == a_ion_dehydrated) || (theoreticalpeakiontype == a_ion_deamidated)
+				|| (theoreticalpeakiontype == a_ion_dehydrated_dehydrated) || (theoreticalpeakiontype == a_ion_deamidated_deamidated) || (theoreticalpeakiontype == a_ion_dehydrated_deamidated)
+				|| (theoreticalpeakiontype == a_ion_dehydrated_dehydrated_dehydrated) || (theoreticalpeakiontype == a_ion_deamidated_deamidated_deamidated) || (theoreticalpeakiontype == a_ion_dehydrated_dehydrated_deamidated) || (theoreticalpeakiontype == a_ion_dehydrated_deamidated_deamidated)) {
+				experimentalpeakiontype = theoreticalpeakiontype;
+			}
+			break;
+		case z_ion_dehydrated_dehydrated_dehydrated_dehydrated:
+		case z_ion_deamidated_deamidated_deamidated_deamidated:
+		case z_ion_dehydrated_dehydrated_dehydrated_deamidated:
+		case z_ion_dehydrated_dehydrated_deamidated_deamidated:
+		case z_ion_dehydrated_deamidated_deamidated_deamidated:
+			if ((theoreticalpeakiontype == z_ion)
+				|| (theoreticalpeakiontype == z_ion_dehydrated) || (theoreticalpeakiontype == z_ion_deamidated)
+				|| (theoreticalpeakiontype == z_ion_dehydrated_dehydrated) || (theoreticalpeakiontype == z_ion_deamidated_deamidated) || (theoreticalpeakiontype == z_ion_dehydrated_deamidated)
+				|| (theoreticalpeakiontype == z_ion_dehydrated_dehydrated_dehydrated) || (theoreticalpeakiontype == z_ion_deamidated_deamidated_deamidated) || (theoreticalpeakiontype == z_ion_dehydrated_dehydrated_deamidated) || (theoreticalpeakiontype == z_ion_dehydrated_deamidated_deamidated)
+				|| (theoreticalpeakiontype == y_ion)
+				|| (theoreticalpeakiontype == y_ion_dehydrated) || (theoreticalpeakiontype == y_ion_deamidated)
+				|| (theoreticalpeakiontype == y_ion_dehydrated_dehydrated) || (theoreticalpeakiontype == y_ion_deamidated_deamidated) || (theoreticalpeakiontype == y_ion_dehydrated_deamidated)
+				|| (theoreticalpeakiontype == y_ion_dehydrated_dehydrated_dehydrated) || (theoreticalpeakiontype == y_ion_deamidated_deamidated_deamidated) || (theoreticalpeakiontype == y_ion_dehydrated_dehydrated_deamidated) || (theoreticalpeakiontype == y_ion_dehydrated_deamidated_deamidated)
+				|| (theoreticalpeakiontype == y_ion_dehydrated_dehydrated_dehydrated_dehydrated) || (theoreticalpeakiontype == y_ion_deamidated_deamidated_deamidated_deamidated) || (theoreticalpeakiontype == y_ion_dehydrated_dehydrated_dehydrated_deamidated) || (theoreticalpeakiontype == y_ion_dehydrated_dehydrated_deamidated_deamidated) || (theoreticalpeakiontype == y_ion_dehydrated_deamidated_deamidated_deamidated)
+				|| (theoreticalpeakiontype == b_ion)
+				|| (theoreticalpeakiontype == b_ion_dehydrated) || (theoreticalpeakiontype == b_ion_deamidated)
+				|| (theoreticalpeakiontype == b_ion_dehydrated_dehydrated) || (theoreticalpeakiontype == b_ion_deamidated_deamidated) || (theoreticalpeakiontype == b_ion_dehydrated_deamidated)
+				|| (theoreticalpeakiontype == b_ion_dehydrated_dehydrated_dehydrated) || (theoreticalpeakiontype == b_ion_deamidated_deamidated_deamidated) || (theoreticalpeakiontype == b_ion_dehydrated_dehydrated_deamidated) || (theoreticalpeakiontype == b_ion_dehydrated_deamidated_deamidated)
+				|| (theoreticalpeakiontype == b_ion_dehydrated_dehydrated_dehydrated_dehydrated) || (theoreticalpeakiontype == b_ion_deamidated_deamidated_deamidated_deamidated) || (theoreticalpeakiontype == b_ion_dehydrated_dehydrated_dehydrated_deamidated) || (theoreticalpeakiontype == b_ion_dehydrated_dehydrated_deamidated_deamidated) || (theoreticalpeakiontype == b_ion_dehydrated_deamidated_deamidated_deamidated)
+				|| (theoreticalpeakiontype == a_ion)
+				|| (theoreticalpeakiontype == a_ion_dehydrated) || (theoreticalpeakiontype == a_ion_deamidated)
+				|| (theoreticalpeakiontype == a_ion_dehydrated_dehydrated) || (theoreticalpeakiontype == a_ion_deamidated_deamidated) || (theoreticalpeakiontype == a_ion_dehydrated_deamidated)
+				|| (theoreticalpeakiontype == a_ion_dehydrated_dehydrated_dehydrated) || (theoreticalpeakiontype == a_ion_deamidated_deamidated_deamidated) || (theoreticalpeakiontype == a_ion_dehydrated_dehydrated_deamidated) || (theoreticalpeakiontype == a_ion_dehydrated_deamidated_deamidated)
+				|| (theoreticalpeakiontype == a_ion_dehydrated_dehydrated_dehydrated_dehydrated) || (theoreticalpeakiontype == a_ion_deamidated_deamidated_deamidated_deamidated) || (theoreticalpeakiontype == a_ion_dehydrated_dehydrated_dehydrated_deamidated) || (theoreticalpeakiontype == a_ion_dehydrated_dehydrated_deamidated_deamidated) || (theoreticalpeakiontype == a_ion_dehydrated_deamidated_deamidated_deamidated)) {
 				experimentalpeakiontype = theoreticalpeakiontype;
 			}
 			break;
@@ -666,12 +1134,12 @@ void cTheoreticalSpectrum::removeUnmatchedMetalIsotopes(cPeaksList& theoreticalp
 }
 
 
-void cTheoreticalSpectrum::removeUnmatchedIsotopePatterns(cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks, cPeaksList& outputtheoreticalpeaks) {
+void cTheoreticalSpectrum::removeUnmatchedIsotopePatterns(cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks, cPeaksList& outputtheoreticalpeaks, bool storeunmatchedpeaks) {
 	if (theoreticalpeaksrealsize == 0) {
 		return;
 	}
 
-	int minimumenvelopepeaks = parameters->minimumpatternsize;
+	int minimumenvelopepeaks = (parameters->mode == dereplication)?parameters->minimumpatternsize:1;
 	
 	int groupid = theoreticalpeaks[0].groupid;
 	int start = 0;
@@ -721,7 +1189,7 @@ void cTheoreticalSpectrum::removeUnmatchedIsotopePatterns(cPeaksList& theoretica
 					}
 
 					// copy unmatched theoretical peaks in matched envelopes into the output
-					if (!theoreticalpeaks[j].decoy && (theoreticalpeaks[j].matched == 0)) {
+					if (storeunmatchedpeaks && !theoreticalpeaks[j].decoy && (theoreticalpeaks[j].matched == 0)) {
 						if (theoreticalpeaks[j].relativeintensity*maximumexperimentalintensity / 100.0 >= parameters->minimumrelativeintensitythreshold) {
 							outputtheoreticalpeaks.add(theoreticalpeaks[j]);
 						}
@@ -773,7 +1241,7 @@ void cTheoreticalSpectrum::removeUnmatchedIsotopePatterns(cPeaksList& theoretica
 				theoreticalpeaks[j].matchedid = -1;
 			}
 
-			if (!theoreticalpeaks[j].decoy && (theoreticalpeaks[j].matched == 0)) {
+			if (storeunmatchedpeaks && !theoreticalpeaks[j].decoy && (theoreticalpeaks[j].matched == 0)) {
 				if (theoreticalpeaks[j].relativeintensity*maximumexperimentalintensity / 100.0 >= parameters->minimumrelativeintensitythreshold) {
 					outputtheoreticalpeaks.add(theoreticalpeaks[j]);
 				}
@@ -1160,6 +1628,66 @@ double cTheoreticalSpectrum::getAngleDistance(cPeaksList& theoreticalpeaks, int 
 }
 
 
+void cTheoreticalSpectrum::generateFragmentIsotopePatterns(int& theoreticalpeaksrealsize, bool writedescription) {
+	cPeaksList tmppeaklist = theoreticalpeaks;
+	int tmppeaklistsize = theoreticalpeaksrealsize;
+
+	//static long long misses = 0;
+	//static long long all = 0;
+
+	cPeaksList isotopepattern;
+	int isotopepatternsize;
+
+	cPeak tmppeak;
+	theoreticalpeaksrealsize = 0;
+	for (int i = 0; i < tmppeaklistsize; i++) {
+		if (!tmppeaklist[i].formula.isEmpty()) {
+			isotopepattern.clear();
+			string hashedformula = to_string(tmppeaklist[i].charge) + "@" + tmppeaklist[i].formula.getSummary();
+
+			isotopepatterncache.lock();
+			bool hit = isotopepatterncache.get(hashedformula, isotopepattern);
+			isotopepatterncache.unlock();
+
+			if (!hit) {
+				isotopepattern = tmppeaklist[i].formula.getIsotopePattern(parameters->fwhm, abs(tmppeaklist[i].charge), (tmppeaklist[i].charge < 0) ? false : true, writedescription);
+
+				isotopepatterncache.lock();
+				isotopepatterncache.put(hashedformula, isotopepattern);
+				isotopepatterncache.unlock();
+
+				//misses++;
+			}
+			isotopepatternsize = isotopepattern.size();
+
+			//all++;
+			//if (all % 100000 == 0) {
+			//	cout << "all: " << all << " misses:" << misses << " hits:" << all - misses << " misses-to-all ratio:" << (double)misses/(double)all*100.0 << "%" << endl;
+			//}
+
+			for (int j = 0; j < isotopepatternsize; j++) {
+				tmppeak = tmppeaklist[i];
+				tmppeak.mzratio = isotopepattern[j].mzratio;
+				tmppeak.relativeintensity = isotopepattern[j].relativeintensity;
+				tmppeak.absoluteintensity = isotopepattern[j].absoluteintensity;
+				tmppeak.groupid = i;
+				if (writedescription) {
+					tmppeak.isotopeformula = isotopepattern[j].description;
+				}
+				addPeakToList(tmppeak, theoreticalpeaksrealsize);
+			}
+		}
+		else {
+			tmppeak = tmppeaklist[i];
+			tmppeak.relativeintensity = 100;
+			tmppeak.absoluteintensity = 100;
+			tmppeak.groupid = i;
+			addPeakToList(tmppeak, theoreticalpeaksrealsize);
+		}
+	}
+}
+
+
 cTheoreticalSpectrum::cTheoreticalSpectrum() {
 	clear();
 }
@@ -1241,18 +1769,7 @@ int cTheoreticalSpectrum::compareBranched(cPeaksList& sortedpeaklist, cBricksDat
 		}
 
 		if (writedescription) {
-			valid = false;
-			if (parameters->searchedsequence.size() > 0) {
-				for (int i = 0; i < (int)trotations.size(); i++) {
-					if (regex_search(trotations[i].tcomposition, searchedsequence) &&
-					(parameters->searchedmodifications[trotations[i].startmodifID].name.compare(parameters->searchedsequenceNtermmodif) == 0) && 
-					(parameters->searchedmodifications[trotations[i].middlemodifID].name.compare(parameters->searchedsequenceTmodif) == 0) && 
-					(parameters->searchedmodifications[trotations[i].endmodifID].name.compare(parameters->searchedsequenceCtermmodif) == 0)) {
-						valid = true;
-						break;
-					}
-				}
-			}
+			setValidSequence(searchedsequence);
 		}
 	} 
 	catch (regex_error& /*e*/) {
@@ -1282,10 +1799,21 @@ int cTheoreticalSpectrum::compareBranched(cPeaksList& sortedpeaklist, cBricksDat
 	generatePrecursorIon(trotations[0].bricks, bricksdatabasewithcombinations, theoreticalpeaksrealsize, writedescription);
 
 
+	if (parameters->generateisotopepattern) {
+		generateFragmentIsotopePatterns(theoreticalpeaksrealsize, writedescription);
+	}
+
+
 	// search the theoretical peaks in the experimental peak list
 	experimentalpeaks = sortedpeaklist;
 	experimentalmatches.clear();
 	searchForPeakPairs(theoreticalpeaks, theoreticalpeaksrealsize, experimentalpeaks, parameters->fragmentmasserrortolerance);
+
+
+	if (parameters->generateisotopepattern) {
+		cPeaksList unmatchedpeaksinmatchedpatterns;
+		removeUnmatchedIsotopePatterns(theoreticalpeaks, theoreticalpeaksrealsize, experimentalpeaks, unmatchedpeaksinmatchedpatterns, false);
+	}
 
 
 	// coverage of series
@@ -1335,8 +1863,13 @@ int cTheoreticalSpectrum::compareBranched(cPeaksList& sortedpeaklist, cBricksDat
 				theoreticalpeaks[*it].matchedppm = ppmError(experimentalpeaks[i].mzratio, theoreticalpeaks[*it].mzratio);
 			}
 
-			experimentalpeaks[i].iontype = selectHigherPriorityIonTypeCID(experimentalpeaks[i].iontype,theoreticalpeaks[*it].iontype);
+			experimentalpeaks[i].iontype = selectHigherPriorityIonTypeCID(experimentalpeaks[i].iontype, theoreticalpeaks[*it].iontype);
 		}
+	}
+
+
+	if (parameters->generateisotopepattern) {
+		normalizeTheoreticalIntensities(theoreticalpeaks, theoreticalpeaksrealsize);
 	}
 
 
@@ -1391,12 +1924,7 @@ int cTheoreticalSpectrum::compareLinear(cPeaksList& sortedpeaklist, cBricksDatab
 		}
 	
 		if (writedescription) {
-			valid = false;
-			if ((parameters->searchedsequence.size() > 0) && regex_search(candidate.getComposition(), searchedsequence) &&
-				(parameters->searchedmodifications[candidate.getStartModifID()].name.compare(parameters->searchedsequenceNtermmodif) == 0) && 
-				(parameters->searchedmodifications[candidate.getEndModifID()].name.compare(parameters->searchedsequenceCtermmodif) == 0)) {
-				valid = true;
-			}	
+			setValidSequence(searchedsequence);
 		}
 	} 
 	catch (regex_error& /*e*/) {
@@ -1420,10 +1948,21 @@ int cTheoreticalSpectrum::compareLinear(cPeaksList& sortedpeaklist, cBricksDatab
 	generatePrecursorIon(intcomposition, bricksdatabasewithcombinations, theoreticalpeaksrealsize, writedescription);
 
 
+	if (parameters->generateisotopepattern) {
+		generateFragmentIsotopePatterns(theoreticalpeaksrealsize, writedescription);
+	}
+
+
 	// search the theoretical peaks in the experimental peak list
 	experimentalpeaks = sortedpeaklist;
 	experimentalmatches.clear();
 	searchForPeakPairs(theoreticalpeaks, theoreticalpeaksrealsize, experimentalpeaks, parameters->fragmentmasserrortolerance);
+
+
+	if (parameters->generateisotopepattern) {
+		cPeaksList unmatchedpeaksinmatchedpatterns;
+		removeUnmatchedIsotopePatterns(theoreticalpeaks, theoreticalpeaksrealsize, experimentalpeaks, unmatchedpeaksinmatchedpatterns, false);
+	}
 
 
 	// coverage of series
@@ -1468,8 +2007,13 @@ int cTheoreticalSpectrum::compareLinear(cPeaksList& sortedpeaklist, cBricksDatab
 				theoreticalpeaks[*it].matchedppm = ppmError(experimentalpeaks[i].mzratio, theoreticalpeaks[*it].mzratio);
 			}
 
-			experimentalpeaks[i].iontype = selectHigherPriorityIonTypeCID(experimentalpeaks[i].iontype,theoreticalpeaks[*it].iontype);
+			experimentalpeaks[i].iontype = selectHigherPriorityIonTypeCID(experimentalpeaks[i].iontype, theoreticalpeaks[*it].iontype);
 		}
+	}
+
+
+	if (parameters->generateisotopepattern) {
+		normalizeTheoreticalIntensities(theoreticalpeaks, theoreticalpeaksrealsize);
 	}
 
 
@@ -1532,33 +2076,8 @@ int cTheoreticalSpectrum::compareCyclic(cPeaksList& sortedpeaklist, cBricksDatab
 		}
 
 		if (writedescription) {
-
-			valid = false;
+			setValidSequence(searchedsequence);
 		
-			if (parameters->searchedsequence.size() > 0) {
-				for (int i = 0; i < (int)rotations.size(); i++) {
-					if (regex_search(rotations[i], searchedsequence)) {
-						validposition = i;
-
-						if (validposition == 0) {
-							reversevalidposition = r;
-						}
-						else if (validposition == r) {
-							reversevalidposition = 0;
-						}
-						else {
-							reversevalidposition = 2*r - validposition;
-						}
-
-						break;
-					}
-				}
-		
-				if (validposition != -1) {
-					valid = true;
-				}
-			}
-
 			bool enableshiftoflabels = false;
 			if (!enableshiftoflabels || (validposition == -1)) {
 				validposition = 0;
@@ -1624,10 +2143,21 @@ int cTheoreticalSpectrum::compareCyclic(cPeaksList& sortedpeaklist, cBricksDatab
 	generatePrecursorIon(intcomposition, bricksdatabasewithcombinations, theoreticalpeaksrealsize, writedescription);
 
 
+	if (parameters->generateisotopepattern) {
+		generateFragmentIsotopePatterns(theoreticalpeaksrealsize, writedescription);
+	}
+
+
 	// search the theoretical peaks in the experimental peak list
 	experimentalpeaks = sortedpeaklist;
 	experimentalmatches.clear();
 	searchForPeakPairs(theoreticalpeaks, theoreticalpeaksrealsize, experimentalpeaks, parameters->fragmentmasserrortolerance);
+
+
+	if (parameters->generateisotopepattern) {
+		cPeaksList unmatchedpeaksinmatchedpatterns;
+		removeUnmatchedIsotopePatterns(theoreticalpeaks, theoreticalpeaksrealsize, experimentalpeaks, unmatchedpeaksinmatchedpatterns, false);
+	}
 
 
 	// coverage of series
@@ -1684,10 +2214,8 @@ int cTheoreticalSpectrum::compareCyclic(cPeaksList& sortedpeaklist, cBricksDatab
 
 							theoreticalpeaks[j].matched--;
 							theoreticalpeaks[j].matchedid = -1;
-
 						}
 						else {
-
 							matchesscrambled = false;
 							for (auto it = experimentalmatches[res].begin(); it != experimentalmatches[res].end(); ++it) {
 								if ((theoreticalpeaks[*it].matched > 0) && theoreticalpeaks[*it].scrambled) {
@@ -1733,7 +2261,7 @@ int cTheoreticalSpectrum::compareCyclic(cPeaksList& sortedpeaklist, cBricksDatab
 
 			if (experimentalpeaks[i].iontype != fragmentIonTypeEnd) {
 				if (theoreticalpeaks[*it].scrambled == experimentalpeaks[i].scrambled) {
-					experimentalpeaks[i].iontype = selectHigherPriorityIonTypeCID(experimentalpeaks[i].iontype,theoreticalpeaks[*it].iontype);
+					experimentalpeaks[i].iontype = selectHigherPriorityIonTypeCID(experimentalpeaks[i].iontype, theoreticalpeaks[*it].iontype);
 				}
 				else {
 					if (experimentalpeaks[i].scrambled && !theoreticalpeaks[*it].scrambled) {
@@ -1747,6 +2275,11 @@ int cTheoreticalSpectrum::compareCyclic(cPeaksList& sortedpeaklist, cBricksDatab
 				experimentalpeaks[i].scrambled = theoreticalpeaks[*it].scrambled;
 			}
 		}
+	}
+
+
+	if (parameters->generateisotopepattern) {
+		normalizeTheoreticalIntensities(theoreticalpeaks, theoreticalpeaksrealsize);
 	}
 
 
@@ -1902,32 +2435,7 @@ int cTheoreticalSpectrum::compareBranchCyclic(cPeaksList& sortedpeaklist, cBrick
 		}
 
 		if (writedescription) {
-			valid = false;
-			if (parameters->searchedsequence.size() > 0) {
-				for (int i = 0; i < (int)branchcyclicrotations.size(); i++) {
-					if (regex_search(branchcyclicrotations[i].getComposition(), searchedsequence)) {
-						validposition = i;
-
-						if (validposition == 0) {
-							reversevalidposition = r;
-						}
-						else if (validposition == r) {
-							reversevalidposition = 0;
-						}
-						else {
-							reversevalidposition = 2*r - validposition;
-						}
-					}
-
-					for (int j = 0; j < (int)trotationsofbranchcyclicrotations[i].size(); j++) {
-						if (regex_search(trotationsofbranchcyclicrotations[i][j].tcomposition, searchedsequence) &&
-						(parameters->searchedmodifications[trotationsofbranchcyclicrotations[i][j].middlemodifID].name.compare(parameters->searchedsequenceTmodif) == 0)) {
-							valid = true;
-							break;
-						}
-					}
-				}
-			}
+			setValidSequence(searchedsequence);
 
 			bool enableshiftoflabels = true;
 			if (!enableshiftoflabels || (validposition == -1)) {
@@ -2002,10 +2510,21 @@ int cTheoreticalSpectrum::compareBranchCyclic(cPeaksList& sortedpeaklist, cBrick
 	generatePrecursorIon(trotationsofbranchcyclicrotations[0][0].bricks, bricksdatabasewithcombinations, theoreticalpeaksrealsize, writedescription);
 
 
+	if (parameters->generateisotopepattern) {
+		generateFragmentIsotopePatterns(theoreticalpeaksrealsize, writedescription);
+	}
+
+
 	// search the theoretical peaks in the experimental peak list
 	experimentalpeaks = sortedpeaklist;
 	experimentalmatches.clear();
 	searchForPeakPairs(theoreticalpeaks, theoreticalpeaksrealsize, experimentalpeaks, parameters->fragmentmasserrortolerance);
+
+
+	if (parameters->generateisotopepattern) {
+		cPeaksList unmatchedpeaksinmatchedpatterns;
+		removeUnmatchedIsotopePatterns(theoreticalpeaks, theoreticalpeaksrealsize, experimentalpeaks, unmatchedpeaksinmatchedpatterns, false);
+	}
 
 
 	// coverage of series
@@ -2064,8 +2583,13 @@ int cTheoreticalSpectrum::compareBranchCyclic(cPeaksList& sortedpeaklist, cBrick
 				theoreticalpeaks[*it].matchedppm = ppmError(experimentalpeaks[i].mzratio, theoreticalpeaks[*it].mzratio);
 			}
 
-			experimentalpeaks[i].iontype = selectHigherPriorityIonTypeCID(experimentalpeaks[i].iontype,theoreticalpeaks[*it].iontype);
+			experimentalpeaks[i].iontype = selectHigherPriorityIonTypeCID(experimentalpeaks[i].iontype, theoreticalpeaks[*it].iontype);
 		}
+	}
+
+
+	if (parameters->generateisotopepattern) {
+		normalizeTheoreticalIntensities(theoreticalpeaks, theoreticalpeaksrealsize);
 	}
 
 
@@ -2157,18 +2681,7 @@ int cTheoreticalSpectrum::compareLinearPolyketide(cPeaksList& sortedpeaklist, cB
 		}
 	
 		if (writedescription) {
-			valid = false;
-			if ((parameters->searchedsequence.size() > 0) && 
-				((regex_search(candidate.getComposition(), searchedsequence) &&
-				(parameters->searchedmodifications[candidate.getStartModifID()].name.compare(parameters->searchedsequenceNtermmodif) == 0) && 
-				(parameters->searchedmodifications[candidate.getEndModifID()].name.compare(parameters->searchedsequenceCtermmodif) == 0))
-				||
-				(regex_search(revertedcandidate.getComposition(), searchedsequence) &&
-				(parameters->searchedmodifications[revertedcandidate.getStartModifID()].name.compare(parameters->searchedsequenceNtermmodif) == 0) && 
-				(parameters->searchedmodifications[revertedcandidate.getEndModifID()].name.compare(parameters->searchedsequenceCtermmodif) == 0)))
-				) {
-				valid = true;
-			}	
+			setValidSequence(searchedsequence);
 		}
 	} 
 	catch (regex_error& /*e*/) {
@@ -2195,10 +2708,21 @@ int cTheoreticalSpectrum::compareLinearPolyketide(cPeaksList& sortedpeaklist, cB
 	generatePrecursorIon(intcomposition, bricksdatabasewithcombinations, theoreticalpeaksrealsize, writedescription);
 
 
+	if (parameters->generateisotopepattern) {
+		generateFragmentIsotopePatterns(theoreticalpeaksrealsize, writedescription);
+	}
+
+
 	// search the theoretical peaks in the experimental peak list
 	experimentalpeaks = sortedpeaklist;
 	experimentalmatches.clear();
 	searchForPeakPairs(theoreticalpeaks, theoreticalpeaksrealsize, experimentalpeaks, parameters->fragmentmasserrortolerance);
+
+
+	if (parameters->generateisotopepattern) {
+		cPeaksList unmatchedpeaksinmatchedpatterns;
+		removeUnmatchedIsotopePatterns(theoreticalpeaks, theoreticalpeaksrealsize, experimentalpeaks, unmatchedpeaksinmatchedpatterns, false);
+	}
 
 
 	// coverage of series
@@ -2243,8 +2767,13 @@ int cTheoreticalSpectrum::compareLinearPolyketide(cPeaksList& sortedpeaklist, cB
 				theoreticalpeaks[*it].matchedppm = ppmError(experimentalpeaks[i].mzratio, theoreticalpeaks[*it].mzratio);
 			}
 
-			experimentalpeaks[i].iontype = selectHigherPriorityIonTypeCID(experimentalpeaks[i].iontype,theoreticalpeaks[*it].iontype);
+			experimentalpeaks[i].iontype = selectHigherPriorityIonTypeCID(experimentalpeaks[i].iontype, theoreticalpeaks[*it].iontype);
 		}
+	}
+
+
+	if (parameters->generateisotopepattern) {
+		normalizeTheoreticalIntensities(theoreticalpeaks, theoreticalpeaksrealsize);
 	}
 
 
@@ -2420,7 +2949,7 @@ void cTheoreticalSpectrum::generateFineMSSpectrum() {
 				}
 				description += " " + parameters->sequencedatabase[i].getNameWithReferenceAsHTMLString() + " (";
 				
-				cPeaksList isotopepattern = chargedformula.getIsotopePattern(parameters->fwhm, k + 1, parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[j]].positive);
+				cPeaksList isotopepattern = chargedformula.getIsotopePattern(parameters->fwhm, k + 1, parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[j]].positive, true);
 				for (int m = 0; m < isotopepattern.size(); m++) {
 					isotopepattern[m].description = description + isotopepattern[m].description + "): ";
 					isotopepattern[m].groupid = groupid;
@@ -2454,7 +2983,7 @@ void cTheoreticalSpectrum::compareMSSpectrum(cPeaksList& peaklist, cTheoreticalS
 		removeUnmatchedMetalIsotopes(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks);
 	}
 	else {
-		removeUnmatchedIsotopePatterns(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks, unmatchedpeaksinmatchedpatterns);
+		removeUnmatchedIsotopePatterns(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks, unmatchedpeaksinmatchedpatterns, true);
 		targetscores.clear();
 		decoyscores.clear();
 		calculateEnvelopeScores(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks);
@@ -2542,12 +3071,30 @@ void cTheoreticalSpectrum::generateNTerminalFragmentIons(int maxcharge, int& pea
 	double tempratio;
 	string tempdescription;
 
+	map<string, int> atoms, tempmap;
+	atoms.clear();
+
+	bool disablesummary = false;
+	if ((parameters->mode == denovoengine) && (parameters->blindedges == 2) && bricksdatabase[intcomposition[0] - 1].isArtificial()) {
+		disablesummary = true;
+	}
+
 	peak.mzratio = parameters->fragmentdefinitions[fragmentiontype].massdifference;
+	if (!disablesummary && (parameters->generateisotopepattern || writedescription)) {
+		mergeMaps(parameters->fragmentdefinitions[fragmentiontype].summarymap, atoms);
+	}
+
 	if ((peptidetype == linear) || (peptidetype == linearpolyketide)) {
 		peak.mzratio += searchedmodifications[candidate.getStartModifID()].massdifference;
+		if (!disablesummary && (parameters->generateisotopepattern || writedescription)) {
+			addStringFormulaToMap(searchedmodifications[candidate.getStartModifID()].summary, atoms);
+		}
 	}
 	if ((peptidetype == branched) || (peptidetype == branchcyclic)) {
 		peak.mzratio += searchedmodifications[trotation->startmodifID].massdifference;
+		if (!disablesummary && (parameters->generateisotopepattern || writedescription)) {
+			addStringFormulaToMap(searchedmodifications[trotation->startmodifID].summary, atoms);
+		}
 	}
 
 	peak.iontype = fragmentiontype;
@@ -2583,10 +3130,22 @@ void cTheoreticalSpectrum::generateNTerminalFragmentIons(int maxcharge, int& pea
 	for (int i = 0; i < (int)intcomposition.size() - 1; i++) {
 		peak.mzratio += bricksdatabase[intcomposition[i] - 1].getMass();
 
+		if ((parameters->mode == denovoengine) && (parameters->blindedges == 2) && bricksdatabase[intcomposition[i] - 1].isArtificial()) {
+			peak.formula.clear();
+			atoms.clear();
+			disablesummary = true;
+		}
+
+		if (!disablesummary && (parameters->generateisotopepattern || writedescription)) {
+			mergeMaps(bricksdatabase[intcomposition[i] - 1].getSummaryMap(), atoms);
+		}
 
 		if ((peptidetype == branched) || (peptidetype == branchcyclic)) {		
 			if (i == trotation->middlebranchstart) {
 				peak.mzratio += searchedmodifications[trotation->middlemodifID].massdifference;
+				if (!disablesummary && (parameters->generateisotopepattern || writedescription)) {
+					addStringFormulaToMap(searchedmodifications[trotation->middlemodifID].summary, atoms);
+				}
 			}
 
 			if ((i >= trotation->middlebranchstart) && (i < trotation->middlebranchend)) {
@@ -2705,7 +3264,7 @@ void cTheoreticalSpectrum::generateNTerminalFragmentIons(int maxcharge, int& pea
 
 		if (peak.mzratio > 0) {
 
-			tempratio = peak.mzratio;
+			tempratio = peak.mzratio;		
 			if (writedescription) {
 				tempdescription = peak.description;
 			}
@@ -2713,6 +3272,11 @@ void cTheoreticalSpectrum::generateNTerminalFragmentIons(int maxcharge, int& pea
 
 				peak.mzratio = charge(uncharge(tempratio, 1), (parameters->precursorcharge > 0)?j:-j);
 				peak.charge = (parameters->precursorcharge > 0)?j:-j;
+				if (!disablesummary && (parameters->generateisotopepattern || writedescription)) {
+					tempmap = atoms;
+					rechargeMap(peak.charge, tempmap);
+					peak.formula.setFromMap(tempmap, false);
+				}
 				if (writedescription) {
 					if (parameters->precursorcharge > 0) {
 						peak.description = to_string(j) + "+ " + tempdescription;
@@ -2722,8 +3286,25 @@ void cTheoreticalSpectrum::generateNTerminalFragmentIons(int maxcharge, int& pea
 					}
 				}
 
-				addPeakToList(peak, peaklistrealsize);
-				addMetalPeaks(peak, parameters->metaladducts, peaklistrealsize, j, writedescription);
+				if (writedescription) {
+					if (peak.formula.hasAllElementsPositive()) {
+						addPeakToList(peak, peaklistrealsize);
+						if (!parameters->generateisotopepattern) {
+							addMetalPeaks(peak, parameters->metaladducts, peaklistrealsize, j, writedescription);
+						}
+					}
+				}
+				else {
+					if (parameters->generateisotopepattern) {
+						if (peak.formula.hasAllElementsPositive()) {
+							addPeakToList(peak, peaklistrealsize);
+						}
+					}
+					else {
+						addPeakToList(peak, peaklistrealsize);
+						addMetalPeaks(peak, parameters->metaladducts, peaklistrealsize, j, writedescription);
+					}
+				}
 
 			}
 			peak.mzratio = tempratio;
@@ -2743,12 +3324,30 @@ void cTheoreticalSpectrum::generateCTerminalFragmentIons(int maxcharge, int& pea
 	double tempratio;
 	string tempdescription;
 
+	map<string, int> atoms, tempmap;
+	atoms.clear();
+
+	bool disablesummary = false;
+	if ((parameters->mode == denovoengine) && (parameters->blindedges == 2) && bricksdatabase[intcomposition[intcomposition.size() - 1] - 1].isArtificial()) {
+		disablesummary = true;
+	}
+
 	peak.mzratio = parameters->fragmentdefinitions[fragmentiontype].massdifference;
+	if (!disablesummary && (parameters->generateisotopepattern || writedescription)) {
+		mergeMaps(parameters->fragmentdefinitions[fragmentiontype].summarymap, atoms);
+	}
+
 	if ((peptidetype == linear) || (peptidetype == linearpolyketide)) {
 		peak.mzratio += searchedmodifications[candidate.getEndModifID()].massdifference;
+		if (!disablesummary && (parameters->generateisotopepattern || writedescription)) {
+			addStringFormulaToMap(searchedmodifications[candidate.getEndModifID()].summary, atoms);
+		}
 	}
 	if ((peptidetype == branched) || (peptidetype == branchcyclic)) {
 		peak.mzratio += searchedmodifications[trotation->endmodifID].massdifference;
+		if (!disablesummary && (parameters->generateisotopepattern || writedescription)) {
+			addStringFormulaToMap(searchedmodifications[trotation->endmodifID].summary, atoms);
+		}
 	}
 
 	peak.iontype = fragmentiontype;
@@ -2784,11 +3383,24 @@ void cTheoreticalSpectrum::generateCTerminalFragmentIons(int maxcharge, int& pea
 	int order = -1;
 	for (int i = (int)intcomposition.size() - 1; i > 0; i--) {
 		peak.mzratio += bricksdatabase[intcomposition[i] - 1].getMass();
+
+		if ((parameters->mode == denovoengine) && (parameters->blindedges == 2) && bricksdatabase[intcomposition[i] - 1].isArtificial()) {
+			peak.formula.clear();
+			atoms.clear();
+			disablesummary = true;
+		}
+
+		if (!disablesummary && (parameters->generateisotopepattern || writedescription)) {
+			mergeMaps(bricksdatabase[intcomposition[i] - 1].getSummaryMap(), atoms);
+		}
 		order++;
 
 		if ((peptidetype == branched) || (peptidetype == branchcyclic)) {		
 			if (i == trotation->middlebranchend) {
 				peak.mzratio += searchedmodifications[trotation->middlemodifID].massdifference;
+				if (!disablesummary && (parameters->generateisotopepattern || writedescription)) {
+					addStringFormulaToMap(searchedmodifications[trotation->middlemodifID].summary, atoms);
+				}
 			}
 
 			if ((i > trotation->middlebranchstart) && (i <= trotation->middlebranchend)) {
@@ -2891,6 +3503,11 @@ void cTheoreticalSpectrum::generateCTerminalFragmentIons(int maxcharge, int& pea
 
 				peak.mzratio = charge(uncharge(tempratio, 1), (parameters->precursorcharge > 0)?j:-j);
 				peak.charge = (parameters->precursorcharge > 0)?j:-j;
+				if (!disablesummary && (parameters->generateisotopepattern || writedescription)) {
+					tempmap = atoms;
+					rechargeMap(peak.charge, tempmap);
+					peak.formula.setFromMap(tempmap, false);
+				}
 				if (writedescription) {
 					if (parameters->precursorcharge > 0) {
 						peak.description = to_string(j) + "+ " + tempdescription;
@@ -2900,8 +3517,25 @@ void cTheoreticalSpectrum::generateCTerminalFragmentIons(int maxcharge, int& pea
 					}
 				}
 				
-				addPeakToList(peak, peaklistrealsize);
-				addMetalPeaks(peak, parameters->metaladducts, peaklistrealsize, j, writedescription);				
+				if (writedescription) {
+					if (peak.formula.hasAllElementsPositive()) {
+						addPeakToList(peak, peaklistrealsize);
+						if (!parameters->generateisotopepattern) {
+							addMetalPeaks(peak, parameters->metaladducts, peaklistrealsize, j, writedescription);
+						}
+					}
+				}
+				else {
+					if (parameters->generateisotopepattern) {
+						if (peak.formula.hasAllElementsPositive()) {
+							addPeakToList(peak, peaklistrealsize);
+						}
+					}
+					else {
+						addPeakToList(peak, peaklistrealsize);
+						addMetalPeaks(peak, parameters->metaladducts, peaklistrealsize, j, writedescription);
+					}
+				}
 
 			}
 			peak.mzratio = tempratio;
@@ -2973,6 +3607,141 @@ int cTheoreticalSpectrum::getValidPosition() {
 
 int cTheoreticalSpectrum::getReverseValidPosition() {
 	return reversevalidposition;
+}
+
+
+void cTheoreticalSpectrum::setValidSequence(regex& searchedsequence) {
+	valid = false;
+
+	if (parameters->searchedsequence.size() == 0) {
+		return;
+	}
+
+	cCandidate revertedcandidate;
+	vector<string> rotations;
+	vector<TRotationInfo> trotations;
+	vector<cCandidate> branchcyclicrotations;
+	vector<vector<TRotationInfo> > trotationsofbranchcyclicrotations;
+	int r, numberofbricks;
+
+	switch (parameters->peptidetype) {
+		case linear:
+			if (regex_search(candidate.getComposition(), searchedsequence) &&
+				(parameters->searchedmodifications[candidate.getStartModifID()].name.compare(parameters->searchedsequenceNtermmodif) == 0) &&
+				(parameters->searchedmodifications[candidate.getEndModifID()].name.compare(parameters->searchedsequenceCtermmodif) == 0)) {
+				valid = true;
+			}
+			break;
+		case cyclic:
+		case cyclicpolyketide:
+			candidate.getRotations(rotations, true);
+			r = (int)rotations.size() / 2;
+
+			for (int i = 0; i < (int)rotations.size(); i++) {
+				if (regex_search(rotations[i], searchedsequence)) {
+					validposition = i;
+
+					if (validposition == 0) {
+						reversevalidposition = r;
+					}
+					else if (validposition == r) {
+						reversevalidposition = 0;
+					}
+					else {
+						reversevalidposition = 2 * r - validposition;
+					}
+
+					break;
+				}
+			}
+
+			if (validposition != -1) {
+				valid = true;
+			}
+			break;
+		case branched:
+			candidate.getPermutationsOfBranches(trotations);
+			for (int i = 0; i < (int)trotations.size(); i++) {
+				if (regex_search(trotations[i].tcomposition, searchedsequence) &&
+					(parameters->searchedmodifications[trotations[i].startmodifID].name.compare(parameters->searchedsequenceNtermmodif) == 0) &&
+					(parameters->searchedmodifications[trotations[i].middlemodifID].name.compare(parameters->searchedsequenceTmodif) == 0) &&
+					(parameters->searchedmodifications[trotations[i].endmodifID].name.compare(parameters->searchedsequenceCtermmodif) == 0)) {
+					valid = true;
+					break;
+				}
+			}
+			break;
+		case branchcyclic:
+			// normalize the candidate
+			candidate.getBranchCyclicRotations(branchcyclicrotations, false);
+			numberofbricks = getNumberOfBricks(candidate.getComposition());
+			for (int i = 0; i < (int)branchcyclicrotations.size(); i++) {
+				if (branchcyclicrotations[i].getBranchEnd() == numberofbricks - 1) {
+					vector<string> v;
+					v.push_back(branchcyclicrotations[i].getComposition());
+					string name = candidate.getName();
+					cSummaryFormula summary = candidate.getSummaryFormula();
+					vector<nodeEdge> cpath = candidate.getPath();
+					candidate.setCandidate(v, cpath, candidate.getStartIonType(), candidate.getStartModifID(), candidate.getEndModifID(), candidate.getMiddleModifID(), branchcyclicrotations[i].getBranchStart(), branchcyclicrotations[i].getBranchEnd());
+					candidate.setName(name);
+					candidate.setSummaryFormula(summary);
+					break;
+				}
+			}
+
+			// get branch-cyclic rotations
+			candidate.getBranchCyclicRotations(branchcyclicrotations, true);
+
+			// get T-permutations of branch-cyclic rotations
+			trotationsofbranchcyclicrotations.resize(branchcyclicrotations.size());
+			for (int i = 0; i < (int)branchcyclicrotations.size(); i++) {
+				branchcyclicrotations[i].getPermutationsOfBranches(trotationsofbranchcyclicrotations[i]);
+			}
+
+			r = (int)branchcyclicrotations.size() / 2;
+			
+			for (int i = 0; i < (int)branchcyclicrotations.size(); i++) {
+				if (regex_search(branchcyclicrotations[i].getComposition(), searchedsequence)) {
+					validposition = i;
+
+					if (validposition == 0) {
+						reversevalidposition = r;
+					}
+					else if (validposition == r) {
+						reversevalidposition = 0;
+					}
+					else {
+						reversevalidposition = 2 * r - validposition;
+					}
+				}
+
+				for (int j = 0; j < (int)trotationsofbranchcyclicrotations[i].size(); j++) {
+					if (regex_search(trotationsofbranchcyclicrotations[i][j].tcomposition, searchedsequence) &&
+						(parameters->searchedmodifications[trotationsofbranchcyclicrotations[i][j].middlemodifID].name.compare(parameters->searchedsequenceTmodif) == 0)) {
+						valid = true;
+						break;
+					}
+				}
+			}
+			break;
+		case linearpolyketide:
+			revertedcandidate = candidate;
+			revertedcandidate.revertComposition();
+			if ((regex_search(candidate.getComposition(), searchedsequence) &&
+				(parameters->searchedmodifications[candidate.getStartModifID()].name.compare(parameters->searchedsequenceNtermmodif) == 0) &&
+				(parameters->searchedmodifications[candidate.getEndModifID()].name.compare(parameters->searchedsequenceCtermmodif) == 0))
+				||
+				(regex_search(revertedcandidate.getComposition(), searchedsequence) &&
+				(parameters->searchedmodifications[revertedcandidate.getStartModifID()].name.compare(parameters->searchedsequenceNtermmodif) == 0) &&
+				(parameters->searchedmodifications[revertedcandidate.getEndModifID()].name.compare(parameters->searchedsequenceCtermmodif) == 0))) {
+				valid = true;
+			}
+			break;
+		case other:
+			break;
+		default:
+			break;
+	}
 }
 
 

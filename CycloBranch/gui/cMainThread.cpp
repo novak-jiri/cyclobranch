@@ -1,6 +1,9 @@
 #include "gui/cMainThread.h"
 
 
+cIsotopePatternCache isotopepatterncache;
+
+
 bool cMainThread::checkModifications(cParameters& parameters, cSequence& sequence, int& startmodifid, int& endmodifid, int& middlemodifid, string& errormessage) {
 	startmodifid = 0;
 	endmodifid = 0;
@@ -138,6 +141,10 @@ void cMainThread::run() {
 
 	theoreticalspectrumlist->clear();
 
+	isotopepatterncache.lock();
+	isotopepatterncache.clear();
+	isotopepatterncache.unlock();
+
 	QTime time;
 	time.start();
 
@@ -223,7 +230,7 @@ void cMainThread::run() {
 			}
 			*os << endl;
 			*os << parameters.peaklistseries[i].print();
-			if (parameters.masserrortolerancefordeisotoping > 0) {
+			if (!parameters.generateisotopepattern && (parameters.masserrortolerancefordeisotoping > 0)) {
 				parameters.peaklistseries[i].removeIsotopes(parameters.precursorcharge, parameters.masserrortolerancefordeisotoping, this);
 			}
 		}
@@ -483,10 +490,17 @@ void cMainThread::run() {
 			ts.generateMSSpectrum(true);		
 		}
 
-		// efficient store of theoretical peak descriptions
-		parameters.peakdesctoid.clear();
+		unordered_map<string, int> tempmap;
 		parameters.peakidtodesc.clear();
-		ts.getTheoreticalPeaks()->reducePeakDescriptions(parameters.peakidtodesc, parameters.peakdesctoid);
+		parameters.isotopeformulaidtodesc.clear();
+
+		tempmap.clear();
+		ts.getTheoreticalPeaks()->reducePeakDescriptions(tempmap);
+		convertStringIntUnorderedMapToStringVector(tempmap, parameters.peakidtodesc);
+
+		//tempmap.clear();
+		//ts.getTheoreticalPeaks()->reduceIsotopeFormulaDescriptions(tempmap);
+		//convertStringIntUnorderedMapToStringVector(tempmap, parameters.isotopeformulaidtodesc);
 
 		*os << "ok" << endl;
 		*os << "Comparing theoretical peaks with the experimental peaklist(s)... " << endl;

@@ -10,6 +10,8 @@
 #include <fstream>
 #include <iostream>
 #include <vector>
+#include <map>
+#include <unordered_map>
 #include <string>
 #include <sstream>
 #include <iomanip>
@@ -139,6 +141,46 @@ void storeStringVector(vector<string>& v, ofstream& os);
 	\param is reference to an input stream
 */ 
 void loadStringVector(vector<string>& v, ifstream& is);
+
+
+/**
+	\brief Store a map<string, int> into an output stream.
+	\param map reference to a map
+	\param os reference to an output stream
+*/
+void storeStringIntMap(map<string, int>& map, ofstream& os);
+
+
+/**
+	\brief Load a map<string, int> from an input stream.
+	\param map reference to a map
+	\param is reference to an input stream
+*/
+void loadStringIntMap(map<string, int>& map, ifstream& is);
+
+
+/**
+	\brief Store a map<int, string> into an output stream.
+	\param map reference to a map
+	\param os reference to an output stream
+*/
+void storeIntStringMap(map<int, string>& map, ofstream& os);
+
+
+/**
+	\brief Load a map<int, string> from an input stream.
+	\param map reference to a map
+	\param is reference to an input stream
+*/
+void loadIntStringMap(map<int, string>& map, ifstream& is);
+
+
+/**
+	\brief Convert an unordered_map<string, int> to a vector<string>.
+	\param map an input map
+	\param vector an output vector
+*/
+void convertStringIntUnorderedMapToStringVector(unordered_map<string, int>& map, vector<string>& vector);
 
 
 /**

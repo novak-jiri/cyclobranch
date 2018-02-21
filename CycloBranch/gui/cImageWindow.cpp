@@ -112,6 +112,23 @@ cImageWindow::cImageWindow(QWidget* parent) {
 	maxy->setValue(500);
 	maxy->setToolTip("The Y coordinate of the bottom-right corner of an optical image [number of points]; see manual for vendor specific details.");
 
+	pixelsizexlabel = new QLabel("Pixel Width: ");
+
+	pixelsizexspinbox = new QSpinBox();
+	pixelsizexspinbox->setRange(1, 100000);
+	pixelsizexspinbox->setSingleStep(1);
+	pixelsizexspinbox->setValue(100);
+	pixelsizexspinbox->setSuffix(" um");
+	pixelsizexspinbox->setToolTip("Pixel width [um].");
+
+	pixelsizeylabel = new QLabel("Pixel Height: ");
+
+	pixelsizeyspinbox = new QSpinBox();
+	pixelsizeyspinbox->setRange(1, 100000);
+	pixelsizeyspinbox->setSingleStep(1);
+	pixelsizeyspinbox->setValue(100);
+	pixelsizeyspinbox->setSuffix(" um");
+	pixelsizeyspinbox->setToolTip("Pixel height [um].");
 
 	setmaxbutton = new QPushButton(" Correlate ");
 	setmaxbutton->setToolTip("Correlate the measured region of compounds with optical image.");
@@ -128,6 +145,10 @@ cImageWindow::cImageWindow(QWidget* parent) {
 	maxcoordinateshbox->addWidget(maxx);
 	maxcoordinateshbox->addWidget(maxylabel);
 	maxcoordinateshbox->addWidget(maxy);
+	maxcoordinateshbox->addWidget(pixelsizexlabel);
+	maxcoordinateshbox->addWidget(pixelsizexspinbox);
+	maxcoordinateshbox->addWidget(pixelsizeylabel);
+	maxcoordinateshbox->addWidget(pixelsizeyspinbox);
 	maxcoordinateshbox->addWidget(setmaxbutton);
 	maxcoordinateshbox->addWidget(setdefaultbutton);
 
@@ -419,6 +440,8 @@ cImageWindow::cImageWindow(QWidget* parent) {
 	toolbarRegion = addToolBar(tr("Compounds"));
 	toolbarRegion->addWidget(regionwidget);
 
+	addToolBarBreak();
+
 	toolbarMaxCoordinates = addToolBar(tr("Optical Image"));
 	toolbarMaxCoordinates->addWidget(maxcoordinateswidget);
 
@@ -490,7 +513,8 @@ cImageWindow::cImageWindow(QWidget* parent) {
 	
 	defaultmaxx = 1;
 	defaultmaxy = 1;
-	pixelsize = 1;
+	defaultpixelsizex = 1;
+	defaultpixelsizey = 1;
 	vendor = unknownvendor;
 }
 
@@ -517,6 +541,10 @@ cImageWindow::~cImageWindow() {
 	delete maxx;
 	delete maxylabel;
 	delete maxy;
+	delete pixelsizexlabel;
+	delete pixelsizexspinbox;
+	delete pixelsizeylabel;
+	delete pixelsizeyspinbox;
 	delete setmaxbutton;
 	delete setdefaultbutton;
 	delete maxcoordinateshbox;
@@ -590,12 +618,13 @@ void cImageWindow::closeEvent(QCloseEvent *event) {
 }
 
 
-void cImageWindow::setDefaultMaxXY(int defaultmaxx, int defaultmaxy, int pixelsize, eVendorType vendor) {
+void cImageWindow::setDefaultMaxXY(int defaultmaxx, int defaultmaxy, int defaultpixelsizex, int defaultpixelsizey, eVendorType vendor) {
 	this->defaultmaxx = defaultmaxx;
 	this->defaultmaxy = defaultmaxy;
-	this->pixelsize = pixelsize;
+	this->defaultpixelsizex = defaultpixelsizex;
+	this->defaultpixelsizey = defaultpixelsizey;
 	this->vendor = vendor;
-	imagewindowwidget->setDefaultMaxXY(defaultmaxx, defaultmaxy, pixelsize, vendor);
+	imagewindowwidget->setDefaultMaxXY(defaultmaxx, defaultmaxy, defaultpixelsizex, defaultpixelsizey, vendor);
 }
 
 
@@ -686,12 +715,16 @@ void cImageWindow::colorSpinBoxes(int layerid) {
 		topshift->setStyleSheet("QSpinBox { background-color: lime; }");
 		maxx->setStyleSheet("QSpinBox { background-color: lime; }");
 		maxy->setStyleSheet("QSpinBox { background-color: lime; }");
+		pixelsizexspinbox->setStyleSheet("QSpinBox { background-color: lime; }");
+		pixelsizeyspinbox->setStyleSheet("QSpinBox { background-color: lime; }");
 	}
 	else {
 		leftshift->setStyleSheet("QSpinBox { background-color: white; }");
 		topshift->setStyleSheet("QSpinBox { background-color: white; }");
 		maxx->setStyleSheet("QSpinBox { background-color: white; }");
 		maxy->setStyleSheet("QSpinBox { background-color: white; }");
+		pixelsizexspinbox->setStyleSheet("QSpinBox { background-color: white; }");
+		pixelsizeyspinbox->setStyleSheet("QSpinBox { background-color: white; }");
 	}
 
 	if ((eLayerType)layerid == layer_histology_image) {
@@ -734,7 +767,7 @@ void cImageWindow::keyPressEvent(QKeyEvent *event) {
 			setregionbutton->click();
 		}
 
-		if (leftshift->hasFocus() || topshift->hasFocus() || maxx->hasFocus() || maxy->hasFocus()) {
+		if (leftshift->hasFocus() || topshift->hasFocus() || maxx->hasFocus() || maxy->hasFocus() || pixelsizexspinbox->hasFocus() || pixelsizeyspinbox->hasFocus()) {
 			setmaxbutton->click();
 		}
 
@@ -834,6 +867,8 @@ void cImageWindow::openOpticalImage() {
 		topshift->setValue(0);
 		maxx->setValue(defaultmaxx);
 		maxy->setValue(defaultmaxy);
+		pixelsizexspinbox->setValue(defaultpixelsizex);
+		pixelsizeyspinbox->setValue(defaultpixelsizey);
 		
 		setMaxButtonReleased();
 
@@ -1043,7 +1078,7 @@ void cImageWindow::setFilterOptionsSlot(vector<cCoordinates> coordinates, string
 
 
 void cImageWindow::setMaxButtonReleased() {
-	imagewindowwidget->setCorrelationValues(leftshift->value(), topshift->value(), maxx->value(), maxy->value());
+	imagewindowwidget->setCorrelationValues(leftshift->value(), topshift->value(), maxx->value(), maxy->value(), pixelsizexspinbox->value(), pixelsizeyspinbox->value());
 	resetregionbutton->click();
 }
 
@@ -1053,7 +1088,9 @@ void cImageWindow::setDefaultButtonReleased() {
 	topshift->setValue(0);
 	maxx->setValue(defaultmaxx);
 	maxy->setValue(defaultmaxy);
-	imagewindowwidget->setCorrelationValues(leftshift->value(), topshift->value(), maxx->value(), maxy->value());
+	pixelsizexspinbox->setValue(defaultpixelsizex);
+	pixelsizeyspinbox->setValue(defaultpixelsizey);
+	imagewindowwidget->setCorrelationValues(leftshift->value(), topshift->value(), maxx->value(), maxy->value(), pixelsizexspinbox->value(), pixelsizeyspinbox->value());
 	resetregionbutton->click();
 }
 
@@ -1137,7 +1174,7 @@ void cImageWindow::microscopyDefaultButtonReleased() {
 			microscopylayers[activelayer].y = microscopylayers[layer_microscopy_navigation_image].y + (microscopylayers[layer_microscopy_navigation_image].height - microscopylayers[activelayer].defaultheight) / 2.0 + (microscopylayers[activelayer].stagey - microscopylayers[layer_microscopy_navigation_image].stagey) * 1000000.0;
 			microscopylayers[activelayer].width = microscopylayers[activelayer].defaultwidth;
 			microscopylayers[activelayer].height = microscopylayers[activelayer].defaultheight;
-			microscopylayers[activelayer].angle = 0;
+			microscopylayers[activelayer].angle = microscopylayers[layer_microscopy_navigation_image].angle;
 			imagewindowwidget->setMicroscopyPosition((eLayerType)activelayer, microscopylayers[activelayer].x, microscopylayers[activelayer].y, microscopylayers[activelayer].width, microscopylayers[activelayer].height, microscopylayers[activelayer].angle);
 		}
 

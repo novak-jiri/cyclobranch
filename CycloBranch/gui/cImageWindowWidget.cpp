@@ -34,10 +34,13 @@ cImageWindowWidget::cImageWindowWidget() {
 	topshift = 0;
 	maxx = 1;
 	maxy = 1;
+	pixelsizex = 1;
+	pixelsizey = 1;
 
 	defaultmaxx = 1;
 	defaultmaxy = 1;
-	pixelsize = 1;
+	defaultpixelsizex = 1;
+	defaultpixelsizey = 1;
 	vendor = unknownvendor;
 
 	currentscale = 1;
@@ -54,6 +57,9 @@ cImageWindowWidget::cImageWindowWidget() {
 	currentheight = 1;
 
 	showselection = false;
+
+	microscopynavigationcenterx = 0;
+	microscopynavigationcentery = 0;
 
 	selectionrect = new QGraphicsRectItem();
 	selectionrect->setZValue(1000);
@@ -109,7 +115,10 @@ void cImageWindowWidget::setMicroscopyImage(eLayerType layer, QImage* microscopy
 
 
 QImage cImageWindowWidget::getImage() {
-	QImage image(sceneRect().size().toSize(), QImage::Format_ARGB32);
+	QRect rect_viewport(0, 0, viewport()->width(), viewport()->height());
+	QRectF rect_scene = mapToScene(rect_viewport).boundingRect();
+
+	QImage image(rect_scene.size().toSize(), QImage::Format_ARGB32);
 	image.fill(Qt::white);
 
 	QPainter painter;
@@ -121,7 +130,7 @@ QImage cImageWindowWidget::getImage() {
 		return image;
 	}
 
-	scene->render(&painter, sceneRect(), sceneRect(), Qt::KeepAspectRatio);
+	scene->render(&painter, rect_viewport, rect_scene, Qt::KeepAspectRatio);
 	painter.end();
 	
 	return image;
@@ -139,20 +148,23 @@ void cImageWindowWidget::setFilterOptions(vector<cCoordinates>& coordinates, str
 }
 
 
-void cImageWindowWidget::setCorrelationValues(int leftshift, int topshift, int maxx, int maxy) {
+void cImageWindowWidget::setCorrelationValues(int leftshift, int topshift, int maxx, int maxy, int pixelsizex, int pixelsizey) {
 	this->leftshift = leftshift;
 	this->topshift = topshift;
 	this->maxx = maxx;
 	this->maxy = maxy;
+	this->pixelsizex = pixelsizex;
+	this->pixelsizey = pixelsizey;
 
 	emit updateRuler(recalculateRulerValue(currentscale));
 }
 
 
-void cImageWindowWidget::setDefaultMaxXY(int defaultmaxx, int defaultmaxy, int pixelsize, eVendorType vendor) {
+void cImageWindowWidget::setDefaultMaxXY(int defaultmaxx, int defaultmaxy, int defaultpixelsizex, int defaultpixelsizey, eVendorType vendor) {
 	this->defaultmaxx = defaultmaxx;
 	this->defaultmaxy = defaultmaxy;
-	this->pixelsize = pixelsize;
+	this->defaultpixelsizex = defaultpixelsizex;
+	this->defaultpixelsizey = defaultpixelsizey;
 	this->vendor = vendor;
 }
 
@@ -229,7 +241,7 @@ void cImageWindowWidget::mousePressEvent(QMouseEvent *event) {
 
 			if ((activelayer == layer_histology_image) || ((activelayer >= layer_microscopy_navigation_image) && (activelayer < layer_end))) {
 				QTransform transform;
-				tmpangle = prepareTransformation(selectionrect->rect(), transform, layersvector[activelayer].fliphorizontally, layersvector[activelayer].flipvertically, layersvector[activelayer].angle);
+				tmpangle = prepareTransformation(selectionrect->rect(), transform, layersvector[activelayer].fliphorizontally, layersvector[activelayer].flipvertically, layersvector[activelayer].angle, true);
 				transform.map(currentx, currenty, &transformedx, &transformedy);
 			}
 
@@ -511,16 +523,16 @@ void cImageWindowWidget::mouseReleaseEvent(QMouseEvent *event) {
 				int micrometerswidth, micrometersheight;
 				switch (vendor) {
 					case unknownvendor:
-						micrometerswidth = maxx*pixelsize;
-						micrometersheight = maxy*pixelsize;
+						micrometerswidth = maxx*pixelsizex;
+						micrometersheight = maxy*pixelsizey;
 						break;
 					case bruker:
-						micrometerswidth = (maxx + 1)*sqrt(pixelsize);
-						micrometersheight = (maxy + 1)*sqrt(pixelsize);
+						micrometerswidth = (maxx + 1)*pixelsizex;
+						micrometersheight = (maxy + 1)*pixelsizey;
 						break;
 					case waters:
-						micrometerswidth = maxx*pixelsize;
-						micrometersheight = maxy*pixelsize;
+						micrometerswidth = maxx*pixelsizex;
+						micrometersheight = maxy*pixelsizey;
 						break;
 					default:
 						break;
@@ -647,9 +659,12 @@ void cImageWindowWidget::redrawScene() {
 		}
 	}
 
+	microscopynavigationcenterx = 0;
+	microscopynavigationcentery = 0;
+
 	for (int i = layer_microscopy_navigation_image; i < layer_end; i++) {
 		if (((int)layersvector.size() >= i + 1) && layersvector[i].ispixmapdefined) {
-			if (layersvector[i].checked) {
+			if ((i == layer_microscopy_navigation_image) || (layersvector[i].checked)) {
 				drawMicroscopyImage((eLayerType)i, rect_scene, currentwidth, currentheight);
 			}
 		}
@@ -945,24 +960,24 @@ void cImageWindowWidget::redrawScene() {
 
 
 void cImageWindowWidget::drawMicroscopyImage(eLayerType layer, QRectF& rect_scene, int currentwidth, int currentheight) {
+
 	int micrometerswidth, micrometersheight;
 	switch (vendor) {
 		case unknownvendor:
-			micrometerswidth = maxx*pixelsize;
-			micrometersheight = maxy*pixelsize;
+			micrometerswidth = maxx*pixelsizex;
+			micrometersheight = maxy*pixelsizey;
 			break;
 		case bruker:
-			micrometerswidth = (maxx + 1)*sqrt(pixelsize);
-			micrometersheight = (maxy + 1)*sqrt(pixelsize);
+			micrometerswidth = (maxx + 1)*pixelsizex;
+			micrometersheight = (maxy + 1)*pixelsizey;
 			break;
 		case waters:
-			micrometerswidth = maxx*pixelsize;
-			micrometersheight = maxy*pixelsize;
+			micrometerswidth = maxx*pixelsizex;
+			micrometersheight = maxy*pixelsizey;
 			break;
 		default:
 			break;
 	}
-
 
 	QPixmap scaledmicroscopypixmap = *layersvector[layer].pixmap;
 
@@ -979,9 +994,11 @@ void cImageWindowWidget::drawMicroscopyImage(eLayerType layer, QRectF& rect_scen
 	int microscopynewcenterx = scaledmicroscopypixmap.rect().center().x();
 	int microscopynewcentery = scaledmicroscopypixmap.rect().center().y();
 
+	qreal centershiftx = microscopyorigcenterx - microscopynewcenterx;
+	qreal centershifty = microscopyorigcentery - microscopynewcentery;
+
 	int microscopynewwidth = scaledmicroscopypixmap.width();
 	int microscopynewheight = scaledmicroscopypixmap.height();
-
 	
 	int scaledmicroscopywidth = ((double)layersvector[layer].width / (double)layersvector[layer].pixmap->width() * (double)microscopynewwidth) / (double)micrometerswidth * (double)currentwidth;
 	int scaledmicroscopyheight = ((double)layersvector[layer].height / (double)layersvector[layer].pixmap->height() * (double)microscopynewheight) / (double)micrometersheight * (double)currentheight;
@@ -992,9 +1009,31 @@ void cImageWindowWidget::drawMicroscopyImage(eLayerType layer, QRectF& rect_scen
 	qreal microscopywidthratio = (double)scaledmicroscopywidth / (double)microscopynewwidth;
 	qreal microscopyheightratio = (double)scaledmicroscopyheight / (double)microscopynewheight;
 
+	qreal scaledmicroscopycenterx = ((qreal)scaledmicroscopyx / microscopywidthratio + (qreal)microscopynewwidth / 2.0 + centershiftx) * microscopywidthratio;
+	qreal scaledmicroscopycentery = ((qreal)scaledmicroscopyy / microscopyheightratio + (qreal)microscopynewheight / 2.0 + centershifty) * microscopyheightratio;
 
-	if (((qreal)((qreal)scaledmicroscopyx / microscopywidthratio + microscopynewwidth + microscopyorigcenterx - microscopynewcenterx) * microscopywidthratio > rect_scene.x()) && ((qreal)((qreal)scaledmicroscopyy / microscopyheightratio + microscopynewheight + microscopyorigcentery - microscopynewcentery) * microscopyheightratio > rect_scene.y())) {
-		scaledmicroscopypixmap = scaledmicroscopypixmap.copy(max(rect_scene.x() / microscopywidthratio - (qreal)((qreal)scaledmicroscopyx / microscopywidthratio + microscopyorigcenterx - microscopynewcenterx), 0.0), max(rect_scene.y() / microscopyheightratio - (qreal)((qreal)scaledmicroscopyy / microscopyheightratio + microscopyorigcentery - microscopynewcentery), 0.0), rect_scene.width() / microscopywidthratio + 1, rect_scene.height() / microscopyheightratio + 1);
+	if (layer == layer_microscopy_navigation_image) {
+		microscopynavigationcenterx = scaledmicroscopycenterx;
+		microscopynavigationcentery = scaledmicroscopycentery;
+
+		if (!layersvector[layer].checked) {
+			return;
+		}
+	}
+
+	QTransform transformcenter;
+	transformcenter.translate((qreal)microscopynavigationcenterx, (qreal)microscopynavigationcentery);
+	transformcenter.rotate(layersvector[layer].angle);
+	transformcenter.translate(-(qreal)microscopynavigationcenterx, -(qreal)microscopynavigationcentery);
+
+	QPointF oldcenterpoint(scaledmicroscopycenterx, scaledmicroscopycentery);
+	QPointF newcenterpoint = transformcenter.map(oldcenterpoint);
+	
+	centershiftx += (newcenterpoint.x() - scaledmicroscopycenterx) / microscopywidthratio;
+	centershifty += (newcenterpoint.y() - scaledmicroscopycentery) / microscopyheightratio;
+
+	if (((qreal)((qreal)scaledmicroscopyx / microscopywidthratio + microscopynewwidth + centershiftx) * microscopywidthratio > rect_scene.x()) && ((qreal)((qreal)scaledmicroscopyy / microscopyheightratio + microscopynewheight + centershifty) * microscopyheightratio > rect_scene.y())) {
+		scaledmicroscopypixmap = scaledmicroscopypixmap.copy(max(rect_scene.x() / microscopywidthratio - (qreal)((qreal)scaledmicroscopyx / microscopywidthratio + centershiftx), 0.0), max(rect_scene.y() / microscopyheightratio - (qreal)((qreal)scaledmicroscopyy / microscopyheightratio + centershifty), 0.0), rect_scene.width() / microscopywidthratio + 1, rect_scene.height() / microscopyheightratio + 1);
 		scaledmicroscopypixmap = scaledmicroscopypixmap.scaled(scaledmicroscopypixmap.width() * microscopywidthratio, scaledmicroscopypixmap.height() * microscopyheightratio);
 
 		QPixmap alphapixmap(scaledmicroscopypixmap.size());
@@ -1006,12 +1045,12 @@ void cImageWindowWidget::drawMicroscopyImage(eLayerType layer, QRectF& rect_scen
 		painter.end();
 
 		QGraphicsPixmapItem* pixmapitem = scene->addPixmap(alphapixmap);
-		pixmapitem->setPos(max(rect_scene.x(), (qreal)((qreal)scaledmicroscopyx / microscopywidthratio + microscopyorigcenterx - microscopynewcenterx) * microscopywidthratio), max(rect_scene.y(), (qreal)((qreal)scaledmicroscopyy / microscopyheightratio + microscopyorigcentery - microscopynewcentery) * microscopyheightratio));
+		pixmapitem->setPos(max(rect_scene.x(), (qreal)((qreal)scaledmicroscopyx / microscopywidthratio + centershiftx) * microscopywidthratio), max(rect_scene.y(), (qreal)((qreal)scaledmicroscopyy / microscopyheightratio + centershifty) * microscopyheightratio));
 		pixmapitem->setZValue(layersvector[layer].zvalue);
 	}
 
-	layersvector[layer].lastx = (qreal)((qreal)scaledmicroscopyx / microscopywidthratio + microscopyorigcenterx - microscopynewcenterx) * microscopywidthratio;
-	layersvector[layer].lasty = (qreal)((qreal)scaledmicroscopyy / microscopyheightratio + microscopyorigcentery - microscopynewcentery) * microscopyheightratio;
+	layersvector[layer].lastx = (qreal)((qreal)scaledmicroscopyx / microscopywidthratio + centershiftx) * microscopywidthratio;
+	layersvector[layer].lasty = (qreal)((qreal)scaledmicroscopyy / microscopyheightratio + centershifty) * microscopyheightratio;
 
 }
 
@@ -1029,16 +1068,16 @@ void cImageWindowWidget::updateSelectionGroup() {
 	int micrometerswidth, micrometersheight;
 	switch (vendor) {
 		case unknownvendor:
-			micrometerswidth = maxx*pixelsize;
-			micrometersheight = maxy*pixelsize;
+			micrometerswidth = maxx*pixelsizex;
+			micrometersheight = maxy*pixelsizey;
 			break;
 		case bruker:
-			micrometerswidth = (maxx + 1)*sqrt(pixelsize);
-			micrometersheight = (maxy + 1)*sqrt(pixelsize);
+			micrometerswidth = (maxx + 1)*pixelsizex;
+			micrometersheight = (maxy + 1)*pixelsizey;
 			break;
 		case waters:
-			micrometerswidth = maxx*pixelsize;
-			micrometersheight = maxy*pixelsize;
+			micrometerswidth = maxx*pixelsizex;
+			micrometersheight = maxy*pixelsizey;
 			break;
 		default:
 			break;
@@ -1049,7 +1088,7 @@ void cImageWindowWidget::updateSelectionGroup() {
 	if ((pressedx != -1) && (pressedy != -1)) {
 
 		getRectanglePoints(rx1, ry1, rx2, ry2);
-	
+
 		if (activelayer == layer_compounds) {
 			selectionrect->resetTransform();
 
@@ -1127,6 +1166,15 @@ void cImageWindowWidget::updateSelectionGroup() {
 			selectionrect->setRect(QRectF(QPointF(rx1, ry1), QPointF(rx2, ry2)));
 
 			QTransform transform;
+			if ((activelayer > layer_microscopy_navigation_image) && (activelayer < layer_end)) {
+				QTransform transformcenter;
+				transformcenter.translate((qreal)microscopynavigationcenterx, (qreal)microscopynavigationcentery);
+				transformcenter.rotate(layersvector[activelayer].angle);
+				transformcenter.translate(-(qreal)microscopynavigationcenterx, -(qreal)microscopynavigationcentery);
+
+				QPointF newcenterpoint = transformcenter.map(selectionrect->rect().center());
+				transform.translate(newcenterpoint.x() - selectionrect->rect().center().x(), newcenterpoint.y() - selectionrect->rect().center().y());
+			}
 			transform.translate(selectionrect->rect().center().x(), selectionrect->rect().center().y());
 			transform.scale(testedflipvertically ? -1 : 1, testedfliphorizontally ? -1 : 1);
 			transform.rotate(testedangle);
@@ -1161,7 +1209,7 @@ void cImageWindowWidget::updateSelectionGroup() {
 
 		if ((activelayer == layer_histology_image) || ((activelayer >= layer_microscopy_navigation_image) && (activelayer < layer_end))) {
 			QTransform transform;
-			tmpangle = prepareTransformation(selectionrect->rect(), transform, testedfliphorizontally, testedflipvertically, testedangle);
+			tmpangle = prepareTransformation(selectionrect->rect(), transform, testedfliphorizontally, testedflipvertically, testedangle, true);
 			transform.map(currentx, currenty, &transformedx, &transformedy);
 		}
 
@@ -1419,6 +1467,15 @@ void cImageWindowWidget::updateSelectionGroup() {
 			selectionrect->setRect(QRectF(QPointF(rx1, ry1), QPointF(rx2, ry2)));
 
 			QTransform transform;
+			if ((activelayer > layer_microscopy_navigation_image) && (activelayer < layer_end)) {
+				QTransform transformcenter;
+				transformcenter.translate((qreal)microscopynavigationcenterx, (qreal)microscopynavigationcentery);
+				transformcenter.rotate(layersvector[activelayer].angle);
+				transformcenter.translate(-(qreal)microscopynavigationcenterx, -(qreal)microscopynavigationcentery);
+
+				QPointF newcenterpoint = transformcenter.map(selectionrect->rect().center());
+				transform.translate(newcenterpoint.x() - selectionrect->rect().center().x(), newcenterpoint.y() - selectionrect->rect().center().y());
+			}
 			transform.translate(selectionrect->rect().center().x(), selectionrect->rect().center().y());
 			transform.scale(testedflipvertically ? -1 : 1, testedfliphorizontally ? -1 : 1);
 			transform.rotate(testedangle);
@@ -1500,7 +1557,7 @@ void cImageWindowWidget::getRectanglePoints(qreal& rx1, qreal& ry1, qreal& rx2, 
 
 	if ((activelayer == layer_histology_image) || ((activelayer >= layer_microscopy_navigation_image) && (activelayer < layer_end))) {
 		QTransform transform;
-		prepareTransformation(currentrect->rect(), transform, testedfliphorizontally, testedflipvertically, testedangle);
+		prepareTransformation(currentrect->rect(), transform, testedfliphorizontally, testedflipvertically, testedangle, true);
 		transform.map((qreal)currentx, (qreal)currenty, &untransformedcurrentx, &untransformedcurrenty);
 		transform.map((qreal)pressedx, (qreal)pressedy, &untransformedpressedx, &untransformedpressedy);
 	}
@@ -1529,10 +1586,26 @@ void cImageWindowWidget::getRectanglePoints(qreal& rx1, qreal& ry1, qreal& rx2, 
 			}
 			break;
 		case cursoractivity_move:
-			rx1 = tmprx1 + (qreal)currentx - (qreal)pressedx;
-			ry1 = tmpry1 + (qreal)currenty - (qreal)pressedy;
-			rx2 = tmprx2 + (qreal)currentx - (qreal)pressedx;
-			ry2 = tmpry2 + (qreal)currenty - (qreal)pressedy;
+			if ((activelayer > layer_microscopy_navigation_image) && (activelayer < layer_end)) {
+				if (((testedangle >= 90.0) && (testedangle <= 270.0)) || ((testedangle <= -90.0) && (testedangle >= -270.0))) {
+					rx1 = tmprx1 - untransformedcurrentx + untransformedpressedx;
+					ry1 = tmpry1 - untransformedcurrenty + untransformedpressedy;
+					rx2 = tmprx2 - untransformedcurrentx + untransformedpressedx;
+					ry2 = tmpry2 - untransformedcurrenty + untransformedpressedy;
+				}
+				else {
+					rx1 = tmprx1 + untransformedcurrentx - untransformedpressedx;
+					ry1 = tmpry1 + untransformedcurrenty - untransformedpressedy;
+					rx2 = tmprx2 + untransformedcurrentx - untransformedpressedx;
+					ry2 = tmpry2 + untransformedcurrenty - untransformedpressedy;
+				}
+			}
+			else {
+				rx1 = tmprx1 + (qreal)currentx - (qreal)pressedx;
+				ry1 = tmpry1 + (qreal)currenty - (qreal)pressedy;
+				rx2 = tmprx2 + (qreal)currentx - (qreal)pressedx;
+				ry2 = tmpry2 + (qreal)currenty - (qreal)pressedy;
+			}
 			if (rx1 < 0) {
 				rx2 = rx2 - rx1;
 				rx1 = 0;
@@ -1708,9 +1781,7 @@ void cImageWindowWidget::getRectanglePoints(qreal& rx1, qreal& ry1, qreal& rx2, 
 }
 
 
-double cImageWindowWidget::prepareTransformation(QRectF rect, QTransform& transform, bool testedfliphorizontally, bool testedflipvertically, double testedangle) {
-	transform.reset();
-	transform.translate(rect.center().x(), rect.center().y());
+double cImageWindowWidget::prepareTransformation(QRectF rect, QTransform& transform, bool testedfliphorizontally, bool testedflipvertically, double testedangle, bool flipaxes) {
 	double tmpangle = testedangle;
 	if (tmpangle < 0) {
 		tmpangle += 360.0;
@@ -1731,6 +1802,25 @@ double cImageWindowWidget::prepareTransformation(QRectF rect, QTransform& transf
 			tmpangle -= 180.0;
 		}
 	}
+
+	transform.reset();
+
+	if ((activelayer > layer_microscopy_navigation_image) && (activelayer < layer_end)) {
+		QTransform transformcenter;
+		transformcenter.translate((qreal)microscopynavigationcenterx, (qreal)microscopynavigationcentery);
+		transformcenter.rotate(-testedangle);
+		transformcenter.translate(-(qreal)microscopynavigationcenterx, -(qreal)microscopynavigationcentery);
+
+		QPointF newcenterpoint = transformcenter.map(rect.center());
+		if (flipaxes && (((testedangle >= 90.0) && (testedangle <= 270.0)) || ((testedangle <= -90.0) && (testedangle >= -270.0)))) {
+			transform.translate(rect.center().x() - newcenterpoint.x(), rect.center().y() - newcenterpoint.y());
+		}
+		else {
+			transform.translate(newcenterpoint.x() - rect.center().x(), newcenterpoint.y() - rect.center().y());
+		}
+	}
+
+	transform.translate(rect.center().x(), rect.center().y());
 	transform.rotate(-tmpangle);
 	transform.translate(-rect.center().x(), -rect.center().y());
 
@@ -1742,15 +1832,15 @@ void cImageWindowWidget::fixRectCenter(qreal& rx1, qreal& ry1, qreal& rx2, qreal
 	qreal x1, y1, x2, y2;
 	QTransform transform;
 
-	prepareTransformation(currentrect->rect(), transform, testedfliphorizontally, testedflipvertically, testedangle);
+	prepareTransformation(currentrect->rect(), transform, testedfliphorizontally, testedflipvertically, testedangle, true);
 	transform.inverted().map(rx1, ry1, &x1, &y1);
 	transform.inverted().map(rx2, ry2, &x2, &y2);
 
 	QGraphicsLineItem gline;
 	gline.setLine(x1, y1, x2, y2);
 
-	prepareTransformation(gline.boundingRect(), transform, testedfliphorizontally, testedflipvertically, testedangle);
-
+	prepareTransformation(gline.boundingRect(), transform, testedfliphorizontally, testedflipvertically, testedangle, false);
+	
 	transform.map(x1, y1, &rx1, &ry1);
 	transform.map(x2, y2, &rx2, &ry2);
 }
@@ -1761,13 +1851,13 @@ double cImageWindowWidget::recalculateRulerValue(qreal currentscale) {
 
 	switch (vendor) {
 		case unknownvendor:
-			value = ((double)maxx*(double)pixelsize) * (double)rulersize / ((double)layersvector[layer_optical_image].pixmap->width()*currentscale);
+			value = ((double)maxx*(double)pixelsizex) * (double)rulersize / ((double)layersvector[layer_optical_image].pixmap->width()*currentscale);
 			break;
 		case bruker:
-			value = ((double)(maxx + 1)*sqrt((double)pixelsize)) * (double)rulersize / ((double)layersvector[layer_optical_image].pixmap->width()*currentscale);
+			value = ((double)(maxx + 1)*(double)pixelsizex) * (double)rulersize / ((double)layersvector[layer_optical_image].pixmap->width()*currentscale);
 			break;
 		case waters:
-			value = ((double)maxx*(double)pixelsize) * (double)rulersize / ((double)layersvector[layer_optical_image].pixmap->width()*currentscale);
+			value = ((double)maxx*(double)pixelsizex) * (double)rulersize / ((double)layersvector[layer_optical_image].pixmap->width()*currentscale);
 			break;
 		default:
 			break;
@@ -1798,13 +1888,13 @@ void cImageWindowWidget::setRulerValue(double value) {
 	rulervalue = value;
 	switch (vendor) {
 		case unknownvendor:
-			currentscale = ((double)maxx*(double)pixelsize) * (double)rulersize / ((double)layersvector[layer_optical_image].pixmap->width()*rulervalue);
+			currentscale = ((double)maxx*(double)pixelsizex) * (double)rulersize / ((double)layersvector[layer_optical_image].pixmap->width()*rulervalue);
 			break;
 		case bruker:
-			currentscale = ((double)(maxx + 1)*sqrt((double)pixelsize)) * (double)rulersize / ((double)layersvector[layer_optical_image].pixmap->width()*rulervalue);
+			currentscale = ((double)(maxx + 1)*(double)pixelsizex) * (double)rulersize / ((double)layersvector[layer_optical_image].pixmap->width()*rulervalue);
 			break;
 		case waters:
-			currentscale = ((double)maxx*(double)pixelsize) * (double)rulersize / ((double)layersvector[layer_optical_image].pixmap->width()*rulervalue);
+			currentscale = ((double)maxx*(double)pixelsizex) * (double)rulersize / ((double)layersvector[layer_optical_image].pixmap->width()*rulervalue);
 			break;
 		default:
 		break;

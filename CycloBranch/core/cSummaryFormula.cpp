@@ -4,34 +4,51 @@
 #include "core/cBricksDatabase.h"
 
 
-void cSummaryFormula::explodeSummary(map<string, int>& atoms, string& summary) {
-	if ((int)summary.size() == 0) {
+void reduceMapToStringFormula(map<string, int>& atoms, string& formula) {
+	formula = "";
+	for (auto it = atoms.begin(); it != atoms.end(); ++it) {
+		if (it->second != 0) {
+			formula += it->first;
+			if (it->second != 1) {
+				formula += to_string(it->second);
+			}
+		}
+	}
+}
+
+
+void addStringFormulaToMap(string& formula, map<string, int>& atoms) {
+	if ((int)formula.size() == 0) {
 		return;
 	}
 
+	map<string, int>::iterator it;
+
 	string tmps;
-	tmps = summary[0];
+	tmps = formula[0];
 
 	int tmpc = 0;
 	bool minus = false;
-	for (int i = 1; i < (int)summary.size(); i++) {
+	for (int i = 1; i < (int)formula.size(); i++) {
 
-		if (((summary[i] >= 'A') && (summary[i] <= 'Z')) || (summary[i] == '+')) {
+		if (((formula[i] >= 'A') && (formula[i] <= 'Z')) || (formula[i] == '+')) {
 			if (periodictablemap.count(tmps) > 0) {
 				if (tmpc == 0) {
-					if (atoms.count(tmps) == 0) {
+					it = atoms.find(tmps);
+					if (it == atoms.end()) {
 						atoms[tmps] = 1;
 					}
 					else {
-						atoms[tmps] += 1;
+						it->second += 1;
 					}
 				}
 				else {
-					if (atoms.count(tmps) == 0) {
-						atoms[tmps] = minus?-tmpc:tmpc;
+					it = atoms.find(tmps);
+					if (it == atoms.end()) {
+						atoms[tmps] = minus ? -tmpc : tmpc;
 					}
 					else {
-						atoms[tmps] += minus?-tmpc:tmpc;
+						it->second += minus ? -tmpc : tmpc;
 					}
 				}
 			}
@@ -39,21 +56,21 @@ void cSummaryFormula::explodeSummary(map<string, int>& atoms, string& summary) {
 				return;
 			}
 
-			tmps = summary[i];
+			tmps = formula[i];
 			tmpc = 0;
 			minus = false;
 		}
 
-		if ((summary[i] >= 'a') && (summary[i] <= 'z')) {
-			tmps += summary[i];
+		if ((formula[i] >= 'a') && (formula[i] <= 'z')) {
+			tmps += formula[i];
 		}
 
-		if ((summary[i] >= '0') && (summary[i] <= '9')) {
+		if ((formula[i] >= '0') && (formula[i] <= '9')) {
 			tmpc *= 10;
-			tmpc += summary[i] - '0';
+			tmpc += formula[i] - '0';
 		}
 
-		if (summary[i] == '-') {
+		if (formula[i] == '-') {
 			minus = true;
 		}
 
@@ -62,21 +79,62 @@ void cSummaryFormula::explodeSummary(map<string, int>& atoms, string& summary) {
 	// the last element
 	if (periodictablemap.count(tmps) > 0) {
 		if (tmpc == 0) {
-			if (atoms.count(tmps) == 0) {
+			it = atoms.find(tmps);
+			if (it == atoms.end()) {
 				atoms[tmps] = 1;
 			}
 			else {
-				atoms[tmps] += 1;
+				it->second += 1;
 			}
 		}
 		else {
-			if (atoms.count(tmps) == 0) {
-				atoms[tmps] = minus?-tmpc:tmpc;
+			it = atoms.find(tmps);
+			if (it == atoms.end()) {
+				atoms[tmps] = minus ? -tmpc : tmpc;
 			}
 			else {
-				atoms[tmps] += minus?-tmpc:tmpc;
+				it->second += minus ? -tmpc : tmpc;
 			}
 		}
+	}
+}
+
+
+void mergeMaps(map<string, int>& source, map<string, int>& target) {
+	map<string, int>::iterator it2;
+	for (auto& it : source) {
+		it2 = target.find(it.first);
+		if (it2 == target.end()) {
+			target[it.first] = it.second;
+		}
+		else {
+			it2->second += it.second;
+		}
+	}
+}
+
+
+void rechargeMap(int charge, map<string, int>& atoms) {
+	if (charge == 1) {
+		return;
+	}
+
+	map<string, int>::iterator it;
+
+	it = atoms.find("H");
+	if (it == atoms.end()) {
+		atoms["H"] = charge - 1;
+	}
+	else {
+		it->second += charge - 1;
+	}
+
+	it = atoms.find("+");
+	if (it == atoms.end()) {
+		atoms["+"] = charge - 1;
+	}
+	else {
+		it->second += charge - 1;
 	}
 }
 
@@ -245,6 +303,33 @@ string cSummaryFormula::getSummary() {
 }
 
 
+string cSummaryFormula::getFancySummary(int charge) {
+	int size = (int)formula.size();
+	string tmpformula;
+
+	if (size == 0) {
+		return tmpformula;
+	}
+
+	for (int i = 0; i < size; i++) {
+		if ((formula[i] >= 'A') && (formula[i] <= 'Z')) {
+			tmpformula = formula.substr(i);
+			break;
+		}
+	}
+
+	if (charge > 0) {
+		tmpformula += " " + to_string(charge) + "+";
+	}
+
+	if (charge < 0) {
+		tmpformula += " " + to_string(abs(charge)) + "-";
+	}
+
+	return tmpformula;
+}
+
+
 bool cSummaryFormula::isPartial() {
 	return partial;
 }
@@ -263,23 +348,23 @@ void cSummaryFormula::addFormula(string& formula, bool remove) {
 	map<string, int> atoms;
 	atoms.clear();
 
-	explodeSummary(atoms, formula);
+	addStringFormulaToMap(formula, atoms);
+
 	if (remove) {
 		for (auto it = atoms.begin(); it != atoms.end(); ++it) {
 			it->second = -it->second;
 		}
 	}
-	explodeSummary(atoms, this->formula);
 
-	this->formula = "";
-	for (auto it = atoms.begin(); it != atoms.end(); ++it) {
-		if (it->second != 0) {
-			this->formula += it->first;
-			if (it->second != 1) {
-				this->formula += to_string(it->second);
-			}
-		}
-	}
+	addStringFormulaToMap(this->formula, atoms);
+
+	reduceMapToStringFormula(atoms, this->formula);
+}
+
+
+void cSummaryFormula::setFromMap(map<string, int>& atoms, bool partial) {
+	reduceMapToStringFormula(atoms, this->formula);
+	this->partial = partial;
 }
 
 
@@ -331,6 +416,20 @@ bool cSummaryFormula::isValid(string& errormessage) {
 	}
 
 	return true;
+}
+
+
+bool cSummaryFormula::isEmpty() {
+	return (formula.size() == 0);
+}
+
+
+bool cSummaryFormula::hasAllElementsPositive() {
+	// start from the position 2 to keep negatively charged ions but to remove incorrect ions e.g. "+-1C3H-1"
+	if (formula.find("-", 2) == string::npos) {
+		return true;
+	}
+	return false;
 }
 
 
@@ -400,9 +499,9 @@ double cSummaryFormula::getMass() {
 }
 
 
-cPeaksList cSummaryFormula::getIsotopePattern(double fwhm, int charge, bool positive) {
+cPeaksList cSummaryFormula::getIsotopePattern(double fwhm, int charge, bool positive, bool writedescription) {
 	map<string, int> atoms;
-	explodeSummary(atoms, formula);
+	addStringFormulaToMap(formula, atoms);
 
 	cBricksDatabase bricksdatabase;
 	cBricksDatabase bricksprobabilities;
@@ -458,7 +557,9 @@ cPeaksList cSummaryFormula::getIsotopePattern(double fwhm, int charge, bool posi
 			cPeak peak;
 			peak.mzratio = bricksdatabase.getMassOfComposition(combarray, numberofbasicbricks) + periodictablemap[atom]*(atomcount - maximumbricksincombination);
 			peak.absoluteintensity = getIntensity(bricksprobabilities, combarray, mostintenseid, atomcount - maximumbricksincombination, (int)atomisotopes.size());
-			getIsotopeSummary(peak.description, bricksdatabase, combarray, mostintenseid, atomcount - maximumbricksincombination, (int)atomisotopes.size(), positive);
+			if (writedescription) {
+				getIsotopeSummary(peak.description, bricksdatabase, combarray, mostintenseid, atomcount - maximumbricksincombination, (int)atomisotopes.size(), positive);
+			}
 			peaklist.add(peak);
 		} while (bricksdatabase.nextCombination(combarray, numberofbasicbricks, maximumbricksincombination, 0, 0));
 

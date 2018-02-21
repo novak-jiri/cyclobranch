@@ -3,6 +3,34 @@
 #include "core/cTheoreticalSpectrumList.h"
 
 
+bool comparePaths(vector<nodeEdge>& a, vector<nodeEdge>& b) {
+	if (a.size() < b.size()) {
+		return true;
+	}
+
+	if (a.size() > b.size()) {
+		return false;
+	}
+
+	for (int i = 0; i < a.size(); i++) {
+		if (a[i].nodeid < b[i].nodeid) {
+			return true;
+		}
+		if (a[i].nodeid > b[i].nodeid) {
+			return false;
+		}
+		if (a[i].edgeid < b[i].edgeid) {
+			return true;
+		}
+		if (a[i].edgeid > b[i].edgeid) {
+			return false;
+		}
+	}
+
+	return false;
+}
+
+
 bool compareBandAllIonsDesc(const cTheoreticalSpectrum& a, const cTheoreticalSpectrum& b) {
 	if (a.getNumberOfMatchedPeaks(b_ion) > b.getNumberOfMatchedPeaks(b_ion)) {
 		return true;
@@ -10,16 +38,25 @@ bool compareBandAllIonsDesc(const cTheoreticalSpectrum& a, const cTheoreticalSpe
 	if (a.getNumberOfMatchedPeaks(b_ion) < b.getNumberOfMatchedPeaks(b_ion)) {
 		return false;
 	}
+
 	if (a.getNumberOfMatchedPeaks() > b.getNumberOfMatchedPeaks()) {
 		return true;
 	}
 	if (a.getNumberOfMatchedPeaks() < b.getNumberOfMatchedPeaks()) {
 		return false;
 	}
+
 	if (a.getPathId() < b.getPathId()) {
 		return true;
 	}
-	return false;
+	if (a.getPathId() > b.getPathId()) {
+		return false;
+	}
+
+	vector<nodeEdge> v1 = ((cTheoreticalSpectrum&)a).getCandidate().getPath();
+	vector<nodeEdge> v2 = ((cTheoreticalSpectrum&)b).getCandidate().getPath();
+
+	return comparePaths(v1, v2);
 }
 
 
@@ -30,16 +67,25 @@ bool compareBBwaterLossAndAllIonsDesc(const cTheoreticalSpectrum& a, const cTheo
 	if (a.getNumberOfMatchedPeaks(b_ion) + a.getNumberOfMatchedPeaks(b_ion_dehydrated) < b.getNumberOfMatchedPeaks(b_ion) + b.getNumberOfMatchedPeaks(b_ion_dehydrated)) {
 		return false;
 	}
+
 	if (a.getNumberOfMatchedPeaks() > b.getNumberOfMatchedPeaks()) {
 		return true;
 	}
 	if (a.getNumberOfMatchedPeaks() < b.getNumberOfMatchedPeaks()) {
 		return false;
 	}
+
 	if (a.getPathId() < b.getPathId()) {
 		return true;
 	}
-	return false;
+	if (a.getPathId() > b.getPathId()) {
+		return false;
+	}
+
+	vector<nodeEdge> v1 = ((cTheoreticalSpectrum&)a).getCandidate().getPath();
+	vector<nodeEdge> v2 = ((cTheoreticalSpectrum&)b).getCandidate().getPath();
+
+	return comparePaths(v1, v2);
 }
 
 
@@ -50,16 +96,25 @@ bool compareBBammoniaLossAndAllIonsDesc(const cTheoreticalSpectrum& a, const cTh
 	if (a.getNumberOfMatchedPeaks(b_ion) + a.getNumberOfMatchedPeaks(b_ion_deamidated) < b.getNumberOfMatchedPeaks(b_ion) + b.getNumberOfMatchedPeaks(b_ion_deamidated)) {
 		return false;
 	}
+
 	if (a.getNumberOfMatchedPeaks() > b.getNumberOfMatchedPeaks()) {
 		return true;
 	}
 	if (a.getNumberOfMatchedPeaks() < b.getNumberOfMatchedPeaks()) {
 		return false;
 	}
+
 	if (a.getPathId() < b.getPathId()) {
 		return true;
 	}
-	return false;
+	if (a.getPathId() > b.getPathId()) {
+		return false;
+	}
+
+	vector<nodeEdge> v1 = ((cTheoreticalSpectrum&)a).getCandidate().getPath();
+	vector<nodeEdge> v2 = ((cTheoreticalSpectrum&)b).getCandidate().getPath();
+
+	return comparePaths(v1, v2);
 }
 
 
@@ -70,16 +125,25 @@ bool compareYBandAllIonsDesc(const cTheoreticalSpectrum& a, const cTheoreticalSp
 	if (a.getNumberOfMatchedPeaksYB() < b.getNumberOfMatchedPeaksYB()) {
 		return false;
 	}
+
 	if (a.getNumberOfMatchedPeaks() > b.getNumberOfMatchedPeaks()) {
 		return true;
 	}
 	if (a.getNumberOfMatchedPeaks() < b.getNumberOfMatchedPeaks()) {
 		return false;
 	}
+
 	if (a.getPathId() < b.getPathId()) {
 		return true;
 	}
-	return false;
+	if (a.getPathId() > b.getPathId()) {
+		return false;
+	}
+
+	vector<nodeEdge> v1 = ((cTheoreticalSpectrum&)a).getCandidate().getPath();
+	vector<nodeEdge> v2 = ((cTheoreticalSpectrum&)b).getCandidate().getPath();
+
+	return comparePaths(v1, v2);
 }
 
 
@@ -90,16 +154,25 @@ bool compareYandAllIonsDesc(const cTheoreticalSpectrum& a, const cTheoreticalSpe
 	if (a.getNumberOfMatchedPeaks(y_ion) < b.getNumberOfMatchedPeaks(y_ion)) {
 		return false;
 	}
+
 	if (a.getNumberOfMatchedPeaks() > b.getNumberOfMatchedPeaks()) {
 		return true;
 	}
 	if (a.getNumberOfMatchedPeaks() < b.getNumberOfMatchedPeaks()) {
 		return false;
 	}
+
 	if (a.getPathId() < b.getPathId()) {
 		return true;
 	}
-	return false;
+	if (a.getPathId() > b.getPathId()) {
+		return false;
+	}
+
+	vector<nodeEdge> v1 = ((cTheoreticalSpectrum&)a).getCandidate().getPath();
+	vector<nodeEdge> v2 = ((cTheoreticalSpectrum&)b).getCandidate().getPath();
+
+	return comparePaths(v1, v2);
 }
 
 
@@ -110,10 +183,18 @@ bool compareWeightedIntensityDesc(const cTheoreticalSpectrum& a, const cTheoreti
 	if (a.getWeightedIntensityScore() < b.getWeightedIntensityScore()) {
 		return false;
 	}
+
 	if (a.getPathId() < b.getPathId()) {
 		return true;
 	}
-	return false;
+	if (a.getPathId() > b.getPathId()) {
+		return false;
+	}
+
+	vector<nodeEdge> v1 = ((cTheoreticalSpectrum&)a).getCandidate().getPath();
+	vector<nodeEdge> v2 = ((cTheoreticalSpectrum&)b).getCandidate().getPath();
+
+	return comparePaths(v1, v2);
 }
 
 
@@ -124,10 +205,18 @@ bool compareNumberOfMatchedPeaksDesc(const cTheoreticalSpectrum& a, const cTheor
 	if (a.getNumberOfMatchedPeaks() < b.getNumberOfMatchedPeaks()) {
 		return false;
 	}
+
 	if (a.getPathId() < b.getPathId()) {
 		return true;
 	}
-	return false;
+	if (a.getPathId() > b.getPathId()) {
+		return false;
+	}
+
+	vector<nodeEdge> v1 = ((cTheoreticalSpectrum&)a).getCandidate().getPath();
+	vector<nodeEdge> v2 = ((cTheoreticalSpectrum&)b).getCandidate().getPath();
+
+	return comparePaths(v1, v2);
 }
 
 
@@ -138,21 +227,29 @@ bool compareNumberOfMatchedBricksDesc(const cTheoreticalSpectrum& a, const cTheo
 	if (a.getNumberOfMatchedBricks() < b.getNumberOfMatchedBricks()) {
 		return false;
 	}
+
 	if (a.getPathId() < b.getPathId()) {
 		return true;
 	}
-	return false;
+	if (a.getPathId() > b.getPathId()) {
+		return false;
+	}
+
+	vector<nodeEdge> v1 = ((cTheoreticalSpectrum&)a).getCandidate().getPath();
+	vector<nodeEdge> v2 = ((cTheoreticalSpectrum&)b).getCandidate().getPath();
+
+	return comparePaths(v1, v2);
 }
 
 
-void cSpectrumComparatorThread::initialize(cCandidate& candidate, cPeaksList& peaklist, cBricksDatabase* bricksdatabasewithcombinations, cTheoreticalSpectrumList* theoreticalspectrumlist, cParameters* parameters, regex* rxsequencetag, regex* rxsearchedsequence, double worstscore, bool* terminatecomputation) {
+void cSpectrumComparatorThread::initialize(cCandidate& candidate, cPeaksList& peaklist, cBricksDatabase* bricksdatabasewithcombinations, cTheoreticalSpectrumList* theoreticalspectrumlist, cParameters* parameters, regex* rxsequencetag, regex* rxsearchedsequence, double currentworstscore, bool* terminatecomputation) {
 	this->candidate = candidate;
 	this->peaklist = peaklist;
 	this->theoreticalspectrumlist = theoreticalspectrumlist;
 	this->parameters = parameters;
 	this->rxsequencetag = rxsequencetag;
 	this->rxsearchedsequence = rxsearchedsequence;
-	this->worstscore = worstscore;
+	this->lastavailableworstscore = currentworstscore;
 	this->terminatecomputation = terminatecomputation;
 	this->bricksdatabasewithcombinations = bricksdatabasewithcombinations;
 }
@@ -193,30 +290,29 @@ void cSpectrumComparatorThread::run() {
 			}
 		}
 
-		switch (parameters->peptidetype)
-		{
-		case linear:
-			theoreticalpeaksrealsize = tsp.compareLinear(peaklist, *bricksdatabasewithcombinations, false, *rxsequencetag, *rxsearchedsequence);
-			break;
-		case cyclic:
-			theoreticalpeaksrealsize = tsp.compareCyclic(peaklist, *bricksdatabasewithcombinations, false, *rxsequencetag, *rxsearchedsequence);
-			break;
-		case branched:
-			theoreticalpeaksrealsize = tsp.compareBranched(peaklist, *bricksdatabasewithcombinations, false, *rxsequencetag, *rxsearchedsequence);
-			break;
-		case branchcyclic:
-			theoreticalpeaksrealsize = tsp.compareBranchCyclic(peaklist, *bricksdatabasewithcombinations, false, *rxsequencetag, *rxsearchedsequence);
-			break;
-		case linearpolyketide:
-			theoreticalpeaksrealsize = tsp.compareLinearPolyketide(peaklist, *bricksdatabasewithcombinations, false, *rxsequencetag, *rxsearchedsequence);
-			break;
-		case cyclicpolyketide:
-			theoreticalpeaksrealsize = tsp.compareCyclicPolyketide(peaklist, *bricksdatabasewithcombinations, false, *rxsequencetag, *rxsearchedsequence);
-			break;
-		case other:
-			break;
-		default:
-			break;
+		switch (parameters->peptidetype) {
+			case linear:
+				theoreticalpeaksrealsize = tsp.compareLinear(peaklist, *bricksdatabasewithcombinations, false, *rxsequencetag, *rxsearchedsequence);
+				break;
+			case cyclic:
+				theoreticalpeaksrealsize = tsp.compareCyclic(peaklist, *bricksdatabasewithcombinations, false, *rxsequencetag, *rxsearchedsequence);
+				break;
+			case branched:
+				theoreticalpeaksrealsize = tsp.compareBranched(peaklist, *bricksdatabasewithcombinations, false, *rxsequencetag, *rxsearchedsequence);
+				break;
+			case branchcyclic:
+				theoreticalpeaksrealsize = tsp.compareBranchCyclic(peaklist, *bricksdatabasewithcombinations, false, *rxsequencetag, *rxsearchedsequence);
+				break;
+			case linearpolyketide:
+				theoreticalpeaksrealsize = tsp.compareLinearPolyketide(peaklist, *bricksdatabasewithcombinations, false, *rxsequencetag, *rxsearchedsequence);
+				break;
+			case cyclicpolyketide:
+				theoreticalpeaksrealsize = tsp.compareCyclicPolyketide(peaklist, *bricksdatabasewithcombinations, false, *rxsequencetag, *rxsearchedsequence);
+				break;
+			case other:
+				break;
+			default:
+				break;
 		}
 
 		// invalid sequence tag
@@ -226,34 +322,34 @@ void cSpectrumComparatorThread::run() {
 
 		score = 0;
 		switch (parameters->scoretype) {
-		case b_ions:
-			score = tsp.getNumberOfMatchedPeaks(b_ion);
-			break;
-		case b_ions_and_b_dehydrated_ions:
-			score = tsp.getNumberOfMatchedPeaks(b_ion) + tsp.getNumberOfMatchedPeaks(b_ion_dehydrated);
-			break;
-		case b_ions_and_b_deamidated_ions:
-			score = tsp.getNumberOfMatchedPeaks(b_ion) + tsp.getNumberOfMatchedPeaks(b_ion_deamidated);
-			break;
-		case y_ions_and_b_ions:
-			score = tsp.getNumberOfMatchedPeaksYB();
-			break;
-		case y_ions:
-			score = tsp.getNumberOfMatchedPeaks(y_ion);
-			break;
-		case weighted_intensity:
-			score = tsp.getWeightedIntensityScore();
-			break;
-		case matched_peaks:
-			score = tsp.getNumberOfMatchedPeaks();
-			break;
-		case matched_bricks:
-			score = tsp.getNumberOfMatchedBricks();
-			break;
+			case b_ions:
+				score = tsp.getNumberOfMatchedPeaks(b_ion);
+				break;
+			case b_ions_and_b_dehydrated_ions:
+				score = tsp.getNumberOfMatchedPeaks(b_ion) + tsp.getNumberOfMatchedPeaks(b_ion_dehydrated);
+				break;
+			case b_ions_and_b_deamidated_ions:
+				score = tsp.getNumberOfMatchedPeaks(b_ion) + tsp.getNumberOfMatchedPeaks(b_ion_deamidated);
+				break;
+			case y_ions_and_b_ions:
+				score = tsp.getNumberOfMatchedPeaksYB();
+				break;
+			case y_ions:
+				score = tsp.getNumberOfMatchedPeaks(y_ion);
+				break;
+			case weighted_intensity:
+				score = tsp.getWeightedIntensityScore();
+				break;
+			case matched_peaks:
+				score = tsp.getNumberOfMatchedPeaks();
+				break;
+			case matched_bricks:
+				score = tsp.getNumberOfMatchedBricks();
+				break;
 		}
 
-		if (score >= worstscore) {
-			theoreticalspectrumlist->addButDoNotFitSize(tsp, theoreticalpeaksrealsize);
+		if (score >= lastavailableworstscore) {
+			lastavailableworstscore = theoreticalspectrumlist->updatekNNList(tsp, theoreticalpeaksrealsize, score, rxsearchedsequence);
 		}
 		
 	}

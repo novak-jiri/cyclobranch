@@ -6,7 +6,46 @@ cPeak::cPeak() {
 }
 
 
+cPeak::cPeak(const cPeak& peak) {
+	*this = peak;
+}
+
+
+cPeak& cPeak::operator=(const cPeak& peak) {
+	formula = peak.formula;
+	isotopeformula = peak.isotopeformula;
+	isotopeformulaid = peak.isotopeformulaid;
+	mzratio = peak.mzratio;
+	relativeintensity = peak.relativeintensity;
+	absoluteintensity = peak.absoluteintensity;
+	description = peak.description;
+	descriptionid = peak.descriptionid;
+	matchedmz = peak.matchedmz;
+	matchedrelativeintensity = peak.matchedrelativeintensity;
+	matchedabsoluteintensity = peak.matchedabsoluteintensity;
+	matchedppm = peak.matchedppm;
+	iontype = peak.iontype;
+	matched = peak.matched;
+	matchedid = peak.matchedid;
+	charge = peak.charge;
+	isotope = peak.isotope;
+	removeme = peak.removeme;
+	scrambled = peak.scrambled;
+	decoy = peak.decoy;
+	orderid = peak.orderid;
+
+	rotationid = peak.rotationid;
+	seriesid = peak.seriesid;
+	groupid = peak.groupid;
+
+	return *this;
+}
+
+
 void cPeak::clear() {
+	formula.clear();
+	isotopeformula = "";
+	isotopeformulaid = -1;
 	mzratio = 0;
 	relativeintensity = 0;
 	absoluteintensity = 0;
@@ -39,6 +78,9 @@ bool cPeak::empty() {
 
 
 void cPeak::store(ofstream& os) {
+	formula.store(os);
+	storeString(isotopeformula, os);
+	os.write((char *)&isotopeformulaid, sizeof(int));
 	os.write((char *)&mzratio, sizeof(double));
 	os.write((char *)&relativeintensity, sizeof(double));
 	os.write((char *)&absoluteintensity, sizeof(double));
@@ -64,6 +106,9 @@ void cPeak::store(ofstream& os) {
 
 
 void cPeak::load(ifstream& is) {
+	formula.load(is);
+	loadString(isotopeformula, is);
+	is.read((char *)&isotopeformulaid, sizeof(int));
 	is.read((char *)&mzratio, sizeof(double));
 	is.read((char *)&relativeintensity, sizeof(double));
 	is.read((char *)&absoluteintensity, sizeof(double));

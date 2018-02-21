@@ -162,13 +162,17 @@ int cDeNovoGraph::createGraph(bool& terminatecomputation) {
 	sortedpeaklist.removeChargeVariants(parameters->precursorcharge, parameters->fragmentmasserrortolerance);
 	*os << "Number of nodes after deconvolution: " << sortedpeaklist.size() << endl;
 
-	// remove dehydrated peaks
-	sortedpeaklist.removeNeutralLoss(- H2O, parameters->precursorcharge, parameters->fragmentmasserrortolerance);
-	*os << "Number of nodes when dehydrated ions are removed: " << sortedpeaklist.size() << endl;
+	//if (!parameters->generateisotopepattern) {
 
-	// remove deamidated peaks
-	sortedpeaklist.removeNeutralLoss(- NH3, parameters->precursorcharge, parameters->fragmentmasserrortolerance);
-	*os << "Number of nodes when deamidated ions are removed: " << sortedpeaklist.size() << endl;	
+		// remove dehydrated peaks
+		sortedpeaklist.removeNeutralLoss(-H2O, parameters->precursorcharge, parameters->fragmentmasserrortolerance);
+		*os << "Number of nodes when dehydrated ions are removed: " << sortedpeaklist.size() << endl;
+
+		// remove deamidated peaks
+		sortedpeaklist.removeNeutralLoss(-NH3, parameters->precursorcharge, parameters->fragmentmasserrortolerance);
+		*os << "Number of nodes when deamidated ions are removed: " << sortedpeaklist.size() << endl;
+
+	//}
 
 	double negativeshift = (parameters->precursorcharge > 0)?0:-2*(H - e);
 	string negativeshiftsummary = (parameters->precursorcharge > 0)?"":"H-2+-2";

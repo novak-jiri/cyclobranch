@@ -8,6 +8,7 @@
 #define _CTHEORETICALSPECTRUMLIST_H
 
 #include <algorithm>
+#include <list>
 #include <QMutex>
 
 #include "parallel/cSpectrumComparatorThread.h"
@@ -21,13 +22,12 @@ class cMainThread;
 class cTheoreticalSpectrumList {
 
 	vector<cTheoreticalSpectrum> theoreticalspectra;
+	list<cTheoreticalSpectrum> spectrumbuffer;
 	cMainThread* os;
 	cParameters* parameters;
 	cDeNovoGraph* graph;
 
-	double worstScore;
-	int worstNumberOfMatchedPeaks;
-	int refreshlimit;
+	double currentworstscore;
 
 	QMutex mutex;
 
@@ -93,12 +93,14 @@ public:
 
 
 	/**
-		\brief Add a new spectrum to the list when the number cParameters::hitsreported has not been exceeded or when it has been exceeded but
-		the score of the newly added spectrum is better than the worst score of a peptide in the list (thread-safe).
-		\param theoreticalspectrum reference to a newly added spectrum
+		\brief Update the kNN list of peptide sequence candidates (thread-safe).
+		\param theoreticalspectrum reference to the newly added spectrum
 		\param theoreticalpeaksrealsize the number of peaks in the newly added spectrum (required because of a performance improvement)
+		\param score score of the candidate to be inserted
+		\param rxsearchedsequence regular expression corresponding to searched sequence
+		\retval double current value of the worst score in the list of candidates
 	*/ 
-	void addButDoNotFitSize(cTheoreticalSpectrum& theoreticalspectrum, int theoreticalpeaksrealsize);
+	double updatekNNList(cTheoreticalSpectrum& theoreticalspectrum, int theoreticalpeaksrealsize, double score, regex* rxsearchedsequence);
 
 
 	/**

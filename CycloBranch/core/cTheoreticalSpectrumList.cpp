@@ -5,7 +5,7 @@
 
 double cTheoreticalSpectrumList::getCurrentWorstScore() {
 	QMutexLocker ml(&mutex);
-	return worstScore;
+	return currentworstscore;
 }
 
 
@@ -54,13 +54,12 @@ cTheoreticalSpectrumList::cTheoreticalSpectrumList() {
 
 void cTheoreticalSpectrumList::clear() {
 	theoreticalspectra.clear();
+	spectrumbuffer.clear();
 	os = 0;
 	parameters = 0;
 	graph = 0;
 
-	worstScore = 0;
-	worstNumberOfMatchedPeaks = 0;
-	refreshlimit = 0;
+	currentworstscore = 0;
 }
 
 
@@ -68,8 +67,6 @@ void cTheoreticalSpectrumList::initialize(cMainThread& os, cParameters& paramete
 	this->os = &os;
 	this->parameters = &parameters;
 	this->graph = graph;
-	
-	refreshlimit = parameters.hitsreported + 500;
 }
 
 
@@ -118,8 +115,7 @@ int cTheoreticalSpectrumList::parallelCompareAndStore(cCandidateSet& candidates,
 	//int pos;
 	
 	int theoreticalpeaksrealsize = 0;
-	worstScore = 0;
-	worstNumberOfMatchedPeaks = 0;
+	currentworstscore = 0;
 
 	stmp = parameters->sequencetag;
 	fixRegularExpression(stmp);
@@ -190,15 +186,15 @@ int cTheoreticalSpectrumList::parallelCompareAndStore(cCandidateSet& candidates,
 				candidates.unlock();
 				QThreadPool::globalInstance()->start(comparatorthread);
 
-				if ((i % 100 == 0) && (i > 0)) {
+				if ((i + 1) % 100 == 0) {
 					*os << ".";
 				}
 
-				if ((i % 1000 == 0) && (i > 0)) {
-					*os << i << " ";
+				if ((i + 1) % 1000 == 0) {
+					*os << i + 1;
 				}
 
-				if ((i % 10000 == 0) && (i > 0)) {
+				if ((i + 1) % 10000 == 0) {
 					//*os << "(Remaining candidates in buffer: " << size << "; Are they all ?: " << (os->isGraphReaderWorking() ? "no" : "yes") << ")" << endl;
 					*os << endl;
 				}
@@ -221,7 +217,10 @@ int cTheoreticalSpectrumList::parallelCompareAndStore(cCandidateSet& candidates,
 			os->usleep(1000);
 		}
 
-		sortAndFitSize();
+		// move the list to vector
+		theoreticalspectra.clear();
+		theoreticalspectra.insert(theoreticalspectra.end(), make_move_iterator(spectrumbuffer.begin()), make_move_iterator(spectrumbuffer.end()));
+		spectrumbuffer.clear();
 
 	}
 	else {
@@ -234,6 +233,18 @@ int cTheoreticalSpectrumList::parallelCompareAndStore(cCandidateSet& candidates,
 	cTheoreticalSpectrum tsp;
 	tsp.resizePeakList(5000);
 
+	isotopepatterncache.lock();
+	isotopepatterncache.clear();
+	isotopepatterncache.unlock();
+
+	unordered_map<string, int> peakdesctoid;
+	unordered_map<string, int> isotopeformuladesctoid;
+
+	parameters->peakidtodesc.clear();
+	parameters->isotopeformulaidtodesc.clear();
+
+	*os << " ok" << endl << endl << "Preparing the report... " << endl;
+
 	// fill descriptions of peaks
 	resultspectra.resize(theoreticalspectra.size());
 	for (int i = 0; i < (int)theoreticalspectra.size(); i++) {
@@ -242,29 +253,31 @@ int cTheoreticalSpectrumList::parallelCompareAndStore(cCandidateSet& candidates,
 		tsp.setParameters(parameters);
 		tsp.setCandidate(theoreticalspectra[i].getCandidate());
 
-		switch (parameters->peptidetype)
-		{
-		case linear:
-			theoreticalpeaksrealsize = tsp.compareLinear(peaklist, *bricksdb, true, rxsequencetag, rxsearchedsequence);
-			break;
-		case cyclic:
-			theoreticalpeaksrealsize = tsp.compareCyclic(peaklist, *bricksdb, true, rxsequencetag, rxsearchedsequence);
-			break;
-		case branched:
-			theoreticalpeaksrealsize = tsp.compareBranched(peaklist, *bricksdb, true, rxsequencetag, rxsearchedsequence);
-			break;
-		case branchcyclic:
-			theoreticalpeaksrealsize = tsp.compareBranchCyclic(peaklist, *bricksdb, true, rxsequencetag, rxsearchedsequence);
-			break;
-		case linearpolyketide:
-			theoreticalpeaksrealsize = tsp.compareLinearPolyketide(peaklist, *bricksdb, true, rxsequencetag, rxsearchedsequence);
-			break;
-		case cyclicpolyketide:
-			theoreticalpeaksrealsize = tsp.compareCyclicPolyketide(peaklist, *bricksdb, true, rxsequencetag, rxsearchedsequence);
-			break;
-		case other:
-		default:
-			break;
+		theoreticalspectra[i].clear(true);
+
+		switch (parameters->peptidetype) {
+			case linear:
+				theoreticalpeaksrealsize = tsp.compareLinear(peaklist, *bricksdb, true, rxsequencetag, rxsearchedsequence);
+				break;
+			case cyclic:
+				theoreticalpeaksrealsize = tsp.compareCyclic(peaklist, *bricksdb, true, rxsequencetag, rxsearchedsequence);
+				break;
+			case branched:
+				theoreticalpeaksrealsize = tsp.compareBranched(peaklist, *bricksdb, true, rxsequencetag, rxsearchedsequence);
+				break;
+			case branchcyclic:
+				theoreticalpeaksrealsize = tsp.compareBranchCyclic(peaklist, *bricksdb, true, rxsequencetag, rxsearchedsequence);
+				break;
+			case linearpolyketide:
+				theoreticalpeaksrealsize = tsp.compareLinearPolyketide(peaklist, *bricksdb, true, rxsequencetag, rxsearchedsequence);
+				break;
+			case cyclicpolyketide:
+				theoreticalpeaksrealsize = tsp.compareCyclicPolyketide(peaklist, *bricksdb, true, rxsequencetag, rxsearchedsequence);
+				break;
+			case other:
+				break;
+			default:
+				break;
 		}
 
 		// invalid sequence tag
@@ -273,9 +286,33 @@ int cTheoreticalSpectrumList::parallelCompareAndStore(cCandidateSet& candidates,
 		}
 		resultspectra[i] = tsp;
 		resultspectra[i].resizePeakList(theoreticalpeaksrealsize);
+		resultspectra[i].getTheoreticalPeaks()->reducePeakDescriptions(peakdesctoid);
+		resultspectra[i].getTheoreticalPeaks()->reduceIsotopeFormulaDescriptions(isotopeformuladesctoid);
+
+		if ((i + 1) % 100 == 0) {
+			*os << ".";
+		}
+
+		if ((i + 1) % 1000 == 0) {
+			*os << i + 1;
+		}
+
+		if ((i + 1) % 10000 == 0) {
+			*os << endl;
+		}
+
 	}
 
-	theoreticalspectra = resultspectra;
+	convertStringIntUnorderedMapToStringVector(peakdesctoid, parameters->peakidtodesc);
+	convertStringIntUnorderedMapToStringVector(isotopeformuladesctoid, parameters->isotopeformulaidtodesc);
+
+	isotopepatterncache.lock();
+	isotopepatterncache.clear();
+	isotopepatterncache.unlock();
+
+	theoreticalspectra.clear();
+	theoreticalspectra.insert(theoreticalspectra.end(), make_move_iterator(resultspectra.begin()), make_move_iterator(resultspectra.end()));
+	resultspectra.clear();
 
 	//computeNumbersOfCompletedSeries();
 
@@ -307,7 +344,7 @@ int cTheoreticalSpectrumList::parallelCompareAndStore(cCandidateSet& candidates,
 		theoreticalspectra[i].setParameters(0);
 	}
 
-	if (parameters->mode == denovoengine) {
+	if ((parameters->mode == denovoengine) || (parameters->mode == databasesearch)) {
 		sortAndFitSize();
 	}
 		
@@ -316,188 +353,154 @@ int cTheoreticalSpectrumList::parallelCompareAndStore(cCandidateSet& candidates,
 }
 
 
-void cTheoreticalSpectrumList::addButDoNotFitSize(cTheoreticalSpectrum& theoreticalspectrum, int theoreticalpeaksrealsize) {
+double cTheoreticalSpectrumList::updatekNNList(cTheoreticalSpectrum& theoreticalspectrum, int theoreticalpeaksrealsize, double score, regex* rxsearchedsequence) {
 	QMutexLocker ml(&mutex);
 
-	if ((int)theoreticalspectra.size() < parameters->hitsreported) {
-
-		theoreticalspectra.push_back(theoreticalspectrum);
-		theoreticalspectra.back().resizePeakList(theoreticalpeaksrealsize);
-
-		if ((int)theoreticalspectra.size() == parameters->hitsreported) {
-			switch (parameters->scoretype) {
-			case b_ions:
-				sort(theoreticalspectra.begin(), theoreticalspectra.end(), compareBandAllIonsDesc);
-				worstScore = theoreticalspectra.back().getNumberOfMatchedPeaks(b_ion);
-				break;
-			case b_ions_and_b_dehydrated_ions:
-				sort(theoreticalspectra.begin(), theoreticalspectra.end(), compareBBwaterLossAndAllIonsDesc);
-				worstScore = theoreticalspectra.back().getNumberOfMatchedPeaks(b_ion) + theoreticalspectra.back().getNumberOfMatchedPeaks(b_ion_dehydrated);
-				break;
-			case b_ions_and_b_deamidated_ions:
-				sort(theoreticalspectra.begin(), theoreticalspectra.end(), compareBBammoniaLossAndAllIonsDesc);
-				worstScore = theoreticalspectra.back().getNumberOfMatchedPeaks(b_ion) + theoreticalspectra.back().getNumberOfMatchedPeaks(b_ion_deamidated);
-				break;
-			case y_ions_and_b_ions:
-				sort(theoreticalspectra.begin(), theoreticalspectra.end(), compareYBandAllIonsDesc);
-				worstScore = theoreticalspectra.back().getNumberOfMatchedPeaksYB();
-				break;
-			case y_ions:
-				sort(theoreticalspectra.begin(), theoreticalspectra.end(), compareYandAllIonsDesc);
-				worstScore = theoreticalspectra.back().getNumberOfMatchedPeaks(y_ion);
-				break;
-			case weighted_intensity:
-				sort(theoreticalspectra.begin(), theoreticalspectra.end(), compareWeightedIntensityDesc);
-				worstScore = theoreticalspectra.back().getWeightedIntensityScore();
-				break;
-			case matched_peaks:
-				sort(theoreticalspectra.begin(), theoreticalspectra.end(), compareNumberOfMatchedPeaksDesc);
-				worstScore = theoreticalspectra.back().getNumberOfMatchedPeaks();
-				break;
-			case matched_bricks:
-				sort(theoreticalspectra.begin(), theoreticalspectra.end(), compareNumberOfMatchedBricksDesc);
-				worstScore = theoreticalspectra.back().getNumberOfMatchedBricks();
-				break;
-			}
-			worstNumberOfMatchedPeaks = theoreticalspectra.back().getNumberOfMatchedPeaks();
-		}
-
+	if (score < currentworstscore) {
+		return currentworstscore;
 	}
-	else {
 
-		switch (parameters->scoretype) {
+	bool (*comparatorfunction)(const cTheoreticalSpectrum&, const cTheoreticalSpectrum&);
+
+	switch (parameters->scoretype) {
 		case b_ions:
-			if ((worstScore < theoreticalspectrum.getNumberOfMatchedPeaks(b_ion)) || ((worstScore == theoreticalspectrum.getNumberOfMatchedPeaks(b_ion)) && (worstNumberOfMatchedPeaks < theoreticalspectrum.getNumberOfMatchedPeaks()))) {
-				theoreticalspectra.push_back(theoreticalspectrum);
-				theoreticalspectra.back().resizePeakList(theoreticalpeaksrealsize);
-			}
+			comparatorfunction = &compareBandAllIonsDesc;
 			break;
 		case b_ions_and_b_dehydrated_ions:
-			if ((worstScore < theoreticalspectrum.getNumberOfMatchedPeaks(b_ion) + theoreticalspectrum.getNumberOfMatchedPeaks(b_ion_dehydrated)) || ((worstScore == theoreticalspectrum.getNumberOfMatchedPeaks(b_ion) + theoreticalspectrum.getNumberOfMatchedPeaks(b_ion_dehydrated)) && (worstNumberOfMatchedPeaks < theoreticalspectrum.getNumberOfMatchedPeaks()))) {
-				theoreticalspectra.push_back(theoreticalspectrum);
-				theoreticalspectra.back().resizePeakList(theoreticalpeaksrealsize);
-			}
+			comparatorfunction = &compareBBwaterLossAndAllIonsDesc;
 			break;
 		case b_ions_and_b_deamidated_ions:
-			if ((worstScore < theoreticalspectrum.getNumberOfMatchedPeaks(b_ion) + theoreticalspectrum.getNumberOfMatchedPeaks(b_ion_deamidated)) || ((worstScore == theoreticalspectrum.getNumberOfMatchedPeaks(b_ion) + theoreticalspectrum.getNumberOfMatchedPeaks(b_ion_deamidated)) && (worstNumberOfMatchedPeaks < theoreticalspectrum.getNumberOfMatchedPeaks()))) {
-				theoreticalspectra.push_back(theoreticalspectrum);
-				theoreticalspectra.back().resizePeakList(theoreticalpeaksrealsize);
-			}
+			comparatorfunction = &compareBBammoniaLossAndAllIonsDesc;
 			break;
 		case y_ions_and_b_ions:
-			if ((worstScore < theoreticalspectrum.getNumberOfMatchedPeaksYB()) || ((worstScore == theoreticalspectrum.getNumberOfMatchedPeaksYB()) && (worstNumberOfMatchedPeaks < theoreticalspectrum.getNumberOfMatchedPeaks()))) {
-				theoreticalspectra.push_back(theoreticalspectrum);
-				theoreticalspectra.back().resizePeakList(theoreticalpeaksrealsize);
-			}
+			comparatorfunction = &compareYBandAllIonsDesc;
 			break;
 		case y_ions:
-			if (worstScore < theoreticalspectrum.getNumberOfMatchedPeaks(y_ion)) {
-				theoreticalspectra.push_back(theoreticalspectrum);
-				theoreticalspectra.back().resizePeakList(theoreticalpeaksrealsize);
-			}
+			comparatorfunction = &compareYandAllIonsDesc;
 			break;
 		case weighted_intensity:
-			if (worstScore < theoreticalspectrum.getWeightedIntensityScore()) {
-				theoreticalspectra.push_back(theoreticalspectrum);
-				theoreticalspectra.back().resizePeakList(theoreticalpeaksrealsize);
-			}
+			comparatorfunction = &compareWeightedIntensityDesc;
 			break;
 		case matched_peaks:
-			if (worstScore < theoreticalspectrum.getNumberOfMatchedPeaks()) {
-				theoreticalspectra.push_back(theoreticalspectrum);
-				theoreticalspectra.back().resizePeakList(theoreticalpeaksrealsize);
-			}
+			comparatorfunction = &compareNumberOfMatchedPeaksDesc;
 			break;
 		case matched_bricks:
-			if (worstScore < theoreticalspectrum.getNumberOfMatchedBricks()) {
-				theoreticalspectra.push_back(theoreticalspectrum);
-				theoreticalspectra.back().resizePeakList(theoreticalpeaksrealsize);
-			}
+			comparatorfunction = &compareNumberOfMatchedBricksDesc;
 			break;
-		}
-
-		if ((int)theoreticalspectra.size() >= refreshlimit) {
-	
-			switch (parameters->scoretype) {
-			case b_ions:
-				sort(theoreticalspectra.begin(), theoreticalspectra.end(), compareBandAllIonsDesc);
-				theoreticalspectra.resize(parameters->hitsreported);
-				worstScore = theoreticalspectra.back().getNumberOfMatchedPeaks(b_ion);
-				break;
-			case b_ions_and_b_dehydrated_ions:
-				sort(theoreticalspectra.begin(), theoreticalspectra.end(), compareBBwaterLossAndAllIonsDesc);
-				theoreticalspectra.resize(parameters->hitsreported);
-				worstScore = theoreticalspectra.back().getNumberOfMatchedPeaks(b_ion) + theoreticalspectra.back().getNumberOfMatchedPeaks(b_ion_dehydrated);
-				break;
-			case b_ions_and_b_deamidated_ions:
-				sort(theoreticalspectra.begin(), theoreticalspectra.end(), compareBBammoniaLossAndAllIonsDesc);
-				theoreticalspectra.resize(parameters->hitsreported);
-				worstScore = theoreticalspectra.back().getNumberOfMatchedPeaks(b_ion) + theoreticalspectra.back().getNumberOfMatchedPeaks(b_ion_deamidated);
-				break;
-			case y_ions_and_b_ions:
-				sort(theoreticalspectra.begin(), theoreticalspectra.end(), compareYBandAllIonsDesc);
-				theoreticalspectra.resize(parameters->hitsreported);
-				worstScore = theoreticalspectra.back().getNumberOfMatchedPeaksYB();
-				break;
-			case y_ions:
-				sort(theoreticalspectra.begin(), theoreticalspectra.end(), compareYandAllIonsDesc);
-				theoreticalspectra.resize(parameters->hitsreported);
-				worstScore = theoreticalspectra.back().getNumberOfMatchedPeaks(y_ion);
-				break;
-			case weighted_intensity:
-				sort(theoreticalspectra.begin(), theoreticalspectra.end(), compareWeightedIntensityDesc);
-				theoreticalspectra.resize(parameters->hitsreported);
-				worstScore = theoreticalspectra.back().getWeightedIntensityScore();
-				break;
-			case matched_peaks:
-				sort(theoreticalspectra.begin(), theoreticalspectra.end(), compareNumberOfMatchedPeaksDesc);
-				theoreticalspectra.resize(parameters->hitsreported);
-				worstScore = theoreticalspectra.back().getNumberOfMatchedPeaks();
-				break;
-			case matched_bricks:
-				sort(theoreticalspectra.begin(), theoreticalspectra.end(), compareNumberOfMatchedBricksDesc);
-				theoreticalspectra.resize(parameters->hitsreported);
-				worstScore = theoreticalspectra.back().getNumberOfMatchedBricks();
-				break;
-			}
-
-			worstNumberOfMatchedPeaks = theoreticalspectra.back().getNumberOfMatchedPeaks();
-
-		}
 	}
 
+	auto it1 = lower_bound(spectrumbuffer.begin(), spectrumbuffer.end(), theoreticalspectrum, comparatorfunction);
+
+	theoreticalspectrum.setValidSequence(*rxsearchedsequence);
+
+	if (it1 != spectrumbuffer.end()) {
+		double currentscore = 0;
+
+		switch (parameters->scoretype) {
+			case b_ions:
+				currentscore = it1->getNumberOfMatchedPeaks(b_ion);
+				break;
+			case b_ions_and_b_dehydrated_ions:
+				currentscore = it1->getNumberOfMatchedPeaks(b_ion) + it1->getNumberOfMatchedPeaks(b_ion_dehydrated);
+				break;
+			case b_ions_and_b_deamidated_ions:
+				currentscore = it1->getNumberOfMatchedPeaks(b_ion) + it1->getNumberOfMatchedPeaks(b_ion_deamidated);
+				break;
+			case y_ions_and_b_ions:
+				currentscore = it1->getNumberOfMatchedPeaksYB();
+				break;
+			case y_ions:
+				currentscore = it1->getNumberOfMatchedPeaks(y_ion);
+				break;
+			case weighted_intensity:
+				currentscore = it1->getWeightedIntensityScore();
+				break;
+			case matched_peaks:
+				currentscore = it1->getNumberOfMatchedPeaks();
+				break;
+			case matched_bricks:
+				currentscore = it1->getNumberOfMatchedBricks();
+				break;
+		}
+
+		if ((currentscore == score) && (it1->getCandidate().getPath() == theoreticalspectrum.getCandidate().getPath())) {
+			if (!it1->isValid() && theoreticalspectrum.isValid()) {
+				*it1 = theoreticalspectrum;
+				it1->resizePeakList(theoreticalpeaksrealsize);
+			}
+			return currentworstscore;
+		}
+	}
+	
+	auto it2 = spectrumbuffer.insert(it1, theoreticalspectrum);
+	it2->resizePeakList(theoreticalpeaksrealsize);
+
+	if ((int)spectrumbuffer.size() > parameters->hitsreported) {
+		spectrumbuffer.pop_back();
+
+		switch (parameters->scoretype) {
+			case b_ions:
+				currentworstscore = prev(spectrumbuffer.end())->getNumberOfMatchedPeaks(b_ion);
+				break;
+			case b_ions_and_b_dehydrated_ions:
+				currentworstscore = prev(spectrumbuffer.end())->getNumberOfMatchedPeaks(b_ion) + prev(spectrumbuffer.end())->getNumberOfMatchedPeaks(b_ion_dehydrated);
+				break;
+			case b_ions_and_b_deamidated_ions:
+				currentworstscore = prev(spectrumbuffer.end())->getNumberOfMatchedPeaks(b_ion) + prev(spectrumbuffer.end())->getNumberOfMatchedPeaks(b_ion_deamidated);
+				break;
+			case y_ions_and_b_ions:
+				currentworstscore = prev(spectrumbuffer.end())->getNumberOfMatchedPeaksYB();
+				break;
+			case y_ions:
+				currentworstscore = prev(spectrumbuffer.end())->getNumberOfMatchedPeaks(y_ion);
+				break;
+			case weighted_intensity:
+				currentworstscore = prev(spectrumbuffer.end())->getWeightedIntensityScore();
+				break;
+			case matched_peaks:
+				currentworstscore = prev(spectrumbuffer.end())->getNumberOfMatchedPeaks();
+				break;
+			case matched_bricks:
+				currentworstscore = prev(spectrumbuffer.end())->getNumberOfMatchedBricks();
+				break;
+		}
+
+	}
+
+	return currentworstscore;
 }
 
 
 void cTheoreticalSpectrumList::sortAndFitSize() {
 
 	switch (parameters->scoretype) {
-	case b_ions:
-		sort(theoreticalspectra.begin(), theoreticalspectra.end(), compareBandAllIonsDesc);
-		break;
-	case b_ions_and_b_dehydrated_ions:
-		sort(theoreticalspectra.begin(), theoreticalspectra.end(), compareBBwaterLossAndAllIonsDesc);
-		break;
-	case b_ions_and_b_deamidated_ions:
-		sort(theoreticalspectra.begin(), theoreticalspectra.end(), compareBBammoniaLossAndAllIonsDesc);
-		break;
-	case y_ions_and_b_ions:
-		sort(theoreticalspectra.begin(), theoreticalspectra.end(), compareYBandAllIonsDesc);
-		break;
-	case y_ions:
-		sort(theoreticalspectra.begin(), theoreticalspectra.end(), compareYandAllIonsDesc);
-		break;
-	case weighted_intensity:
-		sort(theoreticalspectra.begin(), theoreticalspectra.end(), compareWeightedIntensityDesc);
-		break;
-	case matched_peaks:
-		sort(theoreticalspectra.begin(), theoreticalspectra.end(), compareNumberOfMatchedPeaksDesc);
-		break;
-	case matched_bricks:
-		sort(theoreticalspectra.begin(), theoreticalspectra.end(), compareNumberOfMatchedBricksDesc);
-		break;
+		case b_ions:
+			sort(theoreticalspectra.begin(), theoreticalspectra.end(), compareBandAllIonsDesc);
+			break;
+		case b_ions_and_b_dehydrated_ions:
+			sort(theoreticalspectra.begin(), theoreticalspectra.end(), compareBBwaterLossAndAllIonsDesc);
+			break;
+		case b_ions_and_b_deamidated_ions:
+			sort(theoreticalspectra.begin(), theoreticalspectra.end(), compareBBammoniaLossAndAllIonsDesc);
+			break;
+		case y_ions_and_b_ions:
+			sort(theoreticalspectra.begin(), theoreticalspectra.end(), compareYBandAllIonsDesc);
+			break;
+		case y_ions:
+			sort(theoreticalspectra.begin(), theoreticalspectra.end(), compareYandAllIonsDesc);
+			break;
+		case weighted_intensity:
+			sort(theoreticalspectra.begin(), theoreticalspectra.end(), compareWeightedIntensityDesc);
+			break;
+		case matched_peaks:
+			sort(theoreticalspectra.begin(), theoreticalspectra.end(), compareNumberOfMatchedPeaksDesc);
+			break;
+		case matched_bricks:
+			sort(theoreticalspectra.begin(), theoreticalspectra.end(), compareNumberOfMatchedBricksDesc);
+			break;
 	}
 
+	// might be useful for databasesearch mode
 	if ((int)theoreticalspectra.size() > parameters->hitsreported) {
 		theoreticalspectra.resize(parameters->hitsreported);
 	}

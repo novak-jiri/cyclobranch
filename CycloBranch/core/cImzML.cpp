@@ -21,7 +21,7 @@ cImzML::~cImzML() {
 }
 
 
-int cImzML::parse(string& filename, int& defaultmaxx, int& defaultmaxy, int& pixelsize, eVendorType& vendor) {
+int cImzML::parse(string& filename, int& defaultmaxx, int& defaultmaxy, int& defaultpixelsizex, int& defaultpixelsizey, eVendorType& vendor) {
 
 	parser->parse(filename.c_str());
 	document = parser->getDocument();
@@ -36,7 +36,8 @@ int cImzML::parse(string& filename, int& defaultmaxx, int& defaultmaxy, int& pix
 	use_64bit_float_intensity_precision = false;
 	defaultmaxx = 1;
 	defaultmaxy = 1;
-	pixelsize = 1;
+	defaultpixelsizex = 1;
+	defaultpixelsizey = 1;
 	vendor = unknownvendor;
 
 	// childrens of mzML
@@ -332,9 +333,14 @@ int cImzML::parse(string& filename, int& defaultmaxx, int& defaultmaxy, int& pix
 											defaultmaxy = stoi(value);
 										}
 
-										// pixel size
+										// pixel size x
 										if (accession.compare("IMS:1000046") == 0) {
-											pixelsize = stoi(value);
+											defaultpixelsizex = stoi(value);
+										}
+
+										// pixel size y
+										if (accession.compare("IMS:1000047") == 0) {
+											defaultpixelsizey = stoi(value);
 										}
 
 									}
@@ -580,6 +586,15 @@ int cImzML::parse(string& filename, int& defaultmaxx, int& defaultmaxy, int& pix
 
 		currentNode1 = currentNode1->getNextSibling();
 
+	}
+
+	if (defaultpixelsizey == 1) {
+		defaultpixelsizey = defaultpixelsizex;
+	}
+
+	if (vendor == bruker) {
+		defaultpixelsizex = sqrt(defaultpixelsizex);
+		defaultpixelsizey = sqrt(defaultpixelsizey);
 	}
 
 	return 0;

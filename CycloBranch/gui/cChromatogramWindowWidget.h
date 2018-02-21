@@ -175,6 +175,9 @@ private:
 	void updateZoomGroup();
 
 
+	void calculateMinMaxScan();
+
+
 signals:
 
 

@@ -41,14 +41,14 @@ void cParameters::clear() {
 	mode = denovoengine;
 	scoretype = matched_peaks;
 	clearhitswithoutparent = false;
-	generateisotopepattern = true;
+	generateisotopepattern = false;
 	minimumpatternsize = 1;
 	cyclicnterminus = false;
 	cycliccterminus = false;
 	enablescrambling = false;
 	similaritysearch = false;
 	regularblocksorder = false;
-	hitsreported = 1000;
+	hitsreported = 100;
 	sequencetag = "";
 	originalsequencetag = "";
 	searchedsequence = "";
@@ -65,11 +65,12 @@ void cParameters::clear() {
 	fragmentionsfortheoreticalspectra.clear();
 
 	peakidtodesc.clear();
-	peakdesctoid.clear();
+	isotopeformulaidtodesc.clear();
 
 	defaultmaxx = 1;
 	defaultmaxy = 1;
-	pixelsize = 1;
+	defaultpixelsizex = 1;
+	defaultpixelsizey = 1;
 	vendor = unknownvendor;
 }
 
@@ -418,7 +419,7 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 					}
 					break;
 				case imzML:
-					errtype = peaklistseries.loadFromIMZMLStream(peaklistfilename, peakliststream, fwhm, defaultmaxx, defaultmaxy, pixelsize, vendor, os, terminatecomputation);
+					errtype = peaklistseries.loadFromIMZMLStream(peaklistfilename, peakliststream, fwhm, defaultmaxx, defaultmaxy, defaultpixelsizex, defaultpixelsizey, vendor, os, terminatecomputation);
 					if (errtype == -1) {
 						error = true;
 						errormessage = "Aborted by user.\n";
@@ -933,30 +934,19 @@ void cParameters::store(ofstream& os) {
 		os.write((char *)&fragmentionsfortheoreticalspectra[i], sizeof(eFragmentIonType));
 	}
 
-	size = (int)peakidtodesc.size();
-	os.write((char *)&size, sizeof(int));
-	for (auto it = peakidtodesc.begin(); it != peakidtodesc.end(); ++it) {
-		os.write((char *)&it->first, sizeof(int));
-		storeString(it->second, os);
-	}
-
-	size = (int)peakdesctoid.size();
-	os.write((char *)&size, sizeof(int));
-	for (auto it = peakdesctoid.begin(); it != peakdesctoid.end(); ++it) {
-		s = it->first;
-		storeString(s, os);
-		os.write((char *)&it->second, sizeof(int));
-	}
+	storeStringVector(peakidtodesc, os);
+	storeStringVector(isotopeformulaidtodesc, os);
 
 	os.write((char *)&defaultmaxx, sizeof(int));
 	os.write((char *)&defaultmaxy, sizeof(int));
-	os.write((char *)&pixelsize, sizeof(int));
+	os.write((char *)&defaultpixelsizex, sizeof(int));
+	os.write((char *)&defaultpixelsizey, sizeof(int));
 	os.write((char *)&vendor, sizeof(eVendorType));
 }
 
 
 void cParameters::load(ifstream& is) {
-	int size, value;
+	int size;
 	string s;
 
 	os = 0;
@@ -1039,25 +1029,13 @@ void cParameters::load(ifstream& is) {
 		is.read((char *)&fragmentionsfortheoreticalspectra[i], sizeof(eFragmentIonType));
 	}
 
-	is.read((char *)&size, sizeof(int));
-	peakidtodesc.clear();
-	for (int i = 0; i < size; i++) {
-		is.read((char *)&value, sizeof(int));
-		loadString(s, is);
-		peakidtodesc[value] = s;
-	}
-
-	is.read((char *)&size, sizeof(int));
-	peakdesctoid.clear();
-	for (int i = 0; i < size; i++) {
-		loadString(s, is);
-		is.read((char *)&value, sizeof(int));
-		peakdesctoid[s] = value;
-	}
+	loadStringVector(peakidtodesc, is);
+	loadStringVector(isotopeformulaidtodesc, is);
 
 	is.read((char *)&defaultmaxx, sizeof(int));
 	is.read((char *)&defaultmaxy, sizeof(int));
-	is.read((char *)&pixelsize, sizeof(int));
+	is.read((char *)&defaultpixelsizex, sizeof(int));
+	is.read((char *)&defaultpixelsizey, sizeof(int));
 	is.read((char *)&vendor, sizeof(eVendorType));
 }
 

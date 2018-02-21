@@ -10,6 +10,7 @@
 #include <string>
 #include <fstream>
 #include "core/cFragmentIons.h"
+#include "core/cSummaryFormula.h"
 
 
 using namespace std;
@@ -34,6 +35,21 @@ enum eScoreType {
 	\brief A structure representing a peak in a mass spectrum.
 */
 struct cPeak {
+
+	/**
+		\brief Summary formlula.
+	*/
+	cSummaryFormula formula;
+
+	/**
+		\brief Isotope summary formula.
+	*/
+	string isotopeformula;
+
+	/**
+		\brief Id of isotope summary formula.
+	*/
+	int isotopeformulaid;
 
 	/**
 		\brief MZ ratio.
@@ -163,8 +179,22 @@ struct cPeak {
 
 	/**
 		\brief The constructor.
-	*/ 
+	*/
 	cPeak();
+
+
+	/**
+		\brief The copy constructor.
+		\param peak reference to cPeak
+	*/
+	cPeak(const cPeak& peak);
+
+
+	/**
+		\brief Overloaded operator=.
+		\param peak reference to cPeak
+	*/
+	cPeak& operator=(const cPeak& peak);
 
 
 	/**

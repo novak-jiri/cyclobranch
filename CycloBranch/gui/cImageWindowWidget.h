@@ -264,18 +264,21 @@ public:
 		\param topshift top shift
 		\param maxx maximum X coordinate
 		\param maxy maximum Y coordinate
+		\param pixelsizex pixel size x
+		\param pixelsizey pixel size y
 	*/
-	void setCorrelationValues(int leftshift, int topshift, int maxx, int maxy);
+	void setCorrelationValues(int leftshift, int topshift, int maxx, int maxy, int pixelsizex, int pixelsizey);
 
 
 	/**
 		\brief Set the default maximum X and Y coordinates - parsed from the imzML file.
 		\param defaultmaxx maximum X coordinate
 		\param defaultmaxy maximum Y coordinate
-		\param pixelsize pixel size
+		\param defaultpixelsizex pixel size x
+		\param defaultpixelsizey pixel size y
 		\param vendor vendor type
 	*/
-	void setDefaultMaxXY(int defaultmaxx, int defaultmaxy, int pixelsize, eVendorType vendor);
+	void setDefaultMaxXY(int defaultmaxx, int defaultmaxy, int defaultpixelsizex, int defaultpixelsizey, eVendorType vendor);
 
 
 	/**
@@ -441,10 +444,13 @@ private:
 	int topshift;
 	int maxx;
 	int maxy;
+	int pixelsizex;
+	int pixelsizey;
 
 	int defaultmaxx;
 	int defaultmaxy;
-	int pixelsize;	
+	int defaultpixelsizex;
+	int defaultpixelsizey;
 	eVendorType vendor;
 
 	qreal currentscale;
@@ -462,6 +468,9 @@ private:
 
 	bool showselection;
 
+	qreal microscopynavigationcenterx;
+	qreal microscopynavigationcentery;
+
 	QGraphicsRectItem* selectionrect;
 	QGraphicsSimpleTextItem* selectionsimpletextitem;
 
@@ -476,7 +485,7 @@ private:
 
 	void getRectanglePoints(qreal& rx1, qreal& ry1, qreal& rx2, qreal& ry2);
 
-	double prepareTransformation(QRectF rect, QTransform& transform, bool testedfliphorizontally, bool testedflipvertically, double testedangle);
+	double prepareTransformation(QRectF rect, QTransform& transform, bool testedfliphorizontally, bool testedflipvertically, double testedangle, bool flipaxes);
 	
 	void fixRectCenter(qreal& rx1, qreal& ry1, qreal& rx2, qreal& ry2, bool testedfliphorizontally, bool testedflipvertically, double testedangle);
 

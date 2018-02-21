@@ -5,13 +5,17 @@ cSpectrumDetailProxyModel::cSpectrumDetailProxyModel(QObject *parent) : QSortFil
 	hidematched = false;
 	hideunmatched = false;
 	hidescrambled = false;
+	hiderotations = false;
+	hidetrotations = false;
 }
 
 
-void cSpectrumDetailProxyModel::setFlags(bool hidematched, bool hideunmatched, bool hidescrambled) {
+void cSpectrumDetailProxyModel::setFlags(bool hidematched, bool hideunmatched, bool hidescrambled, bool hiderotations, bool hidetrotations) {
 	this->hidematched = hidematched;
 	this->hideunmatched = hideunmatched;
 	this->hidescrambled = hidescrambled;
+	this->hiderotations = hiderotations;
+	this->hidetrotations = hidetrotations;
 }
 
 
@@ -40,7 +44,8 @@ bool cSpectrumDetailProxyModel::filterAcceptsRow(int sourceRow, const QModelInde
 		show = false;
 	}
 		
-	if (hidescrambled && ((QStandardItemModel *)sourceModel())->item(sourceRow, 0) && (sourceModel()->data(sourceModel()->index(sourceRow, 0, sourceParent)).toString().contains(filterRegExp()))) {
+	if ((hidescrambled || hiderotations || hidetrotations) && 
+		((QStandardItemModel *)sourceModel())->item(sourceRow, 0) && (!sourceModel()->data(sourceModel()->index(sourceRow, 0, sourceParent)).toString().contains(filterRegExp()))) {
 		show = false;
 	}
 		
