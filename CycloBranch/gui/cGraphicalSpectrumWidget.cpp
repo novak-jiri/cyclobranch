@@ -10,6 +10,8 @@
 
 cGraphicalSpectrumWidget::cGraphicalSpectrumWidget(QWidget* parent) {
 	this->parent = parent;
+	parameters = 0;
+	theoreticalspectrum = 0;
 	origwidth = 0;
 	origheight = 0;
 	scale = 1;
@@ -17,6 +19,8 @@ cGraphicalSpectrumWidget::cGraphicalSpectrumWidget(QWidget* parent) {
 	hidematched = false;
 	factor = 0.2;
 	coloredrotationid = -1;
+	coloredrotationstring = "";
+	coloredtrotationid = -1;
 	pressedx = -1;
 	pressedy = -1;
 	currentx = 0;
@@ -32,7 +36,8 @@ cGraphicalSpectrumWidget::~cGraphicalSpectrumWidget() {
 }
 
 
-void cGraphicalSpectrumWidget::setTheoreticalSpectrum(cTheoreticalSpectrum* theoreticalspectrum) {
+void cGraphicalSpectrumWidget::initialize(cParameters* parameters, cTheoreticalSpectrum* theoreticalspectrum) {
+	this->parameters = parameters;
 	this->theoreticalspectrum = theoreticalspectrum;
 	minmzratio = 0;
 	maxmzratio = theoreticalspectrum->getExperimentalSpectrum().getMaximumMZRatio();
@@ -65,7 +70,7 @@ void cGraphicalSpectrumWidget::paintEvent(QPaintEvent *event) {
 	int x;
 	double y;
 
-	char tmpbuf[20];
+	char tmpbuf[30];
 	string s;
 
 	int w = origwidth;
@@ -114,7 +119,60 @@ void cGraphicalSpectrumWidget::paintEvent(QPaintEvent *event) {
 
 		y = theoreticalspectrum->getExperimentalSpectrum()[i].intensity/maxintensity * (h - topmargin - bottommargin);
 
-		if ((theoreticalspectrum->getExperimentalSpectrum()[i].matched > 0) && ((coloredrotationid == -1) || ((coloredrotationid != -1) && (theoreticalspectrum->getExperimentalSpectrum()[i].hasMatchedRotation(coloredrotationid))))) {
+		string coloredtrotationstring;
+		if (coloredtrotationid != -1) {
+			if (parameters->peptidetype == branched) {
+				coloredtrotationstring = " " + to_string(coloredtrotationid + 1) + "_";
+			}
+			if (parameters->peptidetype == lasso) {
+				coloredtrotationstring = "_" + to_string(coloredtrotationid + 1) + "_";
+			}
+		}
+
+		vector<string> hits;
+		hits.clear();
+		s = theoreticalspectrum->getExperimentalSpectrum()[i].description;
+		int position = (int)s.find(',');
+		while (position != string::npos) {
+			hits.push_back(s.substr(0, position));
+			s = s.substr(position + 1);
+
+			if ((parameters->peptidetype == cyclic) && (coloredrotationid != -1) && (hits.back().find(coloredrotationstring) == string::npos)) {
+				hits.pop_back();
+			}
+
+			if ((parameters->peptidetype == branched) && (coloredtrotationid != -1) && (hits.back().find(coloredtrotationstring) == string::npos)) {
+				hits.pop_back();
+			}
+
+			if ((parameters->peptidetype == lasso) && (((coloredrotationid != -1) && (hits.back().find(coloredrotationstring) == string::npos)) || ((coloredtrotationid != -1) && (hits.back().find(coloredtrotationstring) == string::npos)))) {
+				hits.pop_back();
+			}
+
+			position = (int)s.find(',');
+		}
+
+		if (s.size() > 0) {
+			hits.push_back(s);
+
+			if ((parameters->peptidetype == cyclic) && (coloredrotationid != -1) && (hits.back().find(coloredrotationstring) == string::npos)) {
+				hits.pop_back();
+			}
+
+			if ((parameters->peptidetype == branched) && (coloredtrotationid != -1) && (hits.back().find(coloredtrotationstring) == string::npos)) {
+				hits.pop_back();
+			}
+
+			if ((parameters->peptidetype == lasso) && (((coloredrotationid != -1) && (hits.back().find(coloredrotationstring) == string::npos)) || ((coloredtrotationid != -1) && (hits.back().find(coloredtrotationstring) == string::npos)))) {
+				hits.pop_back();
+			}
+		}
+
+		sprintf_s(tmpbuf,"%.3f\0",theoreticalspectrum->getExperimentalSpectrum()[i].mzratio);
+		s = tmpbuf;
+		hits.push_back(s);
+
+		if (hits.size() > 1) {
 			painter.setPen(QPen(Qt::red, 2, Qt::SolidLine));
 		}
 		else {
@@ -123,13 +181,10 @@ void cGraphicalSpectrumWidget::paintEvent(QPaintEvent *event) {
 
 		painter.drawLine(QPoint(x, h - bottommargin - 2), QPoint(x, h - bottommargin - std::max((int)y, 3)));
 
-		sprintf_s(tmpbuf,"%.3f\0",theoreticalspectrum->getExperimentalSpectrum()[i].mzratio);
-		s = tmpbuf;
-		if (theoreticalspectrum->getExperimentalSpectrum()[i].description.length() > 0) {
-			s += " (" + theoreticalspectrum->getExperimentalSpectrum()[i].description + ")";
+		for (int i = 0; i < (int)hits.size(); i++) {
+			painter.drawText(x - 2, h - bottommargin - std::max((int)y, 3) - 15*((int)hits.size() - i), width(), 20, Qt::AlignLeft, hits[i].c_str());
 		}
-		//painter.drawText(QPoint((int)x + margin, h - margin - (int)y), tmpbuf);
-		drawVerticalText(&painter, QString(s.c_str()), x + 3, h - bottommargin - (int)y - 5);
+
 	}	
 
 }
@@ -339,6 +394,18 @@ void cGraphicalSpectrumWidget::resetMZInterval() {
 
 void cGraphicalSpectrumWidget::rotationChanged(int index) {
 	coloredrotationid = index - 1;
+	repaint();
+}
+
+
+void cGraphicalSpectrumWidget::trotationChanged(int index) {
+	coloredtrotationid = index - 1;
+	repaint();
+}
+
+
+void cGraphicalSpectrumWidget::rotationChanged(QString text) {
+	coloredrotationstring = " " + text.toStdString() + "_";
 	repaint();
 }
 

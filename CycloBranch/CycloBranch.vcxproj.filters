@@ -200,6 +200,18 @@
     <ClCompile Include="gui\cLinearWidget.cpp">
       <Filter>Source Files\gui</Filter>
     </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_cLassoWidget.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_cLassoWidget.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="gui\cLassoWidget.cpp">
+      <Filter>Source Files\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="core\cSummaryFormula.cpp">
+      <Filter>Source Files\core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="gui\cAboutWidget.h">
@@ -244,6 +256,9 @@
     <CustomBuild Include="gui\cLinearWidget.h">
       <Filter>Header Files\gui</Filter>
     </CustomBuild>
+    <CustomBuild Include="gui\cLassoWidget.h">
+      <Filter>Header Files\gui</Filter>
+    </CustomBuild>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="core\cBrick.h">
@@ -277,6 +292,9 @@
       <Filter>Header Files\core</Filter>
     </ClInclude>
     <ClInclude Include="core\cCandidateSet.h">
+      <Filter>Header Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="core\cSummaryFormula.h">
       <Filter>Header Files\core</Filter>
     </ClInclude>
   </ItemGroup>

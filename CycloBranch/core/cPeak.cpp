@@ -20,23 +20,12 @@ void cPeak::clear() {
 	scrambled = false;
 
 	rotationid = -1;
-	matchedrotations.clear();
 	seriesid = -1;
 }
 
 
 bool cPeak::empty() {
 	if ((mzratio == 0) && (intensity == 0)) return true;
-	return false;
-}
-
-
-bool cPeak::hasMatchedRotation(int rotationid) {
-	for (int i = 0; i < (int)matchedrotations.size(); i++) {
-		if (rotationid == matchedrotations[i]) {
-			return true;
-		}
-	}
 	return false;
 }
 
@@ -60,13 +49,6 @@ void cPeak::store(ofstream& os) {
 	os.write((char *)&matchedid, sizeof(int));
 	os.write((char *)&charge, sizeof(int));
 	os.write((char *)&rotationid, sizeof(int));
-
-	size = (int)matchedrotations.size();
-	os.write((char *)&size, sizeof(int));
-	for (int i = 0; i < (int)matchedrotations.size(); i++) {
-		os.write((char *)&matchedrotations[i], sizeof(int));
-	}
-	
 	os.write((char *)&seriesid, sizeof(int));
 	os.write((char *)&isotope, sizeof(bool));
 	os.write((char *)&removeme, sizeof(bool));
@@ -93,13 +75,6 @@ void cPeak::load(ifstream& is) {
 	is.read((char *)&matchedid, sizeof(int));
 	is.read((char *)&charge, sizeof(int));
 	is.read((char *)&rotationid, sizeof(int));
-
-	is.read((char *)&size, sizeof(int));
-	matchedrotations.resize(size);
-	for (int i = 0; i < (int)matchedrotations.size(); i++) {
-		is.read((char *)&matchedrotations[i], sizeof(int));
-	}
-	
 	is.read((char *)&seriesid, sizeof(int));
 	is.read((char *)&isotope, sizeof(bool));
 	is.read((char *)&removeme, sizeof(bool));

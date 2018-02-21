@@ -9,6 +9,7 @@
 cBranchedWidget::cBranchedWidget() {
 	parameters = 0;
 	theoreticalspectrum = 0;
+	visibletrotationid = -1;
 }
 
 
@@ -26,8 +27,8 @@ void cBranchedWidget::paintEvent(QPaintEvent *event) {
 
 	vector<string> backboneacronyms;
 	vector<string> branchacronyms;
-	theoreticalspectrum->getCandidate().getBackboneAcronyms(parameters->bricksdatabase, backboneacronyms);
-	theoreticalspectrum->getCandidate().getBranchAcronyms(parameters->bricksdatabase, branchacronyms);
+	backboneacronyms = theoreticalspectrum->getBackboneAcronyms();
+	branchacronyms = theoreticalspectrum->getBranchAcronyms();
 
 	QPainter painter(this);
 	const int topmargin = 20;
@@ -35,8 +36,8 @@ void cBranchedWidget::paintEvent(QPaintEvent *event) {
 	const int bottommargin = 80;
 	const int rightmargin = 20;
 
+	int backbonesize = (int)backboneacronyms.size();
 	int branchsize = (int)branchacronyms.size();
-	int backbonesize = (int)theoreticalspectrum->getAcronyms().size() - branchsize;
 
 	vector<TRotationInfo> tpermutations;
 	theoreticalspectrum->getCandidate().getPermutationsOfBranches(tpermutations);
@@ -86,6 +87,11 @@ void cBranchedWidget::paintEvent(QPaintEvent *event) {
 	string name;
 	int len = (int)theoreticalspectrum->getVisualCoverage()[0].series.size();
 	for (int i = 0; i < 6; i++) {
+
+		if ((visibletrotationid != -1) && (visibletrotationid != i)) {
+			continue;
+		}
+
 		for (int j = 0; j < (int)parameters->fragmentionsfortheoreticalspectra.size(); j++) {
 			
 			position = 0;
@@ -279,5 +285,11 @@ void cBranchedWidget::paintEvent(QPaintEvent *event) {
 		}
 	}
 	
+}
+
+
+void cBranchedWidget::trotationChanged(int index) {
+	visibletrotationid = index - 1;
+	repaint();
 }
 

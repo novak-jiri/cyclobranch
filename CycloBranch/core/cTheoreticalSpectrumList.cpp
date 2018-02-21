@@ -257,6 +257,10 @@ int cTheoreticalSpectrumList::parallelCompareAndStore(cCandidateSet& candidates,
 		theoreticalspectra[i].setRealPeptideName(*bricksdb, parameters->peptidetype);
 		theoreticalspectra[i].setAcronymPeptideNameWithHTMLReferences(*bricksdb, parameters->peptidetype);
 		theoreticalspectra[i].setAcronyms(*bricksdb);
+		if ((parameters->peptidetype == branched) || (parameters->peptidetype == lasso)) {
+			theoreticalspectra[i].setBackboneAcronyms(*bricksdb);
+			theoreticalspectra[i].setBranchAcronyms(*bricksdb);
+		}
 		if (parameters->mode == 0) {
 			theoreticalspectra[i].setPath(*graph);
 		}

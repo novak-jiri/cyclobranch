@@ -325,6 +325,8 @@ void cTheoreticalSpectrum::clear(bool clearpeaklist) {
 	realpeptidename = "";
 	acronympeptidename = "";
 	acronyms.clear();
+	backboneacronyms.clear();
+	branchacronyms.clear();
 	path = "";
 	seriescompleted = 1;
 }
@@ -493,10 +495,9 @@ int cTheoreticalSpectrum::compareBranched(cPeaksList& sortedpeaklist, cBricksDat
 		for (set<int>::iterator it = experimentalpeakmatches[i].begin(); it != experimentalpeakmatches[i].end(); ++it) {
 			if (writedescription) {
 				if (experimentalpeaks[i].description.compare("") != 0) {
-					experimentalpeaks[i].description += ", ";
+					experimentalpeaks[i].description += ",";
 				}
 				experimentalpeaks[i].description += theoreticalpeaks[*it].description.substr(0,theoreticalpeaks[*it].description.find(':'));
-				experimentalpeaks[i].matchedrotations.push_back(theoreticalpeaks[*it].rotationid);
 				theoreticalpeaks[*it].matchdescription += ", measured mass " + to_string((long double)experimentalpeaks[i].mzratio) + " matched with " + to_string((long double)ppmError(experimentalpeaks[i].mzratio, theoreticalpeaks[*it].mzratio)) + " ppm error";
 			}
 
@@ -510,7 +511,7 @@ int cTheoreticalSpectrum::compareBranched(cPeaksList& sortedpeaklist, cBricksDat
 		visualcoverage.clear();
 		visualSeries tempseries;
 
-		coveragebyseries = "T-Permutations:<br/>\n";
+		coveragebyseries = "Linearized sequences:<br/>\n";
 		for (int i = 0; i < (int)trotations.size(); i++) {
 			coveragebyseries += to_string(i + 1) + " ~ " + bricksdatabasewithcombinations.getAcronymNameOfTPeptide(trotations[i].tcomposition, false) + "<br/>\n";
 		}
@@ -661,10 +662,9 @@ int cTheoreticalSpectrum::compareLinear(cPeaksList& sortedpeaklist, cBricksDatab
 		for (set<int>::iterator it = experimentalpeakmatches[i].begin(); it != experimentalpeakmatches[i].end(); ++it) {
 			if (writedescription) {
 				if (experimentalpeaks[i].description.compare("") != 0) {
-					experimentalpeaks[i].description += ", ";
+					experimentalpeaks[i].description += ",";
 				}
 				experimentalpeaks[i].description += theoreticalpeaks[*it].description.substr(0,theoreticalpeaks[*it].description.find(':'));
-				experimentalpeaks[i].matchedrotations.push_back(theoreticalpeaks[*it].rotationid);
 				theoreticalpeaks[*it].matchdescription += ", measured mass " + to_string((long double)experimentalpeaks[i].mzratio) + " matched with " + to_string((long double)ppmError(experimentalpeaks[i].mzratio, theoreticalpeaks[*it].mzratio)) + " ppm error";
 			}
 
@@ -954,10 +954,9 @@ int cTheoreticalSpectrum::compareCyclic(cPeaksList& sortedpeaklist, cBricksDatab
 		for (set<int>::iterator it = experimentalpeakmatches[i].begin(); it != experimentalpeakmatches[i].end(); ++it) {
 			if (writedescription) {
 				if (experimentalpeaks[i].description.compare("") != 0) {
-					experimentalpeaks[i].description += ", ";
+					experimentalpeaks[i].description += ",";
 				}
 				experimentalpeaks[i].description += theoreticalpeaks[*it].description.substr(0,theoreticalpeaks[*it].description.find(':'));
-				experimentalpeaks[i].matchedrotations.push_back(theoreticalpeaks[*it].rotationid);
 				theoreticalpeaks[*it].matchdescription += ", measured mass " + to_string((long double)experimentalpeaks[i].mzratio) + " matched with " + to_string((long double)ppmError(experimentalpeaks[i].mzratio, theoreticalpeaks[*it].mzratio)) + " ppm error";
 			}
 
@@ -1022,16 +1021,8 @@ int cTheoreticalSpectrum::compareCyclic(cPeaksList& sortedpeaklist, cBricksDatab
 		visualSeries tempseries;
 		visualcoverage.clear();
 
-		coveragebyseries = "Rotations:<br/>\n";
+		coveragebyseries = "Linearized sequences from all ring break up points:<br/>\n";
 		for (int i = 0; i < (int)rotations.size(); i++) {
-			/*
-			if (i == 0) {
-				coveragebyseries += "&gt;&gt;&gt;<br/>\n";
-			}
-			if (i == r) {
-				coveragebyseries += "<br/>\n&lt;&lt;&lt;<br/>\n";
-			}
-			*/
 			if (i == r) {
 				coveragebyseries += "<br/>\n";
 			}
@@ -1056,7 +1047,7 @@ int cTheoreticalSpectrum::compareCyclic(cPeaksList& sortedpeaklist, cBricksDatab
 					}
 				}
 				coveragebyseries += "<br/>\n";
-				visualcoverage.push_back(tempseries); // comment
+				visualcoverage.push_back(tempseries);
 			}
 		}
 
@@ -1065,19 +1056,11 @@ int cTheoreticalSpectrum::compareCyclic(cPeaksList& sortedpeaklist, cBricksDatab
 
 	vector<int> mask; // peaks converted to letters
 	vector<int> tempvector;
-	visualSeries visualtempseries;
 	for (int k = 0; k < r; k++) {
 		mask.push_back(0);
 		tempvector.push_back(0);
-		if (writedescription) {
-			visualtempseries.series.push_back(0);
-		}
 	}
 
-	if (writedescription) {
-		//visualcoverage.clear(); // uncomment
-	}
-		
 	for (int i = 0; i < (int)series.size(); i++) {
 
 		for (int j = 0; j < (int)parameters->fragmentionsfortheoreticalspectra.size(); j++) {
@@ -1102,18 +1085,9 @@ int cTheoreticalSpectrum::compareCyclic(cPeaksList& sortedpeaklist, cBricksDatab
 				}			
 			}
 
-			if (writedescription) {
-				visualtempseries.name = to_string(splittingsites[i].first + 1) + "-" + to_string(splittingsites[i].second + 1) + "_";
-				visualtempseries.name += parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[j]].name;
-			}
-			
 			if (i < r) {			
 				for (int k = 0; k < r; k++) {
 					mask[k] += tempvector[(k + r - i) % r];
-
-					if (writedescription) {
-						visualtempseries.series[k] = tempvector[(k + r - i) % r];
-					}
 				}		
 			}
 			else {
@@ -1121,15 +1095,7 @@ int cTheoreticalSpectrum::compareCyclic(cPeaksList& sortedpeaklist, cBricksDatab
 
 				for (int k = 0; k < r; k++) {
 					mask[k] += tempvector[(k + i) % r];
-
-					if (writedescription) {
-						visualtempseries.series[k] = tempvector[(k + i) % r];
-					}
 				}
-			}
-
-			if (writedescription) {
-				//visualcoverage.push_back(visualtempseries); // uncomment
 			}
 
 		}
@@ -1152,23 +1118,35 @@ int cTheoreticalSpectrum::compareLasso(cPeaksList& sortedpeaklist, cBricksDataba
 	vector<splitSite> splittingsites;
 	int theoreticalpeaksrealsize = 0;
 	vector<string> stringcomposition;
-
-
 	vector<cCandidate> lassorotations;
+
+
+	// normalize the candidate
+	candidate.getLassoRotations(lassorotations, false);
+	for (int i = 0; i < (int)lassorotations.size(); i++) {
+		if (lassorotations[i].getBranchEnd() == getNumberOfBricks(candidate.getComposition()) - 1) {
+			vector<string> v;
+			v.push_back(lassorotations[i].getComposition());
+			candidate.setCandidate(v, candidate.getPath(), candidate.getStartModifID(), candidate.getEndModifID(), candidate.getMiddleModifID(), lassorotations[i].getBranchStart(), lassorotations[i].getBranchEnd());
+			break;
+		}
+	}
+
+
+	// get lasso rotations
 	candidate.getLassoRotations(lassorotations, true);
 
-
-	int r = (int)lassorotations.size() / 2;
-	validposition = -1;
-	reversevalidposition = -1;
-
-
+	// get T-permutations of lasso rotations
 	vector<vector<TRotationInfo> > trotationsoflassorotations;
 	trotationsoflassorotations.resize(lassorotations.size());
 	for (int i = 0; i < (int)lassorotations.size(); i++) {
 		lassorotations[i].getPermutationsOfBranches(trotationsoflassorotations[i]);
 	}
 
+
+	int r = (int)lassorotations.size() / 2;
+	validposition = -1;
+	reversevalidposition = -1;
 
 	try {
 		bool stop = true;
@@ -1385,10 +1363,9 @@ int cTheoreticalSpectrum::compareLasso(cPeaksList& sortedpeaklist, cBricksDataba
 		for (set<int>::iterator it = experimentalpeakmatches[i].begin(); it != experimentalpeakmatches[i].end(); ++it) {
 			if (writedescription) {
 				if (experimentalpeaks[i].description.compare("") != 0) {
-					experimentalpeaks[i].description += ", ";
+					experimentalpeaks[i].description += ",";
 				}
 				experimentalpeaks[i].description += theoreticalpeaks[*it].description.substr(0,theoreticalpeaks[*it].description.find(':'));
-				experimentalpeaks[i].matchedrotations.push_back(theoreticalpeaks[*it].rotationid);
 				theoreticalpeaks[*it].matchdescription += ", measured mass " + to_string((long double)experimentalpeaks[i].mzratio) + " matched with " + to_string((long double)ppmError(experimentalpeaks[i].mzratio, theoreticalpeaks[*it].mzratio)) + " ppm error";
 			}
 
@@ -1399,14 +1376,11 @@ int cTheoreticalSpectrum::compareLasso(cPeaksList& sortedpeaklist, cBricksDataba
 
 	if (writedescription) {
 
-		coveragebyseries = "T-Permutations of lasso rotations:<br/>\n";
+		visualSeries tempseries;
+		visualcoverage.clear();
+
+		coveragebyseries = "Linearized sequences from all ring break up points:<br/>\n";
 		for (int i = 0; i < (int)lassorotations.size(); i++) {
-			if (i == 0) {
-				coveragebyseries += "&gt;&gt;&gt;<br/>\n";
-			}
-			if (i == r) {
-				coveragebyseries += "&lt;&lt;&lt;<br/>\n";
-			}
 			for (int j = 0; j < (int)trotationsoflassorotations[i].size(); j++) {
 				coveragebyseries += to_string(splittingsites[i].first + 1) + "-" + to_string(splittingsites[i].second + 1) + "_";
 				coveragebyseries += to_string(j + 1) + " ~ ";
@@ -1420,16 +1394,19 @@ int cTheoreticalSpectrum::compareLasso(cPeaksList& sortedpeaklist, cBricksDataba
 		for (int i = 0; i < (int)lassorotations.size(); i++) {
 			for (int j = 0; j < (int)series[i].size(); j++) {
 				for (int k = 0; k < (int)parameters->fragmentionsfortheoreticalspectra.size(); k++) {
-					coveragebyseries += to_string(splittingsites[i].first + 1) + "-" + to_string(splittingsites[i].second + 1) + "_";
-					coveragebyseries += to_string(j + 1) + "_";
-					coveragebyseries += parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[k]].name + "  ";
+					tempseries.name = to_string(splittingsites[i].first + 1) + "-" + to_string(splittingsites[i].second + 1) + "_";
+					tempseries.name += to_string(j + 1) + "_" + parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[k]].name;
+					coveragebyseries += tempseries.name + "  ";
+					tempseries.series.clear();
 					for (int m = 0; m < series[i][j][parameters->fragmentionsfortheoreticalspectra[k]].size() - 1; m++) {
 						coveragebyseries += to_string(series[i][j][parameters->fragmentionsfortheoreticalspectra[k]][m]);
+						tempseries.series.push_back(series[i][j][parameters->fragmentionsfortheoreticalspectra[k]][m]);
 						if (m < series[i][j][parameters->fragmentionsfortheoreticalspectra[k]].size() - 2) {
 							coveragebyseries += " ";
 						}
 					}
 					coveragebyseries += "<br/>\n";
+					visualcoverage.push_back(tempseries);
 				}
 			}
 		}
@@ -1562,10 +1539,9 @@ int cTheoreticalSpectrum::compareLinearPolysaccharide(cPeaksList& sortedpeaklist
 		for (set<int>::iterator it = experimentalpeakmatches[i].begin(); it != experimentalpeakmatches[i].end(); ++it) {
 			if (writedescription) {
 				if (experimentalpeaks[i].description.compare("") != 0) {
-					experimentalpeaks[i].description += ", ";
+					experimentalpeaks[i].description += ",";
 				}
 				experimentalpeaks[i].description += theoreticalpeaks[*it].description.substr(0,theoreticalpeaks[*it].description.find(':'));
-				experimentalpeaks[i].matchedrotations.push_back(theoreticalpeaks[*it].rotationid);
 				theoreticalpeaks[*it].matchdescription += ", measured mass " + to_string((long double)experimentalpeaks[i].mzratio) + " matched with " + to_string((long double)ppmError(experimentalpeaks[i].mzratio, theoreticalpeaks[*it].mzratio)) + " ppm error";
 			}
 
@@ -2121,8 +2097,50 @@ void cTheoreticalSpectrum::setAcronyms(cBricksDatabase& bricksdatabase) {
 }
 
 
+void cTheoreticalSpectrum::setBackboneAcronyms(cBricksDatabase& bricksdatabase) {
+	vector<int> bricks;
+	cBrick b;
+	b.clear();
+	b.setComposition(candidate.getComposition(), false);
+	b.explodeToIntComposition(bricks);
+
+	backboneacronyms.clear();
+	for (int i = 0; i < (int)bricks.size(); i++) {
+		if ((candidate.getBranchStart() >= 0) && (candidate.getBranchEnd() >= 0) && ((i <= candidate.getBranchStart()) || (i > candidate.getBranchEnd()))) {
+			backboneacronyms.push_back(bricksdatabase[bricks[i] - 1].getAcronymsAsString());
+		}
+	}
+}
+
+
+void cTheoreticalSpectrum::setBranchAcronyms(cBricksDatabase& bricksdatabase) {
+	vector<int> bricks;
+	cBrick b;
+	b.clear();
+	b.setComposition(candidate.getComposition(), false);
+	b.explodeToIntComposition(bricks);
+
+	branchacronyms.clear();
+	for (int i = 0; i < (int)bricks.size(); i++) {
+		if ((candidate.getBranchStart() >= 0) && (candidate.getBranchEnd() >= 0) && (i > candidate.getBranchStart()) && (i <= candidate.getBranchEnd())) {
+			branchacronyms.push_back(bricksdatabase[bricks[i] - 1].getAcronymsAsString());
+		}
+	}
+}
+
+
 vector<string>& cTheoreticalSpectrum::getAcronyms() {
 	return acronyms;
+}
+
+
+vector<string>& cTheoreticalSpectrum::getBackboneAcronyms() {
+	return backboneacronyms;
+}
+
+
+vector<string>& cTheoreticalSpectrum::getBranchAcronyms() {
+	return branchacronyms;
 }
 
 
@@ -2246,6 +2264,22 @@ void cTheoreticalSpectrum::store(ofstream& os) {
 		os.write(acronyms[i].c_str(), acronyms[i].size());
 	}
 
+	size = (int)backboneacronyms.size();
+	os.write((char *)&size, sizeof(int));
+	for (int i = 0; i < (int)backboneacronyms.size(); i++) {
+		size = (int)backboneacronyms[i].size();
+		os.write((char *)&size, sizeof(int));
+		os.write(backboneacronyms[i].c_str(), backboneacronyms[i].size());
+	}
+
+	size = (int)branchacronyms.size();
+	os.write((char *)&size, sizeof(int));
+	for (int i = 0; i < (int)branchacronyms.size(); i++) {
+		size = (int)branchacronyms[i].size();
+		os.write((char *)&size, sizeof(int));
+		os.write(branchacronyms[i].c_str(), branchacronyms[i].size());
+	}
+
 	size = (int)path.size();
 	os.write((char *)&size, sizeof(int));
 	os.write(path.c_str(), path.size());
@@ -2312,6 +2346,22 @@ void cTheoreticalSpectrum::load(ifstream& is) {
 		is.read((char *)&size, sizeof(int));
 		acronyms[i].resize(size);
 		is.read(&acronyms[i][0], acronyms[i].size());
+	}
+
+	is.read((char *)&size, sizeof(int));
+	backboneacronyms.resize(size);
+	for (int i = 0; i < (int)backboneacronyms.size(); i++) {
+		is.read((char *)&size, sizeof(int));
+		backboneacronyms[i].resize(size);
+		is.read(&backboneacronyms[i][0], backboneacronyms[i].size());
+	}
+
+	is.read((char *)&size, sizeof(int));
+	branchacronyms.resize(size);
+	for (int i = 0; i < (int)branchacronyms.size(); i++) {
+		is.read((char *)&size, sizeof(int));
+		branchacronyms[i].resize(size);
+		is.read(&branchacronyms[i][0], branchacronyms[i].size());
 	}
 
 	is.read((char *)&size, sizeof(int));

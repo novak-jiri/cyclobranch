@@ -115,6 +115,8 @@ class cTheoreticalSpectrum {
 	string realpeptidename;
 	string acronympeptidename;
 	vector<string> acronyms;
+	vector<string> backboneacronyms;
+	vector<string> branchacronyms;
 	string path;
 
 	// remove false hits, i.e., b-H2O without existing b-ion
@@ -451,10 +453,38 @@ public:
 
 
 	/**
+		\brief Set a vector of acronyms corresponding to a backbone of a peptide sequence candidate.
+		\param bricksdatabase a database of building blocks
+	*/ 
+	void setBackboneAcronyms(cBricksDatabase& bricksdatabase);
+
+
+	/**
+		\brief Set a vector of acronyms corresponding to a branch of a peptide sequence candidate.
+		\param bricksdatabase a database of building blocks
+	*/ 
+	void setBranchAcronyms(cBricksDatabase& bricksdatabase);
+
+
+	/**
 		\brief Get a vector of acronyms corresponding to a peptide sequence candidate.
 		\retval vector<string> a vector of acronyms
 	*/ 
 	vector<string>& getAcronyms();
+
+
+	/**
+		\brief Get a vector of acronyms corresponding to a backbone of a peptide sequence candidate.
+		\retval vector<string> a vector of acronyms
+	*/ 
+	vector<string>& getBackboneAcronyms();
+
+
+	/**
+		\brief Get a vector of acronyms corresponding to a branch of a peptide sequence candidate.
+		\retval vector<string> a vector of acronyms
+	*/ 
+	vector<string>& getBranchAcronyms();
 
 
 	/**

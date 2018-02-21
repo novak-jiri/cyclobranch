@@ -14,9 +14,8 @@
 #include <QLineEdit>
 #include <QPushButton>
 
-#include "core/cFragmentIons.h"
+#include "core/cSummaryFormula.h"
 #include "core/cParameters.h"
-
 #include "gui/cFragmentIonsListWidget.h"
 
 

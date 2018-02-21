@@ -487,38 +487,6 @@ int cCandidate::getBranchEnd() {
 }
 
 
-void cCandidate::getBackboneAcronyms(cBricksDatabase& bricksdatabase, vector<string>& acronyms) {
-	vector<int> bricks;
-	cBrick b;
-	b.clear();
-	b.setComposition(getComposition(), false);
-	b.explodeToIntComposition(bricks);
-
-	acronyms.clear();
-	for (int i = 0; i < (int)bricks.size(); i++) {
-		if ((branchstart >= 0) && (branchend >= 0) && ((i <= branchstart) || (i > branchend))) {
-			acronyms.push_back(bricksdatabase[bricks[i] - 1].getAcronymsAsString());
-		}
-	}
-}
-
-
-void cCandidate::getBranchAcronyms(cBricksDatabase& bricksdatabase, vector<string>& acronyms) {
-	vector<int> bricks;
-	cBrick b;
-	b.clear();
-	b.setComposition(getComposition(), false);
-	b.explodeToIntComposition(bricks);
-
-	acronyms.clear();
-	for (int i = 0; i < (int)bricks.size(); i++) {
-		if ((branchstart >= 0) && (branchend >= 0) && (i > branchstart) && (i <= branchend)) {
-			acronyms.push_back(bricksdatabase[bricks[i] - 1].getAcronymsAsString());
-		}
-	}
-}
-
-
 void cCandidate::getPermutationsOfBranches(vector<TRotationInfo>& tpermutations) {
 	tpermutations.resize(6);
 	for (int i = 0; i < (int)tpermutations.size(); i++) {
@@ -738,7 +706,6 @@ double cCandidate::getPrecursorMass(cBricksDatabase& brickdatabasewithcombinatio
 	}
 	
 	return mass;
-
 }
 
 
@@ -903,6 +870,52 @@ void cCandidate::getLassoRotations(vector<cCandidate>& lassorotations, bool incl
 	if (includerevertedrotations) {
 		getPartialLassoRotations(getRevertedTComposition(false), lassorotations, numberofinternalbricks - branchend - 1, numberofinternalbricks - branchstart - 1);
 	}
+}
+
+
+string cCandidate::getSummaryFormula(cParameters& parameters) {
+	cBrick b;
+	vector<int> bricks;
+	b.setComposition(internalcomposition, false);
+	b.explodeToIntComposition(bricks);
+	
+	cSummaryFormula formula;
+	string summary;
+
+	switch (parameters.peptidetype)
+	{
+	case linear:
+	case linearpolysaccharide:
+		summary = "H2O";
+		formula.addFormula(summary);
+		formula.addFormula(parameters.searchedmodifications[startmodifID].summary);
+		formula.addFormula(parameters.searchedmodifications[endmodifID].summary);
+		break;
+	case cyclic: 
+		break;
+	case branched:
+		summary = "H2O";
+		formula.addFormula(summary);
+		formula.addFormula(parameters.searchedmodifications[startmodifID].summary);
+		formula.addFormula(parameters.searchedmodifications[endmodifID].summary);
+		formula.addFormula(parameters.searchedmodifications[middlemodifID].summary);
+		break;
+	case lasso:
+		formula.addFormula(parameters.searchedmodifications[middlemodifID].summary);
+		break;
+	}
+
+	bool partial = false;
+	for (int i = 0; i < (int)bricks.size(); i++) {
+		if (bricks[i] - 1 < (int)parameters.bricksdatabase.size()) {
+			formula.addFormula(parameters.bricksdatabase[bricks[i] - 1].getSummary());
+		}
+		else {
+			partial = true;
+		}
+	}
+	
+	return partial?formula.getFormula() + " (partial)":formula.getFormula();
 }
 
 

@@ -90,12 +90,6 @@ struct cPeak {
 
 		
 	/**
-		\brief Vector of ids of rotations matched by an experimental peak.
-	*/
-	vector<int> matchedrotations;
-
-	
-	/**
 		\brief An order of a peak in a series (e.g., B_5 in a B series).
 	*/ 
 	int seriesid;
@@ -136,14 +130,6 @@ struct cPeak {
 		\retval bool true when the structure is empty
 	*/
 	bool empty();
-
-
-	/**
-		\brief Test whether the peak matches a rotation of a cyclic peptide.
-		\param rotationid id of a rotation of a cyclic peptide
-		\retval bool true when the peak matches the rotation
-	*/
-	bool hasMatchedRotation(int rotationid);
 
 
 	/**

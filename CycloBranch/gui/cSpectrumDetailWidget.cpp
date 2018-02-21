@@ -16,6 +16,7 @@
 
 cSpectrumDetailWidget::cSpectrumDetailWidget() {
 	rotation = 0;
+	trotation = 0;
 	parameters = 0;
 
 	preparedToShow = false;
@@ -25,6 +26,7 @@ cSpectrumDetailWidget::cSpectrumDetailWidget() {
 
 cSpectrumDetailWidget::cSpectrumDetailWidget(const cSpectrumDetailWidget& sd) {
 	rotation = 0;
+	trotation = 0;
 	parameters = sd.parameters;
 
 	preparedToShow = false;
@@ -109,6 +111,10 @@ cSpectrumDetailWidget::~cSpectrumDetailWidget() {
 			delete rotation;
 		}
 
+		if (trotation) {
+			delete trotation;
+		}
+
 		delete formlayout;
 		delete formwidget;
 
@@ -125,6 +131,7 @@ cSpectrumDetailWidget::~cSpectrumDetailWidget() {
 				delete branchedwidget;
 				break;
 			case lasso:
+				delete lassowidget;
 				break;
 			case linearpolysaccharide:
 				break;
@@ -173,6 +180,7 @@ void cSpectrumDetailWidget::prepareToShow(peptideType peptidetype) {
 			branchedwidget = new cBranchedWidget();
 			break;
 		case lasso:
+			lassowidget = new cLassoWidget();
 			break;
 		case linearpolysaccharide:
 			break;
@@ -261,22 +269,68 @@ void cSpectrumDetailWidget::prepareToShow(peptideType peptidetype) {
 			rotation->addItem(tr("all"));
 
 			string s;
-			for (int i = 0; i < 2*r; i++) {
-				s = theoreticalspectrum->getVisualCoverage()[i*hint].name.substr(0, theoreticalspectrum->getVisualCoverage()[i*hint].name.rfind('_'));
-				/*
-				if (i < r) {
-					s += " >>>";
+			if (theoreticalspectrum->getVisualCoverage().size() > 0) {
+				for (int i = 0; i < 2*r; i++) {
+					s = theoreticalspectrum->getVisualCoverage()[i*hint].name.substr(0, theoreticalspectrum->getVisualCoverage()[i*hint].name.rfind('_'));
+					rotation->addItem(tr(s.c_str()));
 				}
-				else {
-					s += " <<<";
-				}
-				*/
-				rotation->addItem(tr(s.c_str()));
 			}
 
 			connect(rotation, SIGNAL(currentIndexChanged(int)), graphicalspectrum, SLOT(rotationChanged(int)));
+			connect(rotation, SIGNAL(currentIndexChanged(QString)), graphicalspectrum, SLOT(rotationChanged(QString)));
 			connect(rotation, SIGNAL(currentIndexChanged(int)), cyclicwidget, SLOT(rotationChanged(int)));
-			formlayout->addRow(tr("Show matched series: "), rotation);
+			formlayout->addRow(tr("Ring break up point: "), rotation);
+		}
+
+		// branched
+		if (parameters && (parameters->peptidetype == branched)) {
+			trotation = new QComboBox();
+			trotation->addItem(tr("all"));
+			trotation->addItem(tr("1 (left-to-right)"));
+			trotation->addItem(tr("2 (top-to-right)"));
+			trotation->addItem(tr("3 (right-to-left)"));
+			trotation->addItem(tr("4 (left-to-top)"));
+			trotation->addItem(tr("5 (top-to-left)"));
+			trotation->addItem(tr("6 (right-to-top)"));
+
+			connect(trotation, SIGNAL(currentIndexChanged(int)), graphicalspectrum, SLOT(trotationChanged(int)));
+			connect(trotation, SIGNAL(currentIndexChanged(int)), branchedwidget, SLOT(trotationChanged(int)));
+			formlayout->addRow(tr("Linearized sequence: "), trotation);
+		}
+
+		// lasso
+		if (parameters && theoreticalspectrum && (parameters->peptidetype == lasso)) {
+			int r = (int)theoreticalspectrum->getAcronyms().size() - (int)theoreticalspectrum->getCandidate().getBranchSize();
+			int hint = (int)theoreticalspectrum->getVisualCoverage().size()/(2*r);
+
+			rotation = new QComboBox();
+			rotation->addItem(tr("all"));
+
+			string s;
+			if (theoreticalspectrum->getVisualCoverage().size() > 0) {
+				for (int i = 0; i < 2*r; i++) {
+					s = theoreticalspectrum->getVisualCoverage()[i*hint].name.substr(0, theoreticalspectrum->getVisualCoverage()[i*hint].name.find('_'));
+					rotation->addItem(tr(s.c_str()));
+				}
+			}
+
+			connect(rotation, SIGNAL(currentIndexChanged(int)), graphicalspectrum, SLOT(rotationChanged(int)));
+			connect(rotation, SIGNAL(currentIndexChanged(QString)), graphicalspectrum, SLOT(rotationChanged(QString)));
+			connect(rotation, SIGNAL(currentIndexChanged(int)), lassowidget, SLOT(rotationChanged(int)));
+			formlayout->addRow(tr("Ring break up point: "), rotation);
+
+			trotation = new QComboBox();
+			trotation->addItem(tr("all"));
+			trotation->addItem(tr("1 (left-to-right)"));
+			trotation->addItem(tr("2 (top-to-right)"));
+			trotation->addItem(tr("3 (right-to-left)"));
+			trotation->addItem(tr("4 (left-to-top)"));
+			trotation->addItem(tr("5 (top-to-left)"));
+			trotation->addItem(tr("6 (right-to-top)"));
+
+			connect(trotation, SIGNAL(currentIndexChanged(int)), graphicalspectrum, SLOT(trotationChanged(int)));
+			connect(trotation, SIGNAL(currentIndexChanged(int)), lassowidget, SLOT(trotationChanged(int)));
+			formlayout->addRow(tr("Linearized sequence: "), trotation);
 		}
 
 		formwidget = new QWidget();
@@ -314,6 +368,13 @@ void cSpectrumDetailWidget::prepareToShow(peptideType peptidetype) {
 			vsplitter2->setStretchFactor(2, 5);
 			break;
 		case lasso:
+			vsplitter2->addWidget(formwidget);
+			vsplitter2->addWidget(lassowidget);
+			vsplitter2->addWidget(textedit);
+			vsplitter2->setStretchFactor(0, 2);
+			vsplitter2->setStretchFactor(1, 3);
+			vsplitter2->setStretchFactor(2, 5);
+			break;
 		case linearpolysaccharide:
 			vsplitter2->addWidget(formwidget);
 			vsplitter2->addWidget(textedit);
@@ -335,7 +396,7 @@ void cSpectrumDetailWidget::prepareToShow(peptideType peptidetype) {
 
 		resize(1280, 700);
 
-		if (theoreticalspectrum) {
+		if (parameters && theoreticalspectrum) {
 
 			switch (peptidetype)
 			{
@@ -349,6 +410,7 @@ void cSpectrumDetailWidget::prepareToShow(peptideType peptidetype) {
 				branchedwidget->initialize(parameters, theoreticalspectrum);
 				break;
 			case lasso:
+				lassowidget->initialize(parameters, theoreticalspectrum);
 				break;
 			case linearpolysaccharide:
 				break;
@@ -356,7 +418,7 @@ void cSpectrumDetailWidget::prepareToShow(peptideType peptidetype) {
 				break;
 			}
 			
-			graphicalspectrum->setTheoreticalSpectrum(theoreticalspectrum);
+			graphicalspectrum->initialize(parameters, theoreticalspectrum);
 
 			textedit->setHtml(theoreticalspectrum->getCoverageBySeries().c_str());
 			textbrowser->setHtml(getDetailsAsHTMLString().c_str());

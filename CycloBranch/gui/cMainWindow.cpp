@@ -125,7 +125,7 @@ cMainWindow::cMainWindow() {
 
 	setWindowTitle(appname);
 
-	resultsbasecolumncount = 7;
+	resultsbasecolumncount = 8;
 	resultsspecificcolumncount = 0;
 
 	resultsDetails.clear();
@@ -243,42 +243,45 @@ void cMainWindow::sendTheoreticalSpectrum(cTheoreticalSpectrum theoreticalspectr
 	results->setItem(row, 2, new QTableWidgetItem(stripHTML(theoreticalspectrum.getAcronymPeptideNameWithHTMLReferences()).c_str()));
 
 	results->setItem(row, 3, new QTableWidgetItem());
-	results->item(row, 3)->setData(Qt::DisplayRole, getNumberOfBricks(theoreticalspectrum.getCandidate().getComposition()));
+	results->item(row, 3)->setData(Qt::DisplayRole, theoreticalspectrum.getCandidate().getSummaryFormula(parameters).c_str());
+
+	results->setItem(row, 4, new QTableWidgetItem());
+	results->item(row, 4)->setData(Qt::DisplayRole, getNumberOfBricks(theoreticalspectrum.getCandidate().getComposition()));
 
 	switch (parameters.peptidetype)
 	{
 	case linear:
-		results->setItem(row, 4, new QTableWidgetItem(parameters.searchedmodifications[theoreticalspectrum.getCandidate().getStartModifID()].name.c_str()));
-		results->setItem(row, 5, new QTableWidgetItem(parameters.searchedmodifications[theoreticalspectrum.getCandidate().getEndModifID()].name.c_str()));
-		break;
-	case branched:
-		results->setItem(row, 4, new QTableWidgetItem(parameters.searchedmodifications[theoreticalspectrum.getCandidate().getStartModifID()].name.c_str()));
-		results->setItem(row, 5, new QTableWidgetItem(parameters.searchedmodifications[theoreticalspectrum.getCandidate().getMiddleModifID()].name.c_str()));
+		results->setItem(row, 5, new QTableWidgetItem(parameters.searchedmodifications[theoreticalspectrum.getCandidate().getStartModifID()].name.c_str()));
 		results->setItem(row, 6, new QTableWidgetItem(parameters.searchedmodifications[theoreticalspectrum.getCandidate().getEndModifID()].name.c_str()));
 		break;
+	case branched:
+		results->setItem(row, 5, new QTableWidgetItem(parameters.searchedmodifications[theoreticalspectrum.getCandidate().getStartModifID()].name.c_str()));
+		results->setItem(row, 6, new QTableWidgetItem(parameters.searchedmodifications[theoreticalspectrum.getCandidate().getMiddleModifID()].name.c_str()));
+		results->setItem(row, 7, new QTableWidgetItem(parameters.searchedmodifications[theoreticalspectrum.getCandidate().getEndModifID()].name.c_str()));
+		break;
 	case cyclic:
-		results->setItem(row, 4, new QTableWidgetItem());
-		results->item(row, 4)->setData(Qt::DisplayRole, theoreticalspectrum.getNumberOfMatchedBricks());	
+		results->setItem(row, 5, new QTableWidgetItem());
+		results->item(row, 5)->setData(Qt::DisplayRole, theoreticalspectrum.getNumberOfMatchedBricks());	
 		break;
 	case lasso:
-		results->setItem(row, 4, new QTableWidgetItem(parameters.searchedmodifications[theoreticalspectrum.getCandidate().getMiddleModifID()].name.c_str()));
+		results->setItem(row, 5, new QTableWidgetItem(parameters.searchedmodifications[theoreticalspectrum.getCandidate().getMiddleModifID()].name.c_str()));
 		break;
 	case linearpolysaccharide:
-		results->setItem(row, 4, new QTableWidgetItem(parameters.searchedmodifications[theoreticalspectrum.getCandidate().getStartModifID()].name.c_str()));
-		results->setItem(row, 5, new QTableWidgetItem(parameters.searchedmodifications[theoreticalspectrum.getCandidate().getEndModifID()].name.c_str()));
+		results->setItem(row, 5, new QTableWidgetItem(parameters.searchedmodifications[theoreticalspectrum.getCandidate().getStartModifID()].name.c_str()));
+		results->setItem(row, 6, new QTableWidgetItem(parameters.searchedmodifications[theoreticalspectrum.getCandidate().getEndModifID()].name.c_str()));
 		break;
 	default:
 		break;
 	}
 
-	results->setItem(row, 4 + resultsspecificcolumncount, new QTableWidgetItem());
-	results->item(row, 4 + resultsspecificcolumncount)->setData(Qt::DisplayRole, theoreticalspectrum.getNumberOfMatchedPeaks());
-
 	results->setItem(row, 5 + resultsspecificcolumncount, new QTableWidgetItem());
-	results->item(row, 5 + resultsspecificcolumncount)->setData(Qt::DisplayRole, theoreticalspectrum.getRatioOfMatchedPeaks()*100);
+	results->item(row, 5 + resultsspecificcolumncount)->setData(Qt::DisplayRole, theoreticalspectrum.getNumberOfMatchedPeaks());
 
 	results->setItem(row, 6 + resultsspecificcolumncount, new QTableWidgetItem());
-	results->item(row, 6 + resultsspecificcolumncount)->setData(Qt::DisplayRole, theoreticalspectrum.getWeightedIntensityScore());
+	results->item(row, 6 + resultsspecificcolumncount)->setData(Qt::DisplayRole, theoreticalspectrum.getRatioOfMatchedPeaks()*100);
+
+	results->setItem(row, 7 + resultsspecificcolumncount, new QTableWidgetItem());
+	results->item(row, 7 + resultsspecificcolumncount)->setData(Qt::DisplayRole, theoreticalspectrum.getWeightedIntensityScore());
 
 	for (int i = 0; i < (int)parameters.fragmentionsfortheoreticalspectra.size(); i++) {
 		results->setItem(row, resultsbasecolumncount + resultsspecificcolumncount + i, new QTableWidgetItem());
@@ -334,36 +337,37 @@ void cMainWindow::prepareColumns() {
 	results->setHorizontalHeaderItem(0, new QTableWidgetItem("*"));
 	results->setHorizontalHeaderItem(1, new QTableWidgetItem("Result ID"));
 	results->setHorizontalHeaderItem(2, new QTableWidgetItem("Peptide Sequence"));
-	results->setHorizontalHeaderItem(3, new QTableWidgetItem("Number of Bricks"));
+	results->setHorizontalHeaderItem(3, new QTableWidgetItem("Neutral Formula"));
+	results->setHorizontalHeaderItem(4, new QTableWidgetItem("Number of Bricks"));
 
 	switch (parameters.peptidetype)
 	{
 	case linear:
-		results->setHorizontalHeaderItem(4, new QTableWidgetItem("N-terminal Modification"));
-		results->setHorizontalHeaderItem(5, new QTableWidgetItem("C-terminal Modification"));
-		break;
-	case branched:
-		results->setHorizontalHeaderItem(4, new QTableWidgetItem("N-terminal Modification"));
-		results->setHorizontalHeaderItem(5, new QTableWidgetItem("T-Modification"));
+		results->setHorizontalHeaderItem(5, new QTableWidgetItem("N-terminal Modification"));
 		results->setHorizontalHeaderItem(6, new QTableWidgetItem("C-terminal Modification"));
 		break;
+	case branched:
+		results->setHorizontalHeaderItem(5, new QTableWidgetItem("N-terminal Modification"));
+		results->setHorizontalHeaderItem(6, new QTableWidgetItem("Branch Modification"));
+		results->setHorizontalHeaderItem(7, new QTableWidgetItem("C-terminal Modification"));
+		break;
 	case cyclic:
-		results->setHorizontalHeaderItem(4, new QTableWidgetItem("Matched Bricks"));
+		results->setHorizontalHeaderItem(5, new QTableWidgetItem("Matched Bricks"));
 		break;
 	case lasso:
-		results->setHorizontalHeaderItem(4, new QTableWidgetItem("T-Modification"));
+		results->setHorizontalHeaderItem(5, new QTableWidgetItem("Branch Modification"));
 		break;
 	case linearpolysaccharide:
-		results->setHorizontalHeaderItem(4, new QTableWidgetItem("N-terminal Modification"));
-		results->setHorizontalHeaderItem(5, new QTableWidgetItem("C-terminal Modification"));
+		results->setHorizontalHeaderItem(5, new QTableWidgetItem("N-terminal Modification"));
+		results->setHorizontalHeaderItem(6, new QTableWidgetItem("C-terminal Modification"));
 		break;
 	default:
 		break;
 	}
 		
-	results->setHorizontalHeaderItem(4 + resultsspecificcolumncount, new QTableWidgetItem("Matched Peaks"));
-	results->setHorizontalHeaderItem(5 + resultsspecificcolumncount, new QTableWidgetItem("Ratio of Matched Peaks [%]"));
-	results->setHorizontalHeaderItem(6 + resultsspecificcolumncount, new QTableWidgetItem("Sum of Relative Intensities"));
+	results->setHorizontalHeaderItem(5 + resultsspecificcolumncount, new QTableWidgetItem("Matched Peaks"));
+	results->setHorizontalHeaderItem(6 + resultsspecificcolumncount, new QTableWidgetItem("Ratio of Matched Peaks [%]"));
+	results->setHorizontalHeaderItem(7 + resultsspecificcolumncount, new QTableWidgetItem("Sum of Relative Intensities"));
 
 	for (int i = 0; i < (int)parameters.fragmentionsfortheoreticalspectra.size(); i++) {
 		results->setHorizontalHeaderItem(resultsbasecolumncount + resultsspecificcolumncount + i, new QTableWidgetItem(parameters.fragmentdefinitions[(fragmentIonType)parameters.fragmentionsfortheoreticalspectra[i]].name.c_str()));

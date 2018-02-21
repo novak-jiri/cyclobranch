@@ -12,9 +12,9 @@
 #include <string>
 
 #include "core/cParameters.h"
-#include "core/cFragmentIons.h"
 #include "core/cBricksDatabase.h"
 #include "core/cDeNovoGraphNode.h"
+#include "core/cSummaryFormula.h"
 
 class cCandidateSet;
 
@@ -290,22 +290,6 @@ public:
 
 
 	/**
-		\brief Get acronyms of blocks on a backbone of a branched peptide.
-		\param bricksdatabase reference to the database of bricks
-		\param acronyms an output vector of string acronyms
-	*/ 
-	void getBackboneAcronyms(cBricksDatabase& bricksdatabase, vector<string>& acronyms);
-
-
-	/**
-		\brief Get acronyms of blocks on a branch of a branched peptide.
-		\param bricksdatabase reference to the database of bricks
-		\param acronyms an output vector of string acronyms
-	*/ 
-	void getBranchAcronyms(cBricksDatabase& bricksdatabase, vector<string>& acronyms);
-
-
-	/**
 		\brief Get permutations of branches a branched peptide.
 		\param tpermutations reference to an output vector of auxiliary structures where permutations will be stored
 	*/ 
@@ -424,6 +408,14 @@ public:
 		\param includerevertedrotations if true then reverted lasso rotations are also included
 	*/ 
 	void getLassoRotations(vector<cCandidate>& lassorotations, bool includerevertedrotations);
+
+
+	/**
+		\brief Get the summary formula of the peptide sequence candidate.
+		\param parameters a reference to the parameters of the application
+		\retval string the summary formula
+	*/ 
+	string getSummaryFormula(cParameters& parameters);
 
 
 	/**

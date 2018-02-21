@@ -54,6 +54,12 @@ private:
 
 	cParameters* parameters;
 	cTheoreticalSpectrum* theoreticalspectrum;
+	int visibletrotationid;
+
+
+private slots:
+
+	void trotationChanged(int index);
 
 };
 

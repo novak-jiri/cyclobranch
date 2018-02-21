@@ -90,16 +90,6 @@ public:
 };
 
 
-/**
-	\brief Compute mass from summary molecular formula.
-	\param summary reference to a string with summary molecular formula
-	\param error reference to an output boolean value; when the value is true, an error occurred
-	\param errormessage reference to an output string value; filled when an error occurred
-	\retval double mass corresponding to the formula
-*/ 
-double getMassFromResidueSummary(string& summary, bool& error, string& errormessage);
-
-
 const double H2O = 2 * H + O;
 const double NH3 = 3 * H + N;
 const double CO = C + O;

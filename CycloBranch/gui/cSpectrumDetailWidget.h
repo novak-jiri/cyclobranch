@@ -12,6 +12,7 @@
 #include "gui/cLinearWidget.h"
 #include "gui/cCyclicWidget.h"
 #include "gui/cBranchedWidget.h"
+#include "gui/cLassoWidget.h"
 #include "gui/cGraphicalSpectrumWidget.h"
 
 
@@ -114,12 +115,14 @@ private:
 	QCheckBox* hideunmatched;
 	QCheckBox* hidematched;
 	QComboBox* rotation;
+	QComboBox* trotation;
 
 	QTextEdit* textedit;
 	QTextBrowser* textbrowser;
 	cLinearWidget* linearwidget;
 	cCyclicWidget* cyclicwidget;
 	cBranchedWidget* branchedwidget;
+	cLassoWidget* lassowidget;
 
 	QScrollArea* graphicalspectrumscroll;
 	cGraphicalSpectrumWidget* graphicalspectrum;

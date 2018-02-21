@@ -15,6 +15,7 @@
 
 
 #include "core/cBrick.h"
+#include "core/cSummaryFormula.h"
 
 
 using namespace std;

@@ -433,7 +433,7 @@ string cParameters::printToString() {
 	s += "Searched Peptide Sequence: " + originalsearchedsequence + "\n";
 	s += "N-terminal Modification of Searched Peptide Sequence: " + searchedsequenceNtermmodif + "\n";
 	s += "C-terminal Modification of Searched Peptide Sequence: " + searchedsequenceCtermmodif + "\n";
-	s += "T-Modification of Searched Peptide Sequence: " + searchedsequenceTmodif + "\n";
+	s += "Branch Modification of Searched Peptide Sequence: " + searchedsequenceTmodif + "\n";
 
 	s += "\n";
 

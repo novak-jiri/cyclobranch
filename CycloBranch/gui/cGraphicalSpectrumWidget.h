@@ -45,10 +45,11 @@ public:
 
 
 	/**
-		\brief Set the theoretical spectrum.
-		\param theoreticalspectrum pointer to a theoretical spectrum
+		\brief Initialize the widget.
+		\param parameters a pointer to parameters
+		\param theoreticalspectrum a pointer to a theoretical spectrum
 	*/ 
-	void setTheoreticalSpectrum(cTheoreticalSpectrum* theoreticalspectrum);
+	void initialize(cParameters* parameters, cTheoreticalSpectrum* theoreticalspectrum);
 
 
 protected:
@@ -100,6 +101,7 @@ private:
 	void drawVerticalText(QPainter* painter, QString text, int x, int y);
 
 	QWidget* parent;
+	cParameters* parameters;
 	cTheoreticalSpectrum* theoreticalspectrum;
 
 	qreal scale;
@@ -107,6 +109,8 @@ private:
 
 	int origwidth, origheight;
 	int coloredrotationid;
+	string coloredrotationstring;
+	int coloredtrotationid;
 
 	bool hideunmatched;
 	bool hidematched;
@@ -151,6 +155,10 @@ private slots:
 	void resetMZInterval();
 
 	void rotationChanged(int index);
+
+	void trotationChanged(int index);
+
+	void rotationChanged(QString text);
 
 };
 

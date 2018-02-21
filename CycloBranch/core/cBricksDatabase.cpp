@@ -117,6 +117,7 @@ int cBricksDatabase::loadFromPlainTextStream(ifstream &stream, string& errormess
 
 	bool error = false;
 	errormessage = "";
+	cSummaryFormula formula;
 	
 	while (stream.good()) {
 		getline(stream,s);
@@ -182,9 +183,13 @@ int cBricksDatabase::loadFromPlainTextStream(ifstream &stream, string& errormess
 		if (!b.empty()) {
 
 			// calculate mass from the summary
-			b.setMass(getMassFromResidueSummary(b.getSummary(), error, errormessage));
-			
-			if (error) {
+			formula.clear();
+			formula.setFormula(b.getSummary());
+			if (formula.isValid(errormessage)) {
+				b.setMass(formula.getMass());
+			}
+			else {
+				error = true;
 				break;
 			}
 
@@ -195,7 +200,6 @@ int cBricksDatabase::loadFromPlainTextStream(ifstream &stream, string& errormess
 			}
 
 			bricks.push_back(b);
-			//cout << b.getSummary() << " " << b.getMass() << endl;
 		}
 	}
 

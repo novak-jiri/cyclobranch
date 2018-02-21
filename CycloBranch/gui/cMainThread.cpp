@@ -2,7 +2,7 @@
 
 
 QString appname = "CycloBranch";
-QString appversion = "v. 1.0.696 (64-bit)";
+QString appversion = "v. 1.0.739 (64-bit)";
 
 
 cMainThread::cMainThread(cParameters& parameters, bool enablelogwindow, bool enablestdout) {
@@ -145,11 +145,15 @@ void cMainThread::run() {
 		return;	
 	}
 
-	bool error = false;
 	string errormessage = "";
+	cSummaryFormula formula;
 	for (int i = 0; i < (int)parameters.searchedmodifications.size(); i++) {
-		parameters.searchedmodifications[i].massdifference = getMassFromResidueSummary(parameters.searchedmodifications[i].summary, error, errormessage);
-		if (error) {
+		formula.clear();
+		formula.setFormula(parameters.searchedmodifications[i].summary);
+		if (formula.isValid(errormessage)) {
+			parameters.searchedmodifications[i].massdifference = formula.getMass();
+		}
+		else {
 			*os << errormessage << endl;
 			emit safeExit();
 			return;	
@@ -295,7 +299,7 @@ void cMainThread::run() {
 			}
 
 			if (middlemodifid == -1) {
-				*os << endl << "Error: Unknown T-modification is used." << endl;
+				*os << endl << "Error: Unknown branch modification is used." << endl;
 				emitEndSignals();
 				endNow();
 				return;

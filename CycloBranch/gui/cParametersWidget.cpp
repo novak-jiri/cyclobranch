@@ -289,7 +289,7 @@ cParametersWidget::cParametersWidget() {
 
 	searchedsequenceTmodif = new QLineEdit();
 	searchedsequenceTmodif->setToolTip("A name of an N-terminal or C-terminal modification as defined in the window \"N-terminal and C-terminal Modifications\"  which belongs to a branch of a searched peptide (branched and lasso peptides only).");
-	searchedsequenceformlayout->addRow(tr("T-Modification: "), searchedsequenceTmodif);
+	searchedsequenceformlayout->addRow(tr("Branch Modification: "), searchedsequenceTmodif);
 
 	searchedsequencegroupbox = new QGroupBox("Searched Peptide Sequence");
 	searchedsequencegroupbox->setLayout(searchedsequenceformlayout);
