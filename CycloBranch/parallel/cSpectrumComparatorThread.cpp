@@ -139,9 +139,17 @@ void cSpectrumComparatorThread::run() {
 		case branched:
 			theoreticalpeaksrealsize = tsp.compareBranched(peaklist, *bricksdatabasewithcombinations, false, *rxsequencetag, *rxsearchedsequence);
 			break;
-		case lasso:
-			theoreticalpeaksrealsize = tsp.compareLasso(peaklist, *bricksdatabasewithcombinations, false, *rxsequencetag, *rxsearchedsequence);
+		case branchcyclic:
+			theoreticalpeaksrealsize = tsp.compareBranchCyclic(peaklist, *bricksdatabasewithcombinations, false, *rxsequencetag, *rxsearchedsequence);
 			break;
+#if POLYKETIDE_SIDEROPHORES == 1
+		case linearpolyketide:
+			theoreticalpeaksrealsize = tsp.compareLinearPolyketideSiderophore(peaklist, *bricksdatabasewithcombinations, false, *rxsequencetag, *rxsearchedsequence);
+			break;
+		case cyclicpolyketide:
+			theoreticalpeaksrealsize = tsp.compareCyclicPolyketideSiderophore(peaklist, *bricksdatabasewithcombinations, false, *rxsequencetag, *rxsearchedsequence);
+			break;
+#endif
 		case linearpolysaccharide:
 			theoreticalpeaksrealsize = tsp.compareLinearPolysaccharide(peaklist, *bricksdatabasewithcombinations, false, *rxsequencetag, *rxsearchedsequence);
 			break;

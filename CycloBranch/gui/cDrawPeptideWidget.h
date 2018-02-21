@@ -8,10 +8,13 @@
 #define _CDRAWPEPTIDEWIDGET_H
 
 #include <QWidget>
+#include <QDesktopServices>
+#include <QUrl>
+#include <QFileInfo>
 #include "gui/cLinearWidget.h"
 #include "gui/cCyclicWidget.h"
 #include "gui/cBranchedWidget.h"
-#include "gui/cLassoWidget.h"
+#include "gui/cBranchCyclicWidget.h"
 
 
 // forward declaration
@@ -114,7 +117,7 @@ private:
 	cLinearWidget* linearwidget;
 	cCyclicWidget* cyclicwidget;
 	cBranchedWidget* branchedwidget;
-	cLassoWidget* lassowidget;
+	cBranchCyclicWidget* branchcyclicwidget;
 
 	QVBoxLayout* vbox;
 	QHBoxLayout* mainbox;

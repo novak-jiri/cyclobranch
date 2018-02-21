@@ -4,7 +4,8 @@
 
 
 QString appname = "CycloBranch";
-QString appversion = "v. 1.0.1216 (64-bit)";
+QString appversion = "v. 1.0.1512 (64-bit)";
+
 
 #if OS_TYPE == UNX
 	QString installdir = "/usr/share/cyclobranch/";
@@ -60,7 +61,7 @@ string& removeWhiteSpacesExceptSpaces(string& s) {
 }
 
 
-bool checkRegex(peptideType peptidetype, string& sequence, string& errormessage) {
+bool checkRegex(ePeptideType peptidetype, string& sequence, string& errormessage) {
 	errormessage = "";
 
 	if (sequence.compare("") == 0) {
@@ -74,15 +75,21 @@ bool checkRegex(peptideType peptidetype, string& sequence, string& errormessage)
 	{
 	case linear:
 	case linearpolysaccharide:
+#if POLYKETIDE_SIDEROPHORES == 1
+	case linearpolyketide:
+#endif
 		rx = "^\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])*$";
 		break;
 	case cyclic:
+#if POLYKETIDE_SIDEROPHORES == 1
+	case cyclicpolyketide:
+#endif
 		rx = "^\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])+$";
 		break;
 	case branched:
 		rx = "^\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])*\\\\\\(\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])+\\\\\\)\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])*$";
 		break;
-	case lasso:
+	case branchcyclic:
 		rx = "(^(\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])*)?\\\\\\(\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])+\\\\\\)\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])*$|^\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])*\\\\\\(\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])+\\\\\\)(\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])*)?$)";
 		break;
 	case other:
@@ -106,13 +113,13 @@ bool checkRegex(peptideType peptidetype, string& sequence, string& errormessage)
 }
 
 
-void parseBranch(peptideType peptidetype, string& composition, vector<string>& vectorcomposition, int& branchstart, int& branchend) {
+void parseBranch(ePeptideType peptidetype, string& composition, vector<string>& vectorcomposition, int& branchstart, int& branchend) {
 	string s = composition;
 	cBrick b;
 	branchstart = -1;
 	branchend = -1;
 
-	if ((peptidetype == branched) || (peptidetype == lasso)) {
+	if ((peptidetype == branched) || (peptidetype == branchcyclic)) {
 		int i = 0;
 		while (i < (int)s.size()) {
 			if (s[i] == '\\') {
@@ -166,7 +173,7 @@ void parseBranch(peptideType peptidetype, string& composition, vector<string>& v
 }
 
 
-peptideType getPeptideTypeFromString(string s) {
+ePeptideType getPeptideTypeFromString(string& s) {
 	if (s.compare("linear") == 0) {
 		return linear;
 	}
@@ -177,9 +184,17 @@ peptideType getPeptideTypeFromString(string s) {
 		return branched;
 	}
 	if (s.compare("branch-cyclic") == 0) {
-		return lasso;
+		return branchcyclic;
 	}
-	if (s.compare("linearpolysaccharide") == 0) {
+#if POLYKETIDE_SIDEROPHORES == 1
+	if (s.compare("linear-oligoketide-siderophore") == 0) {
+		return linearpolyketide;
+	}
+	if (s.compare("cyclic-oligoketide-siderophore") == 0) {
+		return cyclicpolyketide;
+	}
+#endif
+	if (s.compare("linear-polysaccharide") == 0) {
 		return linearpolysaccharide;
 	}
 	if (s.compare("other") == 0) {
@@ -190,7 +205,7 @@ peptideType getPeptideTypeFromString(string s) {
 }
 
 
-string getStringFromPeptideType(peptideType peptidetype) {
+string getStringFromPeptideType(ePeptideType peptidetype) {
 	switch (peptidetype)
 	{
 	case linear:
@@ -202,11 +217,19 @@ string getStringFromPeptideType(peptideType peptidetype) {
 	case branched:
 		return "branched";
 		break;
-	case lasso:
+	case branchcyclic:
 		return "branch-cyclic";
 		break;
+#if POLYKETIDE_SIDEROPHORES == 1
+	case linearpolyketide:
+		return "linear-oligoketide-siderophore";
+		break;
+	case cyclicpolyketide:
+		return "cyclic-oligoketide-siderophore";
+		break;
+#endif
 	case linearpolysaccharide:
-		return "linearpolysaccharide";
+		return "linear-polysaccharide";
 		break;
 	case other:
 		return "other";
@@ -216,5 +239,14 @@ string getStringFromPeptideType(peptideType peptidetype) {
 	}
 
 	return "other";
+}
+
+
+double cropPrecisionToSixDecimals(double value) {
+	char buffer[50];
+	double val;
+	sprintf_s(buffer, "%.6f\0", value);
+	sscanf_s(buffer, "%lf", &val);
+	return val;
 }
 

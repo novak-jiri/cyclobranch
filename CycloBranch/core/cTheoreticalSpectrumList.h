@@ -93,14 +93,6 @@ public:
 
 
 	/**
-		\brief Print peptide spectrum matches into a stream.
-		\param os reference to the main thread of the application (output stream)
-		\param limit a number of peptide spectrum matches printed
-		\param peptidetype the type of peptide corresponding to the experimental spectrum
-	*/ 
-	void printPeptideSpectrumMatches(ofstream& os, int limit, peptideType peptidetype);
-
-	/**
 		\brief Add a new spectrum to the list when the number cParameters::hitsreported has not been exceeded or when it has been exceeded but
 		the score of the newly added spectrum is better than the worst score of a peptide in the list (thread-safe).
 		\param theoreticalspectrum reference to a newly added spectrum

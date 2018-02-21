@@ -89,7 +89,7 @@ cTheoreticalSpectrum& cTheoreticalSpectrumList::operator[](int position) {
 
 
 int cTheoreticalSpectrumList::parallelCompareAndStore(cCandidateSet& candidates, bool& terminatecomputation) {
-	cPeaksList peaklist = parameters->peaklist;
+	cPeaksList peaklist = parameters->peaklistseries[0];
 	peaklist.sortbyMass();
 	cCandidateSet permutations;
 	theoreticalspectra.clear();
@@ -253,9 +253,17 @@ int cTheoreticalSpectrumList::parallelCompareAndStore(cCandidateSet& candidates,
 		case branched:
 			theoreticalpeaksrealsize = tsp.compareBranched(peaklist, *bricksdb, true, rxsequencetag, rxsearchedsequence);
 			break;
-		case lasso:
-			theoreticalpeaksrealsize = tsp.compareLasso(peaklist, *bricksdb, true, rxsequencetag, rxsearchedsequence);
+		case branchcyclic:
+			theoreticalpeaksrealsize = tsp.compareBranchCyclic(peaklist, *bricksdb, true, rxsequencetag, rxsearchedsequence);
 			break;
+#if POLYKETIDE_SIDEROPHORES == 1
+		case linearpolyketide:
+			theoreticalpeaksrealsize = tsp.compareLinearPolyketideSiderophore(peaklist, *bricksdb, true, rxsequencetag, rxsearchedsequence);
+			break;
+		case cyclicpolyketide:
+			theoreticalpeaksrealsize = tsp.compareCyclicPolyketideSiderophore(peaklist, *bricksdb, true, rxsequencetag, rxsearchedsequence);
+			break;
+#endif
 		case linearpolysaccharide:
 			theoreticalpeaksrealsize = tsp.compareLinearPolysaccharide(peaklist, *bricksdb, true, rxsequencetag, rxsearchedsequence);
 			break;
@@ -282,7 +290,7 @@ int cTheoreticalSpectrumList::parallelCompareAndStore(cCandidateSet& candidates,
 		theoreticalspectra[i].getCandidate().setRealPeptideName(*bricksdb, parameters->peptidetype);
 		theoreticalspectra[i].getCandidate().setAcronymPeptideNameWithHTMLReferences(*bricksdb, parameters->peptidetype);
 		theoreticalspectra[i].getCandidate().setAcronyms(*bricksdb);
-		if ((parameters->peptidetype == branched) || (parameters->peptidetype == lasso)) {
+		if ((parameters->peptidetype == branched) || (parameters->peptidetype == branchcyclic)) {
 			theoreticalspectra[i].getCandidate().setBackboneAcronyms(*bricksdb);
 			theoreticalspectra[i].getCandidate().setBranchAcronyms(*bricksdb);
 		}
@@ -295,16 +303,6 @@ int cTheoreticalSpectrumList::parallelCompareAndStore(cCandidateSet& candidates,
 		
 	// -1 = partial results, aborted by user
 	return terminatecomputation ? -1 : 0;
-}
-
-
-void cTheoreticalSpectrumList::printPeptideSpectrumMatches(ofstream& os, int limit, peptideType peptidetype) {
-	int count = min(limit, (int)theoreticalspectra.size());
-	for (int i = 0; i < count; i++) {
-		os << "--------------------------------------------------------------------------------" << endl;
-		os << "Peptide-Spectrum Match no. " << i+1 << endl;
-		theoreticalspectra[i].printMatch(os, peptidetype);
-	}
 }
 
 

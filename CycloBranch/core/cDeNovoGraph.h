@@ -14,7 +14,7 @@
 
 #include "core/cParameters.h"
 #include "core/cDeNovoGraphNode.h"
-#include "core/cPeaksList.h"
+#include "core/cPeakListSeries.h"
 #include "core/cBricksDatabase.h"
 #include "core/cTheoreticalSpectrumList.h"
 #include "parallel/cGraphReaderThread.h"

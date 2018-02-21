@@ -27,29 +27,41 @@ cSequenceDatabaseWidget::cSequenceDatabaseWidget(QWidget* parent) {
 
 	insertrow = new QPushButton(tr("Add Row"));
 	insertrow->setToolTip("Add a new row.");
+	insertrow->setShortcut(QKeySequence(Qt::Key_Insert));
+
 	removechecked = new QPushButton(tr(" Remove Rows "));
 	removechecked->setToolTip("Remove selected rows.");
+	removechecked->setShortcut(QKeySequence(Qt::Key_Delete));
 
 	close = new QPushButton(tr("Close"));
 	close->setToolTip("Close the window.");
+
 	load = new QPushButton(tr("Load"));
 	load->setToolTip("Load the database of sequences.");
+	load->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_L));
+
 	save = new QPushButton(QString(" Save "));
 	save->setToolTip("Save the database of sequences in the current file. When a file has not been loaded yet, the \"Save As ...\" file dialog is opened.");
+
 	saveas = new QPushButton(tr("Save As..."));
 	saveas->setToolTip("Save the database of sequences into a file.");
+	saveas->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_D));
 
 	rowsfilterline = new QLineEdit();
 	rowsfilterline->setMinimumWidth(250);
 	rowsfilterline->setToolTip("Text to Find");
+
 	rowsfiltercasesensitive = new QCheckBox();
 	rowsfiltercasesensitive->setToolTip("Case Sensitive");
+
 	rowsfilterbutton = new QPushButton("Filter");
 	rowsfilterbutton->setToolTip("Filter Search Results");
 	rowsfilterbutton->setMinimumWidth(50);
+
 	rowsfilterclearbutton = new QPushButton("Clear");
 	rowsfilterclearbutton->setToolTip("Clear Form and Reset Search Results");
 	rowsfilterclearbutton->setMinimumWidth(50);
+	rowsfilterclearbutton->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_R));
 
 	rowsfilterhbox = new QHBoxLayout();
 	rowsfilterhbox->addWidget(rowsfilterline);
@@ -83,6 +95,7 @@ cSequenceDatabaseWidget::cSequenceDatabaseWidget(QWidget* parent) {
 	database->setHorizontalHeaderItem(2, new QTableWidgetItem("Name"));
 	database->setHorizontalHeaderItem(3, new QTableWidgetItem("Summary Formula"));
 	database->setHorizontalHeaderItem(4, new QTableWidgetItem("Monoisotopic Mass"));
+	database->setItemDelegateForColumn(4, &columndelegate);
 	database->setHorizontalHeaderItem(5, new QTableWidgetItem("Sequence"));
 	database->setHorizontalHeaderItem(6, new QTableWidgetItem("N-terminal Modification"));
 	database->setHorizontalHeaderItem(7, new QTableWidgetItem("C-terminal Modification"));
@@ -262,7 +275,7 @@ bool cSequenceDatabaseWidget::checkFormula(int row, const string& summary) {
 		return false;
 	}
 	if (database->item(row, 4)) {
-		database->item(row, 4)->setData(Qt::DisplayRole, to_string(formula.getMass()).c_str());
+		database->item(row, 4)->setData(Qt::DisplayRole, cropPrecisionToSixDecimals(formula.getMass()));
 	}
 	return true;
 }
@@ -276,19 +289,25 @@ bool cSequenceDatabaseWidget::checkSequence(int row) {
 
 	regex rx;
 	// [^\\[\\]]+ is used instead of .+ to prevent from a too complex regex error
-	switch ((peptideType)((QComboBox *)database->cellWidget(row, 1))->currentIndex())
+	switch ((ePeptideType)((QComboBox *)database->cellWidget(row, 1))->currentIndex())
 	{
 	case linear:
 	case linearpolysaccharide:
+#if POLYKETIDE_SIDEROPHORES == 1
+	case linearpolyketide:
+#endif
 		rx = "^\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])*$";
 		break;
 	case cyclic:
+#if POLYKETIDE_SIDEROPHORES == 1
+	case cyclicpolyketide:
+#endif
 		rx = "^\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])+$";
 		break;
 	case branched:
 		rx = "^\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])*\\\\\\(\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])+\\\\\\)\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])*$";
 		break;
-	case lasso:
+	case branchcyclic:
 		rx = "(^(\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])*)?\\\\\\(\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])+\\\\\\)\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])*$|^\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])*\\\\\\(\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])+\\\\\\)(\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])*)?$)";
 		break;
 	case other:
@@ -305,7 +324,7 @@ bool cSequenceDatabaseWidget::checkSequence(int row) {
 			errstr += ". The format of sequence '";
 			errstr += database->item(row, 5)->text().toStdString().c_str();
 			errstr += "' does not correspond to the sequence type '";
-			errstr += getStringFromPeptideType((peptideType)((QComboBox *)database->cellWidget(row, 1))->currentIndex()).c_str();
+			errstr += getStringFromPeptideType((ePeptideType)((QComboBox *)database->cellWidget(row, 1))->currentIndex()).c_str();
 			errstr += "'.";
 			msgBox.setText(errstr);
 			msgBox.exec();
@@ -358,6 +377,26 @@ void cSequenceDatabaseWidget::keyPressEvent(QKeyEvent *event) {
 			filterRows();
 		}
     }
+
+	if (event->key() == Qt::Key_F1) {
+		#if OS_TYPE == WIN
+			QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo("docs/html/sequenceeditor.html").absoluteFilePath()));
+		#else
+			QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo(installdir + "docs/html/sequenceeditor.html").absoluteFilePath()));
+		#endif
+	}
+
+	if ((event->modifiers() == Qt::ControlModifier) && (event->key() == Qt::Key_F)) {
+		rowsfilterline->setFocus();
+	}
+
+	if ((event->modifiers() == Qt::ControlModifier) && (event->key() == Qt::Key_N)) {
+		rowsfiltercasesensitive->setChecked(!rowsfiltercasesensitive->isChecked());
+	}
+
+	if ((event->modifiers() == Qt::ControlModifier) && (event->key() == Qt::Key_S)) {
+		saveDatabase();
+	}
 }
 
 
@@ -414,7 +453,7 @@ void cSequenceDatabaseWidget::loadDatabase() {
 
                 QComboBox* combo = new QComboBox();
 				for (int j = 0; j <= (int)other; j++) {
-                    combo->addItem(QString(getStringFromPeptideType((peptideType)j).c_str()));
+                    combo->addItem(QString(getStringFromPeptideType((ePeptideType)j).c_str()));
                 }
                 combo->setCurrentIndex((int)sequences[i].getPeptideType());
 				connect(combo, SIGNAL(currentIndexChanged(int)), this, SLOT(comboBoxModified(int)));
@@ -428,7 +467,7 @@ void cSequenceDatabaseWidget::loadDatabase() {
 
 				formula.setFormula(sequences[i].getSummaryFormula());
                 database->setItem(i, 4, widgetitemallocator.getNewItem());
-				database->item(i, 4)->setData(Qt::DisplayRole, to_string(formula.getMass()).c_str());
+				database->item(i, 4)->setData(Qt::DisplayRole, cropPrecisionToSixDecimals(formula.getMass()));
 
 				database->setItem(i, 5, widgetitemallocator.getNewItem());
 				database->item(i, 5)->setText(sequences[i].getSequence().c_str());
@@ -518,7 +557,7 @@ bool cSequenceDatabaseWidget::saveDatabase() {
 					// nothing to do
 					break;
 				case 1:
-					seq.setPeptideType((peptideType)(((QComboBox *)database->cellWidget(i,j))->currentIndex()));
+					seq.setPeptideType((ePeptideType)(((QComboBox *)database->cellWidget(i,j))->currentIndex()));
 					break;
 				case 2:
 					s = database->item(i,j)->text().toStdString();
@@ -606,7 +645,7 @@ void cSequenceDatabaseWidget::addRow() {
 
 	QComboBox* combo = new QComboBox();
 	for (int i = 0; i <= (int)other; i++) {
-		combo->addItem(QString(getStringFromPeptideType((peptideType)i).c_str()));
+		combo->addItem(QString(getStringFromPeptideType((ePeptideType)i).c_str()));
 	}
 	combo->setCurrentIndex((int)other);
 	connect(combo, SIGNAL(currentIndexChanged(int)), this, SLOT(comboBoxModified(int)));

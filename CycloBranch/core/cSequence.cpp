@@ -19,7 +19,7 @@ void cSequence::clear() {
 
 
 void cSequence::store(ofstream& os) {
-	os.write((char *)&peptidetype, sizeof(peptideType));
+	os.write((char *)&peptidetype, sizeof(ePeptideType));
 	storeString(sequence, os);
 	storeString(nterminalmodification, os);
 	storeString(cterminalmodification, os);
@@ -31,7 +31,7 @@ void cSequence::store(ofstream& os) {
 
 
 void cSequence::load(ifstream& is) {
-	is.read((char *)&peptidetype, sizeof(peptideType));
+	is.read((char *)&peptidetype, sizeof(ePeptideType));
 	loadString(sequence, is);
 	loadString(nterminalmodification, is);
 	loadString(cterminalmodification, is);
@@ -42,7 +42,7 @@ void cSequence::load(ifstream& is) {
 }
 
 
-peptideType cSequence::getPeptideType() {
+ePeptideType cSequence::getPeptideType() {
 	return peptidetype;
 }
 
@@ -62,7 +62,7 @@ string& cSequence::getReference() {
 }
 
 
-void cSequence::setPeptideType(peptideType peptidetype) {
+void cSequence::setPeptideType(ePeptideType peptidetype) {
 	this->peptidetype = peptidetype;
 }
 

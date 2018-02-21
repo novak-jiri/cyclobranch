@@ -37,29 +37,41 @@ cBricksDatabaseWidget::cBricksDatabaseWidget(QWidget* parent) {
 
 	insertrow = new QPushButton(tr("Add Row"));
 	insertrow->setToolTip("Add a new row.");
+	insertrow->setShortcut(QKeySequence(Qt::Key_Insert));
+
 	removechecked = new QPushButton(tr(" Remove Rows "));
 	removechecked->setToolTip("Remove selected rows.");
+	removechecked->setShortcut(QKeySequence(Qt::Key_Delete));
 
 	close = new QPushButton(tr("Close"));
 	close->setToolTip("Close the window.");
+
 	load = new QPushButton(tr("Load"));
 	load->setToolTip("Load the database of building blocks.");
+	load->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_L));
+
 	save = new QPushButton(QString(" Save "));
 	save->setToolTip("Save the database of building blocks in the current file. When a file has not been loaded yet, the \"Save As ...\" file dialog is opened.");
+
 	saveas = new QPushButton(tr("Save As..."));
 	saveas->setToolTip("Save the database of building blocks into a file.");
+	saveas->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_D));
 
 	rowsfilterline = new QLineEdit();
 	rowsfilterline->setMinimumWidth(250);
 	rowsfilterline->setToolTip("Text to Find");
+
 	rowsfiltercasesensitive = new QCheckBox();
 	rowsfiltercasesensitive->setToolTip("Case Sensitive");
+
 	rowsfilterbutton = new QPushButton("Filter");
 	rowsfilterbutton->setToolTip("Filter Search Results");
 	rowsfilterbutton->setMinimumWidth(50);
+
 	rowsfilterclearbutton = new QPushButton("Clear");
 	rowsfilterclearbutton->setToolTip("Clear Form and Reset Search Results");
 	rowsfilterclearbutton->setMinimumWidth(50);
+	rowsfilterclearbutton->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_R));
 
 	rowsfilterhbox = new QHBoxLayout();
 	rowsfilterhbox->addWidget(rowsfilterline);
@@ -97,6 +109,7 @@ cBricksDatabaseWidget::cBricksDatabaseWidget(QWidget* parent) {
 	database->horizontalHeaderItem(3)->setText("Residue Summary");
 	database->setHorizontalHeaderItem(4, new QTableWidgetItem());
 	database->horizontalHeaderItem(4)->setText("Monoisotopic Residue Mass");
+	database->setItemDelegateForColumn(4, &columndelegate);
 	database->setHorizontalHeaderItem(5, new QTableWidgetItem());
 	database->horizontalHeaderItem(5)->setText("Reference(s)");
 	database->setHorizontalHeaderItem(6, new QTableWidgetItem());
@@ -270,7 +283,7 @@ bool cBricksDatabaseWidget::checkFormula(int row, const string& summary) {
 		return false;
 	}
 	if (database->item(row, 4)) {
-		database->item(row, 4)->setData(Qt::DisplayRole, to_string(formula.getMass()).c_str());
+		database->item(row, 4)->setData(Qt::DisplayRole, cropPrecisionToSixDecimals(formula.getMass()));
 	}
 	return true;
 }
@@ -304,6 +317,26 @@ void cBricksDatabaseWidget::keyPressEvent(QKeyEvent *event) {
 			filterRows();
 		}
     }
+
+	if (event->key() == Qt::Key_F1) {
+		#if OS_TYPE == WIN
+			QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo("docs/html/blockseditor.html").absoluteFilePath()));
+		#else
+			QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo(installdir + "docs/html/blockseditor.html").absoluteFilePath()));
+		#endif
+	}
+
+	if ((event->modifiers() == Qt::ControlModifier) && (event->key() == Qt::Key_F)) {
+		rowsfilterline->setFocus();
+	}
+
+	if ((event->modifiers() == Qt::ControlModifier) && (event->key() == Qt::Key_N)) {
+		rowsfiltercasesensitive->setChecked(!rowsfiltercasesensitive->isChecked());
+	}
+
+	if ((event->modifiers() == Qt::ControlModifier) && (event->key() == Qt::Key_S)) {
+		saveDatabase();
+	}
 }
 
 
@@ -368,7 +401,7 @@ void cBricksDatabaseWidget::loadDatabase() {
 				database->item(i, 3)->setText(bricks[i].getSummary().c_str());
 
 				database->setItem(i, 4, widgetitemallocator.getNewItem());
-				database->item(i, 4)->setData(Qt::DisplayRole, to_string(bricks[i].getMass()).c_str());
+				database->item(i, 4)->setData(Qt::DisplayRole, cropPrecisionToSixDecimals(bricks[i].getMass()));
 				
 				database->setItem(i, 5, widgetitemallocator.getNewItem());
 				database->item(i, 5)->setText(bricks[i].getReferencesAsString().c_str());

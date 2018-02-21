@@ -8,11 +8,16 @@
 #define _CMODIFICATIONSWIDGET_H
 
 #include <QWidget>
+#include <QDesktopServices>
+#include <QUrl>
+#include <QFileInfo>
 #include <fstream>
 #include "core/utilities.h"
 #include "core/cFragmentIons.h"
 #include "core/cSummaryFormula.h"
 #include "core/cAllocator.h"
+#include "gui/cDelegate.h"
+
 
 using namespace std;
 
@@ -85,6 +90,7 @@ private:
 	vector<fragmentDescription> modifications;
 
 	vector<int> headersort;
+	cDelegate columndelegate;
 
 	cAllocator<QTableWidgetItem> widgetitemallocator;
 

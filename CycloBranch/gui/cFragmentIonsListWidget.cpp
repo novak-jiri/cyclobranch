@@ -17,11 +17,11 @@ cFragmentIonsListWidget::cFragmentIonsListWidget(QObject* parent) {
 	list->setSelectionMode(QAbstractItemView::MultiSelection);
 
 	selectall = new QPushButton("Select All");
-	selectall->setToolTip("Select all fragment ion types in the list.");
+	selectall->setToolTip("Select all ion types in the list.");
 	clearall = new QPushButton("Clear All");
-	clearall->setToolTip("Unselect all fragment ion types in the list.");
+	clearall->setToolTip("Unselect all ion types in the list.");
 	reset = new QPushButton("Reset");
-	reset->setToolTip("Reset to a default selection of fragment ions considering selected \"Peptide Type\".");
+	reset->setToolTip("Reset to the default seletion of ions.");
 
 	hbox->addWidget(selectall);
 	hbox->addWidget(clearall);

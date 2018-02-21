@@ -47,7 +47,7 @@ void cCandidate::getPermutationsIter(cCandidateSet& permutations, vector<string>
 }
 
 
-void cCandidate::attachSubBranchCandidates(cCandidate& candidate, cCandidateSet& result, peptideType peptidetype, bool* terminatecomputation) {
+void cCandidate::attachSubBranchCandidates(cCandidate& candidate, cCandidateSet& result, ePeptideType peptidetype, bool* terminatecomputation) {
 	if (*terminatecomputation) {
 		return;
 	}
@@ -81,7 +81,7 @@ void cCandidate::attachSubBranchCandidates(cCandidate& candidate, cCandidateSet&
 }
 
 
-void cCandidate::attachAllBranches(cCandidate& candidate, cCandidateSet& result, peptideType peptidetype, bool* terminatecomputation) {
+void cCandidate::attachAllBranches(cCandidate& candidate, cCandidateSet& result, ePeptideType peptidetype, bool* terminatecomputation) {
 	cCandidate c;
 	int start, end;
 	int cumsize = 0;
@@ -135,7 +135,7 @@ void cCandidate::getPartialRotations(const string& composition, vector<string>& 
 }
 
 
-void cCandidate::getPartialLassoRotations(const string& composition, vector<cCandidate>& lassorotations, int branchstart, int branchend) {
+void cCandidate::getPartialBranchCyclicRotations(const string& composition, vector<cCandidate>& branchcyclicrotations, int branchstart, int branchend) {
 	cBrick b;
 	string s;
 	bool leftbracketput;
@@ -176,7 +176,7 @@ void cCandidate::getPartialLassoRotations(const string& composition, vector<cCan
 			vector<nodeEdge> ne;
 			v.push_back(s);
 			cCandidate c(v, ne, startmodifID, endmodifID, middlemodifID, (branchstart + count - i) % count, (branchend + count - i) % count);
-			lassorotations.push_back(c);
+			branchcyclicrotations.push_back(c);
 			//cout << s << endl;
 		}
 	}
@@ -298,14 +298,14 @@ void cCandidate::revertComposition() {
 }
 
 
-void cCandidate::prepareBranchedCandidates(cCandidateSet& result, peptideType peptidetype, bool* terminatecomputation) {
+void cCandidate::prepareBranchedCandidates(cCandidateSet& result, ePeptideType peptidetype, bool* terminatecomputation) {
 	cCandidate c;
 	result.getSet().clear();
 
-	if (peptidetype == lasso) {
+	if (peptidetype == branchcyclic) {
 
 		// just one from startmodifid and middlemodifid may be > 0 (checked in getCandidatesIter)
-		// endmodifid is always 0 because precursor_ion is not used in initializeFragmentIonsForDeNovoGraphOfLassoPeptides
+		// endmodifid is always 0 because precursor_ion is not used in initializeFragmentIonsForDeNovoGraphOfBranchCyclicPeptides
 		// startmodifid is always N-terminal because only b-ions are used in the de novo graph
 
 		if ((startmodifID > 0) && (composition.size() > 0)) {
@@ -751,9 +751,32 @@ double cCandidate::getPrecursorMass(cBricksDatabase& brickdatabasewithcombinatio
 	case branched:
 		mass = parameters->fragmentdefinitions[precursor_ion].massdifference + parameters->searchedmodifications[startmodifID].massdifference + parameters->searchedmodifications[endmodifID].massdifference + parameters->searchedmodifications[middlemodifID].massdifference;
 		break;
-	case lasso:
+	case branchcyclic:
 		mass = parameters->fragmentdefinitions[cyclic_precursor_ion].massdifference + parameters->searchedmodifications[middlemodifID].massdifference;
 		break;
+#if POLYKETIDE_SIDEROPHORES == 1
+	case linearpolyketide:
+		switch (getResidueLossType(brickdatabasewithcombinations))
+		{
+		case water:
+			mass = parameters->fragmentdefinitions[linear_polyketide_precursor_ion_h_oh].massdifference;
+			break;
+		case h2:
+			mass = parameters->fragmentdefinitions[linear_polyketide_precursor_ion_h_h].massdifference;
+			break;
+		case h2o2:
+			mass = parameters->fragmentdefinitions[linear_polyketide_precursor_ion_oh_oh].massdifference;
+			break;
+		default:
+			mass = 0;
+			break;
+		}
+		mass += parameters->searchedmodifications[startmodifID].massdifference + parameters->searchedmodifications[endmodifID].massdifference;
+		break;
+	case cyclicpolyketide:
+		mass = parameters->fragmentdefinitions[cyclic_polyketide_precursor_ion].massdifference;
+		break;
+#endif
 	case other:
 		break;
 	default:
@@ -909,12 +932,36 @@ bool cCandidate::hasOnlyArtificialBricks(cBricksDatabase& brickdatabasewithcombi
 }
 
 
+bool cCandidate::hasFirstBrickArtificial(cBricksDatabase& brickdatabasewithcombinations) {
+	cBrick b;
+	vector<int> intcomposition;
+	b.setComposition(internalcomposition, false);
+	b.explodeToIntComposition(intcomposition);
+	if ((intcomposition.size() > 0) && brickdatabasewithcombinations[intcomposition[0] - 1].isArtificial()) {
+		return true;
+	}
+	return false;
+}
+
+
 bool cCandidate::hasLastBrickArtificial(cBricksDatabase& brickdatabasewithcombinations) {
 	cBrick b;
 	vector<int> intcomposition;
 	b.setComposition(internalcomposition, false);
 	b.explodeToIntComposition(intcomposition);
 	if ((intcomposition.size() > 0) && brickdatabasewithcombinations[intcomposition.back() - 1].isArtificial()) {
+		return true;
+	}
+	return false;
+}
+
+
+bool cCandidate::hasLastBrickInvalid(cBricksDatabase& brickdatabasewithcombinations) {
+	cBrick b;
+	vector<int> intcomposition;
+	b.setComposition(internalcomposition, false);
+	b.explodeToIntComposition(intcomposition);
+	if ((intcomposition.size() > 0) && brickdatabasewithcombinations[intcomposition.back() - 1].isArtificial() && (brickdatabasewithcombinations[intcomposition.back() - 1].getMass() <= 0)) {
 		return true;
 	}
 	return false;
@@ -935,16 +982,16 @@ void cCandidate::getRotations(vector<string>& rotations, bool includerevertedrot
 }
 
 
-void cCandidate::getLassoRotations(vector<cCandidate>& lassorotations, bool includerevertedrotations) {
-	lassorotations.clear();
-	getPartialLassoRotations(internalcomposition, lassorotations, branchstart, branchend);
+void cCandidate::getBranchCyclicRotations(vector<cCandidate>& branchcyclicrotations, bool includerevertedrotations) {
+	branchcyclicrotations.clear();
+	getPartialBranchCyclicRotations(internalcomposition, branchcyclicrotations, branchstart, branchend);
 	if (includerevertedrotations) {
-		getPartialLassoRotations(getRevertedTComposition(false), lassorotations, numberofinternalbricks - branchend - 1, numberofinternalbricks - branchstart - 1);
+		getPartialBranchCyclicRotations(getRevertedTComposition(false), branchcyclicrotations, numberofinternalbricks - branchend - 1, numberofinternalbricks - branchstart - 1);
 	}
 }
 
 
-cSummaryFormula cCandidate::getSummaryFormula(cParameters& parameters, peptideType peptidetype) {
+cSummaryFormula cCandidate::getSummaryFormula(cParameters& parameters, ePeptideType peptidetype) {
 	cBrick b;
 	vector<int> bricks;
 	b.setComposition(internalcomposition, false);
@@ -971,9 +1018,37 @@ cSummaryFormula cCandidate::getSummaryFormula(cParameters& parameters, peptideTy
 		formula.addFormula(parameters.searchedmodifications[endmodifID].summary);
 		formula.addFormula(parameters.searchedmodifications[middlemodifID].summary);
 		break;
-	case lasso:
+	case branchcyclic:
 		formula.addFormula(parameters.searchedmodifications[middlemodifID].summary);
 		break;
+#if POLYKETIDE_SIDEROPHORES == 1
+	case linearpolyketide:
+		switch (getResidueLossType(parameters.bricksdatabase))
+		{
+		case water:
+			summary = "H2O";
+			break;
+		case h2:
+			summary = "H2";
+			break;
+		case h2o2:
+			summary = "H2O2";
+			break;
+		default:
+			break;
+		}
+
+		if (hasFirstBrickArtificial(parameters.bricksdatabase) || hasLastBrickArtificial(parameters.bricksdatabase)) {
+			summary = "";
+		}
+
+		formula.addFormula(summary);
+		formula.addFormula(parameters.searchedmodifications[startmodifID].summary);
+		formula.addFormula(parameters.searchedmodifications[endmodifID].summary);
+		break;
+	case cyclicpolyketide:
+		break;
+#endif
 	case other:
 		break;
 	default:
@@ -1154,7 +1229,7 @@ void cCandidate::setPath(cDeNovoGraph& graph, cParameters* parameters) {
 		stringpath += "ppm error: " + to_string(currentedge->ppmerror) + ", ";
 		stringpath += "source charge: " + to_string(currentedge->sourcecharge) + ", ";
 		stringpath += "target charge: " + to_string(currentedge->targetcharge);
-		if ((parameters->peptidetype == branched) || (parameters->peptidetype == lasso)) {
+		if ((parameters->peptidetype == branched) || (parameters->peptidetype == branchcyclic)) {
 			if (currentedge->middlemodifID > 0) {
 				stringpath += ", branch modification: " + parameters->searchedmodifications[currentedge->middlemodifID].name;
 			}
@@ -1175,16 +1250,20 @@ string& cCandidate::getPathAsString() {
 }
 
 
-void cCandidate::setRealPeptideName(cBricksDatabase& bricksdatabase, peptideType peptidetype) {
+void cCandidate::setRealPeptideName(cBricksDatabase& bricksdatabase, ePeptideType peptidetype) {
 	switch (peptidetype)
 	{
 	case linear:
 	case cyclic:
+#if POLYKETIDE_SIDEROPHORES == 1
+	case linearpolyketide:
+	case cyclicpolyketide:
+#endif
 	case linearpolysaccharide:
 		realpeptidename = bricksdatabase.getRealName(internalcomposition);
 		break;
 	case branched:
-	case lasso:
+	case branchcyclic:
 		realpeptidename = getRealNameTComposition(bricksdatabase);
 		break;
 	case other:
@@ -1195,16 +1274,20 @@ void cCandidate::setRealPeptideName(cBricksDatabase& bricksdatabase, peptideType
 }
 
 
-void cCandidate::setAcronymPeptideNameWithHTMLReferences(cBricksDatabase& bricksdatabase, peptideType peptidetype) {
+void cCandidate::setAcronymPeptideNameWithHTMLReferences(cBricksDatabase& bricksdatabase, ePeptideType peptidetype) {
 	switch (peptidetype)
 	{
 	case linear:
 	case cyclic:
+#if POLYKETIDE_SIDEROPHORES == 1
+	case linearpolyketide:
+	case cyclicpolyketide:
+#endif
 	case linearpolysaccharide:
 		acronympeptidename = bricksdatabase.getAcronymName(internalcomposition, true);
 		break;
 	case branched:
-	case lasso:
+	case branchcyclic:
 		acronympeptidename = getAcronymsTComposition(bricksdatabase);
 		break;
 	case other:
@@ -1223,6 +1306,135 @@ string& cCandidate::getRealPeptideName() {
 string& cCandidate::getAcronymPeptideNameWithHTMLReferences() {
 	return acronympeptidename;
 }
+
+
+eResidueLossType cCandidate::getResidueLossType(cBricksDatabase& bricksdatabase) {
+	cBrick b;
+	b.setComposition(internalcomposition, false);
+	vector<int> intcomposition;
+	b.explodeToIntComposition(intcomposition);
+
+	int hydrogens = 0;
+	int hydroxyls = 0;
+	for (int i = 0; i < (int)intcomposition.size(); i++) {
+		if (bricksdatabase[intcomposition[i] - 1].getResidueLossType() == h2) {
+			hydrogens++;
+		}
+		if (bricksdatabase[intcomposition[i] - 1].getResidueLossType() == h2o2) {
+			hydroxyls++;
+		}
+	}
+
+	if (hydrogens == hydroxyls) {
+		return water;
+	}
+
+	if (hydrogens > hydroxyls) {
+		return h2;
+	}
+
+	return h2o2;
+}
+
+
+#if POLYKETIDE_SIDEROPHORES == 1
+
+
+bool cCandidate::checkPolyketideSequence(cBricksDatabase& bricksdatabase, ePeptideType peptidetype) {
+	cBrick b;
+	b.setComposition(internalcomposition, false);
+	vector<int> intcomposition;
+	b.explodeToIntComposition(intcomposition);
+
+	if (intcomposition.size() == 0) {
+		return false;
+	}
+
+	bool hasfirstblockartificial = hasFirstBrickArtificial(bricksdatabase);
+	bool haslastblockartificial = hasLastBrickArtificial(bricksdatabase);
+
+	// cyclic polyketide has always an even number of blocks
+	if ((peptidetype == cyclicpolyketide) && !hasfirstblockartificial && !haslastblockartificial && ((int)intcomposition.size() % 2 == 1)) {
+		return false;
+	}
+
+	for (int i = (hasfirstblockartificial?2:1); i < (haslastblockartificial?(int)intcomposition.size()-1:(int)intcomposition.size()); i++) {
+		if (!(((bricksdatabase[intcomposition[i] - 1].getResidueLossType() == h2) && (bricksdatabase[intcomposition[i - 1] - 1].getResidueLossType() == h2o2))
+			|| ((bricksdatabase[intcomposition[i] - 1].getResidueLossType() == h2o2) && (bricksdatabase[intcomposition[i - 1] - 1].getResidueLossType() == h2)))) {
+				return false;
+		}
+	}
+
+	return true;
+}
+
+
+eResidueLossType cCandidate::getLeftResidueType(cBricksDatabase& bricksdatabase) {
+	cBrick b;
+	b.setComposition(internalcomposition, false);
+	vector<int> intcomposition;
+	b.explodeToIntComposition(intcomposition);
+
+	if (intcomposition.size() == 0) {
+		return water;
+	}
+
+	return bricksdatabase[intcomposition[0] - 1].getResidueLossType();
+}
+
+
+eResidueLossType cCandidate::getRightResidueType(cBricksDatabase& bricksdatabase) {
+	cBrick b;
+	b.setComposition(internalcomposition, false);
+	vector<int> intcomposition;
+	b.explodeToIntComposition(intcomposition);
+
+	if (intcomposition.size() == 0) {
+		return water;
+	}
+
+	return bricksdatabase[intcomposition.back() - 1].getResidueLossType();
+}
+
+
+bool cCandidate::checkPolyketideBlocks(cBricksDatabase& bricksdatabase, ePeptideType peptidetype) {
+	cBrick b;
+	b.setComposition(internalcomposition, false);
+	vector<int> intcomposition;
+	b.explodeToIntComposition(intcomposition);
+
+	if (intcomposition.size() == 0) {
+		return false;
+	}
+
+	bool hasfirstblockartificial = hasFirstBrickArtificial(bricksdatabase);
+	bool haslastblockartificial = hasLastBrickArtificial(bricksdatabase);
+
+	// cyclic polyketide has always an even number of blocks
+	if ((peptidetype == cyclicpolyketide) && !hasfirstblockartificial && !haslastblockartificial && ((int)intcomposition.size() % 2 == 1)) {
+		return false;
+	}
+
+	int hydrogens = 0;
+	int hydroxyls = 0;
+	for (int i = (hasfirstblockartificial?1:0); i < (haslastblockartificial?(int)intcomposition.size()-1:(int)intcomposition.size()); i++) {
+		if (bricksdatabase[intcomposition[i] - 1].getResidueLossType() == h2) {
+			hydrogens++;
+		}
+		if (bricksdatabase[intcomposition[i] - 1].getResidueLossType() == h2o2) {
+			hydroxyls++;
+		}
+	}
+
+	if ((hydrogens == hydroxyls) || (hydrogens == hydroxyls + 1) || (hydrogens + 1 == hydroxyls)) {
+		return true;
+	}
+
+	return false;
+}
+
+
+#endif
 
 
 bool operator == (cCandidate const& a, cCandidate const& b) {

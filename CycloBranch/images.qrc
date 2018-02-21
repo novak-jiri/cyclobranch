@@ -31,5 +31,7 @@
         <file>images/icons/65.png</file>
         <file>images/icons/56.png</file>
         <file>images/icons/66.png</file>
+        <file>images/icons/5.png</file>
+        <file>images/icons/25.png</file>
     </qresource>
 </RCC>

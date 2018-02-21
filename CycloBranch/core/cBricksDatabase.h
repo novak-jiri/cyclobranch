@@ -222,6 +222,21 @@ public:
 	*/ 
 	void load(ifstream& is);
 
+
+#if POLYKETIDE_SIDEROPHORES == 1
+
+
+	/**
+		\brief Check if the numbers of hydrogen and hydroxyl blocks are correct.
+		\param brickseries a tested combination of building blocks
+		\retval bool true when the numbers of blocks are correct
+	*/ 
+	bool checkPolyketideBlocks(cBrick& brickseries);
+
+
+#endif
+
+
 };
 
 

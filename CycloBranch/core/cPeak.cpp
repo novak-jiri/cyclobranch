@@ -10,7 +10,9 @@ void cPeak::clear() {
 	mzratio = 0;
 	intensity = 0;
 	description = "";
-	matchdescription = "";
+	matchedmz = 0;
+	matchedintensity = 0;
+	matchedppm = 0;
 	iontype = fragmentIonTypeEnd;
 	matched = 0;
 	matchedid = -1;
@@ -34,8 +36,10 @@ void cPeak::store(ofstream& os) {
 	os.write((char *)&mzratio, sizeof(double));
 	os.write((char *)&intensity, sizeof(double));
 	storeString(description, os);
-	storeString(matchdescription, os);
-	os.write((char *)&iontype, sizeof(fragmentIonType));
+	os.write((char *)&matchedmz, sizeof(double));
+	os.write((char *)&matchedintensity, sizeof(double));
+	os.write((char *)&matchedppm, sizeof(double));
+	os.write((char *)&iontype, sizeof(eFragmentIonType));
 	os.write((char *)&matched, sizeof(int));
 	os.write((char *)&matchedid, sizeof(int));
 	os.write((char *)&charge, sizeof(int));
@@ -51,8 +55,10 @@ void cPeak::load(ifstream& is) {
 	is.read((char *)&mzratio, sizeof(double));
 	is.read((char *)&intensity, sizeof(double));
 	loadString(description, is);
-	loadString(matchdescription, is);
-	is.read((char *)&iontype, sizeof(fragmentIonType));
+	is.read((char *)&matchedmz, sizeof(double));
+	is.read((char *)&matchedintensity, sizeof(double));
+	is.read((char *)&matchedppm, sizeof(double));
+	is.read((char *)&iontype, sizeof(eFragmentIonType));
 	is.read((char *)&matched, sizeof(int));
 	is.read((char *)&matchedid, sizeof(int));
 	is.read((char *)&charge, sizeof(int));

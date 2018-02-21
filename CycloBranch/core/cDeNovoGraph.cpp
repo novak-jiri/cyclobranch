@@ -145,7 +145,7 @@ int cDeNovoGraph::createGraph(bool& terminatecomputation) {
 	double unchargedmz;
 	int i;
 	
-	sortedpeaklist = parameters->peaklist;
+	sortedpeaklist = parameters->peaklistseries[0];
 	// insert the single charged precursor, if neccessary
 	sortedpeaklist.sortbyMass();
 	sortedpeaklist.cropMaximumMZRatio(unchargedprecursormass, parameters->precursormasserrortolerance);
@@ -242,7 +242,7 @@ int cDeNovoGraph::createGraph(bool& terminatecomputation) {
 		//sort(graph.begin() + 1, graph.end(), compareNodes);
 
 		break;
-	case lasso:
+	case branchcyclic:
 		node.clear();
 		node.setMZRatio(0);
 		node.setIntensity(0);
@@ -300,6 +300,154 @@ int cDeNovoGraph::createGraph(bool& terminatecomputation) {
 		lastsystemnode = (int)graph.size() - 1;
 		startnode = 1;
 		break;
+#if POLYKETIDE_SIDEROPHORES == 1
+	case linearpolyketide:
+		node.clear();
+		node.setMZRatio(0);
+		node.setIntensity(0);
+		node.addIonAnnotation(l1h_ion);
+		node.addIonAnnotation(l2h_ion);
+		node.addIonAnnotation(l1oh_ion);
+		node.addIonAnnotation(l2oh_ion);
+		graph.push_back(node);
+
+		node.clear();
+		node.setMZRatio(parameters->fragmentdefinitions[l1h_ion].massdifference + negativeshift);
+		node.setIntensity(0);
+		node.addIonAnnotation(l1h_ion);
+		graph.push_back(node);
+
+		node.clear();
+		node.setMZRatio(parameters->fragmentdefinitions[l2h_ion].massdifference + negativeshift);
+		node.setIntensity(0);
+		node.addIonAnnotation(l2h_ion);
+		graph.push_back(node);
+
+		node.clear();
+		node.setMZRatio(parameters->fragmentdefinitions[l1oh_ion].massdifference + negativeshift);
+		node.setIntensity(0);
+		node.addIonAnnotation(l1oh_ion);
+		graph.push_back(node);
+
+		node.clear();
+		node.setMZRatio(parameters->fragmentdefinitions[l2oh_ion].massdifference + negativeshift);
+		node.setIntensity(0);
+		node.addIonAnnotation(l2oh_ion);
+		graph.push_back(node);
+
+		e.clear();
+		e.composition = "0";
+		e.targetnode = 1;
+		graph[0].insertTempEdge(e);
+
+		e.clear();
+		e.composition = "0";
+		e.targetnode = 2;
+		graph[0].insertTempEdge(e);
+
+		e.clear();
+		e.composition = "0";
+		e.targetnode = 3;
+		graph[0].insertTempEdge(e);
+
+		e.clear();
+		e.composition = "0";
+		e.targetnode = 4;
+		graph[0].insertTempEdge(e);
+
+		e.clear();
+		e.composition = "0";
+		e.targetnode = 4;
+
+		for (i = 1; i < (int)parameters->searchedmodifications.size(); i++) {	
+
+			if (parameters->searchedmodifications[i].nterminal) {
+				node.clear();
+				node.setMZRatio(parameters->fragmentdefinitions[l1h_ion].massdifference + parameters->searchedmodifications[i].massdifference + negativeshift);
+				node.setIntensity(0);
+				node.addIonAnnotation(l1h_ion);
+				graph.push_back(node);
+				e.targetnode++;
+				graph[0].insertTempEdge(e);
+
+				node.clear();
+				node.setMZRatio(parameters->fragmentdefinitions[l2h_ion].massdifference + parameters->searchedmodifications[i].massdifference + negativeshift);
+				node.setIntensity(0);
+				node.addIonAnnotation(l2h_ion);
+				graph.push_back(node);
+				e.targetnode++;
+				graph[0].insertTempEdge(e);
+			}
+
+			if (parameters->searchedmodifications[i].cterminal) {
+				node.clear();
+				node.setMZRatio(parameters->fragmentdefinitions[l1oh_ion].massdifference + parameters->searchedmodifications[i].massdifference + negativeshift);
+				node.setIntensity(0);
+				node.addIonAnnotation(l1oh_ion);
+				graph.push_back(node);
+				e.targetnode++;
+				graph[0].insertTempEdge(e);
+
+				node.clear();
+				node.setMZRatio(parameters->fragmentdefinitions[l2oh_ion].massdifference + parameters->searchedmodifications[i].massdifference + negativeshift);
+				node.setIntensity(0);
+				node.addIonAnnotation(l2oh_ion);
+				graph.push_back(node);
+				e.targetnode++;
+				graph[0].insertTempEdge(e);
+			}		
+	
+		}
+
+		lastsystemnode = (int)graph.size() - 1;
+		startnode = 1;
+		break;
+	case cyclicpolyketide:
+		node.clear();
+		node.setMZRatio(0);
+		node.setIntensity(0);
+		node.addIonAnnotation(l0h_ion);
+		node.addIonAnnotation(l1h_ion);
+		node.addIonAnnotation(l2h_ion);
+		graph.push_back(node);
+
+		node.clear();
+		node.setMZRatio(parameters->fragmentdefinitions[l0h_ion].massdifference + negativeshift);
+		node.setIntensity(0);
+		node.addIonAnnotation(l0h_ion);
+		graph.push_back(node);
+
+		node.clear();
+		node.setMZRatio(parameters->fragmentdefinitions[l1h_ion].massdifference + negativeshift);
+		node.setIntensity(0);
+		node.addIonAnnotation(l1h_ion);
+		graph.push_back(node);
+
+		node.clear();
+		node.setMZRatio(parameters->fragmentdefinitions[l2h_ion].massdifference + negativeshift);
+		node.setIntensity(0);
+		node.addIonAnnotation(l2h_ion);
+		graph.push_back(node);
+
+		e.clear();
+		e.composition = "0";
+		e.targetnode = 1;
+		graph[0].insertTempEdge(e);
+
+		e.clear();
+		e.composition = "0";
+		e.targetnode = 2;
+		graph[0].insertTempEdge(e);
+
+		e.clear();
+		e.composition = "0";
+		e.targetnode = 3;
+		graph[0].insertTempEdge(e);
+
+		lastsystemnode = (int)graph.size() - 1;
+		startnode = 1;
+		break;
+#endif
 	case linearpolysaccharide:
 		node.clear();
 		node.setMZRatio(0);
@@ -435,6 +583,13 @@ int cDeNovoGraph::createGraph(bool& terminatecomputation) {
 			b.clear();
 			b.setMass(bricksdatabasewithcombinations.getMassOfComposition(combarray));
 			b.setComposition(compositionname, true);
+
+#if POLYKETIDE_SIDEROPHORES == 1
+			if (((parameters->peptidetype == linearpolyketide) || (parameters->peptidetype == cyclicpolyketide)) && !bricksdatabasewithcombinations.checkPolyketideBlocks(b)) {
+				continue;
+			}
+#endif
+
 			bricksdatabasewithcombinations.push_back(b);
 		}
 
@@ -467,37 +622,76 @@ int cDeNovoGraph::createGraph(bool& terminatecomputation) {
 
 			for (int k = 0; k < (int)parameters->fragmentionsfordenovograph.size(); k++) { 
 				
-				if (/*!graph[i].ionannotation[parameters->fragmentionsfordenovograph[k]] ||*/ (parameters->fragmentionsfordenovograph[k] == precursor_ion)) {
+				if (/*!graph[i].ionannotation[parameters->fragmentionsfordenovograph[k]] ||*/ (parameters->fragmentionsfordenovograph[k] == precursor_ion)
+#if POLYKETIDE_SIDEROPHORES == 1
+					|| (parameters->fragmentionsfordenovograph[k] == linear_polyketide_precursor_ion_h_h) || (parameters->fragmentionsfordenovograph[k] == linear_polyketide_precursor_ion_h_oh) 
+					|| (parameters->fragmentionsfordenovograph[k] == linear_polyketide_precursor_ion_oh_oh) || (parameters->fragmentionsfordenovograph[k] == cyclic_polyketide_precursor_ion)
+#endif
+					) {
 					continue;
 				}
 
 				for (int m = 0; m < (int)parameters->fragmentionsfordenovograph.size(); m++) {
 					
 					// test for incompatible ion series
-					if ((!((parameters->fragmentdefinitions[parameters->fragmentionsfordenovograph[k]].nterminal == parameters->fragmentdefinitions[parameters->fragmentionsfordenovograph[m]].nterminal) && 
-						(parameters->fragmentdefinitions[parameters->fragmentionsfordenovograph[k]].cterminal == parameters->fragmentdefinitions[parameters->fragmentionsfordenovograph[m]].cterminal))) && (parameters->fragmentionsfordenovograph[m] != precursor_ion)) {
+					if (
+#if POLYKETIDE_SIDEROPHORES == 1
+						(
+#endif
+						!((parameters->fragmentdefinitions[parameters->fragmentionsfordenovograph[k]].nterminal == parameters->fragmentdefinitions[parameters->fragmentionsfordenovograph[m]].nterminal) && 
+						(parameters->fragmentdefinitions[parameters->fragmentionsfordenovograph[k]].cterminal == parameters->fragmentdefinitions[parameters->fragmentionsfordenovograph[m]].cterminal)) 
+#if POLYKETIDE_SIDEROPHORES == 1
+						||
+						(((parameters->peptidetype == linearpolyketide) || (parameters->peptidetype == cyclicpolyketide)) && 
+						!(((parameters->fragmentionsfordenovograph[k] == l0h_ion) && (parameters->fragmentionsfordenovograph[m] == l0h_ion)) || ((parameters->fragmentionsfordenovograph[k] == l1h_ion) && (parameters->fragmentionsfordenovograph[m] == l1h_ion)) || ((parameters->fragmentionsfordenovograph[k] == l2h_ion) && (parameters->fragmentionsfordenovograph[m] == l2h_ion))
+						|| ((parameters->fragmentionsfordenovograph[k] == l1oh_ion) && (parameters->fragmentionsfordenovograph[m] == l1oh_ion)) || ((parameters->fragmentionsfordenovograph[k] == l2oh_ion) && (parameters->fragmentionsfordenovograph[m] == l2oh_ion))))
+						)						
+						&& (parameters->fragmentionsfordenovograph[m] != linear_polyketide_precursor_ion_h_h) && (parameters->fragmentionsfordenovograph[m] != linear_polyketide_precursor_ion_h_oh)
+						&& (parameters->fragmentionsfordenovograph[m] != linear_polyketide_precursor_ion_oh_oh) && (parameters->fragmentionsfordenovograph[m] != cyclic_polyketide_precursor_ion)
+#endif
+						&& (parameters->fragmentionsfordenovograph[m] != precursor_ion)
+						) {
 						continue;
 					}
 
 					// terminal modifications
 					for (int n = 0; n < (int)parameters->searchedmodifications.size(); n++) {
 
-						if ((n > 0) && (parameters->fragmentionsfordenovograph[m] != precursor_ion)) {
+						if ((n > 0) && (parameters->fragmentionsfordenovograph[m] != precursor_ion)
+#if POLYKETIDE_SIDEROPHORES == 1
+							&& (parameters->fragmentionsfordenovograph[m] != linear_polyketide_precursor_ion_h_h) && (parameters->fragmentionsfordenovograph[m] != linear_polyketide_precursor_ion_h_oh)
+							&& (parameters->fragmentionsfordenovograph[m] != linear_polyketide_precursor_ion_oh_oh) && (parameters->fragmentionsfordenovograph[m] != cyclic_polyketide_precursor_ion)
+#endif			
+							) {
 							continue;
 						}
 
 						// middle modifications for branched and branch-cyclic peptides
 						for (int p = 0; p < (int)parameters->searchedmodifications.size(); p++) {
 
-							if ((p > 0) && ((parameters->peptidetype == linear) || (parameters->peptidetype == cyclic) || (parameters->peptidetype == linearpolysaccharide))) {
+							if ((p > 0) && ((parameters->peptidetype == linear) || (parameters->peptidetype == cyclic) || (parameters->peptidetype == linearpolysaccharide)
+#if POLYKETIDE_SIDEROPHORES == 1
+								|| (parameters->peptidetype == linearpolyketide) || (parameters->peptidetype == cyclicpolyketide)
+#endif						
+								)) {
 								continue;
 							}
 
 							termmass = 0;
 
+#if POLYKETIDE_SIDEROPHORES == 1
+							if ((parameters->fragmentionsfordenovograph[m] == precursor_ion) 
+								|| (parameters->fragmentionsfordenovograph[m] == linear_polyketide_precursor_ion_h_h) || (parameters->fragmentionsfordenovograph[m] == linear_polyketide_precursor_ion_h_oh)
+								|| (parameters->fragmentionsfordenovograph[m] == linear_polyketide_precursor_ion_oh_oh) || (parameters->fragmentionsfordenovograph[m] == cyclic_polyketide_precursor_ion)) {
+#else
 							if (parameters->fragmentionsfordenovograph[m] == precursor_ion) {
+#endif
 
-								if ((parameters->peptidetype == linear) || ((parameters->peptidetype == linearpolysaccharide))) {
+								if ((parameters->peptidetype == linear) || (parameters->peptidetype == linearpolysaccharide)
+#if POLYKETIDE_SIDEROPHORES == 1
+									|| (parameters->peptidetype == linearpolyketide)
+#endif
+									) {
 									if ((n > 0) && ((parameters->fragmentdefinitions[parameters->fragmentionsfordenovograph[k]].nterminal && parameters->searchedmodifications[n].nterminal) || (parameters->fragmentdefinitions[parameters->fragmentionsfordenovograph[k]].cterminal && parameters->searchedmodifications[n].cterminal))) {
 										continue;
 									}
@@ -527,7 +721,7 @@ int cDeNovoGraph::createGraph(bool& terminatecomputation) {
 									mass += parameters->fragmentdefinitions[parameters->fragmentionsfordenovograph[m]].massdifference;				
 									mass += termmass;
 
-									if ((parameters->peptidetype == branched) || (parameters->peptidetype == lasso)) {
+									if ((parameters->peptidetype == branched) || (parameters->peptidetype == branchcyclic)) {
 										mass += parameters->searchedmodifications[p].massdifference;
 									}
 
@@ -572,7 +766,14 @@ int cDeNovoGraph::createGraph(bool& terminatecomputation) {
 												}
 
 												// irrelevant connection with precursor
+#if POLYKETIDE_SIDEROPHORES == 1
+												if (((parameters->fragmentionsfordenovograph[m] == precursor_ion) 
+													|| (parameters->fragmentionsfordenovograph[m] == linear_polyketide_precursor_ion_h_h) || (parameters->fragmentionsfordenovograph[m] == linear_polyketide_precursor_ion_h_oh)
+													|| (parameters->fragmentionsfordenovograph[m] == linear_polyketide_precursor_ion_oh_oh) || (parameters->fragmentionsfordenovograph[m] == cyclic_polyketide_precursor_ion)) 
+													&& (middle != (int)graph.size() - 1) && (i != (int)graph.size() - 1)) {
+#else
 												if ((parameters->fragmentionsfordenovograph[m] == precursor_ion) && (middle != (int)graph.size() - 1) && (i != (int)graph.size() - 1)) {
+#endif
 													middle++;
 													continue;
 												}
@@ -782,11 +983,12 @@ int cDeNovoGraph::connectEdgesFormingPathsNotFinishingInPrecursor(bool& terminat
 			graph[i].insertEdge(e);
 			edgescreated++;
 
-			// normal brick
 			cBrick b;
+			string s = "unknown";
+
+			// normal brick
 			b.setName(to_string(e.massdifference));
 			b.setAcronyms(to_string(e.massdifference));
-			string s = "unknown";
 			b.setReferences(s);
 			b.setSummary(s);
 			b.setMass(e.massdifference);
@@ -794,7 +996,7 @@ int cDeNovoGraph::connectEdgesFormingPathsNotFinishingInPrecursor(bool& terminat
 			b.setArtificial(true);
 			bricksdatabasewithcombinations.push_back(b);
 
-			// water loss brick
+			// -H2O brick (1)
 			b.setName(to_string(e.massdifference - H2O));
 			b.setAcronyms(to_string(e.massdifference - H2O));
 			b.setReferences(s);
@@ -803,6 +1005,80 @@ int cDeNovoGraph::connectEdgesFormingPathsNotFinishingInPrecursor(bool& terminat
 			b.setComposition(to_string((int)bricksdatabasewithcombinations.size() + 1), false);
 			b.setArtificial(true);
 			bricksdatabasewithcombinations.push_back(b);
+
+			// +H2O brick (2)
+			b.setName(to_string(e.massdifference + H2O));
+			b.setAcronyms(to_string(e.massdifference + H2O));
+			b.setReferences(s);
+			b.setSummary(s);
+			b.setMass(e.massdifference + H2O);
+			b.setComposition(to_string((int)bricksdatabasewithcombinations.size() + 1), false);
+			b.setArtificial(true);
+			bricksdatabasewithcombinations.push_back(b);
+
+#if POLYKETIDE_SIDEROPHORES == 1
+
+			// -H2 brick (3)
+			b.setName(to_string(e.massdifference - 2*H));
+			b.setAcronyms(to_string(e.massdifference - 2*H));
+			b.setReferences(s);
+			b.setSummary(s);
+			b.setMass(e.massdifference - 2*H);
+			b.setComposition(to_string((int)bricksdatabasewithcombinations.size() + 1), false);
+			b.setArtificial(true);
+			bricksdatabasewithcombinations.push_back(b);
+
+			// -O brick (4)
+			b.setName(to_string(e.massdifference - O));
+			b.setAcronyms(to_string(e.massdifference - O));
+			b.setReferences(s);
+			b.setSummary(s);
+			b.setMass(e.massdifference - O);
+			b.setComposition(to_string((int)bricksdatabasewithcombinations.size() + 1), false);
+			b.setArtificial(true);
+			bricksdatabasewithcombinations.push_back(b);
+
+			// +O brick (5)
+			b.setName(to_string(e.massdifference + O));
+			b.setAcronyms(to_string(e.massdifference + O));
+			b.setReferences(s);
+			b.setSummary(s);
+			b.setMass(e.massdifference + O);
+			b.setComposition(to_string((int)bricksdatabasewithcombinations.size() + 1), false);
+			b.setArtificial(true);
+			bricksdatabasewithcombinations.push_back(b);
+
+			// -O2 brick (6)
+			b.setName(to_string(e.massdifference - 2*O));
+			b.setAcronyms(to_string(e.massdifference - 2*O));
+			b.setReferences(s);
+			b.setSummary(s);
+			b.setMass(e.massdifference - 2*O);
+			b.setComposition(to_string((int)bricksdatabasewithcombinations.size() + 1), false);
+			b.setArtificial(true);
+			bricksdatabasewithcombinations.push_back(b);
+
+			// -H2+O brick (7)
+			b.setName(to_string(e.massdifference - 2*H + O));
+			b.setAcronyms(to_string(e.massdifference - 2*H + O));
+			b.setReferences(s);
+			b.setSummary(s);
+			b.setMass(e.massdifference - 2*H + O);
+			b.setComposition(to_string((int)bricksdatabasewithcombinations.size() + 1), false);
+			b.setArtificial(true);
+			bricksdatabasewithcombinations.push_back(b);
+
+			// -H2O2 brick (8)
+			b.setName(to_string(e.massdifference - 2*H - 2*O));
+			b.setAcronyms(to_string(e.massdifference - 2*H - 2*O));
+			b.setReferences(s);
+			b.setSummary(s);
+			b.setMass(e.massdifference - 2*H - 2*O);
+			b.setComposition(to_string((int)bricksdatabasewithcombinations.size() + 1), false);
+			b.setArtificial(true);
+			bricksdatabasewithcombinations.push_back(b);
+
+#endif
 		//}
 
 	}
@@ -1020,7 +1296,7 @@ string cDeNovoGraph::printGraph() {
 			g += "ppm error: " + s2 + ", ";
 			g += "source charge: " + to_string(graph[i][j].sourcecharge) + ", ";
 			g += "target charge: " + to_string(graph[i][j].targetcharge);
-			if ((parameters->peptidetype == branched) || (parameters->peptidetype == lasso)) {
+			if ((parameters->peptidetype == branched) || (parameters->peptidetype == branchcyclic)) {
 				if (graph[i][j].middlemodifID > 0) {
 					g += ", branch modification: " + parameters->searchedmodifications[graph[i][j].middlemodifID].name;
 				}

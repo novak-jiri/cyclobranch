@@ -29,24 +29,7 @@ void cSequenceDatabase::loadFromPlainTextStream(ifstream &stream) {
 		pos = s.find('\t');
 		if (pos != string::npos) {
 			type = s.substr(0, pos);
-			if (type.compare("linear") == 0) {
-				sequence.setPeptideType(linear);
-			}
-			if (type.compare("cyclic") == 0) {
-				sequence.setPeptideType(cyclic);
-			}
-			if (type.compare("branched") == 0) {
-				sequence.setPeptideType(branched);
-			}
-			if (type.compare("branch-cyclic") == 0) {
-				sequence.setPeptideType(lasso);
-			}
-			if (type.compare("linearpolysaccharide") == 0) {
-				sequence.setPeptideType(linearpolysaccharide);
-			}
-			if (type.compare("other") == 0) {
-				sequence.setPeptideType(other);
-			}
+			sequence.setPeptideType(getPeptideTypeFromString(type));
 			s = s.substr(pos + 1);
 		}
 		else {

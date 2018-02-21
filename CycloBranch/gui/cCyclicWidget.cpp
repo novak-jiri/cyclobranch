@@ -209,15 +209,33 @@ void generateCyclicLabelsToRight(bool nterminal, int rotationid, int rotationsta
 	double cumulativeangle;
 	string name;
 	int m;
-	if ((visiblerotationid == -1) || ((parameters->peptidetype == cyclic) && (visiblerotationid == rotationid)) || ((parameters->peptidetype == lasso) && (visiblerotationid == rotationid/6))) {
+	if ((visiblerotationid == -1) || ((parameters->peptidetype == cyclic) && (visiblerotationid == rotationid)) 
+#if POLYKETIDE_SIDEROPHORES == 1
+		|| ((parameters->peptidetype == cyclicpolyketide) && (visiblerotationid == rotationid))
+#endif
+		|| ((parameters->peptidetype == branchcyclic) && (visiblerotationid == rotationid/6))) {
 		for (int i = 0; i < (int)parameters->fragmentionsfortheoreticalspectra.size(); i++) {
-			if ((nterminal && parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].nterminal) || (!nterminal && parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].cterminal)) {
+			if ((nterminal && parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].nterminal) || (!nterminal && parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].cterminal)
+#if POLYKETIDE_SIDEROPHORES == 1
+				|| (parameters->peptidetype == cyclicpolyketide)
+#endif
+				) {
 				m = 0;
 				for (int j = fragmentstart; j < fragmentend; j++) {	
 					if ((branchstart == -1) || (branchend == -1) || ((branchstart >= 0) && (j < branchstart)) || ((branchend >= 0) && (j >= branchend))) {
 						if (theoreticalspectrum->getVisualCoverage()[rotationid*parameters->fragmentionsfortheoreticalspectra.size() + i].series[j] > 0) {
 							name = theoreticalspectrum->getVisualCoverage()[rotationid*parameters->fragmentionsfortheoreticalspectra.size() + i].name.substr(0, theoreticalspectrum->getVisualCoverage()[rotationid*parameters->fragmentionsfortheoreticalspectra.size() + i].name.rfind('_') + 1);
-							name += parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].name[0] + to_string(j + 1) + parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].name.substr(1);
+#if POLYKETIDE_SIDEROPHORES == 1							
+							if (parameters->peptidetype == cyclicpolyketide) {
+								name += parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].name.substr(0, 2) + to_string(j + 1) + parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].name.substr(2);
+							}
+							else {
+#endif
+								name += parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].name[0] + to_string(j + 1) + parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].name.substr(1);
+#if POLYKETIDE_SIDEROPHORES == 1
+							}
+#endif
+							
 							cumulativeangle = angle*(double)((rotationstart + m + 1) % numberofringblocks) + angle/(double)2;
 							if (cumulativeangle < pi/2) {
 								QPoint p3(centerx + sin(cumulativeangle)*(radius + linesize) - sin(pi/2 - cumulativeangle)*cornerlinesize, centery - sin(pi/2 - cumulativeangle)*(radius + linesize) - sin(cumulativeangle)*cornerlinesize);
@@ -249,15 +267,32 @@ void generateCyclicLabelsToLeft(bool nterminal, int rotationid, int rotationstar
 	double cumulativeangle;
 	string name;
 	int m;
-	if ((visiblerotationid == -1) || ((parameters->peptidetype == cyclic) && (visiblerotationid == rotationid)) || ((parameters->peptidetype == lasso) && (visiblerotationid == rotationid/6))) {
+	if ((visiblerotationid == -1) || ((parameters->peptidetype == cyclic) && (visiblerotationid == rotationid)) 
+#if POLYKETIDE_SIDEROPHORES == 1
+		|| ((parameters->peptidetype == cyclicpolyketide) && (visiblerotationid == rotationid))
+#endif		
+		|| ((parameters->peptidetype == branchcyclic) && (visiblerotationid == rotationid/6))) {
 		for (int i = 0; i < (int)parameters->fragmentionsfortheoreticalspectra.size(); i++) {
-			if ((nterminal && parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].nterminal) || (!nterminal && parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].cterminal)) {
+			if ((nterminal && parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].nterminal) || (!nterminal && parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].cterminal)
+#if POLYKETIDE_SIDEROPHORES == 1
+				|| (parameters->peptidetype == cyclicpolyketide)
+#endif			
+				) {
 				m = 0;
 				for (int j = fragmentstart; j < fragmentend; j++) {		
 					if ((branchstart == -1) || (branchend == -1) || ((branchstart >= 0) && (j < branchstart)) || ((branchend >= 0) && (j >= branchend))) {
 						if (theoreticalspectrum->getVisualCoverage()[rotationid*parameters->fragmentionsfortheoreticalspectra.size() + i].series[j] > 0) {
 							name = theoreticalspectrum->getVisualCoverage()[rotationid*parameters->fragmentionsfortheoreticalspectra.size() + i].name.substr(0, theoreticalspectrum->getVisualCoverage()[rotationid*parameters->fragmentionsfortheoreticalspectra.size() + i].name.rfind('_') + 1);
-							name += parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].name[0] + to_string(j + 1) + parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].name.substr(1);
+#if POLYKETIDE_SIDEROPHORES == 1							
+							if (parameters->peptidetype == cyclicpolyketide) {
+								name += parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].name.substr(0, 2) + to_string(j + 1) + parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].name.substr(2);
+							}
+							else {
+#endif
+								name += parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].name[0] + to_string(j + 1) + parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].name.substr(1);
+#if POLYKETIDE_SIDEROPHORES == 1
+							}					
+#endif
 							cumulativeangle = angle*(double)((2*numberofringblocks - rotationstart + numberofringblocks - m - 1) % numberofringblocks) + angle/(double)2;
 							if (cumulativeangle < pi/2) {
 								QPoint p4(centerx + sin(cumulativeangle)*(radius - linesize) + sin(pi/2 - cumulativeangle)*cornerlinesize, centery - sin(pi/2 - cumulativeangle)*(radius - linesize) + sin(cumulativeangle)*cornerlinesize);

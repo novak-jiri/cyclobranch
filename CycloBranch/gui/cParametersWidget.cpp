@@ -35,12 +35,17 @@ cParametersWidget::cParametersWidget(QWidget* parent) {
 	stdbuttons->button(QDialogButtonBox::Ok)->setToolTip("Accept changes and hide window.");
 	stdbuttons->button(QDialogButtonBox::Apply)->setToolTip("Accept changes and keep window opened.");
 	stdbuttons->button(QDialogButtonBox::Cancel)->setToolTip("Drop changes and hide window.");
+
 	load = new QPushButton(tr("Load"));
 	load->setToolTip("Load settings from a file (*.ini).");
+	load->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_L));
+
 	save = new QPushButton(QString("Save"));
 	save->setToolTip("Save settings in the current file (*.ini). When a file has not been loaded yet, the \"Save As ...\" file dialog is opened.");
+	
 	saveas = new QPushButton(tr("Save As..."));
 	saveas->setToolTip("Save settings into a file (*.ini).");
+	saveas->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_D));
 
 	buttons = new QHBoxLayout();
 	buttons->addWidget(stdbuttons);
@@ -58,6 +63,10 @@ cParametersWidget::cParametersWidget(QWidget* parent) {
 	peptidetype->addItem(tr("Cyclic"));
 	peptidetype->addItem(tr("Branched"));
 	peptidetype->addItem(tr("Branch-cyclic"));
+#if POLYKETIDE_SIDEROPHORES == 1
+	peptidetype->addItem(tr("Linear oligoketide siderophore"));
+	peptidetype->addItem(tr("Cyclic oligoketide siderophore"));
+#endif
 	peptidetype->addItem(tr("Linear polysaccharide (beta version)"));
 	//peptidetype->addItem(tr("Other"));
 	peaklistformlayout->addRow(tr("Peptide Type: "), peptidetype);
@@ -65,12 +74,13 @@ cParametersWidget::cParametersWidget(QWidget* parent) {
 	peaklistline = new QLineEdit();
 	peaklistbutton = new QPushButton("Select");
 	#if OS_TYPE != WIN
-		peaklistline->setToolTip("Select the peaklist. Following formats are supported: txt, mgf, mzML, mzXML.");
-		peaklistbutton->setToolTip("Select the peaklist. Following formats are supported: txt, mgf, mzML, mzXML.");
+		peaklistline->setToolTip("Select the peaklist. Following formats are supported: txt, mgf, mzML, mzXML, imzML.");
+		peaklistbutton->setToolTip("Select the peaklist. Following formats are supported: txt, mgf, mzML, mzXML, imzML.");
 	#else
-		peaklistline->setToolTip("Select the peaklist. Following formats are supported: txt, mgf, mzML, mzXML, baf.");
-		peaklistbutton->setToolTip("Select the peaklist. Following formats are supported: txt, mgf, mzML, mzXML, baf.");
+		peaklistline->setToolTip("Select the peaklist. Following formats are supported: txt, mgf, mzML, mzXML, baf, mis, imzML.");
+		peaklistbutton->setToolTip("Select the peaklist. Following formats are supported: txt, mgf, mzML, mzXML, baf, mis, imzML.");
 	#endif
+	peaklistbutton->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_P));
 	peaklistlayout = new QHBoxLayout();
 	peaklistlayout->addWidget(peaklistline);
 	peaklistlayout->addWidget(peaklistbutton);
@@ -102,20 +112,20 @@ cParametersWidget::cParametersWidget(QWidget* parent) {
 	peaklistformlayout->addRow(tr("Precursor m/z Error Tolerance: "), precursormasserrortolerance);
 
 	fragmentmasserrortolerance = new QDoubleSpinBox();
-	fragmentmasserrortolerance->setToolTip("Enter the fragment m/z error tolerance in ppm.");
+	fragmentmasserrortolerance->setToolTip("Enter the m/z error tolerance in MS mode or the fragment m/z error tolerance in MS/MS mode [ppm].");
 	fragmentmasserrortolerance->setDecimals(3);
 	fragmentmasserrortolerance->setRange(0, 10000);
 	fragmentmasserrortolerance->setSingleStep(1);
 	fragmentmasserrortolerance->setSuffix(" ppm");
-	peaklistformlayout->addRow(tr("Fragment m/z Error Tolerance: "), fragmentmasserrortolerance);
+	peaklistformlayout->addRow(tr("m/z Error Tolerance: "), fragmentmasserrortolerance);
 
 	masserrortolerancefordeisotoping = new QDoubleSpinBox();
-	masserrortolerancefordeisotoping->setToolTip("Enter the fragment m/z error tolerance for deisotoping in ppm (the same value like \"Fragment m/z Error Tolerance\" is recommended by default; 0 = the deisotoping is disabled).");
+	masserrortolerancefordeisotoping->setToolTip("Enter the m/z error tolerance for deisotoping in MS mode or the fragment m/z error tolerance for deisotoping in MS/MS mode [ppm]\n(the same value like \"m/z Error Tolerance\" is recommended by default; 0 = the deisotoping is disabled).");
 	masserrortolerancefordeisotoping->setDecimals(3);
 	masserrortolerancefordeisotoping->setRange(0, 10000);
 	masserrortolerancefordeisotoping->setSingleStep(1);
 	masserrortolerancefordeisotoping->setSuffix(" ppm");
-	peaklistformlayout->addRow(tr("Fragment m/z Error Tolerance for Deisotoping: "), masserrortolerancefordeisotoping);
+	peaklistformlayout->addRow(tr("m/z Error Tolerance for Deisotoping: "), masserrortolerancefordeisotoping);
 
 	minimumrelativeintensitythreshold = new QDoubleSpinBox();
 	minimumrelativeintensitythreshold->setToolTip("Enter the threshold of relative intensity in %. Peaks having relative intensities below the threshold will be removed from the peaklist.");
@@ -141,6 +151,7 @@ cParametersWidget::cParametersWidget(QWidget* parent) {
 	brickdatabaseline->setToolTip("Select the txt file containing a list of building blocks.");
 	brickdatabasebutton = new QPushButton("Select");
 	brickdatabasebutton->setToolTip("Select the txt file containing a list of building blocks.");
+	brickdatabasebutton->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_B));
 	brickdatabaselayout = new QHBoxLayout();
 	brickdatabaselayout->addWidget(brickdatabaseline);
 	brickdatabaselayout->addWidget(brickdatabasebutton);
@@ -179,6 +190,7 @@ cParametersWidget::cParametersWidget(QWidget* parent) {
 	modificationsline->setToolTip("Select the txt file containing a list of modifications.");
 	modificationsbutton = new QPushButton("Select");
 	modificationsbutton->setToolTip("Select the txt file containing a list of modifications.");
+	modificationsbutton->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_M));
 	modificationslayout = new QHBoxLayout();
 	modificationslayout->addWidget(modificationsline);
 	modificationslayout->addWidget(modificationsbutton);
@@ -231,6 +243,7 @@ cParametersWidget::cParametersWidget(QWidget* parent) {
 	sequencedatabaseline->setToolTip("Select the txt file containing a database of sequences.");
 	sequencedatabasebutton = new QPushButton("Select");
 	sequencedatabasebutton->setToolTip("Select the txt file containing a database of sequences.");
+	sequencedatabasebutton->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_T));
 	sequencedatabaselayout = new QHBoxLayout();
 	sequencedatabaselayout->addWidget(sequencedatabaseline);
 	sequencedatabaselayout->addWidget(sequencedatabasebutton);
@@ -266,8 +279,8 @@ cParametersWidget::cParametersWidget(QWidget* parent) {
 	applicationformlayout->addRow(tr("Peptide Sequence Tag: "), sequencetag);
 
 	fragmentiontypes = new cFragmentIonsListWidget(this);
-	fragmentiontypes->setToolTip("Select fragment ion types which will be generated in theoretical spectra of peptide sequence candidates.");
-	applicationformlayout->addRow(tr("Fragment Ion Types in Theoretical Spectra: "), fragmentiontypes);
+	fragmentiontypes->setToolTip("Select ion types which will be generated in theoretical spectra.");
+	applicationformlayout->addRow(tr("Ion Types in Theoretical Spectra: "), fragmentiontypes);
 
 	clearhitswithoutparent = new QCheckBox();
 	clearhitswithoutparent->setToolTip("When checked, a hit of a peak is not considered when corresponding parent peak is not hit (e.g., a hit of a dehydrated b-ion is not considered as a hit when corresponding b-ion has not been hit).");
@@ -285,6 +298,7 @@ cParametersWidget::cParametersWidget(QWidget* parent) {
 	searchedsequencebutton = new QPushButton("Edit");
 	searchedsequencebutton->setMinimumWidth(50);
 	searchedsequencebutton->setToolTip("Edit the sequence using the 'Draw Peptide' tool.");
+	searchedsequencebutton->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_E));
 	searchedsequencelayout = new QHBoxLayout();
 	searchedsequencelayout->addWidget(searchedsequenceline);
 	searchedsequencelayout->addWidget(searchedsequencebutton);
@@ -314,7 +328,6 @@ cParametersWidget::cParametersWidget(QWidget* parent) {
 	vlayout2 = new QVBoxLayout();
 	vlayout2->addWidget(applicationgroupbox);
 	vlayout2->addWidget(searchedsequencegroupbox);
-		
 
 	hlayout = new QHBoxLayout();
 	hlayout->setContentsMargins(0, 0, 0, 0);
@@ -322,10 +335,11 @@ cParametersWidget::cParametersWidget(QWidget* parent) {
 	hlayout->addLayout(vlayout2);
 
 	hlayoutwidget = new QWidget();
+	hlayoutwidget->setMinimumWidth(1250);
 	hlayoutwidget->setLayout(hlayout);
 
 	hlayoutscroll = new QScrollArea();
-	hlayoutscroll->setWidgetResizable(true);
+	hlayoutscroll->setWidgetResizable(false);
 	hlayoutscroll->setFrameShape(QFrame::NoFrame);
 	hlayoutscroll->setWidget(hlayoutwidget);
 
@@ -466,7 +480,7 @@ void cParametersWidget::setAndRestoreParameters(cParameters& parameters) {
 
 	this->parameters = parameters;
 	this->parameters.bricksdatabase.clear();
-	this->parameters.peaklist.clear();
+	this->parameters.peaklistseries.clear();
 	this->parameters.fragmentionsfordenovograph.clear();
 	this->parameters.sequencetag = this->parameters.originalsequencetag;
 	this->parameters.searchedsequence = this->parameters.originalsearchedsequence;
@@ -496,6 +510,22 @@ void cParametersWidget::keyPressEvent(QKeyEvent *event) {
     if (event->key() == Qt::Key_Escape) {
 		restoreParameters();
     }
+
+	if ((event->key() == Qt::Key_Enter) || (event->key() == Qt::Key_Return)) {
+		updateParametersAndHide();
+    }
+
+	if ((event->modifiers() == Qt::ControlModifier) && (event->key() == Qt::Key_S)) {
+		saveSettings();
+	}
+
+	if (event->key() == Qt::Key_F1) {
+		#if OS_TYPE == WIN
+			QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo("docs/html/basicconfiguration.html").absoluteFilePath()));
+		#else
+			QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo(installdir + "docs/html/basicconfiguration.html").absoluteFilePath()));
+		#endif
+	}
 }
 
 
@@ -634,9 +664,9 @@ void cParametersWidget::saveSettingsAs() {
 
 void cParametersWidget::peaklistButtonReleased() {
 	#if OS_TYPE != WIN
-		QString filename = QFileDialog::getOpenFileName(this, tr("Select Peaklist..."), lastdirselectpeaklist, tr("Peak Lists (*.txt *.mgf *.mzML *.mzXML)"));
+		QString filename = QFileDialog::getOpenFileName(this, tr("Select Peaklist..."), lastdirselectpeaklist, tr("Peak Lists (*.txt *.mgf *.mzML *.mzXML *.imzML)"));
 	#else
-		QString filename = QFileDialog::getOpenFileName(this, tr("Select Peaklist..."), lastdirselectpeaklist, tr("Peak Lists (*.txt *.mgf *.mzML *.mzXML *.baf)"));
+		QString filename = QFileDialog::getOpenFileName(this, tr("Select Peaklist..."), lastdirselectpeaklist, tr("Peak Lists (*.txt *.mgf *.mzML *.mzXML *.baf *.mis *.imzML)"));
 	#endif
 
 	if (!filename.isEmpty()) {
@@ -687,14 +717,14 @@ bool cParametersWidget::updateParameters() {
 		return false;
 	}
 
-	if ((brickdatabaseline->text().toStdString().compare("") == 0) && (((modeType)mode->currentIndex() == denovoengine) || ((modeType)mode->currentIndex() == singlecomparison) || ((modeType)mode->currentIndex() == databasesearch))) {
+	if ((brickdatabaseline->text().toStdString().compare("") == 0) && (((eModeType)mode->currentIndex() == denovoengine) || ((eModeType)mode->currentIndex() == singlecomparison) || ((eModeType)mode->currentIndex() == databasesearch))) {
 		errstr = "A database of building blocks must be specified!";
 		msgBox.setText(errstr);
 		msgBox.exec();
 		return false;
 	}
 
-	if ((sequencedatabaseline->text().toStdString().compare("") == 0) && (((modeType)mode->currentIndex() == databasesearch) || ((modeType)mode->currentIndex() == dereplication))) {
+	if ((sequencedatabaseline->text().toStdString().compare("") == 0) && (((eModeType)mode->currentIndex() == databasesearch) || ((eModeType)mode->currentIndex() == dereplication))) {
 		errstr = "A sequence database must be specified!";
 		msgBox.setText(errstr);
 		msgBox.exec();
@@ -709,7 +739,7 @@ bool cParametersWidget::updateParameters() {
 	}
 
 	/*
-	if ((maximumbricksincombinationmiddle->value() < 2) && ((modeType)mode->currentIndex() == denovoengine) && (((peptideType)peptidetype->currentIndex() == branched) || ((peptideType)peptidetype->currentIndex() == lasso))) {
+	if ((maximumbricksincombinationmiddle->value() < 2) && ((eModeType)mode->currentIndex() == denovoengine) && (((ePeptideType)peptidetype->currentIndex() == branched) || ((ePeptideType)peptidetype->currentIndex() == branchcyclic))) {
 		errstr = "'Maximum Number of Combined Blocks (middle)' must be at least 2 when a branched or a branch-cyclic peptide is searched! (One block represents a branched residue, the other block(s) corresponds to a branch.)";
 		msgBox.setText(errstr);
 		msgBox.exec();
@@ -717,7 +747,7 @@ bool cParametersWidget::updateParameters() {
 	}
 	*/
 
-	parameters.peptidetype = (peptideType)peptidetype->currentIndex();
+	parameters.peptidetype = (ePeptideType)peptidetype->currentIndex();
 	parameters.peaklistfilename = peaklistline->text().toStdString();
 	parameters.precursormass = precursormass->value();
 	parameters.precursoradduct = precursoradduct->text().toStdString();
@@ -743,10 +773,10 @@ bool cParametersWidget::updateParameters() {
 	parameters.enablescrambling = enablescrambling->isChecked();
 	parameters.similaritysearch = similaritysearch->isChecked();
 
-	parameters.mode = (modeType)mode->currentIndex();
+	parameters.mode = (eModeType)mode->currentIndex();
 	parameters.sequencedatabasefilename = sequencedatabaseline->text().toStdString();
 	parameters.maximumnumberofthreads = maximumnumberofthreads->value();
-	parameters.scoretype = (scoreType)scoretype->currentIndex();
+	parameters.scoretype = (eScoreType)scoretype->currentIndex();
 	parameters.hitsreported = hitsreported->value();
 	parameters.sequencetag = sequencetag->text().toStdString();
 	parameters.originalsequencetag = parameters.sequencetag;
@@ -754,22 +784,26 @@ bool cParametersWidget::updateParameters() {
 	parameters.fragmentionsfortheoreticalspectra.clear();
 	int start;
 
-	if ((modeType)mode->currentIndex() == dereplication) {
+	if ((eModeType)mode->currentIndex() == dereplication) {
 		start = ms_hplus;
 	}
 	else {
-		switch ((peptideType)peptidetype->currentIndex())
+		switch ((ePeptideType)peptidetype->currentIndex())
 		{
 		case linear:
 		case branched:
-			start = a_ion;
-			break;
 		case cyclic:
+		case branchcyclic:
 			start = a_ion;
 			break;
-		case lasso:
-			start = a_ion;
+#if POLYKETIDE_SIDEROPHORES == 1
+		case linearpolyketide:
+			start = l1h_ion;
 			break;
+		case cyclicpolyketide:
+			start = l0h_ion;
+			break;
+#endif
 		case linearpolysaccharide:
 			start = ms_nterminal_ion_hplus;
 			break;
@@ -781,7 +815,7 @@ bool cParametersWidget::updateParameters() {
 
 	for (int i = 0; i < fragmentiontypes->getList()->count(); i++) {
 		if (fragmentiontypes->getList()->item(i)->isSelected()) {
-			parameters.fragmentionsfortheoreticalspectra.push_back((fragmentIonType)(i + start));
+			parameters.fragmentionsfortheoreticalspectra.push_back((eFragmentIonType)(i + start));
 		}
 	}
 
@@ -850,14 +884,18 @@ void cParametersWidget::restoreParameters() {
 		{
 		case linear:
 		case branched:
-			start = a_ion;
-			break;
 		case cyclic:
+		case branchcyclic:
 			start = a_ion;
 			break;
-		case lasso:
-			start = a_ion;
+#if POLYKETIDE_SIDEROPHORES == 1
+		case linearpolyketide:
+			start = l1h_ion;
 			break;
+		case cyclicpolyketide:
+			start = l0h_ion;
+			break;
+#endif
 		case linearpolysaccharide:
 			start = ms_nterminal_ion_hplus;
 			break;
@@ -894,7 +932,7 @@ void cParametersWidget::updateSettingsWhenPeptideTypeChanged(int index) {
 
 	resetFragmentIonTypes();
 
-	switch ((peptideType)index)
+	switch ((ePeptideType)index)
 	{
 	case linear:
 		modificationsline->setDisabled(false);
@@ -926,7 +964,7 @@ void cParametersWidget::updateSettingsWhenPeptideTypeChanged(int index) {
 		searchedsequenceCtermmodif->setDisabled(false);
 		searchedsequenceTmodif->setDisabled(false);
 		break;
-	case lasso:
+	case branchcyclic:
 		modificationsline->setDisabled(false);
 		modificationsbutton->setDisabled(false);
 		cyclicnterminus->setDisabled(true);
@@ -936,6 +974,28 @@ void cParametersWidget::updateSettingsWhenPeptideTypeChanged(int index) {
 		searchedsequenceCtermmodif->setDisabled(true);
 		searchedsequenceTmodif->setDisabled(false);
 		break;
+#if POLYKETIDE_SIDEROPHORES == 1
+	case linearpolyketide:
+		modificationsline->setDisabled(false);
+		modificationsbutton->setDisabled(false);
+		cyclicnterminus->setDisabled(true);
+		cycliccterminus->setDisabled(true);
+		enablescrambling->setDisabled(true);
+		searchedsequenceNtermmodif->setDisabled(false);
+		searchedsequenceCtermmodif->setDisabled(false);
+		searchedsequenceTmodif->setDisabled(true);
+		break;
+	case cyclicpolyketide:
+		modificationsline->setDisabled(true);
+		modificationsbutton->setDisabled(true);
+		cyclicnterminus->setDisabled(true);
+		cycliccterminus->setDisabled(true);
+		enablescrambling->setDisabled(true);
+		searchedsequenceNtermmodif->setDisabled(true);
+		searchedsequenceCtermmodif->setDisabled(true);
+		searchedsequenceTmodif->setDisabled(true);
+		break;
+#endif
 	case linearpolysaccharide:
 		modificationsline->setDisabled(false);
 		modificationsbutton->setDisabled(false);
@@ -955,7 +1015,7 @@ void cParametersWidget::updateSettingsWhenPeptideTypeChanged(int index) {
 
 void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 
-	switch ((modeType)index)
+	switch ((eModeType)index)
 	{
 	case denovoengine:
 		peptidetype->setDisabled(false);
@@ -1095,15 +1155,14 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 
 void cParametersWidget::resetFragmentIonTypes() {
 	fragmentiontypes->getList()->clear();
-	fragmentIonType start, end;
-
-
-	if ((modeType)mode->currentIndex() == dereplication) {
+	eFragmentIonType start, end;
+	
+	if ((eModeType)mode->currentIndex() == dereplication) {
 		start = ms_hplus;
-		end = ms_MFe4H;
+		end = ms_MGa4H;
 	}
 	else {
-		switch ((peptideType)peptidetype->currentIndex()) {
+		switch ((ePeptideType)peptidetype->currentIndex()) {
 		case linear:
 		case branched:
 			start = a_ion;
@@ -1113,10 +1172,20 @@ void cParametersWidget::resetFragmentIonTypes() {
 			start = a_ion;
 			end = c_ion_dehydrated_and_deamidated;
 			break;
-		case lasso:
+		case branchcyclic:
 			start = a_ion;
 			end = z_ion_dehydrated_and_deamidated;
 			break;
+#if POLYKETIDE_SIDEROPHORES == 1
+		case linearpolyketide:
+			start = l1h_ion;
+			end = r2oh_ion_co_loss_dehydrated_and_deamidated;
+			break;
+		case cyclicpolyketide:
+			start = l0h_ion;
+			end = l2h_ion_co_loss_dehydrated_and_deamidated;
+			break;
+#endif
 		case linearpolysaccharide:
 			start = ms_nterminal_ion_hplus;
 			end = ms_cterminal_ion_kplus;
@@ -1129,33 +1198,47 @@ void cParametersWidget::resetFragmentIonTypes() {
 
 	for (int i = (int)start; i <= (int)end; i++) {
 
-		fragmentiontypes->getList()->addItem(tr(parameters.fragmentdefinitions[(fragmentIonType)i].name.c_str()));
+		fragmentiontypes->getList()->addItem(tr(parameters.fragmentdefinitions[(eFragmentIonType)i].name.c_str()));
 
-		if ((modeType)mode->currentIndex() == dereplication) {
-			if ((fragmentIonType)i == ms_hplus) {
+		if ((eModeType)mode->currentIndex() == dereplication) {
+			if ((eFragmentIonType)i == ms_hplus) {
 				fragmentiontypes->getList()->item(i-start)->setSelected(true);
 			}
 		}
 		else {
-			switch ((peptideType)peptidetype->currentIndex()) {
+			switch ((ePeptideType)peptidetype->currentIndex()) {
 			case linear:
 			case branched:
-				if (((fragmentIonType)i == b_ion) || ((fragmentIonType)i == y_ion)) {
+				if (((eFragmentIonType)i == b_ion) || ((eFragmentIonType)i == y_ion)) {
 					fragmentiontypes->getList()->item(i-start)->setSelected(true);
 				}
 				break;
 			case cyclic:
-				if ((fragmentIonType)i == b_ion) {
+				if ((eFragmentIonType)i == b_ion) {
 					fragmentiontypes->getList()->item(i-start)->setSelected(true);
 				}
 				break;
-			case lasso:
-				if (((fragmentIonType)i == b_ion) || ((fragmentIonType)i == y_ion)) {
+			case branchcyclic:
+				if (((eFragmentIonType)i == b_ion) || ((eFragmentIonType)i == y_ion)) {
 					fragmentiontypes->getList()->item(i-start)->setSelected(true);
 				}
 				break;
+#if POLYKETIDE_SIDEROPHORES == 1
+			case linearpolyketide:
+				if (((eFragmentIonType)i == l1h_ion) || ((eFragmentIonType)i == l2h_ion) || ((eFragmentIonType)i == r1h_ion) || ((eFragmentIonType)i == r2h_ion) ||
+					((eFragmentIonType)i == l1oh_ion) || ((eFragmentIonType)i == l2oh_ion) || ((eFragmentIonType)i == r1oh_ion) || ((eFragmentIonType)i == r2oh_ion)
+					) {
+					fragmentiontypes->getList()->item(i-start)->setSelected(true);
+				}
+				break;
+			case cyclicpolyketide:
+				if (((eFragmentIonType)i == l0h_ion) || ((eFragmentIonType)i == l1h_ion) || ((eFragmentIonType)i == l2h_ion)) {
+					fragmentiontypes->getList()->item(i-start)->setSelected(true);
+				}
+				break;
+#endif
 			case linearpolysaccharide:
-				if (((fragmentIonType)i == ms_nterminal_ion_hplus) || ((fragmentIonType)i == ms_cterminal_ion_hplus)) {
+				if (((eFragmentIonType)i == ms_nterminal_ion_hplus) || ((eFragmentIonType)i == ms_cterminal_ion_hplus)) {
 					fragmentiontypes->getList()->item(i-start)->setSelected(true);
 				}
 				break;

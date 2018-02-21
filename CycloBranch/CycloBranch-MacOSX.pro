@@ -5,10 +5,10 @@
 TEMPLATE = app
 TARGET = CycloBranch
 QT += core gui widgets printsupport svg
-INCLUDEPATH += . core gui parallel /usr/local/Cellar/boost/1.57.0/include
+INCLUDEPATH += . core gui parallel /usr/local/Cellar/boost/1.57.0/include /usr/local/Cellar/xerces-c/3.1.1/include
 QMAKE_CXXFLAGS += -std=c++0x -DMACOSX -m64
-QMAKE_LIBS += -lboost_regex
-QMAKE_LIBDIR = /usr/local/Cellar/boost/1.57.0/lib
+QMAKE_LIBS += -lboost_regex -lxerces-c
+QMAKE_LIBDIR = /usr/local/Cellar/boost/1.57.0/lib /usr/local/Cellar/xerces-c/3.1.1/lib
 OBJECTS_DIR = build/
 MOC_DIR = moc/
 ICON = images/cb.icns
@@ -29,8 +29,10 @@ HEADERS += core/cAllocator.h \
            core/cDeNovoGraph.h \
            core/cDeNovoGraphNode.h \
            core/cFragmentIons.h \
+           core/cImzML.h \
            core/cParameters.h \
            core/cPeak.h \
+           core/cPeakListSeries.h \
            core/cPeaksList.h \
            core/cSequence.h \
            core/cSequenceDatabase.h \
@@ -39,16 +41,18 @@ HEADERS += core/cAllocator.h \
            core/cTheoreticalSpectrumList.h \
            core/utilities.h \
            gui/cAboutWidget.h \
+           gui/cBranchCyclicWidget.h \
            gui/cBranchedWidget.h \
            gui/cBricksDatabaseWidget.h \
            gui/cCyclicWidget.h \
+           gui/cDelegate.h \
            gui/cDrawPeptideWidget.h \
            gui/cEventFilter.h \
            gui/cExportDialog.h \
            gui/cFindDialog.h \
            gui/cFragmentIonsListWidget.h \
            gui/cGraphWidget.h \
-           gui/cLassoWidget.h \
+           gui/cHTMLExportDialog.h \
            gui/cLinearWidget.h \
            gui/cMainThread.h \
            gui/cMainWindow.h \
@@ -66,8 +70,10 @@ SOURCES += core/cBrick.cpp \
            core/cDeNovoGraph.cpp \
            core/cDeNovoGraphNode.cpp \
            core/cFragmentIons.cpp \
+           core/cImzML.cpp \
            core/cParameters.cpp \
            core/cPeak.cpp \
+           core/cPeakListSeries.cpp \
            core/cPeaksList.cpp \
            core/cSequence.cpp \
            core/cSequenceDatabase.cpp \
@@ -76,16 +82,18 @@ SOURCES += core/cBrick.cpp \
            core/cTheoreticalSpectrumList.cpp \
            core/utilities.cpp \
            gui/cAboutWidget.cpp \
+           gui/cBranchCyclicWidget.cpp \
            gui/cBranchedWidget.cpp \
            gui/cBricksDatabaseWidget.cpp \
            gui/cCyclicWidget.cpp \
+           gui/cDelegate.cpp \
            gui/cDrawPeptideWidget.cpp \
            gui/cEventFilter.cpp \
            gui/cExportDialog.cpp \
            gui/cFindDialog.cpp \
            gui/cFragmentIonsListWidget.cpp \
            gui/cGraphWidget.cpp \
-           gui/cLassoWidget.cpp \
+           gui/cHTMLExportDialog.cpp \
            gui/cLinearWidget.cpp \
            gui/cMainThread.cpp \
            gui/cMainWindow.cpp \

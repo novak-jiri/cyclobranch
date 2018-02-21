@@ -10,11 +10,13 @@
 #include <iostream>
 #include <fstream>
 #include "core/utilities.h"
-#include "core/cPeaksList.h"
+#include "core/cPeakListSeries.h"
 #include "core/cBricksDatabase.h"
 #include "core/cSequenceDatabase.h"
 
+
 class cMainThread;
+
 
 using namespace std;
 using namespace boost;
@@ -23,7 +25,7 @@ using namespace boost;
 /**
 	\brief Running modes of the application.
 */
-enum modeType {
+enum eModeType {
 	denovoengine = 0,
 	singlecomparison = 1,
 	databasesearch = 2,
@@ -39,7 +41,9 @@ enum ePeakListFileFormat {
 	mgf = 1,
 	mzML = 2,
 	mzXML = 3,
-	baf = 4
+	baf = 4,
+	mis = 5,
+	imzML = 6
 };
 
 
@@ -62,7 +66,7 @@ public:
 	/**
 		\brief The type of analyzed peptide.
     */
-    peptideType peptidetype;
+    ePeptideType peptidetype;
  
 
 	/**
@@ -72,9 +76,15 @@ public:
 
 
 	/**
-		\brief A structure representing a peak list.
+		\brief A file format of peak list.
     */
-    cPeaksList peaklist;
+	ePeakListFileFormat peaklistfileformat;
+
+
+	/**
+		\brief A structure representing a series of peaklists.
+    */
+	cPeakListSeries peaklistseries;
 
 
 	/**
@@ -87,6 +97,84 @@ public:
 		\brief An adduct of a precursor ion.
     */
     string precursoradduct;
+
+
+	/**
+		\brief True when the precursor adduct contains Li.
+    */
+    bool precursorAdductHasLi;
+
+
+	/**
+		\brief True when the precursor adduct contains Na.
+    */
+    bool precursorAdductHasNa;
+
+
+	/**
+		\brief True when the precursor adduct contains Mg.
+    */
+    bool precursorAdductHasMg;
+
+
+	/**
+		\brief True when the precursor adduct contains Al.
+    */
+    bool precursorAdductHasAl;
+
+
+	/**
+		\brief True when the precursor adduct contains K.
+    */
+    bool precursorAdductHasK;
+
+
+	/**
+		\brief True when the precursor adduct contains Ca.
+    */
+    bool precursorAdductHasCa;
+
+
+	/**
+		\brief True when the precursor adduct contains Mn.
+    */
+    bool precursorAdductHasMn;
+
+
+	/**
+		\brief True when the precursor adduct contains Fe.
+    */
+    bool precursorAdductHasFe;
+
+
+	/**
+		\brief True when the precursor adduct contains Co.
+    */
+    bool precursorAdductHasCo;
+
+
+	/**
+		\brief True when the precursor adduct contains Ni.
+    */
+    bool precursorAdductHasNi;
+
+
+	/**
+		\brief True when the precursor adduct contains Cu.
+    */
+    bool precursorAdductHasCu;
+
+
+	/**
+		\brief True when the precursor adduct contains Zn.
+    */
+    bool precursorAdductHasZn;
+
+
+	/**
+		\brief True when the precursor adduct contains Ga.
+    */
+    bool precursorAdductHasGa;
 
 
 	/**
@@ -188,13 +276,13 @@ public:
 	/**
 		\brief Program mode.
     */
-	modeType mode;
+	eModeType mode;
 
 
 	/**
 		\brief A type of score.
     */
-    scoreType scoretype;
+    eScoreType scoretype;
 
 
 	/**
@@ -308,13 +396,13 @@ public:
 	/**
 		\brief A vector of fragment ion types generated in the de novo graph.
     */
-    vector<fragmentIonType> fragmentionsfordenovograph;
+    vector<eFragmentIonType> fragmentionsfordenovograph;
 
 
 	/**
 		\brief A vector of fragment ion types generated in theoretical spectra.
 	*/
-    vector<fragmentIonType> fragmentionsfortheoreticalspectra;
+    vector<eFragmentIonType> fragmentionsfortheoreticalspectra;
 
 
 	/**
@@ -331,9 +419,10 @@ public:
 
 	/**
 		\brief Test restrictions of parameters and prepare some internal parameters.
+		\param terminatecomputation reference to a variable determining that the computation must be stopped
 		\retval int -1 when an error occurred, 0 otherwise
 	*/ 
-	int checkAndPrepare();
+	int checkAndPrepare(bool& terminatecomputation);
 
 
 	/**

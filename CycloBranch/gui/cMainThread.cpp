@@ -7,20 +7,32 @@ bool cMainThread::checkModifications(cParameters& parameters, cSequence& sequenc
 	middlemodifid = 0;
 	errormessage = "";
 
-	if ((sequence.getPeptideType() == linear) || (sequence.getPeptideType() == branched) || (sequence.getPeptideType() == lasso) || (sequence.getPeptideType() == linearpolysaccharide)) {
+	if ((sequence.getPeptideType() == linear) || (sequence.getPeptideType() == branched) || (sequence.getPeptideType() == branchcyclic) || (sequence.getPeptideType() == linearpolysaccharide)
+#if POLYKETIDE_SIDEROPHORES == 1
+		|| (sequence.getPeptideType() == linearpolyketide)
+#endif
+		) {
 
-		if ((sequence.getPeptideType() == linear) || (sequence.getPeptideType() == branched) || (sequence.getPeptideType() == linearpolysaccharide)) {
+		if ((sequence.getPeptideType() == linear) || (sequence.getPeptideType() == branched) || (sequence.getPeptideType() == linearpolysaccharide)
+#if POLYKETIDE_SIDEROPHORES == 1
+			|| (sequence.getPeptideType() == linearpolyketide)
+#endif
+			) {
 			startmodifid = -1;
 			endmodifid = -1;
 		}
 
-		if ((sequence.getPeptideType() == branched) || (sequence.getPeptideType() == lasso)) {
+		if ((sequence.getPeptideType() == branched) || (sequence.getPeptideType() == branchcyclic)) {
 			middlemodifid = -1;
 		}
 
 		for (int i = 0; i < (int)parameters.searchedmodifications.size(); i++) {
 
-			if ((sequence.getPeptideType() == linear) || (sequence.getPeptideType() == branched) || (sequence.getPeptideType() == linearpolysaccharide)) {
+			if ((sequence.getPeptideType() == linear) || (sequence.getPeptideType() == branched) || (sequence.getPeptideType() == linearpolysaccharide)
+#if POLYKETIDE_SIDEROPHORES == 1
+				|| (sequence.getPeptideType() == linearpolyketide)
+#endif			
+				) {
 				if (parameters.searchedmodifications[i].name.compare(sequence.getNTterminalModification()) == 0) {
 					startmodifid = i;
 				}
@@ -30,7 +42,7 @@ bool cMainThread::checkModifications(cParameters& parameters, cSequence& sequenc
 				}
 			}
 
-			if ((sequence.getPeptideType() == branched) || (sequence.getPeptideType() == lasso)) {
+			if ((sequence.getPeptideType() == branched) || (sequence.getPeptideType() == branchcyclic)) {
 				if (parameters.searchedmodifications[i].name.compare(sequence.getBranchModification()) == 0) {
 					middlemodifid = i;
 				}
@@ -146,7 +158,7 @@ void cMainThread::run() {
 	*os << appname.toStdString() << " started at " << time.currentTime().toString().toStdString() << "." << endl << endl;
 
 	parameters.setOutputStream(*os);
-	if (parameters.checkAndPrepare() == -1) {
+	if (parameters.checkAndPrepare(terminatecomputation) == -1) {
 		emitEndSignals();
 		return;
 	}
@@ -174,27 +186,41 @@ void cMainThread::run() {
 		}
 	}
 
-	parameters.peaklist.sortbyMass();
-	parameters.peaklist.cropMinimumMZRatio(parameters.minimummz, parameters.fragmentmasserrortolerance);
-
-	if ((parameters.mode == denovoengine) || (parameters.mode == singlecomparison) || (parameters.mode == databasesearch)) {
-		parameters.peaklist.cropMaximumMZRatio(charge(uncharge(parameters.precursormass, parameters.precursorcharge), (parameters.precursorcharge > 0)?1:-1), parameters.precursormasserrortolerance);
+	bool seriesofspectra = false;
+	if (parameters.mode == dereplication) {
+		seriesofspectra = true;
 	}
 
-	if (parameters.peaklist.normalizeIntenzity() == -1) {
-		*os << "Error: the spectrum cannot be normalized because the maximum intensity is <= 0. The format of peaklist is likely incorrect." << endl;
+	if (parameters.peaklistseries.size() == 0) {
+		*os << "Error: no peaklist found. The format of peaklist is likely incorrect." << endl;
 		emitEndSignals();
 		return;
 	}
-	parameters.peaklist.cropIntenzity(parameters.minimumrelativeintensitythreshold);
-	//parameters.peaklist.maxHighestPeaksInWindow(10, 50);
 
-	*os << "Peaklist:" << endl;
-	*os << parameters.peaklist.print();
-	if (parameters.masserrortolerancefordeisotoping > 0) {
-		parameters.peaklist.removeIsotopes(parameters.precursorcharge, parameters.masserrortolerancefordeisotoping, this);
+	for (int i = 0; i < (seriesofspectra?parameters.peaklistseries.size():1); i++) {
+		parameters.peaklistseries[i].sortbyMass();
+		parameters.peaklistseries[i].cropMinimumMZRatio(parameters.minimummz, parameters.fragmentmasserrortolerance);
+
+		if ((parameters.mode == denovoengine) || (parameters.mode == singlecomparison) || (parameters.mode == databasesearch)) {
+			parameters.peaklistseries[i].cropMaximumMZRatio(charge(uncharge(parameters.precursormass, parameters.precursorcharge), (parameters.precursorcharge > 0)?1:-1), parameters.precursormasserrortolerance);
+		}
+
+		if (parameters.peaklistseries[i].normalizeIntenzity() == -1) {
+			*os << "Error: the spectrum no. " << i + 1 << " cannot be normalized because the maximum intensity is <= 0. The spectrum likely does not contain any peak or the format of peaklist is incorrect." << endl;
+			emitEndSignals();
+			return;
+		}
+		parameters.peaklistseries[i].cropIntenzity(parameters.minimumrelativeintensitythreshold);
+		//parameters.peaklistseries[i].maxHighestPeaksInWindow(10, 50);
+
+		if (parameters.mode != dereplication) {
+			*os << "Peaklist no. " << i + 1 << ":" << endl;
+			*os << parameters.peaklistseries[i].print();
+			if (parameters.masserrortolerancefordeisotoping > 0) {
+				parameters.peaklistseries[i].removeIsotopes(parameters.precursorcharge, parameters.masserrortolerancefordeisotoping, this);
+			}
+		}
 	}
-
 
 	if ((parameters.mode == denovoengine) || (parameters.mode == singlecomparison) || (parameters.mode == databasesearch)) {
 		int startmodifid, endmodifid, middlemodifid;
@@ -355,8 +381,39 @@ void cMainThread::run() {
 			// parse branch of a branched or a branch-cyclic peptide
 			parseBranch(parameters.sequencedatabase[i].getPeptideType(), composition, v, branchstart, branchend);
 
-			// set candidate and check precursor mass error
+			// set candidate
 			c.setCandidate(v, netmp, startmodifid, endmodifid, middlemodifid, branchstart, branchend);
+
+#if POLYKETIDE_SIDEROPHORES == 1
+
+			if (!calculatesummaries && ((parameters.sequencedatabase[i].getPeptideType() == linearpolyketide) || (parameters.sequencedatabase[i].getPeptideType() == cyclicpolyketide))) {
+
+				if (!c.checkPolyketideSequence(parameters.bricksdatabase, parameters.sequencedatabase[i].getPeptideType())) {
+					if (parameters.sequencedatabase[i].getPeptideType() == linearpolyketide) {
+						*os << "Ignored sequence: " << parameters.sequencedatabase[i].getName() << " " << parameters.sequencedatabase[i].getSequence() << "; the order of building blocks is not correct." << endl;
+					}
+					else {
+						*os << "Ignored sequence: " << parameters.sequencedatabase[i].getName() << " " << parameters.sequencedatabase[i].getSequence() << "; the number or order of building blocks is not correct." << endl;
+					}
+					continue;
+				}
+
+				eResidueLossType leftresiduelosstype = c.getLeftResidueType(parameters.bricksdatabase);
+				eResidueLossType rightresiduelosstype = c.getRightResidueType(parameters.bricksdatabase);
+
+				if (((leftresiduelosstype == h2) && (c.getStartModifID() > 0) && parameters.searchedmodifications[c.getStartModifID()].cterminal) 
+					|| ((leftresiduelosstype == h2o2) && (c.getStartModifID() > 0) && parameters.searchedmodifications[c.getStartModifID()].nterminal)
+					|| ((rightresiduelosstype == h2) && (c.getEndModifID() > 0) && parameters.searchedmodifications[c.getEndModifID()].cterminal)
+					|| ((rightresiduelosstype == h2o2) && (c.getEndModifID() > 0) && parameters.searchedmodifications[c.getEndModifID()].nterminal)) {
+					*os << "Ignored sequence: " << parameters.sequencedatabase[i].getName() << " " << parameters.sequencedatabase[i].getSequence() << "; the N-terminal modification is attached to C-terminus or vice versa." << endl;
+					continue;
+				}
+
+			}
+
+#endif
+			
+			// check the precursor mass error
 			if (!calculatesummaries && !parameters.similaritysearch && !isInPpmMassErrorTolerance(charge(uncharge(parameters.precursormass, parameters.precursorcharge), (parameters.precursorcharge > 0)?1:-1), c.getPrecursorMass(parameters.bricksdatabase, &parameters), parameters.precursormasserrortolerance)) {
 				continue;
 			}
@@ -365,7 +422,7 @@ void cMainThread::run() {
 			candidates.getSet().insert(c);
 
 			if (calculatesummaries) {
-				*os << c.getSummaryFormula(parameters, parameters.sequencedatabase[i].getPeptideType()).getSummary() << endl;
+				*os << i + 1 << " " << c.getSummaryFormula(parameters, parameters.sequencedatabase[i].getPeptideType()).getSummary() << endl;
 			}
 		}
 		
@@ -384,11 +441,32 @@ void cMainThread::run() {
 
 	// database search - MS mode
 	if (parameters.mode == dereplication) {
-		*os << "Comparing theoretical peaks with the peak list... " << endl;
-		cTheoreticalSpectrum ts;
-		ts.compareMSSpectrum(&parameters);
+		*os << "Comparing theoretical peaks with the experimental peaklist(s)... " << endl;
+		*os << "Number of experimental peaklists: " << parameters.peaklistseries.size() << endl;
+		*os << "Processing the peaklist no. : " << endl;
+
 		theoreticalspectrumlist->initialize(*os, parameters, &graph);
-		theoreticalspectrumlist->add(ts);
+		cTheoreticalSpectrum ts;
+		ts.setParameters(&parameters);
+		ts.generateMSSpectrum();
+
+		for (int i = 0; i < parameters.peaklistseries.size(); i++) {
+			*os << i + 1 << " ";
+			if ((i + 1) % 25 == 0) {
+				*os << endl;
+			}
+
+			if (terminatecomputation) {
+				emitEndSignals();
+				return;
+			}
+
+			cTheoreticalSpectrum tstmp;
+			tstmp = ts;
+			tstmp.compareMSSpectrum(parameters.peaklistseries[i]);
+			theoreticalspectrumlist->add(tstmp);
+		}
+
 		*os << " ok" << endl;
 	}
 	

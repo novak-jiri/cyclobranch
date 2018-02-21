@@ -10,6 +10,9 @@
 #include <string>
 #include <fstream>
 #include <QWidget>
+#include <QDesktopServices>
+#include <QUrl>
+#include <QFileInfo>
 #include "core/utilities.h"
 
 

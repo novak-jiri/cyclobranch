@@ -10,18 +10,24 @@
 #include <QWidget>
 #include <QMainWindow>
 #include <QTextDocument>
+#include <QTableWidget>
+#include <QHeaderView>
+#include <QProgressDialog>
+#include <QTextStream>
+#include "core/cAllocator.h"
 #include "core/cTheoreticalSpectrum.h"
 #include "gui/cLinearWidget.h"
 #include "gui/cCyclicWidget.h"
 #include "gui/cBranchedWidget.h"
-#include "gui/cLassoWidget.h"
+#include "gui/cBranchCyclicWidget.h"
 #include "gui/cSpectrumSceneWidget.h"
 #include "gui/cFindDialog.h"
 #include "gui/cExportDialog.h"
+#include "gui/cEventFilter.h"
+#include "gui/cDelegate.h"
 
 
 // forward declaration
-class QTextEdit;
 class QTextBrowser;
 class QHBoxLayout;
 class QVBoxLayout;
@@ -34,6 +40,29 @@ class QDoubleSpinBox;
 class QToolBar;
 class QAction;
 class QLabel;
+
+
+/**
+	\brief Position in QTableWidget.
+*/
+struct cTablePosition {
+	/**
+		\brief A number of a row.
+	*/
+	int row;
+
+
+	/**
+		\brief A number of a column.
+	*/
+	int column;
+
+
+	cTablePosition() {
+		row = 0;
+		column = 0;
+	}
+};
 
 
 /**
@@ -83,8 +112,9 @@ public:
 		\brief Initialize the widget.
 		\param parameters a pointer to parameters
 		\param theoreticalspectrum a reference to a theoretical spectrum
+		\param parent pointer to a parent widget
 	*/ 
-	void initialize(cParameters* parameters, cTheoreticalSpectrum& theoreticalspectrum);
+	void initialize(cParameters* parameters, cTheoreticalSpectrum& theoreticalspectrum, QWidget* parent);
 
 
 	/**
@@ -102,18 +132,36 @@ public:
 
 
 	/**
+		\brief Get a table of peaks as a HTML string.
+		\param unmatchedtheoreticalpeaks if true then unmatched theoretical peaks are included
+		\param unmatchedexperimentalpeaks if true then unmatched experimental peaks are included
+		\retval string a table of peaks as a HTML string
+	*/ 
+	string getPeaksTableAsHTMLString(bool unmatchedtheoreticalpeaks, bool unmatchedexperimentalpeaks);
+
+
+	/**
+		\brief Get a partial table of peaks as a HTML string.
+		\param id identifier of a spectrum
+		\retval string a partial table of peaks as a HTML string
+	*/ 
+	string getPartialPeaksTableAsHTMLString(int id);
+
+
+	/**
 		\brief Prepare the widget to show.
 		\param peptidetype a type of peptide
 	*/ 
-	void prepareToShow(peptideType peptidetype);
+	void prepareToShow(ePeptideType peptidetype);
 	
 
 	/**
 		\brief Find all occurrences of \a str and highlight them.
 		\param str search string
 		\param opt search options
+		\param errormessage if true, an error message in a popup window is shown when no results are matched
 	*/ 
-	void findAll(const QString& str, QTextDocument::FindFlags opt = 0);
+	void findAll(const QString& str, QTextDocument::FindFlags opt = 0, bool errormessage = true);
 
 
 	/**
@@ -134,6 +182,8 @@ protected:
 
 
 private:
+	QWidget* parent;
+
 	QToolBar* toolbarExport;
 	QToolBar* toolbarFind;
 	QToolBar* toolbarZoom;
@@ -142,6 +192,7 @@ private:
 	QToolBar* toolbarRotation;
 	QToolBar* toolbarTrotation;
 
+	QAction* actionExportTable;
 	QAction* actionExportSpectrum;
 	QAction* actionFind;
 	QAction* actionPrevious;
@@ -176,12 +227,18 @@ private:
 	QLabel* labeltrotation;
 	QComboBox* trotation;
 
-	QTextEdit* textedit;
 	QTextBrowser* textbrowser;
+
+	QTableWidget* peakstable;
+	vector<int> peakstableheadersort;
+	cAllocator<QTableWidgetItem> widgetitemallocator;
+	vector<cTablePosition> tablematches;
+	cDelegate columndelegate;
+
 	cLinearWidget* linearwidget;
 	cCyclicWidget* cyclicwidget;
 	cBranchedWidget* branchedwidget;
-	cLassoWidget* lassowidget;
+	cBranchCyclicWidget* branchcyclicwidget;
 
 	cSpectrumSceneWidget* spectrumscene;
 
@@ -193,6 +250,11 @@ private:
 	cFindDialog* finddialog;
 	cExportDialog* exportdialog;
 	int currentfinditem;
+
+
+	void preparePeaksTable();
+
+	string printHTMLTableCell(string text, bool red);	
 
 
 signals:
@@ -217,12 +279,25 @@ private slots:
 
 	void openFindDialog();
 
-	void openExportDialog();
+	void openExportImageDialog();
+
+	void exportTableToCSV();
 
 	void movePrevious();
 
 	void moveNext();
 
+	void headerItemDoubleClicked(int);
+
+	void filterPeaksTable();
+
+	void hideMatchedPeaks(bool hide);
+
+	void hideUnmatchedPeaks(bool hide);
+
+	void hideScrambledPeaks(bool hide);
+
 };
 
 #endif
+

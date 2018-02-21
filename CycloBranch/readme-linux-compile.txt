@@ -1,6 +1,7 @@
 1) Required packages:
 g++
 libboost-all-dev
+libxerces-c-dev
 qt5-default
 libqt5svg5*
 

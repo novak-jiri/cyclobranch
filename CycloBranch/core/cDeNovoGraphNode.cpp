@@ -40,7 +40,7 @@ void cDeNovoGraphNode::clear() {
 	
 	for (int i = 0; i < fragmentIonTypeEnd; i++)
 	{
-		ionannotation[(fragmentIonType)i] = false;
+		ionannotation[(eFragmentIonType)i] = false;
 	}
 	
 	tempedges.clear();
@@ -117,12 +117,12 @@ void cDeNovoGraphNode::clearEdges() {
 }
 
 
-void cDeNovoGraphNode::addIonAnnotation(fragmentIonType iontype) {
+void cDeNovoGraphNode::addIonAnnotation(eFragmentIonType iontype) {
 	ionannotation[iontype] = true;
 }
 
 
-bool cDeNovoGraphNode::checkIonAnnotation(fragmentIonType iontype) {
+bool cDeNovoGraphNode::checkIonAnnotation(eFragmentIonType iontype) {
 	return ionannotation[iontype];
 }
 

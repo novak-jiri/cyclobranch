@@ -67,5 +67,13 @@ void cGraphWidget::keyPressEvent(QKeyEvent *event) {
     if (event->key() == Qt::Key_Escape) {
 		hide();
     }
+
+	if (event->key() == Qt::Key_F1) {
+		#if OS_TYPE == WIN
+			QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo("docs/html/menubar.html").absoluteFilePath()));
+		#else
+			QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo(installdir + "docs/html/menubar.html").absoluteFilePath()));
+		#endif
+	}
 }
 

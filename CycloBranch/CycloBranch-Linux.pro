@@ -7,7 +7,7 @@ TARGET = CycloBranch
 QT += core gui widgets printsupport svg
 INCLUDEPATH += . core gui parallel
 QMAKE_CXXFLAGS += -std=c++0x -DLINUX -m64
-QMAKE_LIBS += -lboost_regex
+QMAKE_LIBS += -lboost_regex -lxerces-c
 OBJECTS_DIR = build/
 MOC_DIR = moc/
 
@@ -21,8 +21,10 @@ HEADERS += core/cAllocator.h \
            core/cDeNovoGraph.h \
            core/cDeNovoGraphNode.h \
            core/cFragmentIons.h \
+           core/cImzML.h \
            core/cParameters.h \
            core/cPeak.h \
+           core/cPeakListSeries.h \
            core/cPeaksList.h \
            core/cSequence.h \
            core/cSequenceDatabase.h \
@@ -31,16 +33,18 @@ HEADERS += core/cAllocator.h \
            core/cTheoreticalSpectrumList.h \
            core/utilities.h \
            gui/cAboutWidget.h \
+           gui/cBranchCyclicWidget.h \
            gui/cBranchedWidget.h \
            gui/cBricksDatabaseWidget.h \
            gui/cCyclicWidget.h \
+           gui/cDelegate.h \
            gui/cDrawPeptideWidget.h \
            gui/cEventFilter.h \
            gui/cExportDialog.h \
            gui/cFindDialog.h \
            gui/cFragmentIonsListWidget.h \
            gui/cGraphWidget.h \
-           gui/cLassoWidget.h \
+           gui/cHTMLExportDialog.h \
            gui/cLinearWidget.h \
            gui/cMainThread.h \
            gui/cMainWindow.h \
@@ -58,8 +62,10 @@ SOURCES += core/cBrick.cpp \
            core/cDeNovoGraph.cpp \
            core/cDeNovoGraphNode.cpp \
            core/cFragmentIons.cpp \
+           core/cImzML.cpp \
            core/cParameters.cpp \
            core/cPeak.cpp \
+           core/cPeakListSeries.cpp \
            core/cPeaksList.cpp \
            core/cSequence.cpp \
            core/cSequenceDatabase.cpp \
@@ -68,16 +74,18 @@ SOURCES += core/cBrick.cpp \
            core/cTheoreticalSpectrumList.cpp \
            core/utilities.cpp \
            gui/cAboutWidget.cpp \
+           gui/cBranchCyclicWidget.cpp \
            gui/cBranchedWidget.cpp \
            gui/cBricksDatabaseWidget.cpp \
            gui/cCyclicWidget.cpp \
+           gui/cDelegate.cpp \
            gui/cDrawPeptideWidget.cpp \
            gui/cEventFilter.cpp \
            gui/cExportDialog.cpp \
            gui/cFindDialog.cpp \
            gui/cFragmentIonsListWidget.cpp \
            gui/cGraphWidget.cpp \
-           gui/cLassoWidget.cpp \
+           gui/cHTMLExportDialog.cpp \
            gui/cLinearWidget.cpp \
            gui/cMainThread.cpp \
            gui/cMainWindow.cpp \

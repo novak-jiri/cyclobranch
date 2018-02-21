@@ -36,6 +36,9 @@ class cBrick;
 #endif
 
 
+#define POLYKETIDE_SIDEROPHORES 1
+
+
 using namespace std;
 using namespace boost;
 
@@ -43,13 +46,20 @@ using namespace boost;
 /**
 	\brief The types of peptides supported by the application.
 */
-enum peptideType {
+enum ePeptideType {
 	linear = 0,
 	cyclic = 1,
 	branched = 2,
-	lasso = 3,
+	branchcyclic = 3,
+#if POLYKETIDE_SIDEROPHORES == 1
+	linearpolyketide = 4,
+	cyclicpolyketide = 5,
+	linearpolysaccharide = 6,
+	other = 7
+#else
 	linearpolysaccharide = 4,
 	other = 5
+#endif
 };
 
 
@@ -126,7 +136,7 @@ string& removeWhiteSpacesExceptSpaces(string& s);
 	\param errormessage an error message if false is returned
 	\retval bool true when the syntax is correct, false otherwise
 */ 
-bool checkRegex(peptideType peptidetype, string& sequence, string& errormessage);
+bool checkRegex(ePeptideType peptidetype, string& sequence, string& errormessage);
 
 
 /**
@@ -137,15 +147,15 @@ bool checkRegex(peptideType peptidetype, string& sequence, string& errormessage)
 	\param branchstart start position of a branch (an output value)
 	\param branchend end position of a branch (an output value)
 */ 
-void parseBranch(peptideType peptidetype, string& composition, vector<string>& vectorcomposition, int& branchstart, int& branchend);
+void parseBranch(ePeptideType peptidetype, string& composition, vector<string>& vectorcomposition, int& branchstart, int& branchend);
 
 
 /**
 	\brief Convert a string to peptide type.
 	\param s string
-	\retval peptideType type of peptide
+	\retval ePeptideType type of peptide
 */
-peptideType getPeptideTypeFromString(string s);
+ePeptideType getPeptideTypeFromString(string& s);
 
 
 /**
@@ -153,7 +163,15 @@ peptideType getPeptideTypeFromString(string s);
 	\param peptidetype type of peptide
 	\retval string string
 */
-string getStringFromPeptideType(peptideType peptidetype);
+string getStringFromPeptideType(ePeptideType peptidetype);
+
+
+/**
+	\brief Crop a precision of a double to six decimal places.
+	\param value an input value
+	\retval double a value with the limited precision
+*/
+double cropPrecisionToSixDecimals(double value);
 
 
 #endif

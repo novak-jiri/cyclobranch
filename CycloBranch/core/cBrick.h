@@ -18,6 +18,16 @@ using namespace std;
 
 
 /**
+	\brief Residue loss types.
+*/
+enum eResidueLossType {
+	water = 0,
+	h2,
+	h2o2
+};
+
+
+/**
 	\brief Get the number of bricks in a composition.
 	\param composition string containing ids of bricks separated by '-'
 	\retval number number of bricks
@@ -44,6 +54,7 @@ class cBrick {
 	double mass;
 	string composition;
 	bool artificial;
+	eResidueLossType residuelosstype;
 
 public:
 
@@ -218,6 +229,20 @@ public:
 		\retval bool true when the brick is a calculated mass block; false when the brick is a regular brick.
 	*/
 	bool isArtificial();
+
+
+	/**
+		\brief Set the residue loss type.
+		\param residuelosstype the residue loss type.
+	*/
+	void setResidueLossType(eResidueLossType residuelosstype);
+
+
+	/**
+		\brief Get the residue loss type.
+		\retval eResidueLossType the residue loss type.
+	*/
+	eResidueLossType getResidueLossType();
 
 
 	/**

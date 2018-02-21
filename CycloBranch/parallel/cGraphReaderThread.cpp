@@ -9,6 +9,7 @@ int cGraphReaderThread::getCandidatesIter(bool cterminalstartingnode, cCandidate
 	int finish;
 	int size;
 	bool cycle;
+	int bid;
 
 	if (*terminatecomputation) {
 		return -1;
@@ -18,7 +19,7 @@ int cGraphReaderThread::getCandidatesIter(bool cterminalstartingnode, cCandidate
 		return 0;
 	}
 
-	if ((parameters->peptidetype == lasso) && (startmodifID > 0) && (middlemodifID > 0)) {
+	if ((parameters->peptidetype == branchcyclic) && (startmodifID > 0) && (middlemodifID > 0)) {
 		return 0;
 	}
 
@@ -32,7 +33,7 @@ int cGraphReaderThread::getCandidatesIter(bool cterminalstartingnode, cCandidate
 			}
 
 			// accumulation of middle modifications is not allowed
-			if (((parameters->peptidetype == branched) || (parameters->peptidetype == lasso)) && (middlemodifID != 0) && ((*graph)[nodeid][i].middlemodifID != 0)) {
+			if (((parameters->peptidetype == branched) || (parameters->peptidetype == branchcyclic)) && (middlemodifID != 0) && ((*graph)[nodeid][i].middlemodifID != 0)) {
 				continue;
 			}
 
@@ -53,7 +54,7 @@ int cGraphReaderThread::getCandidatesIter(bool cterminalstartingnode, cCandidate
 			ne.edgeid = i;	
 			perspectivepath.push_back(ne);
 
-			if ((parameters->peptidetype == branched) || (parameters->peptidetype == lasso)) {
+			if ((parameters->peptidetype == branched) || (parameters->peptidetype == branchcyclic)) {
 				tmpmiddlemodifID = max(middlemodifID, (*graph)[nodeid][i].middlemodifID);
 				if (tmpmiddlemodifID != middlemodifID) {
 					middlepos = (int)composition.size();
@@ -74,19 +75,125 @@ int cGraphReaderThread::getCandidatesIter(bool cterminalstartingnode, cCandidate
 	}
 	else {
 		cCandidate candidate(composition, perspectivepath, startmodifID, endmodifID, middlemodifID, middlepos);
-		
-		if (!cterminalstartingnode && (((parameters->peptidetype == linear) && !parameters->cyclicnterminus && !parameters->cycliccterminus) || (parameters->peptidetype == branched) || (parameters->peptidetype == linearpolysaccharide))) {
-			if ((candidate.hasLastBrickArtificial(*bricksdatabasewithcombinations)) && (composition.size() > 0)) {
-				int bid = atoi(composition.back().c_str()) + 1;
+
+		if (!cterminalstartingnode && (((parameters->peptidetype == linear) && !parameters->cyclicnterminus && !parameters->cycliccterminus) || (parameters->peptidetype == branched) || (parameters->peptidetype == linearpolysaccharide))) {	
+			if (candidate.hasLastBrickArtificial(*bricksdatabasewithcombinations) && (composition.size() > 0)) {
+				bid = atoi(composition.back().c_str()) + 1; // offset of -H2O brick
 				composition.pop_back();
 				composition.push_back(to_string(bid));
 				candidate.setCandidate(composition, perspectivepath, startmodifID, endmodifID, middlemodifID, middlepos);			
 			}
 		}
 
-		if ((candidate.getComposition().compare("") != 0) && (!candidate.hasOnlyArtificialBricks(*bricksdatabasewithcombinations))) {
+		if ((parameters->peptidetype == linear) && parameters->cyclicnterminus && candidate.hasLastBrickArtificial(*bricksdatabasewithcombinations) && (composition.size() > 0)) {
+			if (!cterminalstartingnode) {
+				bid = atoi(composition.back().c_str()) + 1; // offset of -H2O brick
+			}
+			else {
+				bid = atoi(composition.back().c_str()) + 2; // offset of +H2O brick
+			}
+			composition.pop_back();
+			composition.push_back(to_string(bid));
+			candidate.setCandidate(composition, perspectivepath, startmodifID, endmodifID, middlemodifID, middlepos);			
+		}
 
-			if (isInPpmMassErrorTolerance(precursormass, candidate.getPrecursorMass(*bricksdatabasewithcombinations, parameters), parameters->precursormasserrortolerance)) {
+#if POLYKETIDE_SIDEROPHORES == 1
+		if ((parameters->peptidetype == linearpolyketide) && candidate.hasLastBrickArtificial(*bricksdatabasewithcombinations) && (composition.size() > 0) && (perspectivepath.size() > 0)) {
+		
+			if ((*graph)[perspectivepath[0].nodeid].checkIonAnnotation(l1h_ion)) {
+				switch (candidate.getResidueLossType(*bricksdatabasewithcombinations))
+				{
+				case water:
+					bid = atoi(composition.back().c_str()) + 1; // offset of -H2O brick
+					break;
+				case h2:
+					bid = atoi(composition.back().c_str()) + 3; // offset of -H2 brick
+					break;
+				case h2o2:
+					bid = atoi(composition.back().c_str()) + 8; // offset of -H2O2 brick
+					break;
+				default:
+					bid = atoi(composition.back().c_str()); // nop
+					break;
+				}
+				composition.pop_back();
+				composition.push_back(to_string(bid));
+				candidate.setCandidate(composition, perspectivepath, startmodifID, endmodifID, middlemodifID, middlepos);			
+			}
+
+			if ((*graph)[perspectivepath[0].nodeid].checkIonAnnotation(l2h_ion)) {
+				switch (candidate.getResidueLossType(*bricksdatabasewithcombinations))
+				{
+				case water:
+					bid = atoi(composition.back().c_str()) + 4; // offset of -O brick
+					break;
+				case h2:
+					bid = atoi(composition.back().c_str()); // nop
+					break;
+				case h2o2:
+					bid = atoi(composition.back().c_str()) + 6; // offset of -O2 brick
+					break;
+				default:
+					bid = atoi(composition.back().c_str()); // nop
+					break;
+				}
+				composition.pop_back();
+				composition.push_back(to_string(bid));
+				candidate.setCandidate(composition, perspectivepath, startmodifID, endmodifID, middlemodifID, middlepos);			
+			}
+
+			if ((*graph)[perspectivepath[0].nodeid].checkIonAnnotation(l1oh_ion)) {
+				switch (candidate.getResidueLossType(*bricksdatabasewithcombinations))
+				{
+				case water:
+					bid = atoi(composition.back().c_str()) + 3; // offset of -H2 brick
+					break;
+				case h2:
+					bid = atoi(composition.back().c_str()) + 7; // offset of -H2+O brick
+					break;
+				case h2o2:
+					bid = atoi(composition.back().c_str()) + 1; // offset of -H2O brick
+					break;
+				default:
+					bid = atoi(composition.back().c_str()); // nop
+					break;
+				}
+				composition.pop_back();
+				composition.push_back(to_string(bid));
+				candidate.setCandidate(composition, perspectivepath, startmodifID, endmodifID, middlemodifID, middlepos);			
+			}
+
+			if ((*graph)[perspectivepath[0].nodeid].checkIonAnnotation(l2oh_ion)) {
+				switch (candidate.getResidueLossType(*bricksdatabasewithcombinations))
+				{
+				case water:
+					bid = atoi(composition.back().c_str()); // nop
+					break;
+				case h2:
+					bid = atoi(composition.back().c_str()) + 5; // offset of +O brick
+					break;
+				case h2o2:
+					bid = atoi(composition.back().c_str()) + 4; // offset of -O brick
+					break;
+				default:
+					bid = atoi(composition.back().c_str()); // nop
+					break;
+				}
+				composition.pop_back();
+				composition.push_back(to_string(bid));
+				candidate.setCandidate(composition, perspectivepath, startmodifID, endmodifID, middlemodifID, middlepos);			
+			}
+		
+		}
+#endif
+
+		if ((candidate.getComposition().compare("") != 0) && !candidate.hasOnlyArtificialBricks(*bricksdatabasewithcombinations) && !candidate.hasLastBrickInvalid(*bricksdatabasewithcombinations)) {
+
+			if (isInPpmMassErrorTolerance(precursormass, candidate.getPrecursorMass(*bricksdatabasewithcombinations, parameters), parameters->precursormasserrortolerance)
+#if POLYKETIDE_SIDEROPHORES == 1
+				&& (((parameters->peptidetype != linearpolyketide) && (parameters->peptidetype != cyclicpolyketide)) || candidate.checkPolyketideBlocks(*bricksdatabasewithcombinations, parameters->peptidetype))
+#endif
+				) {
 				
 				cCandidateSet result;
 
@@ -94,7 +201,7 @@ int cGraphReaderThread::getCandidatesIter(bool cterminalstartingnode, cCandidate
 					candidate.revertComposition();
 				}
 
-				if ((parameters->peptidetype == branched) || (parameters->peptidetype == lasso)) {
+				if ((parameters->peptidetype == branched) || (parameters->peptidetype == branchcyclic)) {
 					result.getSet().clear();
 					candidate.prepareBranchedCandidates(result, parameters->peptidetype, terminatecomputation);
 					if (scanmode == 0) {
@@ -206,7 +313,7 @@ void cGraphReaderThread::run() {
 			}
 		}
 		break;
-	case lasso:
+	case branchcyclic:
 		for (int i = 1; i <= lastsystemnode; i++) {
 			if (i - 1/*2*/ > 0) {
 				startmodifID = i - 1/*2*/;
@@ -219,6 +326,27 @@ void cGraphReaderThread::run() {
 			}
 		}
 		break;
+#if POLYKETIDE_SIDEROPHORES == 1
+	case linearpolyketide:
+		for (int i = 1; i <= lastsystemnode; i++) {
+			if (i - 4 > 0) {
+				startmodifID = i - 4;
+			}
+			if (getCandidatesIter(false, candidates, i, composition, unchargedprecursormass, startmodifID, 0, 0, -1, perspectivepath, (*graph)[i].getMZRatio(), terminatecomputation) == -1) {
+				// terminated
+				return;
+			}
+		}
+		break;
+	case cyclicpolyketide:
+		for (int i = 1; i <= lastsystemnode; i++) {
+			if (getCandidatesIter(false, candidates, i, composition, unchargedprecursormass, 0, 0, 0, -1, perspectivepath, (*graph)[i].getMZRatio(), terminatecomputation) == -1) {
+				// terminated
+				return;
+			}
+		}
+		break;
+#endif
 	case linearpolysaccharide:
 		for (int i = 1; i <= lastsystemnode; i++) {
 			if (i - 1 > 0) {

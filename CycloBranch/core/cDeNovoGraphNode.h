@@ -196,7 +196,7 @@ class cDeNovoGraphNode {
 
 	unordered_set<cEdge, hash_cEdge> tempedges;
 	vector<cEdge> edges;
-	map<fragmentIonType, bool> ionannotation;
+	map<eFragmentIonType, bool> ionannotation;
 
 public:
 
@@ -305,7 +305,7 @@ public:
 		\brief Add ion annotation.
 		\param iontype type of fragment ion
 	*/
-	void addIonAnnotation(fragmentIonType iontype);
+	void addIonAnnotation(eFragmentIonType iontype);
 
 
 	/**
@@ -313,7 +313,7 @@ public:
 		\param iontype type of fragment ion
 		\retval bool true when the ion type was assigned to the node
 	*/
-	bool checkIonAnnotation(fragmentIonType iontype);
+	bool checkIonAnnotation(eFragmentIonType iontype);
 
 };
 

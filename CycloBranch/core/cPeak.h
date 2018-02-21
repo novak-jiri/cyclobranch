@@ -18,7 +18,7 @@ using namespace std;
 /**
 	\brief The types of scores between an experimental and a theoretical spectrum.
 */
-enum scoreType {
+enum eScoreType {
 	b_ions = 0,
 	b_ions_and_b_dehydrated_ions = 1,
 	b_ions_and_b_deamidated_ions = 2,
@@ -54,15 +54,27 @@ struct cPeak {
 
 	
 	/**
-		\brief An extended description when the peak is matched.
+		\brief A m/z ratio when the peak was matched with an experimental peak.
 	*/ 
-	string matchdescription;
+	double matchedmz;
+
+
+	/**
+		\brief An intensity when the peak was matched with an experimental peak.
+	*/ 
+	double matchedintensity;
+
+
+	/**
+		\brief An error in ppm when the peak was matched with an experimental peak.
+	*/ 
+	double matchedppm;
 
 
 	/**
 		\brief The type of a fragment ion corresponding to the peak.
 	*/ 
-	fragmentIonType iontype;
+	eFragmentIonType iontype;
 
 	
 	/**

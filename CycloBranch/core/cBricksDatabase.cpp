@@ -128,6 +128,11 @@ int cBricksDatabase::loadFromPlainTextStream(ifstream &stream, string& errormess
 	size_t pos;
 	double mass;
 
+#if POLYKETIDE_SIDEROPHORES == 1
+	regex rx;
+	string name;
+#endif
+
 	bool error = false;
 	errormessage = "";
 	cSummaryFormula formula;
@@ -159,6 +164,20 @@ int cBricksDatabase::loadFromPlainTextStream(ifstream &stream, string& errormess
 		else {
 			break;
 		}
+
+#if POLYKETIDE_SIDEROPHORES == 1
+		name = b.getName();
+
+		rx = "^\\(-2H\\) ";
+		if (regex_search(name, rx)) {
+			b.setResidueLossType(h2);
+		}
+
+		rx = "^\\(-2OH\\) ";
+		if (regex_search(name, rx)) {
+			b.setResidueLossType(h2o2);
+		}
+#endif
 
 		// load acronyms
 		pos = s.find('\t');
@@ -534,3 +553,35 @@ void cBricksDatabase::load(ifstream& is) {
 	}
 }
 
+
+#if POLYKETIDE_SIDEROPHORES == 1
+
+
+bool cBricksDatabase::checkPolyketideBlocks(cBrick& brickseries) {
+	vector<int> intcomposition;
+	brickseries.explodeToIntComposition(intcomposition);
+
+	if (intcomposition.size() == 0) {
+		return false;
+	}
+
+	int hydrogens = 0;
+	int hydroxyls = 0;
+	for (int i = 0; i < (int)intcomposition.size(); i++) {
+		if (bricks[intcomposition[i] - 1].getResidueLossType() == h2) {
+			hydrogens++;
+		}
+		if (bricks[intcomposition[i] - 1].getResidueLossType() == h2o2) {
+			hydroxyls++;
+		}
+	}
+
+	if ((hydrogens == hydroxyls) || (hydrogens == hydroxyls + 1) || (hydrogens + 1 == hydroxyls)) {
+		return true;
+	}
+
+	return false;
+}
+
+
+#endif

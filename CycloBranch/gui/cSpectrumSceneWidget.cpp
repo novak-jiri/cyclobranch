@@ -152,6 +152,42 @@ void cSpectrumSceneWidget::exportToPNG(QString filename) {
 }
 
 
+void cSpectrumSceneWidget::hideUnmatchedPeaks(bool state) {
+	if (state == false) {
+		hideunmatched = false;
+	}
+	else {
+		hideunmatched = true;
+	}
+
+	redrawScene();
+}
+
+
+void cSpectrumSceneWidget::hideMatchedPeaks(bool state) {
+	if (state == false) {
+		hidematched = false;
+	}
+	else {
+		hidematched = true;
+	}
+
+	redrawScene();
+}
+
+
+void cSpectrumSceneWidget::hideScrambledPeaks(bool state) {
+	if (state == false) {
+		hidescrambled = false;
+	}
+	else {
+		hidescrambled = true;
+	}
+
+	redrawScene();
+}
+
+
 void cSpectrumSceneWidget::wheelEvent(QWheelEvent *event) {
 	if (event->delta() > 0) {
 		zoomIn();
@@ -372,7 +408,7 @@ void cSpectrumSceneWidget::redrawScene() {
 			if (parameters->peptidetype == branched) {
 				coloredtrotationstring = " " + to_string(coloredtrotationid + 1) + "_";
 			}
-			if (parameters->peptidetype == lasso) {
+			if (parameters->peptidetype == branchcyclic) {
 				coloredtrotationstring = "_" + to_string(coloredtrotationid + 1) + "_";
 			}
 		}
@@ -402,7 +438,7 @@ void cSpectrumSceneWidget::redrawScene() {
 				hits.pop_back();
 			}
 
-			if ((parameters->peptidetype == lasso) && (((coloredrotationid != -1) && (hits.back().find(coloredrotationstring) == string::npos)) || ((coloredtrotationid != -1) && (hits.back().find(coloredtrotationstring) == string::npos)))) {
+			if ((parameters->peptidetype == branchcyclic) && (((coloredrotationid != -1) && (hits.back().find(coloredrotationstring) == string::npos)) || ((coloredtrotationid != -1) && (hits.back().find(coloredtrotationstring) == string::npos)))) {
 				hits.pop_back();
 			}
 
@@ -429,7 +465,7 @@ void cSpectrumSceneWidget::redrawScene() {
 				hits.pop_back();
 			}
 
-			if ((parameters->peptidetype == lasso) && (((coloredrotationid != -1) && (hits.back().find(coloredrotationstring) == string::npos)) || ((coloredtrotationid != -1) && (hits.back().find(coloredtrotationstring) == string::npos)))) {
+			if ((parameters->peptidetype == branchcyclic) && (((coloredrotationid != -1) && (hits.back().find(coloredrotationstring) == string::npos)) || ((coloredtrotationid != -1) && (hits.back().find(coloredtrotationstring) == string::npos)))) {
 				hits.pop_back();
 			}
 		}
@@ -524,48 +560,14 @@ void cSpectrumSceneWidget::updateZoomGroup() {
 	qstr += QString::number(getMZRatioFromXPosition((pressedx < currentx)?pressedx:currentx, origwidth));
 	qstr += "-";
 	qstr += QString::number(getMZRatioFromXPosition((pressedx < currentx)?currentx:pressedx, origwidth));
+	qstr += "\ndiff: ";
+	qstr += QString::number(getMZRatioFromXPosition((pressedx < currentx)?currentx:pressedx, origwidth) - getMZRatioFromXPosition((pressedx < currentx)?pressedx:currentx, origwidth));
 		
 	zoomsimpletextitem->setFont(myFont);
 	zoomsimpletextitem->setText(qstr);
 	zoomsimpletextitem->setPos(QPointF(pressedx, pressedy - 2));
 
 	zoomgroup->setVisible(true);
-}
-
-
-void cSpectrumSceneWidget::hideUnmatchedPeaks(bool state) {
-	if (state == false) {
-		hideunmatched = false;
-	}
-	else {
-		hideunmatched = true;
-	}
-
-	redrawScene();
-}
-
-
-void cSpectrumSceneWidget::hideMatchedPeaks(bool state) {
-	if (state == false) {
-		hidematched = false;
-	}
-	else {
-		hidematched = true;
-	}
-
-	redrawScene();
-}
-
-
-void cSpectrumSceneWidget::hideScrambledPeaks(bool state) {
-	if (state == false) {
-		hidescrambled = false;
-	}
-	else {
-		hidescrambled = true;
-	}
-
-	redrawScene();
 }
 
 

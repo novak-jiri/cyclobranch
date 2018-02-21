@@ -25,29 +25,41 @@ cModificationsWidget::cModificationsWidget(QWidget* parent) {
 
 	insertrow = new QPushButton(tr("Add Row"));
 	insertrow->setToolTip("Add a new row.");
+	insertrow->setShortcut(QKeySequence(Qt::Key_Insert));
+
 	removechecked = new QPushButton(tr(" Remove Rows "));
 	removechecked->setToolTip("Remove selected rows.");
+	removechecked->setShortcut(QKeySequence(Qt::Key_Delete));
 
 	close = new QPushButton(tr("Close"));
 	close->setToolTip("Close the window.");
+
 	load = new QPushButton(tr("Load"));
 	load->setToolTip("Load modifications.");
+	load->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_L));
+
 	save = new QPushButton(QString(" Save "));
 	save->setToolTip("Save modifications in the current file. When a file has not been loaded yet, the \"Save As ...\" file dialog is opened.");
+
 	saveas = new QPushButton(tr("Save As..."));
 	saveas->setToolTip("Save modifications into a file.");
+	saveas->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_D));
 
 	rowsfilterline = new QLineEdit();
 	rowsfilterline->setMinimumWidth(250);
 	rowsfilterline->setToolTip("Text to Find");
+
 	rowsfiltercasesensitive = new QCheckBox();
 	rowsfiltercasesensitive->setToolTip("Case Sensitive");
+
 	rowsfilterbutton = new QPushButton("Filter");
 	rowsfilterbutton->setToolTip("Filter Search Results");
 	rowsfilterbutton->setMinimumWidth(50);
+
 	rowsfilterclearbutton = new QPushButton("Clear");
 	rowsfilterclearbutton->setToolTip("Clear Form and Reset Search Results");
 	rowsfilterclearbutton->setMinimumWidth(50);
+	rowsfilterclearbutton->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_R));
 
 	rowsfilterhbox = new QHBoxLayout();
 	rowsfilterhbox->addWidget(rowsfilterline);
@@ -80,6 +92,7 @@ cModificationsWidget::cModificationsWidget(QWidget* parent) {
 	database->setHorizontalHeaderItem(1, new QTableWidgetItem("Name"));
 	database->setHorizontalHeaderItem(2, new QTableWidgetItem("Summary Formula"));
 	database->setHorizontalHeaderItem(3, new QTableWidgetItem("Monoisotopic Mass"));
+	database->setItemDelegateForColumn(3, &columndelegate);
 	database->setHorizontalHeaderItem(4, new QTableWidgetItem("N-terminal"));
 	database->setHorizontalHeaderItem(5, new QTableWidgetItem("C-terminal"));
 	database->horizontalHeader()->setStretchLastSection(true);
@@ -235,7 +248,7 @@ bool cModificationsWidget::checkFormula(int row, const string& summary) {
 		return false;
 	}
 	if (database->item(row, 3)) {
-		database->item(row, 3)->setData(Qt::DisplayRole, to_string(formula.getMass()).c_str());
+		database->item(row, 3)->setData(Qt::DisplayRole, cropPrecisionToSixDecimals(formula.getMass()));
 	}
 	return true;
 }
@@ -269,6 +282,26 @@ void cModificationsWidget::keyPressEvent(QKeyEvent *event) {
 			filterRows();
 		}
     }
+
+	if (event->key() == Qt::Key_F1) {
+		#if OS_TYPE == WIN
+			QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo("docs/html/modificationseditor.html").absoluteFilePath()));
+		#else
+			QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo(installdir + "docs/html/modificationseditor.html").absoluteFilePath()));
+		#endif
+	}
+
+	if ((event->modifiers() == Qt::ControlModifier) && (event->key() == Qt::Key_F)) {
+		rowsfilterline->setFocus();
+	}
+
+	if ((event->modifiers() == Qt::ControlModifier) && (event->key() == Qt::Key_N)) {
+		rowsfiltercasesensitive->setChecked(!rowsfiltercasesensitive->isChecked());
+	}
+
+	if ((event->modifiers() == Qt::ControlModifier) && (event->key() == Qt::Key_S)) {
+		saveDatabase();
+	}
 }
 
 
@@ -330,7 +363,7 @@ void cModificationsWidget::loadDatabase() {
 				database->item(i, 2)->setText(modifications[i].summary.c_str());
 
 				database->setItem(i, 3, widgetitemallocator.getNewItem());
-				database->item(i, 3)->setData(Qt::DisplayRole, to_string(modifications[i].massdifference).c_str());
+				database->item(i, 3)->setData(Qt::DisplayRole, cropPrecisionToSixDecimals(modifications[i].massdifference));
 
 				checkbox = new QCheckBox();
 				connect(checkbox, SIGNAL(stateChanged(int)), this, SLOT(checkBoxModified(int)));

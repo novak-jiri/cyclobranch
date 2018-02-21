@@ -153,13 +153,13 @@ class cCandidate {
 
 	void getPermutationsIter(cCandidateSet& permutations, vector<string>& currentcandidate, int position, bool* terminatecomputation);
 
-	void attachSubBranchCandidates(cCandidate& candidate, cCandidateSet& result, peptideType peptidetype, bool* terminatecomputation);
+	void attachSubBranchCandidates(cCandidate& candidate, cCandidateSet& result, ePeptideType peptidetype, bool* terminatecomputation);
 
-	void attachAllBranches(cCandidate& candidate, cCandidateSet& result, peptideType peptidetype, bool* terminatecomputation);
+	void attachAllBranches(cCandidate& candidate, cCandidateSet& result, ePeptideType peptidetype, bool* terminatecomputation);
 
 	void getPartialRotations(const string& composition, vector<string>& rotations);
 
-	void getPartialLassoRotations(const string& composition, vector<cCandidate>& lassorotations, int branchstart, int branchend);
+	void getPartialBranchCyclicRotations(const string& composition, vector<cCandidate>& branchcyclicrotations, int branchstart, int branchend);
 
 public:
 
@@ -244,7 +244,7 @@ public:
 		\param peptidetype a type of an analyzed peptide
 		\param terminatecomputation pointer to a variable determining that the computation must be stopped
 	*/ 
-	void prepareBranchedCandidates(cCandidateSet& result, peptideType peptidetype, bool* terminatecomputation);
+	void prepareBranchedCandidates(cCandidateSet& result, ePeptideType peptidetype, bool* terminatecomputation);
 
 
 	/**
@@ -405,13 +405,29 @@ public:
 
 	
 	/**
+		\brief Check if the first brick is artificial.
+		\param brickdatabasewithcombinations reference to an input database of bricks with combinations of bricks
+		\retval bool true if the first brick is artificial, false otherwise
+	*/ 
+	bool hasFirstBrickArtificial(cBricksDatabase& brickdatabasewithcombinations);
+
+
+	/**
 		\brief Check if the last brick is artificial.
 		\param brickdatabasewithcombinations reference to an input database of bricks with combinations of bricks
 		\retval bool true if the last brick is artificial, false otherwise
 	*/ 
 	bool hasLastBrickArtificial(cBricksDatabase& brickdatabasewithcombinations);
 
-	
+
+	/**
+		\brief Check if the last brick is invalid.
+		\param brickdatabasewithcombinations reference to an input database of bricks with combinations of bricks
+		\retval bool true if the last brick is invalid, false otherwise
+	*/ 
+	bool hasLastBrickInvalid(cBricksDatabase& brickdatabasewithcombinations);
+
+
 	/**
 		\brief Get rotations of a cyclic peptide sequence.
 		\param rotations reference to an output vector containing rotations of a sequence
@@ -422,10 +438,10 @@ public:
 
 	/**
 		\brief Get branch-cyclic rotations of a branch-cyclic peptide sequence.
-		\param lassorotations reference to an output vector containing branch-cyclic rotations of a sequence
+		\param branchcyclicrotations reference to an output vector containing branch-cyclic rotations of a sequence
 		\param includerevertedrotations if true then reverted branch-cyclic rotations are also included
 	*/ 
-	void getLassoRotations(vector<cCandidate>& lassorotations, bool includerevertedrotations);
+	void getBranchCyclicRotations(vector<cCandidate>& branchcyclicrotations, bool includerevertedrotations);
 
 
 	/**
@@ -434,7 +450,7 @@ public:
 		\param peptidetype the type of peptide
 		\retval cSummaryFormula the summary formula
 	*/ 
-	cSummaryFormula getSummaryFormula(cParameters& parameters, peptideType peptidetype);
+	cSummaryFormula getSummaryFormula(cParameters& parameters, ePeptideType peptidetype);
 
 
 	/**
@@ -527,7 +543,7 @@ public:
 		\param bricksdatabase the database of building blocks
 		\param peptidetype the type of peptide
 	*/ 
-	void setRealPeptideName(cBricksDatabase& bricksdatabase, peptideType peptidetype);
+	void setRealPeptideName(cBricksDatabase& bricksdatabase, ePeptideType peptidetype);
 
 
 	/**
@@ -535,7 +551,7 @@ public:
 		\param bricksdatabase the database of building blocks
 		\param peptidetype the type of peptide
 	*/ 
-	void setAcronymPeptideNameWithHTMLReferences(cBricksDatabase& bricksdatabase, peptideType peptidetype);
+	void setAcronymPeptideNameWithHTMLReferences(cBricksDatabase& bricksdatabase, ePeptideType peptidetype);
 
 
 	/**
@@ -550,6 +566,53 @@ public:
 		\retval string reference to the acronym peptide name
 	*/ 
 	string& getAcronymPeptideNameWithHTMLReferences();
+
+
+	/**
+		\brief Get the residue loss type.
+		\param bricksdatabase a database of building blocks
+		\retval eResidueLossType the residue loss type
+	*/ 
+	eResidueLossType getResidueLossType(cBricksDatabase& bricksdatabase);
+
+
+#if POLYKETIDE_SIDEROPHORES == 1
+
+	/**
+		\brief Check if the order of blocks is correct.
+		\param bricksdatabase a database of building blocks
+		\param peptidetype the type of peptide
+		\retval bool true when the order of blocks is correct; false otherwise
+	*/ 
+	bool checkPolyketideSequence(cBricksDatabase& bricksdatabase, ePeptideType peptidetype);
+
+
+	/**
+		\brief Get the residue type of the left-most building block.
+		\param bricksdatabase a database of building blocks
+		\retval eResidueLossType residue loss type of the left-most building block
+	*/ 
+	eResidueLossType getLeftResidueType(cBricksDatabase& bricksdatabase);
+
+
+	/**
+		\brief Get the residue type of the right-most building block.
+		\param bricksdatabase a database of building blocks
+		\retval eResidueLossType residue loss type of the right-most building block
+	*/ 
+	eResidueLossType getRightResidueType(cBricksDatabase& bricksdatabase);
+
+
+	/**
+		\brief Check if the numbers of hydrogen and hydroxyl blocks are correct.
+		\param bricksdatabase a database of building blocks
+		\param peptidetype the type of peptide
+		\retval bool true when the numbers of blocks are correct
+	*/ 
+	bool checkPolyketideBlocks(cBricksDatabase& bricksdatabase, ePeptideType peptidetype);
+
+
+#endif
 
 };
 

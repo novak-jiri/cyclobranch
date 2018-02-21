@@ -50,6 +50,7 @@ void cBrick::clear() {
 	mass = 0;
 	composition = "";
 	artificial = false;
+	residuelosstype = water;
 }
 
 
@@ -365,6 +366,16 @@ bool cBrick::isArtificial() {
 }
 
 
+void cBrick::setResidueLossType(eResidueLossType residuelosstype) {
+	this->residuelosstype = residuelosstype;
+}
+
+
+eResidueLossType cBrick::getResidueLossType() {
+	return residuelosstype;
+}
+
+
 void cBrick::store(ofstream& os) {
 	storeString(name, os);
 	storeStringVector(acronyms, os);
@@ -373,6 +384,7 @@ void cBrick::store(ofstream& os) {
 	os.write((char *)&mass, sizeof(double));
 	storeString(composition, os);
 	os.write((char *)&artificial, sizeof(bool));
+	os.write((char *)&residuelosstype, sizeof(eResidueLossType));
 }
 
 
@@ -384,5 +396,6 @@ void cBrick::load(ifstream& is) {
 	is.read((char *)&mass, sizeof(double));
 	loadString(composition, is);
 	is.read((char *)&artificial, sizeof(bool));
+	is.read((char *)&residuelosstype, sizeof(eResidueLossType));
 }
 

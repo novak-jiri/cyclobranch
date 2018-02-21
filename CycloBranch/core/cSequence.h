@@ -25,7 +25,7 @@ using namespace boost;
 */
 class cSequence {
 
-	peptideType peptidetype;
+	ePeptideType peptidetype;
 	string sequence;
 	string nterminalmodification;
 	string cterminalmodification;
@@ -65,9 +65,9 @@ public:
 
 	/**
 		\brief Get peptide type.
-		\retval peptideType peptide type
+		\retval ePeptideType peptide type
 	*/ 
-	peptideType getPeptideType();
+	ePeptideType getPeptideType();
 
 
 	/**
@@ -95,7 +95,7 @@ public:
 		\brief Set peptide type.
 		\param peptidetype peptide type
 	*/ 
-	void setPeptideType(peptideType peptidetype);
+	void setPeptideType(ePeptideType peptidetype);
 
 
 	/**

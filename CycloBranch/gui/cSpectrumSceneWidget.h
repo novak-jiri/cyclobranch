@@ -79,6 +79,27 @@ public:
 	void exportToPNG(QString filename);
 
 
+	/**
+		\brief Hide/Show unmatched peaks.
+		\param state the peaks are hidden when \a state is true
+	*/ 
+	void hideUnmatchedPeaks(bool state);
+
+
+	/**
+		\brief Hide/Show matched peaks.
+		\param state the peaks are hidden when \a state is true
+	*/ 
+	void hideMatchedPeaks(bool state);
+
+
+	/**
+		\brief Hide/Show scrambled peaks.
+		\param state the peaks are hidden when \a state is true
+	*/ 
+	void hideScrambledPeaks(bool state);
+
+
 protected:
 
 
@@ -180,12 +201,6 @@ signals:
 	void updateMZInterval(double minmz, double maxmz);
 
 private slots:
-
-	void hideUnmatchedPeaks(bool state);
-
-	void hideMatchedPeaks(bool state);
-
-	void hideScrambledPeaks(bool state);
 
 	void zoomIn();
 

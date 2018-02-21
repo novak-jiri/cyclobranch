@@ -15,6 +15,9 @@
 #include "core/cPeak.h"
 
 
+#include "core/cImzML.h"
+
+
 using namespace std;
 
 
@@ -73,6 +76,7 @@ double ppmError(double experimentalmass, double theoreticalmass);
 class cPeaksList {
 
 	vector<cPeak> peaks;
+	int x, y;
 
 public:
 
@@ -129,6 +133,14 @@ public:
 		\param stream source stream
 	*/ 
 	void loadFromBAFStream(ifstream &stream);
+
+
+	/**
+		\brief Load the spectrum from .ibd file.
+		\param imzmlitem cImzML containing the offset in the ibd file
+		\param ibdstream ibd binary file stream
+	*/ 
+	void loadFromIBDStream(cImzMLItem& imzmlitem, ifstream &ibdstream);
 
 
 	/**
@@ -295,6 +307,28 @@ public:
 		\retval double intensity
 	*/ 
 	double getMaximumIntensityFromMZInterval(double minmz, double maxmz);
+
+
+	/**
+		\brief Set the coordinates.
+		\param x X coordinate
+		\param y Y coordinate
+	*/ 
+	void setCoordinates(int x, int y);
+
+
+	/**
+		\brief Get the X coordinate.
+		\retval int X coordinate
+	*/ 
+	int getCoordinateX();
+
+
+	/**
+		\brief Get the Y coordinate.
+		\retval int Y coordinate
+	*/ 
+	int getCoordinateY();
 
 
 	/**

@@ -14,9 +14,23 @@ void cParameters::clear() {
 	fragmentdefinitions.recalculateFragments(false, false, s);
 	peptidetype = linear;
 	peaklistfilename = "";
-	peaklist.clear();
+	peaklistfileformat = txt;
+	peaklistseries.clear();
 	precursormass = 0;
 	precursoradduct = "";
+	precursorAdductHasLi = false;
+	precursorAdductHasNa = false;
+	precursorAdductHasMg = false;
+	precursorAdductHasAl = false;
+	precursorAdductHasK = false;
+	precursorAdductHasCa = false;
+	precursorAdductHasMn = false;
+	precursorAdductHasFe = false;
+	precursorAdductHasCo = false;
+	precursorAdductHasNi = false;
+	precursorAdductHasCu = false;
+	precursorAdductHasZn = false;
+	precursorAdductHasGa = false;
 	precursormasserrortolerance = 5;
 	precursorcharge = 1;
 	fragmentmasserrortolerance = 5;
@@ -59,18 +73,20 @@ void cParameters::clear() {
 }
 
 
-int cParameters::checkAndPrepare() {
+int cParameters::checkAndPrepare(bool& terminatecomputation) {
 
 	bool error = false;
 	string errormessage = "";
 	ifstream peakliststream;
+	ifstream spotliststream;
 	ifstream bricksdatabasestream;
 	ifstream modificationsstream;
 	ifstream sequencedatabasestream;
 	regex rx;
-	ePeakListFileFormat peaklistfileformat;
 	string s;
 	int i;
+	string foldername;
+	string ibdfilename;
 
 	if (peaklistfilename.empty()) {
 		error = true;
@@ -108,7 +124,19 @@ int cParameters::checkAndPrepare() {
 				if (regex_search(peaklistfilename, rx)) {
 					peaklistfileformat = baf;
 				}
+
+				rx = "\\.[mM][iI][sS]$";
+				// flexImaging File
+				if (regex_search(peaklistfilename, rx)) {
+					peaklistfileformat = mis;
+				}
 			#endif
+
+			rx = "\\.[iI][mM][zZ][mM][lL]$";
+			// flexImaging File
+			if (regex_search(peaklistfilename, rx)) {
+				peaklistfileformat = imzML;
+			}
 
 		}
 		catch (regex_error& e) {
@@ -192,6 +220,33 @@ int cParameters::checkAndPrepare() {
 					}
 				#endif
 				break;
+			case mis:
+				#if OS_TYPE == WIN
+					foldername = peaklistfilename.substr(0, peaklistfilename.rfind('.'));
+					*os << "Converting flexImaging data folder " + foldername + " ... ";
+					s = "External\\windows\\mis2csv.bat \"" + foldername + "\"";
+					if (system(s.c_str()) != 0) {
+						error = true;
+						errormessage = "The folder cannot be converted.\n";
+						errormessage += "Does the folder '" + foldername + "' exist ?\n";
+						errormessage += "Do you have Bruker Daltonik's CompassXport installed ?\n";
+						errormessage += "Do you have path to the CompassXport.exe in your PATH variable ?\n";
+						errormessage += "Is the directory with the file '" + peaklistfilename + "' writable ?\n";
+						errormessage += "Do you have 'mis2csv.bat' file located in the 'External/windows' folder ?\n";
+					}
+
+					if (!error) {
+						*os << "ok" << endl << endl;
+						peakliststream.open(foldername + ".baf.csv");
+						spotliststream.open(foldername + ".baf.txt");
+					}
+				#endif
+				break;
+			case imzML:
+				ibdfilename = peaklistfilename.substr(0, (int)peaklistfilename.size() - 5);
+				ibdfilename += "ibd";
+				peakliststream.open(ibdfilename, std::ifstream::binary);
+				break;
 			default:
 				break;
 			}
@@ -202,7 +257,12 @@ int cParameters::checkAndPrepare() {
 		if (!error) {
 			if (!peakliststream.good()) {
 				error = true;
-				errormessage = "Cannot open the file '" + peaklistfilename + "'.";
+				if (peaklistfileformat == mis) {
+					errormessage = "Cannot open the folder '" + foldername + "'.";
+				}
+				else {
+					errormessage = "Cannot open the file '" + peaklistfilename + "'.";
+				}
 			}
 			else {
 				if (os) {
@@ -210,17 +270,30 @@ int cParameters::checkAndPrepare() {
 				}
 				switch (peaklistfileformat) {
 				case txt:
-					peaklist.loadFromPlainTextStream(peakliststream);
+					peaklistseries.loadFromPlainTextStream(peakliststream);
 					break;
 				case mzML:
 				case mzXML:
 				case mgf:
-					peaklist.loadFromMGFStream(peakliststream);
+					peaklistseries.loadFromMGFStream(peakliststream);
 					break;
 				case baf:
 					#if OS_TYPE == WIN
-						peaklist.loadFromBAFStream(peakliststream);
+						peaklistseries.loadFromBAFStream(peakliststream);
 					#endif
+					break;
+				case mis:
+					#if OS_TYPE == WIN
+						peaklistseries.loadFromBAFStream(peakliststream);
+						peaklistseries.loadSpotList(spotliststream);
+						spotliststream.close();
+					#endif
+					break;
+				case imzML:
+					if (peaklistseries.loadFromIMZMLStream(peaklistfilename, peakliststream, minimumrelativeintensitythreshold, os, terminatecomputation) == -1) {
+						error = true;
+						errormessage = "Aborted by user.";
+					}
 					break;
 				default:
 					break;
@@ -330,6 +403,73 @@ int cParameters::checkAndPrepare() {
 			error = true;
 			errormessage = "Precursor Ion Adduct: " + errormessage;
 		}
+
+		precursorAdductHasLi = false;
+		precursorAdductHasNa = false;
+		precursorAdductHasMg = false;
+		precursorAdductHasAl = false;
+		precursorAdductHasK = false;
+		precursorAdductHasCa = false;
+		precursorAdductHasMn = false;
+		precursorAdductHasFe = false;
+		precursorAdductHasCo = false;
+		precursorAdductHasNi = false;
+		precursorAdductHasCu = false;
+		precursorAdductHasZn = false;
+		precursorAdductHasGa = false;
+
+		rx = "Li";
+		if (regex_search(precursoradduct, rx)) {
+			precursorAdductHasLi = true;
+		}
+		rx = "Na";
+		if (regex_search(precursoradduct, rx)) {
+			precursorAdductHasNa = true;
+		}
+		rx = "Mg";
+		if (regex_search(precursoradduct, rx)) {
+			precursorAdductHasMg = true;
+		}
+		rx = "Al";
+		if (regex_search(precursoradduct, rx)) {
+			precursorAdductHasAl = true;
+		}
+		rx = "K";
+		if (regex_search(precursoradduct, rx)) {
+			precursorAdductHasK = true;
+		}
+		rx = "Ca";
+		if (regex_search(precursoradduct, rx)) {
+			precursorAdductHasCa = true;
+		}
+		rx = "Mn";
+		if (regex_search(precursoradduct, rx)) {
+			precursorAdductHasMn = true;
+		}
+		rx = "Fe";
+		if (regex_search(precursoradduct, rx)) {
+			precursorAdductHasFe = true;
+		}
+		rx = "Co";
+		if (regex_search(precursoradduct, rx)) {
+			precursorAdductHasCo = true;
+		}
+		rx = "Ni";
+		if (regex_search(precursoradduct, rx)) {
+			precursorAdductHasNi = true;
+		}
+		rx = "Cu";
+		if (regex_search(precursoradduct, rx)) {
+			precursorAdductHasCu = true;
+		}
+		rx = "Zn";
+		if (regex_search(precursoradduct, rx)) {
+			precursorAdductHasZn = true;
+		}
+		rx = "Ga";
+		if (regex_search(precursoradduct, rx)) {
+			precursorAdductHasGa = true;
+		}
 	}
 
 
@@ -369,9 +509,17 @@ int cParameters::checkAndPrepare() {
 		case branched:
 			initializeFragmentIonsForDeNovoGraphOfTPeptides(fragmentionsfordenovograph);
 			break;
-		case lasso:
-			initializeFragmentIonsForDeNovoGraphOfLassoPeptides(fragmentionsfordenovograph);
+		case branchcyclic:
+			initializeFragmentIonsForDeNovoGraphOfBranchCyclicPeptides(fragmentionsfordenovograph);
 			break;
+#if POLYKETIDE_SIDEROPHORES == 1
+		case linearpolyketide:
+			initializeFragmentIonsForDeNovoGraphOfLinearPolyketideSiderophore(fragmentionsfordenovograph);
+			break;
+		case cyclicpolyketide:
+			initializeFragmentIonsForDeNovoGraphOfCyclicPolyketideSiderophore(fragmentionsfordenovograph);
+			break;
+#endif
 		case linearpolysaccharide:
 			initializeFragmentIonsForDeNovoGraphOfLinearPolysaccharide(fragmentionsfordenovograph);
 			break;
@@ -430,9 +578,17 @@ string cParameters::printToString() {
 	case branched:
 		s += "Branched\n";
 		break;
-	case lasso:
+	case branchcyclic:
 		s += "Branch-cyclic\n";
 		break;
+#if POLYKETIDE_SIDEROPHORES == 1
+	case linearpolyketide:
+		s += "Linear oligoketide siderophore\n";
+		break;
+	case cyclicpolyketide:
+		s += "Cyclic oligoketide siderophore\n";
+		break;
+#endif
 	case linearpolysaccharide:
 		s += "Linear polysaccharide (beta version)\n";
 		break;
@@ -494,7 +650,7 @@ string cParameters::printToString() {
 	s += "\n";
 
 	s += "Mode: ";
-	switch ((modeType)mode) {
+	switch ((eModeType)mode) {
 	case denovoengine:
 		s += "De Novo Search Engine";
 		break;
@@ -551,7 +707,7 @@ string cParameters::printToString() {
 	s += "Maximum Number of Candidate Peptides Reported: " + to_string(hitsreported) + "\n";
 	s += "Peptide Sequence Tag: " + originalsequencetag + "\n";
 
-	s += "Fragment Ion Types in Theoretical Spectra: ";
+	s += "Ion Types in Theoretical Spectra: ";
 	for (int i = 0; i < (int)fragmentionsfortheoreticalspectra.size(); i++) {
 		s += fragmentdefinitions[fragmentionsfortheoreticalspectra[i]].name;
 		if (i < (int)fragmentionsfortheoreticalspectra.size() - 1) {
@@ -595,14 +751,28 @@ void cParameters::store(ofstream& os) {
 	
 	fragmentdefinitions.store(os);
 
-	os.write((char *)&peptidetype, sizeof(peptideType));
+	os.write((char *)&peptidetype, sizeof(ePeptideType));
 
 	storeString(peaklistfilename, os);
-	peaklist.store(os);
+	os.write((char *)&peaklistfileformat, sizeof(ePeakListFileFormat));
+	peaklistseries.store(os);
 
 	os.write((char *)&precursormass, sizeof(double));
 
 	storeString(precursoradduct, os);
+	os.write((char *)&precursorAdductHasLi, sizeof(bool));
+	os.write((char *)&precursorAdductHasNa, sizeof(bool));
+	os.write((char *)&precursorAdductHasMg, sizeof(bool));
+	os.write((char *)&precursorAdductHasAl, sizeof(bool));
+	os.write((char *)&precursorAdductHasK, sizeof(bool));
+	os.write((char *)&precursorAdductHasCa, sizeof(bool));
+	os.write((char *)&precursorAdductHasMn, sizeof(bool));
+	os.write((char *)&precursorAdductHasFe, sizeof(bool));
+	os.write((char *)&precursorAdductHasCo, sizeof(bool));
+	os.write((char *)&precursorAdductHasNi, sizeof(bool));
+	os.write((char *)&precursorAdductHasCu, sizeof(bool));
+	os.write((char *)&precursorAdductHasZn, sizeof(bool));
+	os.write((char *)&precursorAdductHasGa, sizeof(bool));
 
 	os.write((char *)&precursormasserrortolerance, sizeof(double));
 	os.write((char *)&precursorcharge, sizeof(int));
@@ -629,8 +799,8 @@ void cParameters::store(ofstream& os) {
 	}
 
 	os.write((char *)&maximumnumberofthreads, sizeof(int));
-	os.write((char *)&mode, sizeof(modeType));
-	os.write((char *)&scoretype, sizeof(scoreType));
+	os.write((char *)&mode, sizeof(eModeType));
+	os.write((char *)&scoretype, sizeof(eScoreType));
 	os.write((char *)&clearhitswithoutparent, sizeof(bool));
 	os.write((char *)&cyclicnterminus, sizeof(bool));
 	os.write((char *)&cycliccterminus, sizeof(bool));
@@ -655,13 +825,13 @@ void cParameters::store(ofstream& os) {
 	size = (int)fragmentionsfordenovograph.size();
 	os.write((char *)&size, sizeof(int));
 	for (int i = 0; i < (int)fragmentionsfordenovograph.size(); i++) {
-		os.write((char *)&fragmentionsfordenovograph[i], sizeof(fragmentIonType));
+		os.write((char *)&fragmentionsfordenovograph[i], sizeof(eFragmentIonType));
 	}
 
 	size = (int)fragmentionsfortheoreticalspectra.size();
 	os.write((char *)&size, sizeof(int));
 	for (int i = 0; i < (int)fragmentionsfortheoreticalspectra.size(); i++) {
-		os.write((char *)&fragmentionsfortheoreticalspectra[i], sizeof(fragmentIonType));
+		os.write((char *)&fragmentionsfortheoreticalspectra[i], sizeof(eFragmentIonType));
 	}
 }
 
@@ -673,14 +843,28 @@ void cParameters::load(ifstream& is) {
 
 	fragmentdefinitions.load(is);
 
-	is.read((char *)&peptidetype, sizeof(peptideType));
+	is.read((char *)&peptidetype, sizeof(ePeptideType));
 
 	loadString(peaklistfilename, is);
-	peaklist.load(is);
+	is.read((char *)&peaklistfileformat, sizeof(ePeakListFileFormat));
+	peaklistseries.load(is);
 
 	is.read((char *)&precursormass, sizeof(double));
 
 	loadString(precursoradduct, is);
+	is.read((char *)&precursorAdductHasLi, sizeof(bool));
+	is.read((char *)&precursorAdductHasNa, sizeof(bool));
+	is.read((char *)&precursorAdductHasMg, sizeof(bool));
+	is.read((char *)&precursorAdductHasAl, sizeof(bool));
+	is.read((char *)&precursorAdductHasK, sizeof(bool));
+	is.read((char *)&precursorAdductHasCa, sizeof(bool));
+	is.read((char *)&precursorAdductHasMn, sizeof(bool));
+	is.read((char *)&precursorAdductHasFe, sizeof(bool));
+	is.read((char *)&precursorAdductHasCo, sizeof(bool));
+	is.read((char *)&precursorAdductHasNi, sizeof(bool));
+	is.read((char *)&precursorAdductHasCu, sizeof(bool));
+	is.read((char *)&precursorAdductHasZn, sizeof(bool));
+	is.read((char *)&precursorAdductHasGa, sizeof(bool));
 
 	is.read((char *)&precursormasserrortolerance, sizeof(double));
 	is.read((char *)&precursorcharge, sizeof(int));
@@ -707,8 +891,8 @@ void cParameters::load(ifstream& is) {
 	}
 
 	is.read((char *)&maximumnumberofthreads, sizeof(int));
-	is.read((char *)&mode, sizeof(modeType));
-	is.read((char *)&scoretype, sizeof(scoreType));
+	is.read((char *)&mode, sizeof(eModeType));
+	is.read((char *)&scoretype, sizeof(eScoreType));
 	is.read((char *)&clearhitswithoutparent, sizeof(bool));
 	is.read((char *)&cyclicnterminus, sizeof(bool));
 	is.read((char *)&cycliccterminus, sizeof(bool));
@@ -733,13 +917,13 @@ void cParameters::load(ifstream& is) {
 	is.read((char *)&size, sizeof(int));
 	fragmentionsfordenovograph.resize(size);
 	for (int i = 0; i < (int)fragmentionsfordenovograph.size(); i++) {
-		is.read((char *)&fragmentionsfordenovograph[i], sizeof(fragmentIonType));
+		is.read((char *)&fragmentionsfordenovograph[i], sizeof(eFragmentIonType));
 	}
 
 	is.read((char *)&size, sizeof(int));
 	fragmentionsfortheoreticalspectra.resize(size);
 	for (int i = 0; i < (int)fragmentionsfortheoreticalspectra.size(); i++) {
-		is.read((char *)&fragmentionsfortheoreticalspectra[i], sizeof(fragmentIonType));
+		is.read((char *)&fragmentionsfortheoreticalspectra[i], sizeof(eFragmentIonType));
 	}
 }
 

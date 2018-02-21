@@ -40,12 +40,16 @@ cPeaksList::cPeaksList(const cPeaksList& peakslist) {
 
 cPeaksList& cPeaksList::operator=(const cPeaksList& peakslist) {
 	peaks = peakslist.peaks;
+	x = peakslist.x;
+	y = peakslist.y;
 	return *this;
 }
 
 
 void cPeaksList::clear() {
 	peaks.clear();
+	x = 0;
+	y = 0;
 }
 
 
@@ -85,6 +89,9 @@ void cPeaksList::loadFromPlainTextStream(ifstream &stream) {
 		if (!p.empty()) {
 			peaks.push_back(p);
 		}
+		else {
+			break;
+		}
 	}
 }
 
@@ -94,19 +101,16 @@ void cPeaksList::loadFromBAFStream(ifstream &stream) {
 	cPeak p;
 	size_t pos;
 
-	getline(stream,s);
-
-	while (stream.good()) {
-		getline(stream,s);
+	while (stream.good() && !(strstr(s.c_str(),"M/Z"))) {
 
 		// replaces commas with dots
-		pos = s.find(',');
-		while (pos != string::npos) {
-			s.replace(pos, 1, ".");
-			pos = s.find(',');
-		}
+		//pos = s.find(',');
+		//while (pos != string::npos) {
+		//	s.replace(pos, 1, ".");
+		//	pos = s.find(',');
+		//}
 
-		pos = s.find(':');
+		pos = s.find(',');
 		if (pos != string::npos) {
 			s.replace(pos, 1, "\t");
 		}
@@ -117,7 +121,45 @@ void cPeaksList::loadFromBAFStream(ifstream &stream) {
 		if (!p.empty()) {
 			peaks.push_back(p);
 		}
+
+		getline(stream,s);
 	}
+}
+
+
+void cPeaksList::loadFromIBDStream(cImzMLItem& imzmlitem, ifstream &ibdstream) {
+	unsigned long long start;
+	unsigned long long end;
+	double value;
+
+	peaks.resize(imzmlitem.mzlength/8);
+
+	start = imzmlitem.mzstart;
+	end = imzmlitem.mzstart + imzmlitem.mzlength;
+	ibdstream.seekg(start, ibdstream.beg);
+	for (int i = 0; i < (int)imzmlitem.mzlength/8; i++) {
+		if (ibdstream.good()) {
+			ibdstream.read((char*)&value, 8);
+			peaks[i].mzratio = value;
+		}
+	}
+
+	if (imzmlitem.mzlength != imzmlitem.intensitylength) {
+		return;
+	}
+
+	start = imzmlitem.intensitystart;
+	end = imzmlitem.intensitystart + imzmlitem.intensitylength;
+	ibdstream.seekg(start, ibdstream.beg);
+	for (int i = 0; i < (int)imzmlitem.intensitylength/8; i++) {
+		if (ibdstream.good()) {
+			ibdstream.read((char*)&value, 8);
+			peaks[i].intensity = value;
+		}
+	}
+
+	x = imzmlitem.x;
+	y = imzmlitem.y;
 }
 
 
@@ -147,7 +189,7 @@ void cPeaksList::loadFromMGFStream(ifstream &stream) {
 		}
 	}
 
-	while ((stream.good()) && !(strstr(s.c_str(),"END IONS"))) {
+	while (stream.good() && !(strstr(s.c_str(),"END IONS"))) {
 
 		// replaces commas with dots
 		pos = s.find(',');
@@ -187,10 +229,6 @@ string cPeaksList::print(bool htmlterminatelines) {
 		if (peaks[i].intensity > 0) {
 			s += " ";
 			s += to_string(peaks[i].intensity);
-		}
-
-		if (peaks[i].matchdescription.compare("") != 0) {
-			s += peaks[i].matchdescription + " ";
 		}
 
 		if (htmlterminatelines) {
@@ -243,15 +281,15 @@ int cPeaksList::normalizeIntenzity() {
 
 
 void cPeaksList::cropIntenzity(double minimumrelativeintensitythreshold) {
-	int i = 0;
-	while (i < (int)peaks.size()) {
-		if (peaks[i].intensity < minimumrelativeintensitythreshold) {
-			peaks.erase(peaks.begin()+i);
-		}
-		else {
-			i++;
-		}
+	sortbyIntensityDesc();
+	
+	int i = (int)peaks.size() - 1;
+	while ((i > 0) && (peaks[i].intensity < minimumrelativeintensitythreshold)) {
+		i--;
 	}
+	peaks.resize(i + 1);
+
+	sortbyMass();
 }
 
 
@@ -535,6 +573,22 @@ double cPeaksList::getMaximumIntensityFromMZInterval(double minmz, double maxmz)
 }
 
 
+void cPeaksList::setCoordinates(int x, int y) {
+	this->x = x;
+	this->y = y;
+}
+
+
+int cPeaksList::getCoordinateX() {
+	return x;
+}
+
+
+int cPeaksList::getCoordinateY() {
+	return y;
+}
+
+
 void cPeaksList::store(ofstream& os) {
 	int size;
 
@@ -544,6 +598,9 @@ void cPeaksList::store(ofstream& os) {
 	for (int i = 0; i < (int)peaks.size(); i++) {
 		peaks[i].store(os);
 	}
+
+	os.write((char *)&x, sizeof(int));
+	os.write((char *)&y, sizeof(int));
 }
 
 
@@ -556,5 +613,8 @@ void cPeaksList::load(ifstream& is) {
 	for (int i = 0; i < (int)peaks.size(); i++) {
 		peaks[i].load(is);
 	}
+
+	is.read((char *)&x, sizeof(int));
+	is.read((char *)&y, sizeof(int));
 }
 

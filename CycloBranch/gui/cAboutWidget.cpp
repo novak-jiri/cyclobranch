@@ -16,13 +16,19 @@ cAboutWidget::cAboutWidget(QWidget* parent) {
 
 	layout = new QVBoxLayout();
 
-	QString title = "A tool for <i>de novo</i> sequencing of nonribosomal peptides from accurate product ion mass spectra.<br/><hr/><br/>";
+	QString homepage = "Homepage: <a href=\"http://ms.biomed.cas.cz/cyclobranch/\">http://ms.biomed.cas.cz/cyclobranch/</a><br/><br/>";
+
+	QString citation = "If you use CycloBranch in your work, please, cite us using the following publication:<br/><br/>";
+	citation += "<b>Jiri Novak, Karel Lemr, Kevin A. Schug and Vladimir Havlicek.<br/>";
+	citation += "CycloBranch: De Novo Sequencing of Nonribosomal Peptides from Accurate Product Ion Mass Spectra.<br/>";
+	citation += "<i>J. Am. Soc. Mass Spectrom.</i>, vol. 26, no. 10, pp. 1780-1786, 2015. DOI: 10.1007/s13361-015-1211-1.<br/>";
+	citation += "Download citation: [ <a href=\"http://ms.biomed.cas.cz/cyclobranch/docs/cyclobranch_ris.txt\"><b>ris</b></a> ], [ <a href=\"http://ms.biomed.cas.cz/cyclobranch/docs/cyclobranch_bib.txt\"><b>bib</b></a> ]</b><br/><hr/><br/>";
 
 	QString licence = "Licence:<br/><br/> This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.<br/><br/>";
 	licence += "This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.<br/><br/>";
 	licence += "You should have received a copy of the GNU General Public License along with this program. If not, see <a href=\"http://www.gnu.org/licenses/\">http://www.gnu.org/licenses/</a>.<br/><hr/><br/>";
 
-	QString developers = "Developers:<br/><br/>Jiri Novak<br/>Laboratory of Molecular Structure Characterization<br/>Institute of Microbiology<br/>Academy of Sciences of the Czech Republic<br/>Videnska 1083<br/>142 20 Prague<br/>Czech Republic<br/><a href=\"mailto:jiri.novak@biomed.cas.cz\">jiri.novak@biomed.cas.cz</a><br/><a href=\"http://ms.biomed.cas.cz/cyclobranch/\">http://ms.biomed.cas.cz/cyclobranch/</a><br/><a href=\"http://ms.biomed.cas.cz/staff-novak_jiri.php\">http://ms.biomed.cas.cz/staff-novak_jiri.php</a><br/><a href=\"https://cas-cz.academia.edu/JiriNovak\">https://cas-cz.academia.edu/JiriNovak</a><br/><br/>(C) 2013 - 2015<br/><hr/><br/>";
+	QString developers = "Developers:<br/><br/>Jiri Novak<br/>Laboratory of Molecular Structure Characterization<br/>Institute of Microbiology<br/>Academy of Sciences of the Czech Republic<br/>Videnska 1083<br/>142 20 Prague<br/>Czech Republic<br/><a href=\"mailto:jiri.novak@biomed.cas.cz\">jiri.novak@biomed.cas.cz</a><br/><a href=\"http://ms.biomed.cas.cz/staff-novak_jiri.php\">http://ms.biomed.cas.cz/staff-novak_jiri.php</a><br/><a href=\"https://cas-cz.academia.edu/JiriNovak\">https://cas-cz.academia.edu/JiriNovak</a><br/><br/>(C) 2013 - 2015<br/><hr/><br/>";
 
 	QString splash = "<div align=\"center\"><img src=\":/images/splash.png\"></div><br/><hr/><br/>";
 
@@ -32,7 +38,7 @@ cAboutWidget::cAboutWidget(QWidget* parent) {
 	message->setReadOnly(true);
 	message->setAcceptRichText(true);
 	message->setOpenExternalLinks(true);
-	message->setHtml("<br/>" + splash + "<b>" + appname + " " + appversion + "</b><br/><br/>" + title + developers + licence + acknowledgement);
+	message->setHtml("<br/>" + splash + "<b>" + appname + " " + appversion + "</b><br/><br/>" + homepage + citation + developers + licence + acknowledgement);
 
 	buttonbox = new QDialogButtonBox(QDialogButtonBox::Ok);
 	//buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);

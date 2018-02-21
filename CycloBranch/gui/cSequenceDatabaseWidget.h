@@ -8,10 +8,15 @@
 #define _CSEQUENCEDATABASEWIDGET_H
 
 #include <QWidget>
+#include <QDesktopServices>
+#include <QUrl>
+#include <QFileInfo>
 #include <fstream>
 #include "core/utilities.h"
 #include "core/cSequenceDatabase.h"
 #include "core/cAllocator.h"
+#include "gui/cDelegate.h"
+
 
 using namespace std;
 using namespace boost;
@@ -93,6 +98,7 @@ private:
 	cSequenceDatabase sequences;
 
 	vector<int> headersort;
+	cDelegate columndelegate;
 
 	cAllocator<QTableWidgetItem> widgetitemallocator;
 

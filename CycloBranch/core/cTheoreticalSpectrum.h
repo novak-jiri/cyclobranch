@@ -14,7 +14,7 @@
 #include <QMetaType>
 
 #include "core/cParameters.h"
-#include "core/cPeaksList.h"
+#include "core/cPeakListSeries.h"
 #include "core/cCandidateSet.h"
 
 class cMainThread;
@@ -34,10 +34,12 @@ struct splitSite {
 	*/
 	int first;
 
+
 	/**
 		\brief Order of the second amino acid where a cyclic peptide is split.
 	*/
 	int second;
+
 
 	splitSite() {
 		first = 0;
@@ -99,10 +101,10 @@ class cTheoreticalSpectrum {
 	cCandidate candidate;
 	int experimentalpeaksmatched;
 	int scrambledpeaksmatched;
-	map<fragmentIonType, int> matchedions;
+	map<eFragmentIonType, int> matchedions;
 	int peakstested;
 	double experimentalpeaksmatchedratio;
-	string unmatchedpeaks;
+	cPeaksList unmatchedpeaks;
 	string coveragebyseries;
 	bool valid;
 	double intensityweightedscore;
@@ -113,7 +115,7 @@ class cTheoreticalSpectrum {
 	int seriescompleted;
 
 	// remove false hits, i.e., b-H2O without existing b-ion
-	void clearFalseHits(map<fragmentIonType, vector<int> >& series, vector<fragmentIonType>& fragmentions);
+	void clearFalseHits(map<eFragmentIonType, vector<int> >& series, vector<eFragmentIonType>& fragmentions);
 
 	// search for matches of experimental and theoretical peaks
 	void searchForPeakPairs(cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks, vector<set<int> >& experimentalpeakmatches, double fragmentmasserrortolerance);
@@ -131,7 +133,23 @@ class cTheoreticalSpectrum {
 	void selectAndNormalizeScrambledSequences(unordered_set<string>& scrambledsequences);
 
 	// select a proper fragment ion type for an experimental peak when masses of more theoretical fragment ions collide
-	fragmentIonType selectHigherPriorityIonTypeCID(fragmentIonType experimentalpeakiontype, fragmentIonType theoreticalpeakiontype);
+	eFragmentIonType selectHigherPriorityIonTypeCID(eFragmentIonType experimentalpeakiontype, eFragmentIonType theoreticalpeakiontype);
+
+	// add a peak to the list
+	void addPeakToList(cPeak& peak, int& theoreticalpeaksrealsize);
+
+	// add an adduct to a peak description
+	void addAdductToDescription(string& description);
+
+	// count isotopes of metals
+	int countIsotopesOfMetals(cParameters* parameters);
+
+	// add theoretical peaks containing metals
+	void addMetalPeaks(cPeak& peak, int& peaklistrealsize, int charge, bool writedescription);
+
+	// remove unmatched biometal isotopes
+	void removeUnmatchedMetalIsotopes(cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks, vector<set<int> >& experimentalpeakmatches);
+
 
 public:
 
@@ -180,7 +198,7 @@ public:
 
 	/**
 		\brief Compare the theoretical spectrum of a branched peptide with an experimental spectrum.
-		\param sortedpeaklist reference to a peak list of an experimental spectrum
+		\param sortedpeaklist reference to an experimental peaklist
 		\param bricksdatabasewithcombinations reference to a database of bricks with combinations of bricks
 		\param writedescription if true then string descriptions of peaks are filled
 		\param sequencetag reference to a regex of a sequence tag
@@ -192,7 +210,7 @@ public:
 
 	/**
 		\brief Compare the theoretical spectrum of a linear peptide with an experimental spectrum.
-		\param sortedpeaklist reference to a peak list of an experimental spectrum
+		\param sortedpeaklist reference to an experimental peaklist
 		\param bricksdatabasewithcombinations reference to a database of bricks with combinations of bricks
 		\param writedescription if true then string descriptions of peaks are filled
 		\param sequencetag reference to a regex of a sequence tag
@@ -204,7 +222,7 @@ public:
 
 	/**
 		\brief Compare the theoretical spectrum of a cyclic peptide with an experimental spectrum.
-		\param sortedpeaklist reference to a peak list of an experimental spectrum
+		\param sortedpeaklist reference to an experimental peaklist
 		\param bricksdatabasewithcombinations reference to a database of bricks with combinations of bricks
 		\param writedescription if true then string descriptions of peaks are filled
 		\param sequencetag reference to a regex of a sequence tag
@@ -216,19 +234,49 @@ public:
 
 	/**
 		\brief Compare the theoretical spectrum of a branch-cyclic peptide with an experimental spectrum.
-		\param sortedpeaklist reference to a peak list of an experimental spectrum
+		\param sortedpeaklist reference to an experimental peaklist
 		\param bricksdatabasewithcombinations reference to a database of bricks with combinations of bricks
 		\param writedescription if true then string descriptions of peaks are filled
 		\param sequencetag reference to a regex of a sequence tag
 		\param searchedsequence reference to a regex of a searched sequence
 		\retval int number theoretical peaks generated; -2 when the sequence tag does not match the peptide sequence candidate
 	*/ 
-	int compareLasso(cPeaksList& sortedpeaklist, cBricksDatabase& bricksdatabasewithcombinations, bool writedescription, regex& sequencetag, regex& searchedsequence);
+	int compareBranchCyclic(cPeaksList& sortedpeaklist, cBricksDatabase& bricksdatabasewithcombinations, bool writedescription, regex& sequencetag, regex& searchedsequence);
+
+
+#if POLYKETIDE_SIDEROPHORES == 1
+
+
+	/**
+		\brief Compare the theoretical spectrum of a linear polyketide siderophore with an experimental spectrum.
+		\param sortedpeaklist reference to an experimental peaklist
+		\param bricksdatabasewithcombinations reference to a database of bricks with combinations of bricks
+		\param writedescription if true then string descriptions of peaks are filled
+		\param sequencetag reference to a regex of a sequence tag
+		\param searchedsequence reference to a regex of a searched sequence
+		\retval int number theoretical peaks generated; -2 when the sequence tag does not match the peptide sequence candidate
+	*/ 
+	int compareLinearPolyketideSiderophore(cPeaksList& sortedpeaklist, cBricksDatabase& bricksdatabasewithcombinations, bool writedescription, regex& sequencetag, regex& searchedsequence);
+
+
+	/**
+		\brief Compare the theoretical spectrum of a cyclic polyketide siderophore with an experimental spectrum.
+		\param sortedpeaklist reference to an experimental peaklist
+		\param bricksdatabasewithcombinations reference to a database of bricks with combinations of bricks
+		\param writedescription if true then string descriptions of peaks are filled
+		\param sequencetag reference to a regex of a sequence tag
+		\param searchedsequence reference to a regex of a searched sequence
+		\retval int number theoretical peaks generated; -2 when the sequence tag does not match the peptide sequence candidate
+	*/ 
+	int compareCyclicPolyketideSiderophore(cPeaksList& sortedpeaklist, cBricksDatabase& bricksdatabasewithcombinations, bool writedescription, regex& sequencetag, regex& searchedsequence);
+
+
+#endif
 
 
 	/**
 		\brief Compare the theoretical spectrum of a linear polysaccharide with an experimental spectrum.
-		\param sortedpeaklist reference to a peak list of an experimental spectrum
+		\param sortedpeaklist reference to an experimental peaklist
 		\param bricksdatabasewithcombinations reference to a database of bricks with combinations of bricks
 		\param writedescription if true then string descriptions of peaks are filled
 		\param sequencetag reference to a regex of a sequence tag
@@ -240,9 +288,15 @@ public:
 
 	/**
 		\brief Compare theoretical peaks with an experimental spectrum.
-		\param parameters a pointer to the parameters of the application
 	*/ 
-	void compareMSSpectrum(cParameters* parameters);
+	void generateMSSpectrum();
+
+
+	/**
+		\brief Compare theoretical peaks with an experimental spectrum.
+		\param peaklist reference to an experimental peaklist
+	*/ 
+	void compareMSSpectrum(cPeaksList& peaklist);
 
 
 	/**
@@ -264,7 +318,7 @@ public:
 		\param iontype a fragment ion type
 		\retval int number of matched peaks
 	*/ 
-	int getNumberOfMatchedPeaks(fragmentIonType iontype) const;
+	int getNumberOfMatchedPeaks(eFragmentIonType iontype) const;
 
 
 	/**
@@ -282,14 +336,6 @@ public:
 
 
 	/**
-		\brief Print a peptide-spectrum match into a stream.
-		\param os reference to an ouput stream
-		\param peptidetype the type of peptide corresponding to the experimental spectrum
-	*/ 
-	void printMatch(ofstream& os, peptideType peptidetype);
-
-
-	/**
 		\brief Generate a N-terminal fragment ion series.
 		\param maxcharge a charge of precursor ion
 		\param peaklistrealsize real size of the peak list
@@ -302,8 +348,10 @@ public:
 		\param searchedmodifications reference to a vector of searched modifications
 		\param peptidetype the type of searched peptide
 		\param trotation a pointer to a T-permutation of a branched peptide
+		\param leftresiduelosstype a residue type of the leftmost building block
+		\param hasfirstblockartificial true when the first block is artificial, false otherwise
 	*/ 
-	void generateNTerminalFragmentIons(int maxcharge, int& peaklistrealsize, vector<int>& intcomposition, fragmentIonType fragmentiontype, cBricksDatabase& bricksdatabase, bool writedescription, int rotationid, vector<splitSite>& splittingsites, vector<fragmentDescription>& searchedmodifications, peptideType peptidetype, TRotationInfo* trotation = 0);
+	void generateNTerminalFragmentIons(int maxcharge, int& peaklistrealsize, vector<int>& intcomposition, eFragmentIonType fragmentiontype, cBricksDatabase& bricksdatabase, bool writedescription, int rotationid, vector<splitSite>& splittingsites, vector<fragmentDescription>& searchedmodifications, ePeptideType peptidetype, TRotationInfo* trotation = 0, eResidueLossType leftresiduelosstype = water, bool hasfirstblockartificial = false);
 	
 
 	/**
@@ -319,8 +367,10 @@ public:
 		\param searchedmodifications reference to a vector of searched modifications
 		\param peptidetype the type of searched peptide
 		\param trotation a pointer to a T-permutation of a branched peptide
+		\param rightresiduelosstype a residue type of the rightmost building block
+		\param haslastblockartificial true when the last block is artificial, false otherwise
 	*/ 
-	void generateCTerminalFragmentIons(int maxcharge, int& peaklistrealsize, vector<int>& intcomposition, fragmentIonType fragmentiontype, cBricksDatabase& bricksdatabase, bool writedescription, int rotationid, vector<splitSite>& splittingsites, vector<fragmentDescription>& searchedmodifications, peptideType peptidetype, TRotationInfo* trotation = 0);
+	void generateCTerminalFragmentIons(int maxcharge, int& peaklistrealsize, vector<int>& intcomposition, eFragmentIonType fragmentiontype, cBricksDatabase& bricksdatabase, bool writedescription, int rotationid, vector<splitSite>& splittingsites, vector<fragmentDescription>& searchedmodifications, ePeptideType peptidetype, TRotationInfo* trotation = 0, eResidueLossType rightresiduelosstype = water, bool haslastblockartificial = false);
 
 
 	/**
@@ -375,15 +425,15 @@ public:
 
 
 	/**
-		\brief Get list of unmatched peaks.
-		\retval string list of unmatched peaks
+		\brief Get a list of unmatched peaks.
+		\retval cPeaksList a pointer to a list of unmatched peaks
 	*/ 
-	string getUnmatchedPeaks();
+	cPeaksList* getUnmatchedPeaks();
 
 
 	/**
-		\brief Access to the list of theoretical peaks.
-		\retval cPeaksList pointer to a list of theoretical peaks
+		\brief Get a list of theoretical peaks.
+		\retval cPeaksList a pointer to a list of theoretical peaks
 	*/ 
 	cPeaksList* getTheoreticalPeaks();
 

@@ -12,6 +12,7 @@
 #include <QUrl>
 #include <QFileInfo>
 #include "core/utilities.h"
+#include "core/cAllocator.h"
 #include "core/cTheoreticalSpectrum.h"
 #include "gui/cAboutWidget.h"
 #include "gui/cGraphWidget.h"
@@ -22,7 +23,8 @@
 #include "gui/cModificationsWidget.h"
 #include "gui/cDrawPeptideWidget.h"
 #include "gui/cMainThread.h"
-#include "core/cAllocator.h"
+#include "gui/cDelegate.h"
+#include "gui/cHTMLExportDialog.h"
 
 
 // forward declaration
@@ -95,6 +97,8 @@ private:
 	QAction* actionSequenceDatabase;
 	QAction* actionModifications;
 	QAction *actionDrawPeptide;
+	QAction *actionNorine;
+	QAction *actionSmilesToMonomers;
 	QAction* actionShowIsomers;
 	QAction* actionGraph;
 	QAction* actionLog;
@@ -125,12 +129,14 @@ private:
 	cModificationsWidget* modificationswidget;
 	cDrawPeptideWidget* drawpeptidewidget;
 	cParametersWidget* parameterswidget;
+	cHTMLExportDialog* htmlexportdialog;
 
 	int resultsbasecolumncount;
 	int resultsspecificcolumncount;
 	int dbsearchspecificcolumncount;
 
 	vector<int> resultsheadersort;
+	cDelegate columndelegate;
 
 	QString lastdirexporttocsv;
 	QString lastdirexporttohtml;
@@ -217,6 +223,10 @@ private slots:
 	void filterResults();
 
 	void resetFilter();
+
+	void gotoNorine();
+
+	void gotoSmiles2Monomers();
 
 	//void showContextMenu(const QPoint &pt);
 

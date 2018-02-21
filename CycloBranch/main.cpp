@@ -25,8 +25,8 @@ int main(int argc, char** argv) {
 		chdir(installdir.toStdString().c_str());
 	#endif
 	qRegisterMetaType<cParameters>("cParameters");
-	qRegisterMetaType<vector<fragmentIonType> >("vector<fragmentIonType>");
-	qRegisterMetaType<peptideType>("peptideType");
+	qRegisterMetaType<vector<eFragmentIonType> >("vector<eFragmentIonType>");
+	qRegisterMetaType<ePeptideType>("ePeptideType");
 	qRegisterMetaType<vector<fragmentDescription> >("vector<fragmentDescription>");
 	qRegisterMetaType<string>("string");
 	qRegisterMetaType<cFragmentIons>("cFragmentIons");
@@ -35,7 +35,7 @@ int main(int argc, char** argv) {
 	QSplashScreen splash(pixmap);
 	if(!pixmap.isNull()) {
 		splash.show();
-		splash.showMessage(QObject::tr(QString(appname + " " + appversion + " is starting ...").toStdString().c_str()), Qt::AlignLeft | Qt::AlignBottom, Qt::black);
+		splash.showMessage(QObject::tr(QString(appname + " " + appversion + " is starting ...").toStdString().c_str()), Qt::AlignCenter | Qt::AlignBottom, Qt::black);
 		for (int i = 0; i < 50; i++) {
 			if (!splash.isVisible()) {
 				break;

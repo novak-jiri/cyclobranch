@@ -194,15 +194,6 @@
     <ClCompile Include="gui\cLinearWidget.cpp">
       <Filter>Source Files\gui</Filter>
     </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_cLassoWidget.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_cLassoWidget.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include="gui\cLassoWidget.cpp">
-      <Filter>Source Files\gui</Filter>
-    </ClCompile>
     <ClCompile Include="core\cSummaryFormula.cpp">
       <Filter>Source Files\core</Filter>
     </ClCompile>
@@ -290,6 +281,39 @@
     <ClCompile Include="gui\cExportDialog.cpp">
       <Filter>Source Files\gui</Filter>
     </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_cDelegate.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_cDelegate.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="gui\cDelegate.cpp">
+      <Filter>Source Files\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="core\cPeakListSeries.cpp">
+      <Filter>Source Files\core</Filter>
+    </ClCompile>
+    <ClCompile Include="gui\cBranchCyclicWidget.cpp">
+      <Filter>Source Files\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_cBranchCyclicWidget.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_cBranchCyclicWidget.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="gui\cHTMLExportDialog.cpp">
+      <Filter>Source Files\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_cHTMLExportDialog.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_cHTMLExportDialog.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="core\cImzML.cpp">
+      <Filter>Source Files\core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="gui\cAboutWidget.h">
@@ -331,9 +355,6 @@
     <CustomBuild Include="gui\cLinearWidget.h">
       <Filter>Header Files\gui</Filter>
     </CustomBuild>
-    <CustomBuild Include="gui\cLassoWidget.h">
-      <Filter>Header Files\gui</Filter>
-    </CustomBuild>
     <CustomBuild Include="gui\cBricksDatabaseWidget.h">
       <Filter>Header Files\gui</Filter>
     </CustomBuild>
@@ -362,6 +383,15 @@
       <Filter>Header Files\gui</Filter>
     </CustomBuild>
     <CustomBuild Include="gui\cExportDialog.h">
+      <Filter>Header Files\gui</Filter>
+    </CustomBuild>
+    <CustomBuild Include="gui\cDelegate.h">
+      <Filter>Header Files\gui</Filter>
+    </CustomBuild>
+    <CustomBuild Include="gui\cBranchCyclicWidget.h">
+      <Filter>Header Files\gui</Filter>
+    </CustomBuild>
+    <CustomBuild Include="gui\cHTMLExportDialog.h">
       <Filter>Header Files\gui</Filter>
     </CustomBuild>
   </ItemGroup>
@@ -409,6 +439,12 @@
       <Filter>Header Files\core</Filter>
     </ClInclude>
     <ClInclude Include="core\cAllocator.h">
+      <Filter>Header Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="core\cPeakListSeries.h">
+      <Filter>Header Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="core\cImzML.h">
       <Filter>Header Files\core</Filter>
     </ClInclude>
   </ItemGroup>

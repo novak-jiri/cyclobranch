@@ -11,6 +11,9 @@
 #include <string>
 
 #include <QWidget>
+#include <QDesktopServices>
+#include <QUrl>
+#include <QFileInfo>
 #include <QLineEdit>
 #include <QPushButton>
 

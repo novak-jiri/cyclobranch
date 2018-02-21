@@ -8,10 +8,14 @@
 #define _CBRICKSDATABASEWIDGET_H
 
 #include <QWidget>
+#include <QDesktopServices>
+#include <QUrl>
+#include <QFileInfo>
 #include <fstream>
 #include "core/utilities.h"
 #include "core/cBricksDatabase.h"
 #include "core/cAllocator.h"
+#include "gui/cDelegate.h"
 
 using namespace std;
 
@@ -93,6 +97,7 @@ private:
 	cBricksDatabase bricks;
 
 	vector<int> headersort;
+	cDelegate columndelegate;
 
 	cAllocator<QTableWidgetItem> widgetitemallocator;
 

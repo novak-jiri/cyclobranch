@@ -30,7 +30,7 @@ void visualSeries::load(ifstream& is) {
 }
 
 
-void cTheoreticalSpectrum::clearFalseHits(map<fragmentIonType, vector<int> >& series, vector<fragmentIonType>& fragmentions) {
+void cTheoreticalSpectrum::clearFalseHits(map<eFragmentIonType, vector<int> >& series, vector<eFragmentIonType>& fragmentions) {
 	for (int i = 0; i < (int)fragmentions.size(); i++) {
 		for (int j = 0; j < (int)series[fragmentions[i]].size(); j++) {
 
@@ -75,7 +75,7 @@ void cTheoreticalSpectrum::computeStatistics(bool writedescription) {
 	experimentalpeaksmatched = 0;
 	scrambledpeaksmatched = 0;
 	if (writedescription) {
-		unmatchedpeaks = "";
+		unmatchedpeaks.clear();
 	}
 	intensityweightedscore = 0;
 	for (int i = 0; i < (int)experimentalpeaks.size(); i++) {
@@ -94,7 +94,7 @@ void cTheoreticalSpectrum::computeStatistics(bool writedescription) {
 		}
 		else {
 			if (writedescription) {
-				unmatchedpeaks += to_string((long double)experimentalpeaks[i].mzratio) + " ";
+				unmatchedpeaks.add(experimentalpeaks[i]);
 			}
 		}
 	}
@@ -106,6 +106,10 @@ void cTheoreticalSpectrum::computeStatistics(bool writedescription) {
 void cTheoreticalSpectrum::generatePrecursorIon(vector<int>& intcomposition, cBricksDatabase& bricksdatabasewithcombinations, int& theoreticalpeaksrealsize, bool writedescription) {
 	cPeak peak;
 	int starttype, endtype;
+	set<int> usedmodifications;
+	usedmodifications.insert(0);
+
+	peak.isotope = false;
 
 	switch (parameters->peptidetype)
 	{
@@ -114,6 +118,8 @@ void cTheoreticalSpectrum::generatePrecursorIon(vector<int>& intcomposition, cBr
 		peak.seriesid = 0;
 		starttype = (int)precursor_ion;
 		endtype = (int)precursor_ion_co_loss_and_dehydrated_and_deamidated;
+		usedmodifications.insert(candidate.getStartModifID());
+		usedmodifications.insert(candidate.getEndModifID());
 		break;
 	case cyclic:
 		peak.mzratio = 0;
@@ -126,18 +132,62 @@ void cTheoreticalSpectrum::generatePrecursorIon(vector<int>& intcomposition, cBr
 		peak.seriesid = 0;
 		starttype = (int)precursor_ion;
 		endtype = (int)precursor_ion_co_loss_and_dehydrated_and_deamidated;
+		usedmodifications.insert(candidate.getStartModifID());
+		usedmodifications.insert(candidate.getEndModifID());
+		usedmodifications.insert(candidate.getMiddleModifID());
 		break;
-	case lasso:
+	case branchcyclic:
 		peak.mzratio = parameters->searchedmodifications[candidate.getMiddleModifID()].massdifference;
 		peak.seriesid = 0;
 		starttype = (int)cyclic_precursor_ion;
 		endtype = (int)cyclic_precursor_ion_co_loss_and_dehydrated_and_deamidated;
+		usedmodifications.insert(candidate.getMiddleModifID());
 		break;
+#if POLYKETIDE_SIDEROPHORES == 1
+	case linearpolyketide:
+		peak.mzratio = parameters->searchedmodifications[candidate.getStartModifID()].massdifference + parameters->searchedmodifications[candidate.getEndModifID()].massdifference;
+		peak.seriesid = 0;
+
+		switch (candidate.getResidueLossType(bricksdatabasewithcombinations))
+		{
+		case water:
+			starttype = (int)linear_polyketide_precursor_ion_h_oh;
+			endtype = (int)linear_polyketide_precursor_ion_h_oh_co_loss_dehydrated_and_deamidated;
+			break;
+		case h2:
+			starttype = (int)linear_polyketide_precursor_ion_h_h;
+			endtype = (int)linear_polyketide_precursor_ion_h_h_co_loss_dehydrated_and_deamidated;
+			break;
+		case h2o2:
+			starttype = (int)linear_polyketide_precursor_ion_oh_oh;
+			endtype = (int)linear_polyketide_precursor_ion_oh_oh_co_loss_dehydrated_and_deamidated;
+			break;
+		default:
+			break;
+		}
+
+		if (candidate.hasFirstBrickArtificial(bricksdatabasewithcombinations) || candidate.hasLastBrickArtificial(bricksdatabasewithcombinations)) {
+			starttype = (int)linear_polyketide_precursor_ion_h_h;
+			endtype = (int)linear_polyketide_precursor_ion_oh_oh_co_loss_dehydrated_and_deamidated;
+		}
+
+		usedmodifications.insert(candidate.getStartModifID());
+		usedmodifications.insert(candidate.getEndModifID());
+		break;
+	case cyclicpolyketide:
+		peak.mzratio = 0;
+		peak.seriesid = (int)intcomposition.size() - 1;
+		starttype = (int)cyclic_polyketide_precursor_ion;
+		endtype = (int)cyclic_polyketide_precursor_ion_co_loss_dehydrated_and_deamidated;
+		break;
+#endif
 	case linearpolysaccharide:
 		peak.mzratio = parameters->searchedmodifications[candidate.getStartModifID()].massdifference + parameters->searchedmodifications[candidate.getEndModifID()].massdifference;
 		peak.seriesid = 0;
 		starttype = (int)precursor_ion;
 		endtype = (int)precursor_ion_co_loss_and_dehydrated_and_deamidated;
+		usedmodifications.insert(candidate.getStartModifID());
+		usedmodifications.insert(candidate.getEndModifID());
 		break;
 	case other:
 		break;
@@ -151,86 +201,86 @@ void cTheoreticalSpectrum::generatePrecursorIon(vector<int>& intcomposition, cBr
 	
 	double tempratio = peak.mzratio;
 	for (int i = starttype; i <= endtype; i++) {
-		for (int j = 1; j <= abs(parameters->precursorcharge); j++) {
-			peak.mzratio = tempratio + parameters->fragmentdefinitions[(fragmentIonType)i].massdifference;
-			peak.iontype = (fragmentIonType)i;
+		for(set<int>::iterator j = usedmodifications.begin(); j != usedmodifications.end(); ++j) {
+			for (int k = 1; k <= abs(parameters->precursorcharge); k++) {
+				peak.mzratio = tempratio + parameters->fragmentdefinitions[(eFragmentIonType)i].massdifference - parameters->searchedmodifications[*j].massdifference;
+				peak.iontype = (eFragmentIonType)i;
 
-			if (writedescription) {
-				string str;
+				if (writedescription) {
+					string str;
 
-				if (parameters->precursorcharge > 0) {
-					peak.description = parameters->fragmentdefinitions[(fragmentIonType)i].name + ":";
+					if (parameters->precursorcharge > 0) {
+						peak.description = parameters->fragmentdefinitions[(eFragmentIonType)i].name;
+						if (*j > 0) {
+							peak.description += " (" + parameters->searchedmodifications[*j].name + " loss)";
+						}
+						peak.description += ":";
 
-					if (!parameters->precursoradduct.empty()) {
-						str = "+" + parameters->precursoradduct;
-						if (j > 1) {
-							str += "+";
-							if (j > 2) {
-								str += to_string(j - 1);
+						if (!parameters->precursoradduct.empty()) {
+							str = "+" + parameters->precursoradduct;
+							if (k > 1) {
+								str += "+";
+								if (k > 2) {
+									str += to_string(k - 1);
+								}
+								str += "H";
+							}
+							peak.description.replace(peak.description.find("+zH"), 3, str);
+						}
+						else {
+							str = "+";
+							if (k > 1) {
+								str += to_string(k);
 							}
 							str += "H";
+							peak.description.replace(peak.description.find("+zH"), 3, str);
 						}
-						peak.description.replace(peak.description.find("+zH"), 3, str);
+
+						str = "]";
+						if (k > 1) {
+							str += to_string(k);
+						}
+						str += "+";
+						peak.description.replace(peak.description.find("]+"), 2, str);
 					}
 					else {
-						str = "+";
-						if (j > 1) {
-							str += to_string(j);
+						peak.description = parameters->fragmentdefinitions[(eFragmentIonType)i].name + ":";
+
+						if (!parameters->precursoradduct.empty()) {
+							str = "-" + parameters->precursoradduct;
+							if (k > 1) {
+								str += "-";
+								if (k > 2) {
+									str += to_string(k - 1);
+								}
+								str += "H";
+							}
+							peak.description.replace(peak.description.find("+zH"), 3, str);
 						}
-						str += "H";
-						peak.description.replace(peak.description.find("+zH"), 3, str);
-					}
-
-					str = "]";
-					if (j > 1) {
-						str += to_string(j);
-					}
-					str += "+";
-					peak.description.replace(peak.description.find("]+"), 2, str);
-				}
-				else {
-					peak.description = parameters->fragmentdefinitions[(fragmentIonType)i].name + ":";
-
-					if (!parameters->precursoradduct.empty()) {
-						str = "-" + parameters->precursoradduct;
-						if (j > 1) {
-							str += "-";
-							if (j > 2) {
-								str += to_string(j - 1);
+						else {
+							str = "-";
+							if (k > 1) {
+								str += to_string(k);
 							}
 							str += "H";
+							peak.description.replace(peak.description.find("+zH"), 3, str);
 						}
-						peak.description.replace(peak.description.find("+zH"), 3, str);
-					}
-					else {
-						str = "-";
-						if (j > 1) {
-							str += to_string(j);
-						}
-						str += "H";
-						peak.description.replace(peak.description.find("+zH"), 3, str);
-					}
 
-					str = "]";
-					if (j > 1) {
-						str += to_string(j);
+						str = "]";
+						if (k > 1) {
+							str += to_string(k);
+						}
+						str += "-";
+						peak.description.replace(peak.description.find("]+"), 2, str);
 					}
-					str += "-";
-					peak.description.replace(peak.description.find("]+"), 2, str);
 				}
-			}
 
-			peak.mzratio = charge(uncharge(peak.mzratio, 1), (parameters->precursorcharge > 0)?j:-j);
-			peak.charge = (parameters->precursorcharge > 0)?j:-j;
-
-			if (theoreticalpeaks.size() > theoreticalpeaksrealsize) {
-				theoreticalpeaks[theoreticalpeaksrealsize] = peak;
+				peak.mzratio = charge(uncharge(peak.mzratio, 1), (parameters->precursorcharge > 0)?k:-k);
+				peak.charge = (parameters->precursorcharge > 0)?k:-k;
+			
+				addPeakToList(peak, theoreticalpeaksrealsize);
+				addMetalPeaks(peak, theoreticalpeaksrealsize, k, writedescription);
 			}
-			else {
-				theoreticalpeaks.add(peak);
-			}
-			theoreticalpeaksrealsize++;
-
 		}
 	}
 }
@@ -287,7 +337,7 @@ void cTheoreticalSpectrum::generateScrambledIons(cBricksDatabase& bricksdatabase
 			intcomposition.clear();
 			b.explodeToIntComposition(intcomposition);
 			cPeak peak;
-			peak.iontype = (fragmentIonType)parameters->fragmentionsfortheoreticalspectra[i];
+			peak.iontype = (eFragmentIonType)parameters->fragmentionsfortheoreticalspectra[i];
 			peak.mzratio = parameters->fragmentdefinitions[peak.iontype].massdifference;
 			peak.removeme = false;
 			peak.scrambled = true;
@@ -342,13 +392,7 @@ void cTheoreticalSpectrum::generateScrambledIons(cBricksDatabase& bricksdatabase
 
 	// attach scrambled peaks to common peaks
 	for (int i = 0; i < (int)scrambledpeaks.size(); i++) {
-		if (theoreticalpeaks.size() > theoreticalpeaksrealsize) {
-			theoreticalpeaks[theoreticalpeaksrealsize] = scrambledpeaks[i];
-		}
-		else {
-			theoreticalpeaks.add(scrambledpeaks[i]);
-		}
-		theoreticalpeaksrealsize++;
+		addPeakToList(scrambledpeaks[i], theoreticalpeaksrealsize);
 	}
 
 }
@@ -374,7 +418,7 @@ void cTheoreticalSpectrum::selectAndNormalizeScrambledSequences(unordered_set<st
 }
 
 
-fragmentIonType cTheoreticalSpectrum::selectHigherPriorityIonTypeCID(fragmentIonType experimentalpeakiontype, fragmentIonType theoreticalpeakiontype) {
+eFragmentIonType cTheoreticalSpectrum::selectHigherPriorityIonTypeCID(eFragmentIonType experimentalpeakiontype, eFragmentIonType theoreticalpeakiontype) {
 	if (experimentalpeakiontype != fragmentIonTypeEnd) {
 
 		switch (experimentalpeakiontype)
@@ -483,6 +527,259 @@ fragmentIonType cTheoreticalSpectrum::selectHigherPriorityIonTypeCID(fragmentIon
 }
 
 
+void cTheoreticalSpectrum::addPeakToList(cPeak& peak, int& theoreticalpeaksrealsize) {
+	if (theoreticalpeaks.size() > theoreticalpeaksrealsize) {
+		theoreticalpeaks[theoreticalpeaksrealsize] = peak;
+	}
+	else {
+		theoreticalpeaks.add(peak);
+	}
+	theoreticalpeaksrealsize++;
+}
+
+
+void cTheoreticalSpectrum::addAdductToDescription(string& description) {
+	if (parameters->precursorAdductHasLi) {
+		description += "_Li";
+	}
+
+	if (parameters->precursorAdductHasNa) {
+		description += "_Na";
+	}
+
+	if (parameters->precursorAdductHasMg) {
+		description += "_Mg";
+	}
+
+	if (parameters->precursorAdductHasAl) {
+		description += "_Al";
+	}
+
+	if (parameters->precursorAdductHasK) {
+		description += "_K";
+	}
+
+	if (parameters->precursorAdductHasCa) {
+		description += "_Ca";
+	}
+
+	if (parameters->precursorAdductHasMn) {
+		description += "_Mn";
+	}
+
+	if (parameters->precursorAdductHasFe) {
+		description += "_Fe";
+	}
+
+	if (parameters->precursorAdductHasCo) {
+		description += "_Co";
+	}
+
+	if (parameters->precursorAdductHasNi) {
+		description += "_Ni";
+	}
+
+	if (parameters->precursorAdductHasCu) {
+		description += "_Cu";
+	}
+
+	if (parameters->precursorAdductHasZn) {
+		description += "_Zn";
+	}
+
+	if (parameters->precursorAdductHasGa) {
+		description += "_Ga";
+	}
+}
+
+
+int cTheoreticalSpectrum::countIsotopesOfMetals(cParameters* parameters) {
+	int count = 0;
+	for (int i = 0; i < (int)parameters->fragmentionsfortheoreticalspectra.size(); i++) {
+		count += parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].numberofisotopes;
+	}
+	return count;
+}
+
+
+void cTheoreticalSpectrum::addMetalPeaks(cPeak& peak, int& peaklistrealsize, int charge, bool writedescription) {
+	if (parameters->precursorAdductHasLi) {
+		cPeak tmppeak;
+
+		tmppeak = peak;
+		tmppeak.isotope = true;
+		tmppeak.mzratio -= (Li - Li6)/(double)charge;
+		if (writedescription) {
+			tmppeak.description.replace(tmppeak.description.find("Li"), 2, "6Li");
+		}
+		addPeakToList(tmppeak, peaklistrealsize);
+	}
+
+	if (parameters->precursorAdductHasMg) {
+		cPeak tmppeak;
+				
+		tmppeak = peak;
+		tmppeak.isotope = true;
+		tmppeak.mzratio += (Mg25 - Mg)/(double)charge;
+		if (writedescription) {
+			tmppeak.description.replace(tmppeak.description.find("Mg"), 2, "25Mg");
+		}
+		addPeakToList(tmppeak, peaklistrealsize);
+				
+		tmppeak = peak;
+		tmppeak.isotope = true;
+		tmppeak.mzratio += (Mg26 - Mg)/(double)charge;
+		if (writedescription) {
+			tmppeak.description.replace(tmppeak.description.find("Mg"), 2, "26Mg");
+		}
+		addPeakToList(tmppeak, peaklistrealsize);
+	}
+
+	if (parameters->precursorAdductHasK) {
+		cPeak tmppeak;
+				
+		tmppeak = peak;
+		tmppeak.isotope = true;
+		tmppeak.mzratio += (K41 - K)/(double)charge;
+		if (writedescription) {
+			tmppeak.description.replace(tmppeak.description.find("K"), 1, "41K");
+		}
+		addPeakToList(tmppeak, peaklistrealsize);
+	}
+
+	if (parameters->precursorAdductHasCa) {
+		cPeak tmppeak;
+				
+		tmppeak = peak;
+		tmppeak.isotope = true;
+		tmppeak.mzratio += (Ca44 - Ca)/(double)charge;
+		if (writedescription) {
+			tmppeak.description.replace(tmppeak.description.find("Ca"), 2, "44Ca");
+		}
+		addPeakToList(tmppeak, peaklistrealsize);
+	}
+
+	if (parameters->precursorAdductHasFe) {
+		cPeak tmppeak;
+
+		tmppeak = peak;
+		tmppeak.isotope = true;
+		tmppeak.mzratio -= (Fe - Fe54)/(double)charge;
+		if (writedescription) {
+			tmppeak.description.replace(tmppeak.description.find("Fe"), 2, "54Fe");
+		}
+		addPeakToList(tmppeak, peaklistrealsize);
+
+		/*tmppeak = peak;
+		tmppeak.isotope = true;
+		tmppeak.mzratio += (Fe57 - Fe)/(double)j;
+		if (writedescription) {
+			tmppeak.description.replace(tmppeak.description.find(':') - 2, 2, "57Fe");
+		}
+		addPeakToList(tmppeak, peaklistrealsize);*/
+	}
+
+	if (parameters->precursorAdductHasNi) {
+		cPeak tmppeak;
+				
+		tmppeak = peak;
+		tmppeak.isotope = true;
+		tmppeak.mzratio += (Ni60 - Ni)/(double)charge;
+		if (writedescription) {
+			tmppeak.description.replace(tmppeak.description.find("Ni"), 2, "60Ni");
+		}
+		addPeakToList(tmppeak, peaklistrealsize);
+				
+		tmppeak = peak;
+		tmppeak.isotope = true;
+		tmppeak.mzratio += (Ni61 - Ni)/(double)charge;
+		if (writedescription) {
+			tmppeak.description.replace(tmppeak.description.find("Ni"), 2, "61Ni");
+		}
+		addPeakToList(tmppeak, peaklistrealsize);
+				
+		tmppeak = peak;
+		tmppeak.isotope = true;
+		tmppeak.mzratio += (Ni62 - Ni)/(double)charge;
+		if (writedescription) {
+			tmppeak.description.replace(tmppeak.description.find("Ni"), 2, "62Ni");
+		}
+		addPeakToList(tmppeak, peaklistrealsize);
+	}
+
+	if (parameters->precursorAdductHasCu) {
+		cPeak tmppeak;
+				
+		tmppeak = peak;
+		tmppeak.isotope = true;
+		tmppeak.mzratio += (Cu65 - Cu)/(double)charge;
+		if (writedescription) {
+			tmppeak.description.replace(tmppeak.description.find("Cu"), 2, "65Cu");
+		}
+		addPeakToList(tmppeak, peaklistrealsize);
+	}
+
+	if (parameters->precursorAdductHasZn) {
+		cPeak tmppeak;
+				
+		tmppeak = peak;
+		tmppeak.isotope = true;
+		tmppeak.mzratio += (Zn66 - Zn)/(double)charge;
+		if (writedescription) {
+			tmppeak.description.replace(tmppeak.description.find("Zn"), 2, "66Zn");
+		}
+		addPeakToList(tmppeak, peaklistrealsize);
+				
+		tmppeak = peak;
+		tmppeak.isotope = true;
+		tmppeak.mzratio += (Zn67 - Zn)/(double)charge;
+		if (writedescription) {
+			tmppeak.description.replace(tmppeak.description.find("Zn"), 2, "67Zn");
+		}
+		addPeakToList(tmppeak, peaklistrealsize);
+				
+		tmppeak = peak;
+		tmppeak.isotope = true;
+		tmppeak.mzratio += (Zn68 - Zn)/(double)charge;
+		if (writedescription) {
+			tmppeak.description.replace(tmppeak.description.find("Zn"), 2, "68Zn");
+		}
+		addPeakToList(tmppeak, peaklistrealsize);
+	}
+
+	if (parameters->precursorAdductHasGa) {
+		cPeak tmppeak;
+				
+		tmppeak = peak;
+		tmppeak.isotope = true;
+		tmppeak.mzratio += (Ga71 - Ga)/(double)charge;
+		if (writedescription) {
+			tmppeak.description.replace(tmppeak.description.find("Ga"), 2, "71Ga");
+		}
+		addPeakToList(tmppeak, peaklistrealsize);
+	}
+}
+
+
+void cTheoreticalSpectrum::removeUnmatchedMetalIsotopes(cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks, vector<set<int> >& experimentalpeakmatches) {
+	int lastparent = 0;
+	for (int i = 0; i < theoreticalpeaksrealsize; i++) {
+		if (!theoreticalpeaks[i].isotope) {
+			lastparent = i;
+			continue;
+		}
+
+		if ((theoreticalpeaks[lastparent].matched == 0) && (theoreticalpeaks[i].matched > 0)) {
+			experimentalpeakmatches[theoreticalpeaks[i].matchedid].erase(experimentalpeakmatches[theoreticalpeaks[i].matchedid].find(i));
+			experimentalpeaks[theoreticalpeaks[i].matchedid].matched--;
+
+			theoreticalpeaks[i].matched--;
+			theoreticalpeaks[i].matchedid = -1;
+		}
+	}
+}
+
+
 cTheoreticalSpectrum::cTheoreticalSpectrum() {
 	clear();
 }
@@ -505,7 +802,7 @@ void cTheoreticalSpectrum::clear(bool clearpeaklist) {
 	experimentalpeaks.clear();
 	matchedions.clear();
 	for (int i = 0; i < fragmentIonTypeEnd; i++) {
-		matchedions[(fragmentIonType)i] = 0;
+		matchedions[(eFragmentIonType)i] = 0;
 	}
 
 	candidate.clear();
@@ -513,7 +810,7 @@ void cTheoreticalSpectrum::clear(bool clearpeaklist) {
 	scrambledpeaksmatched = 0;
 	peakstested = 0;
 	experimentalpeaksmatchedratio = 0;
-	unmatchedpeaks = "";
+	unmatchedpeaks.clear();
 	coveragebyseries = "";
 	valid = false;
 	maskscore = 0;
@@ -585,10 +882,10 @@ int cTheoreticalSpectrum::compareBranched(cPeaksList& sortedpeaklist, cBricksDat
 			// j == 2, 4, 5 are invalid
 			if ((j == 0) || ((j == 1) && (parameters->searchedmodifications[trotations[j].startmodifID].nterminal)) || ((j == 3) && (parameters->searchedmodifications[trotations[j].endmodifID].cterminal))) {
 				if (parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].nterminal) {
-					generateNTerminalFragmentIons(parameters->precursorcharge, theoreticalpeaksrealsize, trotations[j].bricks, parameters->fragmentionsfortheoreticalspectra[i], bricksdatabasewithcombinations, writedescription, 0, splittingsites, parameters->searchedmodifications, branched, &trotations[j]);
+					generateNTerminalFragmentIons(parameters->precursorcharge, theoreticalpeaksrealsize, trotations[j].bricks, parameters->fragmentionsfortheoreticalspectra[i], bricksdatabasewithcombinations, writedescription, 0, splittingsites, parameters->searchedmodifications, parameters->peptidetype, &trotations[j]);
 				}
 				if (parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].cterminal) {
-					generateCTerminalFragmentIons(parameters->precursorcharge, theoreticalpeaksrealsize, trotations[j].bricks, parameters->fragmentionsfortheoreticalspectra[i], bricksdatabasewithcombinations, writedescription, 0, splittingsites, parameters->searchedmodifications, branched, &trotations[j]);
+					generateCTerminalFragmentIons(parameters->precursorcharge, theoreticalpeaksrealsize, trotations[j].bricks, parameters->fragmentionsfortheoreticalspectra[i], bricksdatabasewithcombinations, writedescription, 0, splittingsites, parameters->searchedmodifications, parameters->peptidetype, &trotations[j]);
 				}
 			}
 
@@ -606,7 +903,7 @@ int cTheoreticalSpectrum::compareBranched(cPeaksList& sortedpeaklist, cBricksDat
 
 
 	// coverage of series
-	vector<map<fragmentIonType, vector<int> > > series;
+	vector<map<eFragmentIonType, vector<int> > > series;
 	series.resize(trotations.size());
 	for (int i = 0; i < (int)series.size(); i++) {
 		for (int j = 0; j < (int)parameters->fragmentionsfortheoreticalspectra.size(); j++) {
@@ -615,7 +912,7 @@ int cTheoreticalSpectrum::compareBranched(cPeaksList& sortedpeaklist, cBricksDat
 	}
 	
 	for (int i = 0; i < theoreticalpeaksrealsize; i++) {
-		if ((theoreticalpeaks[i].matched > 0) && (theoreticalpeaks[i].rotationid >= 0) && (series[theoreticalpeaks[i].rotationid].count(theoreticalpeaks[i].iontype) == 1)) {
+		if (!theoreticalpeaks[i].isotope && (theoreticalpeaks[i].matched > 0) && (theoreticalpeaks[i].rotationid >= 0) && (series[theoreticalpeaks[i].rotationid].count(theoreticalpeaks[i].iontype) == 1)) {
 			series[theoreticalpeaks[i].rotationid][theoreticalpeaks[i].iontype][theoreticalpeaks[i].seriesid]++;
 		}
 	}
@@ -628,7 +925,7 @@ int cTheoreticalSpectrum::compareBranched(cPeaksList& sortedpeaklist, cBricksDat
 		}
 
 		for (int i = 0; i < theoreticalpeaksrealsize; i++) {
-			if ((theoreticalpeaks[i].matched > 0) && (theoreticalpeaks[i].rotationid >= 0) && ((series[theoreticalpeaks[i].rotationid].count(parameters->fragmentdefinitions[theoreticalpeaks[i].iontype].parent) == 0) || (series[theoreticalpeaks[i].rotationid][parameters->fragmentdefinitions[theoreticalpeaks[i].iontype].parent][theoreticalpeaks[i].seriesid] == 0))) {		
+			if (!theoreticalpeaks[i].isotope && (theoreticalpeaks[i].matched > 0) && (theoreticalpeaks[i].rotationid >= 0) && ((series[theoreticalpeaks[i].rotationid].count(parameters->fragmentdefinitions[theoreticalpeaks[i].iontype].parent) == 0) || (series[theoreticalpeaks[i].rotationid][parameters->fragmentdefinitions[theoreticalpeaks[i].iontype].parent][theoreticalpeaks[i].seriesid] == 0))) {		
 				experimentalpeakmatches[theoreticalpeaks[i].matchedid].erase(experimentalpeakmatches[theoreticalpeaks[i].matchedid].find(i));
 				experimentalpeaks[theoreticalpeaks[i].matchedid].matched--;
 
@@ -639,6 +936,9 @@ int cTheoreticalSpectrum::compareBranched(cPeaksList& sortedpeaklist, cBricksDat
 	}
 
 
+	removeUnmatchedMetalIsotopes(theoreticalpeaks, theoreticalpeaksrealsize, experimentalpeaks, experimentalpeakmatches);
+
+
 	// fill annotations of peaks
 	for (int i = 0; i < (int)experimentalpeaks.size(); i++) {
 		for (set<int>::iterator it = experimentalpeakmatches[i].begin(); it != experimentalpeakmatches[i].end(); ++it) {
@@ -647,7 +947,9 @@ int cTheoreticalSpectrum::compareBranched(cPeaksList& sortedpeaklist, cBricksDat
 					experimentalpeaks[i].description += ",";
 				}
 				experimentalpeaks[i].description += theoreticalpeaks[*it].description.substr(0,theoreticalpeaks[*it].description.find(':'));
-				theoreticalpeaks[*it].matchdescription += ", measured mass " + to_string((long double)experimentalpeaks[i].mzratio) + " matched with " + to_string((long double)ppmError(experimentalpeaks[i].mzratio, theoreticalpeaks[*it].mzratio)) + " ppm error";
+				theoreticalpeaks[*it].matchedmz = experimentalpeaks[i].mzratio;
+				theoreticalpeaks[*it].matchedintensity = experimentalpeaks[i].intensity;
+				theoreticalpeaks[*it].matchedppm = ppmError(experimentalpeaks[i].mzratio, theoreticalpeaks[*it].mzratio);
 			}
 
 			experimentalpeaks[i].iontype = selectHigherPriorityIonTypeCID(experimentalpeaks[i].iontype,theoreticalpeaks[*it].iontype);
@@ -723,10 +1025,10 @@ int cTheoreticalSpectrum::compareLinear(cPeaksList& sortedpeaklist, cBricksDatab
 
 	for (int i = 0; i < (int)parameters->fragmentionsfortheoreticalspectra.size(); i++) {
 		if (parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].nterminal) {
-			generateNTerminalFragmentIons(parameters->precursorcharge, theoreticalpeaksrealsize, intcomposition, parameters->fragmentionsfortheoreticalspectra[i], bricksdatabasewithcombinations, writedescription, 0, splittingsites, parameters->searchedmodifications, linear);
+			generateNTerminalFragmentIons(parameters->precursorcharge, theoreticalpeaksrealsize, intcomposition, parameters->fragmentionsfortheoreticalspectra[i], bricksdatabasewithcombinations, writedescription, 0, splittingsites, parameters->searchedmodifications, parameters->peptidetype);
 		}
 		if (parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].cterminal) {
-			generateCTerminalFragmentIons(parameters->precursorcharge, theoreticalpeaksrealsize, intcomposition, parameters->fragmentionsfortheoreticalspectra[i], bricksdatabasewithcombinations, writedescription, 0, splittingsites, parameters->searchedmodifications, linear);
+			generateCTerminalFragmentIons(parameters->precursorcharge, theoreticalpeaksrealsize, intcomposition, parameters->fragmentionsfortheoreticalspectra[i], bricksdatabasewithcombinations, writedescription, 0, splittingsites, parameters->searchedmodifications, parameters->peptidetype);
 		}
 	}
 
@@ -740,13 +1042,13 @@ int cTheoreticalSpectrum::compareLinear(cPeaksList& sortedpeaklist, cBricksDatab
 
 
 	// coverage of series
-	map<fragmentIonType, vector<int> > series;
+	map<eFragmentIonType, vector<int> > series;
 	for (int i = 0; i < (int)parameters->fragmentionsfortheoreticalspectra.size(); i++) {
 		series[parameters->fragmentionsfortheoreticalspectra[i]].resize(intcomposition.size());
 	}
 
 	for (int i = 0; i < theoreticalpeaksrealsize; i++) {
-		if ((theoreticalpeaks[i].matched > 0) && (series.count(theoreticalpeaks[i].iontype) == 1)) {
+		if (!theoreticalpeaks[i].isotope && (theoreticalpeaks[i].matched > 0) && (series.count(theoreticalpeaks[i].iontype) == 1)) {
 			series[theoreticalpeaks[i].iontype][theoreticalpeaks[i].seriesid]++;
 		}
 	}
@@ -757,7 +1059,7 @@ int cTheoreticalSpectrum::compareLinear(cPeaksList& sortedpeaklist, cBricksDatab
 		clearFalseHits(series, parameters->fragmentionsfortheoreticalspectra);
 
 		for (int i = 0; i < theoreticalpeaksrealsize; i++) {
-			if ((theoreticalpeaks[i].matched > 0) && (theoreticalpeaks[i].rotationid != -1) && ((series.count(parameters->fragmentdefinitions[theoreticalpeaks[i].iontype].parent) == 0) || (series[parameters->fragmentdefinitions[theoreticalpeaks[i].iontype].parent][theoreticalpeaks[i].seriesid] == 0))) {		
+			if (!theoreticalpeaks[i].isotope && (theoreticalpeaks[i].matched > 0) && (theoreticalpeaks[i].rotationid != -1) && ((series.count(parameters->fragmentdefinitions[theoreticalpeaks[i].iontype].parent) == 0) || (series[parameters->fragmentdefinitions[theoreticalpeaks[i].iontype].parent][theoreticalpeaks[i].seriesid] == 0))) {		
 				experimentalpeakmatches[theoreticalpeaks[i].matchedid].erase(experimentalpeakmatches[theoreticalpeaks[i].matchedid].find(i));
 				experimentalpeaks[theoreticalpeaks[i].matchedid].matched--;
 
@@ -768,6 +1070,9 @@ int cTheoreticalSpectrum::compareLinear(cPeaksList& sortedpeaklist, cBricksDatab
 	}
 
 
+	removeUnmatchedMetalIsotopes(theoreticalpeaks, theoreticalpeaksrealsize, experimentalpeaks, experimentalpeakmatches);
+
+
 	// fill annotations of peaks
 	for (int i = 0; i < (int)experimentalpeaks.size(); i++) {
 		for (set<int>::iterator it = experimentalpeakmatches[i].begin(); it != experimentalpeakmatches[i].end(); ++it) {
@@ -776,7 +1081,9 @@ int cTheoreticalSpectrum::compareLinear(cPeaksList& sortedpeaklist, cBricksDatab
 					experimentalpeaks[i].description += ",";
 				}
 				experimentalpeaks[i].description += theoreticalpeaks[*it].description.substr(0,theoreticalpeaks[*it].description.find(':'));
-				theoreticalpeaks[*it].matchdescription += ", measured mass " + to_string((long double)experimentalpeaks[i].mzratio) + " matched with " + to_string((long double)ppmError(experimentalpeaks[i].mzratio, theoreticalpeaks[*it].mzratio)) + " ppm error";
+				theoreticalpeaks[*it].matchedmz = experimentalpeaks[i].mzratio;
+				theoreticalpeaks[*it].matchedintensity = experimentalpeaks[i].intensity;
+				theoreticalpeaks[*it].matchedppm = ppmError(experimentalpeaks[i].mzratio, theoreticalpeaks[*it].mzratio);
 			}
 
 			experimentalpeaks[i].iontype = selectHigherPriorityIonTypeCID(experimentalpeaks[i].iontype,theoreticalpeaks[*it].iontype);
@@ -907,6 +1214,8 @@ int cTheoreticalSpectrum::compareCyclic(cPeaksList& sortedpeaklist, cBricksDatab
 		return -2;
 	}
 
+	eResidueLossType leftresiduelosstype = water;
+	bool hasfirstblockartificial = false;
 
 	for (int i = 0; i < 2*r; i++) {
 
@@ -915,8 +1224,13 @@ int cTheoreticalSpectrum::compareCyclic(cPeaksList& sortedpeaklist, cBricksDatab
 		brick.setComposition(rotations[i], false);
 		brick.explodeToIntComposition(intcomposition);
 
+#if POLYKETIDE_SIDEROPHORES == 1
+		eResidueLossType leftresiduelosstype = bricksdatabasewithcombinations[intcomposition[0] - 1].getResidueLossType();
+		bool hasfirstblockartificial = bricksdatabasewithcombinations[intcomposition[0] - 1].isArtificial();
+#endif
+
 		for (int j = 0; j < (int)parameters->fragmentionsfortheoreticalspectra.size(); j++) {
-			generateNTerminalFragmentIons(parameters->precursorcharge, theoreticalpeaksrealsize, intcomposition, parameters->fragmentionsfortheoreticalspectra[j], bricksdatabasewithcombinations, writedescription, i, splittingsites, parameters->searchedmodifications, cyclic);
+			generateNTerminalFragmentIons(parameters->precursorcharge, theoreticalpeaksrealsize, intcomposition, parameters->fragmentionsfortheoreticalspectra[j], bricksdatabasewithcombinations, writedescription, i, splittingsites, parameters->searchedmodifications, parameters->peptidetype, 0, leftresiduelosstype, hasfirstblockartificial);
 		}
 
 	}
@@ -935,7 +1249,7 @@ int cTheoreticalSpectrum::compareCyclic(cPeaksList& sortedpeaklist, cBricksDatab
 
 
 	// coverage of series
-	vector<map<fragmentIonType, vector<int> > > series;
+	vector<map<eFragmentIonType, vector<int> > > series;
 	series.resize(rotations.size());
 	for (int i = 0; i < (int)series.size(); i++) {
 		for (int j = 0; j < (int)parameters->fragmentionsfortheoreticalspectra.size(); j++) {
@@ -944,7 +1258,7 @@ int cTheoreticalSpectrum::compareCyclic(cPeaksList& sortedpeaklist, cBricksDatab
 	}
 
 	for (int i = 0; i < theoreticalpeaksrealsize; i++) {
-		if ((theoreticalpeaks[i].matched > 0) && (theoreticalpeaks[i].rotationid >= 0) && (series[theoreticalpeaks[i].rotationid].count(theoreticalpeaks[i].iontype) == 1)) {
+		if (!theoreticalpeaks[i].isotope && (theoreticalpeaks[i].matched > 0) && (theoreticalpeaks[i].rotationid >= 0) && (series[theoreticalpeaks[i].rotationid].count(theoreticalpeaks[i].iontype) == 1)) {
 			series[theoreticalpeaks[i].rotationid][theoreticalpeaks[i].iontype][theoreticalpeaks[i].seriesid]++;
 		}
 	}
@@ -957,7 +1271,7 @@ int cTheoreticalSpectrum::compareCyclic(cPeaksList& sortedpeaklist, cBricksDatab
 		}
 
 		for (int i = 0; i < theoreticalpeaksrealsize; i++) {
-			if ((theoreticalpeaks[i].matched > 0) && (theoreticalpeaks[i].rotationid >= 0) && ((series[theoreticalpeaks[i].rotationid].count(parameters->fragmentdefinitions[theoreticalpeaks[i].iontype].parent) == 0) || (series[theoreticalpeaks[i].rotationid][parameters->fragmentdefinitions[theoreticalpeaks[i].iontype].parent][theoreticalpeaks[i].seriesid] == 0))) {	
+			if (!theoreticalpeaks[i].isotope && (theoreticalpeaks[i].matched > 0) && (theoreticalpeaks[i].rotationid >= 0) && ((series[theoreticalpeaks[i].rotationid].count(parameters->fragmentdefinitions[theoreticalpeaks[i].iontype].parent) == 0) || (series[theoreticalpeaks[i].rotationid][parameters->fragmentdefinitions[theoreticalpeaks[i].iontype].parent][theoreticalpeaks[i].seriesid] == 0))) {	
 				experimentalpeakmatches[theoreticalpeaks[i].matchedid].erase(experimentalpeakmatches[theoreticalpeaks[i].matchedid].find(i));
 				experimentalpeaks[theoreticalpeaks[i].matchedid].matched--;
 
@@ -1022,6 +1336,9 @@ int cTheoreticalSpectrum::compareCyclic(cPeaksList& sortedpeaklist, cBricksDatab
 	}
 
 
+	removeUnmatchedMetalIsotopes(theoreticalpeaks, theoreticalpeaksrealsize, experimentalpeaks, experimentalpeakmatches);
+
+
 	// fill annotations of peaks
 	for (int i = 0; i < (int)experimentalpeakmatches.size(); i++) {
 		for (set<int>::iterator it = experimentalpeakmatches[i].begin(); it != experimentalpeakmatches[i].end(); ++it) {
@@ -1030,7 +1347,9 @@ int cTheoreticalSpectrum::compareCyclic(cPeaksList& sortedpeaklist, cBricksDatab
 					experimentalpeaks[i].description += ",";
 				}
 				experimentalpeaks[i].description += theoreticalpeaks[*it].description.substr(0,theoreticalpeaks[*it].description.find(':'));
-				theoreticalpeaks[*it].matchdescription += ", measured mass " + to_string((long double)experimentalpeaks[i].mzratio) + " matched with " + to_string((long double)ppmError(experimentalpeaks[i].mzratio, theoreticalpeaks[*it].mzratio)) + " ppm error";
+				theoreticalpeaks[*it].matchedmz = experimentalpeaks[i].mzratio;
+				theoreticalpeaks[*it].matchedintensity = experimentalpeaks[i].intensity;
+				theoreticalpeaks[*it].matchedppm = ppmError(experimentalpeaks[i].mzratio, theoreticalpeaks[*it].mzratio);
 			}
 
 			if (experimentalpeaks[i].iontype != fragmentIonTypeEnd) {
@@ -1149,47 +1468,47 @@ int cTheoreticalSpectrum::compareCyclic(cPeaksList& sortedpeaklist, cBricksDatab
 }
 
 
-int cTheoreticalSpectrum::compareLasso(cPeaksList& sortedpeaklist, cBricksDatabase& bricksdatabasewithcombinations, bool writedescription, regex& sequencetag, regex& searchedsequence) {
+int cTheoreticalSpectrum::compareBranchCyclic(cPeaksList& sortedpeaklist, cBricksDatabase& bricksdatabasewithcombinations, bool writedescription, regex& sequencetag, regex& searchedsequence) {
 
 	vector<splitSite> splittingsites;
 	int theoreticalpeaksrealsize = 0;
-	vector<cCandidate> lassorotations;
+	vector<cCandidate> branchcyclicrotations;
 
 	// normalize the candidate
-	candidate.getLassoRotations(lassorotations, false);
+	candidate.getBranchCyclicRotations(branchcyclicrotations, false);
 	int numberofbricks = getNumberOfBricks(candidate.getComposition());
-	for (int i = 0; i < (int)lassorotations.size(); i++) {
-		if (lassorotations[i].getBranchEnd() == numberofbricks - 1) {
+	for (int i = 0; i < (int)branchcyclicrotations.size(); i++) {
+		if (branchcyclicrotations[i].getBranchEnd() == numberofbricks - 1) {
 			vector<string> v;
-			v.push_back(lassorotations[i].getComposition());
+			v.push_back(branchcyclicrotations[i].getComposition());
 			string name = candidate.getName();
 			vector<nodeEdge> cpath = candidate.getPath();
-			candidate.setCandidate(v, cpath, candidate.getStartModifID(), candidate.getEndModifID(), candidate.getMiddleModifID(), lassorotations[i].getBranchStart(), lassorotations[i].getBranchEnd());
+			candidate.setCandidate(v, cpath, candidate.getStartModifID(), candidate.getEndModifID(), candidate.getMiddleModifID(), branchcyclicrotations[i].getBranchStart(), branchcyclicrotations[i].getBranchEnd());
 			candidate.setName(name);
 			break;
 		}
 	}
 
 	// get branch-cyclic rotations
-	candidate.getLassoRotations(lassorotations, true);
+	candidate.getBranchCyclicRotations(branchcyclicrotations, true);
 
 	// get T-permutations of branch-cyclic rotations
-	vector<vector<TRotationInfo> > trotationsoflassorotations;
-	trotationsoflassorotations.resize(lassorotations.size());
-	for (int i = 0; i < (int)lassorotations.size(); i++) {
-		lassorotations[i].getPermutationsOfBranches(trotationsoflassorotations[i]);
+	vector<vector<TRotationInfo> > trotationsofbranchcyclicrotations;
+	trotationsofbranchcyclicrotations.resize(branchcyclicrotations.size());
+	for (int i = 0; i < (int)branchcyclicrotations.size(); i++) {
+		branchcyclicrotations[i].getPermutationsOfBranches(trotationsofbranchcyclicrotations[i]);
 	}
 
 
-	int r = (int)lassorotations.size() / 2;
+	int r = (int)branchcyclicrotations.size() / 2;
 	validposition = -1;
 	reversevalidposition = -1;
 
 	try {
 		bool stop = true;
-		for (int i = 0; i < (int)lassorotations.size(); i++) {
-			for (int j = 0; j < (int)trotationsoflassorotations[i].size(); j++) {
-				if (regex_search(trotationsoflassorotations[i][j].tcomposition, sequencetag)) {
+		for (int i = 0; i < (int)branchcyclicrotations.size(); i++) {
+			for (int j = 0; j < (int)trotationsofbranchcyclicrotations[i].size(); j++) {
+				if (regex_search(trotationsofbranchcyclicrotations[i][j].tcomposition, sequencetag)) {
 					stop = false;
 					break;
 				}
@@ -1202,8 +1521,8 @@ int cTheoreticalSpectrum::compareLasso(cPeaksList& sortedpeaklist, cBricksDataba
 		if (writedescription) {
 			valid = false;
 			if (parameters->searchedsequence.size() > 0) {
-				for (int i = 0; i < (int)lassorotations.size(); i++) {
-					if (regex_search(lassorotations[i].getComposition(), searchedsequence)) {
+				for (int i = 0; i < (int)branchcyclicrotations.size(); i++) {
+					if (regex_search(branchcyclicrotations[i].getComposition(), searchedsequence)) {
 						validposition = i;
 
 						if (validposition == 0) {
@@ -1217,9 +1536,9 @@ int cTheoreticalSpectrum::compareLasso(cPeaksList& sortedpeaklist, cBricksDataba
 						}
 					}
 
-					for (int j = 0; j < (int)trotationsoflassorotations[i].size(); j++) {
-						if (regex_search(trotationsoflassorotations[i][j].tcomposition, searchedsequence) &&
-						(parameters->searchedmodifications[trotationsoflassorotations[i][j].middlemodifID].name.compare(parameters->searchedsequenceTmodif) == 0)) {
+					for (int j = 0; j < (int)trotationsofbranchcyclicrotations[i].size(); j++) {
+						if (regex_search(trotationsofbranchcyclicrotations[i][j].tcomposition, searchedsequence) &&
+						(parameters->searchedmodifications[trotationsofbranchcyclicrotations[i][j].middlemodifID].name.compare(parameters->searchedsequenceTmodif) == 0)) {
 							valid = true;
 							break;
 						}
@@ -1235,7 +1554,7 @@ int cTheoreticalSpectrum::compareLasso(cPeaksList& sortedpeaklist, cBricksDataba
 
 			if (validposition != -1) {
 
-				splittingsites.resize(lassorotations.size());
+				splittingsites.resize(branchcyclicrotations.size());
 				splittingsites[validposition].first = 0;
 				splittingsites[validposition].second = r - 1;
 				splittingsites[reversevalidposition].first = r - 1;
@@ -1269,25 +1588,25 @@ int cTheoreticalSpectrum::compareLasso(cPeaksList& sortedpeaklist, cBricksDataba
 
 	for (int i = 0; i < (int)parameters->fragmentionsfortheoreticalspectra.size(); i++) {
 
-		for (int j = 0; j < (int)lassorotations.size(); j++) {
+		for (int j = 0; j < (int)branchcyclicrotations.size(); j++) {
 
-			for (int k = 0; k < (int)trotationsoflassorotations[j].size(); k++) {
+			for (int k = 0; k < (int)trotationsofbranchcyclicrotations[j].size(); k++) {
 
 				// we do not know whether the middle branch is n-terminal or c-terminal for an unmodified middle branch
 				// in this case the modifID is 0, and both n-terminal (*) and c-terminal (**) fragments are generated
 
 				if (parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].nterminal) {
 					// if the start modification for k == 1 or k == 4 is nterminal, generate n-terminal ions (*)
-					if (!(((k == 1) || (k == 4)) && (!parameters->searchedmodifications[trotationsoflassorotations[j][k].startmodifID].nterminal))) {
-						generateNTerminalFragmentIons(parameters->precursorcharge, theoreticalpeaksrealsize, trotationsoflassorotations[j][k].bricks, parameters->fragmentionsfortheoreticalspectra[i], bricksdatabasewithcombinations, writedescription, j, splittingsites, parameters->searchedmodifications, lasso, &trotationsoflassorotations[j][k]);
+					if (!(((k == 1) || (k == 4)) && (!parameters->searchedmodifications[trotationsofbranchcyclicrotations[j][k].startmodifID].nterminal))) {
+						generateNTerminalFragmentIons(parameters->precursorcharge, theoreticalpeaksrealsize, trotationsofbranchcyclicrotations[j][k].bricks, parameters->fragmentionsfortheoreticalspectra[i], bricksdatabasewithcombinations, writedescription, j, splittingsites, parameters->searchedmodifications, parameters->peptidetype, &trotationsofbranchcyclicrotations[j][k]);
 					}
 				}
 
 				// all permmutations except 3 and 5 have invalid c-terms
-				if (parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].cterminal && ((k == 3) || (k == 5) /*|| ((k == 0) && (trotationsoflassorotations[j][k].endsWithBracket())) || ((k == 2) && (trotationsoflassorotations[j][k].startsWithBracket()))*/)) {
+				if (parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].cterminal && ((k == 3) || (k == 5) /*|| ((k == 0) && (trotationsofbranchcyclicrotations[j][k].endsWithBracket())) || ((k == 2) && (trotationsofbranchcyclicrotations[j][k].startsWithBracket()))*/)) {
 					// if the end modification is cterminal, generate c-terminal ions (**)
-					if (parameters->searchedmodifications[trotationsoflassorotations[j][k].endmodifID].cterminal) {
-						generateCTerminalFragmentIons(parameters->precursorcharge, theoreticalpeaksrealsize, trotationsoflassorotations[j][k].bricks, parameters->fragmentionsfortheoreticalspectra[i], bricksdatabasewithcombinations, writedescription, j, splittingsites, parameters->searchedmodifications, lasso, &trotationsoflassorotations[j][k]);
+					if (parameters->searchedmodifications[trotationsofbranchcyclicrotations[j][k].endmodifID].cterminal) {
+						generateCTerminalFragmentIons(parameters->precursorcharge, theoreticalpeaksrealsize, trotationsofbranchcyclicrotations[j][k].bricks, parameters->fragmentionsfortheoreticalspectra[i], bricksdatabasewithcombinations, writedescription, j, splittingsites, parameters->searchedmodifications, parameters->peptidetype, &trotationsofbranchcyclicrotations[j][k]);
 					}
 				}
 
@@ -1297,7 +1616,7 @@ int cTheoreticalSpectrum::compareLasso(cPeaksList& sortedpeaklist, cBricksDataba
 
 	}
 
-	generatePrecursorIon(trotationsoflassorotations[0][0].bricks, bricksdatabasewithcombinations, theoreticalpeaksrealsize, writedescription);
+	generatePrecursorIon(trotationsofbranchcyclicrotations[0][0].bricks, bricksdatabasewithcombinations, theoreticalpeaksrealsize, writedescription);
 
 
 	// search the theoretical peaks in the experimental peak list
@@ -1307,20 +1626,20 @@ int cTheoreticalSpectrum::compareLasso(cPeaksList& sortedpeaklist, cBricksDataba
 
 
 	// coverage of series
-	vector<vector<map<fragmentIonType, vector<int> > > > series;
-	series.resize(lassorotations.size());
-	for (int i = 0; i < (int)lassorotations.size(); i++) {
+	vector<vector<map<eFragmentIonType, vector<int> > > > series;
+	series.resize(branchcyclicrotations.size());
+	for (int i = 0; i < (int)branchcyclicrotations.size(); i++) {
 		series[i].resize(6);
-		//series[i].resize(trotationsoflassorotations[i].size()); // to do - potential bug
+		//series[i].resize(trotationsofbranchcyclicrotations[i].size()); // to do - potential bug
 
 		for (int j = 0; j < (int)series[i].size(); j++) {
 			for (int k = 0; k < (int)parameters->fragmentionsfortheoreticalspectra.size(); k++) {
-				series[i][j][parameters->fragmentionsfortheoreticalspectra[k]].resize(trotationsoflassorotations[i][0].bricks.size());
+				series[i][j][parameters->fragmentionsfortheoreticalspectra[k]].resize(trotationsofbranchcyclicrotations[i][0].bricks.size());
 			}
 		}
 	
 		for (int j = 0; j < theoreticalpeaksrealsize; j++) {
-			if ((theoreticalpeaks[j].matched > 0) && (theoreticalpeaks[j].rotationid >= 0) && (series[i][theoreticalpeaks[j].rotationid % 6].count(theoreticalpeaks[j].iontype) == 1)) {
+			if (!theoreticalpeaks[j].isotope && (theoreticalpeaks[j].matched > 0) && (theoreticalpeaks[j].rotationid >= 0) && (series[i][theoreticalpeaks[j].rotationid % 6].count(theoreticalpeaks[j].iontype) == 1)) {
 				if (i == theoreticalpeaks[j].rotationid / 6) {
 					series[i][theoreticalpeaks[j].rotationid % 6][theoreticalpeaks[j].iontype][theoreticalpeaks[j].seriesid]++;
 				}
@@ -1331,13 +1650,13 @@ int cTheoreticalSpectrum::compareLasso(cPeaksList& sortedpeaklist, cBricksDataba
 
 	// peak hits without parents are removed
 	if (parameters->clearhitswithoutparent) {
-		for (int i = 0; i < (int)lassorotations.size(); i++) {
-			for (int j = 0; j < (int)trotationsoflassorotations[i].size(); j++) {	
+		for (int i = 0; i < (int)branchcyclicrotations.size(); i++) {
+			for (int j = 0; j < (int)trotationsofbranchcyclicrotations[i].size(); j++) {	
 				clearFalseHits(series[i][j], parameters->fragmentionsfortheoreticalspectra);
 			}
 
 			for (int j = 0; j < theoreticalpeaksrealsize; j++) {
-				if ((theoreticalpeaks[j].matched > 0) && (theoreticalpeaks[j].rotationid >= 0) && (i == theoreticalpeaks[j].rotationid / 6) && ((series[i][theoreticalpeaks[j].rotationid % 6].count(parameters->fragmentdefinitions[theoreticalpeaks[j].iontype].parent) == 0) || (series[i][theoreticalpeaks[j].rotationid % 6][parameters->fragmentdefinitions[theoreticalpeaks[j].iontype].parent][theoreticalpeaks[j].seriesid] == 0))) {		
+				if (!theoreticalpeaks[j].isotope && (theoreticalpeaks[j].matched > 0) && (theoreticalpeaks[j].rotationid >= 0) && (i == theoreticalpeaks[j].rotationid / 6) && ((series[i][theoreticalpeaks[j].rotationid % 6].count(parameters->fragmentdefinitions[theoreticalpeaks[j].iontype].parent) == 0) || (series[i][theoreticalpeaks[j].rotationid % 6][parameters->fragmentdefinitions[theoreticalpeaks[j].iontype].parent][theoreticalpeaks[j].seriesid] == 0))) {		
 					experimentalpeakmatches[theoreticalpeaks[j].matchedid].erase(experimentalpeakmatches[theoreticalpeaks[j].matchedid].find(j));
 					experimentalpeaks[theoreticalpeaks[j].matchedid].matched--;
 
@@ -1349,6 +1668,9 @@ int cTheoreticalSpectrum::compareLasso(cPeaksList& sortedpeaklist, cBricksDataba
 	}
 
 
+	removeUnmatchedMetalIsotopes(theoreticalpeaks, theoreticalpeaksrealsize, experimentalpeaks, experimentalpeakmatches);
+
+
 	// fill annotations of peaks
 	for (int i = 0; i < (int)experimentalpeaks.size(); i++) {
 		for (set<int>::iterator it = experimentalpeakmatches[i].begin(); it != experimentalpeakmatches[i].end(); ++it) {
@@ -1357,7 +1679,9 @@ int cTheoreticalSpectrum::compareLasso(cPeaksList& sortedpeaklist, cBricksDataba
 					experimentalpeaks[i].description += ",";
 				}
 				experimentalpeaks[i].description += theoreticalpeaks[*it].description.substr(0,theoreticalpeaks[*it].description.find(':'));
-				theoreticalpeaks[*it].matchdescription += ", measured mass " + to_string((long double)experimentalpeaks[i].mzratio) + " matched with " + to_string((long double)ppmError(experimentalpeaks[i].mzratio, theoreticalpeaks[*it].mzratio)) + " ppm error";
+				theoreticalpeaks[*it].matchedmz = experimentalpeaks[i].mzratio;
+				theoreticalpeaks[*it].matchedintensity = experimentalpeaks[i].intensity;
+				theoreticalpeaks[*it].matchedppm = ppmError(experimentalpeaks[i].mzratio, theoreticalpeaks[*it].mzratio);
 			}
 
 			experimentalpeaks[i].iontype = selectHigherPriorityIonTypeCID(experimentalpeaks[i].iontype,theoreticalpeaks[*it].iontype);
@@ -1371,18 +1695,18 @@ int cTheoreticalSpectrum::compareLasso(cPeaksList& sortedpeaklist, cBricksDataba
 		visualcoverage.clear();
 
 		coveragebyseries = "Linearized sequences from all ring break up points:<br/>\n";
-		for (int i = 0; i < (int)lassorotations.size(); i++) {
-			for (int j = 0; j < (int)trotationsoflassorotations[i].size(); j++) {
+		for (int i = 0; i < (int)branchcyclicrotations.size(); i++) {
+			for (int j = 0; j < (int)trotationsofbranchcyclicrotations[i].size(); j++) {
 				coveragebyseries += to_string(splittingsites[i].first + 1) + "-" + to_string(splittingsites[i].second + 1) + "_";
 				coveragebyseries += to_string(j + 1) + " ~ ";
-				coveragebyseries += bricksdatabasewithcombinations.getAcronymNameOfTPeptide(trotationsoflassorotations[i][j].tcomposition, false);
+				coveragebyseries += bricksdatabasewithcombinations.getAcronymNameOfTPeptide(trotationsofbranchcyclicrotations[i][j].tcomposition, false);
 				coveragebyseries += "<br/>\n";
 			}
 			coveragebyseries += "<br/>\n";
 		}
 
 		coveragebyseries += "Series of matched peaks:<br/>\n";
-		for (int i = 0; i < (int)lassorotations.size(); i++) {
+		for (int i = 0; i < (int)branchcyclicrotations.size(); i++) {
 			for (int j = 0; j < (int)series[i].size(); j++) {
 				for (int k = 0; k < (int)parameters->fragmentionsfortheoreticalspectra.size(); k++) {
 					tempseries.name = to_string(splittingsites[i].first + 1) + "-" + to_string(splittingsites[i].second + 1) + "_";
@@ -1409,6 +1733,187 @@ int cTheoreticalSpectrum::compareLasso(cPeaksList& sortedpeaklist, cBricksDataba
 
 	return theoreticalpeaksrealsize;
 }
+
+
+#if POLYKETIDE_SIDEROPHORES == 1
+
+
+int cTheoreticalSpectrum::compareLinearPolyketideSiderophore(cPeaksList& sortedpeaklist, cBricksDatabase& bricksdatabasewithcombinations, bool writedescription, regex& sequencetag, regex& searchedsequence) {
+	
+	if (!candidate.checkPolyketideSequence(bricksdatabasewithcombinations, parameters->peptidetype)) {
+		return -2;
+	}
+
+	cBrick brick;
+	vector<int> intcomposition;
+	vector<splitSite> splittingsites;
+	int theoreticalpeaksrealsize = 0;
+
+	intcomposition.clear();
+	brick.clear();
+	brick.setComposition(candidate.getComposition(), false);
+	brick.explodeToIntComposition(intcomposition);
+
+	eResidueLossType leftresiduelosstype = bricksdatabasewithcombinations[intcomposition[0] - 1].getResidueLossType();
+	eResidueLossType rightresiduelosstype = bricksdatabasewithcombinations[intcomposition.back() - 1].getResidueLossType();
+
+	bool hasfirstblockartificial = bricksdatabasewithcombinations[intcomposition[0] - 1].isArtificial();
+	bool haslastblockartificial = bricksdatabasewithcombinations[intcomposition.back() - 1].isArtificial();
+
+	if (!hasfirstblockartificial && !haslastblockartificial) {
+		if (((leftresiduelosstype == h2) && (candidate.getStartModifID() > 0) && parameters->searchedmodifications[candidate.getStartModifID()].cterminal) 
+			|| ((leftresiduelosstype == h2o2) && (candidate.getStartModifID() > 0) && parameters->searchedmodifications[candidate.getStartModifID()].nterminal)
+			|| ((rightresiduelosstype == h2) && (candidate.getEndModifID() > 0) && parameters->searchedmodifications[candidate.getEndModifID()].cterminal)
+			|| ((rightresiduelosstype == h2o2) && (candidate.getEndModifID() > 0) && parameters->searchedmodifications[candidate.getEndModifID()].nterminal)) {
+			return -2;
+		}
+	}
+
+	cCandidate revertedcandidate = candidate;
+	revertedcandidate.revertComposition();
+
+	try {
+		if (!regex_search(candidate.getComposition(), sequencetag) && !regex_search(revertedcandidate.getComposition(), sequencetag)) {
+			return -2;
+		}
+	
+		if (writedescription) {
+			valid = false;
+			if ((parameters->searchedsequence.size() > 0) && 
+				((regex_search(candidate.getComposition(), searchedsequence) &&
+				(parameters->searchedmodifications[candidate.getStartModifID()].name.compare(parameters->searchedsequenceNtermmodif) == 0) && 
+				(parameters->searchedmodifications[candidate.getEndModifID()].name.compare(parameters->searchedsequenceCtermmodif) == 0))
+				||
+				(regex_search(revertedcandidate.getComposition(), searchedsequence) &&
+				(parameters->searchedmodifications[revertedcandidate.getStartModifID()].name.compare(parameters->searchedsequenceNtermmodif) == 0) && 
+				(parameters->searchedmodifications[revertedcandidate.getEndModifID()].name.compare(parameters->searchedsequenceCtermmodif) == 0)))
+				) {
+				valid = true;
+			}	
+		}
+	} 
+	catch (regex_error& /*e*/) {
+		return -2;
+	}
+
+	for (int i = 0; i < (int)parameters->fragmentionsfortheoreticalspectra.size(); i++) {
+		if (
+			((hasfirstblockartificial || (leftresiduelosstype == h2)) && ((parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].parent == l1h_ion) || (parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].parent == l2h_ion)))
+			|| 
+			((hasfirstblockartificial || (leftresiduelosstype == h2o2)) && ((parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].parent == l1oh_ion) || (parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].parent == l2oh_ion)))
+			) {
+			generateNTerminalFragmentIons(parameters->precursorcharge, theoreticalpeaksrealsize, intcomposition, parameters->fragmentionsfortheoreticalspectra[i], bricksdatabasewithcombinations, writedescription, 0, splittingsites, parameters->searchedmodifications, parameters->peptidetype, 0, leftresiduelosstype, hasfirstblockartificial);
+		}
+		if (
+			((haslastblockartificial || (rightresiduelosstype == h2)) && ((parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].parent == r1h_ion) || (parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].parent == r2h_ion)))
+			|| 
+			((haslastblockartificial || (rightresiduelosstype == h2o2)) && ((parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].parent == r1oh_ion) || (parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].parent == r2oh_ion)))
+			) {
+			generateCTerminalFragmentIons(parameters->precursorcharge, theoreticalpeaksrealsize, intcomposition, parameters->fragmentionsfortheoreticalspectra[i], bricksdatabasewithcombinations, writedescription, 0, splittingsites, parameters->searchedmodifications, parameters->peptidetype, 0, rightresiduelosstype, haslastblockartificial);
+		}
+	}
+
+	generatePrecursorIon(intcomposition, bricksdatabasewithcombinations, theoreticalpeaksrealsize, writedescription);
+
+
+	// search the theoretical peaks in the experimental peak list
+	experimentalpeaks = sortedpeaklist;
+	vector<set<int> > experimentalpeakmatches;
+	searchForPeakPairs(theoreticalpeaks, theoreticalpeaksrealsize, experimentalpeaks, experimentalpeakmatches, parameters->fragmentmasserrortolerance);
+
+
+	// coverage of series
+	map<eFragmentIonType, vector<int> > series;
+	for (int i = 0; i < (int)parameters->fragmentionsfortheoreticalspectra.size(); i++) {
+		series[parameters->fragmentionsfortheoreticalspectra[i]].resize(intcomposition.size());
+	}
+
+	for (int i = 0; i < theoreticalpeaksrealsize; i++) {
+		if (!theoreticalpeaks[i].isotope && (theoreticalpeaks[i].matched > 0) && (series.count(theoreticalpeaks[i].iontype) == 1)) {
+			series[theoreticalpeaks[i].iontype][theoreticalpeaks[i].seriesid]++;
+		}
+	}
+	
+	
+	// peak hits without parents are removed
+	if (parameters->clearhitswithoutparent) {
+		clearFalseHits(series, parameters->fragmentionsfortheoreticalspectra);
+
+		for (int i = 0; i < theoreticalpeaksrealsize; i++) {
+			if (!theoreticalpeaks[i].isotope && (theoreticalpeaks[i].matched > 0) && (theoreticalpeaks[i].rotationid != -1) && ((series.count(parameters->fragmentdefinitions[theoreticalpeaks[i].iontype].parent) == 0) || (series[parameters->fragmentdefinitions[theoreticalpeaks[i].iontype].parent][theoreticalpeaks[i].seriesid] == 0))) {		
+				experimentalpeakmatches[theoreticalpeaks[i].matchedid].erase(experimentalpeakmatches[theoreticalpeaks[i].matchedid].find(i));
+				experimentalpeaks[theoreticalpeaks[i].matchedid].matched--;
+
+				theoreticalpeaks[i].matched--;
+				theoreticalpeaks[i].matchedid = -1;
+			}
+		}
+	}
+
+
+	removeUnmatchedMetalIsotopes(theoreticalpeaks, theoreticalpeaksrealsize, experimentalpeaks, experimentalpeakmatches);
+
+
+	// fill annotations of peaks
+	for (int i = 0; i < (int)experimentalpeaks.size(); i++) {
+		for (set<int>::iterator it = experimentalpeakmatches[i].begin(); it != experimentalpeakmatches[i].end(); ++it) {
+			if (writedescription) {
+				if (experimentalpeaks[i].description.compare("") != 0) {
+					experimentalpeaks[i].description += ",";
+				}
+				experimentalpeaks[i].description += theoreticalpeaks[*it].description.substr(0,theoreticalpeaks[*it].description.find(':'));
+				theoreticalpeaks[*it].matchedmz = experimentalpeaks[i].mzratio;
+				theoreticalpeaks[*it].matchedintensity = experimentalpeaks[i].intensity;
+				theoreticalpeaks[*it].matchedppm = ppmError(experimentalpeaks[i].mzratio, theoreticalpeaks[*it].mzratio);
+			}
+
+			experimentalpeaks[i].iontype = selectHigherPriorityIonTypeCID(experimentalpeaks[i].iontype,theoreticalpeaks[*it].iontype);
+		}
+	}
+
+
+	if (writedescription) {
+
+		visualcoverage.clear();
+		visualSeries tempseries;
+
+		coveragebyseries = "Series of matched peaks:<br/>\n";
+		for (int i = 0; i < (int)parameters->fragmentionsfortheoreticalspectra.size(); i++) {
+			tempseries.name = parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].name;
+			coveragebyseries += tempseries.name + "  ";
+			tempseries.series.clear();
+			for (int j = 0; j < (int)series[parameters->fragmentionsfortheoreticalspectra[i]].size() - 1; j++) {
+				coveragebyseries += to_string(series[parameters->fragmentionsfortheoreticalspectra[i]][j]);
+				tempseries.series.push_back(series[parameters->fragmentionsfortheoreticalspectra[i]][j]);
+				if (j < (int)series[parameters->fragmentionsfortheoreticalspectra[i]].size() - 2) {
+					coveragebyseries += " ";
+				}
+			}
+			coveragebyseries += "<br/>\n";
+			visualcoverage.push_back(tempseries);
+		}
+
+	}
+
+	computeStatistics(writedescription);
+
+	return theoreticalpeaksrealsize;
+
+}
+
+
+int cTheoreticalSpectrum::compareCyclicPolyketideSiderophore(cPeaksList& sortedpeaklist, cBricksDatabase& bricksdatabasewithcombinations, bool writedescription, regex& sequencetag, regex& searchedsequence) {
+
+	if (!candidate.checkPolyketideSequence(bricksdatabasewithcombinations, parameters->peptidetype)) {
+		return -2;
+	}
+
+	return compareCyclic(sortedpeaklist, bricksdatabasewithcombinations, writedescription, sequencetag, searchedsequence);
+
+}
+
+
+#endif
 
 
 int cTheoreticalSpectrum::compareLinearPolysaccharide(cPeaksList& sortedpeaklist, cBricksDatabase& bricksdatabasewithcombinations, bool writedescription, regex& sequencetag, regex& searchedsequence) {
@@ -1442,10 +1947,10 @@ int cTheoreticalSpectrum::compareLinearPolysaccharide(cPeaksList& sortedpeaklist
 
 	for (int i = 0; i < (int)parameters->fragmentionsfortheoreticalspectra.size(); i++) {
 		if (parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].nterminal) {
-			generateNTerminalFragmentIons(parameters->precursorcharge, theoreticalpeaksrealsize, intcomposition, parameters->fragmentionsfortheoreticalspectra[i], bricksdatabasewithcombinations, writedescription, 0, splittingsites, parameters->searchedmodifications, linearpolysaccharide);
+			generateNTerminalFragmentIons(parameters->precursorcharge, theoreticalpeaksrealsize, intcomposition, parameters->fragmentionsfortheoreticalspectra[i], bricksdatabasewithcombinations, writedescription, 0, splittingsites, parameters->searchedmodifications, parameters->peptidetype);
 		}
 		if (parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].cterminal) {
-			generateCTerminalFragmentIons(parameters->precursorcharge, theoreticalpeaksrealsize, intcomposition, parameters->fragmentionsfortheoreticalspectra[i], bricksdatabasewithcombinations, writedescription, 0, splittingsites, parameters->searchedmodifications, linearpolysaccharide);
+			generateCTerminalFragmentIons(parameters->precursorcharge, theoreticalpeaksrealsize, intcomposition, parameters->fragmentionsfortheoreticalspectra[i], bricksdatabasewithcombinations, writedescription, 0, splittingsites, parameters->searchedmodifications, parameters->peptidetype);
 		}
 	}
 
@@ -1459,13 +1964,13 @@ int cTheoreticalSpectrum::compareLinearPolysaccharide(cPeaksList& sortedpeaklist
 
 
 	// coverage of series
-	map<fragmentIonType, vector<int> > series;
+	map<eFragmentIonType, vector<int> > series;
 	for (int i = 0; i < (int)parameters->fragmentionsfortheoreticalspectra.size(); i++) {
 		series[parameters->fragmentionsfortheoreticalspectra[i]].resize(intcomposition.size());
 	}
 
 	for (int i = 0; i < theoreticalpeaksrealsize; i++) {
-		if ((theoreticalpeaks[i].matched > 0) && (series.count(theoreticalpeaks[i].iontype) == 1)) {
+		if (!theoreticalpeaks[i].isotope && (theoreticalpeaks[i].matched > 0) && (series.count(theoreticalpeaks[i].iontype) == 1)) {
 			series[theoreticalpeaks[i].iontype][theoreticalpeaks[i].seriesid]++;
 		}
 	}
@@ -1476,7 +1981,7 @@ int cTheoreticalSpectrum::compareLinearPolysaccharide(cPeaksList& sortedpeaklist
 		clearFalseHits(series, parameters->fragmentionsfortheoreticalspectra);
 
 		for (int i = 0; i < theoreticalpeaksrealsize; i++) {
-			if ((theoreticalpeaks[i].matched > 0) && (theoreticalpeaks[i].rotationid != -1) && ((series.count(parameters->fragmentdefinitions[theoreticalpeaks[i].iontype].parent) == 0) || (series[parameters->fragmentdefinitions[theoreticalpeaks[i].iontype].parent][theoreticalpeaks[i].seriesid] == 0))) {		
+			if (!theoreticalpeaks[i].isotope && (theoreticalpeaks[i].matched > 0) && (theoreticalpeaks[i].rotationid != -1) && ((series.count(parameters->fragmentdefinitions[theoreticalpeaks[i].iontype].parent) == 0) || (series[parameters->fragmentdefinitions[theoreticalpeaks[i].iontype].parent][theoreticalpeaks[i].seriesid] == 0))) {		
 				experimentalpeakmatches[theoreticalpeaks[i].matchedid].erase(experimentalpeakmatches[theoreticalpeaks[i].matchedid].find(i));
 				experimentalpeaks[theoreticalpeaks[i].matchedid].matched--;
 
@@ -1487,6 +1992,9 @@ int cTheoreticalSpectrum::compareLinearPolysaccharide(cPeaksList& sortedpeaklist
 	}
 
 
+	removeUnmatchedMetalIsotopes(theoreticalpeaks, theoreticalpeaksrealsize, experimentalpeaks, experimentalpeakmatches);
+
+
 	// fill annotations of peaks
 	for (int i = 0; i < (int)experimentalpeaks.size(); i++) {
 		for (set<int>::iterator it = experimentalpeakmatches[i].begin(); it != experimentalpeakmatches[i].end(); ++it) {
@@ -1495,7 +2003,9 @@ int cTheoreticalSpectrum::compareLinearPolysaccharide(cPeaksList& sortedpeaklist
 					experimentalpeaks[i].description += ",";
 				}
 				experimentalpeaks[i].description += theoreticalpeaks[*it].description.substr(0,theoreticalpeaks[*it].description.find(':'));
-				theoreticalpeaks[*it].matchdescription += ", measured mass " + to_string((long double)experimentalpeaks[i].mzratio) + " matched with " + to_string((long double)ppmError(experimentalpeaks[i].mzratio, theoreticalpeaks[*it].mzratio)) + " ppm error";
+				theoreticalpeaks[*it].matchedmz = experimentalpeaks[i].mzratio;
+				theoreticalpeaks[*it].matchedintensity = experimentalpeaks[i].intensity;
+				theoreticalpeaks[*it].matchedppm = ppmError(experimentalpeaks[i].mzratio, theoreticalpeaks[*it].mzratio);
 			}
 
 			// to do
@@ -1533,22 +2043,78 @@ int cTheoreticalSpectrum::compareLinearPolysaccharide(cPeaksList& sortedpeaklist
 }
 
 
-void cTheoreticalSpectrum::compareMSSpectrum(cParameters* parameters) {
-	experimentalpeaks = parameters->peaklist;
-	experimentalpeaks.sortbyMass();
-
+void cTheoreticalSpectrum::generateMSSpectrum() {
 	cPeak peak;
 	cSummaryFormula formula;
-	theoreticalpeaks.resize((int)parameters->fragmentionsfortheoreticalspectra.size()*parameters->sequencedatabase.size()*abs(parameters->precursorcharge));
+	string metalname;
+	regex rx;
+
+	theoreticalpeaks.resize(((int)parameters->fragmentionsfortheoreticalspectra.size() + countIsotopesOfMetals(parameters)) * parameters->sequencedatabase.size() * abs(parameters->precursorcharge));
+	int theoreticalpeaksrealsize = 0;
+
 	for (int i = 0; i < parameters->sequencedatabase.size(); i++) {
+
 		peak.clear();
+		peak.isotope = false;
+
 		formula.clear();
 
 		formula.setFormula(parameters->sequencedatabase[i].getSummaryFormula());
 
 		for (int j = 0; j < (int)parameters->fragmentionsfortheoreticalspectra.size(); j++) {
 
+			parameters->precursorAdductHasLi = false;
+			parameters->precursorAdductHasMg = false;
+			parameters->precursorAdductHasK = false;
+			parameters->precursorAdductHasCa = false;
+			parameters->precursorAdductHasFe = false;
+			parameters->precursorAdductHasNi = false;
+			parameters->precursorAdductHasCu = false;
+			parameters->precursorAdductHasZn = false;
+			parameters->precursorAdductHasGa = false;
+
+			metalname = parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[j]].name;
+
+			// to do - optimize performance
+			rx = "Li";
+			if (regex_search(metalname, rx)) {
+				parameters->precursorAdductHasLi = true;
+			}
+			rx = "Mg";
+			if (regex_search(metalname, rx)) {
+				parameters->precursorAdductHasMg = true;
+			}
+			rx = "K";
+			if (regex_search(metalname, rx)) {
+				parameters->precursorAdductHasK = true;
+			}
+			rx = "Ca";
+			if (regex_search(metalname, rx)) {
+				parameters->precursorAdductHasCa = true;
+			}
+			rx = "Fe";
+			if (regex_search(metalname, rx)) {
+				parameters->precursorAdductHasFe = true;
+			}
+			rx = "Ni";
+			if (regex_search(metalname, rx)) {
+				parameters->precursorAdductHasNi = true;
+			}
+			rx = "Cu";
+			if (regex_search(metalname, rx)) {
+				parameters->precursorAdductHasCu = true;
+			}
+			rx = "Zn";
+			if (regex_search(metalname, rx)) {
+				parameters->precursorAdductHasZn = true;
+			}
+			rx = "Ga";
+			if (regex_search(metalname, rx)) {
+				parameters->precursorAdductHasGa = true;
+			}
+
 			for (int k = 0; k < abs(parameters->precursorcharge); k++) {
+
 				peak.mzratio = (double)parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[j]].multiplier*formula.getMass() + parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[j]].massdifference;
 				if (parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[j]].positive) {
 					peak.mzratio += (double)k*Hplus;
@@ -1565,18 +2131,29 @@ void cTheoreticalSpectrum::compareMSSpectrum(cParameters* parameters) {
 				else {
 					peak.description += "-";
 				}
-				//peak.description += " " + parameters->sequencedatabase[i].getName() + " (" + parameters->sequencedatabase[i].getSummaryFormula() + "): ";
 				peak.description += " " + parameters->sequencedatabase[i].getNameWithReferenceAsHTMLString() + " (" + parameters->sequencedatabase[i].getSummaryFormula() + "): ";
+				
+				addPeakToList(peak, theoreticalpeaksrealsize);
+				addMetalPeaks(peak, theoreticalpeaksrealsize, k + 1, true);				
 
-				theoreticalpeaks[(i*(int)parameters->fragmentionsfortheoreticalspectra.size() + j)*abs(parameters->precursorcharge) + k] = peak;
 			}
-
+			
 		}
+
 	}
-	theoreticalpeaks.sortbyMass();
+
+	theoreticalpeaks.resize(theoreticalpeaksrealsize);
+}
+
+
+void cTheoreticalSpectrum::compareMSSpectrum(cPeaksList& peaklist) {
+	experimentalpeaks = peaklist;
+	experimentalpeaks.sortbyMass();
 
 	vector<set<int> > experimentalpeakmatches;
 	searchForPeakPairs(theoreticalpeaks, theoreticalpeaks.size(), experimentalpeaks, experimentalpeakmatches, parameters->fragmentmasserrortolerance);
+
+	removeUnmatchedMetalIsotopes(theoreticalpeaks, theoreticalpeaks.size(), experimentalpeaks, experimentalpeakmatches);
 
 	// fill annotations of peaks
 	for (int i = 0; i < (int)experimentalpeaks.size(); i++) {
@@ -1586,11 +2163,25 @@ void cTheoreticalSpectrum::compareMSSpectrum(cParameters* parameters) {
 				experimentalpeaks[i].description += ",";
 			}
 			experimentalpeaks[i].description += theoreticalpeaks[*it].description.substr(0,theoreticalpeaks[*it].description.rfind(':'));
-			theoreticalpeaks[*it].matchdescription += ", measured mass " + to_string((long double)experimentalpeaks[i].mzratio) + " matched with " + to_string((long double)ppmError(experimentalpeaks[i].mzratio, theoreticalpeaks[*it].mzratio)) + " ppm error";
+			theoreticalpeaks[*it].matchedmz = experimentalpeaks[i].mzratio;
+			theoreticalpeaks[*it].matchedintensity = experimentalpeaks[i].intensity;
+			theoreticalpeaks[*it].matchedppm = ppmError(experimentalpeaks[i].mzratio, theoreticalpeaks[*it].mzratio);
 		}
 	}
 
 	computeStatistics(true);
+
+	cPeaksList tmppeaklist = theoreticalpeaks;
+	theoreticalpeaks.clear();
+
+	// remove unmatched theoretical peaks to save memory
+	for (int i = 0; i < tmppeaklist.size(); i++) {
+		if (tmppeaklist[i].matchedmz > 0) {
+			theoreticalpeaks.add(tmppeaklist[i]);
+		}
+	}
+
+	theoreticalpeaks.sortbyMass();
 }
 
 
@@ -1609,7 +2200,7 @@ int cTheoreticalSpectrum::getNumberOfScrambledPeaks() {
 }
 
 
-int cTheoreticalSpectrum::getNumberOfMatchedPeaks(fragmentIonType iontype) const {
+int cTheoreticalSpectrum::getNumberOfMatchedPeaks(eFragmentIonType iontype) const {
 	return matchedions.at(iontype);
 }
 
@@ -1624,138 +2215,26 @@ double cTheoreticalSpectrum::getRatioOfMatchedPeaks() {
 }
 
 
-void cTheoreticalSpectrum::printMatch(ofstream& os, peptideType peptidetype) {
-	vector<string> rotations;
-	
-	os << endl << "Peptide: " << candidate.getRealPeptideName() << endl;
-
-	switch (peptidetype)
-	{
-	case linear:
-	case cyclic:
-	case linearpolysaccharide:
-		os << "Composition: " << candidate.getComposition();
-		break;
-	case branched:
-	case lasso:
-		os << "Composition: " << candidate.getTComposition();
-		break;
-	case other:
-		break;
-	default:
-		break;
-	}
-	
-	if (valid) {
-		os << " (valid)";
-	}
-	os << endl;
-
-	os << "Number of bricks: " << getNumberOfBricks(candidate.getComposition()) << endl << endl;
-	
-	if ((peptidetype == linear) || (peptidetype == linearpolysaccharide)) {
-		os << "Modifications: ";
-		os << candidate.getStartModifID() << " " << candidate.getEndModifID() << endl;
-	}
-
-	if (peptidetype == branched) {
-		os << "Modifications: ";
-		os << candidate.getStartModifID() << " " << candidate.getMiddleModifID() << " " << candidate.getEndModifID() << endl;
-	}
-
-	if (peptidetype == lasso) {
-		os << "Modifications: ";
-		os << candidate.getMiddleModifID() << endl;
-	}
-
-	os << "Coverage by series:" << endl;
-	os << coveragebyseries << endl;
-
-	switch (peptidetype)
-	{
-	case linear:
-		os << "Matched y-ions and b-ions: " << matchedions[y_ion] + matchedions[b_ion] << endl;
-		os << "Matched y-ions: " << matchedions[y_ion] << endl;
-		os << "Matched b-ions: " << matchedions[b_ion] << endl;
-		os << "Matched a-ions: " << matchedions[a_ion] << endl;
-		os << "Matched y*-ions: " << matchedions[y_ion_dehydrated] << endl;
-		os << "Matched b*-ions: " << matchedions[b_ion_dehydrated] << endl;
-		os << "Matched a*-ions: " << matchedions[a_ion_dehydrated] << endl;
-		os << "Matched yx-ions: " << matchedions[y_ion_deamidated] << endl;
-		os << "Matched bx-ions: " << matchedions[b_ion_deamidated] << endl;
-		os << "Matched ax-ions: " << matchedions[a_ion_deamidated] << endl;
-		break;
-	case cyclic:
-		os << "Matched b-ions: " << matchedions[b_ion] << endl;
-		os << "Matched a-ions: " << matchedions[a_ion] << endl;
-		os << "Matched b*-ions: " << matchedions[b_ion_dehydrated] << endl;
-		os << "Matched a*-ions: " << matchedions[a_ion_dehydrated] << endl;
-		os << "Matched bx-ions: " << matchedions[b_ion_deamidated] << endl;
-		os << "Matched ax-ions: " << matchedions[a_ion_deamidated] << endl;
-		os << "Matched b*x-ions: " << matchedions[b_ion_dehydrated_and_deamidated] << endl;
-		os << "Matched a*x-ions: " << matchedions[a_ion_dehydrated_and_deamidated] << endl;
-		os << "Matched b-ions and b*-ions: " << matchedions[b_ion] + matchedions[b_ion_dehydrated] << endl;
-		os << "Matched b-ions and bx-ions: " << matchedions[b_ion] + matchedions[b_ion_deamidated] << endl << endl;
-		break;
-	case branched:
-		os << "Matched y-ions and b-ions: " << matchedions[y_ion] + matchedions[b_ion] << endl;
-		os << "Matched y-ions: " << matchedions[y_ion] << endl;
-		os << "Matched b-ions: " << matchedions[b_ion] << endl;
-		os << "Matched a-ions: " << matchedions[a_ion] << endl;
-		os << "Matched y*-ions: " << matchedions[y_ion_dehydrated] << endl;
-		os << "Matched b*-ions: " << matchedions[b_ion_dehydrated] << endl;
-		os << "Matched a*-ions: " << matchedions[a_ion_dehydrated] << endl;
-		os << "Matched yx-ions: " << matchedions[y_ion_deamidated] << endl;
-		os << "Matched bx-ions: " << matchedions[b_ion_deamidated] << endl;
-		os << "Matched ax-ions: " << matchedions[a_ion_deamidated] << endl;
-		break;
-	case lasso:
-		os << "Matched y-ions and b-ions: " << matchedions[y_ion] + matchedions[b_ion] << endl;
-		os << "Matched y-ions: " << matchedions[y_ion] << endl;
-		os << "Matched b-ions: " << matchedions[b_ion] << endl;
-		os << "Matched a-ions: " << matchedions[a_ion] << endl;
-		os << "Matched y*-ions: " << matchedions[y_ion_dehydrated] << endl;
-		os << "Matched b*-ions: " << matchedions[b_ion_dehydrated] << endl;
-		os << "Matched a*-ions: " << matchedions[a_ion_dehydrated] << endl;
-		os << "Matched yx-ions: " << matchedions[y_ion_deamidated] << endl;
-		os << "Matched bx-ions: " << matchedions[b_ion_deamidated] << endl;
-		os << "Matched ax-ions: " << matchedions[a_ion_deamidated] << endl;
-		break;
-	case linearpolysaccharide:
-		break;
-	case other:
-		break;
-	default:
-		break;
-	}
-
-	os << "Matched peaks: " << experimentalpeaksmatched << endl;
-	if (peptidetype == cyclic) {
-		os << "Scrambled peaks matched: " << scrambledpeaksmatched << endl;
-	}
-	os << "Total peaks: " << peakstested << endl;
-	os << "Sum of Relative Intensities: " << intensityweightedscore << endl;
-	os << "Ratio of matched peaks: " << experimentalpeaksmatchedratio*100.0f << "%" << endl << endl;
-	os << "Unmatched measured peaks:" << endl << unmatchedpeaks << endl << endl;
-	os << "Theoretical peaks:" << endl << theoreticalpeaks.print();
-}
-
-
-void cTheoreticalSpectrum::generateNTerminalFragmentIons(int maxcharge, int& peaklistrealsize, vector<int>& intcomposition, fragmentIonType fragmentiontype, cBricksDatabase& bricksdatabase, bool writedescription, int rotationid, vector<splitSite>& splittingsites, vector<fragmentDescription>& searchedmodifications, peptideType peptidetype, TRotationInfo* trotation) {
+void cTheoreticalSpectrum::generateNTerminalFragmentIons(int maxcharge, int& peaklistrealsize, vector<int>& intcomposition, eFragmentIonType fragmentiontype, cBricksDatabase& bricksdatabase, bool writedescription, int rotationid, vector<splitSite>& splittingsites, vector<fragmentDescription>& searchedmodifications, ePeptideType peptidetype, TRotationInfo* trotation, eResidueLossType leftresiduelosstype, bool hasfirstblockartificial) {
 	cPeak peak;
 	double tempratio;
 	string tempdescription;
 
 	peak.mzratio = parameters->fragmentdefinitions[fragmentiontype].massdifference;
-	if ((peptidetype == linear) || (peptidetype == linearpolysaccharide)) {
+	if ((peptidetype == linear) || (peptidetype == linearpolysaccharide)
+#if POLYKETIDE_SIDEROPHORES == 1
+		|| (peptidetype == linearpolyketide)
+#endif
+		) {
 		peak.mzratio += searchedmodifications[candidate.getStartModifID()].massdifference;
 	}
-	if ((peptidetype == branched) || (peptidetype == lasso)) {
+	if ((peptidetype == branched) || (peptidetype == branchcyclic)) {
 		peak.mzratio += searchedmodifications[trotation->startmodifID].massdifference;
 	}
 
 	peak.iontype = fragmentiontype;
 	peak.scrambled = false;
+	peak.isotope = false;
 
 	switch (peptidetype)
 	{
@@ -1768,12 +2247,20 @@ void cTheoreticalSpectrum::generateNTerminalFragmentIons(int maxcharge, int& pea
 	case branched:
 		peak.rotationid = trotation->id;
 		break;
-	case lasso:
+	case branchcyclic:
 		peak.rotationid = rotationid*6 + trotation->id; // to do - potential bug
 		break;
 	case linearpolysaccharide:
 		peak.rotationid = rotationid;
 		break;
+#if POLYKETIDE_SIDEROPHORES == 1
+	case linearpolyketide:
+		peak.rotationid = rotationid;
+		break;
+	case cyclicpolyketide:
+		peak.rotationid = rotationid;
+		break;
+#endif
 	case other:
 		break;
 	default:
@@ -1784,7 +2271,7 @@ void cTheoreticalSpectrum::generateNTerminalFragmentIons(int maxcharge, int& pea
 		peak.mzratio += bricksdatabase[intcomposition[i] - 1].getMass();
 
 
-		if ((peptidetype == branched) || (peptidetype == lasso)) {		
+		if ((peptidetype == branched) || (peptidetype == branchcyclic)) {		
 			if (i == trotation->middlebranchstart) {
 				peak.mzratio += searchedmodifications[trotation->middlemodifID].massdifference;
 			}
@@ -1804,25 +2291,91 @@ void cTheoreticalSpectrum::generateNTerminalFragmentIons(int maxcharge, int& pea
 			//}
 		}
 
+#if POLYKETIDE_SIDEROPHORES == 1
+		if (peptidetype == linearpolyketide) {
+			if (!hasfirstblockartificial && (leftresiduelosstype == h2) && (parameters->fragmentdefinitions[fragmentiontype].parent == l1h_ion) && (i % 2 == 0)) {
+				continue;
+			}
+
+			if (!hasfirstblockartificial && (leftresiduelosstype == h2) && (parameters->fragmentdefinitions[fragmentiontype].parent == l2h_ion) && (i % 2 == 1)) {
+				continue;
+			}
+
+			if (!hasfirstblockartificial && (leftresiduelosstype == h2o2) && (parameters->fragmentdefinitions[fragmentiontype].parent == l1oh_ion) && (i % 2 == 1)) {
+				continue;
+			}
+
+			if (!hasfirstblockartificial && (leftresiduelosstype == h2o2) && (parameters->fragmentdefinitions[fragmentiontype].parent == l2oh_ion) && (i % 2 == 0)) {
+				continue;
+			}	
+		}
+		
+		if (peptidetype == cyclicpolyketide) {
+
+			if (!hasfirstblockartificial && (leftresiduelosstype == h2) && (parameters->fragmentdefinitions[fragmentiontype].parent == l0h_ion)) { // b+2H ion is generated instead of b-2H
+				continue;
+			}
+
+			if (!hasfirstblockartificial && (leftresiduelosstype == h2) && (parameters->fragmentdefinitions[fragmentiontype].parent == l1h_ion) && (i % 2 == 0)) {
+				continue;
+			}
+
+			if (!hasfirstblockartificial && (leftresiduelosstype == h2) && (parameters->fragmentdefinitions[fragmentiontype].parent == l2h_ion) && (i % 2 == 1)) {
+				continue;
+			}
+
+			if (!hasfirstblockartificial && (leftresiduelosstype == h2o2) && (parameters->fragmentdefinitions[fragmentiontype].parent == l0h_ion) && (i % 2 == 1)) {
+				continue;
+			}
+
+			if (!hasfirstblockartificial && (leftresiduelosstype == h2o2) && (parameters->fragmentdefinitions[fragmentiontype].parent == l1h_ion) && (i % 2 == 0)) { // ok - even numbers of blocks => always b-ion
+				continue;
+			}
+
+			if (!hasfirstblockartificial && (leftresiduelosstype == h2o2) && (parameters->fragmentdefinitions[fragmentiontype].parent == l2h_ion)) { // b-2H ion is generated instead of b+2H
+				continue;
+			}	
+		}
+#endif
+
 		peak.seriesid = i;
 
 		if (writedescription) {
 
 			peak.description = "";
+#if POLYKETIDE_SIDEROPHORES == 1
+			if ((peptidetype == cyclic) || (peptidetype == cyclicpolyketide)) {
+#else
 			if (peptidetype == cyclic) {
+#endif
 				peak.description += to_string(splittingsites[rotationid].first + 1) + "-" + to_string(splittingsites[rotationid].second + 1) + "_";
 			}
 			if (peptidetype == branched) {
 				peak.description += to_string(peak.rotationid + 1) + "_";
 			}
-			if (peptidetype == lasso) {
+			if (peptidetype == branchcyclic) {
 				peak.description += to_string(splittingsites[rotationid].first + 1) + "-" + to_string(splittingsites[rotationid].second + 1) + "_";
 				peak.description += to_string(trotation->id + 1) + "_";
 			}
-			peak.description += parameters->fragmentdefinitions[fragmentiontype].name.substr(0, 1) + to_string(i + 1);
-			if (parameters->fragmentdefinitions[fragmentiontype].name.size() > 1) {
-				peak.description += parameters->fragmentdefinitions[fragmentiontype].name.substr(1, parameters->fragmentdefinitions[fragmentiontype].name.length() - 1);
+
+#if POLYKETIDE_SIDEROPHORES == 1
+			if ((peptidetype == linearpolyketide) || (peptidetype == cyclicpolyketide)) {
+				peak.description += parameters->fragmentdefinitions[fragmentiontype].name.substr(0, 2) + to_string(i + 1);
+				if (parameters->fragmentdefinitions[fragmentiontype].name.size() > 2) {
+					peak.description += parameters->fragmentdefinitions[fragmentiontype].name.substr(2, parameters->fragmentdefinitions[fragmentiontype].name.length() - 2);
+				}
 			}
+			else {
+#endif
+				peak.description += parameters->fragmentdefinitions[fragmentiontype].name.substr(0, 1) + to_string(i + 1);
+				if (parameters->fragmentdefinitions[fragmentiontype].name.size() > 1) {
+					peak.description += parameters->fragmentdefinitions[fragmentiontype].name.substr(1, parameters->fragmentdefinitions[fragmentiontype].name.length() - 1);
+				}
+#if POLYKETIDE_SIDEROPHORES == 1
+			}
+#endif
+
+			addAdductToDescription(peak.description);
 			peak.description += ": ";
 			for (int j = 0; j <= i; j++) {
 				peak.description += "[" + bricksdatabase[intcomposition[j] - 1].getAcronymsAsString() + "]";
@@ -1852,13 +2405,8 @@ void cTheoreticalSpectrum::generateNTerminalFragmentIons(int maxcharge, int& pea
 					}
 				}
 
-				if (theoreticalpeaks.size() > peaklistrealsize) {
-					theoreticalpeaks[peaklistrealsize] = peak;
-				}
-				else {
-					theoreticalpeaks.add(peak);
-				}
-				peaklistrealsize++;
+				addPeakToList(peak, peaklistrealsize);
+				addMetalPeaks(peak, peaklistrealsize, j, writedescription);
 
 			}
 			peak.mzratio = tempratio;
@@ -1873,21 +2421,26 @@ void cTheoreticalSpectrum::generateNTerminalFragmentIons(int maxcharge, int& pea
 }
 
 
-void cTheoreticalSpectrum::generateCTerminalFragmentIons(int maxcharge, int& peaklistrealsize, vector<int>& intcomposition, fragmentIonType fragmentiontype, cBricksDatabase& bricksdatabase, bool writedescription, int rotationid, vector<splitSite>& splittingsites, vector<fragmentDescription>& searchedmodifications, peptideType peptidetype, TRotationInfo* trotation) {
+void cTheoreticalSpectrum::generateCTerminalFragmentIons(int maxcharge, int& peaklistrealsize, vector<int>& intcomposition, eFragmentIonType fragmentiontype, cBricksDatabase& bricksdatabase, bool writedescription, int rotationid, vector<splitSite>& splittingsites, vector<fragmentDescription>& searchedmodifications, ePeptideType peptidetype, TRotationInfo* trotation, eResidueLossType rightresiduelosstype, bool haslastblockartificial) {
 	cPeak peak;
 	double tempratio;
 	string tempdescription;
 
 	peak.mzratio = parameters->fragmentdefinitions[fragmentiontype].massdifference;
-	if ((peptidetype == linear) || (peptidetype == linearpolysaccharide)) {
+	if ((peptidetype == linear) || (peptidetype == linearpolysaccharide)
+#if POLYKETIDE_SIDEROPHORES == 1
+		|| (peptidetype == linearpolyketide)
+#endif
+		) {
 		peak.mzratio += searchedmodifications[candidate.getEndModifID()].massdifference;
 	}
-	if ((peptidetype == branched) || (peptidetype == lasso)) {
+	if ((peptidetype == branched) || (peptidetype == branchcyclic)) {
 		peak.mzratio += searchedmodifications[trotation->endmodifID].massdifference;
 	}
 
 	peak.iontype = fragmentiontype;
 	peak.scrambled = false;
+	peak.isotope = false;
 
 	switch (peptidetype)
 	{
@@ -1900,9 +2453,17 @@ void cTheoreticalSpectrum::generateCTerminalFragmentIons(int maxcharge, int& pea
 	case branched:
 		peak.rotationid = trotation->id;
 		break;
-	case lasso:
+	case branchcyclic:
 		peak.rotationid = rotationid*6 + trotation->id; // to do - potential bug
 		break;
+#if POLYKETIDE_SIDEROPHORES == 1
+	case linearpolyketide:
+		peak.rotationid = rotationid;
+		break;
+	case cyclicpolyketide:
+		peak.rotationid = rotationid;
+		break;
+#endif
 	case linearpolysaccharide:
 		peak.rotationid = rotationid;
 		break;
@@ -1912,10 +2473,12 @@ void cTheoreticalSpectrum::generateCTerminalFragmentIons(int maxcharge, int& pea
 		break;
 	}
 
+	int order = -1;
 	for (int i = (int)intcomposition.size() - 1; i > 0; i--) {
 		peak.mzratio += bricksdatabase[intcomposition[i] - 1].getMass();
+		order++;
 
-		if ((peptidetype == branched) || (peptidetype == lasso)) {		
+		if ((peptidetype == branched) || (peptidetype == branchcyclic)) {		
 			if (i == trotation->middlebranchend) {
 				peak.mzratio += searchedmodifications[trotation->middlemodifID].massdifference;
 			}
@@ -1935,26 +2498,65 @@ void cTheoreticalSpectrum::generateCTerminalFragmentIons(int maxcharge, int& pea
 			//}
 		}
 
+#if POLYKETIDE_SIDEROPHORES == 1
+		if (peptidetype == linearpolyketide) {
+			if (!haslastblockartificial && (rightresiduelosstype == h2) && (parameters->fragmentdefinitions[fragmentiontype].parent == r1h_ion) && (order % 2 == 0)) {
+				continue;
+			}
+
+			if (!haslastblockartificial && (rightresiduelosstype == h2) && (parameters->fragmentdefinitions[fragmentiontype].parent == r2h_ion) && (order % 2 == 1)) {
+				continue;
+			}
+
+			if (!haslastblockartificial && (rightresiduelosstype == h2o2) && (parameters->fragmentdefinitions[fragmentiontype].parent == r1oh_ion) && (order % 2 == 1)) {
+				continue;
+			}
+
+			if (!haslastblockartificial && (rightresiduelosstype == h2o2) && (parameters->fragmentdefinitions[fragmentiontype].parent == r2oh_ion) && (order % 2 == 0)) {
+				continue;
+			}		
+		}
+#endif
+
 		peak.seriesid = (int)intcomposition.size() - i - 1;
 
 		if (writedescription) {
 
 			peak.description = "";
+#if POLYKETIDE_SIDEROPHORES == 1
+			if (peptidetype == cyclicpolyketide) {
+				peak.description += to_string(splittingsites[rotationid].first + 1) + "-" + to_string(splittingsites[rotationid].second + 1) + "_";
+			}
+#endif
 			//if (peptidetype == cyclic) {
-			//	peak.description += to_string(splittingsites[rotationid].first + 1) + "-" + to_string(splittingsites[rotationid].second + 1); // +"_";
+			//	peak.description += to_string(splittingsites[rotationid].first + 1) + "-" + to_string(splittingsites[rotationid].second + 1) + "_";
 			//}
 			if (peptidetype == branched) {
 				peak.description += to_string(peak.rotationid + 1) + "_";
 			}
-			if (peptidetype == lasso) {
+			if (peptidetype == branchcyclic) {
 				peak.description += to_string(splittingsites[rotationid].first + 1) + "-" + to_string(splittingsites[rotationid].second + 1) + "_";
 				peak.description += to_string(trotation->id + 1) + "_";
 			}
-			peak.description += parameters->fragmentdefinitions[fragmentiontype].name.substr(0, 1) + to_string((int)intcomposition.size() - i);
-			
-			if (parameters->fragmentdefinitions[fragmentiontype].name.size() > 1) {
-				peak.description += parameters->fragmentdefinitions[fragmentiontype].name.substr(1, parameters->fragmentdefinitions[fragmentiontype].name.length() - 1);
+
+#if POLYKETIDE_SIDEROPHORES == 1
+			if ((peptidetype == linearpolyketide) || (peptidetype == cyclicpolyketide)) {
+				peak.description += parameters->fragmentdefinitions[fragmentiontype].name.substr(0, 2) + to_string((int)intcomposition.size() - i);
+				if (parameters->fragmentdefinitions[fragmentiontype].name.size() > 2) {
+					peak.description += parameters->fragmentdefinitions[fragmentiontype].name.substr(2, parameters->fragmentdefinitions[fragmentiontype].name.length() - 2);
+				}
 			}
+			else {
+#endif
+				peak.description += parameters->fragmentdefinitions[fragmentiontype].name.substr(0, 1) + to_string((int)intcomposition.size() - i);
+				if (parameters->fragmentdefinitions[fragmentiontype].name.size() > 1) {
+					peak.description += parameters->fragmentdefinitions[fragmentiontype].name.substr(1, parameters->fragmentdefinitions[fragmentiontype].name.length() - 1);
+				}
+#if POLYKETIDE_SIDEROPHORES == 1
+			}
+#endif
+
+			addAdductToDescription(peak.description);
 			peak.description += ": ";
 			for (int j = (int)intcomposition.size() - 1; j >= i; j--) {
 				peak.description += "[" + bricksdatabase[intcomposition[j] - 1].getAcronymsAsString() + "]";
@@ -1983,14 +2585,9 @@ void cTheoreticalSpectrum::generateCTerminalFragmentIons(int maxcharge, int& pea
 						peak.description = to_string(j) + "- " + tempdescription;
 					}
 				}
-
-				if (theoreticalpeaks.size() > peaklistrealsize) {
-					theoreticalpeaks[peaklistrealsize] = peak;
-				}
-				else {
-					theoreticalpeaks.add(peak);
-				}
-				peaklistrealsize++;
+				
+				addPeakToList(peak, peaklistrealsize);
+				addMetalPeaks(peak, peaklistrealsize, j, writedescription);				
 
 			}
 			peak.mzratio = tempratio;
@@ -2040,8 +2637,8 @@ string cTheoreticalSpectrum::getCoverageBySeries() {
 }
 
 
-string cTheoreticalSpectrum::getUnmatchedPeaks() {
-	return unmatchedpeaks;
+cPeaksList* cTheoreticalSpectrum::getUnmatchedPeaks() {
+	return &unmatchedpeaks;
 }
 
 
@@ -2102,15 +2699,15 @@ void cTheoreticalSpectrum::store(ofstream& os) {
 
 	size = (int)matchedions.size();
 	os.write((char *)&size, sizeof(int));
-	for (map<fragmentIonType, int>::iterator it = matchedions.begin(); it != matchedions.end(); ++it) {
-		os.write((char *)&it->first, sizeof(fragmentIonType));
+	for (map<eFragmentIonType, int>::iterator it = matchedions.begin(); it != matchedions.end(); ++it) {
+		os.write((char *)&it->first, sizeof(eFragmentIonType));
 		os.write((char *)&it->second, sizeof(int));
 	}
 
 	os.write((char *)&peakstested, sizeof(int));
 	os.write((char *)&experimentalpeaksmatchedratio, sizeof(double));
 
-	storeString(unmatchedpeaks, os);
+	unmatchedpeaks.store(os);
 	storeString(coveragebyseries, os);
 
 	os.write((char *)&valid, sizeof(bool));
@@ -2131,7 +2728,7 @@ void cTheoreticalSpectrum::store(ofstream& os) {
 
 void cTheoreticalSpectrum::load(ifstream& is) {
 	int size;
-	fragmentIonType iontype;
+	eFragmentIonType iontype;
 	int number;
 
 	parameters = 0;
@@ -2146,7 +2743,7 @@ void cTheoreticalSpectrum::load(ifstream& is) {
 	is.read((char *)&size, sizeof(int));
 	matchedions.clear();
 	for (int i = 0; i < size; i++) {
-		is.read((char *)&iontype, sizeof(fragmentIonType));
+		is.read((char *)&iontype, sizeof(eFragmentIonType));
 		is.read((char *)&number, sizeof(int));
 		matchedions[iontype] = number;
 	}
@@ -2154,7 +2751,7 @@ void cTheoreticalSpectrum::load(ifstream& is) {
 	is.read((char *)&peakstested, sizeof(int));
 	is.read((char *)&experimentalpeaksmatchedratio, sizeof(double));
 
-	loadString(unmatchedpeaks, is);
+	unmatchedpeaks.load(is);
 	loadString(coveragebyseries, is);
 
 	is.read((char *)&valid, sizeof(bool));
