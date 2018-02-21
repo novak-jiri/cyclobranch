@@ -4,8 +4,15 @@
 
 
 QString appname = "CycloBranch";
-QString appversion = "v. 1.0.1106 (64-bit)";
-QString linuxinstalldir = "/usr/share/cyclobranch/";
+QString appversion = "v. 1.0.1216 (64-bit)";
+
+#if OS_TYPE == UNX
+	QString installdir = "/usr/share/cyclobranch/";
+#endif
+
+#if OS_TYPE == OSX
+	QString installdir = "";
+#endif
 
 
 void storeString(string& s, ofstream& os) {
@@ -120,7 +127,7 @@ void parseBranch(peptideType peptidetype, string& composition, vector<string>& v
 			if (s[i] == '(') {
 				if (i > 0) {
 					b.clear();
-					b.setComposition(s.substr(0, i - 1), false);
+					b.setComposition(s.substr(0, i), false);
 					branchstart = getNumberOfBricks(b.getComposition());
 					s[i] = '-';
 				}
@@ -135,7 +142,7 @@ void parseBranch(peptideType peptidetype, string& composition, vector<string>& v
 		for (int i = 0; i < (int)s.size(); i++) {
 			if (s[i] == ')') {
 				b.clear();
-				b.setComposition(s.substr(0, i - 1), false);
+				b.setComposition(s.substr(0, i), false);
 				branchend = getNumberOfBricks(b.getComposition()) - 1;
 				if (i < (int)s.size() - 1) {
 					s[i] = '-';

@@ -26,7 +26,10 @@
         <file>images/icons/84.png</file>
         <file>images/icons/80.png</file>
         <file>images/icons/57.png</file>
-        <file>images/icons/54.png</file>
         <file>images/icons/64.png</file>
+        <file>images/icons/95.png</file>
+        <file>images/icons/65.png</file>
+        <file>images/icons/56.png</file>
+        <file>images/icons/66.png</file>
     </qresource>
 </RCC>

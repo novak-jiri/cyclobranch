@@ -357,7 +357,7 @@ void cMainThread::run() {
 
 			// set candidate and check precursor mass error
 			c.setCandidate(v, netmp, startmodifid, endmodifid, middlemodifid, branchstart, branchend);
-			if (!calculatesummaries && !isInPpmMassErrorTolerance(charge(uncharge(parameters.precursormass, parameters.precursorcharge), (parameters.precursorcharge > 0)?1:-1), c.getPrecursorMass(parameters.bricksdatabase, &parameters), parameters.precursormasserrortolerance)) {
+			if (!calculatesummaries && !parameters.similaritysearch && !isInPpmMassErrorTolerance(charge(uncharge(parameters.precursormass, parameters.precursorcharge), (parameters.precursorcharge > 0)?1:-1), c.getPrecursorMass(parameters.bricksdatabase, &parameters), parameters.precursormasserrortolerance)) {
 				continue;
 			}
 
@@ -365,7 +365,7 @@ void cMainThread::run() {
 			candidates.getSet().insert(c);
 
 			if (calculatesummaries) {
-				*os << c.getSummaryFormula(parameters, parameters.sequencedatabase[i].getPeptideType()) << endl;
+				*os << c.getSummaryFormula(parameters, parameters.sequencedatabase[i].getPeptideType()).getSummary() << endl;
 			}
 		}
 		
@@ -375,7 +375,7 @@ void cMainThread::run() {
 			return;
 		}
 
-		*os << "Number of candidates in the precursor mass error tolerance found: " << candidates.size() << endl;
+		*os << "Number of candidates found: " << candidates.size() << endl;
 
 		graphreaderisworking = false;
 

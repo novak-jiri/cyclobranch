@@ -867,7 +867,7 @@ bool cCandidate::compare(cCandidate& candidate) {
 }
 
 
-vector<nodeEdge>& cCandidate::getPath() {
+vector<nodeEdge> cCandidate::getPath() {
 	return path;
 }
 
@@ -896,13 +896,25 @@ bool cCandidate::hasOnlyArtificialBricks(cBricksDatabase& brickdatabasewithcombi
 	if (numberofinternalbricks <= 2) {
 		cBrick b;
 		vector<int> intcomposition;
-		b.setComposition(internalcomposition,false);
+		b.setComposition(internalcomposition, false);
 		b.explodeToIntComposition(intcomposition);
 		for (int i = 0; i < (int)intcomposition.size(); i++) {
 			if (!brickdatabasewithcombinations[intcomposition[i] - 1].isArtificial()) {
 				return false;
 			}
 		}
+		return true;
+	}
+	return false;
+}
+
+
+bool cCandidate::hasLastBrickArtificial(cBricksDatabase& brickdatabasewithcombinations) {
+	cBrick b;
+	vector<int> intcomposition;
+	b.setComposition(internalcomposition, false);
+	b.explodeToIntComposition(intcomposition);
+	if ((intcomposition.size() > 0) && brickdatabasewithcombinations[intcomposition.back() - 1].isArtificial()) {
 		return true;
 	}
 	return false;
@@ -932,7 +944,7 @@ void cCandidate::getLassoRotations(vector<cCandidate>& lassorotations, bool incl
 }
 
 
-string cCandidate::getSummaryFormula(cParameters& parameters, peptideType peptidetype) {
+cSummaryFormula cCandidate::getSummaryFormula(cParameters& parameters, peptideType peptidetype) {
 	cBrick b;
 	vector<int> bricks;
 	b.setComposition(internalcomposition, false);
@@ -977,8 +989,10 @@ string cCandidate::getSummaryFormula(cParameters& parameters, peptideType peptid
 			partial = true;
 		}
 	}
-	
-	return partial?formula.getFormula() + " (partial)":formula.getFormula();
+
+	formula.setPartial(partial);
+
+	return formula;
 }
 
 

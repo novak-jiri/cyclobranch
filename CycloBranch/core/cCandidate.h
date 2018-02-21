@@ -383,9 +383,9 @@ public:
 
 	/**
 		\brief Get a path in the de novo graph corresponding to the peptide sequence candidate.
-		\retval vector<nodeEdge> reference to a vector of pairs node and edge
+		\retval vector<nodeEdge> vector of pairs node and edge
 	*/ 
-	vector<nodeEdge>& getPath();
+	vector<nodeEdge> getPath();
 
 
 	/**
@@ -402,6 +402,14 @@ public:
 		\retval bool true when the candidate is composed exclusively from artificial bricks; false when the candidate constains a regular brick
 	*/ 
 	bool hasOnlyArtificialBricks(cBricksDatabase& brickdatabasewithcombinations);
+
+	
+	/**
+		\brief Check if the last brick is artificial.
+		\param brickdatabasewithcombinations reference to an input database of bricks with combinations of bricks
+		\retval bool true if the last brick is artificial, false otherwise
+	*/ 
+	bool hasLastBrickArtificial(cBricksDatabase& brickdatabasewithcombinations);
 
 	
 	/**
@@ -424,9 +432,9 @@ public:
 		\brief Get the summary formula of the peptide sequence candidate.
 		\param parameters a reference to the parameters of the application
 		\param peptidetype the type of peptide
-		\retval string the summary formula
+		\retval cSummaryFormula the summary formula
 	*/ 
-	string getSummaryFormula(cParameters& parameters, peptideType peptidetype);
+	cSummaryFormula getSummaryFormula(cParameters& parameters, peptideType peptidetype);
 
 
 	/**

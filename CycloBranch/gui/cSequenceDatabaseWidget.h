@@ -23,6 +23,8 @@ class QVBoxLayout;
 class QTableWidget;
 class QTableWidgetItem;
 class QPushButton;
+class QLineEdit;
+class QCheckBox;
 
 
 /**
@@ -64,6 +66,7 @@ public:
 
 
 private:
+
 	QWidget* parent;
 	QPushButton* insertrow;
 	QPushButton* removechecked;
@@ -71,6 +74,14 @@ private:
 	QPushButton* load;
 	QPushButton* save;
 	QPushButton* saveas;
+
+	QWidget* rowsfilterwidget;
+	QHBoxLayout* rowsfilterhbox;
+	QLineEdit* rowsfilterline;
+	QCheckBox* rowsfiltercasesensitive;
+	QPushButton* rowsfilterbutton;
+	QPushButton* rowsfilterclearbutton;
+
 	QTableWidget* database;
 	QHBoxLayout* buttons;
 	QVBoxLayout* mainlayout;
@@ -85,6 +96,8 @@ private:
 
 	cAllocator<QTableWidgetItem> widgetitemallocator;
 
+	bool datamodified;
+
 	void deleteTable(bool enableprogress);
 
 	void removeRow(int row);
@@ -94,6 +107,8 @@ private:
 	bool checkFormula(int row, const string& summary);
 
 	bool checkSequence(int row);
+
+	void setDataModified(bool datamodified);
 
 
 protected:
@@ -112,17 +127,23 @@ private slots:
 
 	void loadDatabase();
 
-	void saveDatabase();
+	bool saveDatabase();
 
-	void saveDatabaseAs();
+	bool saveDatabaseAs();
 
 	void addRow();
 
-	void removeEmptyRows();
+	void removeCheckedRows();
 
 	void itemChanged(QTableWidgetItem* item);
 
 	void headerItemDoubleClicked(int index);
+
+	void filterRows();
+
+	void resetFilter();
+
+	void comboBoxModified(int index);
 
 };
 

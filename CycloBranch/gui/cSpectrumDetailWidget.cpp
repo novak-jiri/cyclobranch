@@ -148,8 +148,6 @@ cSpectrumDetailWidget::~cSpectrumDetailWidget() {
 				break;
 			}
 
-			delete actionExportPeptide;
-
 		}
 		
 		delete hsplitter1;
@@ -158,6 +156,9 @@ cSpectrumDetailWidget::~cSpectrumDetailWidget() {
 		delete vsplitter;
 
 		delete actionExportSpectrum;
+		delete actionFind;
+		delete actionPrevious;
+		delete actionNext;
 		delete actionZoomIn;
 		delete actionZoomOut;
 		delete actionZoomReset;
@@ -165,6 +166,9 @@ cSpectrumDetailWidget::~cSpectrumDetailWidget() {
 		delete actionHideUnmatched;
 		delete actionHideScrambled;
 		delete actionMouseMzSelection;
+
+		delete finddialog;
+		delete exportdialog;
 
 	}
 }
@@ -219,19 +223,37 @@ void cSpectrumDetailWidget::prepareToShow(peptideType peptidetype) {
 		toolbarExport->setMovable(false);
 		toolbarExport->setFloatable(false);
 
-		actionExportSpectrum = new QAction(QIcon(":/images/icons/54.png"), tr("Export Spectrum"), this);
+		actionExportSpectrum = new QAction(QIcon(":/images/icons/66.png"), tr("Export Image"), this);
 		actionExportSpectrum->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_E));
-		actionExportSpectrum->setToolTip("Export Spectrum (Ctrl + E)");
+		actionExportSpectrum->setToolTip("Export Image (Ctrl + E)");
 		toolbarExport->addAction(actionExportSpectrum);
-		connect(actionExportSpectrum, SIGNAL(triggered()), this, SLOT(exportSpectrum()));
+		connect(actionExportSpectrum, SIGNAL(triggered()), this, SLOT(openExportDialog()));
 
-		if (parameters && ((parameters->mode == denovoengine) || (parameters->mode == singlecomparison) || (parameters->mode == databasesearch))) {
-			actionExportPeptide = new QAction(QIcon(":/images/icons/57.png"), tr("Export Peptide"), this);
-			actionExportPeptide->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_P));
-			actionExportPeptide->setToolTip("Export Peptide (Ctrl + P)");
-			toolbarExport->addAction(actionExportPeptide);
-			connect(actionExportPeptide, SIGNAL(triggered()), this, SLOT(exportPeptide()));
-		}
+
+		toolbarFind = addToolBar(tr("Find"));
+		toolbarFind->setMovable(false);
+		toolbarFind->setFloatable(false);
+				
+		actionFind = new QAction(QIcon(":/images/icons/65.png"), tr("Find Text"), this);
+		actionFind->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_F));
+		actionFind->setToolTip("Find Text (Ctrl + F)");
+		toolbarFind->addAction(actionFind);
+		connect(actionFind, SIGNAL(triggered()), this, SLOT(openFindDialog()));
+
+		actionPrevious = new QAction(QIcon(":/images/icons/56.png"), tr("Find Previous"), this);
+		actionPrevious->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_1));
+		actionPrevious->setToolTip("Find Previous (Ctrl + 1)");
+		toolbarFind->addAction(actionPrevious);
+		connect(actionPrevious, SIGNAL(triggered()), this, SLOT(movePrevious()));
+		actionPrevious->setDisabled(true);
+
+		actionNext = new QAction(QIcon(":/images/icons/57.png"), tr("Find Next"), this);
+		actionNext->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_2));
+		actionNext->setToolTip("Find Next (Ctrl + 2)");
+		toolbarFind->addAction(actionNext);
+		connect(actionNext, SIGNAL(triggered()), this, SLOT(moveNext()));
+		actionNext->setDisabled(true);
+
 
 		toolbarZoom = addToolBar(tr("Zoom"));
 		toolbarZoom->setMovable(false);
@@ -521,6 +543,9 @@ void cSpectrumDetailWidget::prepareToShow(peptideType peptidetype) {
 		setCentralWidget(vsplitter);
 		centralWidget()->setContentsMargins(10, 10, 10, 10);
 
+		finddialog = new cFindDialog(this);
+		exportdialog = new cExportDialog(this);
+
 		resize(1280, 700);
 
 		if (parameters && theoreticalspectrum) {
@@ -555,6 +580,7 @@ void cSpectrumDetailWidget::prepareToShow(peptideType peptidetype) {
 
 			spectrumscene->initialize(parameters, theoreticalspectrum);
 			textbrowser->setHtml(getDetailsAsHTMLString().c_str());
+
 		}
 
 		preparedToShow = true;
@@ -563,12 +589,88 @@ void cSpectrumDetailWidget::prepareToShow(peptideType peptidetype) {
 }
 
 
+void cSpectrumDetailWidget::findAll(const QString& str, QTextDocument::FindFlags opt) {
+
+	currentfinditem = 0;
+
+	// textbrowser
+	QList<QTextEdit::ExtraSelection> extraSelections;
+	textbrowser->moveCursor(QTextCursor::Start);
+	QColor color = QColor(Qt::yellow);
+ 
+	while (textbrowser->find(str, opt)) {
+		QTextEdit::ExtraSelection extra;
+		extra.format.setBackground(color);        
+ 
+		extra.cursor = textbrowser->textCursor();
+		extraSelections.append(extra);
+	}
+ 
+	textbrowser->setExtraSelections(extraSelections);
+
+	
+	// textedit
+	extraSelections.clear();
+	textedit->moveCursor(QTextCursor::Start);
+
+	while (textedit->find(str, opt)) {
+		QTextEdit::ExtraSelection extra;
+		extra.format.setBackground(color);        
+ 
+		extra.cursor = textedit->textCursor();
+		extraSelections.append(extra);
+	}
+ 
+	textedit->setExtraSelections(extraSelections);
+
+
+	if (textbrowser->extraSelections().size() + textedit->extraSelections().size() == 0) {
+		actionPrevious->setDisabled(true);
+		actionNext->setDisabled(true);
+
+		QMessageBox msgBox;
+		QString errstr = "No results were found.";
+		msgBox.setWindowTitle("Find Text");
+		msgBox.setText(errstr);
+		msgBox.exec();
+	}
+	else {
+		actionPrevious->setDisabled(false);
+		actionNext->setDisabled(false);
+	}
+
+
+	// order changed because of setFocus()
+	if (textedit->extraSelections().size() > 0) {
+		textedit->setTextCursor(textedit->extraSelections().at(0).cursor);
+		textedit->setFocus();
+	}
+
+
+	if (textbrowser->extraSelections().size() > 0) {
+		textbrowser->setTextCursor(textbrowser->extraSelections().at(0).cursor);
+		textbrowser->setFocus();
+	}
+
+}
+
+
+void cSpectrumDetailWidget::exportImage(bool exportspectrum) {
+	if (exportspectrum) {
+		exportSpectrum();
+	}
+	else {
+		exportPeptide();
+	}
+}
+
+
 void cSpectrumDetailWidget::keyPressEvent(QKeyEvent *event) {
-	if(event->key() == Qt::Key_Escape) {
+	if (event->key() == Qt::Key_Escape) {
 		hide();
     }
 	
-	if(event->key() == Qt::Key_Enter) {
+	if ((event->key() == Qt::Key_Enter) || (event->key() == Qt::Key_Return)) {
 		setMZInterval();
     }
 }
@@ -586,10 +688,10 @@ void cSpectrumDetailWidget::setMZInterval() {
 
 
 void cSpectrumDetailWidget::exportSpectrum() {
-	#if OS_TYPE == UNX
+	#if OS_TYPE == WIN
 		QString filename = QFileDialog::getSaveFileName(this, tr("Export Spectrum..."), "./", "PDF Files (*.pdf);; PS Files (*.ps);; PNG Files (*.png);; SVG Files (*.svg)");
 	#else
-		QString filename = QFileDialog::getSaveFileName(this, tr("Export Spectrum..."), "./", "PDF Files (*.pdf);; PS Files (*.ps);; PNG Files (*.png)");
+		QString filename = QFileDialog::getSaveFileName(this, tr("Export Spectrum..."), "./", "PDF Files (*.pdf);; PNG Files (*.png);; SVG Files (*.svg)");
 	#endif
 	if (!filename.isEmpty()) {
 		regex rx;
@@ -601,11 +703,13 @@ void cSpectrumDetailWidget::exportSpectrum() {
 			selected = true;
 		}
 
-		rx = ".+\\.ps$";
-		if (!selected && (regex_search(filename.toStdString(), rx))) {
-			spectrumscene->exportToPDF(filename, true);
-			selected = true;
-		}
+		#if OS_TYPE == WIN
+			rx = ".+\\.ps$";
+			if (!selected && (regex_search(filename.toStdString(), rx))) {
+				spectrumscene->exportToPDF(filename, true);
+				selected = true;
+			}
+		#endif
 
 		rx = ".+\\.png$";
 		if (!selected && (regex_search(filename.toStdString(), rx))) {
@@ -613,13 +717,11 @@ void cSpectrumDetailWidget::exportSpectrum() {
 			selected = true;
 		}
 
-		#if OS_TYPE == UNX
-			rx = ".+\\.svg$";
-			if (!selected && (regex_search(filename.toStdString(), rx))) {
-				spectrumscene->exportToSVG(filename);
-				selected = true;
-			}
-		#endif
+		rx = ".+\\.svg$";
+		if (!selected && (regex_search(filename.toStdString(), rx))) {
+			spectrumscene->exportToSVG(filename);
+			selected = true;
+		}
 
 		if (!selected) {
 			QMessageBox msgBox;
@@ -632,10 +734,10 @@ void cSpectrumDetailWidget::exportSpectrum() {
 
 
 void cSpectrumDetailWidget::exportPeptide() {
-	#if OS_TYPE == UNX
+	#if OS_TYPE == WIN
 		QString filename = QFileDialog::getSaveFileName(this, tr("Export Peptide..."), "./", "PDF Files (*.pdf);; PS Files (*.ps);; PNG Files (*.png);; SVG Files (*.svg)");
 	#else
-		QString filename = QFileDialog::getSaveFileName(this, tr("Export Peptide..."), "./", "PDF Files (*.pdf);; PS Files (*.ps);; PNG Files (*.png)");
+		QString filename = QFileDialog::getSaveFileName(this, tr("Export Peptide..."), "./", "PDF Files (*.pdf);; PNG Files (*.png);; SVG Files (*.svg)");
 	#endif
 	if (!filename.isEmpty() && parameters) {
 		regex rx;
@@ -649,11 +751,13 @@ void cSpectrumDetailWidget::exportPeptide() {
 					selected = true;
 				}
 
-				rx = ".+\\.ps$";
-				if (!selected && (regex_search(filename.toStdString(), rx))) {
-					linearwidget->exportToPDF(filename, true);
-					selected = true;
-				}
+				#if OS_TYPE == WIN
+					rx = ".+\\.ps$";
+					if (!selected && (regex_search(filename.toStdString(), rx))) {
+						linearwidget->exportToPDF(filename, true);
+						selected = true;
+					}
+				#endif
 
 				rx = ".+\\.png$";
 				if (!selected && (regex_search(filename.toStdString(), rx))) {
@@ -661,13 +765,11 @@ void cSpectrumDetailWidget::exportPeptide() {
 					selected = true;
 				}
 
-				#if OS_TYPE == UNX
-					rx = ".+\\.svg$";
-					if (!selected && (regex_search(filename.toStdString(), rx))) {
-						linearwidget->exportToSVG(filename);
-						selected = true;
-					}
-				#endif
+				rx = ".+\\.svg$";
+				if (!selected && (regex_search(filename.toStdString(), rx))) {
+					linearwidget->exportToSVG(filename);
+					selected = true;
+				}
 				break;
 			case cyclic:
 				rx = ".+\\.pdf$";
@@ -676,26 +778,25 @@ void cSpectrumDetailWidget::exportPeptide() {
 					selected = true;
 				}
 
-				rx = ".+\\.ps$";
-				if (!selected && (regex_search(filename.toStdString(), rx))) {
-					cyclicwidget->exportToPDF(filename, true);
-					selected = true;
-				}
-
-
+				#if OS_TYPE == WIN
+					rx = ".+\\.ps$";
+					if (!selected && (regex_search(filename.toStdString(), rx))) {
+						cyclicwidget->exportToPDF(filename, true);
+						selected = true;
+					}
+				#endif
+				
 				rx = ".+\\.png$";
 				if (!selected && (regex_search(filename.toStdString(), rx))) {
 					cyclicwidget->exportToPNG(filename);
 					selected = true;
 				}
 
-				#if OS_TYPE == UNX
-					rx = ".+\\.svg$";
-					if (!selected && (regex_search(filename.toStdString(), rx))) {
-						cyclicwidget->exportToSVG(filename);
-						selected = true;
-					}
-				#endif
+				rx = ".+\\.svg$";
+				if (!selected && (regex_search(filename.toStdString(), rx))) {
+					cyclicwidget->exportToSVG(filename);
+					selected = true;
+				}
 				break;
 			case branched:
 				rx = ".+\\.pdf$";
@@ -704,12 +805,13 @@ void cSpectrumDetailWidget::exportPeptide() {
 					selected = true;
 				}
 
-				rx = ".+\\.ps$";
-				if (!selected && (regex_search(filename.toStdString(), rx))) {
-					branchedwidget->exportToPDF(filename, true);
-					selected = true;
-				}
-
+				#if OS_TYPE == WIN
+					rx = ".+\\.ps$";
+					if (!selected && (regex_search(filename.toStdString(), rx))) {
+						branchedwidget->exportToPDF(filename, true);
+						selected = true;
+					}
+				#endif
 
 				rx = ".+\\.png$";
 				if (!selected && (regex_search(filename.toStdString(), rx))) {
@@ -717,13 +819,11 @@ void cSpectrumDetailWidget::exportPeptide() {
 					selected = true;
 				}
 
-				#if OS_TYPE == UNX
-					rx = ".+\\.svg$";
-					if (!selected && (regex_search(filename.toStdString(), rx))) {
-						branchedwidget->exportToSVG(filename);
-						selected = true;
-					}
-				#endif
+				rx = ".+\\.svg$";
+				if (!selected && (regex_search(filename.toStdString(), rx))) {
+					branchedwidget->exportToSVG(filename);
+					selected = true;
+				}
 				break;
 			case lasso:
 				rx = ".+\\.pdf$";
@@ -732,26 +832,25 @@ void cSpectrumDetailWidget::exportPeptide() {
 					selected = true;
 				}
 
-				rx = ".+\\.ps$";
-				if (!selected && (regex_search(filename.toStdString(), rx))) {
-					lassowidget->exportToPDF(filename, true);
-					selected = true;
-				}
-
-
+				#if OS_TYPE == WIN
+					rx = ".+\\.ps$";
+					if (!selected && (regex_search(filename.toStdString(), rx))) {
+						lassowidget->exportToPDF(filename, true);
+						selected = true;
+					}
+				#endif
+				
 				rx = ".+\\.png$";
 				if (!selected && (regex_search(filename.toStdString(), rx))) {
 					lassowidget->exportToPNG(filename);
 					selected = true;
 				}
 
-				#if OS_TYPE == UNX
-					rx = ".+\\.svg$";
-					if (!selected && (regex_search(filename.toStdString(), rx))) {
-						lassowidget->exportToSVG(filename);
-						selected = true;
-					}
-				#endif
+				rx = ".+\\.svg$";
+				if (!selected && (regex_search(filename.toStdString(), rx))) {
+					lassowidget->exportToSVG(filename);
+					selected = true;
+				}
 				break;
 			case linearpolysaccharide:
 				break;
@@ -767,6 +866,51 @@ void cSpectrumDetailWidget::exportPeptide() {
 			msgBox.setText(errstr);
 			msgBox.exec();
 		}
+	}
+}
+
+
+void cSpectrumDetailWidget::openFindDialog() {
+	finddialog->exec();
+}
+
+
+void cSpectrumDetailWidget::openExportDialog() {
+	if (parameters && ((parameters->mode == denovoengine) || (parameters->mode == singlecomparison) || (parameters->mode == databasesearch))) {
+		exportdialog->exec();
+	}
+	else {
+		exportSpectrum();
+	}
+}
+
+
+void cSpectrumDetailWidget::movePrevious() {
+	int count = textbrowser->extraSelections().size() + textedit->extraSelections().size();
+	currentfinditem = (currentfinditem + count - 1)%count;
+
+	if (currentfinditem < textbrowser->extraSelections().size()) {
+		textbrowser->setFocus();
+		textbrowser->setTextCursor(textbrowser->extraSelections().at(currentfinditem).cursor);
+	}
+	else {
+		textedit->setFocus();
+		textedit->setTextCursor(textedit->extraSelections().at(currentfinditem - textbrowser->extraSelections().size()).cursor);
+	}
+}
+
+
+void cSpectrumDetailWidget::moveNext() {
+	int count = textbrowser->extraSelections().size() + textedit->extraSelections().size();
+	currentfinditem = (currentfinditem + 1)%count;
+
+	if (currentfinditem < textbrowser->extraSelections().size()) {
+		textbrowser->setFocus();
+		textbrowser->setTextCursor(textbrowser->extraSelections().at(currentfinditem).cursor);
+	}
+	else {
+		textedit->setFocus();
+		textedit->setTextCursor(textedit->extraSelections().at(currentfinditem - textbrowser->extraSelections().size()).cursor);
 	}
 }
 

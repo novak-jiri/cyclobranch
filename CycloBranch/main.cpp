@@ -20,9 +20,9 @@ int main(int argc, char** argv) {
 	QApplication app(argc, argv);
 	Q_INIT_RESOURCE(images);
 
-	#if OS_TYPE == UNX
+	#if OS_TYPE != WIN
 		setlocale(LC_NUMERIC,"C");
-		chdir(linuxinstalldir.toStdString().c_str());
+		chdir(installdir.toStdString().c_str());
 	#endif
 	qRegisterMetaType<cParameters>("cParameters");
 	qRegisterMetaType<vector<fragmentIonType> >("vector<fragmentIonType>");

@@ -19,6 +19,7 @@
 #include <QMessageBox>
 #include <QKeyEvent>
 #include <QIcon>
+#include <QScrollArea>
 
 
 cParametersWidget::cParametersWidget(QWidget* parent) {
@@ -63,7 +64,7 @@ cParametersWidget::cParametersWidget(QWidget* parent) {
 
 	peaklistline = new QLineEdit();
 	peaklistbutton = new QPushButton("Select");
-	#if OS_TYPE == UNX
+	#if OS_TYPE != WIN
 		peaklistline->setToolTip("Select the peaklist. Following formats are supported: txt, mgf, mzML, mzXML.");
 		peaklistbutton->setToolTip("Select the peaklist. Following formats are supported: txt, mgf, mzML, mzXML.");
 	#else
@@ -208,6 +209,10 @@ cParametersWidget::cParametersWidget(QWidget* parent) {
 	enablescrambling->setToolTip("When checked, scrambled fragment ions of cyclic peptides are generated in theoretical spectra.");
 	miscformlayout->addRow(tr("Enable Scrambling: "), enablescrambling);
 
+	similaritysearch = new QCheckBox();
+	similaritysearch->setToolTip("It enables similarity search when a peaklist is searched against a database of sequences.\nThis feature disables filtering of peptide sequence candidates by precursor mass.\nIt may be useful to determine a peptide family when a similar peptide is contained in the database.");
+	miscformlayout->addRow(tr("Enable Similarity Search: "), similaritysearch);
+
 	miscgroupbox = new QGroupBox("Miscellaneous");
 	miscgroupbox->setLayout(miscformlayout);
 
@@ -312,13 +317,21 @@ cParametersWidget::cParametersWidget(QWidget* parent) {
 		
 
 	hlayout = new QHBoxLayout();
+	hlayout->setContentsMargins(0, 0, 0, 0);
 	hlayout->addLayout(vlayout1);
 	hlayout->addLayout(vlayout2);
 
+	hlayoutwidget = new QWidget();
+	hlayoutwidget->setLayout(hlayout);
+
+	hlayoutscroll = new QScrollArea();
+	hlayoutscroll->setWidgetResizable(true);
+	hlayoutscroll->setFrameShape(QFrame::NoFrame);
+	hlayoutscroll->setWidget(hlayoutwidget);
+
 
 	vlayout = new QVBoxLayout();
-	vlayout->addLayout(hlayout);	
-	vlayout->addStretch(1);
+	vlayout->addWidget(hlayoutscroll);	
 	vlayout->addLayout(buttons);
 
 	setLayout(vlayout);
@@ -355,12 +368,12 @@ cParametersWidget::cParametersWidget(QWidget* parent) {
 		lastdirselectmodifications = "./Modifications/";
 		lastdirselectsequencedatabase = "./SequenceDatabases/";
 	#else
-		lastdirloadsettings = linuxinstalldir + "Settings/";
-		lastdirsavesettings = linuxinstalldir + "Settings/";
-		lastdirselectpeaklist = linuxinstalldir + "PeakLists/";
-		lastdirselectbricksdatabase = linuxinstalldir + "BrickDatabases/";
-		lastdirselectmodifications = linuxinstalldir + "Modifications/";
-		lastdirselectsequencedatabase = linuxinstalldir + "SequenceDatabases/";
+		lastdirloadsettings = installdir + "Settings/";
+		lastdirsavesettings = installdir + "Settings/";
+		lastdirselectpeaklist = installdir + "PeakLists/";
+		lastdirselectbricksdatabase = installdir + "BrickDatabases/";
+		lastdirselectmodifications = installdir + "Modifications/";
+		lastdirselectsequencedatabase = installdir + "SequenceDatabases/";
 	#endif
 	
 }
@@ -407,6 +420,7 @@ cParametersWidget::~cParametersWidget() {
 	delete cyclicnterminus;
 	delete cycliccterminus;
 	delete enablescrambling;
+	delete similaritysearch;
 	delete miscformlayout;
 	delete miscgroupbox;
 
@@ -435,6 +449,8 @@ cParametersWidget::~cParametersWidget() {
 	delete vlayout1;
 	delete vlayout2;
 	delete hlayout;
+	delete hlayoutwidget;
+	delete hlayoutscroll;
 	delete vlayout;
 }
 
@@ -477,7 +493,7 @@ void cParametersWidget::setTag(int peptidetypeindex, QString tag) {
 
 
 void cParametersWidget::keyPressEvent(QKeyEvent *event) {
-    if(event->key() == Qt::Key_Escape) {
+    if (event->key() == Qt::Key_Escape) {
 		restoreParameters();
     }
 }
@@ -518,6 +534,7 @@ void cParametersWidget::loadSettings() {
 		settings.value("cyclicnterminus", 0).toInt() == 0 ? cyclicnterminus->setChecked(false) : cyclicnterminus->setChecked(true);
 		settings.value("cycliccterminus", 0).toInt() == 0 ? cycliccterminus->setChecked(false) : cycliccterminus->setChecked(true);
 		settings.value("enablescrambling", 0).toInt() == 0 ? enablescrambling->setChecked(false) : enablescrambling->setChecked(true);
+		settings.value("similaritysearch", 0).toInt() == 0 ? similaritysearch->setChecked(false) : similaritysearch->setChecked(true);
 
 		mode->setCurrentIndex(settings.value("mode", 0).toInt());
 		sequencedatabaseline->setText(settings.value("sequencedatabase", "").toString());
@@ -578,6 +595,7 @@ void cParametersWidget::saveSettings() {
 	cyclicnterminus->isChecked() ? settings.setValue("cyclicnterminus", 1) : settings.setValue("cyclicnterminus", 0);
 	cycliccterminus->isChecked() ? settings.setValue("cycliccterminus", 1) : settings.setValue("cycliccterminus", 0);
 	enablescrambling->isChecked() ? settings.setValue("enablescrambling", 1) : settings.setValue("enablescrambling", 0);
+	similaritysearch->isChecked() ? settings.setValue("similaritysearch", 1) : settings.setValue("similaritysearch", 0);
 
 	settings.setValue("mode", mode->currentIndex());
 	settings.setValue("sequencedatabase", sequencedatabaseline->text());
@@ -615,7 +633,7 @@ void cParametersWidget::saveSettingsAs() {
 
 
 void cParametersWidget::peaklistButtonReleased() {
-	#if OS_TYPE == UNX
+	#if OS_TYPE != WIN
 		QString filename = QFileDialog::getOpenFileName(this, tr("Select Peaklist..."), lastdirselectpeaklist, tr("Peak Lists (*.txt *.mgf *.mzML *.mzXML)"));
 	#else
 		QString filename = QFileDialog::getOpenFileName(this, tr("Select Peaklist..."), lastdirselectpeaklist, tr("Peak Lists (*.txt *.mgf *.mzML *.mzXML *.baf)"));
@@ -723,6 +741,7 @@ bool cParametersWidget::updateParameters() {
 	parameters.cyclicnterminus = cyclicnterminus->isChecked();
 	parameters.cycliccterminus = cycliccterminus->isChecked();
 	parameters.enablescrambling = enablescrambling->isChecked();
+	parameters.similaritysearch = similaritysearch->isChecked();
 
 	parameters.mode = (modeType)mode->currentIndex();
 	parameters.sequencedatabasefilename = sequencedatabaseline->text().toStdString();
@@ -813,6 +832,7 @@ void cParametersWidget::restoreParameters() {
 	cyclicnterminus->setChecked(parameters.cyclicnterminus);
 	cycliccterminus->setChecked(parameters.cycliccterminus);
 	enablescrambling->setChecked(parameters.enablescrambling);
+	similaritysearch->setChecked(parameters.similaritysearch);
 
 	mode->setCurrentIndex(parameters.mode);
 	sequencedatabaseline->setText(parameters.sequencedatabasefilename.c_str());
@@ -955,6 +975,7 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 		sequencedatabaseline->setDisabled(true);
 		sequencedatabasebutton->setDisabled(true);
 		blindedges->setDisabled(false);
+		similaritysearch->setDisabled(true);
 		maximumnumberofthreads->setDisabled(false);
 		scoretype->setDisabled(false);
 		hitsreported->setDisabled(false);
@@ -984,6 +1005,7 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 		sequencedatabaseline->setDisabled(true);
 		sequencedatabasebutton->setDisabled(true);
 		blindedges->setDisabled(true);
+		similaritysearch->setDisabled(true);
 		maximumnumberofthreads->setDisabled(true);
 		scoretype->setDisabled(true);
 		hitsreported->setDisabled(true);
@@ -1011,6 +1033,7 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 		modificationsline->setDisabled(false);
 		modificationsbutton->setDisabled(false);
 		blindedges->setDisabled(true);
+		similaritysearch->setDisabled(false);
 		sequencedatabaseline->setDisabled(false);
 		sequencedatabasebutton->setDisabled(false);
 		maximumnumberofthreads->setDisabled(false);
@@ -1040,6 +1063,7 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 		modificationsline->setDisabled(true);
 		modificationsbutton->setDisabled(true);
 		blindedges->setDisabled(true);
+		similaritysearch->setDisabled(true);
 		sequencedatabaseline->setDisabled(false);
 		sequencedatabasebutton->setDisabled(false);
 		maximumnumberofthreads->setDisabled(true);

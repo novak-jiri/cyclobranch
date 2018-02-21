@@ -32,7 +32,7 @@ cAboutWidget::cAboutWidget(QWidget* parent) {
 	message->setReadOnly(true);
 	message->setAcceptRichText(true);
 	message->setOpenExternalLinks(true);
-	message->setHtml("<br/>" + splash + "<b>" + appname + " " + appversion + "</b><br/><br/>" + title + developers /*+ licence*/ + acknowledgement);
+	message->setHtml("<br/>" + splash + "<b>" + appname + " " + appversion + "</b><br/><br/>" + title + developers + licence + acknowledgement);
 
 	buttonbox = new QDialogButtonBox(QDialogButtonBox::Ok);
 	//buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
@@ -62,7 +62,7 @@ void cAboutWidget::closeEvent(QCloseEvent *event) {
 
 
 void cAboutWidget::keyPressEvent(QKeyEvent *event) {
-    if(event->key() == Qt::Key_Escape) {
+    if (event->key() == Qt::Key_Escape) {
 		hide();
     }
 }

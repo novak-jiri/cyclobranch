@@ -239,7 +239,7 @@ void cDrawPeptideWidget::setSequence(int peptidetypeindex, QString sequence) {
 
 
 void cDrawPeptideWidget::keyPressEvent(QKeyEvent *event) {
-    if(event->key() == Qt::Key_Escape) {
+    if (event->key() == Qt::Key_Escape) {
 		hide();
     }
 }
@@ -574,6 +574,9 @@ void cDrawPeptideWidget::sequenceChanged() {
 		}
 
 		if ((peptidetype == branched) || (peptidetype == lasso)) {
+			branchstart = theoreticalspectrum.getCandidate().getBranchStart();
+			branchend = theoreticalspectrum.getCandidate().getBranchEnd();
+
 			numberofblocksbackbone->setValue((int)v.size() - branchend + branchstart);
 			numberofblocksbranch->setValue(branchend - branchstart);
 			branchposition->setValue(branchstart + 1);
@@ -644,7 +647,8 @@ void cDrawPeptideWidget::drawPeptide(vector<string>& composition, cBricksDatabas
 				if (lassorotations[i].getBranchEnd() == numberofbricks - 1) {
 					vector<string> v;
 					v.push_back(lassorotations[i].getComposition());
-					theoreticalspectrum.getCandidate().setCandidate(v, theoreticalspectrum.getCandidate().getPath(), theoreticalspectrum.getCandidate().getStartModifID(), theoreticalspectrum.getCandidate().getEndModifID(), theoreticalspectrum.getCandidate().getMiddleModifID(), lassorotations[i].getBranchStart(), lassorotations[i].getBranchEnd());
+					vector<nodeEdge> cpath = theoreticalspectrum.getCandidate().getPath();
+					theoreticalspectrum.getCandidate().setCandidate(v, cpath, theoreticalspectrum.getCandidate().getStartModifID(), theoreticalspectrum.getCandidate().getEndModifID(), theoreticalspectrum.getCandidate().getMiddleModifID(), lassorotations[i].getBranchStart(), lassorotations[i].getBranchEnd());
 					break;
 				}
 			}

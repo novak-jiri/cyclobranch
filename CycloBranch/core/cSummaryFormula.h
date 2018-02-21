@@ -21,6 +21,8 @@ using namespace boost;
 */
 class cSummaryFormula {
 
+	bool partial;
+
 	string formula;
 
 	void explodeSummary(map<string, int>& atoms, string& summary);
@@ -36,9 +38,10 @@ public:
 
 	/**
 		\brief The constructor.
-		\brief formula a chemical formula
+		\param formula a chemical formula
+		\param partial true when the formula is incomplete
 	*/ 
-	cSummaryFormula(string& formula);
+	cSummaryFormula(string& formula, bool partial = false);
 
 
 	/**
@@ -50,15 +53,30 @@ public:
 	/**
 		\brief Set the formula.
 		\param formula a chemical formula
+		\param partial true when the formula is incomplete
 	*/
-	void setFormula(const string& formula);
+	void setFormula(const string& formula, bool partial = false);
 
 
 	/**
-		\brief Get the formula.
-		\retval string reference to the formula
+		\brief Get the summary formula as a string.
+		\retval string formula as a string 
 	*/
-	string& getFormula();
+	string getSummary();
+
+
+	/**
+		\brief Check if the formula is incomplete or not.
+		\retval bool true when the formula is incomplete, false when the formula is complete 
+	*/
+	bool isPartial();
+
+
+	/**
+		\brief Set the formula as partial.
+		\param partial true if the formula is incomplete 
+	*/
+	void setPartial(bool partial);
 
 
 	/**

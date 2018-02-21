@@ -156,13 +156,67 @@ void cTheoreticalSpectrum::generatePrecursorIon(vector<int>& intcomposition, cBr
 			peak.iontype = (fragmentIonType)i;
 
 			if (writedescription) {
+				string str;
+
 				if (parameters->precursorcharge > 0) {
-					peak.description = to_string(j) + "+ " + parameters->fragmentdefinitions[(fragmentIonType)i].name + ":";
+					peak.description = parameters->fragmentdefinitions[(fragmentIonType)i].name + ":";
+
+					if (!parameters->precursoradduct.empty()) {
+						str = "+" + parameters->precursoradduct;
+						if (j > 1) {
+							str += "+";
+							if (j > 2) {
+								str += to_string(j - 1);
+							}
+							str += "H";
+						}
+						peak.description.replace(peak.description.find("+zH"), 3, str);
+					}
+					else {
+						str = "+";
+						if (j > 1) {
+							str += to_string(j);
+						}
+						str += "H";
+						peak.description.replace(peak.description.find("+zH"), 3, str);
+					}
+
+					str = "]";
+					if (j > 1) {
+						str += to_string(j);
+					}
+					str += "+";
+					peak.description.replace(peak.description.find("]+"), 2, str);
 				}
 				else {
-					peak.description = to_string(j) + "- " + parameters->fragmentdefinitions[(fragmentIonType)i].name + ":";
-					peak.description.replace(peak.description.find("+z"), 2, "-z");
-					peak.description.replace(peak.description.find("]+"), 2, "]-");
+					peak.description = parameters->fragmentdefinitions[(fragmentIonType)i].name + ":";
+
+					if (!parameters->precursoradduct.empty()) {
+						str = "-" + parameters->precursoradduct;
+						if (j > 1) {
+							str += "-";
+							if (j > 2) {
+								str += to_string(j - 1);
+							}
+							str += "H";
+						}
+						peak.description.replace(peak.description.find("+zH"), 3, str);
+					}
+					else {
+						str = "-";
+						if (j > 1) {
+							str += to_string(j);
+						}
+						str += "H";
+						peak.description.replace(peak.description.find("+zH"), 3, str);
+					}
+
+					str = "]";
+					if (j > 1) {
+						str += to_string(j);
+					}
+					str += "-";
+					peak.description.replace(peak.description.find("]+"), 2, str);
 				}
 			}
 
@@ -703,7 +757,7 @@ int cTheoreticalSpectrum::compareLinear(cPeaksList& sortedpeaklist, cBricksDatab
 		clearFalseHits(series, parameters->fragmentionsfortheoreticalspectra);
 
 		for (int i = 0; i < theoreticalpeaksrealsize; i++) {
-			if ((theoreticalpeaks[i].matched > 0) && ((series.count(parameters->fragmentdefinitions[theoreticalpeaks[i].iontype].parent) == 0) || (series[parameters->fragmentdefinitions[theoreticalpeaks[i].iontype].parent][theoreticalpeaks[i].seriesid] == 0))) {		
+			if ((theoreticalpeaks[i].matched > 0) && (theoreticalpeaks[i].rotationid != -1) && ((series.count(parameters->fragmentdefinitions[theoreticalpeaks[i].iontype].parent) == 0) || (series[parameters->fragmentdefinitions[theoreticalpeaks[i].iontype].parent][theoreticalpeaks[i].seriesid] == 0))) {		
 				experimentalpeakmatches[theoreticalpeaks[i].matchedid].erase(experimentalpeakmatches[theoreticalpeaks[i].matchedid].find(i));
 				experimentalpeaks[theoreticalpeaks[i].matchedid].matched--;
 
@@ -1101,7 +1155,6 @@ int cTheoreticalSpectrum::compareLasso(cPeaksList& sortedpeaklist, cBricksDataba
 	int theoreticalpeaksrealsize = 0;
 	vector<cCandidate> lassorotations;
 
-
 	// normalize the candidate
 	candidate.getLassoRotations(lassorotations, false);
 	int numberofbricks = getNumberOfBricks(candidate.getComposition());
@@ -1109,11 +1162,13 @@ int cTheoreticalSpectrum::compareLasso(cPeaksList& sortedpeaklist, cBricksDataba
 		if (lassorotations[i].getBranchEnd() == numberofbricks - 1) {
 			vector<string> v;
 			v.push_back(lassorotations[i].getComposition());
-			candidate.setCandidate(v, candidate.getPath(), candidate.getStartModifID(), candidate.getEndModifID(), candidate.getMiddleModifID(), lassorotations[i].getBranchStart(), lassorotations[i].getBranchEnd());
+			string name = candidate.getName();
+			vector<nodeEdge> cpath = candidate.getPath();
+			candidate.setCandidate(v, cpath, candidate.getStartModifID(), candidate.getEndModifID(), candidate.getMiddleModifID(), lassorotations[i].getBranchStart(), lassorotations[i].getBranchEnd());
+			candidate.setName(name);
 			break;
 		}
 	}
-
 
 	// get branch-cyclic rotations
 	candidate.getLassoRotations(lassorotations, true);
@@ -1421,7 +1476,7 @@ int cTheoreticalSpectrum::compareLinearPolysaccharide(cPeaksList& sortedpeaklist
 		clearFalseHits(series, parameters->fragmentionsfortheoreticalspectra);
 
 		for (int i = 0; i < theoreticalpeaksrealsize; i++) {
-			if ((theoreticalpeaks[i].matched > 0) && ((series.count(parameters->fragmentdefinitions[theoreticalpeaks[i].iontype].parent) == 0) || (series[parameters->fragmentdefinitions[theoreticalpeaks[i].iontype].parent][theoreticalpeaks[i].seriesid] == 0))) {		
+			if ((theoreticalpeaks[i].matched > 0) && (theoreticalpeaks[i].rotationid != -1) && ((series.count(parameters->fragmentdefinitions[theoreticalpeaks[i].iontype].parent) == 0) || (series[parameters->fragmentdefinitions[theoreticalpeaks[i].iontype].parent][theoreticalpeaks[i].seriesid] == 0))) {		
 				experimentalpeakmatches[theoreticalpeaks[i].matchedid].erase(experimentalpeakmatches[theoreticalpeaks[i].matchedid].find(i));
 				experimentalpeaks[theoreticalpeaks[i].matchedid].matched--;
 

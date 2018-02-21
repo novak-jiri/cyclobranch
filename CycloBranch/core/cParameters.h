@@ -222,6 +222,12 @@ public:
 
 
 	/**
+		\brief True when the similarity search is enabled.
+    */
+    bool similaritysearch;
+
+
+	/**
 		\brief Maximum number of reported hits.
     */
     int hitsreported;

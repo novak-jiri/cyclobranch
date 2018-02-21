@@ -74,6 +74,16 @@ int cGraphReaderThread::getCandidatesIter(bool cterminalstartingnode, cCandidate
 	}
 	else {
 		cCandidate candidate(composition, perspectivepath, startmodifID, endmodifID, middlemodifID, middlepos);
+		
+		if (!cterminalstartingnode && (((parameters->peptidetype == linear) && !parameters->cyclicnterminus && !parameters->cycliccterminus) || (parameters->peptidetype == branched) || (parameters->peptidetype == linearpolysaccharide))) {
+			if ((candidate.hasLastBrickArtificial(*bricksdatabasewithcombinations)) && (composition.size() > 0)) {
+				int bid = atoi(composition.back().c_str()) + 1;
+				composition.pop_back();
+				composition.push_back(to_string(bid));
+				candidate.setCandidate(composition, perspectivepath, startmodifID, endmodifID, middlemodifID, middlepos);			
+			}
+		}
+
 		if ((candidate.getComposition().compare("") != 0) && (!candidate.hasOnlyArtificialBricks(*bricksdatabasewithcombinations))) {
 
 			if (isInPpmMassErrorTolerance(precursormass, candidate.getPrecursorMass(*bricksdatabasewithcombinations, parameters), parameters->precursormasserrortolerance)) {

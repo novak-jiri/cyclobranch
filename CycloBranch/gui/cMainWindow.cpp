@@ -77,11 +77,17 @@ cMainWindow::cMainWindow() {
 	actionDrawPeptide->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_P));
 
 
+	actionShowIsomers = new QAction(QIcon(":/images/icons/95.png"), tr("Show &Isomers"), this);
+	actionShowIsomers->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_I));
+	actionShowIsomers->setCheckable(true);
+
 	actionGraph = new QAction(QIcon(":/images/icons/32.png"), tr("De Novo &Graph"), this);
 	actionGraph->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_G));
 
 	actionLog = new QAction(QIcon(":/images/icons/2.png"), tr("&Log Window"), this);
 	actionLog->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_L));
+	actionLog->setCheckable(true);
+	actionLog->setChecked(true);
 
 
 	actionHTMLDocumentation = new QAction(QIcon(":/images/icons/3.png"), tr("&HTML Documentation"), this);
@@ -113,6 +119,7 @@ cMainWindow::cMainWindow() {
 	toolbarTools->addAction(actionDrawPeptide);
 
 	toolbarView = addToolBar(tr("View"));
+	toolbarView->addAction(actionShowIsomers);
 	toolbarView->addAction(actionGraph);
 	toolbarView->addAction(actionLog);
 
@@ -120,6 +127,34 @@ cMainWindow::cMainWindow() {
 	toolbarHelp->addAction(actionHTMLDocumentation);
 	toolbarHelp->addAction(actionPDFManual);
 	toolbarHelp->addAction(actionAbout);
+
+	rowsfilterline = new QLineEdit();
+	rowsfilterline->setMinimumWidth(250);
+	rowsfilterline->setToolTip("Text to Find");
+	rowsfiltercasesensitive = new QCheckBox();
+	rowsfiltercasesensitive->setToolTip("Case Sensitive");
+	rowsfilterbutton = new QPushButton("Filter");
+	rowsfilterbutton->setToolTip("Filter Search Results");
+	rowsfilterbutton->setMinimumWidth(50);
+	rowsfilterclearbutton = new QPushButton("Clear");
+	rowsfilterclearbutton->setToolTip("Clear Form and Reset Search Results");
+	rowsfilterclearbutton->setMinimumWidth(50);
+
+	rowsfilterhbox = new QHBoxLayout();
+	rowsfilterhbox->addWidget(rowsfilterline);
+	rowsfilterhbox->addStretch();
+	rowsfilterhbox->addWidget(rowsfiltercasesensitive);
+	rowsfilterhbox->addStretch();
+	rowsfilterhbox->addWidget(rowsfilterbutton);
+	rowsfilterhbox->addStretch();
+	rowsfilterhbox->addWidget(rowsfilterclearbutton);
+
+	rowsfilterwidget = new QWidget();
+	rowsfilterwidget->setLayout(rowsfilterhbox);
+	rowsfilterwidget->setMaximumWidth(420);
+
+	toolbarFilter = addToolBar(tr("Filter"));
+	toolbarFilter->addWidget(rowsfilterwidget);
 
 
 	// widgets
@@ -153,11 +188,15 @@ cMainWindow::cMainWindow() {
 	connect(actionSequenceDatabase, SIGNAL(triggered()), this, SLOT(showSequenceDatabase()));
 	connect(actionModifications, SIGNAL(triggered()), this, SLOT(showModifications()));
 	connect(actionDrawPeptide, SIGNAL(triggered()), this, SLOT(showDrawPeptideWidget()));
+	connect(actionShowIsomers, SIGNAL(triggered()), this, SLOT(updateSpectra()));
 	connect(actionGraph, SIGNAL(triggered()), this, SLOT(showGraph()));
 	connect(actionLog, SIGNAL(triggered()), this, SLOT(showHideLog()));
 	connect(actionHTMLDocumentation, SIGNAL(triggered()), this, SLOT(showHTMLDocumentation()));
 	connect(actionPDFManual, SIGNAL(triggered()), this, SLOT(showPDFManual()));
 	connect(actionAbout, SIGNAL(triggered()), this, SLOT(showAbout()));
+
+	connect(rowsfilterbutton, SIGNAL(released()), this, SLOT(filterResults()));
+	connect(rowsfilterclearbutton, SIGNAL(released()), this, SLOT(resetFilter()));
 
 	// add subitems to the items in main menu
 	// menuFile->addAction(actionOpen);
@@ -177,8 +216,9 @@ cMainWindow::cMainWindow() {
 	menuTools->addAction(actionModifications);
 	menuTools->addSeparator();
 	menuTools->addAction(actionDrawPeptide);
-	menuView->addAction(actionGraph);
+	menuView->addAction(actionShowIsomers);
 	menuView->addSeparator();
+	menuView->addAction(actionGraph);
 	menuView->addAction(actionLog);
 	menuHelp->addAction(actionHTMLDocumentation);
 	menuHelp->addAction(actionPDFManual);
@@ -222,7 +262,7 @@ cMainWindow::cMainWindow() {
 	// set the size of main window
 	resize(1280, 700);
 
-	resultsbasecolumncount = 8;
+	resultsbasecolumncount = 9;
 	resultsspecificcolumncount = 0;
 	dbsearchspecificcolumncount = 0;
 
@@ -238,13 +278,108 @@ cMainWindow::cMainWindow() {
 }
 
 
+cMainWindow::~cMainWindow() {
+	deleteResults();
+
+	delete rowsfilterline;
+	delete rowsfiltercasesensitive;
+	delete rowsfilterbutton;
+	delete rowsfilterclearbutton;
+	delete rowsfilterhbox;
+	delete rowsfilterwidget;
+
+	delete results;
+    delete logWindow;
+	delete splitter;
+		
+	delete about;
+	delete graph;
+	delete bricksdatabasewidget;
+	delete sequencedatabasewidget;
+	delete modificationswidget;
+	delete drawpeptidewidget;
+	delete parameterswidget;
+
+	delete actionOpenResults;
+	delete actionSaveResults;
+	delete actionExportToCsv;
+	delete actionExportToHTML;
+	delete actionQuit;
+	delete actionProperties;
+	delete actionRun;
+	delete actionBricksDatabase;
+	delete actionSequenceDatabase;
+	delete actionModifications;
+	delete actionDrawPeptide;
+	delete actionShowIsomers;
+	delete actionGraph;
+	delete actionLog;
+	delete actionHTMLDocumentation;
+	delete actionPDFManual;
+	delete actionAbout;
+
+	delete menuFile;
+	delete menuSearch;
+	delete menuTools;
+	delete menuView;
+	delete menuHelp;
+
+	delete menuBar;
+}
+
+
+void cMainWindow::keyPressEvent(QKeyEvent *event) {
+	if ((event->key() == Qt::Key_Enter) || (event->key() == Qt::Key_Return)) {
+		if (rowsfilterline->hasFocus()) {
+			filterResults();
+		}
+		else {
+			if ((results->currentRow() >= 0) && !results->isRowHidden(results->currentRow())) {		
+				resultsCellClicked(results->currentRow(), 0);
+			}
+		}
+    }
+}
+
+
 void cMainWindow::closeEvent(QCloseEvent *event) {
 	quitApplication();
 	event->ignore();
 }
 
 
-void cMainWindow::reportSpectrum(int id, cTheoreticalSpectrum& theoreticalspectrum) {
+void cMainWindow::preparePeptideSequence(int row, string& peptidesequence, bool reportisomers) {
+	int spectrumindex = results->item(row, 1)->data(Qt::DisplayRole).toInt() - 1;
+	string tmpsequence;
+	bool copy;
+
+	if (!reportisomers) {
+		tmpsequence = stripHTML(theoreticalspectrumlist[spectrumindex].getCandidate().getAcronymPeptideNameWithHTMLReferences());
+		peptidesequence = "";
+		copy = true;
+		for (int j = 0; j < (int)tmpsequence.size(); j++) {
+			if (tmpsequence[j] == '/') {
+				copy = false;
+			}
+			if (tmpsequence[j] == ']') {
+				copy = true;
+			}
+			if (copy) {
+				peptidesequence += tmpsequence[j];
+			}
+		}
+	}
+	else {
+		peptidesequence = stripHTML(theoreticalspectrumlist[spectrumindex].getCandidate().getAcronymPeptideNameWithHTMLReferences());
+	}
+
+}
+
+
+void cMainWindow::reportSpectrum(int id, cTheoreticalSpectrum& theoreticalspectrum, bool reportisomers) {
+	string peptidesequence;
+	cSummaryFormula formula;
+
 	int row = results->rowCount();
     results->insertRow(row);
 	
@@ -261,57 +396,63 @@ void cMainWindow::reportSpectrum(int id, cTheoreticalSpectrum& theoreticalspectr
 		}
 
 		results->setItem(row, 2 + dbsearchspecificcolumncount, widgetitemallocator.getNewItem());
-		results->item(row, 2 + dbsearchspecificcolumncount)->setText(stripHTML(theoreticalspectrum.getCandidate().getAcronymPeptideNameWithHTMLReferences()).c_str());
+		preparePeptideSequence(row, peptidesequence, reportisomers);
+		results->item(row, 2 + dbsearchspecificcolumncount)->setText(peptidesequence.c_str());
+
+		formula = theoreticalspectrum.getCandidate().getSummaryFormula(parameters, parameters.peptidetype);
 
 		results->setItem(row, 3 + dbsearchspecificcolumncount, widgetitemallocator.getNewItem());
-		results->item(row, 3 + dbsearchspecificcolumncount)->setData(Qt::DisplayRole, theoreticalspectrum.getCandidate().getSummaryFormula(parameters, parameters.peptidetype).c_str());
+		results->item(row, 3 + dbsearchspecificcolumncount)->setData(Qt::DisplayRole, formula.isPartial()?string(formula.getSummary() + " (partial)").c_str():formula.getSummary().c_str());
 
 		results->setItem(row, 4 + dbsearchspecificcolumncount, widgetitemallocator.getNewItem());
-		results->item(row, 4 + dbsearchspecificcolumncount)->setData(Qt::DisplayRole, getNumberOfBricks(theoreticalspectrum.getCandidate().getComposition()));
+		results->item(row, 4 + dbsearchspecificcolumncount)->setData(Qt::DisplayRole, to_string(formula.getMass()).c_str());
+
+		results->setItem(row, 5 + dbsearchspecificcolumncount, widgetitemallocator.getNewItem());
+		results->item(row, 5 + dbsearchspecificcolumncount)->setData(Qt::DisplayRole, getNumberOfBricks(theoreticalspectrum.getCandidate().getComposition()));
 
 		switch (parameters.peptidetype)
 		{
 		case linear:
-			results->setItem(row, 5 + dbsearchspecificcolumncount, widgetitemallocator.getNewItem());
-			results->item(row, 5 + dbsearchspecificcolumncount)->setText(parameters.searchedmodifications[theoreticalspectrum.getCandidate().getStartModifID()].name.c_str());
 			results->setItem(row, 6 + dbsearchspecificcolumncount, widgetitemallocator.getNewItem());
-			results->item(row, 6 + dbsearchspecificcolumncount)->setText(parameters.searchedmodifications[theoreticalspectrum.getCandidate().getEndModifID()].name.c_str());
-			break;
-		case branched:
-			results->setItem(row, 5 + dbsearchspecificcolumncount, widgetitemallocator.getNewItem());
-			results->item(row, 5 + dbsearchspecificcolumncount)->setText(parameters.searchedmodifications[theoreticalspectrum.getCandidate().getStartModifID()].name.c_str());
-			results->setItem(row, 6 + dbsearchspecificcolumncount, widgetitemallocator.getNewItem());
-			results->item(row, 6 + dbsearchspecificcolumncount)->setText(parameters.searchedmodifications[theoreticalspectrum.getCandidate().getMiddleModifID()].name.c_str());
+			results->item(row, 6 + dbsearchspecificcolumncount)->setText(parameters.searchedmodifications[theoreticalspectrum.getCandidate().getStartModifID()].name.c_str());
 			results->setItem(row, 7 + dbsearchspecificcolumncount, widgetitemallocator.getNewItem());
 			results->item(row, 7 + dbsearchspecificcolumncount)->setText(parameters.searchedmodifications[theoreticalspectrum.getCandidate().getEndModifID()].name.c_str());
 			break;
+		case branched:
+			results->setItem(row, 6 + dbsearchspecificcolumncount, widgetitemallocator.getNewItem());
+			results->item(row, 6 + dbsearchspecificcolumncount)->setText(parameters.searchedmodifications[theoreticalspectrum.getCandidate().getStartModifID()].name.c_str());
+			results->setItem(row, 7 + dbsearchspecificcolumncount, widgetitemallocator.getNewItem());
+			results->item(row, 7 + dbsearchspecificcolumncount)->setText(parameters.searchedmodifications[theoreticalspectrum.getCandidate().getMiddleModifID()].name.c_str());
+			results->setItem(row, 8 + dbsearchspecificcolumncount, widgetitemallocator.getNewItem());
+			results->item(row, 8 + dbsearchspecificcolumncount)->setText(parameters.searchedmodifications[theoreticalspectrum.getCandidate().getEndModifID()].name.c_str());
+			break;
 		case cyclic:
-			results->setItem(row, 5 + dbsearchspecificcolumncount, widgetitemallocator.getNewItem());
-			results->item(row, 5 + dbsearchspecificcolumncount)->setData(Qt::DisplayRole, theoreticalspectrum.getNumberOfMatchedBricks());	
+			results->setItem(row, 6 + dbsearchspecificcolumncount, widgetitemallocator.getNewItem());
+			results->item(row, 6 + dbsearchspecificcolumncount)->setData(Qt::DisplayRole, theoreticalspectrum.getNumberOfMatchedBricks());	
 			break;
 		case lasso:
-			results->setItem(row, 5 + dbsearchspecificcolumncount, widgetitemallocator.getNewItem());
-			results->item(row, 5 + dbsearchspecificcolumncount)->setText(parameters.searchedmodifications[theoreticalspectrum.getCandidate().getMiddleModifID()].name.c_str());
+			results->setItem(row, 6 + dbsearchspecificcolumncount, widgetitemallocator.getNewItem());
+			results->item(row, 6 + dbsearchspecificcolumncount)->setText(parameters.searchedmodifications[theoreticalspectrum.getCandidate().getMiddleModifID()].name.c_str());
 			break;
 		case linearpolysaccharide:
-			results->setItem(row, 5 + dbsearchspecificcolumncount, widgetitemallocator.getNewItem());
-			results->item(row, 5 + dbsearchspecificcolumncount)->setText(parameters.searchedmodifications[theoreticalspectrum.getCandidate().getStartModifID()].name.c_str());
 			results->setItem(row, 6 + dbsearchspecificcolumncount, widgetitemallocator.getNewItem());
-			results->item(row, 6 + dbsearchspecificcolumncount)->setText(parameters.searchedmodifications[theoreticalspectrum.getCandidate().getEndModifID()].name.c_str());
+			results->item(row, 6 + dbsearchspecificcolumncount)->setText(parameters.searchedmodifications[theoreticalspectrum.getCandidate().getStartModifID()].name.c_str());
+			results->setItem(row, 7 + dbsearchspecificcolumncount, widgetitemallocator.getNewItem());
+			results->item(row, 7 + dbsearchspecificcolumncount)->setText(parameters.searchedmodifications[theoreticalspectrum.getCandidate().getEndModifID()].name.c_str());
 			break;
 		case other:
 		default:
 			break;
 		}
 
-		results->setItem(row, 5 + dbsearchspecificcolumncount + resultsspecificcolumncount, widgetitemallocator.getNewItem());
-		results->item(row, 5 + dbsearchspecificcolumncount + resultsspecificcolumncount)->setData(Qt::DisplayRole, theoreticalspectrum.getNumberOfMatchedPeaks());
-
 		results->setItem(row, 6 + dbsearchspecificcolumncount + resultsspecificcolumncount, widgetitemallocator.getNewItem());
-		results->item(row, 6 + dbsearchspecificcolumncount + resultsspecificcolumncount)->setData(Qt::DisplayRole, theoreticalspectrum.getRatioOfMatchedPeaks()*100);
+		results->item(row, 6 + dbsearchspecificcolumncount + resultsspecificcolumncount)->setData(Qt::DisplayRole, theoreticalspectrum.getNumberOfMatchedPeaks());
 
 		results->setItem(row, 7 + dbsearchspecificcolumncount + resultsspecificcolumncount, widgetitemallocator.getNewItem());
-		results->item(row, 7 + dbsearchspecificcolumncount + resultsspecificcolumncount)->setData(Qt::DisplayRole, theoreticalspectrum.getWeightedIntensityScore());
+		results->item(row, 7 + dbsearchspecificcolumncount + resultsspecificcolumncount)->setData(Qt::DisplayRole, to_string(theoreticalspectrum.getRatioOfMatchedPeaks()*100).c_str());
+
+		results->setItem(row, 8 + dbsearchspecificcolumncount + resultsspecificcolumncount, widgetitemallocator.getNewItem());
+		results->item(row, 8 + dbsearchspecificcolumncount + resultsspecificcolumncount)->setData(Qt::DisplayRole, to_string(theoreticalspectrum.getWeightedIntensityScore()).c_str());
 
 		for (int i = 0; i < (int)parameters.fragmentionsfortheoreticalspectra.size(); i++) {
 			results->setItem(row, resultsbasecolumncount  + dbsearchspecificcolumncount + resultsspecificcolumncount + i, widgetitemallocator.getNewItem());
@@ -338,10 +479,10 @@ void cMainWindow::reportSpectrum(int id, cTheoreticalSpectrum& theoreticalspectr
 		results->item(row, 2)->setData(Qt::DisplayRole, theoreticalspectrum.getNumberOfMatchedPeaks());
 
 		results->setItem(row, 3, widgetitemallocator.getNewItem());
-		results->item(row, 3)->setData(Qt::DisplayRole, theoreticalspectrum.getRatioOfMatchedPeaks()*100);
+		results->item(row, 3)->setData(Qt::DisplayRole, to_string(theoreticalspectrum.getRatioOfMatchedPeaks()*100).c_str());
 
 		results->setItem(row, 4, widgetitemallocator.getNewItem());
-		results->item(row, 4)->setData(Qt::DisplayRole, theoreticalspectrum.getWeightedIntensityScore());
+		results->item(row, 4)->setData(Qt::DisplayRole, to_string(theoreticalspectrum.getWeightedIntensityScore()).c_str());
 	}
 
 
@@ -474,6 +615,15 @@ void cMainWindow::enableButtonsHandlingResults(bool enable) {
 	actionSaveResults->setEnabled(enable);
 	actionExportToCsv->setEnabled(enable);
 	actionExportToHTML->setEnabled(enable);
+	
+	if (parameters.mode == dereplication) {
+		actionShowIsomers->setEnabled(false);
+		rowsfilterwidget->setEnabled(false);
+	}
+	else {
+		actionShowIsomers->setEnabled(enable);
+		rowsfilterwidget->setEnabled(enable);
+	}
 }
 
 
@@ -537,56 +687,62 @@ void cMainWindow::reportSpectra() {
 			results->setHorizontalHeaderItem(2, widgetitemallocator.getNewItem());
 			results->horizontalHeaderItem(2)->setText("Name");
 		}
+		
 		results->setHorizontalHeaderItem(2 + dbsearchspecificcolumncount, widgetitemallocator.getNewItem());
 		results->horizontalHeaderItem(2 + dbsearchspecificcolumncount)->setText("Peptide Sequence");
+		
 		results->setHorizontalHeaderItem(3 + dbsearchspecificcolumncount, widgetitemallocator.getNewItem());
 		results->horizontalHeaderItem(3 + dbsearchspecificcolumncount)->setText("Summary Formula");
+		
 		results->setHorizontalHeaderItem(4 + dbsearchspecificcolumncount, widgetitemallocator.getNewItem());
-		results->horizontalHeaderItem(4 + dbsearchspecificcolumncount)->setText("Number of Bricks");
+		results->horizontalHeaderItem(4 + dbsearchspecificcolumncount)->setText("Monoisotopic Mass");
+		
+		results->setHorizontalHeaderItem(5 + dbsearchspecificcolumncount, widgetitemallocator.getNewItem());
+		results->horizontalHeaderItem(5 + dbsearchspecificcolumncount)->setText("Number of Bricks");
 
 		switch (parameters.peptidetype)
 		{
 		case linear:
-			results->setHorizontalHeaderItem(5 + dbsearchspecificcolumncount, widgetitemallocator.getNewItem());
-			results->horizontalHeaderItem(5 + dbsearchspecificcolumncount)->setText("N-terminal Modification");
 			results->setHorizontalHeaderItem(6 + dbsearchspecificcolumncount, widgetitemallocator.getNewItem());
-			results->horizontalHeaderItem(6 + dbsearchspecificcolumncount)->setText("C-terminal Modification");
-			break;
-		case branched:
-			results->setHorizontalHeaderItem(5 + dbsearchspecificcolumncount, widgetitemallocator.getNewItem());
-			results->horizontalHeaderItem(5 + dbsearchspecificcolumncount)->setText("N-terminal Modification");
-			results->setHorizontalHeaderItem(6 + dbsearchspecificcolumncount, widgetitemallocator.getNewItem());
-			results->horizontalHeaderItem(6 + dbsearchspecificcolumncount)->setText("Branch Modification");
+			results->horizontalHeaderItem(6 + dbsearchspecificcolumncount)->setText("N-terminal Modification");
 			results->setHorizontalHeaderItem(7 + dbsearchspecificcolumncount, widgetitemallocator.getNewItem());
 			results->horizontalHeaderItem(7 + dbsearchspecificcolumncount)->setText("C-terminal Modification");
 			break;
+		case branched:
+			results->setHorizontalHeaderItem(6 + dbsearchspecificcolumncount, widgetitemallocator.getNewItem());
+			results->horizontalHeaderItem(6 + dbsearchspecificcolumncount)->setText("N-terminal Modification");
+			results->setHorizontalHeaderItem(7 + dbsearchspecificcolumncount, widgetitemallocator.getNewItem());
+			results->horizontalHeaderItem(7 + dbsearchspecificcolumncount)->setText("Branch Modification");
+			results->setHorizontalHeaderItem(8 + dbsearchspecificcolumncount, widgetitemallocator.getNewItem());
+			results->horizontalHeaderItem(8 + dbsearchspecificcolumncount)->setText("C-terminal Modification");
+			break;
 		case cyclic:
-			results->setHorizontalHeaderItem(5 + dbsearchspecificcolumncount, widgetitemallocator.getNewItem());
-			results->horizontalHeaderItem(5 + dbsearchspecificcolumncount)->setText("Matched Bricks");
+			results->setHorizontalHeaderItem(6 + dbsearchspecificcolumncount, widgetitemallocator.getNewItem());
+			results->horizontalHeaderItem(6 + dbsearchspecificcolumncount)->setText("Matched Bricks");
 			break;
 		case lasso:
-			results->setHorizontalHeaderItem(5 + dbsearchspecificcolumncount, widgetitemallocator.getNewItem());
-			results->horizontalHeaderItem(5 + dbsearchspecificcolumncount)->setText("Branch Modification");
+			results->setHorizontalHeaderItem(6 + dbsearchspecificcolumncount, widgetitemallocator.getNewItem());
+			results->horizontalHeaderItem(6 + dbsearchspecificcolumncount)->setText("Branch Modification");
 			break;
 		case linearpolysaccharide:
-			results->setHorizontalHeaderItem(5 + dbsearchspecificcolumncount, widgetitemallocator.getNewItem());
-			results->horizontalHeaderItem(5 + dbsearchspecificcolumncount)->setText("N-terminal Modification");
 			results->setHorizontalHeaderItem(6 + dbsearchspecificcolumncount, widgetitemallocator.getNewItem());
-			results->horizontalHeaderItem(6 + dbsearchspecificcolumncount)->setText("C-terminal Modification");
+			results->horizontalHeaderItem(6 + dbsearchspecificcolumncount)->setText("N-terminal Modification");
+			results->setHorizontalHeaderItem(7 + dbsearchspecificcolumncount, widgetitemallocator.getNewItem());
+			results->horizontalHeaderItem(7 + dbsearchspecificcolumncount)->setText("C-terminal Modification");
 			break;
 		case other:
 		default:
 			break;
 		}
 		
-		results->setHorizontalHeaderItem(5 + dbsearchspecificcolumncount + resultsspecificcolumncount, widgetitemallocator.getNewItem());
-		results->horizontalHeaderItem(5 + dbsearchspecificcolumncount + resultsspecificcolumncount)->setText("Matched Peaks");
-
 		results->setHorizontalHeaderItem(6 + dbsearchspecificcolumncount + resultsspecificcolumncount, widgetitemallocator.getNewItem());
-		results->horizontalHeaderItem(6 + dbsearchspecificcolumncount + resultsspecificcolumncount)->setText("Ratio of Matched Peaks [%]");
-				
+		results->horizontalHeaderItem(6 + dbsearchspecificcolumncount + resultsspecificcolumncount)->setText("Matched Peaks");
+
 		results->setHorizontalHeaderItem(7 + dbsearchspecificcolumncount + resultsspecificcolumncount, widgetitemallocator.getNewItem());
-		results->horizontalHeaderItem(7 + dbsearchspecificcolumncount + resultsspecificcolumncount)->setText("Sum of Relative Intensities");
+		results->horizontalHeaderItem(7 + dbsearchspecificcolumncount + resultsspecificcolumncount)->setText("Ratio of Matched Peaks [%]");
+				
+		results->setHorizontalHeaderItem(8 + dbsearchspecificcolumncount + resultsspecificcolumncount, widgetitemallocator.getNewItem());
+		results->horizontalHeaderItem(8 + dbsearchspecificcolumncount + resultsspecificcolumncount)->setText("Sum of Relative Intensities");
 
 		for (int i = 0; i < (int)parameters.fragmentionsfortheoreticalspectra.size(); i++) {
 			results->setHorizontalHeaderItem(resultsbasecolumncount + dbsearchspecificcolumncount + resultsspecificcolumncount + i, widgetitemallocator.getNewItem());
@@ -623,7 +779,6 @@ void cMainWindow::reportSpectra() {
 		resultsheadersort[i] = -1;
 	}
 
-
 	QProgressDialog progress("Preparing the report...", /*"Cancel"*/0, 0, theoreticalspectrumlist.size(), this);
 	cEventFilter filter;
 	progress.installEventFilter(&filter);
@@ -632,8 +787,9 @@ void cMainWindow::reportSpectra() {
 
 	spectradetails.clear();
 	spectradetails.resize(theoreticalspectrumlist.size());
+	bool reportisomers = actionShowIsomers->isChecked();
 	for (int i = 0; i < theoreticalspectrumlist.size(); i++) {
-		reportSpectrum(i, theoreticalspectrumlist[i]);
+		reportSpectrum(i, theoreticalspectrumlist[i], reportisomers);
 		progress.setValue(i);
 		//if (progress.wasCanceled()) {
 		//	break;
@@ -645,6 +801,40 @@ void cMainWindow::reportSpectra() {
 	}
 
 	progress.setValue(theoreticalspectrumlist.size());
+
+}
+
+
+void cMainWindow::updateSpectra() {
+
+	if ((parameters.mode == denovoengine) || (parameters.mode == singlecomparison) || (parameters.mode == databasesearch)) {
+
+		bool reportisomers = actionShowIsomers->isChecked();
+		string peptidesequence;
+
+		QProgressDialog progress("Updating the report...", /*"Cancel"*/0, 0, theoreticalspectrumlist.size(), this);
+		cEventFilter filter;
+		progress.installEventFilter(&filter);
+		progress.setMinimumDuration(0);
+		progress.setWindowModality(Qt::WindowModal);
+
+		for (int i = 0; i < results->rowCount(); i++) {
+			preparePeptideSequence(i, peptidesequence, reportisomers);
+			results->item(i, 2 + dbsearchspecificcolumncount)->setText(peptidesequence.c_str());
+
+			progress.setValue(i);
+			//if (progress.wasCanceled()) {
+			//	break;
+			//}
+		}
+
+		for (int i = 0; i < results->columnCount(); i++) {
+			results->resizeColumnToContents(i);
+		}
+
+		progress.setValue(theoreticalspectrumlist.size());
+
+	}
 
 }
 
@@ -714,6 +904,11 @@ void cMainWindow::exportToCsv() {
 		out << endl;
 
 		for (int i = 0; i < results->rowCount(); i++) {
+
+			if (results->isRowHidden(i)) {
+				continue;
+			}
+
 			for (int j = 0; j < results->columnCount(); j++) {
 				out << "\"" << results->item(i, j)->data(Qt::DisplayRole).toString() << "\"";
 				if (j < results->columnCount() - 1) {
@@ -785,7 +980,15 @@ void cMainWindow::exportToHTML() {
 			}
 			out << "</tr>\n";
 
+			int spectrumindex;
 			for (int i = 0; i < results->rowCount(); i++) {
+
+				if (results->isRowHidden(i)) {
+					continue;
+				}
+
+				spectrumindex = results->item(i, 1)->data(Qt::DisplayRole).toInt() - 1;
+
 				out << "<tr onclick=\"return showHide('row";
 				out << i;
 				out << "');\">\n";
@@ -811,8 +1014,8 @@ void cMainWindow::exportToHTML() {
 				out << results->columnCount();
 				out << "\">\n";
 
-				out << "<p style=\"margin: 20px\">" << spectradetails[i].getTheoreticalSpectrum().getCoverageBySeries().c_str();
-				out << "<br/>" << spectradetails[i].getDetailsAsHTMLString().c_str() << "</p>\n";
+				out << "<p style=\"margin: 20px\">" << spectradetails[spectrumindex].getTheoreticalSpectrum().getCoverageBySeries().c_str();
+				out << "<br/>" << spectradetails[spectrumindex].getDetailsAsHTMLString().c_str() << "</p>\n";
 
 				out << "</td></tr>\n";
 
@@ -853,7 +1056,7 @@ void cMainWindow::showHTMLDocumentation() {
 	#if OS_TYPE == WIN
 		QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo("docs/html/userguide.html").absoluteFilePath()));
 	#else
-		QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo(linuxinstalldir + "docs/html/userguide.html").absoluteFilePath()));
+		QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo(installdir + "docs/html/userguide.html").absoluteFilePath()));
 	#endif
 }
 
@@ -862,7 +1065,7 @@ void cMainWindow::showPDFManual() {
 	#if OS_TYPE == WIN
 		QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo("docs/refman.pdf").absoluteFilePath()));
 	#else
-		QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo(linuxinstalldir + "docs/refman.pdf").absoluteFilePath()));
+		QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo(installdir + "docs/refman.pdf").absoluteFilePath()));
 	#endif	
 }
 
@@ -989,6 +1192,15 @@ void cMainWindow::openResultsFile() {
 			parameters.load(infile);
 			parameterswidget->setAndRestoreParameters(parameters);
 
+			if (parameters.mode == dereplication) {
+				actionShowIsomers->setEnabled(false);
+				rowsfilterwidget->setEnabled(false);
+			}
+			else {
+				actionShowIsomers->setEnabled(true);
+				rowsfilterwidget->setEnabled(true);
+			}
+
 			// load theoretical spectra
 			infile.read((char *)&size, sizeof(int));
 
@@ -1039,12 +1251,67 @@ void cMainWindow::insertSequence(int peptidetypeindex, QString sequence) {
 
 
 void cMainWindow::quitApplication() {
+	QMessageBox::StandardButton reply;
+	reply = QMessageBox::question(this, appname, "Quit ?", QMessageBox::Yes|QMessageBox::No);
+	
+	if (reply != QMessageBox::Yes) {
+		return;
+	}
+ 
 	emit stopComputation();
 	quitapp = true;
 
 	if (actionRun->isEnabled()) {
 		qApp->quit();
 	}
+}
+
+
+void cMainWindow::filterResults() {
+	Qt::CaseSensitivity casesensitive = rowsfiltercasesensitive->isChecked()?Qt::CaseSensitive:Qt::CaseInsensitive;
+	QString str = rowsfilterline->text();
+	int rowcount = results->rowCount();
+	bool match;
+	int i, j;
+
+	QProgressDialog progress("Updating the report...", /*"Cancel"*/0, 0, rowcount, this);
+	cEventFilter filter;
+	progress.installEventFilter(&filter);
+	progress.setMinimumDuration(0);
+	progress.setWindowModality(Qt::WindowModal);
+
+	for (i = 0; i < rowcount; i++) {
+		match = false;
+		for (j = 0; j < results->columnCount(); j++) {
+			if (results->item(i, j)->text().contains(str, casesensitive)) {
+				match = true;
+				break;
+			}
+		}
+		results->setRowHidden(i, !match);
+		progress.setValue(i);
+	}
+
+	progress.setValue(rowcount);
+}
+
+
+void cMainWindow::resetFilter() {
+	rowsfilterline->setText("");
+	int rowcount = results->rowCount();
+
+	QProgressDialog progress("Updating the report...", /*"Cancel"*/0, 0, rowcount, this);
+	cEventFilter filter;
+	progress.installEventFilter(&filter);
+	progress.setMinimumDuration(0);
+	progress.setWindowModality(Qt::WindowModal);
+
+	for (int i = 0; i < rowcount; i++) {
+		results->setRowHidden(i, false);
+		progress.setValue(i);
+	}
+
+	progress.setValue(rowcount);
 }
 
 
@@ -1056,46 +1323,4 @@ void cMainWindow::showContextMenu(const QPoint &pt) {
     delete menu;
 }
 */
-
-
-cMainWindow::~cMainWindow() {
-	deleteResults();
-
-	delete menuBar;
-	
-	delete menuFile;
-	delete menuSearch;
-	delete menuTools;
-	delete menuView;
-	delete menuHelp;
-	
-	delete actionOpenResults;
-	delete actionSaveResults;
-	delete actionExportToCsv;
-	delete actionExportToHTML;
-	delete actionQuit;
-	delete actionProperties;
-	delete actionRun;
-	delete actionBricksDatabase;
-	delete actionSequenceDatabase;
-	delete actionModifications;
-	delete actionDrawPeptide;
-	delete actionGraph;
-	delete actionLog;
-	delete actionHTMLDocumentation;
-	delete actionPDFManual;
-	delete actionAbout;
-
-	delete results;
-    delete logWindow;
-	delete splitter;
-		
-	delete about;
-	delete graph;
-	delete bricksdatabasewidget;
-	delete sequencedatabasewidget;
-	delete modificationswidget;
-	delete drawpeptidewidget;
-	delete parameterswidget;
-}
 

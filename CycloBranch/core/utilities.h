@@ -18,13 +18,21 @@ class cBrick;
 
 #define WIN 0   // Windows
 #define UNX 1   // Linux/UNIX
+#define OSX 2	// Mac OS X
 
-#ifdef UNIX
+
+#ifdef LINUX
 	#define OS_TYPE UNX
 	#define sscanf_s sscanf
 	#define sprintf_s sprintf
 #else
-	#define OS_TYPE WIN
+	#ifdef MACOSX
+		#define OS_TYPE OSX
+		#define sscanf_s sscanf
+		#define sprintf_s sprintf
+	#else
+		#define OS_TYPE WIN
+	#endif
 #endif
 
 
@@ -58,9 +66,9 @@ extern QString appversion;
 
 
 /**
-	\brief A directory where the application is installed in Linux.
+	\brief A directory where the application is installed under Linux or OSX.
 */
-extern QString linuxinstalldir;
+extern QString installdir;
 
 
 /**

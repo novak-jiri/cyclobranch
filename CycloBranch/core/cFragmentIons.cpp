@@ -12,6 +12,7 @@ cPeriodicTableMap::cPeriodicTableMap() {
 	table["N"] = N;
 	table["O"] = O;
 	table["F"] = F;
+	table["Ne"] = Ne;
 	table["Na"] = Na;
 	table["Mg"] = Mg;
 	table["Al"] = Al;
@@ -19,6 +20,7 @@ cPeriodicTableMap::cPeriodicTableMap() {
 	table["P"] = P;
 	table["S"] = S;
 	table["Cl"] = Cl;
+	table["Ar"] = Ar;
 	table["K"] = K;
 	table["Ca"] = Ca;
 	table["Sc"] = Sc;
@@ -31,10 +33,81 @@ cPeriodicTableMap::cPeriodicTableMap() {
 	table["Ni"] = Ni;
 	table["Cu"] = Cu;
 	table["Zn"] = Zn;
+	table["Ga"] = Ga;
+	table["Ge"] = Ge;
+	table["As"] = As;
 	table["Se"] = Se;
 	table["Br"] = Br;
+	table["Kr"] = Kr;
+	table["Rb"] = Rb;
+	table["Sr"] = Sr;
+	table["Y"] = Y;
+	table["Zr"] = Zr;
+	table["Nb"] = Nb;
 	table["Mo"] = Mo;
+	table["Tc"] = Tc;
+	table["Ru"] = Ru;
+	table["Rh"] = Rh;
+	table["Pd"] = Pd;
+	table["Ag"] = Ag;
+	table["Cd"] = Cd;
+	table["In"] = In;
+	table["Sn"] = Sn;
+	table["Sb"] = Sb;
+	table["Te"] = Te;
 	table["I"] = I;
+	table["Xe"] = Xe;
+	table["Cs"] = Cs;
+	table["Ba"] = Ba;
+	table["La"] = La;
+	table["Ce"] = Ce;
+	table["Pr"] = Pr;
+	table["Nd"] = Nd;
+	table["Pm"] = Pm;
+	table["Sm"] = Sm;
+	table["Eu"] = Eu;
+	table["Gd"] = Gd;
+	table["Tb"] = Tb;
+	table["Dy"] = Dy;
+	table["Ho"] = Ho;
+	table["Er"] = Er;
+	table["Tm"] = Tm;
+	table["Yb"] = Yb;
+	table["Lu"] = Lu;
+	table["Hf"] = Hf;
+	table["Ta"] = Ta;
+	table["W"] = W;
+	table["Re"] = Re;
+	table["Os"] = Os;
+	table["Ir"] = Ir;
+	table["Pt"] = Pt;
+	table["Au"] = Au;
+	table["Hg"] = Hg;
+	table["Tl"] = Tl;
+	table["Pb"] = Pb;
+	table["Bi"] = Bi;
+	table["Po"] = Po;
+	table["At"] = At;
+	table["Rn"] = Rn;
+	table["Fr"] = Fr;
+	table["Ra"] = Ra;
+	table["Ac"] = Ac;
+	table["Th"] = Th;
+	table["Pa"] = Pa;
+	table["U"] = U;
+	table["Np"] = Np;
+	table["Pu"] = Pu;
+	table["Am"] = Am;
+	table["Cm"] = Cm;
+	table["Bk"] = Bk;
+	table["Cf"] = Cf;
+	table["Es"] = Es;
+	table["Fm"] = Fm;
+	table["Md"] = Md;
+	table["No"] = No;
+	table["Lr"] = Lr;
+	table["R"] = R;
+	table["X"] = X;
 }
 
 
@@ -717,7 +790,7 @@ int loadModificationsFromPlainTextStream(ifstream &stream, vector<fragmentDescri
 
 
 		// load C-terminal flag
-		#if OS_TYPE == UNX
+		#if OS_TYPE != WIN
 			if ((s.size() > 0) && (s.back() == '\r')) {
 				s = s.substr(0, s.size() - 1);
 			}

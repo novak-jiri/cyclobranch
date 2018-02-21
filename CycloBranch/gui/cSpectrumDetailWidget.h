@@ -9,12 +9,15 @@
 
 #include <QWidget>
 #include <QMainWindow>
+#include <QTextDocument>
 #include "core/cTheoreticalSpectrum.h"
 #include "gui/cLinearWidget.h"
 #include "gui/cCyclicWidget.h"
 #include "gui/cBranchedWidget.h"
 #include "gui/cLassoWidget.h"
 #include "gui/cSpectrumSceneWidget.h"
+#include "gui/cFindDialog.h"
+#include "gui/cExportDialog.h"
 
 
 // forward declaration
@@ -103,6 +106,21 @@ public:
 		\param peptidetype a type of peptide
 	*/ 
 	void prepareToShow(peptideType peptidetype);
+	
+
+	/**
+		\brief Find all occurrences of \a str and highlight them.
+		\param str search string
+		\param opt search options
+	*/ 
+	void findAll(const QString& str, QTextDocument::FindFlags opt = 0);
+
+
+	/**
+		\brief Export spectrum/peptide image.
+		\param exportspectrum if true, a spectrum image is exported; if false, a peptide image is exported
+	*/ 
+	void exportImage(bool exportspectrum);
 
 
 protected:
@@ -117,6 +135,7 @@ protected:
 
 private:
 	QToolBar* toolbarExport;
+	QToolBar* toolbarFind;
 	QToolBar* toolbarZoom;
 	QToolBar* toolbarHide;
 	QToolBar* toolbarMz;
@@ -124,7 +143,9 @@ private:
 	QToolBar* toolbarTrotation;
 
 	QAction* actionExportSpectrum;
-	QAction* actionExportPeptide;
+	QAction* actionFind;
+	QAction* actionPrevious;
+	QAction* actionNext;
 	QAction* actionZoomIn;
 	QAction* actionZoomOut;
 	QAction* actionZoomReset;
@@ -169,6 +190,10 @@ private:
 	bool preparedToShow;
 	cParameters* parameters;
 
+	cFindDialog* finddialog;
+	cExportDialog* exportdialog;
+	int currentfinditem;
+
 
 signals:
 
@@ -189,6 +214,14 @@ private slots:
 	void exportSpectrum();
 
 	void exportPeptide();
+
+	void openFindDialog();
+
+	void openExportDialog();
+
+	void movePrevious();
+
+	void moveNext();
 
 };
 

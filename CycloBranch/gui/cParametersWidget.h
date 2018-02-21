@@ -37,6 +37,7 @@ class QCheckBox;
 class QTableWidget;
 class QListWidget;
 class QMessageBox;
+class QScrollArea;
 
 
 /**
@@ -109,6 +110,8 @@ private:
 	QVBoxLayout* vlayout2;
 	QVBoxLayout* vlayout;
 	QHBoxLayout* hlayout;
+	QWidget* hlayoutwidget;
+	QScrollArea* hlayoutscroll;
 
 	QString settingsfile;
 	QString oldsettingsfile;
@@ -154,6 +157,7 @@ private:
 	QCheckBox* cyclicnterminus;
 	QCheckBox* cycliccterminus;
 	QCheckBox* enablescrambling;
+	QCheckBox* similaritysearch;
 
 	QFormLayout* applicationformlayout;
 	QGroupBox* applicationgroupbox;

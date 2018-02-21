@@ -40,6 +40,7 @@ void cParameters::clear() {
 	cyclicnterminus = false;
 	cycliccterminus = false;
 	enablescrambling = false;
+	similaritysearch = false;
 	hitsreported = 1000;
 	sequencetag = "";
 	originalsequencetag = "";
@@ -130,27 +131,40 @@ int cParameters::checkAndPrepare() {
 				*os << "Converting the file " + peaklistfilename + " to mgf ... ";
 				
 				#if OS_TYPE == UNX
-					s = linuxinstalldir.toStdString() + "External/linux/any2mgf.sh " + peaklistfilename;
+					s = installdir.toStdString() + "External/linux/any2mgf.sh " + peaklistfilename;
 					if (system(s.c_str()) != 0) {
 						error = true;
 						errormessage = "The file cannot be converted.\n";
 						errormessage += "Does the file '" + peaklistfilename + "' exist ?\n";
 						errormessage += "Is the directory with the file '" + peaklistfilename + "' writable ?\n";
 						errormessage += "Do you have FileConverter installed (sudo apt-get install topp) ?\n";
-						errormessage += "Do you have 'any2mgf.sh' file located in '" + linuxinstalldir.toStdString() + "External/linux' folder ?\n";
-						errormessage += "Is the file 'any2mgf.sh' executable (sudo chmod +x " + linuxinstalldir.toStdString() + "External/linux/any2mgf.sh) ? \n";
+						errormessage += "Do you have 'any2mgf.sh' file located in '" + installdir.toStdString() + "External/linux' folder ?\n";
+						errormessage += "Is the file 'any2mgf.sh' executable (sudo chmod +x " + installdir.toStdString() + "External/linux/any2mgf.sh) ? \n";
 					}
 				#else
-					s = "External\\windows\\any2mgf.bat \"" + peaklistfilename + "\"";
-					if (system(s.c_str()) != 0) {
-						error = true;
-						errormessage = "The file cannot be converted.\n";
-						errormessage += "Does the file '" + peaklistfilename + "' exist ?\n";
-						errormessage += "Is the directory with the file '" + peaklistfilename + "' writable ?\n";
-						errormessage += "Do you have FileConverter installed (OpenMS 1.11) ?\n";
-						errormessage += "Do you have a path to FileConverter in your PATH variable (e.g., 'C:/Program Files/OpenMS-1.11/bin') ?\n";
-						errormessage += "Do you have 'any2mgf.bat' file located in the '" + appname.toStdString() + "/External/windows' folder ?\n";
-					}
+					#if OS_TYPE == OSX
+						s = installdir.toStdString() + "External/macosx/any2mgf.sh " + peaklistfilename;
+						if (system(s.c_str()) != 0) {
+							error = true;
+							errormessage = "The file cannot be converted.\n";
+							errormessage += "Does the file '" + peaklistfilename + "' exist ?\n";
+							errormessage += "Is the directory with the file '" + peaklistfilename + "' writable ?\n";
+							errormessage += "Do you have FileConverter installed (OpenMS 1.11) ?\n";
+							errormessage += "Do you have 'any2mgf.sh' file located in '" + installdir.toStdString() + "External/macosx' folder ?\n";
+							errormessage += "Is the file 'any2mgf.sh' executable ? \n";
+						}
+					#else		
+						s = "External\\windows\\any2mgf.bat \"" + peaklistfilename + "\"";
+						if (system(s.c_str()) != 0) {
+							error = true;
+							errormessage = "The file cannot be converted.\n";
+							errormessage += "Does the file '" + peaklistfilename + "' exist ?\n";
+							errormessage += "Is the directory with the file '" + peaklistfilename + "' writable ?\n";
+							errormessage += "Do you have FileConverter installed (OpenMS 1.11) ?\n";
+							errormessage += "Do you have a path to FileConverter in your PATH variable (e.g., 'C:/Program Files/OpenMS-1.11/bin') ?\n";
+							errormessage += "Do you have 'any2mgf.bat' file located in the '" + appname.toStdString() + "/External/windows' folder ?\n";
+						}
+					#endif
 				#endif
 
 				if (!error) {
@@ -475,6 +489,10 @@ string cParameters::printToString() {
 	s += enablescrambling ? "on" : "off";
 	s += "\n";
 
+	s += "Similarity Search: ";
+	s += similaritysearch ? "on" : "off";
+	s += "\n";
+
 	s += "Mode: ";
 	switch ((modeType)mode) {
 	case denovoengine:
@@ -617,6 +635,7 @@ void cParameters::store(ofstream& os) {
 	os.write((char *)&cyclicnterminus, sizeof(bool));
 	os.write((char *)&cycliccterminus, sizeof(bool));
 	os.write((char *)&enablescrambling, sizeof(bool));
+	os.write((char *)&similaritysearch, sizeof(bool));
 	os.write((char *)&hitsreported, sizeof(int));
 
 	storeString(sequencetag, os);
@@ -694,6 +713,7 @@ void cParameters::load(ifstream& is) {
 	is.read((char *)&cyclicnterminus, sizeof(bool));
 	is.read((char *)&cycliccterminus, sizeof(bool));
 	is.read((char *)&enablescrambling, sizeof(bool));
+	is.read((char *)&similaritysearch, sizeof(bool));
 	is.read((char *)&hitsreported, sizeof(int));
 
 	loadString(sequencetag, is);

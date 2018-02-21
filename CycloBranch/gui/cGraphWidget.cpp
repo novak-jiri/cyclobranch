@@ -64,7 +64,7 @@ void cGraphWidget::load(ifstream& is) {
 
 
 void cGraphWidget::keyPressEvent(QKeyEvent *event) {
-    if(event->key() == Qt::Key_Escape) {
+    if (event->key() == Qt::Key_Escape) {
 		hide();
     }
 }

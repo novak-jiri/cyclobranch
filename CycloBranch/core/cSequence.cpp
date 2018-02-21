@@ -164,6 +164,17 @@ string cSequence::getNameWithReferenceAsHTMLString() {
 			}
 		}
 
+		// KEGG Compounds (undocumented)
+		if (!correctreference) {
+			rx = "^C[0-9]{5}$";
+			if (regex_search(reference, rx)) {
+				s += "<a href=\"http://www.genome.jp/dbget-bin/www_bget?cpd:" + reference + "\">";
+				s += name;
+				s += "</a>";
+				correctreference = true;
+			}
+		}
+
 	}
 	catch (regex_error& /*e*/) {
 		// nothing to do
@@ -182,7 +193,7 @@ void cSequence::setSummaryFormula(const string& formula) {
 }
 
 
-string& cSequence::getSummaryFormula() {
-	return summary.getFormula();
+string cSequence::getSummaryFormula() {
+	return summary.getSummary();
 }
 

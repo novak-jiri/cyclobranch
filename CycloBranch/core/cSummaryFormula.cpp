@@ -84,23 +84,35 @@ cSummaryFormula::cSummaryFormula() {
 }
 
 
-cSummaryFormula::cSummaryFormula(string& formula) {
-	this->formula = formula;
+cSummaryFormula::cSummaryFormula(string& formula, bool partial) {
+	setFormula(formula, partial);
 }
 
 
 void cSummaryFormula::clear() {
 	formula = "";
+	partial = false;
 }
 
 
-void cSummaryFormula::setFormula(const string& formula) {
+void cSummaryFormula::setFormula(const string& formula, bool partial) {
 	this->formula = formula;
+	this->partial = partial;
 }
 
 
-string& cSummaryFormula::getFormula() {
+string cSummaryFormula::getSummary() {
 	return formula;
+}
+
+
+bool cSummaryFormula::isPartial() {
+	return partial;
+}
+
+
+void cSummaryFormula::setPartial(bool partial) {
+	this->partial = partial;
 }
 
 
@@ -247,10 +259,12 @@ double cSummaryFormula::getMass() {
 
 void cSummaryFormula::store(ofstream& os) {
 	storeString(formula, os);
+	os.write((char *)&partial, sizeof(bool));
 }
 
 
 void cSummaryFormula::load(ifstream& is) {
 	loadString(formula, is);
+	is.read((char *)&partial, sizeof(bool));
 }
 

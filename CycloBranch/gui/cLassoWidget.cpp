@@ -86,7 +86,6 @@ void cLassoWidget::exportToPDF(QString filename, bool postscript) {
 		QString errstr = "The file cannot be created.";
 		#if OS_TYPE == UNX
 			errstr += "\nDo you have a properly configured print server (sudo apt-get install cups-pdf) ?";
-			errstr += "\nIf you cannot create a ps file, you can create a pdf file and then use pdf2ps tool.";
 		#endif
 		msgBox.setText(errstr);
 		msgBox.exec();
@@ -134,6 +133,7 @@ void cLassoWidget::exportToSVG(QString filename) {
 		return;
 	}
 
+	painter.fillRect(QRect(0, 0, width(), height()), Qt::white);
 	paint(painter);
 	painter.end();
 }

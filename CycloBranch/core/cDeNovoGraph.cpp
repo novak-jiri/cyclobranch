@@ -22,7 +22,12 @@ cDeNovoGraph::cDeNovoGraph() {
 }
 
 
-bool cDeNovoGraph::findPath(int sourcenodeid, int edgeid, int targetnodeid, string& composition, string brickspath, int maximumbricksincombination, vector<nodeEdge>& path) {
+bool cDeNovoGraph::findPath(int sourcenodeid, int edgeid, int targetnodeid, string& composition, string brickspath, int maximumbricksincombination, vector<nodeEdge>& path, bool& terminatecomputation) {
+
+	if (terminatecomputation) {
+		return false;
+	}
+
 	string localbrickpath;
 	bool found;
 	bool badpath;
@@ -70,13 +75,17 @@ bool cDeNovoGraph::findPath(int sourcenodeid, int edgeid, int targetnodeid, stri
 			ne.edgeid = i;
 			path.push_back(ne);
 
-			found = findPath(graph[sourcenodeid][i].targetnode, i, targetnodeid, composition, localbrickpath, maximumbricksincombination, path);
+			found = findPath(graph[sourcenodeid][i].targetnode, i, targetnodeid, composition, localbrickpath, maximumbricksincombination, path, terminatecomputation);
 			
 			path.pop_back();
 			
 			if (found) {
 				//*os << graph[sourcenodeid].getMZRatio() << " ";
 				return true;
+			}
+
+			if (terminatecomputation) {
+				return false;
 			}
 		}
 	}
@@ -380,7 +389,7 @@ int cDeNovoGraph::createGraph(bool& terminatecomputation) {
 		combarray.push_back(0);
 	}
 
-	while (bricksdatabasewithcombinations.nextCombination(combarray, numberofbasicbricks, parameters->maximumbricksincombination, parameters->maximumcumulativemass)) {
+	while (bricksdatabasewithcombinations.nextCombination(combarray, numberofbasicbricks, parameters->maximumbricksincombination, parameters->maximumcumulativemass, uncharge(parameters->precursormass, parameters->precursorcharge))) {
 		if (terminatecomputation) {
 			return -1;
 		}
@@ -400,7 +409,7 @@ int cDeNovoGraph::createGraph(bool& terminatecomputation) {
 	*os << "Generating combinations of bricks and generating edges... " << endl;
 
 	int j = 0;
-	while (bricksdatabasewithcombinations.nextCombination(combarray, numberofbasicbricks, parameters->maximumbricksincombination, parameters->maximumcumulativemass)) {
+	while (bricksdatabasewithcombinations.nextCombination(combarray, numberofbasicbricks, parameters->maximumbricksincombination, parameters->maximumcumulativemass, uncharge(parameters->precursormass, parameters->precursorcharge))) {
 
 		if (terminatecomputation) {
 			return -1;
@@ -424,7 +433,7 @@ int cDeNovoGraph::createGraph(bool& terminatecomputation) {
 		}
 		else {
 			b.clear();
-			b.setMass(bricksdatabasewithcombinations.getMassOfComposition(combarray, parameters->maximumbricksincombination));
+			b.setMass(bricksdatabasewithcombinations.getMassOfComposition(combarray));
 			b.setComposition(compositionname, true);
 			bricksdatabasewithcombinations.push_back(b);
 		}
@@ -773,6 +782,7 @@ int cDeNovoGraph::connectEdgesFormingPathsNotFinishingInPrecursor(bool& terminat
 			graph[i].insertEdge(e);
 			edgescreated++;
 
+			// normal brick
 			cBrick b;
 			b.setName(to_string(e.massdifference));
 			b.setAcronyms(to_string(e.massdifference));
@@ -781,6 +791,16 @@ int cDeNovoGraph::connectEdgesFormingPathsNotFinishingInPrecursor(bool& terminat
 			b.setSummary(s);
 			b.setMass(e.massdifference);
 			b.setComposition(to_string(e.brickid), false);
+			b.setArtificial(true);
+			bricksdatabasewithcombinations.push_back(b);
+
+			// water loss brick
+			b.setName(to_string(e.massdifference - H2O));
+			b.setAcronyms(to_string(e.massdifference - H2O));
+			b.setReferences(s);
+			b.setSummary(s);
+			b.setMass(e.massdifference - H2O);
+			b.setComposition(to_string((int)bricksdatabasewithcombinations.size() + 1), false);
 			b.setArtificial(true);
 			bricksdatabasewithcombinations.push_back(b);
 		//}
@@ -879,7 +899,7 @@ int cDeNovoGraph::removePathsWhichCanBeSubstitutedByLongerPath(bool& terminateco
 			cBrick b;
 			b.setComposition(graph[i][j].composition, true);
 			path.clear();
-			if (findPath(i, j, graph[i][j].targetnode, b.getComposition(), "", parameters->maximumbricksincombination, path)) {
+			if (findPath(i, j, graph[i][j].targetnode, b.getComposition(), "", parameters->maximumbricksincombination, path, terminatecomputation)) {
 				//*os << "removing edge: " << graph[i].getMZRatio() << "->" << graph[graph[i][j].targetnode].getMZRatio() << " " << bricksdatabasewithcombinations.getTagName(b.getComposition()) << endl;
 				graph[i].removeEdge(j);
 				edgesremoved++;
@@ -887,6 +907,11 @@ int cDeNovoGraph::removePathsWhichCanBeSubstitutedByLongerPath(bool& terminateco
 			else {
 				j++;
 			}
+
+			if (terminatecomputation) {
+				return -1;
+			}
+
 		}
 	}
 	*os << "ok" << endl;
@@ -960,6 +985,7 @@ void cDeNovoGraph::printPaths(cMainThread* os, cDeNovoGraphNode& node, vector<st
 
 
 string cDeNovoGraph::printGraph() {
+	const int edgesmaxreport = 100;
 	string s, s2;
 	string g = "";
 
@@ -968,7 +994,7 @@ string cDeNovoGraph::printGraph() {
 		s = to_string(graph[i].getMZRatio());
 
 		if ((int)graph[i].size() > 0) {
-			g += "The node " + s + " with relative intensity " + to_string(graph[i].getIntensity()) + " has " + to_string(graph[i].size()) + " outgoing edge(s).<br/>";
+			g += "The node " + s + " with relative intensity " + to_string(graph[i].getIntensity()) + " has " + to_string(graph[i].size()) + " outgoing edge(s):<br/>";
 		}
 		else {
 			g += "The node " + s + " with relative intensity " + to_string(graph[i].getIntensity()) + " does not have any outgoing edge.<br/>";
@@ -978,7 +1004,8 @@ string cDeNovoGraph::printGraph() {
 		//g += graph[i].printAnnotations();
 		//g += "\n";
 		
-		for (int j = 0; j < (int)graph[i].size(); j++) {
+		for (int j = 0; j < min((int)graph[i].size(), edgesmaxreport); j++) {
+
 			s2 = to_string(graph[graph[i][j].targetnode].getMZRatio());
 			g += s + "->" + s2 + " using brick(s): ";
 			if (graph[i][j].composition.compare("0") == 0) {
@@ -1005,6 +1032,10 @@ string cDeNovoGraph::printGraph() {
 			//g += "->";
 			//g += graph[i][j].printTargetAnnotation(fragmentdefinitions);
 			g += ")<br/>";
+		}
+
+		if ((int)graph[i].size() > edgesmaxreport) {
+			g += "... and " + to_string((int)graph[i].size() - edgesmaxreport) + " other edge(s).<br/>";
 		}
 
 		g += "<br/>";

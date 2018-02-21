@@ -124,7 +124,7 @@ void cSequenceDatabase::loadFromPlainTextStream(ifstream &stream) {
 		}
 
 		// load reference
-		#if OS_TYPE == UNX
+		#if OS_TYPE != WIN
 			if ((s.size() > 0) && (s.back() == '\r')) {
 				s = s.substr(0, s.size() - 1);
 			}

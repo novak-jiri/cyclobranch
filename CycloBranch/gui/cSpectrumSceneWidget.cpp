@@ -100,7 +100,6 @@ void cSpectrumSceneWidget::exportToPDF(QString filename, bool postscript) {
 		QString errstr = "The file cannot be created.";
 		#if OS_TYPE == UNX
 			errstr += "\nDo you have a properly configured print server (sudo apt-get install cups-pdf) ?";
-			errstr += "\nIf you cannot create a ps file, you can create a pdf file and then use pdf2ps tool.";
 		#endif
 		msgBox.setText(errstr);
 		msgBox.exec();
@@ -128,6 +127,7 @@ void cSpectrumSceneWidget::exportToSVG(QString filename) {
 		return;
 	}
 
+	painter.fillRect(QRect(0, 0, scene->width(), scene->height()), Qt::white);
 	scene->render(&painter);
 	painter.end();
 }
@@ -437,9 +437,11 @@ void cSpectrumSceneWidget::redrawScene() {
 		sprintf_s(tmpbuf,"%.3f\0",visiblepeaks[i].mzratio);
 		s = tmpbuf;
 		hits.push_back(s);
+		QGraphicsLineItem* line;
 
 		if (hits.size() > 1) {
-			scene->addLine(x, h - bottommargin - 2, x, h - bottommargin - std::max((int)y, 5), QPen(Qt::red, 2, Qt::SolidLine));
+			line = scene->addLine(x, h - bottommargin - 2, x, h - bottommargin - std::max((int)y, 5), QPen(Qt::red, 2, Qt::SolidLine));
+			line->setZValue(1);
 			
 			hiddenitems.clear();
 			sumh = 0;

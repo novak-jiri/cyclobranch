@@ -57,14 +57,19 @@ void generateBricksPermutations(vector<string>& bricks, vector<string>& currentp
 }
 
 
-bool cBricksDatabase::nextCombination(vector<int>& combarray, int numberofbasicbricks, int maximumbricksincombination, double maximumcumulativemass) {
+bool cBricksDatabase::nextCombination(vector<int>& combarray, int numberofbasicbricks, int maximumbricksincombination, double maximumcumulativemass, double neutralprecursormass) {
 	int pointer = 0;
 	int cyFlag = 0;
+	double mass;
+
 	do {
+
 		combarray[pointer]++;
 
 		// set combarray[pointer] to the maximum value when outside of the mass range
-		if ((cyFlag == 0) && (combarray[pointer] <= numberofbasicbricks) && (maximumcumulativemass > 0) && (getMassOfComposition(combarray, maximumbricksincombination) > maximumcumulativemass)) {
+		mass = getMassOfComposition(combarray);
+
+		if ((cyFlag == 0) && (combarray[pointer] <= numberofbasicbricks) && (((maximumcumulativemass > 0) && (mass > maximumcumulativemass)) || (mass > neutralprecursormass))) {
 			combarray[pointer] = numberofbasicbricks + 1;
 		}
 
@@ -77,27 +82,35 @@ bool cBricksDatabase::nextCombination(vector<int>& combarray, int numberofbasicb
 				}
 
 				// skip combinations outside of the mass range
-				while ((combarray[pointer] <= numberofbasicbricks) && (pointer < maximumbricksincombination - 1) && (maximumcumulativemass > 0) && (getMassOfComposition(combarray, maximumbricksincombination) > maximumcumulativemass)) {
+				mass = getMassOfComposition(combarray);
+
+				while ((combarray[pointer] <= numberofbasicbricks) && (pointer < maximumbricksincombination - 1) && (((maximumcumulativemass > 0) && (mass > maximumcumulativemass)) || (mass > neutralprecursormass))) {
 					pointer++;
 					combarray[pointer]++;
 
 					for (int i = pointer - 1; i >= 0; i--) {
 						combarray[i] = combarray[pointer];
 					}
+
+					mass = getMassOfComposition(combarray);
 				}
 
-				if ((combarray[pointer] > numberofbasicbricks) || ((maximumcumulativemass > 0) && (getMassOfComposition(combarray, maximumbricksincombination) > maximumcumulativemass))) {
+				if ((combarray[pointer] > numberofbasicbricks) || ((maximumcumulativemass > 0) && (mass > maximumcumulativemass)) || (mass > neutralprecursormass)) {
 					return false;
 				}
 
 			}
 
 			return true;
+
 		}
 		else  {
+
 			cyFlag = 1;
 			pointer++;
+
 		}
+
 	} while (pointer < maximumbricksincombination);
 
 	return false;
@@ -178,7 +191,7 @@ int cBricksDatabase::loadFromPlainTextStream(ifstream &stream, string& errormess
 		}
 
 		// load references
-		#if OS_TYPE == UNX
+		#if OS_TYPE != WIN
 			if ((s.size() > 0) && (s.back() == '\r')) {
 				s = s.substr(0, s.size() - 1);
 			}
@@ -252,12 +265,14 @@ cBrick& cBricksDatabase::operator[](int position) {
 }
 
 
-double cBricksDatabase::getMassOfComposition(vector<int>& combarray, int maximumbricksincombination) {
+double cBricksDatabase::getMassOfComposition(vector<int>& combarray) {
 	double mass = 0;
-	for (int i = 0; i < maximumbricksincombination; i++) {
+	int i = 0;
+	while (i < (int)combarray.size()) {
 		if (combarray[i] > 0) {
 			mass += bricks[combarray[i] - 1].getMass();
 		}
+		i++;
 	}
 	return mass;
 }

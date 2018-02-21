@@ -75,9 +75,10 @@ public:
 		\param numberofbasicbricks initial number of bricks in a database
 		\param maximumbricksincombination maximum number of combined bricks
 		\param maximumcumulativemass maximum cummulative mass of combined bricks
+		\param neutralprecursormass neutral precursor mass 
 		\retval bool true when a valid vector is stored in combarray, false when all valid vectors were already generated
 	*/ 
-	bool nextCombination(vector<int>& combarray, int numberofbasicbricks, int maximumbricksincombination, double maximumcumulativemass);
+	bool nextCombination(vector<int>& combarray, int numberofbasicbricks, int maximumbricksincombination, double maximumcumulativemass, double neutralprecursormass);
 
 
 	/**
@@ -133,10 +134,9 @@ public:
 	/**
 		\brief Get the mass of a composition of bricks.
 		\param combarray reference to an input integer vector of ids
-		\param maximumbricksincombination maximum number of bricks in a combination
 		\retval double cumulative mass of the bricks in the \a combarray
 	*/ 
-	double getMassOfComposition(vector<int>& combarray, int maximumbricksincombination);
+	double getMassOfComposition(vector<int>& combarray);
 
 
 	/**

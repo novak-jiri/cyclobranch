@@ -55,13 +55,14 @@ class cDeNovoGraph {
 
 	cGraphReaderThread* graphreaderthread;
 
-	bool findPath(int sourcenodeid, int edgeid, int targetnodeid, string& composition, string brickspath, int maximumbricksincombination, vector<nodeEdge>& path);
+	bool findPath(int sourcenodeid, int edgeid, int targetnodeid, string& composition, string brickspath, int maximumbricksincombination, vector<nodeEdge>& path, bool& terminatecomputation);
 
 	// create vectors of edges from temporary unordered_sets
 	void createVectorsOfEdges();
 
 	// check whether a path leads to the precursor
 	bool finishInPrecursor(int currentnode, double cummass);
+
 
 public:
 

@@ -53,6 +53,15 @@ public:
 	~cMainWindow();
 
 
+protected:
+
+	/**
+		\brief Handle a key press event.
+		\param event pointer to QKeyEvent
+	*/ 
+	void keyPressEvent(QKeyEvent *event);
+
+
 private:
 
 	// main menu
@@ -71,6 +80,7 @@ private:
 	QToolBar* toolbarTools;
 	QToolBar* toolbarView;
 	QToolBar* toolbarHelp;
+	QToolBar* toolbarFilter;
 
 	// subitems in the menu
 	QAction* actionOpenResults;
@@ -85,11 +95,19 @@ private:
 	QAction* actionSequenceDatabase;
 	QAction* actionModifications;
 	QAction *actionDrawPeptide;
+	QAction* actionShowIsomers;
 	QAction* actionGraph;
 	QAction* actionLog;
 	QAction* actionHTMLDocumentation;
 	QAction* actionPDFManual;
 	QAction* actionAbout;
+
+	QWidget* rowsfilterwidget;
+	QHBoxLayout* rowsfilterhbox;
+	QLineEdit* rowsfilterline;
+	QCheckBox* rowsfiltercasesensitive;
+	QPushButton* rowsfilterbutton;
+	QPushButton* rowsfilterclearbutton;
 
 	QTableWidget* results;
 	cTheoreticalSpectrumList theoreticalspectrumlist;
@@ -125,7 +143,9 @@ private:
 
 	void closeEvent(QCloseEvent *event);
 
-	void reportSpectrum(int id, cTheoreticalSpectrum& theoreticalspectrum);
+	void preparePeptideSequence(int row, string& peptidesequence, bool reportisomers);
+
+	void reportSpectrum(int id, cTheoreticalSpectrum& theoreticalspectrum, bool reportisomers);
 
 	void deleteResults();
 
@@ -166,6 +186,8 @@ private slots:
 
 	void reportSpectra();
 
+	void updateSpectra();
+
 	void resultsCellClicked(int row, int column);
 
 	void setGraph(string s);
@@ -191,6 +213,10 @@ private slots:
 	void insertSequence(int peptidetypeindex, QString tag);
 
 	void quitApplication();
+
+	void filterResults();
+
+	void resetFilter();
 
 	//void showContextMenu(const QPoint &pt);
 

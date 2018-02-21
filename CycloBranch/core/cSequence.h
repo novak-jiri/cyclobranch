@@ -179,7 +179,7 @@ public:
 		\brief Get the summary formula.
 		\retval string summary formula
 	*/ 
-	string& getSummaryFormula();
+	string getSummaryFormula();
 
 };
 

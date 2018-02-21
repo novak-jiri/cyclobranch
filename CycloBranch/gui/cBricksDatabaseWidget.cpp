@@ -15,6 +15,7 @@
 #include <QCheckBox>
 #include <QKeyEvent>
 #include <QIcon>
+#include <QLineEdit>
 
 
 int numberOfOccurrences(const string& s, char c) {
@@ -43,17 +44,44 @@ cBricksDatabaseWidget::cBricksDatabaseWidget(QWidget* parent) {
 	close->setToolTip("Close the window.");
 	load = new QPushButton(tr("Load"));
 	load->setToolTip("Load the database of building blocks.");
-	save = new QPushButton(QString("Save"));
+	save = new QPushButton(QString(" Save "));
 	save->setToolTip("Save the database of building blocks in the current file. When a file has not been loaded yet, the \"Save As ...\" file dialog is opened.");
 	saveas = new QPushButton(tr("Save As..."));
 	saveas->setToolTip("Save the database of building blocks into a file.");
 
+	rowsfilterline = new QLineEdit();
+	rowsfilterline->setMinimumWidth(250);
+	rowsfilterline->setToolTip("Text to Find");
+	rowsfiltercasesensitive = new QCheckBox();
+	rowsfiltercasesensitive->setToolTip("Case Sensitive");
+	rowsfilterbutton = new QPushButton("Filter");
+	rowsfilterbutton->setToolTip("Filter Search Results");
+	rowsfilterbutton->setMinimumWidth(50);
+	rowsfilterclearbutton = new QPushButton("Clear");
+	rowsfilterclearbutton->setToolTip("Clear Form and Reset Search Results");
+	rowsfilterclearbutton->setMinimumWidth(50);
+
+	rowsfilterhbox = new QHBoxLayout();
+	rowsfilterhbox->addWidget(rowsfilterline);
+	rowsfilterhbox->addStretch();
+	rowsfilterhbox->addWidget(rowsfiltercasesensitive);
+	rowsfilterhbox->addStretch();
+	rowsfilterhbox->addWidget(rowsfilterbutton);
+	rowsfilterhbox->addStretch();
+	rowsfilterhbox->addWidget(rowsfilterclearbutton);
+
+	rowsfilterwidget = new QWidget();
+	rowsfilterwidget->setLayout(rowsfilterhbox);
+	rowsfilterwidget->setMaximumWidth(420);
+
 	buttons = new QHBoxLayout();
 	buttons->addWidget(close);
-	buttons->addStretch(1);
+	buttons->addStretch();
 	buttons->addWidget(insertrow);
 	buttons->addWidget(removechecked);
-	buttons->addStretch(10);
+	buttons->addStretch();
+	buttons->addWidget(rowsfilterwidget);
+	buttons->addStretch();
 	buttons->addWidget(load);
 	buttons->addWidget(save);
 	buttons->addWidget(saveas);
@@ -91,11 +119,13 @@ cBricksDatabaseWidget::cBricksDatabaseWidget(QWidget* parent) {
 	connect(database->horizontalHeader(), SIGNAL(sectionDoubleClicked(int)), this, SLOT(headerItemDoubleClicked(int)));
 	connect(database, SIGNAL(itemChanged(QTableWidgetItem *)), this, SLOT(itemChanged(QTableWidgetItem *)));
 	connect(insertrow, SIGNAL(released()), this, SLOT(addRow()));
-	connect(removechecked, SIGNAL(released()), this, SLOT(removeEmptyRows()));
+	connect(removechecked, SIGNAL(released()), this, SLOT(removeCheckedRows()));
 	connect(close, SIGNAL(released()), this, SLOT(closeWindow()));
 	connect(load, SIGNAL(released()), this, SLOT(loadDatabase()));
 	connect(save, SIGNAL(released()), this, SLOT(saveDatabase()));
 	connect(saveas, SIGNAL(released()), this, SLOT(saveDatabaseAs()));
+	connect(rowsfilterbutton, SIGNAL(released()), this, SLOT(filterRows()));
+	connect(rowsfilterclearbutton, SIGNAL(released()), this, SLOT(resetFilter()));
 
 	setLayout(mainlayout);
 
@@ -106,10 +136,12 @@ cBricksDatabaseWidget::cBricksDatabaseWidget(QWidget* parent) {
 	#if OS_TYPE == WIN
 		lastdir = "./BrickDatabases/";
 	#else
-		lastdir = linuxinstalldir + "BrickDatabases/";
+		lastdir = installdir + "BrickDatabases/";
 	#endif
 	
 	bricks.clear();
+
+	setDataModified(false);
 }
 
 
@@ -128,6 +160,14 @@ cBricksDatabaseWidget::~cBricksDatabaseWidget() {
 	delete load;
 	delete save;
 	delete saveas;
+
+	delete rowsfilterline;
+	delete rowsfiltercasesensitive;
+	delete rowsfilterbutton;
+	delete rowsfilterclearbutton;
+	delete rowsfilterhbox;
+	delete rowsfilterwidget;
+
 	delete database;
 	delete buttons;
 	delete mainlayout;
@@ -230,20 +270,55 @@ bool cBricksDatabaseWidget::checkFormula(int row, const string& summary) {
 		return false;
 	}
 	if (database->item(row, 4)) {
-		database->item(row, 4)->setData(Qt::DisplayRole, formula.getMass());
+		database->item(row, 4)->setData(Qt::DisplayRole, to_string(formula.getMass()).c_str());
 	}
 	return true;
 }
 
 
+void cBricksDatabaseWidget::setDataModified(bool datamodified) {
+	if (datamodified == this->datamodified) {
+		return;
+	}
+
+	this->datamodified = datamodified;
+
+	if (datamodified) {
+		save->setText("*" + save->text());
+	}
+	else {
+		if ((save->text().size() > 0) && (save->text().at(0) == '*')) {
+			save->setText(save->text().toStdString().substr(1).c_str());
+		}
+	}
+}
+
+
 void cBricksDatabaseWidget::keyPressEvent(QKeyEvent *event) {
-    if(event->key() == Qt::Key_Escape) {
-		hide();
+    if (event->key() == Qt::Key_Escape) {
+		closeWindow();
+    }
+
+	if ((event->key() == Qt::Key_Enter) || (event->key() == Qt::Key_Return)) {
+		if (rowsfilterline->hasFocus()) {
+			filterRows();
+		}
     }
 }
 
 
 void cBricksDatabaseWidget::closeWindow() {
+	if (datamodified) {
+		QMessageBox::StandardButton reply;
+		reply = QMessageBox::question(this, appname, "Save changes ?", QMessageBox::Yes|QMessageBox::No);
+	
+		if (reply == QMessageBox::Yes) {
+			if (!saveDatabase()) {
+				return;
+			}
+		}
+	}
+
 	hide();
 }
 
@@ -256,7 +331,7 @@ void cBricksDatabaseWidget::loadDatabase() {
 		string errormessage;
 		
 		databasefile = filename;
-		save->setText(QString("  Save '") + QString(databasefile.toStdString().substr(databasefile.toStdString().rfind('/') + 1, databasefile.toStdString().size()).c_str()) + QString("'  "));
+		save->setText(QString(" Save '") + QString(databasefile.toStdString().substr(databasefile.toStdString().rfind('/') + 1, databasefile.toStdString().size()).c_str()) + QString("' "));
 		
 		inputstream.open(filename.toStdString().c_str());
 
@@ -293,7 +368,7 @@ void cBricksDatabaseWidget::loadDatabase() {
 				database->item(i, 3)->setText(bricks[i].getSummary().c_str());
 
 				database->setItem(i, 4, widgetitemallocator.getNewItem());
-				database->item(i, 4)->setData(Qt::DisplayRole, bricks[i].getMass());
+				database->item(i, 4)->setData(Qt::DisplayRole, to_string(bricks[i].getMass()).c_str());
 				
 				database->setItem(i, 5, widgetitemallocator.getNewItem());
 				database->item(i, 5)->setText(bricks[i].getReferencesAsString().c_str());
@@ -315,6 +390,8 @@ void cBricksDatabaseWidget::loadDatabase() {
 
 			progress.setValue(bricks.size());
 
+			setDataModified(false);
+
 		}
 
 		inputstream.close();
@@ -323,15 +400,15 @@ void cBricksDatabaseWidget::loadDatabase() {
 }
 
 
-void cBricksDatabaseWidget::saveDatabase() {
+bool cBricksDatabaseWidget::saveDatabase() {
+	bool saved = false;
 
 	if (!checkTable()) {
-		return;
+		return saved;
 	}
 
 	if (databasefile.compare("") == 0) {
-		saveDatabaseAs();
-		return;
+		return saveDatabaseAs();
 	}
 
 	outputstream.open(databasefile.toStdString().c_str());
@@ -352,9 +429,15 @@ void cBricksDatabaseWidget::saveDatabase() {
 		bricks.clear();
 		string s;
 
-		removeEmptyRows();
+		removeCheckedRows();
 
 		for (int i = 0; i < database->rowCount(); i++) {
+
+			if (database->isRowHidden(i)) {
+				progress.setValue(i);
+				continue;
+			}
+
 			b.clear();
 			for (int j = 0; j < database->columnCount(); j++) {
 				switch (j)
@@ -397,15 +480,20 @@ void cBricksDatabaseWidget::saveDatabase() {
 
 		progress.setValue(progress.maximum());
 
+		setDataModified(false);
+			
+		saved = true;
+
 	}
 	outputstream.close();
+
+	return saved;
 }
 
 
-void cBricksDatabaseWidget::saveDatabaseAs() {
-
+bool cBricksDatabaseWidget::saveDatabaseAs() {
 	if (!checkTable()) {
-		return;
+		return false;
 	}
 
 	QString filename = QFileDialog::getSaveFileName(this, tr("Save the Database of Building Blocks As..."), lastdir, tr("Database of Building Blocks (*.txt)"));
@@ -414,9 +502,11 @@ void cBricksDatabaseWidget::saveDatabaseAs() {
 		lastdir = filename;
 	
 		databasefile = filename;
-		save->setText(QString("  Save '") + QString(databasefile.toStdString().substr(databasefile.toStdString().rfind('/') + 1, databasefile.toStdString().size()).c_str()) + QString("'  "));
-		saveDatabase();
+		save->setText(QString(" Save '") + QString(databasefile.toStdString().substr(databasefile.toStdString().rfind('/') + 1, databasefile.toStdString().size()).c_str()) + QString("' "));
+		return saveDatabase();
 	}
+
+	return false;
 }
 
 
@@ -440,11 +530,12 @@ void cBricksDatabaseWidget::addRow() {
 }
 
 
-void cBricksDatabaseWidget::removeEmptyRows() {
+void cBricksDatabaseWidget::removeCheckedRows() {
 	int i = 0;
 	while (i < database->rowCount()) {
 		if (((QCheckBox *)(database->cellWidget(i, 0)))->isChecked()) {
 			removeRow(i);
+			setDataModified(true);
 		}
 		else {
 			i++;
@@ -466,10 +557,14 @@ void cBricksDatabaseWidget::itemChanged(QTableWidgetItem* item) {
 		b.setReferences(database->item(item->row(), 5)->text().toStdString());
 		((QLabel *)database->cellWidget(item->row(), 6))->setText(b.getAcronymsWithReferencesAsHTMLString().c_str());
 	}
+
+	setDataModified(true);
 }
 
 
 void cBricksDatabaseWidget::headerItemDoubleClicked(int index) {
+	setDataModified(true);
+
 	if (headersort[index] == -1) {
 		database->sortByColumn(index, Qt::AscendingOrder);
 		headersort[index] = 1;
@@ -484,5 +579,58 @@ void cBricksDatabaseWidget::headerItemDoubleClicked(int index) {
 		database->sortByColumn(index, Qt::DescendingOrder);
 		headersort[index] = 0;
 	}
+}
+
+
+void cBricksDatabaseWidget::filterRows() {
+	Qt::CaseSensitivity casesensitive = rowsfiltercasesensitive->isChecked()?Qt::CaseSensitive:Qt::CaseInsensitive;
+	QString str = rowsfilterline->text();
+	int rowcount = database->rowCount();
+	bool match;
+	int i, j;
+
+	QProgressDialog progress("Updating...", /*"Cancel"*/0, 0, rowcount, this);
+	cEventFilter filter;
+	progress.installEventFilter(&filter);
+	progress.setMinimumDuration(0);
+	progress.setWindowModality(Qt::WindowModal);
+
+	for (i = 0; i < rowcount; i++) {
+		match = false;
+		for (j = 0; j < database->columnCount(); j++) {
+			// ignore non-text fields
+			if ((j == 0) || (j == 6)) {
+				continue;
+			}
+
+			if (database->item(i, j)->text().contains(str, casesensitive)) {
+				match = true;
+				break;
+			}
+		}
+		database->setRowHidden(i, !match);
+		progress.setValue(i);
+	}
+
+	progress.setValue(rowcount);
+}
+
+
+void cBricksDatabaseWidget::resetFilter() {
+	rowsfilterline->setText("");
+	int rowcount = database->rowCount();
+
+	QProgressDialog progress("Updating...", /*"Cancel"*/0, 0, rowcount, this);
+	cEventFilter filter;
+	progress.installEventFilter(&filter);
+	progress.setMinimumDuration(0);
+	progress.setWindowModality(Qt::WindowModal);
+
+	for (int i = 0; i < rowcount; i++) {
+		database->setRowHidden(i, false);
+		progress.setValue(i);
+	}
+
+	progress.setValue(rowcount);
 }
 
