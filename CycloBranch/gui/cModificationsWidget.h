@@ -17,6 +17,7 @@
 #include <QTableView>
 #include <QStandardItemModel>
 #include <QStandardItem>
+#include <QComboBox>
 #include <fstream>
 #include "core/utilities.h"
 #include "core/cFragmentIons.h"
@@ -95,8 +96,11 @@ private:
 	QToolBar* toolbarFilter;
 	QWidget* rowsfilterwidget;
 	QHBoxLayout* rowsfilterhbox;
+	QComboBox* rowsfiltercombobox;
+	QComboBox* rowsfiltercomparatorcombobox;
 	QLineEdit* rowsfilterline;
 	QCheckBox* rowsfiltercasesensitive;
+	QCheckBox* rowsfilterwholeword;
 	QPushButton* rowsfilterbutton;
 	QPushButton* rowsfilterclearbutton;
 

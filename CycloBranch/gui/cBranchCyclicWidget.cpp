@@ -58,6 +58,8 @@ cBranchCyclicWidget::cBranchCyclicWidget() {
 	theoreticalspectrum = 0;
 	visiblerotationid = -1;
 	visibletrotationid = -1;
+
+	reportisomers = false;
 }
 
 
@@ -139,6 +141,12 @@ void cBranchCyclicWidget::exportToSVG(QString filename) {
 }
 
 
+void cBranchCyclicWidget::setReportIsomers(bool reportisomers) {
+	this->reportisomers = reportisomers;
+	repaint();
+}
+
+
 void cBranchCyclicWidget::paintEvent(QPaintEvent *event) {
 	QPainter painter;
 	painter.begin(this);
@@ -158,6 +166,11 @@ void cBranchCyclicWidget::paint(QPainter& painter) {
 	vector<string> branchacronyms;
 	backboneacronyms = theoreticalspectrum->getCandidate().getBackboneAcronyms();
 	branchacronyms = theoreticalspectrum->getCandidate().getBranchAcronyms();
+
+	if (!reportisomers) {
+		stripIsomersFromStringVector(backboneacronyms);
+		stripIsomersFromStringVector(branchacronyms);
+	}
 
 	const int topmargin = 20;
 	const int leftmargin = 20;

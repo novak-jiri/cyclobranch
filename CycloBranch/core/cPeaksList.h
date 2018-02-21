@@ -25,48 +25,12 @@ class cMainThread;
 
 
 /**
-	\brief Compare two peaks by mz ratio.
-	\param a first peak
-	\param b second peak
-	\retval bool true when the mz ratio of the peak \a a is lower than the mz ratio of the peak \a b
-*/
-bool comparePeakMasses(const cPeak& a, const cPeak& b);
-
-
-/**
 	\brief Compare two peaks by relative intensities.
 	\param a first peak
 	\param b second peak
 	\retval bool true when the relative intensity of the peak \a a is bigger than the relative intensity of the peak \a b
 */
 bool compareRelativePeakIntensitiesDesc(const cPeak& a, const cPeak& b);
-
-
-/**
-	\brief Compare two peaks by absolute intensities.
-	\param a first peak
-	\param b second peak
-	\retval bool true when the absolute intensity of the peak \a a is bigger than the absolute intensity of the peak \a b
-*/
-bool compareAbsolutePeakIntensitiesDesc(const cPeak& a, const cPeak& b);
-
-
-/**
-	\brief Compare two peaks by group id.
-	\param a first peak
-	\param b second peak
-	\retval bool true when the group id of the peak \a a is lower than the group id of the peak \a b
-*/
-bool comparePeakGroupId(const cPeak& a, const cPeak& b);
-
-
-/**
-	\brief Compare two peaks by \a removeme flag.
-	\param a first peak
-	\param b second peak
-	\retval bool true when the \a removeme flag of the peak \a a is lower than the \a removeme flag of the peak \a b
-*/
-bool comparePeakRemoveMeFlag(const cPeak& a, const cPeak& b);
 
 
 /**
@@ -158,17 +122,19 @@ public:
 		\brief Load the spectrum from .ibd file.
 		\param imzmlitem cImzML containing the offset in the ibd file
 		\param ibdstream an input binary file stream
-		\param use_64bit_precision if true, 64bit precision is used; if false, 32bit precision is used
-	*/ 
-	void loadFromIBDStream(cImzMLItem& imzmlitem, ifstream &ibdstream, bool use_64bit_precision);
+		\param use_64bit_float_mz_precision if true, 64bit mz precision is used; if false, 32bit precision is used
+		\param use_64bit_float_intensity_precision if true, 64bit intensity precision is used; if false, 32bit precision is used
+*/
+	void loadFromIBDStream(cImzMLItem& imzmlitem, ifstream &ibdstream, bool use_64bit_float_mz_precision, bool use_64bit_float_intensity_precision);
 
 
 	/**
 		\brief Store the spectrum into .ibd file.
 		\param ibdstream an output binary file stream
-		\param use_64bit_precision if true, 64bit precision is used; if false, 32bit precision is used
-	*/ 
-	void storeToIBDStream(ofstream &ibdstream, bool use_64bit_precision);
+		\param use_64bit_float_mz_precision if true, 64bit mz precision is used; if false, 32bit precision is used
+		\param use_64bit_float_intensity_precision if true, 64bit intensity precision is used; if false, 32bit precision is used
+	*/
+	void storeToIBDStream(ofstream &ibdstream, bool use_64bit_float_mz_precision, bool use_64bit_float_intensity_precision);
 
 
 	/**
@@ -219,6 +185,12 @@ public:
 
 
 	/**
+		\brief Sort the peaks by order id.
+	*/
+	void sortbyOrderId();
+
+
+	/**
 		\brief Normalize intensities of peaks.
 		\retval int 0 == success, -1 == maximum intensity <= 0
 	*/ 
@@ -226,10 +198,17 @@ public:
 
 
 	/**
-		\brief Remove peaks with relative intensities lower than a threshold.
+		\brief Remove peaks with relative intensities lower than the threshold.
 		\param minimumrelativeintensitythreshold minimum threshold of relative intensity
-	*/ 
+	*/
 	void cropRelativeIntenzity(double minimumrelativeintensitythreshold);
+
+
+	/**
+		\brief Remove peaks with absolute intensities lower than the threshold.
+		\param minimumabsoluteintensitythreshold minimum threshold of absolute intensity
+	*/
+	void cropAbsoluteIntenzity(unsigned minimumabsoluteintensitythreshold);
 
 
 	/**
@@ -341,16 +320,29 @@ public:
 
 
 	/**
-		\brief Get a maximum intensity of a peak in an interval of mz ratios.
+		\brief Get the maximum relative intensity from an m/z interval.
 		\param minmz minimum mz ratio
 		\param maxmz maximum mz ratio
 		\param hidematched true, if matched peaks are hidden
 		\param hideunmatched true, if unmatched peaks are hidden
 		\param peptidetype the type of peptide
 		\param hidescrambled true, if scrambled peaks are hidden
-		\retval double intensity
+		\retval double maximum relative intensity
 	*/ 
-	double getMaximumIntensityFromMZInterval(double minmz, double maxmz, bool hidematched, bool hideunmatched, ePeptideType peptidetype, bool hidescrambled);
+	double getMaximumRelativeIntensityFromMZInterval(double minmz, double maxmz, bool hidematched, bool hideunmatched, ePeptideType peptidetype, bool hidescrambled);
+
+
+	/**
+		\brief Get the maximum absolute intensity from an m/z interval.
+		\param minmz minimum mz ratio
+		\param maxmz maximum mz ratio
+		\param hidematched true, if matched peaks are hidden
+		\param hideunmatched true, if unmatched peaks are hidden
+		\param peptidetype the type of peptide
+		\param hidescrambled true, if scrambled peaks are hidden
+		\retval double maximum absolute intensity
+	*/
+	double getMaximumAbsoluteIntensityFromMZInterval(double minmz, double maxmz, bool hidematched, bool hideunmatched, ePeptideType peptidetype, bool hidescrambled);
 
 
 	/**
@@ -410,7 +402,18 @@ public:
 	*/
 	void reducePeakDescriptions(map<int, string>& peakidtodesc, map<string, int>& peakdesctoid);
 
+
+	/**
+		\brief Define order ids of peaks.
+	*/
+	void fillOrderIDs();
+
 };
 
+
+/**
+	\brief Register cPeaksList by Qt.
+*/
+Q_DECLARE_METATYPE(cPeaksList);
 
 #endif

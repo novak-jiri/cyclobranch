@@ -248,11 +248,11 @@ int cPeakListSeries::loadFromMZMLStream(string& mzmlfilename, ifstream &mzmlstre
 }
 
 
-int cPeakListSeries::loadFromIMZMLStream(string& imzmlfilename, ifstream &ibdstream, double fwhm, int& maxcountx, int& maxcounty, eVendorType& vendor, cMainThread* os, bool& terminatecomputation) {
+int cPeakListSeries::loadFromIMZMLStream(string& imzmlfilename, ifstream &ibdstream, double fwhm, int& defaultmaxx, int& defaultmaxy, int& pixelsize, eVendorType& vendor, cMainThread* os, bool& terminatecomputation) {
 	*os << "Loading the imzML file... ";
 
 	cImzML imzml;
-	if (imzml.parse(imzmlfilename, maxcountx, maxcounty, vendor)) {
+	if (imzml.parse(imzmlfilename, defaultmaxx, defaultmaxy, pixelsize, vendor)) {
 		return -3;
 	}
 
@@ -270,7 +270,8 @@ int cPeakListSeries::loadFromIMZMLStream(string& imzmlfilename, ifstream &ibdstr
 
 	int strip;
 	bool rawdata = imzml.hasProfileSpectra();
-	bool use_64bit_precision = imzml.use64BitPrecision();
+	bool use_64bit_float_mz_precision = imzml.use64BitMzPrecision();
+	bool use_64bit_float_intensity_precision = imzml.use64BitIntensityPrecision();
 
 	if (rawdata) {
 		mgfname = imzmlfilename.substr(0, (int)imzmlfilename.size() - 5);
@@ -299,7 +300,7 @@ int cPeakListSeries::loadFromIMZMLStream(string& imzmlfilename, ifstream &ibdstr
 		}
 
 		cPeaksList peaklist;
-		peaklist.loadFromIBDStream(imzml.getItems()[i], ibdstream, use_64bit_precision);
+		peaklist.loadFromIBDStream(imzml.getItems()[i], ibdstream, use_64bit_float_mz_precision, use_64bit_float_intensity_precision);
 		if (!rawdata) {
 			peaklists.push_back(peaklist);
 		}
@@ -394,7 +395,7 @@ int cPeakListSeries::loadFromIMZMLStream(string& imzmlfilename, ifstream &ibdstr
 			
 		// write peaklists
 		for (int i = 0; i < (int)peaklists.size(); i++) {
-			peaklists[i].storeToIBDStream(ofibdstream, use_64bit_precision);
+			peaklists[i].storeToIBDStream(ofibdstream, use_64bit_float_mz_precision, use_64bit_float_intensity_precision);
 		}
 			
 		ofibdstream.close();

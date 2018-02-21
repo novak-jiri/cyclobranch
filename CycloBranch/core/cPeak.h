@@ -132,21 +132,33 @@ struct cPeak {
 
 		
 	/**
-		\brief True when the peak is an isotope peak.
+		\brief True if the peak is an isotope peak.
 	*/ 
 	bool isotope;
 
 	
 	/**
-		\brief True when the peak should be removed.
+		\brief True if the peak should be removed.
 	*/ 
 	bool removeme;
 
 
 	/**
-		\brief True when the peak corresponds to a scrambled fragment ion.
-	*/ 
+		\brief True if the peak corresponds to a scrambled fragment ion.
+	*/
 	bool scrambled;
+
+
+	/**
+		\brief True if the peak corresponds to a decoy compound.
+	*/
+	bool decoy;
+
+
+	/**
+		\brief An order id of a peak in a peaklist.
+	*/
+	int orderid;
 
 
 	/**

@@ -33,6 +33,7 @@ int main(int argc, char** argv) {
 	qRegisterMetaType<string>("string");
 	qRegisterMetaType<cFragmentIons>("cFragmentIons");
 	qRegisterMetaType<vector<cCoordinates> >("vector<cCoordinates>");
+	qRegisterMetaType<cPeaksList>("cPeaksList");
 
 	QPixmap pixmap(":/images/splash.png");
 	QSplashScreen splash(pixmap);

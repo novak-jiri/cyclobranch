@@ -10,6 +10,7 @@
 #include <QString>
 #include <QVariant>
 #include <QSortFilterProxyModel>
+#include <QComboBox>
 #include "core/cParameters.h"
 
 
@@ -25,6 +26,9 @@ private:
 	eModeType mode;
 	ePeakListFileFormat peaklistfileformat;
 	bool generateisotopepattern;
+	QComboBox* rowsfiltercombobox;
+	QComboBox* rowsfiltercomparatorcombobox;
+	bool wholeword;
 
 public:
 
@@ -64,8 +68,10 @@ public:
 		\param mode program mode
 		\param peaklistfileformat peaklist format
 		\param generateisotopepattern true if full isotope patterns are generated; false otherwise
+		\param rowsfiltercombobox reference to the combobox with selection of columns
+		\param rowsfiltercomparatorcombobox reference to the combobox with selection of comparator
 	*/ 
-	void initialize(eModeType mode, ePeakListFileFormat peaklistfileformat, bool generateisotopepattern);
+	void initialize(eModeType mode, ePeakListFileFormat peaklistfileformat, bool generateisotopepattern, QComboBox* rowsfiltercombobox, QComboBox* rowsfiltercomparatorcombobox);
 
 
 	/**
@@ -76,6 +82,13 @@ public:
 		\param ymax maximum y coordinate
 	*/ 
 	void setRegion(int xmin, int xmax, int ymin, int ymax);
+
+
+	/**
+		\brief Set whole word option.
+		\param wholeword true if whole words are matched, false otherwise
+	*/
+	void setWholeWord(bool wholeword);
 
 
 protected:
@@ -98,7 +111,7 @@ protected:
 	*/
 	bool lessThan(const QModelIndex &left, const QModelIndex &right) const Q_DECL_OVERRIDE;    
 
-
+	
 };
 
 

@@ -9,6 +9,7 @@
 
 #include <QString>
 #include <QVariant>
+#include <QComboBox>
 #include <QSortFilterProxyModel>
 #include "core/cFragmentIons.h"
 
@@ -20,6 +21,12 @@ class cModificationsProxyModel : public QSortFilterProxyModel {
 
 	Q_OBJECT
 
+private:
+
+	QComboBox* rowsfiltercombobox;
+	QComboBox* rowsfiltercomparatorcombobox;
+	bool wholeword;
+
 public:
 
 
@@ -28,6 +35,21 @@ public:
 		\param parent pointer to a parent widget
 	*/ 
 	cModificationsProxyModel(QObject *parent = 0);
+
+
+	/**
+		\brief Initialize the model.
+		\param rowsfiltercombobox reference to the combobox with selection of columns
+		\param rowsfiltercomparatorcombobox reference to the combobox with selection of comparator
+	*/
+	void initialize(QComboBox* rowsfiltercombobox, QComboBox* rowsfiltercomparatorcombobox);
+
+
+	/**
+		\brief Set whole word option.
+		\param wholeword true if whole words are matched, false otherwise
+	*/
+	void setWholeWord(bool wholeword);
 
 
 protected:
@@ -48,7 +70,7 @@ protected:
 		\param right QModelIndex
 		\retval bool bool
 	*/
-	bool lessThan(const QModelIndex &left, const QModelIndex &right) const Q_DECL_OVERRIDE;    
+	bool lessThan(const QModelIndex &left, const QModelIndex &right) const Q_DECL_OVERRIDE;  
 
 
 };

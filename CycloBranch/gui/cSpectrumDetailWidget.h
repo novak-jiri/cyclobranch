@@ -9,6 +9,9 @@
 
 #include <QWidget>
 #include <QDesktopServices>
+#include <QToolBar>
+#include <QMenuBar>
+#include <QMenu>
 #include <QUrl>
 #include <QFileInfo>
 #include <QMainWindow>
@@ -43,7 +46,6 @@ class QPushButton;
 class QSplitter;
 class QComboBox;
 class QDoubleSpinBox;
-class QToolBar;
 class QAction;
 class QLabel;
 
@@ -141,24 +143,27 @@ public:
 		\brief Get a table of peaks as a HTML string.
 		\param unmatchedtheoreticalpeaks if true then unmatched theoretical peaks are included
 		\param unmatchedexperimentalpeaks if true then unmatched experimental peaks are included
+		\param exportisomers if true then isomers of building blocks are exported
 		\retval string a table of peaks as a HTML string
 	*/ 
-	string getPeaksTableAsHTMLString(bool unmatchedtheoreticalpeaks, bool unmatchedexperimentalpeaks);
+	string getPeaksTableAsHTMLString(bool unmatchedtheoreticalpeaks, bool unmatchedexperimentalpeaks, bool exportisomers);
 
 
 	/**
 		\brief Get a partial table of peaks as a HTML string.
 		\param id identifier of a spectrum
+		\param exportisomers if true then isomers of building blocks are exported
 		\retval string a partial table of peaks as a HTML string
 	*/ 
-	string getPartialPeaksTableAsHTMLString(int id);
+	string getPartialPeaksTableAsHTMLString(int id, bool exportisomers);
 
 
 	/**
 		\brief Prepare the widget to show.
 		\param peptidetype a type of peptide
+		\param actionShowIsomers reference to QAction to show isomers of building blocks
 	*/ 
-	void prepareToShow(ePeptideType peptidetype);
+	void prepareToShow(ePeptideType peptidetype, QAction* actionShowIsomers);
 	
 
 	/**
@@ -188,29 +193,39 @@ protected:
 
 
 private:
-	QWidget* parent;
 
-	QToolBar* toolbarExport;
+	QWidget* parent;
+	QAction* actionShowIsomers;
+
+	QMenuBar* menuBar;
+	QMenu* menuFile;
+	QMenu* menuFind;
+	QMenu* menuView;
+	QMenu* menuHelp;
+
+	QToolBar* toolbarFile;
 	QToolBar* toolbarFind;
-	QToolBar* toolbarZoom;
-	QToolBar* toolbarHide;
+	QToolBar* toolbarView;
+	QToolBar* toolbarHelp;
 	QToolBar* toolbarMz;
 	QToolBar* toolbarRotation;
 	QToolBar* toolbarTrotation;
 
 	QAction* actionExportTable;
 	QAction* actionExportSpectrum;
+	QAction* actionCloseWindow;
 	QAction* actionFind;
 	QAction* actionPrevious;
 	QAction* actionNext;
 	QAction* actionZoomIn;
 	QAction* actionZoomOut;
 	QAction* actionZoomReset;
+	QAction* actionAbsoluteIntensity;
 	QAction* actionHideMatched;
 	QAction* actionHideUnmatched;
 	QAction* actionHideScrambled;
 	QAction* actionMouseMzSelection;
-
+	QAction* actionHTMLDocumentation;
 	QSplitter* hsplitter1;
 	QSplitter* hsplitter2;
 	QSplitter* vsplitter;
@@ -219,6 +234,7 @@ private:
 	QHBoxLayout* hboxmz;
 	QLabel* labelmz;
 	QDoubleSpinBox* minmz;
+	QLabel* labelseparator;
 	QDoubleSpinBox* maxmz;
 	QPushButton* setmzinterval;
 	QPushButton* resetmzinterval;
@@ -257,6 +273,7 @@ private:
 	cExportDialog* exportdialog;
 	int currentfinditem;
 
+	bool reportisomers;
 
 	void preparePeaksTable();
 
@@ -264,6 +281,7 @@ private:
 
 
 signals:
+
 
 	/**
 		\brief The signal is emitted when the range of m/z ratios has been changed.
@@ -275,33 +293,56 @@ signals:
 
 private slots:
 
+
 	void updateMZInterval(double minmz, double maxmz);
+
 
 	void setMZInterval();
 
+
 	void exportSpectrum();
+
 
 	void exportPeptide();
 
+
 	void openFindDialog();
+
 
 	void openExportImageDialog();
 
+
 	void exportTableToCSV();
+
 
 	void movePrevious();
 
+
 	void moveNext();
 
-	void headerItemClicked(int);
+
+	void headerItemClicked(int index);
+
 
 	void filterPeaksTable();
 
+
 	void hideMatchedPeaks(bool hide);
+
 
 	void hideUnmatchedPeaks(bool hide);
 
+
 	void hideScrambledPeaks(bool hide);
+
+
+	void showIsomersStateChanged();
+
+
+	void showHTMLDocumentation();
+
+
+	void closeWindow();
 
 };
 

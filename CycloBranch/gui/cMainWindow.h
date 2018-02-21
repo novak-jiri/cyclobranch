@@ -16,6 +16,7 @@
 #include <QStandardItemModel>
 #include <QStandardItem>
 #include <QItemDelegate>
+#include <QComboBox>
 #include "core/utilities.h"
 #include "core/cTheoreticalSpectrum.h"
 #include "gui/cAboutWidget.h"
@@ -30,6 +31,7 @@
 #include "gui/cMainThread.h"
 #include "gui/cHTMLExportDialog.h"
 #include "gui/cImageWindow.h"
+#include "gui/cChromatogramWindow.h"
 #include "gui/cMainWindowProxyModel.h"
 
 
@@ -72,17 +74,14 @@ protected:
 
 private:
 
-	// main menu
 	QMenuBar* menuBar;
 	
-	// items in the menu
 	QMenu* menuFile;
 	QMenu* menuSearch;
 	QMenu* menuTools;
 	QMenu* menuView;
 	QMenu* menuHelp;
 	
-	// toolbars
 	QToolBar* toolbarFile;
 	QToolBar* toolbarSearch;
 	QToolBar* toolbarTools;
@@ -90,7 +89,6 @@ private:
 	QToolBar* toolbarHelp;
 	QToolBar* toolbarFilter;
 
-	// subitems in the menu
 	QAction* actionOpenResults;
 	QAction* actionSaveResults;
 	QAction* actionExportToCsv;
@@ -109,6 +107,7 @@ private:
 	QAction* actionGraph;
 	QAction* actionSummaryTableOfMatchedPeaks;
 	QAction* actionImageWindow;
+	QAction* actionChromatogramWindow;
 	QAction* actionLog;
 	QAction* actionHTMLDocumentation;
 	QAction* actionPDFManual;
@@ -116,8 +115,11 @@ private:
 
 	QWidget* rowsfilterwidget;
 	QHBoxLayout* rowsfilterhbox;
+	QComboBox* rowsfiltercombobox;
+	QComboBox* rowsfiltercomparatorcombobox;
 	QLineEdit* rowsfilterline;
 	QCheckBox* rowsfiltercasesensitive;
+	QCheckBox* rowsfilterwholeword;
 	QPushButton* rowsfilterbutton;
 	QPushButton* rowsfilterclearbutton;
 
@@ -140,6 +142,7 @@ private:
 	cDrawPeptideWidget* drawpeptidewidget;
 	cSummaryPeaksTableWidget* summarytableofmatchedpeaks;
 	cImageWindow* imagewindow;
+	cChromatogramWindow* chromatogramwindow;
 	cParametersWidget* parameterswidget;
 	cHTMLExportDialog* htmlexportdialog;
 
@@ -187,6 +190,8 @@ private slots:
 
 	void showImageWindow();
 	
+	void showChromatogramWindow();
+
 	void showGraph();
 
 	void showProperties();
@@ -207,7 +212,7 @@ private slots:
 
 	void reportSpectra();
 
-	void updateSpectra();
+	void showIsomersStateChanged();
 
 	void rowDoubleClicked(const QModelIndex& item);
 
@@ -243,7 +248,9 @@ private slots:
 
 	void summaryPeaksTableCancelled();
 
-	void updateSummaryPeaksTableFilter(int xmin, int xmax, int ymin, int ymax);
+	void summaryPeaksTableRowDoubleClicked(int rowid);
+
+	void updateSummaryPeaksTableFilterSlot(int xmin, int xmax, int ymin, int ymax);
 
 	//void showContextMenu(const QPoint &pt);
 

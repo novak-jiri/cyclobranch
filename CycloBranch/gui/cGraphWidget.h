@@ -48,9 +48,10 @@ public:
 
 	/**
 		\brief Set the HTML text into the widget.
-		\param s string with the HTML text
+		\param html string with the HTML text
+		\param reportisomers true if isomers of building blocks are reported; false otherwise
 	*/ 
-	void setHTML(string s);
+	void setHTML(string html, bool reportisomers);
 
 
 	/**
@@ -58,6 +59,13 @@ public:
 		\retval string HTML string
 	*/ 
 	string getHTML();
+
+
+	/**
+		\brief Update HTML string if report isomers state is changed.
+		\param reportisomers true if isomers of building blocks are reported; false otherwise
+	*/
+	void updateView(bool reportisomers);
 
 
 	/**
@@ -82,6 +90,7 @@ public:
 
 
 private:
+
 	QVBoxLayout* layout;
 	QTextBrowser* textbrowser;
 	string htmlstring;

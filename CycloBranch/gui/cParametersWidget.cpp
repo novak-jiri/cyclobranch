@@ -58,7 +58,8 @@ cParametersWidget::cParametersWidget(QWidget* parent) {
 	peaklistformlayout = new QFormLayout();
 
 	peptidetype = new QComboBox();
-	peptidetype->setToolTip("Select the type of peptide best corresponding to the peaklist.");
+	peptidetype->setToolTip("Select the type of peptide or polyketide.");
+	peptidetype->setSizeAdjustPolicy(QComboBox::AdjustToContents);
 	peptidetype->addItem(tr("Linear"));
 	peptidetype->addItem(tr("Cyclic"));
 	peptidetype->addItem(tr("Branched"));
@@ -71,11 +72,11 @@ cParametersWidget::cParametersWidget(QWidget* parent) {
 	peaklistline = new QLineEdit();
 	peaklistbutton = new QPushButton("Select");
 	#if OS_TYPE != WIN
-		peaklistline->setToolTip("Select a file. Supported formats:\ntxt (peaklists),\nmgf (peaklists),\nmzML (profile spectra or peaklists),\nmzXML (peaklists),\nimzML (profile spectra or peaklists).");
-		peaklistbutton->setToolTip("Select a file. Supported formats:\ntxt (peaklists),\nmgf (peaklists),\nmzML (profile spectra or peaklists),\nmzXML (peaklists),\nimzML (profile spectra or peaklists).");
+		peaklistline->setToolTip("Select a file. Supported file formats:\ntxt (peaklists),\nmgf (peaklists),\nmzML (profile spectra or peaklists),\nmzXML (peaklists),\nimzML (profile spectra or peaklists).");
+		peaklistbutton->setToolTip("Select a file. Supported file formats:\ntxt (peaklists),\nmgf (peaklists),\nmzML (profile spectra or peaklists),\nmzXML (peaklists),\nimzML (profile spectra or peaklists).");
 	#else
-		peaklistline->setToolTip("Select a file. Supported formats:\ntxt (peaklists),\nmgf (peaklists),\nmzML (profile spectra or peaklists),\nmzXML (peaklists),\nbaf (profile spectra),\nimzML (profile spectra or peaklists),\nmis (deprecated),\nser (deprecated).");
-		peaklistbutton->setToolTip("Select a file. Supported formats:\ntxt (peaklists),\nmgf (peaklists),\nmzML (profile spectra or peaklists),\nmzXML (peaklists),\nbaf (profile spectra),\nimzML (profile spectra or peaklists),\nmis (deprecated),\nser (deprecated).");
+		peaklistline->setToolTip("Select a file. Supported file formats:\ntxt (peaklists),\nmgf (peaklists),\nmzML (profile spectra or peaklists),\nmzXML (peaklists),\nimzML (profile spectra or peaklists),\nbaf (profile spectra),\ndat (peaklists),\nmis (deprecated),\nser (deprecated).");
+		peaklistbutton->setToolTip("Select a file. Supported file formats:\ntxt (peaklists),\nmgf (peaklists),\nmzML (profile spectra or peaklists),\nmzXML (peaklists),\nimzML (profile spectra or peaklists),\nbaf (profile spectra),\ndat (peaklists),\nmis (deprecated),\nser (deprecated).");
 	#endif
 	peaklistbutton->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_P));
 	peaklistlayout = new QHBoxLayout();
@@ -84,24 +85,24 @@ cParametersWidget::cParametersWidget(QWidget* parent) {
 	peaklistformlayout->addRow(tr("File: "), peaklistlayout);
 
 	scannumber = new QSpinBox();
-	scannumber->setToolTip("Number of a spectrum to be processed in a LC-MS/MS data file.");
+	scannumber->setToolTip("Number of a spectrum to be processed in a LC-MS/MS data file.\nThe number may be different from an internal scan number stored in the input data file.");
 	scannumber->setRange(1, 100000000);
 	scannumber->setSingleStep(1);
 	peaklistformlayout->addRow(tr("Scan no.: "), scannumber);
 
 	precursormass = new QDoubleSpinBox();
-	precursormass->setToolTip("Enter the precursor mass-to-charge (m/z) ratio (a precursor m/z ratio in the peaklist file is ignored). The value will be automatically decharged.");
+	precursormass->setToolTip("Enter the precursor mass-to-charge (m/z) ratio.\nThe value is decharged automatically.\nThe precursor m/z ratio in the input peaklist file is ignored.");
 	precursormass->setDecimals(6);
 	precursormass->setRange(0, 100000);
 	precursormass->setSingleStep(1);
 	peaklistformlayout->addRow(tr("Precursor m/z Ratio: "), precursormass);
 
 	precursoradduct = new QLineEdit();
-	precursoradduct->setToolTip("Enter the formula of a precursor ion adduct (e.g., Na, K, Li). H is used by default when empty.");
+	precursoradduct->setToolTip("Enter the formula of a precursor ion adduct (e.g., Na, K, Li).\nH is used by default if the field is empty.\nSee the manual for more options.");
 	peaklistformlayout->addRow(tr("Precursor Ion Adduct: "), precursoradduct);
 
 	precursorcharge = new QSpinBox();
-	precursorcharge->setToolTip("Enter the precursor charge (a precursor charge in the peaklist file is ignored). Negative values are allowed.\nWhen mode is set up to \"Compare Peaklist(s) with Database - MS or MSI data\", the value determines the maximum charge of generated peaks.");
+	precursorcharge->setToolTip("Enter the charge of precursor ion. Negative values are allowed. The charge of precursor ion in the input peaklist file is ignored.\nIf the mode \"Compare Peaklist(s) with Database - MS or MSI data\" is used, the value determines the maximum charge of generated theoretical peaks.\nFor example, 3 means that theoretical peaks of compouds are generated with charges 1+, 2+, and 3+. The value -1 means that theoretical peaks of compounds are generated with charge 1-.");
 	precursorcharge->setRange(-100, 100);
 	precursorcharge->setSingleStep(1);
 	peaklistformlayout->addRow(tr("Charge: "), precursorcharge);
@@ -131,15 +132,21 @@ cParametersWidget::cParametersWidget(QWidget* parent) {
 	peaklistformlayout->addRow(tr("m/z Error Tolerance for Deisotoping: "), masserrortolerancefordeisotoping);
 
 	minimumrelativeintensitythreshold = new QDoubleSpinBox();
-	minimumrelativeintensitythreshold->setToolTip("Enter the threshold of relative intensity in %. Peaks having relative intensities below the threshold will be removed from the peaklist.");
+	minimumrelativeintensitythreshold->setToolTip("Enter the minimum threshold of relative intensity in %. Peaks with relative intensities below the threshold are removed from the peaklist.");
 	minimumrelativeintensitythreshold->setDecimals(3);
 	minimumrelativeintensitythreshold->setRange(0, 100);
 	minimumrelativeintensitythreshold->setSingleStep(1);
 	minimumrelativeintensitythreshold->setSuffix(" %");
 	peaklistformlayout->addRow(tr("Minimum Threshold of Relative Intensity: "), minimumrelativeintensitythreshold);
 
+	minimumabsoluteintensitythreshold = new QSpinBox();
+	minimumabsoluteintensitythreshold->setToolTip("Enter the minimum threshold of absolute intensity. Peaks with absolute intensities below the threshold are removed from the peaklist.");
+	minimumabsoluteintensitythreshold->setRange(0, INT32_MAX);
+	minimumabsoluteintensitythreshold->setSingleStep(100);
+	peaklistformlayout->addRow(tr("Minimum Threshold of Absolute Intensity: "), minimumabsoluteintensitythreshold);
+
 	minimummz = new QDoubleSpinBox();
-	minimummz->setToolTip("Enter the minimum m/z ratio. Peaks having m/z ratios below the threshold will be removed from the peaklist.");
+	minimummz->setToolTip("Enter the minimum m/z ratio. Peaks with m/z ratios below the threshold are removed from the peaklist.");
 	minimummz->setDecimals(3);
 	minimummz->setRange(0, 10000);
 	minimummz->setSingleStep(1);
@@ -194,10 +201,6 @@ cParametersWidget::cParametersWidget(QWidget* parent) {
 	maximumcumulativemass->setSingleStep(1);
 	brickdatabaseformlayout->addRow(tr("Maximum Cumulative Mass of Blocks: "), maximumcumulativemass);
 
-	generatebrickspermutations = new QCheckBox();
-	generatebrickspermutations->setToolTip("Permutations of combined blocks are generated when checked (e.g., when an edge corresponds to a combination of blocks leucine, proline and valine, the order of blocks can be LPV, LVP, PVL, PLV, VLP or VPL).\nIt is recommended to enable this option by default.");
-	brickdatabaseformlayout->addRow(tr("Generate Permutations of Combined Blocks: "), generatebrickspermutations);
-
 	modificationsline = new QLineEdit();
 	modificationsline->setToolTip("Select the txt file containing a list of modifications.");
 	modificationsbutton = new QPushButton("Select");
@@ -215,18 +218,19 @@ cParametersWidget::cParametersWidget(QWidget* parent) {
 	miscformlayout = new QFormLayout();
 
 	blindedges = new QComboBox();
-	blindedges->setToolTip("The operation to be performed with edges forming incomplete paths:\nkeep (edges are kept - useful when you would like to see the whole de novo graph in 'View -> Graph');\nremove (edges are removed - speeds up the search);\nconnect (edges are connected - useful when you are looking for sequence tags).");
+	blindedges->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+	blindedges->setToolTip("The operation to be performed with edges forming incomplete paths:\nkeep (edges are kept - useful if you would like to see the whole de novo graph in 'View -> Graph');\nremove (edges are removed - speeds up the search);\nconnect (edges are connected - useful if you are looking for sequence tags).");
 	blindedges->addItem(tr("keep (you can see a complete de novo graph)"));
 	blindedges->addItem(tr("remove (speed up the search)"));
 	blindedges->addItem(tr("connect (allow detection of sequence tags)"));
 	miscformlayout->addRow(tr("Incomplete Paths in De Novo Graph: "), blindedges);
 
 	cyclicnterminus = new QCheckBox();
-	cyclicnterminus->setToolTip("The water molecule is subtracted from all theoretical N-terminal fragment ions and the theoretical precursor mass.\nThis feature is useful when a linear peptide includes a small cycle close to the N-terminus.\nIf the linear polyketide is selected as the peptide type, the water molecule is subtracted only from the precursor ion.");
+	cyclicnterminus->setToolTip("The water molecule is subtracted from all theoretical N-terminal fragment ions and the theoretical precursor mass.\nThis feature is useful if a linear peptide includes a small cycle close to the N-terminus.\nIf the linear polyketide is selected as the peptide type, the water molecule is subtracted only from the precursor ion.");
 	miscformlayout->addRow(tr("Cyclic N-terminus: "), cyclicnterminus);
 
 	cycliccterminus = new QCheckBox();
-	cycliccterminus->setToolTip("The water molecule is subtracted from all theoretical C-terminal fragment ions and the theoretical precursor mass.\nThis feature is useful when a linear peptide includes a small cycle close to the C-terminus.\nIf the linear polyketide is selected as the peptide type, the water molecule is subtracted only from the precursor ion.");
+	cycliccterminus->setToolTip("The water molecule is subtracted from all theoretical C-terminal fragment ions and the theoretical precursor mass.\nThis feature is useful if a linear peptide includes a small cycle close to the C-terminus.\nIf the linear polyketide is selected as the peptide type, the water molecule is subtracted only from the precursor ion.");
 	miscformlayout->addRow(tr("Cyclic C-terminus: "), cycliccterminus);
 
 	enablescrambling = new QCheckBox();
@@ -248,7 +252,8 @@ cParametersWidget::cParametersWidget(QWidget* parent) {
 	applicationformlayout = new QFormLayout();
 	
 	mode = new QComboBox();
-	mode->setToolTip("'De Novo Search Engine' - the default mode of the application.\n'Compare Peaklist with Spectrum of Searched Sequence' - a theoretical spectrum is generated for the input 'Searched Sequence' and is compared with the peaklist.\n'Compare Peaklist with Database - MS/MS data' - a peaklist is compared with theoretical spectra generated from a database of sequences.\n'Compare Peaklist(s) with Database - MS or MSI data' - dereplication; compounds search; the peaklists are compared with theoretical peaks generated from a database of compounds/sequences.");
+	mode->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+	mode->setToolTip("'De Novo Search Engine' - the default mode of the application.\n'Compare Peaklist with Spectrum of Searched Sequence' - a theoretical spectrum is generated for the input 'Searched Sequence' and is compared with the peaklist.\n'Compare Peaklist with Database - MS/MS data' - a peaklist is compared with theoretical spectra generated from a database of sequences.\n'Compare Peaklist(s) with Database - MS or MSI data' - compound search; dereplication; the peaklists are compared with theoretical peaks generated from a database of compounds/sequences.");
 	mode->addItem(tr("De Novo Search Engine"));
 	mode->addItem(tr("Compare Peaklist with Spectrum of Searched Sequence"));
 	mode->addItem(tr("Compare Peaklist with Database - MS/MS data"));
@@ -267,12 +272,13 @@ cParametersWidget::cParametersWidget(QWidget* parent) {
 	applicationformlayout->addRow(tr("Sequence/Compound Database File: "), sequencedatabaselayout);
 
 	maximumnumberofthreads = new QSpinBox();
-	maximumnumberofthreads->setToolTip("A maximum number of threads used when the peaklist is compared with theoretical spectra of peptide sequence candidates.");
+	maximumnumberofthreads->setToolTip("A maximum number of threads used if the peaklist is compared with theoretical spectra of peptide sequence candidates.");
 	maximumnumberofthreads->setRange(1, 1024);
 	maximumnumberofthreads->setSingleStep(1);
 	applicationformlayout->addRow(tr("Maximum Number of Threads: "), maximumnumberofthreads);
 
 	scoretype = new QComboBox();
+	scoretype->setSizeAdjustPolicy(QComboBox::AdjustToContents);
 	scoretype->setToolTip("A score for peptide-spectrum matches.");
 	scoretype->addItem(tr("Number of b-ions"));
 	scoretype->addItem(tr("Number of b-ions + dehydrated b-ions"));
@@ -300,12 +306,19 @@ cParametersWidget::cParametersWidget(QWidget* parent) {
 	applicationformlayout->addRow(tr("Ion Types in Theoretical Spectra: "), fragmentiontypes);
 
 	clearhitswithoutparent = new QCheckBox();
-	clearhitswithoutparent->setToolTip("When checked, a hit of a peak is not considered when corresponding parent peak is not hit (e.g., a hit of a dehydrated b-ion is not considered as a hit when corresponding b-ion has not been hit).");
+	clearhitswithoutparent->setToolTip("If checked, a peak is not matched if the corresponding parent peak is not matched (e.g., a dehydrated b-ion is not matched if corresponding b-ion is not matched).");
 	applicationformlayout->addRow(tr("Remove Hits of Fragments without Hits of Parent Fragments: "), clearhitswithoutparent);
 
 	generateisotopepattern = new QCheckBox();
-	generateisotopepattern->setToolTip("Full isotope patters of compounds are generated in theoretical spectra (MS and MSI). The FWHM value must be set up correctly.");
+	generateisotopepattern->setChecked(true);
+	generateisotopepattern->setToolTip("Full isotope patters of compounds are generated in theoretical spectra (MS and MSI).\nThe FWHM value is used when theoretical patterns are generated.");
 	applicationformlayout->addRow(tr("Generate Full Isotope Patterns: "), generateisotopepattern);
+
+	minimumpatternsize = new QSpinBox();
+	minimumpatternsize->setToolTip("The minimum number of peaks that must be matched in an isotope pattern of a compound to be reported (MS and MSI). \"Generate Full Isotope Patterns\" must be enabled.");
+	minimumpatternsize->setRange(1, 100);
+	minimumpatternsize->setSingleStep(1);
+	applicationformlayout->addRow(tr("Minimum Pattern Size: "), minimumpatternsize);
 
 	applicationgroupbox = new QGroupBox("Application");
 	applicationgroupbox->setLayout(applicationformlayout);
@@ -314,7 +327,7 @@ cParametersWidget::cParametersWidget(QWidget* parent) {
 	searchedsequenceformlayout = new QFormLayout();
 
 	searchedsequenceline = new QLineEdit();
-	searchedsequenceline->setToolTip("A peptide sequence which you are searching for or a peptide sequence tag.\nA peptide sequence must be entered when \"Mode\" is set up to \"Compare Peaklist with Spectrum of Searched Sequence\".\nOtherwise, it is similar to the option \"Peptide Sequence Tag\" with a difference that a peptide sequence candidate is not removed from the search but it is just highlighted in an output report of peptide sequence candidates.");
+	searchedsequenceline->setToolTip("A peptide sequence which you are searching for or a peptide sequence tag.\nA peptide sequence must be entered if \"Mode\" is set up to \"Compare Peaklist with Spectrum of Searched Sequence\".\nOtherwise, the option is similar to \"Peptide Sequence Tag\" with a difference that a peptide sequence candidate is not removed from the search but it is just highlighted in the output list of peptide sequence candidates.");
 	searchedsequenceline->setMaxLength(5000);
 	searchedsequencebutton = new QPushButton("Edit");
 	searchedsequencebutton->setMinimumWidth(50);
@@ -434,6 +447,7 @@ cParametersWidget::~cParametersWidget() {
 	delete fragmentmasserrortolerance;
 	delete masserrortolerancefordeisotoping;
 	delete minimumrelativeintensitythreshold;
+	delete minimumabsoluteintensitythreshold;
 	delete minimummz;
 	delete fwhm;
 	delete peaklistformlayout;
@@ -446,7 +460,6 @@ cParametersWidget::~cParametersWidget() {
 	delete maximumbricksincombinationmiddle;
 	delete maximumbricksincombinationend;
 	delete maximumcumulativemass;
-	delete generatebrickspermutations;
 	delete modificationsline;
 	delete modificationsbutton;
 	delete modificationslayout;
@@ -473,6 +486,7 @@ cParametersWidget::~cParametersWidget() {
 	delete fragmentiontypes;
 	delete clearhitswithoutparent;
 	delete generateisotopepattern;
+	delete minimumpatternsize;
 	delete applicationformlayout;
 	delete applicationgroupbox;
 
@@ -521,12 +535,18 @@ void cParametersWidget::closeEvent(QCloseEvent *event) {
 
 
 void cParametersWidget::setSequence(int peptidetypeindex, QString sequence) {
+	if ((eModeType)mode->currentIndex() == dereplication) {
+		mode->setCurrentIndex(denovoengine);
+	}
 	peptidetype->setCurrentIndex(peptidetypeindex);
 	searchedsequenceline->setText(sequence);
 }
 
 
 void cParametersWidget::setTag(int peptidetypeindex, QString tag) {
+	if ((eModeType)mode->currentIndex() == dereplication) {
+		mode->setCurrentIndex(denovoengine);
+	}
 	peptidetype->setCurrentIndex(peptidetypeindex);
 	sequencetag->setText(tag);
 }
@@ -579,6 +599,7 @@ void cParametersWidget::loadSettings() {
 		fragmentmasserrortolerance->setValue(settings.value("fragmentmasserrortolerance", 5.0).toDouble());
 		masserrortolerancefordeisotoping->setValue(settings.value("masserrortolerancefordeisotoping", 0).toDouble());
 		minimumrelativeintensitythreshold->setValue(settings.value("minimumrelativeintensitythreshold", 1).toDouble());
+		minimumabsoluteintensitythreshold->setValue(settings.value("minimumabsoluteintensitythreshold", 0).toUInt());
 		minimummz->setValue(settings.value("minimummz", 150).toDouble());
 		fwhm->setValue(settings.value("fwhm", 0.05).toDouble());
 
@@ -587,7 +608,6 @@ void cParametersWidget::loadSettings() {
 		maximumbricksincombinationmiddle->setValue(settings.value("maximumbricksincombinationmiddle", 1).toInt());
 		maximumbricksincombinationend->setValue(settings.value("maximumbricksincombinationend", 1).toInt());
 		maximumcumulativemass->setValue(settings.value("maximumcumulativemass", 0).toDouble());
-		settings.value("generatebrickspermutations", 1).toInt() == 0 ? generatebrickspermutations->setChecked(false) : generatebrickspermutations->setChecked(true);
 		modificationsline->setText(settings.value("modificationsfile", "").toString());
 
 		blindedges->setCurrentIndex(settings.value("blindedges", 2).toInt());
@@ -610,7 +630,8 @@ void cParametersWidget::loadSettings() {
 		}
 
 		settings.value("clearhitswithoutparent", 0).toInt() == 0 ? clearhitswithoutparent->setChecked(false) : clearhitswithoutparent->setChecked(true);
-		settings.value("generateisotopepattern", 0).toInt() == 0 ? generateisotopepattern->setChecked(false) : generateisotopepattern->setChecked(true);
+		settings.value("generateisotopepattern", 1).toInt() == 0 ? generateisotopepattern->setChecked(false) : generateisotopepattern->setChecked(true);
+		minimumpatternsize->setValue(settings.value("minimumpatternsize", 1).toInt());
 
 		searchedsequenceline->setText(settings.value("searchedsequence", "").toString());
 		searchedsequenceNtermmodif->setText(settings.value("searchedsequenceNtermmodif", "").toString());
@@ -644,6 +665,7 @@ void cParametersWidget::saveSettings() {
 	settings.setValue("fragmentmasserrortolerance", fragmentmasserrortolerance->value());
 	settings.setValue("masserrortolerancefordeisotoping", masserrortolerancefordeisotoping->value());
 	settings.setValue("minimumrelativeintensitythreshold", minimumrelativeintensitythreshold->value());
+	settings.setValue("minimumabsoluteintensitythreshold", minimumabsoluteintensitythreshold->value());
 	settings.setValue("minimummz", minimummz->value());
 	settings.setValue("fwhm", fwhm->value());
 
@@ -652,7 +674,6 @@ void cParametersWidget::saveSettings() {
 	settings.setValue("maximumbricksincombinationmiddle", maximumbricksincombinationmiddle->value());
 	settings.setValue("maximumbricksincombinationend", maximumbricksincombinationend->value());
 	settings.setValue("maximumcumulativemass", maximumcumulativemass->value());
-	generatebrickspermutations->isChecked() ? settings.setValue("generatebrickspermutations", 1) : settings.setValue("generatebrickspermutations", 0);
 	settings.setValue("modificationsfile", modificationsline->text());
 
 	settings.setValue("blindedges", blindedges->currentIndex());
@@ -676,6 +697,7 @@ void cParametersWidget::saveSettings() {
 
 	clearhitswithoutparent->isChecked() ? settings.setValue("clearhitswithoutparent", 1) : settings.setValue("clearhitswithoutparent", 0);
 	generateisotopepattern->isChecked() ? settings.setValue("generateisotopepattern", 1) : settings.setValue("generateisotopepattern", 0);
+	settings.setValue("minimumpatternsize", minimumpatternsize->value());
 
 	settings.setValue("searchedsequence", searchedsequenceline->text());
 	settings.setValue("searchedsequenceNtermmodif", searchedsequenceNtermmodif->text());
@@ -702,7 +724,7 @@ void cParametersWidget::peaklistButtonReleased() {
 	#if OS_TYPE != WIN
 		QString filename = QFileDialog::getOpenFileName(this, tr("Select Peaklist..."), lastdirselectpeaklist, tr("Peak Lists (*.txt *.mgf *.mzML *.mzXML *.imzML)"));
 	#else
-		QString filename = QFileDialog::getOpenFileName(this, tr("Select Peaklist..."), lastdirselectpeaklist, tr("Peak Lists (*.txt *.mgf *.mzML *.mzXML *.baf *.imzML *.mis ser)"));
+		QString filename = QFileDialog::getOpenFileName(this, tr("Select Peaklist..."), lastdirselectpeaklist, tr("Peak Lists (*.txt *.mgf *.mzML *.mzXML *.imzML *.baf *.dat *.mis ser)"));
 	#endif
 
 	if (!filename.isEmpty()) {
@@ -800,6 +822,7 @@ bool cParametersWidget::updateParameters() {
 	parameters.fragmentmasserrortolerance = fragmentmasserrortolerance->value();
 	parameters.masserrortolerancefordeisotoping = masserrortolerancefordeisotoping->value();
 	parameters.minimumrelativeintensitythreshold = minimumrelativeintensitythreshold->value();
+	parameters.minimumabsoluteintensitythreshold = minimumabsoluteintensitythreshold->value();
 	parameters.minimummz = minimummz->value();
 	parameters.fwhm = fwhm->value();
 
@@ -809,7 +832,6 @@ bool cParametersWidget::updateParameters() {
 	parameters.maximumbricksincombinationend = maximumbricksincombinationend->value();
 	parameters.maximumcumulativemass = maximumcumulativemass->value();
 	parameters.maximumbricksincombination = max(max(parameters.maximumbricksincombinationbegin, parameters.maximumbricksincombinationmiddle), parameters.maximumbricksincombinationend);
-	parameters.generatebrickspermutations = generatebrickspermutations->isChecked();
 	parameters.modificationsfilename = modificationsline->text().toStdString();
 
 	parameters.blindedges = blindedges->currentIndex();
@@ -831,7 +853,7 @@ bool cParametersWidget::updateParameters() {
 	int start;
 
 	if ((eModeType)mode->currentIndex() == dereplication) {
-		start = ms_hplus;
+		start = ms_Hplus;
 	}
 	else {
 		switch ((ePeptideType)peptidetype->currentIndex())
@@ -862,6 +884,7 @@ bool cParametersWidget::updateParameters() {
 
 	parameters.clearhitswithoutparent = clearhitswithoutparent->isChecked();
 	parameters.generateisotopepattern = generateisotopepattern->isChecked();
+	parameters.minimumpatternsize = minimumpatternsize->value();
 
 	parameters.searchedsequence = searchedsequenceline->text().toStdString();
 	parameters.originalsearchedsequence = parameters.searchedsequence;
@@ -895,6 +918,7 @@ void cParametersWidget::restoreParameters() {
 	fragmentmasserrortolerance->setValue(parameters.fragmentmasserrortolerance);
 	masserrortolerancefordeisotoping->setValue(parameters.masserrortolerancefordeisotoping);
 	minimumrelativeintensitythreshold->setValue(parameters.minimumrelativeintensitythreshold);
+	minimumabsoluteintensitythreshold->setValue(parameters.minimumabsoluteintensitythreshold);
 	minimummz->setValue(parameters.minimummz);
 	fwhm->setValue(parameters.fwhm);
 
@@ -903,7 +927,6 @@ void cParametersWidget::restoreParameters() {
 	maximumbricksincombinationmiddle->setValue(parameters.maximumbricksincombinationmiddle);
 	maximumbricksincombinationend->setValue(parameters.maximumbricksincombinationend);
 	maximumcumulativemass->setValue(parameters.maximumcumulativemass);
-	generatebrickspermutations->setChecked(parameters.generatebrickspermutations);
 	modificationsline->setText(parameters.modificationsfilename.c_str());
 
 	blindedges->setCurrentIndex(parameters.blindedges);
@@ -922,7 +945,7 @@ void cParametersWidget::restoreParameters() {
 
 	int start;
 	if (parameters.mode == dereplication) {
-		start = ms_hplus;
+		start = ms_Hplus;
 	}
 	else {
 		switch (parameters.peptidetype)
@@ -951,6 +974,7 @@ void cParametersWidget::restoreParameters() {
 
 	clearhitswithoutparent->setChecked(parameters.clearhitswithoutparent);
 	generateisotopepattern->setChecked(parameters.generateisotopepattern);
+	minimumpatternsize->setValue(parameters.minimumpatternsize);
 	
 	searchedsequenceline->setText(parameters.searchedsequence.c_str());
 	searchedsequenceNtermmodif->setText(parameters.searchedsequenceNtermmodif.c_str());
@@ -1070,7 +1094,6 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 		maximumbricksincombinationmiddle->setDisabled(false);
 		maximumbricksincombinationend->setDisabled(false);
 		maximumcumulativemass->setDisabled(false);
-		generatebrickspermutations->setDisabled(false);
 		modificationsline->setDisabled(false);
 		modificationsbutton->setDisabled(false);
 		sequencedatabaseline->setDisabled(true);
@@ -1084,6 +1107,7 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 		fragmentiontypes->setDisabled(false);
 		clearhitswithoutparent->setDisabled(false);
 		generateisotopepattern->setDisabled(true);
+		minimumpatternsize->setDisabled(true);
 		searchedsequenceline->setDisabled(false);
 		searchedsequencebutton->setDisabled(false);
 
@@ -1104,7 +1128,6 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 		maximumbricksincombinationmiddle->setDisabled(true);
 		maximumbricksincombinationend->setDisabled(true);
 		maximumcumulativemass->setDisabled(true);
-		generatebrickspermutations->setDisabled(true);
 		modificationsline->setDisabled(false);
 		modificationsbutton->setDisabled(false);
 		sequencedatabaseline->setDisabled(true);
@@ -1118,6 +1141,7 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 		fragmentiontypes->setDisabled(false);
 		clearhitswithoutparent->setDisabled(false);
 		generateisotopepattern->setDisabled(true);
+		minimumpatternsize->setDisabled(true);
 		searchedsequenceline->setDisabled(false);
 		searchedsequencebutton->setDisabled(false);
 
@@ -1138,7 +1162,6 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 		maximumbricksincombinationmiddle->setDisabled(true);
 		maximumbricksincombinationend->setDisabled(true);
 		maximumcumulativemass->setDisabled(true);
-		generatebrickspermutations->setDisabled(true);
 		modificationsline->setDisabled(false);
 		modificationsbutton->setDisabled(false);
 		blindedges->setDisabled(true);
@@ -1152,6 +1175,7 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 		fragmentiontypes->setDisabled(false);
 		clearhitswithoutparent->setDisabled(false);
 		generateisotopepattern->setDisabled(true);
+		minimumpatternsize->setDisabled(true);
 		searchedsequenceline->setDisabled(false);
 		searchedsequencebutton->setDisabled(false);
 
@@ -1172,7 +1196,6 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 		maximumbricksincombinationmiddle->setDisabled(true);
 		maximumbricksincombinationend->setDisabled(true);
 		maximumcumulativemass->setDisabled(true);
-		generatebrickspermutations->setDisabled(true);
 		modificationsline->setDisabled(true);
 		modificationsbutton->setDisabled(true);
 		blindedges->setDisabled(true);
@@ -1186,6 +1209,7 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 		fragmentiontypes->setDisabled(false);
 		clearhitswithoutparent->setDisabled(true);
 		generateisotopepattern->setDisabled(false);
+		minimumpatternsize->setDisabled(false);
 		searchedsequenceline->setDisabled(true);
 		searchedsequencebutton->setDisabled(true);
 
@@ -1196,6 +1220,7 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 		cyclicnterminus->setDisabled(true);
 		cycliccterminus->setDisabled(true);
 		enablescrambling->setDisabled(true);
+		regularblocksorder->setDisabled(true);
 		searchedsequenceNtermmodif->setDisabled(true);
 		searchedsequenceCtermmodif->setDisabled(true);
 		searchedsequenceTmodif->setDisabled(true);
@@ -1213,8 +1238,8 @@ void cParametersWidget::resetFragmentIonTypes() {
 	eFragmentIonType start, end;
 	
 	if ((eModeType)mode->currentIndex() == dereplication) {
-		start = ms_hplus;
-		end = ms_MGa4H;
+		start = ms_Hplus;
+		end = ms_NH4plus;
 	}
 	else {
 		switch ((ePeptideType)peptidetype->currentIndex()) {
@@ -1251,7 +1276,7 @@ void cParametersWidget::resetFragmentIonTypes() {
 		fragmentiontypes->getList()->addItem(tr(parameters.fragmentdefinitions[(eFragmentIonType)i].name.c_str()));
 
 		if ((eModeType)mode->currentIndex() == dereplication) {
-			if ((eFragmentIonType)i == ms_hplus) {
+			if ((eFragmentIonType)i == ms_Hplus) {
 				fragmentiontypes->getList()->item(i-start)->setSelected(true);
 			}
 		}

@@ -45,5 +45,9 @@
         <file>images/icons/11.png</file>
         <file>images/icons/50.png</file>
         <file>images/icons/74.png</file>
+        <file>images/icons/flip_horizontal.png</file>
+        <file>images/icons/flip_vertical.png</file>
+        <file>images/icons/rectangle.png</file>
+        <file>images/icons/chromatography.png</file>
     </qresource>
 </RCC>

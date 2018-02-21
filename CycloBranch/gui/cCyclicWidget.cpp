@@ -306,6 +306,8 @@ cCyclicWidget::cCyclicWidget() {
 	parameters = 0;
 	theoreticalspectrum = 0;
 	visiblerotationid = -1;
+
+	reportisomers = false;
 }
 
 
@@ -387,6 +389,12 @@ void cCyclicWidget::exportToSVG(QString filename) {
 }
 
 
+void cCyclicWidget::setReportIsomers(bool reportisomers) {
+	this->reportisomers = reportisomers;
+	repaint();
+}
+
+
 void cCyclicWidget::paintEvent(QPaintEvent *event) {
 	QPainter painter;
 	painter.begin(this);
@@ -407,7 +415,13 @@ void cCyclicWidget::paint(QPainter& painter) {
 	const int bottommargin = 80;
 	const int rightmargin = 20;
 
-	int size = (int)theoreticalspectrum->getCandidate().getAcronyms().size();
+	vector<string> acronyms = theoreticalspectrum->getCandidate().getAcronyms();
+	int size = (int)acronyms.size();
+
+	if (!reportisomers) {
+		stripIsomersFromStringVector(acronyms);
+	}
+
 	double angle = 2*pi/(double)size;
 	int centerx = width()/2;
 	int centery = height()/2;
@@ -425,7 +439,7 @@ void cCyclicWidget::paint(QPainter& painter) {
 	int linesize = 20;
 	int cornerlinesize = horizontalstep/8;
 
-	paintCircle(painter, theoreticalspectrum->getCandidate().getAcronyms(), centerx, centery, radius, angle, horizontalstep, linesize, cornerlinesize, theoreticalspectrum->getVisualCoverage().size() > 0, visiblerotationid, labels);
+	paintCircle(painter, acronyms, centerx, centery, radius, angle, horizontalstep, linesize, cornerlinesize, theoreticalspectrum->getVisualCoverage().size() > 0, visiblerotationid, labels);
 		
 	if (parameters && (theoreticalspectrum->getVisualCoverage().size() > 0)) {
 	

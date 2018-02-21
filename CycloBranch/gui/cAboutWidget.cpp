@@ -18,27 +18,32 @@ cAboutWidget::cAboutWidget(QWidget* parent) {
 
 	QString homepage = "Homepage: <a href=\"http://ms.biomed.cas.cz/cyclobranch/\">http://ms.biomed.cas.cz/cyclobranch/</a><br/><br/>";
 
-	QString citation = "Any work based on CycloBranch shall cite the following reference:<br/><br/>";
-	citation += "<b>Jiri Novak, Karel Lemr, Kevin A. Schug and Vladimir Havlicek.<br/>";
-	citation += "CycloBranch: De Novo Sequencing of Nonribosomal Peptides from Accurate Product Ion Mass Spectra.<br/>";
-	citation += "<i>J. Am. Soc. Mass Spectrom.</i>, vol. 26, no. 10, pp. 1780-1786, 2015. DOI: <a href=\"http://link.springer.com/article/10.1007/s13361-015-1211-1\">10.1007/s13361-015-1211-1</a>.<br/>";
-	citation += "Download citation: [ <a href=\"http://ms.biomed.cas.cz/cyclobranch/docs/cyclobranch_ris.txt\"><b>ris</b></a> ], [ <a href=\"http://ms.biomed.cas.cz/cyclobranch/docs/cyclobranch_bib.txt\"><b>bib</b></a> ]</b><br/><hr/><br/>";
+	QString citations = "Any work based on CycloBranch shall cite any of the following references:<br/><br/>";
+	citations += "Jiri Novak, Karel Lemr, Kevin A. Schug, Vladimir Havlicek:<br/>";
+	citations += "CycloBranch: <i>De Novo</i> Sequencing of Nonribosomal Peptides from Accurate Product Ion Mass Spectra,<br/>";
+	citations += "<i>J. Am. Soc. Mass Spectrom.</i>, vol. 26, no. 10, pp. 1780-1786, 2015. DOI: <a href=\"http://dx.doi.org/10.1007/s13361-015-1211-1\">10.1007/s13361-015-1211-1</a>.<br/>";
+	citations += "Download citation: [ <a href=\"http://ms.biomed.cas.cz/cyclobranch/docs/cyclobranch_ris.txt\"><b>ris</b></a> ], [ <a href=\"http://ms.biomed.cas.cz/cyclobranch/docs/cyclobranch_bib.txt\"><b>bib</b></a> ]<br/><br/>";
+
+	citations += "Jiri Novak, Lucie Sokolova, Karel Lemr, Tomas Pluhacek, Andrea Palyzova, Vladimir Havlicek:<br/>";
+	citations += "Batch-processing of Imaging or Liquid-chromatography Mass Spectrometry Datasets and <i>De Novo</i> Sequencing of Polyketide Siderophores,<br/>";
+	citations += "<i>BBA - Proteins Proteom.</i>, vol. 1865, no. 7, pp. 768-775, 2017. DOI: <a href=\"https://dx.doi.org/10.1016/j.bbapap.2016.12.003\">10.1016/j.bbapap.2016.12.003</a>.<br/>";
+	citations += "Download citation: [ <a href=\"http://ms.biomed.cas.cz/cyclobranch/docs/cyclobranch_bba_ris.txt\"><b>ris</b></a> ], [ <a href=\"http://ms.biomed.cas.cz/cyclobranch/docs/cyclobranch_bba_bib.txt\"><b>bib</b></a> ]<br/><hr/><br/>";
 
 	QString licence = "Licence:<br/><br/> This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.<br/><br/>";
 	licence += "This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.<br/><br/>";
 	licence += "You should have received a copy of the GNU General Public License along with this program. If not, see <a href=\"http://www.gnu.org/licenses/\">http://www.gnu.org/licenses/</a>.<br/><hr/><br/>";
 
-	QString developers = "Developers:<br/><br/>Jiri Novak<br/>Laboratory of Molecular Structure Characterization<br/>Institute of Microbiology<br/>Academy of Sciences of the Czech Republic<br/>Videnska 1083<br/>142 20 Prague<br/>Czech Republic<br/><a href=\"mailto:jiri.novak@biomed.cas.cz\">jiri.novak@biomed.cas.cz</a><br/><a href=\"http://ms.biomed.cas.cz/staff-novak_jiri.php\">http://ms.biomed.cas.cz/staff-novak_jiri.php</a><br/><a href=\"https://cas-cz.academia.edu/JiriNovak\">https://cas-cz.academia.edu/JiriNovak</a><br/><br/>(C) 2013 - 2016<br/><hr/><br/>";
+	QString developers = "Developers:<br/><br/>Jiri Novak<br/>Laboratory of Molecular Structure Characterization<br/>Institute of Microbiology<br/>Academy of Sciences of the Czech Republic<br/>Videnska 1083<br/>142 20 Prague<br/>Czech Republic<br/><a href=\"mailto:jiri.novak@biomed.cas.cz\">jiri.novak@biomed.cas.cz</a><br/><a href=\"http://ms.biomed.cas.cz/staff-novak_jiri.php\">http://ms.biomed.cas.cz/staff-novak_jiri.php</a><br/><a href=\"https://cas-cz.academia.edu/JiriNovak\">https://cas-cz.academia.edu/JiriNovak</a><br/><br/>(C) 2013 - 2017<br/><hr/><br/>";
 
 	QString splash = "<div align=\"center\"><img src=\":/images/splash.png\"></div><br/><hr/><br/>";
 
-	QString acknowledgement = "Acknowledgements:<br/><br/><a href=\"http://www.aha-soft.com/\">http://www.aha-soft.com/</a><br/><hr/><br/>";
+	QString acknowledgement = "Acknowledgements:<br/><br/>Thanks to <a href=\"http://www.aha-soft.com/\">Aha-soft</a> and <a href=\"http://icons8.com/\">Icons8</a> for icons.<br/><hr/><br/>";
 
 	message = new QTextBrowser();
 	message->setReadOnly(true);
 	message->setAcceptRichText(true);
 	message->setOpenExternalLinks(true);
-	message->setHtml("<br/>" + splash + "<b>" + appname + " " + appversion + "</b><br/><br/>" + homepage + citation + developers + licence + acknowledgement);
+	message->setHtml("<br/>" + splash + "<b>" + appname + " " + appversion + "</b><br/><br/>" + homepage + citations + developers + licence + acknowledgement);
 
 	buttonbox = new QDialogButtonBox(QDialogButtonBox::Ok);
 	//buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);

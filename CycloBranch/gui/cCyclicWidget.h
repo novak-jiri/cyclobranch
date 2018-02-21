@@ -19,9 +19,6 @@
 class QPaintEvent;
 
 
-const double pi = 3.141592653589793;
-
-
 /**
 	\brief Paint the circle of a cyclic or a branch-cyclic peptide.
 	\param painter a reference to current QPainter
@@ -134,6 +131,13 @@ public:
 	void exportToSVG(QString filename);
 
 
+	/**
+		\brief Set the report isomers state.
+		\param reportisomers true if isomers are reported; false otherwise
+	*/
+	void setReportIsomers(bool reportisomers);
+
+
 protected:
 
 
@@ -151,6 +155,8 @@ private:
 	cParameters* parameters;
 	cTheoreticalSpectrum* theoreticalspectrum;
 	int visiblerotationid;
+
+	bool reportisomers;
 
 
 private slots:

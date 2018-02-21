@@ -16,27 +16,6 @@ int getNumberOfBricks(const string& composition) {
 }
 
 
-string stripHTML(string& htmlstring) {
-	string s;
-	bool add = true;
-
-	for (int i = 0; i < (int)htmlstring.size(); i++) {
-		if (htmlstring[i] == '<') {
-			add = false;
-			continue;
-		}
-		if (htmlstring[i] == '>') {
-			add = true;
-			continue;
-		}
-		if (add) {
-			s += htmlstring[i];
-		}
-	}
-	return s;
-}
-
-
 cBrick::cBrick() {
 	clear();
 }

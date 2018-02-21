@@ -34,6 +34,8 @@ void insertLabel(unordered_set<cIonLabel, hash_cIonLabel>& labels, int x, int y,
 cLinearWidget::cLinearWidget() {
 	parameters = 0;
 	theoreticalspectrum = 0;
+
+	reportisomers = false;
 }
 
 
@@ -115,6 +117,12 @@ void cLinearWidget::exportToSVG(QString filename) {
 }
 
 
+void cLinearWidget::setReportIsomers(bool reportisomers) {
+	this->reportisomers = reportisomers;
+	repaint();
+}
+
+
 void cLinearWidget::paintEvent(QPaintEvent *event) {
 	QPainter painter;
 	painter.begin(this);
@@ -135,7 +143,12 @@ void cLinearWidget::paint(QPainter& painter) {
 	const int bottommargin = 80;
 	const int rightmargin = 20;
 
-	int size = (int)theoreticalspectrum->getCandidate().getAcronyms().size();
+	vector<string> acronyms = theoreticalspectrum->getCandidate().getAcronyms();
+	int size = (int)acronyms.size();
+
+	if (!reportisomers) {
+		stripIsomersFromStringVector(acronyms);
+	}
 
 	const int horizontalstep = (width() - leftmargin - rightmargin)/std::max(size, 1);
 
@@ -145,11 +158,11 @@ void cLinearWidget::paint(QPainter& painter) {
 
 	for (int i = 0; i < size; i++) {
 		painter.setPen(QPen(Qt::blue, 2, Qt::SolidLine));
-		if (fm.width(theoreticalspectrum->getCandidate().getAcronyms()[i].c_str()) > horizontalstep/2) {
-			painter.drawText(leftmargin + horizontalstep/4 + horizontalstep*i + 2, topmargin, horizontalstep/2 - 2, 20, Qt::AlignLeft|Qt::AlignVCenter, theoreticalspectrum->getCandidate().getAcronyms()[i].c_str());
+		if (fm.width(acronyms[i].c_str()) > horizontalstep/2) {
+			painter.drawText(leftmargin + horizontalstep/4 + horizontalstep*i + 2, topmargin, horizontalstep/2 - 2, 20, Qt::AlignLeft|Qt::AlignVCenter, acronyms[i].c_str());
 		}
 		else {
-			painter.drawText(leftmargin + horizontalstep/4 + horizontalstep*i, topmargin, horizontalstep/2, 20, Qt::AlignCenter, theoreticalspectrum->getCandidate().getAcronyms()[i].c_str());
+			painter.drawText(leftmargin + horizontalstep/4 + horizontalstep*i, topmargin, horizontalstep/2, 20, Qt::AlignCenter, acronyms[i].c_str());
 		}
 
 		painter.setPen(QPen(Qt::black, 2, Qt::SolidLine));

@@ -25,6 +25,15 @@ using namespace std;
 
 
 /**
+	\brief Get the number of hits with equal or better score.
+	\param scores vector of scores
+	\param value current score
+	\retval int number of hits
+*/
+int getNumberOfScoreHits(vector<double>& scores, double value);
+
+
+/**
 	\brief The structure representing a splitting site of a cyclic peptide.
 */
 struct splitSite {
@@ -100,11 +109,12 @@ class cTheoreticalSpectrum {
 	cPeaksList experimentalpeaks;
 	cCandidate candidate;
 	int experimentalpeaksmatched;
+	vector<set<int> > experimentalmatches;
 	int scrambledpeaksmatched;
 	map<eFragmentIonType, int> matchedions;
 	int peakstested;
 	double experimentalpeaksmatchedratio;
-	int unmatchedpeakscount;
+	int unmatchedexperimentalpeakscount;
 	string coveragebyseries;
 	bool valid;
 	double intensityweightedscore;
@@ -114,12 +124,15 @@ class cTheoreticalSpectrum {
 	int reversevalidposition;
 	int seriescompleted;
 	int pathid;
+	map<int, double> targetscores;
+	map<int, double> decoyscores;
+	map<int, double> fdrscores;
 
 	// remove false hits, i.e., b-H2O without existing b-ion
 	void clearFalseHits(map<eFragmentIonType, vector<int> >& series, vector<eFragmentIonType>& fragmentions);
 
 	// search for matches of experimental and theoretical peaks
-	void searchForPeakPairs(cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks, vector<set<int> >& experimentalpeakmatches, double fragmentmasserrortolerance);
+	void searchForPeakPairs(cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks, double fragmentmasserrortolerance);
 
 	// compute additional scores
 	void computeStatistics(bool writedescription);
@@ -146,13 +159,34 @@ class cTheoreticalSpectrum {
 	void addMetalPeaks(cPeak& peak, vector<string>& metals, int& peaklistrealsize, int peakcharge, bool writedescription);
 
 	// remove unmatched biometal isotopes
-	void removeUnmatchedMetalIsotopes(cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks, vector<set<int> >& experimentalpeakmatches);
+	void removeUnmatchedMetalIsotopes(cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks);
 
 	// remove unmatched isotope patterns
-	void removeUnmatchedIsotopePatterns(cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks, vector<set<int> >& experimentalpeakmatches);
+	void removeUnmatchedIsotopePatterns(cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks, cPeaksList& outputtheoreticalpeaks);
+
+	// calculate envelope scores
+	void calculateEnvelopeScores(cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks);
+
+	// remove decoy peak matches
+	void removeDecoyPeakMatches(cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks);
 
 	// normalize theoretical intensities
 	void normalizeTheoreticalIntensities(cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize);
+
+	// calibrate peaklist to the most intense theoretical peak
+	double recalibrateToMostIntenseTheoreticalPeak(cPeaksList& peaklist);
+
+	// calculate standard PPM deviation
+	double getStandardPPMDeviation(cPeaksList& theoreticalpeaks, int start, int stop);
+
+	// calculate standard intensity deviation
+	double getStandardIntensityDeviation(cPeaksList& theoreticalpeaks, int start, int stop, double maximumexperimentalintensity);
+
+	// calculate standard m/z difference deviation
+	double getStandardMZDifferenceDeviation(cPeaksList& theoreticalpeaks, int start, int stop);
+
+	// calculate the angle distance
+	double getAngleDistance(cPeaksList& theoreticalpeaks, int start, int stop);
 
 public:
 
@@ -288,8 +322,16 @@ public:
 		\brief Compare theoretical peaks with an experimental spectrum.
 		\param peaklist reference to an experimental peaklist
 		\param tsfull theoretical spectrum with descriptions of peaks
-	*/ 
-	void compareMSSpectrum(cPeaksList& peaklist, cTheoreticalSpectrum& tsfull);
+		\param unmatchedpeaksinmatchedpatterns unmatched peaks in matched isotope patterns
+	*/
+	void compareMSSpectrum(cPeaksList& peaklist, cTheoreticalSpectrum& tsfull, cPeaksList& unmatchedpeaksinmatchedpatterns);
+
+
+	/**
+		\brief Finalize MS spectrum after comparison.
+		\param unmatchedpeaksinmatchedpatterns unmatched peaks in matched isotope patterns
+	*/
+	void finalizeMSSpectrum(cPeaksList& unmatchedpeaksinmatchedpatterns);
 
 
 	/**
@@ -405,6 +447,13 @@ public:
 
 
 	/**
+		\brief Get ids of theoretical peaks which hit an experimental peak.
+		\retval set<int> set of ids of theoretical peaks
+	*/
+	set<int>& getExperimentalMatches(int peakid);
+
+
+	/**
 		\brief Get coverage of series of fragment ions.
 		\retval string coverage of the series of fragment ions
 	*/ 
@@ -412,10 +461,10 @@ public:
 
 
 	/**
-		\brief Get the number of unmatched peaks.
-		\retval number of unmatched peaks
+		\brief Get the number of unmatched experimental peaks.
+		\retval number of unmatched experimental peaks
 	*/ 
-	int getUnmatchedPeaksCount();
+	int getUnmatchedExperimentalPeaksCount();
 
 
 	/**
@@ -493,6 +542,45 @@ public:
 		\param parameters the pointer to the parameters of the application
 	*/ 
 	void setParameters(cParameters* parameters);
+
+
+	/**
+		\brief Get target pattern score.
+		\param groupid id of a group of peaks forming a target pattern
+		\retval double target pattern score
+	*/
+	double getTargetPatternScore(int groupid);
+
+
+	/**
+		\brief Get target pattern FDR.
+		\param groupid id of a group of peaks forming a target pattern
+		\retval double target pattern FDR
+	*/
+	double getTargetPatternFDR(int groupid);
+
+
+	/**
+		\brief Get map of target scores.
+		\retval map<int, double> map of target scores
+	*/
+	map<int, double>& getTargetScores();
+
+
+	/**
+		\brief Get map of decoy scores.
+		\retval map<int, double> map of decoy scores
+	*/
+	map<int, double>& getDecoyScores();
+
+
+	/**
+		\brief Set false discovery rates to peak groups.
+		\param targetscoresvector vector of target scores
+		\param fdrs vector of FDRs
+		\param unmatchedpeaksinmatchedpatterns unmatched peaks in matched isotope patterns
+	*/
+	void setFDRs(vector<double>& targetscoresvector, vector<double>& fdrs, cPeaksList& unmatchedpeaksinmatchedpatterns);
 
 
 	/**

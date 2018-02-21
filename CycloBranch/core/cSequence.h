@@ -33,6 +33,7 @@ class cSequence {
 	string name;
 	cSummaryFormula summary;
 	string reference;
+	bool decoy;
 
 public:
 
@@ -178,8 +179,22 @@ public:
 	/**
 		\brief Get the summary formula.
 		\retval string summary formula
-	*/ 
+	*/
 	string getSummaryFormula();
+
+
+	/**
+		\brief Check if sequence/compound is decoy.
+		\retval bool true if sequence is decoy, false otherwise
+	*/
+	bool isDecoy();
+
+
+	/**
+		\brief Set decoy flag.
+		\param decoy true if sequence is decoy, false otherwise 
+	*/
+	void setDecoy(bool decoy);
 
 };
 

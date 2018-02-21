@@ -12,8 +12,8 @@ cFragmentIonsListWidget::cFragmentIonsListWidget(QObject* parent) {
 	hbox = new QHBoxLayout();
 
 	list = new QListWidget();
-	list->setMinimumHeight(300);
-	list->setMaximumHeight(300);
+	list->setMinimumHeight(280);
+	list->setMaximumHeight(280);
 	list->setSelectionMode(QAbstractItemView::MultiSelection);
 
 	selectall = new QPushButton("Select All");

@@ -111,14 +111,15 @@ public:
 		\param imzmlfilename imzML filename
 		\param ibdstream ibd binary file stream
 		\param fwhm FWHM
-		\param maxcountx max count of pixel x - parsed from imzML file
-		\param maxcounty max count of pixel y - parsed from imzML file
+		\param defaultmaxx max count of pixel x - parsed from imzML file
+		\param defaultmaxy max count of pixel y - parsed from imzML file
+		\param pixelsize pixel size
 		\param vendor vendor type
 		\param os pointer to the main thread of the application (output stream)
 		\param terminatecomputation reference to a variable determining that the computation must be stopped
 		\retval int 0 = success; -1 = aborted by user, -2 = error
 	*/ 
-	int loadFromIMZMLStream(string& imzmlfilename, ifstream &ibdstream, double fwhm, int& maxcountx, int& maxcounty, eVendorType& vendor, cMainThread* os, bool& terminatecomputation);
+	int loadFromIMZMLStream(string& imzmlfilename, ifstream &ibdstream, double fwhm, int& defaultmaxx, int& defaultmaxy, int& pixelsize, eVendorType& vendor, cMainThread* os, bool& terminatecomputation);
 
 
 	/**

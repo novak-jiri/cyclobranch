@@ -23,6 +23,8 @@ void cPeak::clear() {
 	isotope = false;
 	removeme = false;
 	scrambled = false;
+	decoy = false;
+	orderid = -1;
 
 	rotationid = -1;
 	seriesid = -1;
@@ -56,6 +58,8 @@ void cPeak::store(ofstream& os) {
 	os.write((char *)&isotope, sizeof(bool));
 	os.write((char *)&removeme, sizeof(bool));
 	os.write((char *)&scrambled, sizeof(bool));
+	os.write((char *)&decoy, sizeof(bool));
+	os.write((char *)&orderid, sizeof(int));
 }
 
 
@@ -79,5 +83,7 @@ void cPeak::load(ifstream& is) {
 	is.read((char *)&isotope, sizeof(bool));
 	is.read((char *)&removeme, sizeof(bool));
 	is.read((char *)&scrambled, sizeof(bool));
+	is.read((char *)&decoy, sizeof(bool));
+	is.read((char *)&orderid, sizeof(int));
 }
 

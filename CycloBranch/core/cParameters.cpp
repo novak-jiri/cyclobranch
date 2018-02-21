@@ -25,6 +25,7 @@ void cParameters::clear() {
 	fragmentmasserrortolerance = 5;
 	masserrortolerancefordeisotoping = 0;
 	minimumrelativeintensitythreshold = 1;
+	minimumabsoluteintensitythreshold = 0;
 	minimummz = 150;
 	fwhm = 0.05;
 	bricksdatabasefilename = "";
@@ -34,14 +35,14 @@ void cParameters::clear() {
 	maximumbricksincombinationend = 1;
 	maximumbricksincombination = max(max(maximumbricksincombinationbegin, maximumbricksincombinationmiddle), maximumbricksincombinationend);
 	maximumcumulativemass = 0;
-	generatebrickspermutations = true;
 	modificationsfilename = "";
 	searchedmodifications.clear();
 	maximumnumberofthreads = 1;
 	mode = denovoengine;
 	scoretype = matched_peaks;
 	clearhitswithoutparent = false;
-	generateisotopepattern = false;
+	generateisotopepattern = true;
+	minimumpatternsize = 1;
 	cyclicnterminus = false;
 	cycliccterminus = false;
 	enablescrambling = false;
@@ -66,8 +67,9 @@ void cParameters::clear() {
 	peakidtodesc.clear();
 	peakdesctoid.clear();
 
-	maxcountx = 1;
-	maxcounty = 1;
+	defaultmaxx = 1;
+	defaultmaxy = 1;
+	pixelsize = 1;
 	vendor = unknownvendor;
 }
 
@@ -123,6 +125,12 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 				// Bruker Analysis File
 				if (regex_search(peaklistfilename, rx)) {
 					peaklistfileformat = baf;
+				}
+
+				rx = "\\.[dD][aA][tT]$";
+				// dat file in Waters raw directory
+				if (regex_search(peaklistfilename, rx)) {
+					peaklistfileformat = dat;
 				}
 
 				rx = "\\.[mM][iI][sS]$";
@@ -225,6 +233,27 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 					}
 				#endif
 				break;
+			case dat:
+				#if OS_TYPE == WIN
+					foldername = peaklistfilename.substr(0, peaklistfilename.rfind('/'));
+					*os << "Converting the raw data folder " + foldername + " ... ";
+					s = "External\\windows\\waters\\raw2mgf.exe \"" + foldername + "\"";
+					if (system(s.c_str()) != 0) {
+						error = true;
+						errormessage = "The raw data folder cannot be converted.\n";
+						errormessage += "Does the folder '" + foldername + "' exist ?\n";
+						errormessage += "Is the folder with the folder '" + foldername + "' writable ?\n";
+						errormessage += "Do you have 'raw2mgf.exe' file located in the 'External/windows/waters' folder ?\n";
+					}
+
+					if (!error) {
+						*os << "ok" << endl << endl;
+						string mgfname = foldername.substr(0, foldername.rfind('.')) + ".mgf";
+						peakliststream.open(mgfname);
+						*os << mgfname << endl;
+					}
+				#endif
+				break;
 			case mis:
 				#if OS_TYPE == WIN
 					foldername = peaklistfilename.substr(0, peaklistfilename.rfind('.'));
@@ -287,11 +316,15 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 		if (!error) {
 			if (!peakliststream.good()) {
 				error = true;
-				if ((peaklistfileformat == mis) || (peaklistfileformat == ser)) {
+				if ((peaklistfileformat == mis) || (peaklistfileformat == ser) || (peaklistfileformat == dat)) {
 					errormessage = "Cannot open the folder '" + foldername + "'.";
 				}
 				else {
 					errormessage = "Cannot open the file '" + peaklistfilename + "'.";
+					if (peaklistfileformat == baf) {
+						errormessage += "\n\nDo you have Bruker Daltonik's CompassXport installed ?\n";
+						errormessage += "Do you have path to the CompassXport.exe in your PATH variable ?\n";
+					}
 				}
 			}
 			else {
@@ -309,6 +342,11 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 				case baf:
 					#if OS_TYPE == WIN
 						peaklistseries.loadFromBAFStream(peakliststream);
+					#endif
+					break;
+				case dat:
+					#if OS_TYPE == WIN
+						peaklistseries.loadFromMGFStream(peakliststream);
 					#endif
 					break;
 				case mis:
@@ -380,7 +418,7 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 					}
 					break;
 				case imzML:
-					errtype = peaklistseries.loadFromIMZMLStream(peaklistfilename, peakliststream, fwhm, maxcountx, maxcounty, vendor, os, terminatecomputation);
+					errtype = peaklistseries.loadFromIMZMLStream(peaklistfilename, peakliststream, fwhm, defaultmaxx, defaultmaxy, pixelsize, vendor, os, terminatecomputation);
 					if (errtype == -1) {
 						error = true;
 						errormessage = "Aborted by user.\n";
@@ -665,15 +703,12 @@ string cParameters::printToString() {
 	s += "m/z Error Tolerance: " + to_string(fragmentmasserrortolerance) + "\n";
 	s += "m/z Error Tolerance for Deisotoping: " + to_string(masserrortolerancefordeisotoping) + "\n";
 	s += "Minimum Threshold of Relative Intensity: " + to_string(minimumrelativeintensitythreshold) + "\n";
+	s += "Minimum Threshold of Absolute Intensity: " + to_string(minimumabsoluteintensitythreshold) + "\n";
 	s += "Minimum m/z Ratio: " + to_string(minimummz) + "\n";
 	s += "FWHM: " + to_string(fwhm) + "\n";
 	s += "Building Blocks Database File: " + bricksdatabasefilename + "\n";
 	s += "Maximum Number of Combined Blocks (start, middle, end): " + to_string(maximumbricksincombinationbegin) + ", " + to_string(maximumbricksincombinationmiddle) + ", " + to_string(maximumbricksincombinationend) + "\n";
 	s += "Maximum Cumulative Mass of Blocks: " + to_string(maximumcumulativemass) + "\n";
-
-	s += "Generate Permutations of Combined Blocks: ";
-	s += generatebrickspermutations ? "on" : "off";
-	s += "\n";
 
 	s += "N-/C-terminal Modifications File: " + modificationsfilename + "\n";
 
@@ -787,6 +822,8 @@ string cParameters::printToString() {
 	s += "Generate Full Isotope Patterns: ";
 	s += generateisotopepattern ? "on" : "off";
 	s += "\n";
+	
+	s += "Minimum Pattern Size: " + to_string(minimumpatternsize) + "\n";
 
 	s += "Searched Sequence: " + originalsearchedsequence + "\n";
 	s += "N-terminal Modification: " + searchedsequenceNtermmodif + "\n";
@@ -837,6 +874,7 @@ void cParameters::store(ofstream& os) {
 	os.write((char *)&fragmentmasserrortolerance, sizeof(double));
 	os.write((char *)&masserrortolerancefordeisotoping, sizeof(double));
 	os.write((char *)&minimumrelativeintensitythreshold, sizeof(double));
+	os.write((char *)&minimumabsoluteintensitythreshold, sizeof(unsigned));
 	os.write((char *)&minimummz, sizeof(double));
 	os.write((char *)&fwhm, sizeof(double));
 
@@ -848,7 +886,6 @@ void cParameters::store(ofstream& os) {
 	os.write((char *)&maximumbricksincombinationend, sizeof(int));
 	os.write((char *)&maximumbricksincombination, sizeof(int));
 	os.write((char *)&maximumcumulativemass, sizeof(double));
-	os.write((char *)&generatebrickspermutations, sizeof(bool));
 	storeString(modificationsfilename, os);
 
 	size = (int)searchedmodifications.size();
@@ -862,6 +899,7 @@ void cParameters::store(ofstream& os) {
 	os.write((char *)&scoretype, sizeof(eScoreType));
 	os.write((char *)&clearhitswithoutparent, sizeof(bool));
 	os.write((char *)&generateisotopepattern, sizeof(bool));
+	os.write((char *)&minimumpatternsize, sizeof(int));
 	os.write((char *)&cyclicnterminus, sizeof(bool));
 	os.write((char *)&cycliccterminus, sizeof(bool));
 	os.write((char *)&enablescrambling, sizeof(bool));
@@ -910,8 +948,9 @@ void cParameters::store(ofstream& os) {
 		os.write((char *)&it->second, sizeof(int));
 	}
 
-	os.write((char *)&maxcountx, sizeof(int));
-	os.write((char *)&maxcounty, sizeof(int));
+	os.write((char *)&defaultmaxx, sizeof(int));
+	os.write((char *)&defaultmaxy, sizeof(int));
+	os.write((char *)&pixelsize, sizeof(int));
 	os.write((char *)&vendor, sizeof(eVendorType));
 }
 
@@ -941,6 +980,7 @@ void cParameters::load(ifstream& is) {
 	is.read((char *)&fragmentmasserrortolerance, sizeof(double));
 	is.read((char *)&masserrortolerancefordeisotoping, sizeof(double));
 	is.read((char *)&minimumrelativeintensitythreshold, sizeof(double));
+	is.read((char *)&minimumabsoluteintensitythreshold, sizeof(unsigned));
 	is.read((char *)&minimummz, sizeof(double));
 	is.read((char *)&fwhm, sizeof(double));
 
@@ -952,7 +992,6 @@ void cParameters::load(ifstream& is) {
 	is.read((char *)&maximumbricksincombinationend, sizeof(int));
 	is.read((char *)&maximumbricksincombination, sizeof(int));
 	is.read((char *)&maximumcumulativemass, sizeof(double));
-	is.read((char *)&generatebrickspermutations, sizeof(bool));
 	loadString(modificationsfilename, is);
 
 	is.read((char *)&size, sizeof(int));
@@ -966,6 +1005,7 @@ void cParameters::load(ifstream& is) {
 	is.read((char *)&scoretype, sizeof(eScoreType));
 	is.read((char *)&clearhitswithoutparent, sizeof(bool));
 	is.read((char *)&generateisotopepattern, sizeof(bool));
+	is.read((char *)&minimumpatternsize, sizeof(int));
 	is.read((char *)&cyclicnterminus, sizeof(bool));
 	is.read((char *)&cycliccterminus, sizeof(bool));
 	is.read((char *)&enablescrambling, sizeof(bool));
@@ -1015,8 +1055,9 @@ void cParameters::load(ifstream& is) {
 		peakdesctoid[s] = value;
 	}
 
-	is.read((char *)&maxcountx, sizeof(int));
-	is.read((char *)&maxcounty, sizeof(int));
+	is.read((char *)&defaultmaxx, sizeof(int));
+	is.read((char *)&defaultmaxy, sizeof(int));
+	is.read((char *)&pixelsize, sizeof(int));
 	is.read((char *)&vendor, sizeof(eVendorType));
 }
 

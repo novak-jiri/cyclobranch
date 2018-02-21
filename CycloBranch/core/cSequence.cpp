@@ -15,6 +15,7 @@ void cSequence::clear() {
 	name = "";
 	summary.clear();
 	reference = "";
+	decoy = false;
 }
 
 
@@ -27,6 +28,7 @@ void cSequence::store(ofstream& os) {
 	storeString(name, os);
 	summary.store(os);
 	storeString(reference, os);
+	os.write((char *)&decoy, sizeof(bool));
 }
 
 
@@ -39,6 +41,7 @@ void cSequence::load(ifstream& is) {
 	loadString(name, is);
 	summary.load(is);
 	loadString(reference, is);
+	is.read((char *)&decoy, sizeof(bool));
 }
 
 
@@ -206,5 +209,15 @@ void cSequence::setSummaryFormula(const string& formula) {
 
 string cSequence::getSummaryFormula() {
 	return summary.getSummary();
+}
+
+
+bool cSequence::isDecoy() {
+	return decoy;
+}
+
+
+void cSequence::setDecoy(bool decoy) {
+	this->decoy = decoy;
 }
 

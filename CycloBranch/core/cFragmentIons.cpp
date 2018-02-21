@@ -1783,45 +1783,65 @@ void cFragmentIons::recalculateFragments(bool cyclicnterminus, bool cyclicctermi
 	fragmentions[cyclic_precursor_ion_co_loss_and_dehydrated_and_deamidated].massdifference = PRECURSOR_ION_CYCLIC - CO - H2O - NH3 + adductshift;
 	fragmentions[cyclic_precursor_ion_co_loss_and_dehydrated_and_deamidated].parent = cyclic_precursor_ion_co_loss;
 
-	// initialize ion H+
-	fragmentions[ms_hplus].nterminal = true;
-	fragmentions[ms_hplus].cterminal = true;
-	fragmentions[ms_hplus].name = "[M+H]+";
-	fragmentions[ms_hplus].massdifference = H - e;
-	fragmentions[ms_hplus].parent = ms_hplus;
-	fragmentions[ms_hplus].positive = true;
-	fragmentions[ms_hplus].multiplier = 1;
-	fragmentions[ms_hplus].summary = "H+";
+	// initialize ion [M+H]+
+	fragmentions[ms_Hplus].nterminal = true;
+	fragmentions[ms_Hplus].cterminal = true;
+	fragmentions[ms_Hplus].name = "[M+H]+";
+	fragmentions[ms_Hplus].massdifference = H - e;
+	fragmentions[ms_Hplus].parent = ms_Hplus;
+	fragmentions[ms_Hplus].positive = true;
+	fragmentions[ms_Hplus].multiplier = 1;
+	fragmentions[ms_Hplus].summary = "H+";
 
-	// initialize ion Na+
-	fragmentions[ms_naplus].nterminal = true;
-	fragmentions[ms_naplus].cterminal = true;
-	fragmentions[ms_naplus].name = "[M+Na]+";
-	fragmentions[ms_naplus].massdifference = Na - e;
-	fragmentions[ms_naplus].parent = ms_naplus;
-	fragmentions[ms_naplus].positive = true;
-	fragmentions[ms_naplus].multiplier = 1;
-	fragmentions[ms_naplus].summary = "Na+";
+	// initialize ion [M+Na]+
+	fragmentions[ms_Naplus].nterminal = true;
+	fragmentions[ms_Naplus].cterminal = true;
+	fragmentions[ms_Naplus].name = "[M+Na]+";
+	fragmentions[ms_Naplus].massdifference = Na - e;
+	fragmentions[ms_Naplus].parent = ms_Naplus;
+	fragmentions[ms_Naplus].positive = true;
+	fragmentions[ms_Naplus].multiplier = 1;
+	fragmentions[ms_Naplus].summary = "Na+";
 
-	// initialize ion K+
-	fragmentions[ms_kplus].nterminal = true;
-	fragmentions[ms_kplus].cterminal = true;
-	fragmentions[ms_kplus].name = "[M+K]+";
-	fragmentions[ms_kplus].massdifference = K - e;
-	fragmentions[ms_kplus].parent = ms_kplus;
-	fragmentions[ms_kplus].positive = true;
-	fragmentions[ms_kplus].multiplier = 1;
-	fragmentions[ms_kplus].summary = "K+";
+	// initialize ion [M+K]+
+	fragmentions[ms_Kplus].nterminal = true;
+	fragmentions[ms_Kplus].cterminal = true;
+	fragmentions[ms_Kplus].name = "[M+K]+";
+	fragmentions[ms_Kplus].massdifference = K - e;
+	fragmentions[ms_Kplus].parent = ms_Kplus;
+	fragmentions[ms_Kplus].positive = true;
+	fragmentions[ms_Kplus].multiplier = 1;
+	fragmentions[ms_Kplus].summary = "K+";
 
-	// initialize ion H-
-	fragmentions[ms_hminus].nterminal = true;
-	fragmentions[ms_hminus].cterminal = true;
-	fragmentions[ms_hminus].name = "[M-H]-";
-	fragmentions[ms_hminus].massdifference = -H + e;
-	fragmentions[ms_hminus].parent = ms_hminus;
-	fragmentions[ms_hminus].positive = false;
-	fragmentions[ms_hminus].multiplier = 1;
-	fragmentions[ms_hminus].summary = "H-1+-1";
+	// initialize ion [M-H]-
+	fragmentions[ms_Hminus].nterminal = true;
+	fragmentions[ms_Hminus].cterminal = true;
+	fragmentions[ms_Hminus].name = "[M-H]-";
+	fragmentions[ms_Hminus].massdifference = -H + e;
+	fragmentions[ms_Hminus].parent = ms_Hminus;
+	fragmentions[ms_Hminus].positive = false;
+	fragmentions[ms_Hminus].multiplier = 1;
+	fragmentions[ms_Hminus].summary = "H-1+-1";
+
+	// initialize ion [M+Na-2H]-
+	fragmentions[ms_Naminus].nterminal = true;
+	fragmentions[ms_Naminus].cterminal = true;
+	fragmentions[ms_Naminus].name = "[M+Na-2H]-";
+	fragmentions[ms_Naminus].massdifference = Na - 2*H + e;
+	fragmentions[ms_Naminus].parent = ms_Naminus;
+	fragmentions[ms_Naminus].positive = false;
+	fragmentions[ms_Naminus].multiplier = 1;
+	fragmentions[ms_Naminus].summary = "NaH-2+-1";
+
+	// initialize ion [M+K-2H]-
+	fragmentions[ms_Kminus].nterminal = true;
+	fragmentions[ms_Kminus].cterminal = true;
+	fragmentions[ms_Kminus].name = "[M+K-2H]-";
+	fragmentions[ms_Kminus].massdifference = K - 2*H + e;
+	fragmentions[ms_Kminus].parent = ms_Kminus;
+	fragmentions[ms_Kminus].positive = false;
+	fragmentions[ms_Kminus].multiplier = 1;
+	fragmentions[ms_Kminus].summary = "KH-2+-1";
 
 	// initialize ion [M+Fe-2H]+
 	fragmentions[ms_MFe2H].nterminal = true;
@@ -2432,6 +2452,16 @@ void cFragmentIons::recalculateFragments(bool cyclicnterminus, bool cyclicctermi
 	fragmentions[ms_MGa4H].positive = false;
 	fragmentions[ms_MGa4H].multiplier = 1;
 	fragmentions[ms_MGa4H].summary = "GaH-3H-1+-1";
+
+	// initialize ion [M+NH4]+
+	fragmentions[ms_NH4plus].nterminal = true;
+	fragmentions[ms_NH4plus].cterminal = true;
+	fragmentions[ms_NH4plus].name = "[M+NH4]+";
+	fragmentions[ms_NH4plus].massdifference = H + NH3 - e;
+	fragmentions[ms_NH4plus].parent = ms_NH4plus;
+	fragmentions[ms_NH4plus].positive = true;
+	fragmentions[ms_NH4plus].multiplier = 1;
+	fragmentions[ms_NH4plus].summary = "NH4+";
 
 	// initialize l0h ion
 	fragmentions[l0h_ion].nterminal = true;

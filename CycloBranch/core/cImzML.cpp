@@ -6,7 +6,8 @@
 
 cImzML::cImzML() {
 	profilespectra = false;
-	use_64bit_precision = false;
+	use_64bit_float_mz_precision = false;
+	use_64bit_float_intensity_precision = false;
 
 	imzmlitems.clear();
 
@@ -20,7 +21,7 @@ cImzML::~cImzML() {
 }
 
 
-int cImzML::parse(string& filename, int& maxcountx, int& maxcounty, eVendorType& vendor) {
+int cImzML::parse(string& filename, int& defaultmaxx, int& defaultmaxy, int& pixelsize, eVendorType& vendor) {
 
 	parser->parse(filename.c_str());
 	document = parser->getDocument();
@@ -31,9 +32,11 @@ int cImzML::parse(string& filename, int& maxcountx, int& maxcounty, eVendorType&
 	}
 
 	profilespectra = false;
-	use_64bit_precision = false;
-	maxcountx = 1;
-	maxcounty = 1;
+	use_64bit_float_mz_precision = false;
+	use_64bit_float_intensity_precision = false;
+	defaultmaxx = 1;
+	defaultmaxy = 1;
+	pixelsize = 1;
 	vendor = unknownvendor;
 
 	// childrens of mzML
@@ -130,7 +133,44 @@ int cImzML::parse(string& filename, int& maxcountx, int& maxcounty, eVendorType&
 
 											// 64-bit float
 											if (accession.compare("MS:1000523") == 0) {											
-												use_64bit_precision = true;
+												use_64bit_float_mz_precision = true;
+											}
+
+											// zlib compression detected
+											if (accession.compare("MS:1000574") == 0) {
+												return 1;
+											}
+
+										}
+
+									}
+
+
+									currentNode3 = currentNode3->getNextSibling();
+
+								}
+
+
+							}
+
+							if ((id.compare("intensities") == 0) || (id.compare("intensityArray") == 0)) {
+
+
+								// childrens of referenceableParamGroup
+								DOMNode* currentNode3 = currentNode2->getFirstChild();
+								while (currentNode3) {
+
+
+									if (currentNode3->getNodeType() == DOMNode::ELEMENT_NODE) {
+
+										DOMElement* currentElement3 = dynamic_cast<xercesc::DOMElement*>(currentNode3);
+										if (compareElementTagName(currentElement3, "cvParam")) {
+
+											string accession = getAttribute(currentElement3, "accession");
+
+											// 64-bit float
+											if (accession.compare("MS:1000523") == 0) {
+												use_64bit_float_intensity_precision = true;
 											}
 
 											// zlib compression detected
@@ -284,12 +324,17 @@ int cImzML::parse(string& filename, int& maxcountx, int& maxcounty, eVendorType&
 
 										// max count of pixel x
 										if (accession.compare("IMS:1000042") == 0) {
-											maxcountx = stoi(value);
+											defaultmaxx = stoi(value);
 										}
 
 										// max count of pixel y
 										if (accession.compare("IMS:1000043") == 0) {
-											maxcounty = stoi(value);
+											defaultmaxy = stoi(value);
+										}
+
+										// pixel size
+										if (accession.compare("IMS:1000046") == 0) {
+											pixelsize = stoi(value);
 										}
 
 									}
@@ -446,7 +491,7 @@ int cImzML::parse(string& filename, int& maxcountx, int& maxcounty, eVendorType&
 																				mzarray = true;
 																			}
 
-																			if ((ref.compare("intensities") == 0) || (ref.compare("intensityArray") == 0)){
+																			if ((ref.compare("intensities") == 0) || (ref.compare("intensityArray") == 0)) {
 																				intensityarray = true;
 																			}
 
@@ -556,9 +601,14 @@ void cImzML::updateRawDataToPeakList(vector<cPeaksList>& peaklists, string& conv
 	unsigned long long offset = 16;
 	int currentid = 0;
 
-	int size = 4;
-	if (use_64bit_precision) {
-		size = 8;
+	int mz_size = 4;
+	if (use_64bit_float_mz_precision) {
+		mz_size = 8;
+	}
+
+	int intensity_size = 4;
+	if (use_64bit_float_intensity_precision) {
+		intensity_size = 8;
 	}
 
 	// childrens of mzML
@@ -804,7 +854,7 @@ void cImzML::updateRawDataToPeakList(vector<cPeaksList>& peaklists, string& conv
 																				// external encoded length
 																				if (accession.compare("IMS:1000104") == 0) {
 																					stringstream ss;
-																					ss << peaklists[currentid].size() * size;
+																					ss << peaklists[currentid].size() * mz_size;
 																					setAttribute(currentElement6, "value", ss.str().c_str());
 																				}
 
@@ -820,14 +870,14 @@ void cImzML::updateRawDataToPeakList(vector<cPeaksList>& peaklists, string& conv
 																				// external offset
 																				if (accession.compare("IMS:1000102") == 0) {			
 																					stringstream ss;
-																					ss << offset + peaklists[currentid].size() * size;
+																					ss << offset + peaklists[currentid].size() * mz_size;
 																					setAttribute(currentElement6, "value", ss.str().c_str());
 																				}
 
 																				// external encoded length
 																				if (accession.compare("IMS:1000104") == 0) {
 																					stringstream ss;
-																					ss << peaklists[currentid].size() * size;
+																					ss << peaklists[currentid].size() * intensity_size;
 																					setAttribute(currentElement6, "value", ss.str().c_str());
 																				}
 
@@ -870,7 +920,7 @@ void cImzML::updateRawDataToPeakList(vector<cPeaksList>& peaklists, string& conv
 										}
 
 
-										offset += peaklists[currentid].size() * size * 2;
+										offset += peaklists[currentid].size() * (mz_size + intensity_size);
 										currentid++;
 
 
@@ -917,8 +967,13 @@ bool cImzML::hasProfileSpectra() {
 }
 
 
-bool cImzML::use64BitPrecision() {
-	return use_64bit_precision;
+bool cImzML::use64BitMzPrecision() {
+	return use_64bit_float_mz_precision;
+}
+
+
+bool cImzML::use64BitIntensityPrecision() {
+	return use_64bit_float_intensity_precision;
 }
 
 

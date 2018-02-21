@@ -14,6 +14,7 @@
 #include <sstream>
 #include <iomanip>
 #include <cfloat>
+#include <cmath>
 #include <QString>
 #include <QByteArray>
 #include <QMetaType>
@@ -42,8 +43,17 @@ class cBrick;
 #endif
 
 
+#define MICROSCOPY_IMAGES
+
+
 using namespace std;
 using namespace boost;
+
+
+/**
+	\brief The pi value.
+*/
+const double pi = 3.141592653589793;
 
 
 /**
@@ -353,6 +363,28 @@ double fact(int value);
 	\retval double median value
 */
 double median(vector<double>& vector);
+
+
+/**
+	\brief Strip HTML tags from a HTML string.
+	\param htmlstring reference to a string with HTML tags
+	\retval string stripped string
+*/
+string stripHTML(string& htmlstring);
+
+
+/**
+	\brief Strip isomers of building blocks from an input peptide sequence.
+	\param peptidesequence a peptide sequence
+*/
+void stripIsomers(string& peptidesequence);
+
+
+/**
+	\brief Strip isomers of building blocks from an input string vector.
+	\param acronyms vector of building block acronyms with isomers
+*/
+void stripIsomersFromStringVector(vector<string>& acronyms);
 
 
 #endif

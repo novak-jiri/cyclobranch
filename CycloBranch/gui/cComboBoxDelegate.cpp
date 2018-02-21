@@ -30,6 +30,7 @@ void cComboBoxDelegate::setModelData(QWidget* editor, QAbstractItemModel* model,
 
 QWidget* cComboBoxDelegate::createEditor(QWidget* parent, const QStyleOptionViewItem& option, const QModelIndex& index) const {
 	QComboBox* combo = new QComboBox(parent);
+	combo->setSizeAdjustPolicy(QComboBox::AdjustToContents);
 	for (int j = 0; j <= (int)other; j++) {
 		combo->addItem(QString(getStringFromPeptideType((ePeptideType)j).c_str()));
 	}

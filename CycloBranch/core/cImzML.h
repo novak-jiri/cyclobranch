@@ -98,7 +98,8 @@ class cImzML {
 	DOMDocument* document;
 
 	bool profilespectra;
-	bool use_64bit_precision;
+	bool use_64bit_float_mz_precision;
+	bool use_64bit_float_intensity_precision;
 	vector<cImzMLItem> imzmlitems;
 
 public:
@@ -119,12 +120,13 @@ public:
 	/**
 		\brief Parse an imzml file.
 		\param filename imzml filename
-		\param maxcountx max count of pixel x - parsed from imzML file
-		\param maxcounty max count of pixel y - parsed from imzML file
+		\param defaultmaxx max count of pixel x - parsed from imzML file
+		\param defaultmaxy max count of pixel y - parsed from imzML file
+		\param pixelsize pixel size
 		\param vendor vendor type
 		\retval 0 = success; 1 = failed (zlib compression detected)
 	*/ 
-	int parse(string& filename, int& maxcountx, int& maxcounty, eVendorType& vendor);
+	int parse(string& filename, int& defaultmaxx, int& defaultmaxy, int& pixelsize, eVendorType& vendor);
  
 
 	/**
@@ -150,10 +152,17 @@ public:
 
 
 	/**
-		\brief Check the precision of data.
+		\brief Check the precision of mz values.
 		\retval bool if true, 64bit precision is used; if false, 32bit precision is used
 	*/ 
-	bool use64BitPrecision();
+	bool use64BitMzPrecision();
+
+
+	/**
+		\brief Check the precision of intensity values.
+		\retval bool if true, 64bit precision is used; if false, 32bit precision is used
+	*/
+	bool use64BitIntensityPrecision();
 
 
 	/**

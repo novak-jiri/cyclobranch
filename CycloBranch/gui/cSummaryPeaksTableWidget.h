@@ -19,6 +19,7 @@
 #include <QStandardItem>
 #include <QItemDelegate>
 #include <QMessageBox>
+#include <QComboBox>
 #include <map>
 #include "core/utilities.h"
 #include "gui/cViewButtonDelegate.h"
@@ -140,9 +141,9 @@ struct cSummaryTableKeyMSMS {
 
 
 /**
-	\brief Comparison object for cSummaryTableKeyMS.
+	\brief Comparison object for cSummaryTableKeyMS (independent ions).
 */
-struct cSummaryTableKeyMS_comp {
+struct cIonSummaryTableKeyMS_comp {
 
 	/**
 		\brief Operator to define the order of two items.
@@ -152,6 +153,24 @@ struct cSummaryTableKeyMS_comp {
 	*/
 	bool operator()(const cSummaryTableKeyMS& left, const cSummaryTableKeyMS& right) const {
 		return (left.iontype + left.theoreticalmz + left.summaryformula + left.name + left.reference < right.iontype + right.theoreticalmz + right.summaryformula + right.name + right.reference);
+	}
+
+};
+
+
+/**
+	\brief Comparison object for cSummaryTableKeyMS (whole envelope).
+*/
+struct cEnvelopeSummaryTableKeyMS_comp {
+
+	/**
+		\brief Operator to define the order of two items.
+		\param left first key
+		\param right second key
+		\retval bool true if the first object is less than the second object
+	*/
+	bool operator()(const cSummaryTableKeyMS& left, const cSummaryTableKeyMS& right) const {
+		return (left.iontype + left.name + left.reference < right.iontype + right.name + right.reference);
 	}
 
 };
@@ -211,9 +230,10 @@ public:
 		\param resultsproxymodel proxy model of the tableview in the main application window 
 		\param parameters parameters of the application
 		\param spectralist list of spectra
+		\param showisomers true if isomers of blocks are reported; false otherwise
 		\retval bool true if the table was successfully prepared, false otherwise
 	*/ 
-	bool prepareToShow(QStandardItemModel* resultsstandardmodel, cMainWindowProxyModel* resultsproxymodel, cParameters* parameters, cTheoreticalSpectrumList* spectralist);
+	bool prepareToShow(QStandardItemModel* resultsstandardmodel, cMainWindowProxyModel* resultsproxymodel, cParameters* parameters, cTheoreticalSpectrumList* spectralist, bool showisomers);
 
 
 	/**
@@ -252,8 +272,11 @@ private:
 	QToolBar* toolbarFilter;
 	QWidget* rowsfilterwidget;
 	QHBoxLayout* rowsfilterhbox;
+	QComboBox* rowsfiltercombobox;
+	QComboBox* rowsfiltercomparatorcombobox;
 	QLineEdit* rowsfilterline;
 	QCheckBox* rowsfiltercasesensitive;
+	QCheckBox* rowsfilterwholeword;
 	QPushButton* rowsfilterbutton;
 	QPushButton* rowsfilterclearbutton;
 
@@ -267,7 +290,9 @@ private:
 	QString lastdirexportstatisticstocsv;
 
 	vector<cCoordinates> coordinates;
-	vector<cCoordinates> coordinates_orig;
+	cPeaksList origeicchromatogram;
+
+	void addEICPeak(cPeaksList& eicchromatogram, cPeaksList& experimentalspectrum);
 
 
 protected:
@@ -300,15 +325,25 @@ private slots:
 	void showHTMLDocumentation();
 
 
+	void rowDoubleClicked(const QModelIndex& item);
+
+
 signals:
 
 
 	/**
 		\brief The table was not generated because the process was cancelled.
-	*/ 
+	*/
 	void tableCancelled();
 
-	
+
+	/**
+		\brief A row was double clicked.
+		\param rowid id of a row in the main window
+	*/
+	void summaryPeaksTableRowDoubleClicked(int rowid);
+
+
 	/**
 		\brief Reset the region in imagw window.
 	*/ 
@@ -316,12 +351,22 @@ signals:
 
 	
 	/**
-		\brief Send the vector of coordinates.
+		\brief Send the vector of coordinates to image window.
 		\param coordinates a vector of coordinates x and y
+		\param columnname name of column which was compared
+		\param comparatorname name of used comparator
 		\param filterstring a string used to filter the points
 		\param casesensitive true if the string was used as a casesensitive, false otherwise
+		\param wholeword true if whole words only are compared, false otherwise
 	*/ 
-	void sendFilterOptions(vector<cCoordinates> coordinates, string filterstring, bool casesensitive);
+	void sendFilterOptionsToImageWindow(vector<cCoordinates> coordinates, string columnname, string comparatorname, string filterstring, bool casesensitive, bool wholeword);
+
+
+	/**
+		\brief Send the EIC chromatogram to chromatogram window.
+		\param eic eic chromatogram
+	*/
+	void sendFilterOptionsToChromatogram(cPeaksList eic);
 
 
 };

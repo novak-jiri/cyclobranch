@@ -2,28 +2,8 @@
 #include "gui/cMainThread.h"
 
 
-bool comparePeakMasses(const cPeak& a, const cPeak& b) {
-	return (a.mzratio < b.mzratio);
-}
-
-
 bool compareRelativePeakIntensitiesDesc(const cPeak& a, const cPeak& b) {
 	return (a.relativeintensity > b.relativeintensity);
-}
-
-
-bool compareAbsolutePeakIntensitiesDesc(const cPeak& a, const cPeak& b) {
-	return (a.absoluteintensity > b.absoluteintensity);
-}
-
-
-bool comparePeakGroupId(const cPeak& a, const cPeak& b) {
-	return (a.groupid < b.groupid);
-}
-
-
-bool comparePeakRemoveMeFlag(const cPeak& a, const cPeak& b) {
-	return (a.removeme < b.removeme);
 }
 
 
@@ -34,7 +14,7 @@ bool isInPpmMassErrorTolerance(double experimentalmass, double theoreticalmass, 
 
 
 double ppmError(double experimentalmass, double theoreticalmass) {
-	return abs(experimentalmass - theoreticalmass)/experimentalmass*1000000.0f;
+	return (experimentalmass - theoreticalmass)/experimentalmass*1000000.0f;
 }
 
 
@@ -139,95 +119,90 @@ void cPeaksList::loadFromBAFStream(ifstream &stream) {
 }
 
 
-void cPeaksList::loadFromIBDStream(cImzMLItem& imzmlitem, ifstream &ibdstream, bool use_64bit_precision) {
-	if (use_64bit_precision) {
-		unsigned long long start;
-		double value;
-
+void cPeaksList::loadFromIBDStream(cImzMLItem& imzmlitem, ifstream &ibdstream, bool use_64bit_float_mz_precision, bool use_64bit_float_intensity_precision) {
+	unsigned long long start;
+	float flt;
+	double dbl;
+	
+	// mz values
+	if (use_64bit_float_mz_precision) {
 		peaks.resize(imzmlitem.mzlength/8);
-
 		start = imzmlitem.mzstart;
 		ibdstream.seekg(start, ibdstream.beg);
 		for (int i = 0; i < (int)imzmlitem.mzlength/8; i++) {
 			if (ibdstream.good()) {
-				ibdstream.read((char*)&value, 8);
-				peaks[i].mzratio = value;
+				ibdstream.read((char*)&dbl, 8);
+				peaks[i].mzratio = dbl;
 			}
 		}
-
-		if (imzmlitem.mzlength != imzmlitem.intensitylength) {
-			return;
-		}
-
-		start = imzmlitem.intensitystart;
-		ibdstream.seekg(start, ibdstream.beg);
-		for (int i = 0; i < (int)imzmlitem.intensitylength/8; i++) {
-			if (ibdstream.good()) {
-				ibdstream.read((char*)&value, 8);
-				peaks[i].absoluteintensity = value;
-			}
-		}
-
-		x = imzmlitem.x;
-		y = imzmlitem.y;
-		title = imzmlitem.title;
 	}
 	else {
-		unsigned start;
-		float value;
-
 		peaks.resize(imzmlitem.mzlength/4);
-
 		start = imzmlitem.mzstart;
 		ibdstream.seekg(start, ibdstream.beg);
 		for (int i = 0; i < (int)imzmlitem.mzlength/4; i++) {
 			if (ibdstream.good()) {
-				ibdstream.read((char*)&value, 4);
-				peaks[i].mzratio = value;
+				ibdstream.read((char*)&flt, 4);
+				peaks[i].mzratio = flt;
 			}
 		}
+	}
 
-		if (imzmlitem.mzlength != imzmlitem.intensitylength) {
-			return;
-		}
+	if (imzmlitem.mzlength != imzmlitem.intensitylength) {
+		return;
+	}
 
+	// intensities
+	if (use_64bit_float_intensity_precision) {
 		start = imzmlitem.intensitystart;
 		ibdstream.seekg(start, ibdstream.beg);
-		for (int i = 0; i < (int)imzmlitem.intensitylength/4; i++) {
+		for (int i = 0; i < (int)imzmlitem.intensitylength / 8; i++) {
 			if (ibdstream.good()) {
-				ibdstream.read((char*)&value, 4);
-				peaks[i].absoluteintensity = value;
+				ibdstream.read((char*)&dbl, 8);
+				peaks[i].absoluteintensity = dbl;
 			}
 		}
-
-		x = imzmlitem.x;
-		y = imzmlitem.y;
-		title = imzmlitem.title;
 	}
+	else {
+		start = imzmlitem.intensitystart;
+		ibdstream.seekg(start, ibdstream.beg);
+		for (int i = 0; i < (int)imzmlitem.intensitylength / 4; i++) {
+			if (ibdstream.good()) {
+				ibdstream.read((char*)&flt, 4);
+				peaks[i].absoluteintensity = flt;
+			}
+		}
+	}
+
+	x = imzmlitem.x;
+	y = imzmlitem.y;
+	title = imzmlitem.title;
 }
 
 
-void cPeaksList::storeToIBDStream(ofstream &ibdstream, bool use_64bit_precision) {
-	if (use_64bit_precision) {
-		// store m/z values
+void cPeaksList::storeToIBDStream(ofstream &ibdstream, bool use_64bit_float_mz_precision, bool use_64bit_float_intensity_precision) {
+	float value;
+
+	// store m/z values
+	if (use_64bit_float_mz_precision) {
 		for (int i = 0; i < (int)peaks.size(); i++) {
 			ibdstream.write((char *)&(peaks[i].mzratio), 8);
 		}
+	}
+	else {
+		for (int i = 0; i < (int)peaks.size(); i++) {
+			value = peaks[i].mzratio;
+			ibdstream.write((char *)&value, 4);
+		}
+	}
 
-		// store intensities
+	// store intensities
+	if (use_64bit_float_intensity_precision) {	
 		for (int i = 0; i < (int)peaks.size(); i++) {
 			ibdstream.write((char *)&(peaks[i].absoluteintensity), 8);
 		}
 	}
 	else {
-		float value;
-		// store m/z values
-		for (int i = 0; i < (int)peaks.size(); i++) {
-			value = peaks[i].mzratio;
-			ibdstream.write((char *)&value, 4);
-		}
-
-		// store intensities
 		for (int i = 0; i < (int)peaks.size(); i++) {
 			value = peaks[i].absoluteintensity;
 			ibdstream.write((char *)&value, 4);
@@ -326,11 +301,15 @@ string cPeaksList::print(bool htmlterminatelines) {
 
 
 void cPeaksList::sortbyMass(int limit) {
+	auto cmp = [](const cPeak& a, const cPeak& b) {
+		return (a.mzratio < b.mzratio);
+	};
+
 	if (limit == -1) {
-		sort(peaks.begin(), peaks.end(), comparePeakMasses);
+		sort(peaks.begin(), peaks.end(), cmp);
 	}
 	else {
-		sort(peaks.begin(), peaks.begin() + limit, comparePeakMasses);
+		sort(peaks.begin(), peaks.begin() + limit, cmp);
 	}
 }
 
@@ -341,12 +320,29 @@ void cPeaksList::sortbyRelativeIntensityDesc() {
 
 
 void cPeaksList::sortbyAbsoluteIntensityDesc() {
-	sort(peaks.begin(), peaks.end(), compareAbsolutePeakIntensitiesDesc);
+	auto cmp = [](const cPeak& a, const cPeak& b) {
+		return (a.absoluteintensity > b.absoluteintensity);
+	};
+
+	sort(peaks.begin(), peaks.end(), cmp);
 }
 
 
 void cPeaksList::sortbyGroupId() {
-	sort(peaks.begin(), peaks.end(), comparePeakGroupId);
+	auto cmp = [](const cPeak& a, const cPeak& b) {
+		return (a.groupid < b.groupid);
+	};
+
+	sort(peaks.begin(), peaks.end(), cmp);
+}
+
+
+void cPeaksList::sortbyOrderId() {
+	auto cmp = [](const cPeak& a, const cPeak& b) {
+		return (a.orderid < b.orderid);
+	};
+
+	sort(peaks.begin(), peaks.end(), cmp);
 }
 
 
@@ -373,9 +369,22 @@ int cPeaksList::normalizeIntenzity() {
 
 void cPeaksList::cropRelativeIntenzity(double minimumrelativeintensitythreshold) {
 	sortbyRelativeIntensityDesc();
-	
+
 	int i = (int)peaks.size() - 1;
-	while ((i > 0) && (peaks[i].relativeintensity < minimumrelativeintensitythreshold)) {
+	while ((i >= 0) && (peaks[i].relativeintensity < minimumrelativeintensitythreshold)) {
+		i--;
+	}
+	peaks.resize(i + 1);
+
+	sortbyMass();
+}
+
+
+void cPeaksList::cropAbsoluteIntenzity(unsigned minimumabsoluteintensitythreshold) {
+	sortbyAbsoluteIntensityDesc();
+
+	int i = (int)peaks.size() - 1;
+	while ((i >= 0) && (peaks[i].absoluteintensity < (double)minimumabsoluteintensitythreshold)) {
 		i--;
 	}
 	peaks.resize(i + 1);
@@ -385,13 +394,17 @@ void cPeaksList::cropRelativeIntenzity(double minimumrelativeintensitythreshold)
 
 
 void cPeaksList::cropMinimumMZRatio(double minimummz, double errortolerance) {
-	while ((int)peaks.size() > 0) {
-		if ((peaks[0].mzratio < minimummz) && (!isInPpmMassErrorTolerance(peaks[0].mzratio, minimummz, errortolerance))) {
-			peaks.erase(peaks.begin());
+	int position = 0;
+	while (position < (int)peaks.size()) {
+		if ((peaks[position].mzratio < minimummz) && (!isInPpmMassErrorTolerance(peaks[position].mzratio, minimummz, errortolerance))) {
+			position++;
 		}
 		else {
 			break;
 		}
+	}
+	if (position > 0) {
+		peaks.erase(peaks.begin(), peaks.begin() + position);
 	}
 }
 
@@ -598,7 +611,11 @@ void cPeaksList::removeNeutralLoss(double loss, int maximumcharge, double fragme
 
 
 void cPeaksList::removeObsolete() {
-	sort(peaks.begin(), peaks.end(), comparePeakRemoveMeFlag);
+	auto cmp = [](const cPeak& a, const cPeak& b) {
+		return (a.removeme < b.removeme);
+	};
+
+	sort(peaks.begin(), peaks.end(), cmp);
 
 	int items = 0;
 	int size = (int)peaks.size();
@@ -650,7 +667,7 @@ void cPeaksList::maxHighestPeaksInWindow(int maximumnumberofpeaksinwindow, doubl
 }
 
 
-double cPeaksList::getMaximumIntensityFromMZInterval(double minmz, double maxmz, bool hidematched, bool hideunmatched, ePeptideType peptidetype, bool hidescrambled) {
+double cPeaksList::getMaximumRelativeIntensityFromMZInterval(double minmz, double maxmz, bool hidematched, bool hideunmatched, ePeptideType peptidetype, bool hidescrambled) {
 	double intensity = 0;
 	for (int i = 0; i < (int)peaks.size(); i++) {
 
@@ -676,6 +693,37 @@ double cPeaksList::getMaximumIntensityFromMZInterval(double minmz, double maxmz,
 
 		if (peaks[i].relativeintensity > intensity) {
 			intensity = peaks[i].relativeintensity;
+		}
+	}
+	return intensity;
+}
+
+
+double cPeaksList::getMaximumAbsoluteIntensityFromMZInterval(double minmz, double maxmz, bool hidematched, bool hideunmatched, ePeptideType peptidetype, bool hidescrambled) {
+	double intensity = 0;
+	for (int i = 0; i < (int)peaks.size(); i++) {
+		// skip peaks which are out of range
+		if ((peaks[i].mzratio < minmz) || (peaks[i].mzratio > maxmz)) {
+			continue;
+		}
+
+		// skip unmatched peaks if selected
+		if (hideunmatched && (peaks[i].matched <= 0)) {
+			continue;
+		}
+
+		// skip matched peaks if selected
+		if (hidematched && (peaks[i].matched > 0)) {
+			continue;
+		}
+
+		// skip scrambled peaks if selected
+		if ((peptidetype == cyclic) && hidescrambled && peaks[i].scrambled) {
+			continue;
+		}
+
+		if (peaks[i].absoluteintensity > intensity) {
+			intensity = peaks[i].absoluteintensity;
 		}
 	}
 	return intensity;
@@ -755,6 +803,14 @@ void cPeaksList::reducePeakDescriptions(map<int, string>& peakidtodesc, map<stri
 			peakidtodesc.insert(make_pair(descid, peaks[i].description));
 		}
 		peaks[i].description.clear();
+	}
+}
+
+
+void cPeaksList::fillOrderIDs() {
+	int size = (int)peaks.size();
+	for (int i = 0; i < size; i++) {
+		peaks[i].orderid = i;
 	}
 }
 

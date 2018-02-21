@@ -139,6 +139,7 @@ protected:
 
 
 private:
+
 	QWidget* parent;
 	QGraphicsScene* scene;
 	QMatrix originalmatrix;
@@ -160,6 +161,7 @@ private:
 	string coloredrotationstring;
 	int coloredtrotationid;
 
+	bool absoluteintensity;
 	bool hideunmatched;
 	bool hidematched;
 	bool hidescrambled;
@@ -184,14 +186,18 @@ private:
 
 	double getMZRatioFromXPosition(int x, int w);
 
+
 	int getXPositionFromMZRatio(double mzratio, int w);
 
+
 	void redrawScene();
+
 
 	void updateZoomGroup();
 
 
 signals:
+
 
 	/**
 		\brief The signal is emitted when the range of m/z ratios has been changed.
@@ -200,25 +206,39 @@ signals:
 	*/ 
 	void updateMZInterval(double minmz, double maxmz);
 
+
 private slots:
+
 
 	void zoomIn();
 
+
 	void zoomOut();
 
+	
 	void normalSize();
 
+
+	void absoluteIntensityStateChanged(bool state);
+
+	
 	void setMZInterval(double minmz, double maxmz);
+
 
 	void resetMZInterval();
 
+
 	void rotationChanged(int index);
+
 
 	void trotationChanged(int index);
 
+
 	void rotationChanged(QString text);
 
+
 	void enableMouseMzSelectionTool(bool enable);
+
 
 };
 

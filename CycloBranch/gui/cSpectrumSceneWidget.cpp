@@ -25,6 +25,7 @@ cSpectrumSceneWidget::cSpectrumSceneWidget(QWidget* parent) {
 	origwidth = 500;
 	origheight = 200;
 	currentscale = 1;
+	absoluteintensity = false;
 	hideunmatched = false;
 	hidematched = false;
 	hidescrambled = false;
@@ -309,7 +310,8 @@ void cSpectrumSceneWidget::showEvent(QShowEvent *event) {
 
 
 double cSpectrumSceneWidget::getMZRatioFromXPosition(int x, int w) {
-	return (double)(x - leftmargin)/(double)(w - leftmargin - rightmargin)*(maxmzratio - minmzratio) + minmzratio;
+	double mz = (double)(x - leftmargin)/(double)(w - leftmargin - rightmargin)*(maxmzratio - minmzratio) + minmzratio;
+	return max(0.0, mz);
 }
 
 
@@ -333,8 +335,10 @@ void cSpectrumSceneWidget::redrawScene() {
 	char tmpbuf[30];
 	string s;
 
+	int xstep, ystep;
 	int w = origwidth;
 	int h = origheight;
+	int rulergranularity = 10;
 
 	cPeaksList visiblepeaks;
 	visiblepeaks.clear();
@@ -342,47 +346,103 @@ void cSpectrumSceneWidget::redrawScene() {
 	QList<QGraphicsItem *> hiddenitems;
 
 	vector<string> hits;
+	set<int> experimentalmatches;
 
 	QFont myFont("Arial", 8);
 	QFontMetrics fm(myFont);
 
+
 	// maximum intensity in the interval <minmzratio, maxmzratio>
-	double maxintensity = theoreticalspectrum->getExperimentalSpectrum().getMaximumIntensityFromMZInterval(minmzratio, maxmzratio, hidematched, hideunmatched, parameters->peptidetype, hidescrambled);
+	double maxintensity;
+	if (absoluteintensity) {
+		maxintensity = theoreticalspectrum->getExperimentalSpectrum().getMaximumAbsoluteIntensityFromMZInterval(minmzratio, maxmzratio, hidematched, hideunmatched, parameters->peptidetype, hidescrambled);
+	}
+	else {
+		maxintensity = theoreticalspectrum->getExperimentalSpectrum().getMaximumRelativeIntensityFromMZInterval(minmzratio, maxmzratio, hidematched, hideunmatched, parameters->peptidetype, hidescrambled);
+	}
+
 
 	scene->removeItem(zoomgroup);
 	scene->clear();
 	zoomgroup->setVisible(false);
 	scene->addItem(zoomgroup);
 
+
 	// x axis
 	scene->addLine(leftmargin, h - bottommargin, w - rightmargin, h - bottommargin, QPen(Qt::black, 2, Qt::SolidLine));
 
 	// x axis ruler
-	scene->addLine(leftmargin, h - bottommargin, leftmargin, h - bottommargin + 10, QPen(Qt::black, 2, Qt::SolidLine));
+	xstep = (w - leftmargin - rightmargin) / rulergranularity;
+	for (int i = 0; i < rulergranularity; i++) {
+		scene->addLine(leftmargin + xstep * i, h - bottommargin, leftmargin + xstep * i, h - bottommargin + 10, QPen(Qt::black, 2, Qt::SolidLine));
+	}	
 	scene->addLine(w - rightmargin, h - bottommargin, w - rightmargin, h - bottommargin + 10, QPen(Qt::black, 2, Qt::SolidLine));
 
 	simpletext = scene->addSimpleText(QString::number(minmzratio), myFont);
-	simpletext->setPos(QPointF(leftmargin - 2, h - bottommargin + 12));
+	simpletext->setPos(QPointF(leftmargin - simpletext->boundingRect().width() / 2, h - bottommargin + 12));
+
+	if (maxmzratio - minmzratio > 0.01) {
+		xstep = (w - leftmargin - rightmargin) / rulergranularity;
+		for (int i = 1; i < rulergranularity; i++) {
+			simpletext = scene->addSimpleText(QString::number(minmzratio + (maxmzratio - minmzratio) / (double)rulergranularity * (double)i), myFont);
+			simpletext->setPos(QPointF(leftmargin + xstep * i - simpletext->boundingRect().width() / 2, h - bottommargin + 12));
+		}
+	}
 
 	simpletext = scene->addSimpleText(QString::number(maxmzratio), myFont);
-	simpletext->setPos(QPointF(w - rightmargin - 2, h - bottommargin + 12));
+	simpletext->setPos(QPointF(w - rightmargin - simpletext->boundingRect().width() / 2, h - bottommargin + 12));
+
 
 	// y axis
 	scene->addLine(leftmargin, h - bottommargin, leftmargin, h - bottommargin - std::max(h - topmargin - bottommargin, 5), QPen(Qt::black, 2, Qt::SolidLine));
 	
 	// y axis ruler
+	ystep = (h - topmargin - bottommargin) / rulergranularity;
+	for (int i = 0; i < rulergranularity; i++) {
+		scene->addLine(leftmargin - 10, h - bottommargin - ystep * i, leftmargin, h - bottommargin - ystep * i, QPen(Qt::black, 2, Qt::SolidLine));
+	}
 	scene->addLine(leftmargin - 10, h - bottommargin - std::max(h - topmargin - bottommargin, 5), leftmargin, h - bottommargin - std::max(h - topmargin - bottommargin, 5), QPen(Qt::black, 2, Qt::SolidLine));
-	scene->addLine(leftmargin - 10, h - bottommargin, leftmargin, h - bottommargin, QPen(Qt::black, 2, Qt::SolidLine));
 
-	simpletext = scene->addSimpleText(QString::number(0), myFont);
-	simpletext->setPos(QPointF(leftmargin - 25, h - bottommargin + 2));
-	simpletext->setRotation(-90);
+	if (absoluteintensity) {
+		simpletext = scene->addSimpleText(QString::number(0), myFont);
+	}
+	else {
+		simpletext = scene->addSimpleText(QString::number(0) + " %", myFont);
+	}
+	simpletext->setPos(QPointF(leftmargin - 15 - simpletext->boundingRect().width(), h - bottommargin - simpletext->boundingRect().height() / 2));
 
-	simpletext = scene->addSimpleText(QString::number(maxintensity), myFont);
-	simpletext->setPos(QPointF(leftmargin - 25, h - bottommargin - std::max(h - topmargin - bottommargin, 5) + 2));
-	simpletext->setRotation(-90);
+	ystep = (h - topmargin - bottommargin) / rulergranularity;
+	if (absoluteintensity) {
+		if (maxintensity > rulergranularity) {
+			for (int i = 1; i < rulergranularity; i++) {
+				simpletext = scene->addSimpleText(QString::number((unsigned long long)maxintensity / (unsigned long long)rulergranularity * (unsigned long long)i), myFont);
+				simpletext->setPos(QPointF(leftmargin - 15 - simpletext->boundingRect().width(), h - bottommargin - simpletext->boundingRect().height() / 2 - ystep * i));
+			}
+		}
+	}
+	else {
+		if (maxintensity > 0) {
+			for (int i = 1; i < rulergranularity; i++) {
+				simpletext = scene->addSimpleText(QString::number(maxintensity / (double)rulergranularity * (double)i) + " %", myFont);
+				simpletext->setPos(QPointF(leftmargin - 15 - simpletext->boundingRect().width(), h - bottommargin - simpletext->boundingRect().height() / 2 - ystep * i));
+			}
+		}
+	}
+
+	if (absoluteintensity) {
+		simpletext = scene->addSimpleText(QString::number((unsigned long long)maxintensity), myFont);
+	}
+	else {
+		simpletext = scene->addSimpleText(QString::number(maxintensity) + " %", myFont);
+	}
+	simpletext->setPos(QPointF(leftmargin - 15 - simpletext->boundingRect().width(), h - bottommargin - std::max(h - topmargin - bottommargin, 5) - simpletext->boundingRect().height() / 2));
+
+
+	cPeaksList thpeaks = *theoreticalspectrum->getTheoreticalPeaks();
+	thpeaks.sortbyOrderId();
 
 	// all experimental peaks
+	int visiblepeakscount = 0;
 	for (int i = 0; i < (int)theoreticalspectrum->getExperimentalSpectrum().size(); i++) {
 
 		// skip peaks which are out of range
@@ -406,38 +466,56 @@ void cSpectrumSceneWidget::redrawScene() {
 		}
 
 		visiblepeaks.add(theoreticalspectrum->getExperimentalSpectrum()[i]);
+		visiblepeaks[visiblepeakscount].description.clear();
+
+		experimentalmatches = theoreticalspectrum->getExperimentalMatches(i);
+		for (auto it = experimentalmatches.begin(); it != experimentalmatches.end(); ++it) {
+			if (visiblepeaks[visiblepeakscount].description.compare("") != 0) {
+				visiblepeaks[visiblepeakscount].description += "@";
+			}
+
+			if (parameters->mode == dereplication) {
+				visiblepeaks[visiblepeakscount].description += parameters->peakidtodesc[thpeaks[*it].descriptionid].substr(0, parameters->peakidtodesc[thpeaks[*it].descriptionid].rfind(':'));
+			}
+			else {
+				visiblepeaks[visiblepeakscount].description += thpeaks[*it].description.substr(0, thpeaks[*it].description.find(':'));
+			}
+		}
+
+		visiblepeakscount++;
 
 	}
 
 	visiblepeaks.sortbyRelativeIntensityDesc();
+
+
+	string coloredtrotationstring;
+	if (coloredtrotationid != -1) {
+		if (parameters->peptidetype == branched) {
+			coloredtrotationstring = " " + to_string(coloredtrotationid + 1) + "_";
+		}
+		if (parameters->peptidetype == branchcyclic) {
+			coloredtrotationstring = "_" + to_string(coloredtrotationid + 1) + "_";
+		}
+	}
+
 
 	// visible peaks only
 	for (int i = 0; i < (int)visiblepeaks.size(); i++) {
 
 		x = getXPositionFromMZRatio(visiblepeaks[i].mzratio, origwidth);
 
-		y = visiblepeaks[i].relativeintensity/maxintensity * (h - topmargin - bottommargin);
-
-		string coloredtrotationstring;
-		if (coloredtrotationid != -1) {
-			if (parameters->peptidetype == branched) {
-				coloredtrotationstring = " " + to_string(coloredtrotationid + 1) + "_";
-			}
-			if (parameters->peptidetype == branchcyclic) {
-				coloredtrotationstring = "_" + to_string(coloredtrotationid + 1) + "_";
-			}
+		if (absoluteintensity) {
+			y = visiblepeaks[i].absoluteintensity / maxintensity * (h - topmargin - bottommargin);
+		}
+		else {
+			y = visiblepeaks[i].relativeintensity / maxintensity * (h - topmargin - bottommargin);
 		}
 
 		hits.clear();
 
-		if ((parameters->mode == dereplication) && (visiblepeaks[i].descriptionid != -1)) {
-			s = parameters->peakidtodesc[visiblepeaks[i].descriptionid];
-		}
-		else {
-			s = visiblepeaks[i].description;
-		}
-
-		int position = (int)s.find(',');
+		s = visiblepeaks[i].description;
+		int position = (int)s.find('@');
 		while (position != (int)string::npos) {
 			hits.push_back(s.substr(0, position));
 			s = s.substr(position + 1);
@@ -463,7 +541,7 @@ void cSpectrumSceneWidget::redrawScene() {
 				hits.pop_back();
 			}
 
-			position = (int)s.find(',');
+			position = (int)s.find('@');
 		}
 
 		if (s.size() > 0) {
@@ -490,6 +568,7 @@ void cSpectrumSceneWidget::redrawScene() {
 				hits.pop_back();
 			}
 		}
+
 
 		sprintf_s(tmpbuf,"%.5f\0",visiblepeaks[i].mzratio);
 		s = tmpbuf;
@@ -546,9 +625,12 @@ void cSpectrumSceneWidget::redrawScene() {
 
 	}
 
-	// fix the scene rectangle
+
+	scene->removeItem(zoomgroup);
 	scene->setSceneRect(scene->itemsBoundingRect());
-	
+	zoomgroup->setVisible(false);
+	scene->addItem(zoomgroup);
+
 }
 
 
@@ -616,6 +698,12 @@ void cSpectrumSceneWidget::normalSize() {
 	currentscale = 1;
 	setMatrix(originalmatrix);
 	verticalScrollBar()->setSliderPosition(verticalScrollBar()->maximum());
+}
+
+
+void cSpectrumSceneWidget::absoluteIntensityStateChanged(bool state) {
+	absoluteintensity = state;
+	redrawScene();
 }
 
 

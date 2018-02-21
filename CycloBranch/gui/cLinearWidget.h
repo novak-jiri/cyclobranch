@@ -149,6 +149,13 @@ public:
 	void exportToSVG(QString filename);
 
 
+	/**
+		\brief Set the report isomers state.
+		\param reportisomers true if isomers are reported; false otherwise
+	*/
+	void setReportIsomers(bool reportisomers);
+	
+
 protected:
 
 
@@ -165,6 +172,8 @@ private:
 
 	cParameters* parameters;
 	cTheoreticalSpectrum* theoreticalspectrum;
+
+	bool reportisomers;
 
 };
 

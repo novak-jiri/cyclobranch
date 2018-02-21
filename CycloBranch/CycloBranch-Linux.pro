@@ -38,6 +38,8 @@ HEADERS += core/cBrick.h \
            gui/cBricksDatabaseProxyModel.h \
            gui/cBricksDatabaseWidget.h \
            gui/cCheckBoxDelegate.h \
+           gui/cChromatogramWindow.h \
+           gui/cChromatogramWindowWidget.h \
            gui/cComboBoxDelegate.h \
            gui/cCyclicWidget.h \
            gui/cDrawPeptideWidget.h \
@@ -93,6 +95,8 @@ SOURCES += core/cBrick.cpp \
            gui/cBricksDatabaseProxyModel.cpp \
            gui/cBricksDatabaseWidget.cpp \
            gui/cCheckBoxDelegate.cpp \
+           gui/cChromatogramWindow.cpp \
+           gui/cChromatogramWindowWidget.cpp \
            gui/cComboBoxDelegate.cpp \
            gui/cCyclicWidget.cpp \
            gui/cDrawPeptideWidget.cpp \

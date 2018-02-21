@@ -30,40 +30,62 @@ cModificationsWidget::cModificationsWidget(QWidget* parent) {
 	menuEdit = new QMenu(tr("&Edit"), this);
 	menuHelp = new QMenu(tr("&Help"), this);
 
+	rowsfiltercombobox = new QComboBox();
+	rowsfiltercombobox->setToolTip("Column to be Searched");
+	rowsfiltercombobox->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+
+	rowsfiltercomparatorcombobox = new QComboBox();
+	rowsfiltercomparatorcombobox->setToolTip("Type of Comparison");
+	rowsfiltercomparatorcombobox->addItem("=");
+	rowsfiltercomparatorcombobox->addItem("<");
+	rowsfiltercomparatorcombobox->addItem("<=");
+	rowsfiltercomparatorcombobox->addItem(">");
+	rowsfiltercomparatorcombobox->addItem(">=");
+	rowsfiltercomparatorcombobox->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+
 	rowsfilterline = new QLineEdit();
-	rowsfilterline->setMinimumWidth(250);
+	rowsfilterline->setMinimumWidth(300);
 	rowsfilterline->setToolTip("Text to Find");
 
 	rowsfiltercasesensitive = new QCheckBox();
 	rowsfiltercasesensitive->setToolTip("Case Sensitive");
 
+	rowsfilterwholeword = new QCheckBox();
+	rowsfilterwholeword->setToolTip("Whole Words Only");
+
 	rowsfilterbutton = new QPushButton("Filter");
 	rowsfilterbutton->setToolTip("Filter Search Results");
-	rowsfilterbutton->setMinimumWidth(50);
+	rowsfilterbutton->setMinimumWidth(75);
 
 	rowsfilterclearbutton = new QPushButton("Reset");
 	rowsfilterclearbutton->setToolTip("Reset Search Results");
-	rowsfilterclearbutton->setMinimumWidth(50);
+	rowsfilterclearbutton->setMinimumWidth(75);
 	rowsfilterclearbutton->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_R));
 
 	rowsfilterhbox = new QHBoxLayout();
+	rowsfilterhbox->addWidget(rowsfiltercombobox);
+	rowsfilterhbox->addSpacing(10);
+	rowsfilterhbox->addWidget(rowsfiltercomparatorcombobox);
+	rowsfilterhbox->addSpacing(10);
 	rowsfilterhbox->addWidget(rowsfilterline);
-	rowsfilterhbox->addStretch();
+	rowsfilterhbox->addSpacing(10);
 	rowsfilterhbox->addWidget(rowsfiltercasesensitive);
-	rowsfilterhbox->addStretch();
+	rowsfilterhbox->addSpacing(10);
+	rowsfilterhbox->addWidget(rowsfilterwholeword);
+	rowsfilterhbox->addSpacing(10);
 	rowsfilterhbox->addWidget(rowsfilterbutton);
-	rowsfilterhbox->addStretch();
+	rowsfilterhbox->addSpacing(10);
 	rowsfilterhbox->addWidget(rowsfilterclearbutton);
 
 	rowsfilterwidget = new QWidget();
 	rowsfilterwidget->setLayout(rowsfilterhbox);
-	rowsfilterwidget->setMaximumWidth(420);
 
 	database = new QTableView(this);
 	databasemodel = new QStandardItemModel(0, 0, this);
 	proxymodel = new cModificationsProxyModel(this);
 	proxymodel->setSourceModel(databasemodel);
 	proxymodel->setDynamicSortFilter(false);
+	proxymodel->initialize(rowsfiltercombobox, rowsfiltercomparatorcombobox);
 	database->setModel(proxymodel);
 	database->setSortingEnabled(true);
 
@@ -204,8 +226,11 @@ cModificationsWidget::~cModificationsWidget() {
 	delete proxymodel;
 	delete database;
 
+	delete rowsfiltercombobox;
+	delete rowsfiltercomparatorcombobox;
 	delete rowsfilterline;
 	delete rowsfiltercasesensitive;
+	delete rowsfilterwholeword;
 	delete rowsfilterbutton;
 	delete rowsfilterclearbutton;
 	delete rowsfilterhbox;
@@ -264,6 +289,11 @@ void cModificationsWidget::resetHeader() {
 	database->setItemDelegateForColumn(4, new cCheckBoxDelegate());
 	databasemodel->setHorizontalHeaderItem(5, new QStandardItem("C-terminal"));
 	database->setItemDelegateForColumn(5, new cCheckBoxDelegate());
+
+	rowsfiltercombobox->clear();
+	for (int i = 1; i < databasemodel->columnCount() - 2; i++) {
+		rowsfiltercombobox->addItem(databasemodel->horizontalHeaderItem(i)->text());
+	}
 
 	database->horizontalHeader()->setStretchLastSection(true);
 	for (int i = 0; i < databasemodel->columnCount(); i++) {
@@ -341,6 +371,10 @@ void cModificationsWidget::keyPressEvent(QKeyEvent *event) {
 		rowsfiltercasesensitive->setChecked(!rowsfiltercasesensitive->isChecked());
 	}
 
+	if ((event->modifiers() == Qt::ControlModifier) && (event->key() == Qt::Key_W)) {
+		rowsfilterwholeword->setChecked(!rowsfilterwholeword->isChecked());
+	}
+
 	event->accept();
 }
 
@@ -392,7 +426,7 @@ void cModificationsWidget::openDatabase() {
 			cEventFilter filter;
 			progress.installEventFilter(&filter);
 			progress.setMinimumDuration(0);
-			progress.setWindowModality(Qt::WindowModal);
+			progress.setWindowModality(Qt::ApplicationModal);
 
 			database->setModel(0);
 			proxymodel->setSourceModel(0);
@@ -438,8 +472,8 @@ void cModificationsWidget::openDatabase() {
 
 			proxymodel->setSourceModel(databasemodel);
 			database->setModel(proxymodel);
-			proxymodel->setSortRole(Qt::InitialSortOrderRole);
 			database->setSortingEnabled(true);
+			proxymodel->sort(-1);
 
 			for (int i = 0; i < databasemodel->columnCount(); i++) {
 				database->resizeColumnToContents(i);
@@ -484,7 +518,7 @@ bool cModificationsWidget::saveDatabase() {
 		cEventFilter filter;
 		progress.installEventFilter(&filter);
 		progress.setMinimumDuration(0);
-		progress.setWindowModality(Qt::WindowModal);
+		progress.setWindowModality(Qt::ApplicationModal);
 
 		fragmentDescription modification;
 		modifications.clear();
@@ -617,6 +651,7 @@ void cModificationsWidget::headerItemClicked(int index) {
 
 
 void cModificationsWidget::filterRows() {
+	proxymodel->setWholeWord(rowsfilterwholeword->isChecked());
 	proxymodel->setFilterKeyColumn(-1);
 	proxymodel->setFilterCaseSensitivity(rowsfiltercasesensitive->isChecked()?Qt::CaseSensitive:Qt::CaseInsensitive);
 	proxymodel->setFilterFixedString(rowsfilterline->text());
@@ -629,6 +664,7 @@ void cModificationsWidget::resetFilter() {
 	database->horizontalHeader()->setSortIndicator(-1, Qt::AscendingOrder);
 	proxymodel->sort(-1);
 
+	proxymodel->setWholeWord(false);
 	proxymodel->setFilterKeyColumn(-1);
 	proxymodel->setFilterFixedString("");
 }
@@ -682,7 +718,7 @@ void cModificationsWidget::importDatabase() {
 			cEventFilter filter;
 			progress.installEventFilter(&filter);
 			progress.setMinimumDuration(0);
-			progress.setWindowModality(Qt::WindowModal);
+			progress.setWindowModality(Qt::ApplicationModal);
 
 			database->setModel(0);
 			proxymodel->setSourceModel(0);
@@ -731,8 +767,8 @@ void cModificationsWidget::importDatabase() {
 
 			proxymodel->setSourceModel(databasemodel);
 			database->setModel(proxymodel);
-			proxymodel->setSortRole(Qt::InitialSortOrderRole);
 			database->setSortingEnabled(true);
+			proxymodel->sort(-1);
 
 			for (int i = 0; i < databasemodel->columnCount(); i++) {
 				database->resizeColumnToContents(i);

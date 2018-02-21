@@ -36,8 +36,8 @@ cDrawPeptideWidget::cDrawPeptideWidget(QWidget* parent) {
 	drawpeptideformlayout = new QFormLayout();
 
 	peptidetypecombobox = new QComboBox();
+	peptidetypecombobox->setSizeAdjustPolicy(QComboBox::AdjustToContents);
 	peptidetypecombobox->setToolTip("Select the type of peptide.");
-	peptidetypecombobox->setMaximumWidth(250);
 	peptidetypecombobox->addItem(tr("Linear"));
 	peptidetypecombobox->addItem(tr("Cyclic"));
 	peptidetypecombobox->addItem(tr("Branched"));

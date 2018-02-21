@@ -139,6 +139,7 @@ private:
 	QDoubleSpinBox* fragmentmasserrortolerance;
 	QDoubleSpinBox* masserrortolerancefordeisotoping;
 	QDoubleSpinBox* minimumrelativeintensitythreshold;
+	QSpinBox* minimumabsoluteintensitythreshold;
 	QDoubleSpinBox* minimummz;
 	QDoubleSpinBox* fwhm;
 
@@ -151,7 +152,6 @@ private:
 	QSpinBox* maximumbricksincombinationmiddle;
 	QSpinBox* maximumbricksincombinationend;
 	QDoubleSpinBox* maximumcumulativemass;
-	QCheckBox* generatebrickspermutations;
 	QLineEdit* modificationsline;
 	QPushButton* modificationsbutton;
 	QHBoxLayout* modificationslayout;
@@ -179,6 +179,7 @@ private:
 	cFragmentIonsListWidget* fragmentiontypes;
 	QCheckBox* clearhitswithoutparent;
 	QCheckBox* generateisotopepattern;
+	QSpinBox* minimumpatternsize;
 
 	QGroupBox* searchedsequencegroupbox;
 	QFormLayout* searchedsequenceformlayout;

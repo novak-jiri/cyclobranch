@@ -197,6 +197,8 @@ void cMainThread::run() {
 			parameters.peaklistseries[i].cropMaximumMZRatio(charge(uncharge(parameters.precursormass, parameters.precursorcharge), (parameters.precursorcharge > 0)?1:-1), parameters.precursormasserrortolerance);
 		}
 
+		parameters.peaklistseries[i].cropAbsoluteIntenzity(parameters.minimumabsoluteintensitythreshold);
+
 		if (parameters.peaklistseries[i].normalizeIntenzity() == -1) {
 			if (parameters.mode == dereplication) {
 				*os << "Warning: the spectrum no. " << i + 1 << " is empty or the format of peaklist is incorrect." << endl;
@@ -208,7 +210,9 @@ void cMainThread::run() {
 				return;
 			}
 		}
+
 		parameters.peaklistseries[i].cropRelativeIntenzity(parameters.minimumrelativeintensitythreshold);
+
 		//parameters.peaklistseries[i].maxHighestPeaksInWindow(10, 50);
 
 		if (parameters.mode != dereplication) {
@@ -489,6 +493,9 @@ void cMainThread::run() {
 		*os << "Number of experimental peaklists: " << parameters.peaklistseries.size() << endl;
 		*os << "Processing the peaklist no. : " << endl;
 
+		vector<cPeaksList> unmatchedpeaks;
+		unmatchedpeaks.resize(parameters.peaklistseries.size());
+
 		for (int i = 0; i < parameters.peaklistseries.size(); i++) {
 			if ((i + 1) % 100 == 0) {
 				*os << i + 1 << " ";
@@ -504,11 +511,102 @@ void cMainThread::run() {
 
 			cTheoreticalSpectrum tstmp;
 			tstmp.setParameters(&parameters);
-			tstmp.compareMSSpectrum(parameters.peaklistseries[i], ts);
+			tstmp.compareMSSpectrum(parameters.peaklistseries[i], ts, unmatchedpeaks[i]);
 			theoreticalspectrumlist->add(tstmp);
 		}
 
 		*os << " ok" << endl << "Total number of spectra: " << parameters.peaklistseries.size() << endl;
+
+		if (parameters.generateisotopepattern)	{
+
+			*os << endl << "Calculating FDRs... ";
+
+			vector<double> targetscoresvector;
+			vector<double> decoyscoresvector;
+			vector<double> allscoresvector;
+			vector<double> fdrs;
+			map<int, double> *targetscores;
+			map<int, double> *decoyscores;
+			map<int, int> numbersofmatchedenvelopes;
+			double minfdr;
+			int targetscoresvectorsize;
+
+			// calculate numbers of matched envelopes in single-pixel spectra
+			for (int i = 0; i < (int)theoreticalspectrumlist->size(); i++) {
+				targetscores = &((*theoreticalspectrumlist)[i].getTargetScores());
+				decoyscores = &((*theoreticalspectrumlist)[i].getDecoyScores());
+
+				for (auto& it : *targetscores) {
+					if (numbersofmatchedenvelopes.count(it.first) == 0) {
+						numbersofmatchedenvelopes.insert(make_pair(it.first, 1));
+					}
+					else {
+						numbersofmatchedenvelopes[it.first]++;
+					}
+				}
+
+				for (auto& it : *decoyscores) {
+					if (numbersofmatchedenvelopes.count(it.first) == 0) {
+						numbersofmatchedenvelopes.insert(make_pair(it.first, 1));
+					}
+					else {
+						numbersofmatchedenvelopes[it.first]++;
+					}
+				}
+			}
+
+			// divide scores by numbers of matched envelopes in all single-pixel spectra
+			for (int i = 0; i < (int)theoreticalspectrumlist->size(); i++) {
+				targetscores = &((*theoreticalspectrumlist)[i].getTargetScores());
+				decoyscores = &((*theoreticalspectrumlist)[i].getDecoyScores());
+
+				for (auto& it : *targetscores) {
+					//it.second /= sqrt((double)numbersofmatchedenvelopes[it.first]);
+					targetscoresvector.push_back(it.second);
+				}
+
+				for (auto& it : *decoyscores) {
+					//it.second /= sqrt((double)numbersofmatchedenvelopes[it.first]);
+					decoyscoresvector.push_back(it.second);
+				}
+			}
+
+			// calculate FDRs
+			sort(targetscoresvector.begin(), targetscoresvector.end());
+			sort(decoyscoresvector.begin(), decoyscoresvector.end());
+
+			allscoresvector = targetscoresvector;
+			allscoresvector.insert(allscoresvector.end(), decoyscoresvector.begin(), decoyscoresvector.end());
+			sort(allscoresvector.begin(), allscoresvector.end());
+
+			targetscoresvectorsize = (int)targetscoresvector.size();
+			fdrs.resize(targetscoresvectorsize);
+			for (int i = 0; i < targetscoresvectorsize; i++) {
+				fdrs[i] = (double)getNumberOfScoreHits(decoyscoresvector, targetscoresvector[i]) / (double)max(getNumberOfScoreHits(allscoresvector, targetscoresvector[i]), 1);
+			}
+
+			// calculate q-values
+			/*for (int i = targetscoresvectorsize - 1; i >= 0; i--) {
+				if ((i == targetscoresvectorsize - 1) || (fdrs[i] < minfdr)) {
+					minfdr = fdrs[i];
+				}
+				if (fdrs[i] > minfdr) {
+					fdrs[i] = minfdr;
+				}
+			}*/
+
+			for (int i = 0; i < (int)theoreticalspectrumlist->size(); i++) {
+				(*theoreticalspectrumlist)[i].setFDRs(targetscoresvector, fdrs, unmatchedpeaks[i]);
+			}
+
+			*os << "ok" << endl;
+
+		}
+
+		for (int i = 0; i < (int)theoreticalspectrumlist->size(); i++) {
+			(*theoreticalspectrumlist)[i].finalizeMSSpectrum(unmatchedpeaks[i]);
+		}
+
 	}
 	
 

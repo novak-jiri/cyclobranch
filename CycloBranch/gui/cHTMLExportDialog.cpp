@@ -30,7 +30,7 @@ cHTMLExportDialog::cHTMLExportDialog(QWidget* parent) {
 	form2->addRow("Unmatched Theoretical Peaks", checkboxunmatchedtheoretical);
 	form2->addRow("Details of Identification", checkboxdetails);
 
-	group2 = new QGroupBox("Individual Rows in Output Report Table");
+	group2 = new QGroupBox("Individual Rows in Output Report");
 	group2->setLayout(form2);
 
 	hbox = new QHBoxLayout();

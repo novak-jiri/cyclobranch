@@ -36,14 +36,23 @@ cGraphWidget::~cGraphWidget() {
 }
 
 
-void cGraphWidget::setHTML(string s) {
-	textbrowser->setHtml(s.c_str());
-	htmlstring = s;
+void cGraphWidget::setHTML(string html, bool reportisomers) {
+	htmlstring = html;
+	updateView(reportisomers);
 }
 
 
 string cGraphWidget::getHTML() {
 	return htmlstring;
+}
+
+
+void cGraphWidget::updateView(bool reportisomers) {
+	string html = htmlstring;
+	if (!reportisomers) {
+		stripIsomers(html);
+	}
+	textbrowser->setHtml(html.c_str());
 }
 
 

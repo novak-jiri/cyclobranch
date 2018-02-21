@@ -1,19 +1,16 @@
-Tested on OS X Mountain Lion:
+Tested on macOS Sierra (10.12):
 
 1) Prerequisities:
-- download and install Xcode 4.6.2 (release date 15.4.2013)
-- download and install Command Line Tools for Xcode 4.6.2 (OS X Mountain Lion)
-- download and install Qt 5.2.1 
-- download and install brew and type "brew doctor"
-- install boost 1.57.0 using "brew install boost"
-- install xerces-c 3.1.1 using "brew install xerces-c"
-- install gcc using "brew install gcc"
+- download and install Xcode 8.3.2 (or higher) and Command Line Tools for Xcode 8.3.2 (or higher) from https://developer.apple.com/download/more/
+- type "sudo xcode-select -s /Applications/Xcode.app/Contents/Developer" (if Xcode is installed in the /Applications folder)
+- type "sudo xcodebuild -license" and agree with the license
+- download and install brew from https://brew.sh/ and type "brew doctor"
+- install qt 5.9 (or higher) using "brew install qt"
+- install xerces-c 3.1.4 (or higher) using "brew install xerces-c"
+- install boost 1.64.0 (or higher) using "brew install boost"
 
 2) Execute the following commands in the directory where CycloBranch is unpacked:
-- type "/opt/local/share/Qt5.2.1/5.2.1/clang_64/bin/qmake"
-- open "Makefile" using a text editor and correct the following lines:
-CC            = /usr/local/Cellar/gcc/4.9.2_1/bin/gcc-4.9
-CXX           = /usr/local/Cellar/gcc/4.9.2_1/bin/g++-4.9
-LINK          = /usr/local/Cellar/gcc/4.9.2_1/bin/g++-4.9
+- open "CycloBranch-MacOSX.pro" in TextEdit and click File->Save
+- type "/usr/local/opt/qt/bin/qmake"
 - type "make"
 

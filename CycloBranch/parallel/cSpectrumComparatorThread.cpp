@@ -163,7 +163,7 @@ void cSpectrumComparatorThread::run() {
 	double score;
 		
 	permutations.getSet().clear();
-	if ((parameters->mode == denovoengine) && (parameters->generatebrickspermutations)) {
+	if /*(*/(parameters->mode == denovoengine) /*&& (parameters->generatebrickspermutations))*/ {
 		candidate.getPermutations(permutations, terminatecomputation);
 	}
 	else {

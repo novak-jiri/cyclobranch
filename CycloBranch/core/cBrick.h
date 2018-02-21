@@ -35,14 +35,6 @@ int getNumberOfBricks(const string& composition);
 
 
 /**
-	\brief Strip HTML tags from a HTML string.
-	\param htmlstring reference to a string with HTML tags
-	\retval string stripped string
-*/ 
-string stripHTML(string& htmlstring);
-
-
-/**
 	\brief The class representing a building block (brick).
 */
 class cBrick {

@@ -27,13 +27,14 @@ using namespace boost;
 */
 enum ePeakListFileFormat {
 	txt = 0,
-	mgf = 1,
-	mzML = 2,
-	mzXML = 3,
-	baf = 4,
-	imzML = 5,
-	mis = 6,
-	ser = 7
+	mgf,
+	mzML,
+	mzXML,
+	baf,
+	dat, 
+	imzML,
+	mis,
+	ser
 };
 
 
@@ -127,8 +128,14 @@ public:
 
 	/**
 		\brief Minimum relative intensity threshold.
-    */
-    double minimumrelativeintensitythreshold;
+	*/
+	double minimumrelativeintensitythreshold;
+
+
+	/**
+		\brief Minimum absolute intensity threshold.
+	*/
+	unsigned minimumabsoluteintensitythreshold;
 
 
 	/**
@@ -186,12 +193,6 @@ public:
 
 
 	/**
-		\brief True when permutations of bricks are generated.
-    */
-    bool generatebrickspermutations;
-
-
-	/**
 		\brief A file with modifications.
     */
     string modificationsfilename;
@@ -223,8 +224,14 @@ public:
 
 	/**
 		\brief True when complete isotope pattern is generated.
-    */
-    bool generateisotopepattern;
+	*/
+	bool generateisotopepattern;
+
+
+	/**
+		\brief The minimum number of peaks in a matched pattern.
+	*/
+	int minimumpatternsize;
 
 
 	/**
@@ -362,13 +369,19 @@ public:
 	/**
 		\brief Max count of pixel x - parsed from imzML file.
 	*/
-	int maxcountx;
+	int defaultmaxx;
 
 
 	/**
 		\brief Max count of pixel y - parsed from imzML file.
 	*/
-	int maxcounty;
+	int defaultmaxy;
+
+
+	/**
+		\brief Pixel size.
+	*/
+	int pixelsize;
 
 
 	/**

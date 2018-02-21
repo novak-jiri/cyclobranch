@@ -4,7 +4,7 @@
 
 
 QString appname = "CycloBranch";
-QString appversion = "v. 1.2.192 (64-bit)";
+QString appversion = "v. 1.2.495 (64-bit)";
 
 
 #if OS_TYPE == UNX
@@ -279,5 +279,72 @@ double median(vector<double>& vector) {
 		}
 	}
 	return median;
+}
+
+
+string stripHTML(string& htmlstring) {
+	string s;
+	bool add = true;
+
+	for (int i = 0; i < (int)htmlstring.size(); i++) {
+		if (htmlstring[i] == '<') {
+			add = false;
+			continue;
+		}
+		if (htmlstring[i] == '>') {
+			add = true;
+			continue;
+		}
+		if (add) {
+			s += htmlstring[i];
+		}
+	}
+	return s;
+}
+
+
+void stripIsomers(string& peptidesequence) {
+	string tmpsequence;
+	bool copy, insideblock, insidehtml;
+
+	tmpsequence = peptidesequence;
+	peptidesequence = "";
+	copy = true;
+	insideblock = false;
+	insidehtml = false;
+	for (int j = 0; j < (int)tmpsequence.size(); j++) {
+		if (tmpsequence[j] == '[') {
+			insideblock = true;
+		}
+		if (tmpsequence[j] == '<') {
+			insidehtml = true;
+		}
+		if (tmpsequence[j] == '>') {
+			insidehtml = false;
+		}
+		if ((tmpsequence[j] == '/') && insideblock && !insidehtml) {
+			copy = false;
+		}
+		if (tmpsequence[j] == ']') {
+			insideblock = false;
+			copy = true;
+		}
+		if (copy) {
+			peptidesequence += tmpsequence[j];
+		}
+	}
+}
+
+
+void stripIsomersFromStringVector(vector<string>& acronyms) {
+	int size = (int)acronyms.size();
+	size_t pos;
+
+	for (int i = 0; i < size; i++) {
+		pos = acronyms[i].find('/');
+		if (pos != string::npos) {
+			acronyms[i] = acronyms[i].substr(0, pos);
+		}
+	}
 }
 

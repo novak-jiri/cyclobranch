@@ -4,6 +4,35 @@
 #include "gui/cMainThread.h"
 
 
+int getNumberOfScoreHits(vector<double>& scores, double value) {
+	int left, right, middle, best, size;
+	size = (int)scores.size();
+	left = 0;
+	right = size - 1;
+	best = 0;
+	while (left <= right) {
+		middle = (left + right) / 2;
+		if (value < scores[middle]) {
+			right = middle - 1;
+		}
+		else {
+			left = middle + 1;
+			if (value == scores[middle]) {
+				best = middle;
+				// no break - fast search of the rightmost equal value
+			}
+		}
+		if (fabs(scores[middle] - value) < fabs(scores[best] - value)) {
+			best = middle;
+		}
+	}
+	while ((best < size) && (scores[best] <= value)) {
+		best++;
+	}
+	return best;
+}
+
+
 void visualSeries::store(ofstream& os) {
 	int size;
 
@@ -44,20 +73,45 @@ void cTheoreticalSpectrum::clearFalseHits(map<eFragmentIonType, vector<int> >& s
 }
 
 
-void cTheoreticalSpectrum::searchForPeakPairs(cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks, vector<set<int> >& experimentalpeakmatches, double fragmentmasserrortolerance) {
-	experimentalpeakmatches.resize(experimentalpeaks.size());
-	int left, right, middle;
+void cTheoreticalSpectrum::searchForPeakPairs(cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks, double fragmentmasserrortolerance) {
+	int left, right, middle, best;
+	double bestppm, currentppm;
+
+	int experimentalpeakssize = experimentalpeaks.size();
+	experimentalmatches.resize(experimentalpeakssize);
+
 	for (int i = 0; i < theoreticalpeaksrealsize; i++) {
 		left = 0;
-		right = experimentalpeaks.size() - 1;
+		right = experimentalpeakssize - 1;
 		while (left <= right) {
 			middle = (left + right) / 2;
 			if (isInPpmMassErrorTolerance(experimentalpeaks[middle].mzratio, theoreticalpeaks[i].mzratio, fragmentmasserrortolerance)) {
-				experimentalpeakmatches[middle].insert(i);
-				experimentalpeaks[middle].matched++;
+				best = middle;
+				bestppm = abs(ppmError(experimentalpeaks[middle].mzratio, theoreticalpeaks[i].mzratio));
+
+				while ((middle > 0) && isInPpmMassErrorTolerance(experimentalpeaks[middle - 1].mzratio, theoreticalpeaks[i].mzratio, fragmentmasserrortolerance)) {
+					currentppm = abs(ppmError(experimentalpeaks[middle - 1].mzratio, theoreticalpeaks[i].mzratio));
+					if (currentppm < bestppm) {
+						best = middle - 1;
+						bestppm = currentppm;
+					}
+					middle--;
+				}
+
+				while ((middle < experimentalpeakssize - 1) && isInPpmMassErrorTolerance(experimentalpeaks[middle + 1].mzratio, theoreticalpeaks[i].mzratio, fragmentmasserrortolerance)) {
+					currentppm = abs(ppmError(experimentalpeaks[middle + 1].mzratio, theoreticalpeaks[i].mzratio));
+					if (currentppm < bestppm) {
+						best = middle + 1;
+						bestppm = currentppm;
+					}
+					middle++;
+				}
+
+				experimentalmatches[best].insert(i);
+				experimentalpeaks[best].matched++;
 
 				theoreticalpeaks[i].matched++;
-				theoreticalpeaks[i].matchedid = middle;
+				theoreticalpeaks[i].matchedid = best;
 				break;
 			}
 			if (theoreticalpeaks[i].mzratio < experimentalpeaks[middle].mzratio) {
@@ -75,7 +129,7 @@ void cTheoreticalSpectrum::computeStatistics(bool writedescription) {
 	experimentalpeaksmatched = 0;
 	scrambledpeaksmatched = 0;
 	if (writedescription) {
-		unmatchedpeakscount = 0;
+		unmatchedexperimentalpeakscount = 0;
 	}
 	intensityweightedscore = 0;
 	for (int i = 0; i < (int)experimentalpeaks.size(); i++) {
@@ -94,7 +148,7 @@ void cTheoreticalSpectrum::computeStatistics(bool writedescription) {
 		}
 		else {
 			if (writedescription) {
-				unmatchedpeakscount++;
+				unmatchedexperimentalpeakscount++;
 			}
 		}
 	}
@@ -593,7 +647,7 @@ void cTheoreticalSpectrum::addMetalPeaks(cPeak& peak, vector<string>& metals, in
 }
 
 
-void cTheoreticalSpectrum::removeUnmatchedMetalIsotopes(cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks, vector<set<int> >& experimentalpeakmatches) {
+void cTheoreticalSpectrum::removeUnmatchedMetalIsotopes(cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks) {
 	int lastparent = 0;
 	for (int i = 0; i < theoreticalpeaksrealsize; i++) {
 		if (!theoreticalpeaks[i].isotope) {
@@ -602,7 +656,7 @@ void cTheoreticalSpectrum::removeUnmatchedMetalIsotopes(cPeaksList& theoreticalp
 		}
 
 		if ((theoreticalpeaks[lastparent].matched == 0) && (theoreticalpeaks[i].matched > 0)) {
-			experimentalpeakmatches[theoreticalpeaks[i].matchedid].erase(experimentalpeakmatches[theoreticalpeaks[i].matchedid].find(i));
+			experimentalmatches[theoreticalpeaks[i].matchedid].erase(experimentalmatches[theoreticalpeaks[i].matchedid].find(i));
 			experimentalpeaks[theoreticalpeaks[i].matchedid].matched--;
 
 			theoreticalpeaks[i].matched--;
@@ -612,17 +666,24 @@ void cTheoreticalSpectrum::removeUnmatchedMetalIsotopes(cPeaksList& theoreticalp
 }
 
 
-void cTheoreticalSpectrum::removeUnmatchedIsotopePatterns(cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks, vector<set<int> >& experimentalpeakmatches) {
+void cTheoreticalSpectrum::removeUnmatchedIsotopePatterns(cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks, cPeaksList& outputtheoreticalpeaks) {
 	if (theoreticalpeaksrealsize == 0) {
 		return;
 	}
 
+	int minimumenvelopepeaks = parameters->minimumpatternsize;
+	
 	int groupid = theoreticalpeaks[0].groupid;
 	int start = 0;
 	int stop = 0;
 	int maximumintensityid = 0;
 	double maximumintensity = theoreticalpeaks[0].relativeintensity;
-
+	double maximumexperimentalintensity;
+	if (theoreticalpeaks[maximumintensityid].matched) {
+		maximumexperimentalintensity = experimentalpeaks[theoreticalpeaks[maximumintensityid].matchedid].relativeintensity;
+	}
+	int matchedpeaks = 0;
+	
 	for (int i = 0; i < theoreticalpeaksrealsize; i++) {
 
 		// detect group boundaries and the most intense peak in the group
@@ -630,18 +691,48 @@ void cTheoreticalSpectrum::removeUnmatchedIsotopePatterns(cPeaksList& theoretica
 			if (theoreticalpeaks[i].relativeintensity > maximumintensity) {
 				maximumintensityid = i;
 				maximumintensity = theoreticalpeaks[i].relativeintensity;
+				if (theoreticalpeaks[i].matched) {
+					maximumexperimentalintensity = experimentalpeaks[theoreticalpeaks[i].matchedid].relativeintensity;
+				}
 			}
 
 			stop = i;
 		}
 
-		// clear matches of all peaks in the group if the most intense peak was not matched
 		if (groupid != theoreticalpeaks[i].groupid) {
+
+			if (theoreticalpeaks[maximumintensityid].matched) {
+				for (int j = start; j <= stop; j++) {
+					if ((theoreticalpeaks[j].matched > 0) && (theoreticalpeaks[j].relativeintensity*maximumexperimentalintensity / 100.0 >= parameters->minimumrelativeintensitythreshold)) {
+						matchedpeaks++;
+					}
+				}
+			}
 			
-			if (!theoreticalpeaks[maximumintensityid].matched) {
+			if (theoreticalpeaks[maximumintensityid].matched && (theoreticalpeaks[maximumintensityid].relativeintensity*maximumexperimentalintensity / 100.0 >= parameters->minimumrelativeintensitythreshold) && (matchedpeaks >= minimumenvelopepeaks)) {
+				for (int j = start; j <= stop; j++) {
+					// clear matched peaks below the intensity threshold
+					if ((theoreticalpeaks[j].matched > 0) && (theoreticalpeaks[j].relativeintensity*maximumexperimentalintensity / 100.0 < parameters->minimumrelativeintensitythreshold)) {
+						experimentalmatches[theoreticalpeaks[j].matchedid].erase(experimentalmatches[theoreticalpeaks[j].matchedid].find(j));
+						experimentalpeaks[theoreticalpeaks[j].matchedid].matched--;
+
+						theoreticalpeaks[j].matched--;
+						theoreticalpeaks[j].matchedid = -1;
+					}
+
+					// copy unmatched theoretical peaks in matched envelopes into the output
+					if (!theoreticalpeaks[j].decoy && (theoreticalpeaks[j].matched == 0)) {
+						if (theoreticalpeaks[j].relativeintensity*maximumexperimentalintensity / 100.0 >= parameters->minimumrelativeintensitythreshold) {
+							outputtheoreticalpeaks.add(theoreticalpeaks[j]);
+						}
+					}
+				}
+			}
+			// clear matches of all peaks in the group if the most intense peak was not matched or if the most intense peak is below the minimum relative intensity threshold
+			else {
 				for (int j = start; j <= stop; j++) {
 					if (theoreticalpeaks[j].matched > 0) {
-						experimentalpeakmatches[theoreticalpeaks[j].matchedid].erase(experimentalpeakmatches[theoreticalpeaks[j].matchedid].find(j));
+						experimentalmatches[theoreticalpeaks[j].matchedid].erase(experimentalmatches[theoreticalpeaks[j].matchedid].find(j));
 						experimentalpeaks[theoreticalpeaks[j].matchedid].matched--;
 
 						theoreticalpeaks[j].matched--;
@@ -656,14 +747,43 @@ void cTheoreticalSpectrum::removeUnmatchedIsotopePatterns(cPeaksList& theoretica
 			stop = i;
 			maximumintensityid = i;
 			maximumintensity = theoreticalpeaks[i].relativeintensity;
+			if (theoreticalpeaks[i].matched) {
+				maximumexperimentalintensity = experimentalpeaks[theoreticalpeaks[i].matchedid].relativeintensity;
+			}
+			matchedpeaks = 0;
 		}
 
 	}
 
-	if (!theoreticalpeaks[maximumintensityid].matched) {
+	if (theoreticalpeaks[maximumintensityid].matched) {
+		for (int j = start; j <= stop; j++) {
+			if ((theoreticalpeaks[j].matched > 0) && (theoreticalpeaks[j].relativeintensity*maximumexperimentalintensity / 100.0 >= parameters->minimumrelativeintensitythreshold)) {
+				matchedpeaks++;
+			}
+		}
+	}
+
+	if (theoreticalpeaks[maximumintensityid].matched && (theoreticalpeaks[maximumintensityid].relativeintensity*maximumexperimentalintensity / 100.0 >= parameters->minimumrelativeintensitythreshold) && (matchedpeaks >= minimumenvelopepeaks)) {
+		for (int j = start; j <= stop; j++) {
+			if ((theoreticalpeaks[j].matched > 0) && (theoreticalpeaks[j].relativeintensity*maximumexperimentalintensity / 100.0 < parameters->minimumrelativeintensitythreshold)) {
+				experimentalmatches[theoreticalpeaks[j].matchedid].erase(experimentalmatches[theoreticalpeaks[j].matchedid].find(j));
+				experimentalpeaks[theoreticalpeaks[j].matchedid].matched--;
+
+				theoreticalpeaks[j].matched--;
+				theoreticalpeaks[j].matchedid = -1;
+			}
+
+			if (!theoreticalpeaks[j].decoy && (theoreticalpeaks[j].matched == 0)) {
+				if (theoreticalpeaks[j].relativeintensity*maximumexperimentalintensity / 100.0 >= parameters->minimumrelativeintensitythreshold) {
+					outputtheoreticalpeaks.add(theoreticalpeaks[j]);
+				}
+			}
+		}
+	}
+	else {
 		for (int j = start; j <= stop; j++) {
 			if (theoreticalpeaks[j].matched > 0) {
-				experimentalpeakmatches[theoreticalpeaks[j].matchedid].erase(experimentalpeakmatches[theoreticalpeaks[j].matchedid].find(j));
+				experimentalmatches[theoreticalpeaks[j].matchedid].erase(experimentalmatches[theoreticalpeaks[j].matchedid].find(j));
 				experimentalpeaks[theoreticalpeaks[j].matchedid].matched--;
 
 				theoreticalpeaks[j].matched--;
@@ -671,11 +791,132 @@ void cTheoreticalSpectrum::removeUnmatchedIsotopePatterns(cPeaksList& theoretica
 			}
 		}
 	}
+}
+
+
+void cTheoreticalSpectrum::calculateEnvelopeScores(cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks) {
+	
+	// theoreticalpeaks must not be modified here
+	// the highest peaks in the input theoretical envelopes are normalized to 100% intensity
+	
+	if (theoreticalpeaksrealsize == 0) {
+		return;
+	}
+
+	int groupid = theoreticalpeaks[0].groupid;
+	bool decoyenvelope = theoreticalpeaks[0].decoy;
+	double envelopescore = 0;
+	int start = 0;
+	int stop = 0;
+	int maximumintensityid = 0;
+	double maximumintensity = theoreticalpeaks[0].relativeintensity;
+	double maximumexperimentalintensity;
+	if (theoreticalpeaks[maximumintensityid].matched) {
+		maximumexperimentalintensity = experimentalpeaks[theoreticalpeaks[maximumintensityid].matchedid].relativeintensity;
+	}
+	int matchedpeaks = 0;
+
+	for (int i = 0; i < theoreticalpeaksrealsize; i++) {
+
+		// detect group boundaries and the most intense peak in the group
+		if (groupid == theoreticalpeaks[i].groupid) {
+			if (theoreticalpeaks[i].relativeintensity > maximumintensity) {
+				maximumintensityid = i;
+				maximumintensity = theoreticalpeaks[i].relativeintensity;
+				if (theoreticalpeaks[i].matched) {
+					maximumexperimentalintensity = experimentalpeaks[theoreticalpeaks[i].matchedid].relativeintensity;
+				}
+			}
+
+			stop = i;
+		}
+
+		// normalize the theoretical intensities
+		if (groupid != theoreticalpeaks[i].groupid) {
+			if (theoreticalpeaks[maximumintensityid].matched) {
+				for (int j = start; j <= stop; j++) {
+					if (theoreticalpeaks[j].matched) {
+						//envelopescore += fabs(theoreticalpeaks[j].relativeintensity - experimentalpeaks[theoreticalpeaks[j].matchedid].relativeintensity / experimentalpeaks[theoreticalpeaks[maximumintensityid].matchedid].relativeintensity * 100.0);
+						matchedpeaks++;
+					}
+					else {
+						if (theoreticalpeaks[j].relativeintensity*maximumexperimentalintensity / 100.0 >= parameters->minimumrelativeintensitythreshold) {
+							//envelopescore += theoreticalpeaks[j].relativeintensity;
+						}
+					}
+				}
+				//envelopescore = getStandardIntensityDeviation(theoreticalpeaks, start, stop, maximumexperimentalintensity);
+				envelopescore = getAngleDistance(theoreticalpeaks, start, stop);
+				//envelopescore = getStandardPPMDeviation(theoreticalpeaks, start, stop);
+				//envelopescore /= experimentalpeaks[theoreticalpeaks[maximumintensityid].matchedid].relativeintensity*experimentalpeaks[theoreticalpeaks[maximumintensityid].matchedid].relativeintensity;
+				//envelopescore /= (double)(matchedpeaks*matchedpeaks);
+				if (!decoyenvelope) {
+					targetscores.insert(make_pair(groupid, envelopescore));
+				}
+				else {
+					decoyscores.insert(make_pair(groupid, envelopescore));
+				}
+			}
+
+			// initialize next group
+			groupid = theoreticalpeaks[i].groupid;
+			decoyenvelope = theoreticalpeaks[i].decoy;
+			envelopescore = 0;
+			start = i;
+			stop = i;
+			maximumintensityid = i;
+			maximumintensity = theoreticalpeaks[i].relativeintensity;
+			if (theoreticalpeaks[i].matched) {
+				maximumexperimentalintensity = experimentalpeaks[theoreticalpeaks[i].matchedid].relativeintensity;
+			}
+			matchedpeaks = 0;
+		}
+
+	}
+
+	if (theoreticalpeaks[maximumintensityid].matched) {
+		for (int j = start; j <= stop; j++) {
+			if (theoreticalpeaks[j].matched) {
+				//envelopescore += fabs(theoreticalpeaks[j].relativeintensity - experimentalpeaks[theoreticalpeaks[j].matchedid].relativeintensity / experimentalpeaks[theoreticalpeaks[maximumintensityid].matchedid].relativeintensity * 100.0);
+				matchedpeaks++;
+			}
+			else {
+				if (theoreticalpeaks[j].relativeintensity*maximumexperimentalintensity / 100.0 >= parameters->minimumrelativeintensitythreshold) {
+					//envelopescore += theoreticalpeaks[j].relativeintensity;
+				}
+			}
+		}
+		//envelopescore = getStandardIntensityDeviation(theoreticalpeaks, start, stop, maximumexperimentalintensity);
+		envelopescore = getAngleDistance(theoreticalpeaks, start, stop);
+		//envelopescore = getStandardPPMDeviation(theoreticalpeaks, start, stop);
+		//envelopescore /= experimentalpeaks[theoreticalpeaks[maximumintensityid].matchedid].relativeintensity*experimentalpeaks[theoreticalpeaks[maximumintensityid].matchedid].relativeintensity;
+		//envelopescore /= (double)(matchedpeaks*matchedpeaks);
+		if (!decoyenvelope) {
+			targetscores.insert(make_pair(groupid, envelopescore));
+		}
+		else {
+			decoyscores.insert(make_pair(groupid, envelopescore));
+		}
+	}
 
 }
 
 
+void cTheoreticalSpectrum::removeDecoyPeakMatches(cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks) {
+	for (int i = 0; i < theoreticalpeaksrealsize; i++) {
+		if (theoreticalpeaks[i].decoy && (theoreticalpeaks[i].matched > 0)) {
+			experimentalmatches[theoreticalpeaks[i].matchedid].erase(experimentalmatches[theoreticalpeaks[i].matchedid].find(i));
+			experimentalpeaks[theoreticalpeaks[i].matchedid].matched--;
+			
+			theoreticalpeaks[i].matched--;
+			theoreticalpeaks[i].matchedid = -1;
+		}
+	}
+}
+
+
 void cTheoreticalSpectrum::normalizeTheoreticalIntensities(cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize) {
+
 	if (theoreticalpeaksrealsize == 0) {
 		return;
 	}
@@ -721,6 +962,204 @@ void cTheoreticalSpectrum::normalizeTheoreticalIntensities(cPeaksList& theoretic
 }
 
 
+double cTheoreticalSpectrum::recalibrateToMostIntenseTheoreticalPeak(cPeaksList& peaklist) {
+	if (peaklist.size() == 0) {
+		return DBL_MAX;
+	}
+
+	// get the highest theoretical peak
+	int highestpeak = 0;
+	for (int i = 1; i < peaklist.size(); i++) {
+		if (peaklist[i].relativeintensity > peaklist[highestpeak].relativeintensity) {
+			highestpeak = i;
+		}
+	}
+
+	if (!peaklist[highestpeak].matched) {
+		return DBL_MAX;
+	}
+
+	double difference = experimentalpeaks[peaklist[highestpeak].matchedid].mzratio - peaklist[highestpeak].mzratio;
+	double highestpeakppmerror = abs(ppmError(experimentalpeaks[peaklist[highestpeak].matchedid].mzratio, peaklist[highestpeak].mzratio));
+
+	// shift the theoretical spectrum
+	for (int i = 0; i < peaklist.size(); i++) {
+		peaklist[i].mzratio = peaklist[i].mzratio + difference;
+	}
+
+	return highestpeakppmerror;
+}
+
+
+double cTheoreticalSpectrum::getStandardPPMDeviation(cPeaksList& theoreticalpeaks, int start, int stop) {
+	double average, deviation, difference;
+	int matchedpeaks;
+
+	cPeaksList recalibrated;
+	for (int i = start; i <= stop; i++) {
+		recalibrated.add(theoreticalpeaks[i]);
+	}
+	
+	//double highestpeakppmerror = recalibrateToMostIntenseTheoreticalPeak(recalibrated);
+	double highestpeakppmerror = parameters->fragmentmasserrortolerance;
+
+	average = 0;
+	matchedpeaks = 0;
+	for (int i = 0; i < recalibrated.size(); i++) {
+		if (recalibrated[i].matched) {
+			average += abs(ppmError(experimentalpeaks[recalibrated[i].matchedid].mzratio, recalibrated[i].mzratio));
+			matchedpeaks++;
+		}
+		else {
+			average += highestpeakppmerror;
+			matchedpeaks++;
+		}
+	}
+
+	if (matchedpeaks == 0) {
+		return DBL_MAX;
+	}
+
+	average /= (double)matchedpeaks;
+
+	deviation = 0;
+	for (int i = 0; i < recalibrated.size(); i++) {
+		if (recalibrated[i].matched) {
+			difference = abs(ppmError(experimentalpeaks[recalibrated[i].matchedid].mzratio, recalibrated[i].mzratio)) - average;
+			deviation += difference*difference;
+		}
+		else {
+			difference = highestpeakppmerror - average;
+			deviation += difference*difference;
+		}
+	}
+	deviation /= (double)matchedpeaks;
+	deviation = sqrt(deviation);
+
+	return deviation;
+}
+
+
+double cTheoreticalSpectrum::getStandardIntensityDeviation(cPeaksList& theoreticalpeaks, int start, int stop, double maximumexperimentalintensity) {
+	double average, deviation, difference;
+	int matchedpeaks;
+
+	average = 0;
+	matchedpeaks = 0;
+	for (int i = start; i <= stop; i++) {
+		if (theoreticalpeaks[i].matched) {
+			average += fabs(theoreticalpeaks[i].relativeintensity - experimentalpeaks[theoreticalpeaks[i].matchedid].relativeintensity / maximumexperimentalintensity * 100.0);
+			matchedpeaks++;
+		}
+		else {
+			if (theoreticalpeaks[i].relativeintensity * maximumexperimentalintensity / 100.0 >= parameters->minimumrelativeintensitythreshold) {
+				average += theoreticalpeaks[i].relativeintensity;
+				matchedpeaks++;
+			}
+		}
+	}
+
+	if (matchedpeaks == 0) {
+		return DBL_MAX;
+	}
+
+	average /= (double)matchedpeaks;
+
+	deviation = 0;
+	for (int i = start; i <= stop; i++) {
+		if (theoreticalpeaks[i].matched) {
+			difference = fabs(theoreticalpeaks[i].relativeintensity - experimentalpeaks[theoreticalpeaks[i].matchedid].relativeintensity / maximumexperimentalintensity * 100.0) - average;
+			deviation += difference*difference;
+		}
+		else {
+			if (theoreticalpeaks[i].relativeintensity * maximumexperimentalintensity / 100.0 >= parameters->minimumrelativeintensitythreshold) {
+				difference = theoreticalpeaks[i].relativeintensity - average;
+				deviation += difference*difference;
+			}
+		}
+	}
+	deviation /= (double)matchedpeaks;
+	deviation = sqrt(deviation);
+
+	return deviation;
+}
+
+
+double cTheoreticalSpectrum::getStandardMZDifferenceDeviation(cPeaksList& theoreticalpeaks, int start, int stop) {
+	vector<double> theoreticalmz;
+	vector<double> experimentalmz;
+	double average, deviation, difference;
+	int differencescount;
+
+	for (int i = start; i <= stop; i++) {
+		if (theoreticalpeaks[i].matched) {
+			theoreticalmz.push_back(theoreticalpeaks[i].mzratio);
+			experimentalmz.push_back(experimentalpeaks[theoreticalpeaks[i].matchedid].mzratio);
+		}
+	}
+
+	differencescount = (int)theoreticalmz.size() - 1;
+
+	if (differencescount <= 0) {
+		return DBL_MAX;
+	}
+
+	average = 0;
+	for (int i = 0; i < differencescount; i++) {
+		average += fabs(fabs(theoreticalmz[i + 1] - theoreticalmz[i]) - fabs(experimentalmz[i + 1] - experimentalmz[i]));
+	}
+
+	average /= (double)differencescount;
+
+	deviation = 0;
+	for (int i = 0; i < differencescount; i++) {
+		difference = fabs(fabs(theoreticalmz[i + 1] - theoreticalmz[i]) - fabs(experimentalmz[i + 1] - experimentalmz[i])) - average;
+		deviation += difference*difference;
+	}
+	deviation /= (double)differencescount;
+	deviation = sqrt(deviation);
+
+	return deviation;
+}
+
+
+double cTheoreticalSpectrum::getAngleDistance(cPeaksList& theoreticalpeaks, int start, int stop) {
+	vector<double> theoreticalintensities;
+	vector<double> experimentalintensities;
+
+	int maxintensityid = 0;
+
+	for (int i = start; i <= stop; i++) {
+		if (theoreticalpeaks[i].matched) {
+			theoreticalintensities.push_back(theoreticalpeaks[i].relativeintensity / 100.0);
+			experimentalintensities.push_back(experimentalpeaks[theoreticalpeaks[i].matchedid].relativeintensity / 100.0);
+
+			if (experimentalintensities.back() > experimentalintensities[maxintensityid]) {
+				maxintensityid = (int)experimentalintensities.size() - 1;
+			}
+		}
+	}
+
+	if (theoreticalintensities.empty() || experimentalintensities.empty()) {
+		return 1;
+	}
+
+	double numerator = 0;
+	double denominatora = 0;
+	double denominatorb = 0;
+
+	int size = (int)theoreticalintensities.size();
+	for (int i = 0; i < size; i++) {
+		theoreticalintensities[i] = theoreticalintensities[i] * experimentalintensities[maxintensityid];
+		numerator += theoreticalintensities[i] * experimentalintensities[i];
+		denominatora += theoreticalintensities[i] * theoreticalintensities[i];
+		denominatorb += experimentalintensities[i] * experimentalintensities[i];
+	}
+
+	return acos(numerator / (sqrt(denominatora) * sqrt(denominatorb))) / (pi / 2.0);
+}
+
+
 cTheoreticalSpectrum::cTheoreticalSpectrum() {
 	clear();
 }
@@ -748,10 +1187,11 @@ void cTheoreticalSpectrum::clear(bool clearpeaklist) {
 
 	candidate.clear();
 	experimentalpeaksmatched = 0;
+	experimentalmatches.clear();
 	scrambledpeaksmatched = 0;
 	peakstested = 0;
 	experimentalpeaksmatchedratio = 0;
-	unmatchedpeakscount = 0;
+	unmatchedexperimentalpeakscount = 0;
 	coveragebyseries = "";
 	valid = false;
 	maskscore = 0;
@@ -762,6 +1202,10 @@ void cTheoreticalSpectrum::clear(bool clearpeaklist) {
 	
 	seriescompleted = 1;
 	pathid = 0;
+
+	targetscores.clear();
+	decoyscores.clear();
+	fdrscores.clear();
 }
 
 
@@ -840,8 +1284,8 @@ int cTheoreticalSpectrum::compareBranched(cPeaksList& sortedpeaklist, cBricksDat
 
 	// search the theoretical peaks in the experimental peak list
 	experimentalpeaks = sortedpeaklist;
-	vector<set<int> > experimentalpeakmatches;
-	searchForPeakPairs(theoreticalpeaks, theoreticalpeaksrealsize, experimentalpeaks, experimentalpeakmatches, parameters->fragmentmasserrortolerance);
+	experimentalmatches.clear();
+	searchForPeakPairs(theoreticalpeaks, theoreticalpeaksrealsize, experimentalpeaks, parameters->fragmentmasserrortolerance);
 
 
 	// coverage of series
@@ -868,7 +1312,7 @@ int cTheoreticalSpectrum::compareBranched(cPeaksList& sortedpeaklist, cBricksDat
 
 		for (int i = 0; i < theoreticalpeaksrealsize; i++) {
 			if (!theoreticalpeaks[i].isotope && (theoreticalpeaks[i].matched > 0) && (theoreticalpeaks[i].rotationid >= 0) && ((series[theoreticalpeaks[i].rotationid].count(parameters->fragmentdefinitions[theoreticalpeaks[i].iontype].parent) == 0) || (series[theoreticalpeaks[i].rotationid][parameters->fragmentdefinitions[theoreticalpeaks[i].iontype].parent][theoreticalpeaks[i].seriesid] == 0))) {		
-				experimentalpeakmatches[theoreticalpeaks[i].matchedid].erase(experimentalpeakmatches[theoreticalpeaks[i].matchedid].find(i));
+				experimentalmatches[theoreticalpeaks[i].matchedid].erase(experimentalmatches[theoreticalpeaks[i].matchedid].find(i));
 				experimentalpeaks[theoreticalpeaks[i].matchedid].matched--;
 
 				theoreticalpeaks[i].matched--;
@@ -878,17 +1322,13 @@ int cTheoreticalSpectrum::compareBranched(cPeaksList& sortedpeaklist, cBricksDat
 	}
 
 
-	removeUnmatchedMetalIsotopes(theoreticalpeaks, theoreticalpeaksrealsize, experimentalpeaks, experimentalpeakmatches);
+	removeUnmatchedMetalIsotopes(theoreticalpeaks, theoreticalpeaksrealsize, experimentalpeaks);
 
 
 	// fill annotations of peaks
 	for (int i = 0; i < (int)experimentalpeaks.size(); i++) {
-		for (auto it = experimentalpeakmatches[i].begin(); it != experimentalpeakmatches[i].end(); ++it) {
+		for (auto it = experimentalmatches[i].begin(); it != experimentalmatches[i].end(); ++it) {
 			if (writedescription) {
-				if (experimentalpeaks[i].description.compare("") != 0) {
-					experimentalpeaks[i].description += ",";
-				}
-				experimentalpeaks[i].description += theoreticalpeaks[*it].description.substr(0,theoreticalpeaks[*it].description.find(':'));
 				theoreticalpeaks[*it].matchedmz = experimentalpeaks[i].mzratio;
 				theoreticalpeaks[*it].matchedrelativeintensity = experimentalpeaks[i].relativeintensity;
 				theoreticalpeaks[*it].matchedabsoluteintensity = experimentalpeaks[i].absoluteintensity;
@@ -901,6 +1341,8 @@ int cTheoreticalSpectrum::compareBranched(cPeaksList& sortedpeaklist, cBricksDat
 
 
 	if (writedescription) {
+
+		theoreticalpeaks.fillOrderIDs();
 
 		visualcoverage.clear();
 		visualSeries tempseries;
@@ -980,8 +1422,8 @@ int cTheoreticalSpectrum::compareLinear(cPeaksList& sortedpeaklist, cBricksDatab
 
 	// search the theoretical peaks in the experimental peak list
 	experimentalpeaks = sortedpeaklist;
-	vector<set<int> > experimentalpeakmatches;
-	searchForPeakPairs(theoreticalpeaks, theoreticalpeaksrealsize, experimentalpeaks, experimentalpeakmatches, parameters->fragmentmasserrortolerance);
+	experimentalmatches.clear();
+	searchForPeakPairs(theoreticalpeaks, theoreticalpeaksrealsize, experimentalpeaks, parameters->fragmentmasserrortolerance);
 
 
 	// coverage of series
@@ -1003,7 +1445,7 @@ int cTheoreticalSpectrum::compareLinear(cPeaksList& sortedpeaklist, cBricksDatab
 
 		for (int i = 0; i < theoreticalpeaksrealsize; i++) {
 			if (!theoreticalpeaks[i].isotope && (theoreticalpeaks[i].matched > 0) && (theoreticalpeaks[i].rotationid != -1) && ((series.count(parameters->fragmentdefinitions[theoreticalpeaks[i].iontype].parent) == 0) || (series[parameters->fragmentdefinitions[theoreticalpeaks[i].iontype].parent][theoreticalpeaks[i].seriesid] == 0))) {		
-				experimentalpeakmatches[theoreticalpeaks[i].matchedid].erase(experimentalpeakmatches[theoreticalpeaks[i].matchedid].find(i));
+				experimentalmatches[theoreticalpeaks[i].matchedid].erase(experimentalmatches[theoreticalpeaks[i].matchedid].find(i));
 				experimentalpeaks[theoreticalpeaks[i].matchedid].matched--;
 
 				theoreticalpeaks[i].matched--;
@@ -1013,17 +1455,13 @@ int cTheoreticalSpectrum::compareLinear(cPeaksList& sortedpeaklist, cBricksDatab
 	}
 
 
-	removeUnmatchedMetalIsotopes(theoreticalpeaks, theoreticalpeaksrealsize, experimentalpeaks, experimentalpeakmatches);
+	removeUnmatchedMetalIsotopes(theoreticalpeaks, theoreticalpeaksrealsize, experimentalpeaks);
 
 
 	// fill annotations of peaks
 	for (int i = 0; i < (int)experimentalpeaks.size(); i++) {
-		for (auto it = experimentalpeakmatches[i].begin(); it != experimentalpeakmatches[i].end(); ++it) {
+		for (auto it = experimentalmatches[i].begin(); it != experimentalmatches[i].end(); ++it) {
 			if (writedescription) {
-				if (experimentalpeaks[i].description.compare("") != 0) {
-					experimentalpeaks[i].description += ",";
-				}
-				experimentalpeaks[i].description += theoreticalpeaks[*it].description.substr(0,theoreticalpeaks[*it].description.find(':'));
 				theoreticalpeaks[*it].matchedmz = experimentalpeaks[i].mzratio;
 				theoreticalpeaks[*it].matchedrelativeintensity = experimentalpeaks[i].relativeintensity;
 				theoreticalpeaks[*it].matchedabsoluteintensity = experimentalpeaks[i].absoluteintensity;
@@ -1036,6 +1474,8 @@ int cTheoreticalSpectrum::compareLinear(cPeaksList& sortedpeaklist, cBricksDatab
 
 
 	if (writedescription) {
+
+		theoreticalpeaks.fillOrderIDs();
 
 		visualcoverage.clear();
 		visualSeries tempseries;
@@ -1186,8 +1626,8 @@ int cTheoreticalSpectrum::compareCyclic(cPeaksList& sortedpeaklist, cBricksDatab
 
 	// search the theoretical peaks in the experimental peak list
 	experimentalpeaks = sortedpeaklist;
-	vector<set<int> > experimentalpeakmatches;
-	searchForPeakPairs(theoreticalpeaks, theoreticalpeaksrealsize, experimentalpeaks, experimentalpeakmatches, parameters->fragmentmasserrortolerance);
+	experimentalmatches.clear();
+	searchForPeakPairs(theoreticalpeaks, theoreticalpeaksrealsize, experimentalpeaks, parameters->fragmentmasserrortolerance);
 
 
 	// coverage of series
@@ -1214,7 +1654,7 @@ int cTheoreticalSpectrum::compareCyclic(cPeaksList& sortedpeaklist, cBricksDatab
 
 		for (int i = 0; i < theoreticalpeaksrealsize; i++) {
 			if (!theoreticalpeaks[i].isotope && (theoreticalpeaks[i].matched > 0) && (theoreticalpeaks[i].rotationid >= 0) && ((series[theoreticalpeaks[i].rotationid].count(parameters->fragmentdefinitions[theoreticalpeaks[i].iontype].parent) == 0) || (series[theoreticalpeaks[i].rotationid][parameters->fragmentdefinitions[theoreticalpeaks[i].iontype].parent][theoreticalpeaks[i].seriesid] == 0))) {	
-				experimentalpeakmatches[theoreticalpeaks[i].matchedid].erase(experimentalpeakmatches[theoreticalpeaks[i].matchedid].find(i));
+				experimentalmatches[theoreticalpeaks[i].matchedid].erase(experimentalmatches[theoreticalpeaks[i].matchedid].find(i));
 				experimentalpeaks[theoreticalpeaks[i].matchedid].matched--;
 
 				theoreticalpeaks[i].matched--;
@@ -1239,7 +1679,7 @@ int cTheoreticalSpectrum::compareCyclic(cPeaksList& sortedpeaklist, cBricksDatab
 						// parent not found
 						res = experimentalpeaks.find(theoreticalpeaks[j].mzratio - parameters->fragmentdefinitions[theoreticalpeaks[j].iontype].massdifference + parameters->fragmentdefinitions[parameters->fragmentdefinitions[theoreticalpeaks[j].iontype].parent].massdifference, parameters->fragmentmasserrortolerance);
 						if (res == -1) {
-							experimentalpeakmatches[theoreticalpeaks[j].matchedid].erase(experimentalpeakmatches[theoreticalpeaks[j].matchedid].find(j));
+							experimentalmatches[theoreticalpeaks[j].matchedid].erase(experimentalmatches[theoreticalpeaks[j].matchedid].find(j));
 							experimentalpeaks[theoreticalpeaks[j].matchedid].matched--;
 
 							theoreticalpeaks[j].matched--;
@@ -1249,7 +1689,7 @@ int cTheoreticalSpectrum::compareCyclic(cPeaksList& sortedpeaklist, cBricksDatab
 						else {
 
 							matchesscrambled = false;
-							for (auto it = experimentalpeakmatches[res].begin(); it != experimentalpeakmatches[res].end(); ++it) {
+							for (auto it = experimentalmatches[res].begin(); it != experimentalmatches[res].end(); ++it) {
 								if ((theoreticalpeaks[*it].matched > 0) && theoreticalpeaks[*it].scrambled) {
 									matchesscrambled = true;
 									break;
@@ -1258,7 +1698,7 @@ int cTheoreticalSpectrum::compareCyclic(cPeaksList& sortedpeaklist, cBricksDatab
 
 							// a scrambled peak is not matched by parent
 							if (!matchesscrambled) {
-								experimentalpeakmatches[theoreticalpeaks[j].matchedid].erase(experimentalpeakmatches[theoreticalpeaks[j].matchedid].find(j));
+								experimentalmatches[theoreticalpeaks[j].matchedid].erase(experimentalmatches[theoreticalpeaks[j].matchedid].find(j));
 								experimentalpeaks[theoreticalpeaks[j].matchedid].matched--;
 
 								theoreticalpeaks[j].matched--;
@@ -1278,17 +1718,13 @@ int cTheoreticalSpectrum::compareCyclic(cPeaksList& sortedpeaklist, cBricksDatab
 	}
 
 
-	removeUnmatchedMetalIsotopes(theoreticalpeaks, theoreticalpeaksrealsize, experimentalpeaks, experimentalpeakmatches);
+	removeUnmatchedMetalIsotopes(theoreticalpeaks, theoreticalpeaksrealsize, experimentalpeaks);
 
 
 	// fill annotations of peaks
-	for (int i = 0; i < (int)experimentalpeakmatches.size(); i++) {
-		for (auto it = experimentalpeakmatches[i].begin(); it != experimentalpeakmatches[i].end(); ++it) {
+	for (int i = 0; i < (int)experimentalmatches.size(); i++) {
+		for (auto it = experimentalmatches[i].begin(); it != experimentalmatches[i].end(); ++it) {
 			if (writedescription) {
-				if (experimentalpeaks[i].description.compare("") != 0) {
-					experimentalpeaks[i].description += ",";
-				}
-				experimentalpeaks[i].description += theoreticalpeaks[*it].description.substr(0,theoreticalpeaks[*it].description.find(':'));
 				theoreticalpeaks[*it].matchedmz = experimentalpeaks[i].mzratio;
 				theoreticalpeaks[*it].matchedrelativeintensity = experimentalpeaks[i].relativeintensity;
 				theoreticalpeaks[*it].matchedabsoluteintensity = experimentalpeaks[i].absoluteintensity;
@@ -1315,6 +1751,8 @@ int cTheoreticalSpectrum::compareCyclic(cPeaksList& sortedpeaklist, cBricksDatab
 
 
 	if (writedescription) {
+
+		theoreticalpeaks.fillOrderIDs();
 
 		visualSeries tempseries;
 		visualcoverage.clear();
@@ -1566,8 +2004,8 @@ int cTheoreticalSpectrum::compareBranchCyclic(cPeaksList& sortedpeaklist, cBrick
 
 	// search the theoretical peaks in the experimental peak list
 	experimentalpeaks = sortedpeaklist;
-	vector<set<int> > experimentalpeakmatches;
-	searchForPeakPairs(theoreticalpeaks, theoreticalpeaksrealsize, experimentalpeaks, experimentalpeakmatches, parameters->fragmentmasserrortolerance);
+	experimentalmatches.clear();
+	searchForPeakPairs(theoreticalpeaks, theoreticalpeaksrealsize, experimentalpeaks, parameters->fragmentmasserrortolerance);
 
 
 	// coverage of series
@@ -1602,7 +2040,7 @@ int cTheoreticalSpectrum::compareBranchCyclic(cPeaksList& sortedpeaklist, cBrick
 
 			for (int j = 0; j < theoreticalpeaksrealsize; j++) {
 				if (!theoreticalpeaks[j].isotope && (theoreticalpeaks[j].matched > 0) && (theoreticalpeaks[j].rotationid >= 0) && (i == theoreticalpeaks[j].rotationid / 6) && ((series[i][theoreticalpeaks[j].rotationid % 6].count(parameters->fragmentdefinitions[theoreticalpeaks[j].iontype].parent) == 0) || (series[i][theoreticalpeaks[j].rotationid % 6][parameters->fragmentdefinitions[theoreticalpeaks[j].iontype].parent][theoreticalpeaks[j].seriesid] == 0))) {		
-					experimentalpeakmatches[theoreticalpeaks[j].matchedid].erase(experimentalpeakmatches[theoreticalpeaks[j].matchedid].find(j));
+					experimentalmatches[theoreticalpeaks[j].matchedid].erase(experimentalmatches[theoreticalpeaks[j].matchedid].find(j));
 					experimentalpeaks[theoreticalpeaks[j].matchedid].matched--;
 
 					theoreticalpeaks[j].matched--;
@@ -1613,17 +2051,13 @@ int cTheoreticalSpectrum::compareBranchCyclic(cPeaksList& sortedpeaklist, cBrick
 	}
 
 
-	removeUnmatchedMetalIsotopes(theoreticalpeaks, theoreticalpeaksrealsize, experimentalpeaks, experimentalpeakmatches);
+	removeUnmatchedMetalIsotopes(theoreticalpeaks, theoreticalpeaksrealsize, experimentalpeaks);
 
 
 	// fill annotations of peaks
 	for (int i = 0; i < (int)experimentalpeaks.size(); i++) {
-		for (auto it = experimentalpeakmatches[i].begin(); it != experimentalpeakmatches[i].end(); ++it) {
+		for (auto it = experimentalmatches[i].begin(); it != experimentalmatches[i].end(); ++it) {
 			if (writedescription) {
-				if (experimentalpeaks[i].description.compare("") != 0) {
-					experimentalpeaks[i].description += ",";
-				}
-				experimentalpeaks[i].description += theoreticalpeaks[*it].description.substr(0,theoreticalpeaks[*it].description.find(':'));
 				theoreticalpeaks[*it].matchedmz = experimentalpeaks[i].mzratio;
 				theoreticalpeaks[*it].matchedrelativeintensity = experimentalpeaks[i].relativeintensity;
 				theoreticalpeaks[*it].matchedabsoluteintensity = experimentalpeaks[i].absoluteintensity;
@@ -1636,6 +2070,8 @@ int cTheoreticalSpectrum::compareBranchCyclic(cPeaksList& sortedpeaklist, cBrick
 
 
 	if (writedescription) {
+
+		theoreticalpeaks.fillOrderIDs();
 
 		visualSeries tempseries;
 		visualcoverage.clear();
@@ -1761,8 +2197,8 @@ int cTheoreticalSpectrum::compareLinearPolyketide(cPeaksList& sortedpeaklist, cB
 
 	// search the theoretical peaks in the experimental peak list
 	experimentalpeaks = sortedpeaklist;
-	vector<set<int> > experimentalpeakmatches;
-	searchForPeakPairs(theoreticalpeaks, theoreticalpeaksrealsize, experimentalpeaks, experimentalpeakmatches, parameters->fragmentmasserrortolerance);
+	experimentalmatches.clear();
+	searchForPeakPairs(theoreticalpeaks, theoreticalpeaksrealsize, experimentalpeaks, parameters->fragmentmasserrortolerance);
 
 
 	// coverage of series
@@ -1784,7 +2220,7 @@ int cTheoreticalSpectrum::compareLinearPolyketide(cPeaksList& sortedpeaklist, cB
 
 		for (int i = 0; i < theoreticalpeaksrealsize; i++) {
 			if (!theoreticalpeaks[i].isotope && (theoreticalpeaks[i].matched > 0) && (theoreticalpeaks[i].rotationid != -1) && ((series.count(parameters->fragmentdefinitions[theoreticalpeaks[i].iontype].parent) == 0) || (series[parameters->fragmentdefinitions[theoreticalpeaks[i].iontype].parent][theoreticalpeaks[i].seriesid] == 0))) {		
-				experimentalpeakmatches[theoreticalpeaks[i].matchedid].erase(experimentalpeakmatches[theoreticalpeaks[i].matchedid].find(i));
+				experimentalmatches[theoreticalpeaks[i].matchedid].erase(experimentalmatches[theoreticalpeaks[i].matchedid].find(i));
 				experimentalpeaks[theoreticalpeaks[i].matchedid].matched--;
 
 				theoreticalpeaks[i].matched--;
@@ -1794,17 +2230,13 @@ int cTheoreticalSpectrum::compareLinearPolyketide(cPeaksList& sortedpeaklist, cB
 	}
 
 
-	removeUnmatchedMetalIsotopes(theoreticalpeaks, theoreticalpeaksrealsize, experimentalpeaks, experimentalpeakmatches);
+	removeUnmatchedMetalIsotopes(theoreticalpeaks, theoreticalpeaksrealsize, experimentalpeaks);
 
 
 	// fill annotations of peaks
 	for (int i = 0; i < (int)experimentalpeaks.size(); i++) {
-		for (auto it = experimentalpeakmatches[i].begin(); it != experimentalpeakmatches[i].end(); ++it) {
+		for (auto it = experimentalmatches[i].begin(); it != experimentalmatches[i].end(); ++it) {
 			if (writedescription) {
-				if (experimentalpeaks[i].description.compare("") != 0) {
-					experimentalpeaks[i].description += ",";
-				}
-				experimentalpeaks[i].description += theoreticalpeaks[*it].description.substr(0,theoreticalpeaks[*it].description.find(':'));
 				theoreticalpeaks[*it].matchedmz = experimentalpeaks[i].mzratio;
 				theoreticalpeaks[*it].matchedrelativeintensity = experimentalpeaks[i].relativeintensity;
 				theoreticalpeaks[*it].matchedabsoluteintensity = experimentalpeaks[i].absoluteintensity;
@@ -1817,6 +2249,8 @@ int cTheoreticalSpectrum::compareLinearPolyketide(cPeaksList& sortedpeaklist, cB
 
 
 	if (writedescription) {
+
+		theoreticalpeaks.fillOrderIDs();
 
 		visualcoverage.clear();
 		visualSeries tempseries;
@@ -1925,14 +2359,26 @@ void cTheoreticalSpectrum::generateMSSpectrum(bool writedescription) {
 
 void cTheoreticalSpectrum::generateFineMSSpectrum() {
 	cSummaryFormula formula;
-	string metalname;
-	regex rx;
 	string proton = "H+";
 	string description;
 	string tmp;
 
 	int theoreticalpeaksrealsize = 0;
 	int groupid = 0;
+
+	cSequence sequence;
+	string summary;
+	string name;
+
+	int seqdbsize = parameters->sequencedatabase.size();
+	sequence.setPeptideType(other);
+	sequence.setDecoy(true);
+
+	for (int i = 0; i < seqdbsize; i++) {
+		summary = parameters->sequencedatabase[i].getSummaryFormula() + "H";
+		sequence.setSummaryFormula(summary);
+		parameters->sequencedatabase.push_back(sequence);
+	}
 
 	for (int i = 0; i < parameters->sequencedatabase.size(); i++) {
 
@@ -1978,6 +2424,7 @@ void cTheoreticalSpectrum::generateFineMSSpectrum() {
 				for (int m = 0; m < isotopepattern.size(); m++) {
 					isotopepattern[m].description = description + isotopepattern[m].description + "): ";
 					isotopepattern[m].groupid = groupid;
+					isotopepattern[m].decoy = parameters->sequencedatabase[i].isDecoy();
 					addPeakToList(isotopepattern[m], theoreticalpeaksrealsize);
 				}
 
@@ -1992,37 +2439,40 @@ void cTheoreticalSpectrum::generateFineMSSpectrum() {
 }
 
 
-void cTheoreticalSpectrum::compareMSSpectrum(cPeaksList& peaklist, cTheoreticalSpectrum& tsfull) {
-	string desc;
-
+void cTheoreticalSpectrum::compareMSSpectrum(cPeaksList& peaklist, cTheoreticalSpectrum& tsfull, cPeaksList& unmatchedpeaksinmatchedpatterns) {
 	experimentalpeaks = peaklist;
 	peaklist.clear();
 	experimentalpeaks.sortbyMass();
 
 	cPeaksList* tsfullpeaklist = tsfull.getTheoreticalPeaks();
 
-	vector<set<int> > experimentalpeakmatches;
-	searchForPeakPairs(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks, experimentalpeakmatches, parameters->fragmentmasserrortolerance);
+	experimentalmatches.clear();
+	searchForPeakPairs(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks, parameters->fragmentmasserrortolerance);
 
+	unmatchedpeaksinmatchedpatterns.clear();
 	if (!parameters->generateisotopepattern) {
-		removeUnmatchedMetalIsotopes(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks, experimentalpeakmatches);
+		removeUnmatchedMetalIsotopes(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks);
 	}
 	else {
-		removeUnmatchedIsotopePatterns(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks, experimentalpeakmatches);
+		removeUnmatchedIsotopePatterns(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks, unmatchedpeaksinmatchedpatterns);
+		targetscores.clear();
+		decoyscores.clear();
+		calculateEnvelopeScores(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks);
+		removeDecoyPeakMatches(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks);		
 	}
+
+	theoreticalpeaks.clear();
+	vector<set<int> > updatedexperimentalmatches;
+	updatedexperimentalmatches.resize(experimentalmatches.size());
 
 	// fill annotations of peaks
 	for (int i = 0; i < (int)experimentalpeaks.size(); i++) {
-		for (auto it = experimentalpeakmatches[i].begin(); it != experimentalpeakmatches[i].end(); ++it) {
-
-			if (experimentalpeaks[i].description.compare("") != 0) {
-				experimentalpeaks[i].description += ",";
-			}
-			desc = parameters->peakidtodesc[(*tsfullpeaklist)[*it].descriptionid];
-			experimentalpeaks[i].description += desc.substr(0, desc.rfind(':'));
+		for (auto it = experimentalmatches[i].begin(); it != experimentalmatches[i].end(); ++it) {
+			updatedexperimentalmatches[i].insert((int)theoreticalpeaks.size());
 
 			cPeak matchedpeak;
 			matchedpeak = (*tsfullpeaklist)[*it];
+
 			matchedpeak.matchedmz = experimentalpeaks[i].mzratio;
 			matchedpeak.matchedrelativeintensity = experimentalpeaks[i].relativeintensity;
 			matchedpeak.matchedabsoluteintensity = experimentalpeaks[i].absoluteintensity;
@@ -2032,15 +2482,25 @@ void cTheoreticalSpectrum::compareMSSpectrum(cPeaksList& peaklist, cTheoreticalS
 			(*tsfullpeaklist)[*it].matched = 0;
 			(*tsfullpeaklist)[*it].matchedid = -1;
 		}
+		experimentalpeaks[i].matched = (int)updatedexperimentalmatches[i].size();
 	}
 
-	experimentalpeaks.reducePeakDescriptions(parameters->peakidtodesc, parameters->peakdesctoid);
+	experimentalmatches = updatedexperimentalmatches;
+}
+
+
+void cTheoreticalSpectrum::finalizeMSSpectrum(cPeaksList& unmatchedpeaksinmatchedpatterns) {
+	if (parameters->generateisotopepattern) {
+		theoreticalpeaks.attach(unmatchedpeaksinmatchedpatterns);
+	}
+	
+	theoreticalpeaks.fillOrderIDs();
 
 	if (parameters->generateisotopepattern) {
 		theoreticalpeaks.sortbyGroupId();
 		normalizeTheoreticalIntensities(theoreticalpeaks, theoreticalpeaks.size());
 	}
-	
+
 	computeStatistics(true);
 
 	theoreticalpeaks.sortbyMass();
@@ -2481,13 +2941,18 @@ cPeaksList& cTheoreticalSpectrum::getExperimentalSpectrum() {
 }
 
 
+set<int>& cTheoreticalSpectrum::getExperimentalMatches(int peakid) {
+	return experimentalmatches[peakid];
+}
+
+
 string cTheoreticalSpectrum::getCoverageBySeries() {
 	return coveragebyseries;
 }
 
 
-int cTheoreticalSpectrum::getUnmatchedPeaksCount() {
-	return unmatchedpeakscount;
+int cTheoreticalSpectrum::getUnmatchedExperimentalPeaksCount() {
+	return unmatchedexperimentalpeakscount;
 }
 
 
@@ -2546,14 +3011,92 @@ void cTheoreticalSpectrum::setParameters(cParameters* parameters) {
 }
 
 
-void cTheoreticalSpectrum::store(ofstream& os) {
+double cTheoreticalSpectrum::getTargetPatternScore(int groupid) {
+	return (targetscores.count(groupid) == 1) ? targetscores[groupid] : DBL_MAX;
+}
+
+
+double cTheoreticalSpectrum::getTargetPatternFDR(int groupid) {
+	return (fdrscores.count(groupid) == 1) ? fdrscores[groupid] : DBL_MAX;
+}
+
+
+map<int, double>& cTheoreticalSpectrum::getTargetScores() {
+	return targetscores;
+}
+
+
+map<int, double>& cTheoreticalSpectrum::getDecoyScores() {
+	return decoyscores;
+}
+
+
+void cTheoreticalSpectrum::setFDRs(vector<double>& targetscoresvector, vector<double>& fdrs, cPeaksList& unmatchedpeaksinmatchedpatterns) {
+	if (targetscoresvector.empty() || (targetscoresvector.size() != fdrs.size())) {
+		return;
+	}
+
 	int size;
+	int position;
+
+	for (auto it = targetscores.begin(); it != targetscores.end(); ++it) {
+		position = getNumberOfScoreHits(targetscoresvector, it->second) - 1;
+		fdrscores[it->first] = fdrs[position];
+	}
+
+	// clear matches of peaks exceeding a FDR threshold
+	cPeaksList updatedtheoreticalpeaks;
+	vector<set<int> > updatedexperimentalmatches;
+	updatedexperimentalmatches.resize(experimentalmatches.size());
+	set<int> updatedgroupids;
+
+	// matched peaks
+	size = (int)experimentalpeaks.size();
+	for (int i = 0; i < size; i++) {
+		for (auto it = experimentalmatches[i].begin(); it != experimentalmatches[i].end(); ++it) {
+			if ((fdrscores.count(theoreticalpeaks[*it].groupid) == 1) /*&& (fdrscores[theoreticalpeaks[*it].groupid] <= parameters->maximumfdr)*/) {
+				updatedexperimentalmatches[i].insert((int)updatedtheoreticalpeaks.size());
+				updatedtheoreticalpeaks.add(theoreticalpeaks[*it]);
+				updatedgroupids.insert(theoreticalpeaks[*it].groupid);
+			}
+		}
+		experimentalpeaks[i].matched = (int)updatedexperimentalmatches[i].size();
+	}
+
+	theoreticalpeaks = updatedtheoreticalpeaks;
+	experimentalmatches = updatedexperimentalmatches;
+
+	// unmatched peaks in matched patterns
+	cPeaksList updatedunmatchedpeaks;
+	size = (int)unmatchedpeaksinmatchedpatterns.size();
+	for (int i = 0; i < size; i++) {
+		if (updatedgroupids.count(unmatchedpeaksinmatchedpatterns[i].groupid) == 1) {
+			updatedunmatchedpeaks.add(unmatchedpeaksinmatchedpatterns[i]);
+		}
+	}
+	unmatchedpeaksinmatchedpatterns = updatedunmatchedpeaks;
+}
+
+
+void cTheoreticalSpectrum::store(ofstream& os) {
+	int size, size2;
 
 	theoreticalpeaks.store(os);
 	experimentalpeaks.store(os);
 	candidate.store(os);
 
 	os.write((char *)&experimentalpeaksmatched, sizeof(int));
+
+	size = (int)experimentalmatches.size();
+	os.write((char *)&size, sizeof(int));
+	for (int i = 0; i < size; i++) {
+		size2 = (int)experimentalmatches[i].size();
+		os.write((char *)&size2, sizeof(int));
+		for (auto it = experimentalmatches[i].begin(); it != experimentalmatches[i].end(); ++it) {
+			os.write((char *)&(*it), sizeof(int));
+		}
+	}
+
 	os.write((char *)&scrambledpeaksmatched, sizeof(int));
 
 	size = (int)matchedions.size();
@@ -2566,7 +3109,7 @@ void cTheoreticalSpectrum::store(ofstream& os) {
 	os.write((char *)&peakstested, sizeof(int));
 	os.write((char *)&experimentalpeaksmatchedratio, sizeof(double));
 
-	os.write((char *)&unmatchedpeakscount, sizeof(int));
+	os.write((char *)&unmatchedexperimentalpeakscount, sizeof(int));
 	storeString(coveragebyseries, os);
 
 	os.write((char *)&valid, sizeof(bool));
@@ -2583,13 +3126,36 @@ void cTheoreticalSpectrum::store(ofstream& os) {
 	os.write((char *)&reversevalidposition, sizeof(int));
 	os.write((char *)&seriescompleted, sizeof(int));
 	os.write((char *)&pathid, sizeof(int));
+
+	size = (int)targetscores.size();
+	os.write((char *)&size, sizeof(int));
+	for (auto it = targetscores.begin(); it != targetscores.end(); ++it) {
+		os.write((char *)&it->first, sizeof(int));
+		os.write((char *)&it->second, sizeof(double));
+	}
+
+	size = (int)decoyscores.size();
+	os.write((char *)&size, sizeof(int));
+	for (auto it = decoyscores.begin(); it != decoyscores.end(); ++it) {
+		os.write((char *)&it->first, sizeof(int));
+		os.write((char *)&it->second, sizeof(double));
+	}
+
+	size = (int)fdrscores.size();
+	os.write((char *)&size, sizeof(int));
+	for (auto it = fdrscores.begin(); it != fdrscores.end(); ++it) {
+		os.write((char *)&it->first, sizeof(int));
+		os.write((char *)&it->second, sizeof(double));
+	}
 }
 
 
 void cTheoreticalSpectrum::load(ifstream& is) {
-	int size;
+	int size, size2;
 	eFragmentIonType iontype;
 	int number;
+	double value;
+	set<int> setint;
 
 	parameters = 0;
 
@@ -2598,6 +3164,19 @@ void cTheoreticalSpectrum::load(ifstream& is) {
 	candidate.load(is);
 
 	is.read((char *)&experimentalpeaksmatched, sizeof(int));
+
+	is.read((char *)&size, sizeof(int));
+	experimentalmatches.clear();
+	for (int i = 0; i < size; i++) {
+		is.read((char *)&size2, sizeof(int));
+		setint.clear();
+		for (int j = 0; j < size2; j++) {
+			is.read((char *)&number, sizeof(int));
+			setint.insert(number);
+		}
+		experimentalmatches.push_back(setint);
+	}
+
 	is.read((char *)&scrambledpeaksmatched, sizeof(int));
 
 	is.read((char *)&size, sizeof(int));
@@ -2611,7 +3190,7 @@ void cTheoreticalSpectrum::load(ifstream& is) {
 	is.read((char *)&peakstested, sizeof(int));
 	is.read((char *)&experimentalpeaksmatchedratio, sizeof(double));
 
-	is.read((char *)&unmatchedpeakscount, sizeof(int));
+	is.read((char *)&unmatchedexperimentalpeakscount, sizeof(int));
 	loadString(coveragebyseries, is);
 
 	is.read((char *)&valid, sizeof(bool));
@@ -2628,5 +3207,29 @@ void cTheoreticalSpectrum::load(ifstream& is) {
 	is.read((char *)&reversevalidposition, sizeof(int));
 	is.read((char *)&seriescompleted, sizeof(int));
 	is.read((char *)&pathid, sizeof(int));
+
+	is.read((char *)&size, sizeof(int));
+	targetscores.clear();
+	for (int i = 0; i < size; i++) {
+		is.read((char *)&number, sizeof(int));
+		is.read((char *)&value, sizeof(double));
+		targetscores[number] = value;
+	}
+
+	is.read((char *)&size, sizeof(int));
+	decoyscores.clear();
+	for (int i = 0; i < size; i++) {
+		is.read((char *)&number, sizeof(int));
+		is.read((char *)&value, sizeof(double));
+		decoyscores[number] = value;
+	}
+
+	is.read((char *)&size, sizeof(int));
+	fdrscores.clear();
+	for (int i = 0; i < size; i++) {
+		is.read((char *)&number, sizeof(int));
+		is.read((char *)&value, sizeof(double));
+		fdrscores[number] = value;
+	}
 }
 
