@@ -1,6 +1,6 @@
 # CycloBranch
 
-A tool for mass spectrometry data analysis.
+An open-source and cross-platform tool for mass spectrometry data analysis.
 
 ## Main features
   * *De novo* sequencing of nonribosomal peptides.
@@ -13,15 +13,17 @@ A tool for mass spectrometry data analysis.
 ## Supported file formats
   * mzML, imzML
     * profile or centroid spectra
-    * profile spectra require [OpenMS 2.x](http://www.openms.de) installed 
+    * profile spectra require [OpenMS 2.x](https://www.openms.de/download/openms-binaries/) installed 
   * mzXML
     * centroid spectra
-    * require [OpenMS 2.x](http://www.openms.de) installed
+    * requires [OpenMS 2.x](https://www.openms.de/download/openms-binaries/) installed
   * baf (Bruker)
     * profile spectra
     * requires [CompassXport 3.0](http://www.bruker.com/service/support-upgrades/software-downloads/mass-spectrometry.html) installed
+    * Windows only
   * raw (Waters)
     * centroid spectra
+    * Windows only
   * mgf (Mascot Generic File format)
     * centroid spectra
   * txt
