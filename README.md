@@ -13,10 +13,10 @@ An open-source and cross-platform tool for mass spectrometry data analysis.
 ## Supported file formats
   * mzML, imzML
     * profile or centroid spectra
-    * profile spectra require [OpenMS 2.x](https://www.openms.de/download/openms-binaries/) installed 
+    * profile spectra require [OpenMS 2.0](https://sourceforge.net/projects/open-ms/files/OpenMS/OpenMS-2.0/) installed 
   * mzXML
     * centroid spectra
-    * requires [OpenMS 2.x](https://www.openms.de/download/openms-binaries/) installed
+    * requires [OpenMS 2.0](https://sourceforge.net/projects/open-ms/files/OpenMS/OpenMS-2.0/) installed
   * baf (Bruker)
     * profile spectra
     * requires [CompassXport 3.0](http://www.bruker.com/service/support-upgrades/software-downloads/mass-spectrometry.html) installed
