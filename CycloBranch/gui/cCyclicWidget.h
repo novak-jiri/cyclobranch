@@ -54,11 +54,13 @@ void paintCircle(QPainter& painter, vector<string>& acronymsofblocks, int center
 	\param angle an angle between two building blocks
 	\param linesize length of separators between building blocks
 	\param cornerlinesize length of endings of separators between building blocks
+	\param visibleionseries name of a ion series to be visualized
+	\param visibleneutralloss name of a neutral loss to be visualized
 	\param visiblerotationid id of a rotation whose fragment ions are visualized
 	\param branchstart starting position of a branch
 	\param branchend end position of a branch
 */ 
-void generateCyclicLabelsToRight(bool nterminal, int rotationid, int rotationstart, int fragmentstart, int fragmentend, int numberofringblocks, unordered_set<cIonLabel, hash_cIonLabel>& labels, cParameters* parameters, cTheoreticalSpectrum* theoreticalspectrum, int centerx, int centery, int radius, double angle, int linesize, int cornerlinesize, int visiblerotationid, int branchstart, int branchend);
+void generateCyclicLabelsToRight(bool nterminal, int rotationid, int rotationstart, int fragmentstart, int fragmentend, int numberofringblocks, unordered_set<cIonLabel, hash_cIonLabel>& labels, cParameters* parameters, cTheoreticalSpectrum* theoreticalspectrum, int centerx, int centery, int radius, double angle, int linesize, int cornerlinesize, string visibleionseries, string visibleneutralloss, int visiblerotationid, int branchstart, int branchend);
 
 
 /**
@@ -78,11 +80,13 @@ void generateCyclicLabelsToRight(bool nterminal, int rotationid, int rotationsta
 	\param angle an angle between two building blocks
 	\param linesize length of separators between building blocks
 	\param cornerlinesize length of endings of separators between building blocks
+	\param visibleionseries name of a ion series to be visualized
+	\param visibleneutralloss name of a neutral loss to be visualized
 	\param visiblerotationid id of a rotation whose fragment ions are visualized
 	\param branchstart starting position of a branch
 	\param branchend end position of a branch
 */ 
-void generateCyclicLabelsToLeft(bool nterminal, int rotationid, int rotationstart, int fragmentstart, int fragmentend, int numberofringblocks, unordered_set<cIonLabel, hash_cIonLabel>& labels, cParameters* parameters, cTheoreticalSpectrum* theoreticalspectrum, int centerx, int centery, int radius, double angle, int linesize, int cornerlinesize, int visiblerotationid, int branchstart, int branchend);
+void generateCyclicLabelsToLeft(bool nterminal, int rotationid, int rotationstart, int fragmentstart, int fragmentend, int numberofringblocks, unordered_set<cIonLabel, hash_cIonLabel>& labels, cParameters* parameters, cTheoreticalSpectrum* theoreticalspectrum, int centerx, int centery, int radius, double angle, int linesize, int cornerlinesize, string visibleionseries, string visibleneutralloss, int visiblerotationid, int branchstart, int branchend);
 
 
 /**
@@ -154,6 +158,9 @@ private:
 
 	cParameters* parameters;
 	cTheoreticalSpectrum* theoreticalspectrum;
+
+	string visibleionseries;
+	string visibleneutralloss;
 	int visiblerotationid;
 
 	bool reportisomers;
@@ -161,8 +168,12 @@ private:
 
 private slots:
 
-	void rotationChanged(int index);
+	void ionSeriesChanged(QString text);
 
+	void neutralLossChanged(QString text);
+
+	void rotationChanged(int index);
+	
 };
 
 #endif

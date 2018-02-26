@@ -21,6 +21,7 @@
 #include "core/cSummaryFormula.h"
 #include "core/cParameters.h"
 #include "gui/cFragmentIonsListWidget.h"
+#include "gui/cNeutralLossesListWidget.h"
 
 
 using namespace std;
@@ -28,6 +29,7 @@ using namespace std;
 
 // forward declarations
 class QFormLayout;
+class QGridLayout;
 class QTextEdit;
 class QVBoxLayout;
 class QHBoxLayout;
@@ -41,6 +43,7 @@ class QTableWidget;
 class QListWidget;
 class QMessageBox;
 class QScrollArea;
+class QLabel;
 
 
 /**
@@ -125,59 +128,94 @@ private:
 	QPushButton* save;
 	QPushButton* saveas;
 
-	QFormLayout* peaklistformlayout;
-	QGroupBox* peaklistgroupbox;
+	QGridLayout* searchgridlayout;
+	QGroupBox* searchgroupbox;
+	QLabel* modelabel;
+	QComboBox* mode;
+	eModeType oldmodetype;
+	QSpinBox* maximumnumberofthreads;
+	QLabel* maximumnumberofthreadslabel;
+
+	QGridLayout* experimentalspectragridlayout;
+	QGroupBox* experimentalspectragroupbox;
+	QLabel* peptidetypelabel;
 	QComboBox* peptidetype;
+	QLabel* peaklistlabel;
 	QLineEdit* peaklistline;
 	QPushButton* peaklistbutton;
 	QHBoxLayout* peaklistlayout;
+	QWidget* peaklistwidget;
+	QLabel* scannumberlabel;
 	QSpinBox* scannumber;
+	QLabel* precursormasslabel;
 	QDoubleSpinBox* precursormass;
+	QLabel* precursoradductlabel;
 	QLineEdit* precursoradduct;
+	QLabel* precursorchargelabel;
 	QSpinBox* precursorcharge;
+	QLabel* precursormasserrortolerancelabel;
 	QDoubleSpinBox* precursormasserrortolerance;
+	QLabel* fragmentmasserrortolerancelabel;
 	QDoubleSpinBox* fragmentmasserrortolerance;
-	QDoubleSpinBox* masserrortolerancefordeisotoping;
+	//QDoubleSpinBox* masserrortolerancefordeisotoping;
+	QLabel* minimumrelativeintensitythresholdlabel;
 	QDoubleSpinBox* minimumrelativeintensitythreshold;
+	QLabel* minimumabsoluteintensitythresholdlabel;
 	QSpinBox* minimumabsoluteintensitythreshold;
+	QLabel* minimummzlabel;
 	QDoubleSpinBox* minimummz;
+	QLabel* fwhmlabel;
 	QDoubleSpinBox* fwhm;
 
-	QFormLayout* brickdatabaseformlayout;
+	QGridLayout* brickdatabasegridlayout;
 	QGroupBox* brickdatabasegroupbox;
+	QLabel* brickdatabaselabel;
 	QLineEdit* brickdatabaseline;
 	QPushButton* brickdatabasebutton;
 	QHBoxLayout* brickdatabaselayout;
+	QWidget* brickdatabasewidget;
+	QLabel* maximumbricksincombinatiolabel;
 	QSpinBox* maximumbricksincombinationbegin;
 	QSpinBox* maximumbricksincombinationmiddle;
 	QSpinBox* maximumbricksincombinationend;
+	QHBoxLayout* maximumbricksincombinationlayout;
+	QWidget* maximumbricksincombinationwidget;
+	QLabel* maximumcumulativemasslabel;
 	QDoubleSpinBox* maximumcumulativemass;
+	QLabel* modificationslabel;
 	QLineEdit* modificationsline;
 	QPushButton* modificationsbutton;
 	QHBoxLayout* modificationslayout;
+	QWidget* modificationswidget;
 
 	QGroupBox* miscgroupbox;
-	QFormLayout* miscformlayout;
+	QGridLayout* miscgridlayout;
+	QLabel* blindedgeslabel;
 	QComboBox* blindedges;
+	QLabel* cyclicnterminuslabel;
 	QCheckBox* cyclicnterminus;
+	QLabel* cycliccterminuslabel;
 	QCheckBox* cycliccterminus;
+	QLabel* enablescramblinglabel;
 	QCheckBox* enablescrambling;
+	QLabel* similaritysearchlabel;
 	QCheckBox* similaritysearch;
+	QLabel* regularblocksorderlabel;
 	QCheckBox* regularblocksorder;
 
-	QFormLayout* applicationformlayout;
-	QGroupBox* applicationgroupbox;
-	QComboBox* mode;
-	eModeType oldmodetype;
+	QFormLayout* theoreticalspectraformlayout;
+	QGroupBox* theoreticalspectragroupbox;
 	QLineEdit* sequencedatabaseline;
 	QPushButton* sequencedatabasebutton;
 	QHBoxLayout* sequencedatabaselayout;
-	QSpinBox* maximumnumberofthreads;
 	QComboBox* scoretype;
 	QSpinBox* hitsreported;
 	QLineEdit* sequencetag;
 	cFragmentIonsListWidget* fragmentiontypes;
-	QCheckBox* clearhitswithoutparent;
+	cNeutralLossesListWidget* neutrallosstypes;
+	QSpinBox* maximumcombinedlosses;
+	//QCheckBox* clearhitswithoutparent;
+	QCheckBox* reportunmatchedtheoreticalpeaks;
 	QCheckBox* generateisotopepattern;
 	QSpinBox* minimumpatternsize;
 
@@ -247,6 +285,18 @@ signals:
 		\param sequence searched sequence
 	*/ 
 	void sendSequenceLine(int peptidetypeindex, QString sequence);
+
+
+	/**
+		\brief Set list of neutral losses to HCON.
+	*/
+	void setHCON();
+
+
+	/**
+		\brief Clear the selection of ions.
+	*/
+	void clearIonSelection();
 
 };
 

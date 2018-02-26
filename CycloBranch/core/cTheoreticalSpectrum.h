@@ -112,14 +112,13 @@ class cTheoreticalSpectrum {
 	int experimentalpeaksmatched;
 	vector<set<int> > experimentalmatches;
 	int scrambledpeaksmatched;
-	map<eFragmentIonType, int> matchedions;
+	map<eFragmentIonType, map<int, int> > matchedions;
 	int peakstested;
 	double experimentalpeaksmatchedratio;
 	int unmatchedexperimentalpeakscount;
 	string coveragebyseries;
 	bool valid;
-	double intensityweightedscore;
-	int maskscore;
+	double sumofrelativeintensities;
 	vector<visualSeries> visualcoverage;
 	int validposition;
 	int reversevalidposition;
@@ -129,11 +128,14 @@ class cTheoreticalSpectrum {
 	map<int, double> decoyscores;
 	map<int, double> fdrscores;
 
-	// remove false hits, i.e., b-H2O without existing b-ion
-	void clearFalseHits(map<eFragmentIonType, vector<int> >& series, vector<eFragmentIonType>& fragmentions);
+	// remove hits of peaks without hits of parent peaks
+	void clearFalseHits(map<eFragmentIonType, map<int, vector<int> > >& series, vector<eFragmentIonType>& ions, vector<int>& losses);
 
 	// search for matches of experimental and theoretical peaks
 	void searchForPeakPairs(cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks, double fragmentmasserrortolerance);
+
+	// search a m/z ratio in the experimental spectrum to decide whether its description should be generated
+	bool searchHint(double mzratio, cPeaksList& experimentalpeaks, double fragmentmasserrortolerance);
 
 	// compute additional scores
 	void computeStatistics(bool writedescription);
@@ -148,7 +150,7 @@ class cTheoreticalSpectrum {
 	void selectAndNormalizeScrambledSequences(unordered_set<string>& scrambledsequences);
 
 	// select a proper fragment ion type for an experimental peak when masses of more theoretical fragment ions collide
-	eFragmentIonType selectHigherPriorityIonTypeCID(eFragmentIonType experimentalpeakiontype, eFragmentIonType theoreticalpeakiontype);
+	void selectHigherPriorityIonTypeCID(cPeak& experimentalpeak, cPeak& theoreticalpeak);
 
 	// add a peak to the list
 	void addPeakToList(cPeak& peak, int& theoreticalpeaksrealsize);
@@ -190,7 +192,10 @@ class cTheoreticalSpectrum {
 	double getAngleDistance(cPeaksList& theoreticalpeaks, int start, int stop);
 
 	// generate isotope patterns of fragment ions
-	void generateFragmentIsotopePatterns(int& theoreticalpeaksrealsize, bool writedescription);
+	void generateFragmentIsotopePatterns(int& theoreticalpeaksrealsize, bool writedescription, unordered_map<string, int>* isotopeformuladesctoid);
+
+	// fill annotations of experimental peaks and remove unmatched theoretical peaks
+	void fillExperimentalAnnotationsAndRemoveUnmatchedTheoreticalPeaks(int& theoreticalpeaksrealsize, ePeptideType peptidetype, cPeaksList& unmatchedpeaksinmatchedpatterns, bool reportunmatchedtheoreticalpeaks, bool writedescription);
 
 public:
 
@@ -244,9 +249,11 @@ public:
 		\param writedescription if true then string descriptions of peaks are filled
 		\param sequencetag reference to a regex of a sequence tag
 		\param searchedsequence reference to a regex of a searched sequence
+		\param unmatchedpeaksinmatchedpatterns unmatched peaks in matched isotope patterns
+		\param isotopeformuladesctoid a map of isotope descriptions
 		\retval int number theoretical peaks generated; -2 when the sequence tag does not match the peptide sequence candidate
 	*/ 
-	int compareBranched(cPeaksList& sortedpeaklist, cBricksDatabase& bricksdatabasewithcombinations, bool writedescription, regex& sequencetag, regex& searchedsequence);
+	int compareBranched(cPeaksList& sortedpeaklist, cBricksDatabase& bricksdatabasewithcombinations, bool writedescription, regex& sequencetag, regex& searchedsequence, cPeaksList& unmatchedpeaksinmatchedpatterns, unordered_map<string, int>* isotopeformuladesctoid);
 
 
 	/**
@@ -256,9 +263,11 @@ public:
 		\param writedescription if true then string descriptions of peaks are filled
 		\param sequencetag reference to a regex of a sequence tag
 		\param searchedsequence reference to a regex of a searched sequence
+		\param unmatchedpeaksinmatchedpatterns unmatched peaks in matched isotope patterns
+		\param isotopeformuladesctoid a map of isotope descriptions
 		\retval int number theoretical peaks generated; -2 when the sequence tag does not match the peptide sequence candidate
 	*/ 
-	int compareLinear(cPeaksList& sortedpeaklist, cBricksDatabase& bricksdatabasewithcombinations, bool writedescription, regex& sequencetag, regex& searchedsequence);
+	int compareLinear(cPeaksList& sortedpeaklist, cBricksDatabase& bricksdatabasewithcombinations, bool writedescription, regex& sequencetag, regex& searchedsequence, cPeaksList& unmatchedpeaksinmatchedpatterns, unordered_map<string, int>* isotopeformuladesctoid);
 
 
 	/**
@@ -268,9 +277,11 @@ public:
 		\param writedescription if true then string descriptions of peaks are filled
 		\param sequencetag reference to a regex of a sequence tag
 		\param searchedsequence reference to a regex of a searched sequence
+		\param unmatchedpeaksinmatchedpatterns unmatched peaks in matched isotope patterns
+		\param isotopeformuladesctoid a map of isotope descriptions
 		\retval int number theoretical peaks generated; -2 when the sequence tag does not match the peptide sequence candidate
 	*/ 
-	int compareCyclic(cPeaksList& sortedpeaklist, cBricksDatabase& bricksdatabasewithcombinations, bool writedescription, regex& sequencetag, regex& searchedsequence);
+	int compareCyclic(cPeaksList& sortedpeaklist, cBricksDatabase& bricksdatabasewithcombinations, bool writedescription, regex& sequencetag, regex& searchedsequence, cPeaksList& unmatchedpeaksinmatchedpatterns, unordered_map<string, int>* isotopeformuladesctoid);
 
 
 	/**
@@ -280,9 +291,11 @@ public:
 		\param writedescription if true then string descriptions of peaks are filled
 		\param sequencetag reference to a regex of a sequence tag
 		\param searchedsequence reference to a regex of a searched sequence
+		\param unmatchedpeaksinmatchedpatterns unmatched peaks in matched isotope patterns
+		\param isotopeformuladesctoid a map of isotope descriptions
 		\retval int number theoretical peaks generated; -2 when the sequence tag does not match the peptide sequence candidate
 	*/ 
-	int compareBranchCyclic(cPeaksList& sortedpeaklist, cBricksDatabase& bricksdatabasewithcombinations, bool writedescription, regex& sequencetag, regex& searchedsequence);
+	int compareBranchCyclic(cPeaksList& sortedpeaklist, cBricksDatabase& bricksdatabasewithcombinations, bool writedescription, regex& sequencetag, regex& searchedsequence, cPeaksList& unmatchedpeaksinmatchedpatterns, unordered_map<string, int>* isotopeformuladesctoid);
 
 
 	/**
@@ -292,9 +305,11 @@ public:
 		\param writedescription if true then string descriptions of peaks are filled
 		\param sequencetag reference to a regex of a sequence tag
 		\param searchedsequence reference to a regex of a searched sequence
+		\param unmatchedpeaksinmatchedpatterns unmatched peaks in matched isotope patterns
+		\param isotopeformuladesctoid a map of isotope descriptions
 		\retval int number theoretical peaks generated; -2 when the sequence tag does not match the peptide sequence candidate
 	*/ 
-	int compareLinearPolyketide(cPeaksList& sortedpeaklist, cBricksDatabase& bricksdatabasewithcombinations, bool writedescription, regex& sequencetag, regex& searchedsequence);
+	int compareLinearPolyketide(cPeaksList& sortedpeaklist, cBricksDatabase& bricksdatabasewithcombinations, bool writedescription, regex& sequencetag, regex& searchedsequence, cPeaksList& unmatchedpeaksinmatchedpatterns, unordered_map<string, int>* isotopeformuladesctoid);
 
 
 	/**
@@ -304,9 +319,11 @@ public:
 		\param writedescription if true then string descriptions of peaks are filled
 		\param sequencetag reference to a regex of a sequence tag
 		\param searchedsequence reference to a regex of a searched sequence
+		\param unmatchedpeaksinmatchedpatterns unmatched peaks in matched isotope patterns
+		\param isotopeformuladesctoid a map of isotope descriptions
 		\retval int number theoretical peaks generated; -2 when the sequence tag does not match the peptide sequence candidate
 	*/ 
-	int compareCyclicPolyketide(cPeaksList& sortedpeaklist, cBricksDatabase& bricksdatabasewithcombinations, bool writedescription, regex& sequencetag, regex& searchedsequence);
+	int compareCyclicPolyketide(cPeaksList& sortedpeaklist, cBricksDatabase& bricksdatabasewithcombinations, bool writedescription, regex& sequencetag, regex& searchedsequence, cPeaksList& unmatchedpeaksinmatchedpatterns, unordered_map<string, int>* isotopeformuladesctoid);
 
 
 	/**
@@ -334,8 +351,9 @@ public:
 	/**
 		\brief Finalize MS spectrum after comparison.
 		\param unmatchedpeaksinmatchedpatterns unmatched peaks in matched isotope patterns
+		\param writedescription if true then string descriptions of fragment ions are generated
 	*/
-	void finalizeMSSpectrum(cPeaksList& unmatchedpeaksinmatchedpatterns);
+	void finalizeMSSpectrum(cPeaksList& unmatchedpeaksinmatchedpatterns, bool writedescription);
 
 
 	/**
@@ -355,15 +373,30 @@ public:
 	/**
 		\brief Get the number of matched peaks between an experimental and a theoretical spectrum of a specified fragment ion type.
 		\param iontype a fragment ion type
+		\param neutrallosstype a neutral loss type
 		\retval int number of matched peaks
 	*/ 
-	int getNumberOfMatchedPeaks(eFragmentIonType iontype) const;
+	int getNumberOfMatchedPeaks(eFragmentIonType iontype, int neutrallosstype) const;
+
+
+	/**
+		\brief Get the number of matched B ions between an experimental and a theoretical spectrum.
+		\retval int number of matched peaks
+	*/
+	int getNumberOfMatchedPeaksB() const;
+
+
+	/**
+		\brief Get the number of matched Y ions between an experimental and a theoretical spectrum.
+		\retval int number of matched peaks
+	*/
+	int getNumberOfMatchedPeaksY() const;
 
 
 	/**
 		\brief Get the number of matched Y and B ions between an experimental and a theoretical spectrum.
 		\retval int number of matched peaks
-	*/ 
+	*/
 	int getNumberOfMatchedPeaksYB() const;
 
 
@@ -379,7 +412,8 @@ public:
 		\param maxcharge a charge of precursor ion
 		\param peaklistrealsize real size of the peak list
 		\param intcomposition reference to a vector of ids of bricks as integers
-		\param fragmentiontype fragment ion type which will be generated
+		\param fragmentiontype fragment ion type to be generated
+		\param neutrallosstype neutral loss type to be generated
 		\param bricksdatabase reference to a database of building blocks
 		\param writedescription if true then string descriptions of fragment ions are generated
 		\param rotationid id of a cyclic peptide
@@ -391,7 +425,7 @@ public:
 		\param leftresiduelosstype a residue type of the leftmost building block
 		\param hasfirstblockartificial true when the first block is artificial, false otherwise
 	*/ 
-	void generateNTerminalFragmentIons(int maxcharge, int& peaklistrealsize, vector<int>& intcomposition, eFragmentIonType fragmentiontype, cBricksDatabase& bricksdatabase, bool writedescription, int rotationid, vector<splitSite>& splittingsites, vector<fragmentDescription>& searchedmodifications, ePeptideType peptidetype, bool regularblocksorder, TRotationInfo* trotation = 0, eResidueLossType leftresiduelosstype = h2o_loss, bool hasfirstblockartificial = false);
+	void generateNTerminalFragmentIons(int maxcharge, int& peaklistrealsize, vector<int>& intcomposition, eFragmentIonType fragmentiontype, int neutrallosstype, cBricksDatabase& bricksdatabase, bool writedescription, int rotationid, vector<splitSite>& splittingsites, vector<fragmentDescription>& searchedmodifications, ePeptideType peptidetype, bool regularblocksorder, TRotationInfo* trotation = 0, eResidueLossType leftresiduelosstype = h2o_loss, bool hasfirstblockartificial = false);
 	
 
 	/**
@@ -399,7 +433,8 @@ public:
 		\param maxcharge a charge of precursor ion
 		\param peaklistrealsize real size of the peak list
 		\param intcomposition reference to a vector of ids of bricks as integers
-		\param fragmentiontype fragment ion type which will be generated
+		\param fragmentiontype fragment ion type to be generated
+		\param neutrallosstype neutral loss type to be generated
 		\param bricksdatabase reference to a database of building blocks
 		\param writedescription if true then string descriptions of fragment ions are generated
 		\param rotationid id of a cyclic peptide
@@ -411,7 +446,7 @@ public:
 		\param rightresiduelosstype a residue type of the rightmost building block
 		\param haslastblockartificial true when the last block is artificial, false otherwise
 	*/ 
-	void generateCTerminalFragmentIons(int maxcharge, int& peaklistrealsize, vector<int>& intcomposition, eFragmentIonType fragmentiontype, cBricksDatabase& bricksdatabase, bool writedescription, int rotationid, vector<splitSite>& splittingsites, vector<fragmentDescription>& searchedmodifications, ePeptideType peptidetype, bool regularblocksorder, TRotationInfo* trotation = 0, eResidueLossType rightresiduelosstype = h2o_loss, bool haslastblockartificial = false);
+	void generateCTerminalFragmentIons(int maxcharge, int& peaklistrealsize, vector<int>& intcomposition, eFragmentIonType fragmentiontype, int neutrallosstype, cBricksDatabase& bricksdatabase, bool writedescription, int rotationid, vector<splitSite>& splittingsites, vector<fragmentDescription>& searchedmodifications, ePeptideType peptidetype, bool regularblocksorder, TRotationInfo* trotation = 0, eResidueLossType rightresiduelosstype = h2o_loss, bool haslastblockartificial = false);
 
 
 	/**
@@ -432,7 +467,7 @@ public:
 		\brief Get the sum of relative intensities of matched peaks.
 		\retval double sum of relative intensities of matched peaks
 	*/ 
-	double getWeightedIntensityScore() const;
+	double getSumOfRelativeIntensities() const;
 
 
 	/**
@@ -504,13 +539,6 @@ public:
 		\param searchedsequence searched sequence
 	*/
 	void setValidSequence(regex& searchedsequence);
-
-
-	/**
-		\brief Get the number of matched bricks.
-		\retval int number of matched bricks
-	*/ 
-	int getNumberOfMatchedBricks() const;
 
 
 	/**

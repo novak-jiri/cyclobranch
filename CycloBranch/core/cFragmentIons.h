@@ -943,185 +943,26 @@ double uncharge(double mzratio, int charge);
 */
 enum eFragmentIonType {
 	a_ion = 1,
-	a_ion_dehydrated,
-	a_ion_deamidated,
-	a_ion_dehydrated_dehydrated,
-	a_ion_deamidated_deamidated,
-	a_ion_dehydrated_deamidated,
-	a_ion_dehydrated_dehydrated_dehydrated,
-	a_ion_deamidated_deamidated_deamidated,
-	a_ion_dehydrated_dehydrated_deamidated,
-	a_ion_dehydrated_deamidated_deamidated,
-	a_ion_dehydrated_dehydrated_dehydrated_dehydrated,
-	a_ion_deamidated_deamidated_deamidated_deamidated,
-	a_ion_dehydrated_dehydrated_dehydrated_deamidated,
-	a_ion_dehydrated_dehydrated_deamidated_deamidated,
-	a_ion_dehydrated_deamidated_deamidated_deamidated,
 	b_ion,
-	b_ion_dehydrated,
-	b_ion_deamidated,
-	b_ion_dehydrated_dehydrated,
-	b_ion_deamidated_deamidated,
-	b_ion_dehydrated_deamidated,
-	b_ion_dehydrated_dehydrated_dehydrated,
-	b_ion_deamidated_deamidated_deamidated,
-	b_ion_dehydrated_dehydrated_deamidated,
-	b_ion_dehydrated_deamidated_deamidated,
-	b_ion_dehydrated_dehydrated_dehydrated_dehydrated,
-	b_ion_deamidated_deamidated_deamidated_deamidated,
-	b_ion_dehydrated_dehydrated_dehydrated_deamidated,
-	b_ion_dehydrated_dehydrated_deamidated_deamidated,
-	b_ion_dehydrated_deamidated_deamidated_deamidated,
 	c_ion,
-	c_ion_dehydrated,
-	c_ion_deamidated,
-	c_ion_dehydrated_dehydrated,
-	c_ion_deamidated_deamidated,
-	c_ion_dehydrated_deamidated,
-	c_ion_dehydrated_dehydrated_dehydrated,
-	c_ion_deamidated_deamidated_deamidated,
-	c_ion_dehydrated_dehydrated_deamidated,
-	c_ion_dehydrated_deamidated_deamidated,
-	c_ion_dehydrated_dehydrated_dehydrated_dehydrated,
-	c_ion_deamidated_deamidated_deamidated_deamidated,
-	c_ion_dehydrated_dehydrated_dehydrated_deamidated,
-	c_ion_dehydrated_dehydrated_deamidated_deamidated,
-	c_ion_dehydrated_deamidated_deamidated_deamidated,
 	x_ion,
-	x_ion_dehydrated,
-	x_ion_deamidated,
-	x_ion_dehydrated_dehydrated,
-	x_ion_deamidated_deamidated,
-	x_ion_dehydrated_deamidated,
-	x_ion_dehydrated_dehydrated_dehydrated,
-	x_ion_deamidated_deamidated_deamidated,
-	x_ion_dehydrated_dehydrated_deamidated,
-	x_ion_dehydrated_deamidated_deamidated,
-	x_ion_dehydrated_dehydrated_dehydrated_dehydrated,
-	x_ion_deamidated_deamidated_deamidated_deamidated,
-	x_ion_dehydrated_dehydrated_dehydrated_deamidated,
-	x_ion_dehydrated_dehydrated_deamidated_deamidated,
-	x_ion_dehydrated_deamidated_deamidated_deamidated,
 	y_ion,
-	y_ion_dehydrated,
-	y_ion_deamidated,
-	y_ion_dehydrated_dehydrated,
-	y_ion_deamidated_deamidated,
-	y_ion_dehydrated_deamidated,
-	y_ion_dehydrated_dehydrated_dehydrated,
-	y_ion_deamidated_deamidated_deamidated,
-	y_ion_dehydrated_dehydrated_deamidated,
-	y_ion_dehydrated_deamidated_deamidated,
-	y_ion_dehydrated_dehydrated_dehydrated_dehydrated,
-	y_ion_deamidated_deamidated_deamidated_deamidated,
-	y_ion_dehydrated_dehydrated_dehydrated_deamidated,
-	y_ion_dehydrated_dehydrated_deamidated_deamidated,
-	y_ion_dehydrated_deamidated_deamidated_deamidated,
 	z_ion,
-	z_ion_dehydrated,
-	z_ion_deamidated,
-	z_ion_dehydrated_dehydrated,
-	z_ion_deamidated_deamidated,
-	z_ion_dehydrated_deamidated,
-	z_ion_dehydrated_dehydrated_dehydrated,
-	z_ion_deamidated_deamidated_deamidated,
-	z_ion_dehydrated_dehydrated_deamidated,
-	z_ion_dehydrated_deamidated_deamidated,
-	z_ion_dehydrated_dehydrated_dehydrated_dehydrated,
-	z_ion_deamidated_deamidated_deamidated_deamidated,
-	z_ion_dehydrated_dehydrated_dehydrated_deamidated,
-	z_ion_dehydrated_dehydrated_deamidated_deamidated,
-	z_ion_dehydrated_deamidated_deamidated_deamidated,
 	precursor_ion,
-	precursor_ion_dehydrated,
-	precursor_ion_deamidated,
-	precursor_ion_dehydrated_dehydrated,
-	precursor_ion_deamidated_deamidated,
-	precursor_ion_dehydrated_deamidated,
-	precursor_ion_dehydrated_dehydrated_dehydrated,
-	precursor_ion_deamidated_deamidated_deamidated,
-	precursor_ion_dehydrated_dehydrated_deamidated,
-	precursor_ion_dehydrated_deamidated_deamidated,
-	precursor_ion_dehydrated_dehydrated_dehydrated_dehydrated,
-	precursor_ion_deamidated_deamidated_deamidated_deamidated,
-	precursor_ion_dehydrated_dehydrated_dehydrated_deamidated,
-	precursor_ion_dehydrated_dehydrated_deamidated_deamidated,
-	precursor_ion_dehydrated_deamidated_deamidated_deamidated,
-	precursor_ion_co_loss,
-	precursor_ion_co_loss_dehydrated,
-	precursor_ion_co_loss_deamidated,
-	precursor_ion_co_loss_dehydrated_dehydrated,
-	precursor_ion_co_loss_deamidated_deamidated,
-	precursor_ion_co_loss_dehydrated_deamidated,
-	precursor_ion_co_loss_dehydrated_dehydrated_dehydrated,
-	precursor_ion_co_loss_deamidated_deamidated_deamidated,
-	precursor_ion_co_loss_dehydrated_dehydrated_deamidated,
-	precursor_ion_co_loss_dehydrated_deamidated_deamidated,
-	precursor_ion_co_loss_dehydrated_dehydrated_dehydrated_dehydrated,
-	precursor_ion_co_loss_deamidated_deamidated_deamidated_deamidated,
-	precursor_ion_co_loss_dehydrated_dehydrated_dehydrated_deamidated,
-	precursor_ion_co_loss_dehydrated_dehydrated_deamidated_deamidated,
-	precursor_ion_co_loss_dehydrated_deamidated_deamidated_deamidated,
-	precursor_ion_co_loss_co_loss,
-	precursor_ion_co_loss_co_loss_dehydrated,
-	precursor_ion_co_loss_co_loss_deamidated,
-	precursor_ion_co_loss_co_loss_dehydrated_dehydrated,
-	precursor_ion_co_loss_co_loss_deamidated_deamidated,
-	precursor_ion_co_loss_co_loss_dehydrated_deamidated,
-	precursor_ion_co_loss_co_loss_dehydrated_dehydrated_dehydrated,
-	precursor_ion_co_loss_co_loss_deamidated_deamidated_deamidated,
-	precursor_ion_co_loss_co_loss_dehydrated_dehydrated_deamidated,
-	precursor_ion_co_loss_co_loss_dehydrated_deamidated_deamidated,
-	precursor_ion_co_loss_co_loss_dehydrated_dehydrated_dehydrated_dehydrated,
-	precursor_ion_co_loss_co_loss_deamidated_deamidated_deamidated_deamidated,
-	precursor_ion_co_loss_co_loss_dehydrated_dehydrated_dehydrated_deamidated,
-	precursor_ion_co_loss_co_loss_dehydrated_dehydrated_deamidated_deamidated,
-	precursor_ion_co_loss_co_loss_dehydrated_deamidated_deamidated_deamidated,
 	cyclic_precursor_ion,
-	cyclic_precursor_ion_dehydrated,
-	cyclic_precursor_ion_deamidated,
-	cyclic_precursor_ion_dehydrated_dehydrated,
-	cyclic_precursor_ion_deamidated_deamidated,
-	cyclic_precursor_ion_dehydrated_deamidated,
-	cyclic_precursor_ion_dehydrated_dehydrated_dehydrated,
-	cyclic_precursor_ion_deamidated_deamidated_deamidated,
-	cyclic_precursor_ion_dehydrated_dehydrated_deamidated,
-	cyclic_precursor_ion_dehydrated_deamidated_deamidated,
-	cyclic_precursor_ion_dehydrated_dehydrated_dehydrated_dehydrated,
-	cyclic_precursor_ion_deamidated_deamidated_deamidated_deamidated,
-	cyclic_precursor_ion_dehydrated_dehydrated_dehydrated_deamidated,
-	cyclic_precursor_ion_dehydrated_dehydrated_deamidated_deamidated,
-	cyclic_precursor_ion_dehydrated_deamidated_deamidated_deamidated,
-	cyclic_precursor_ion_co_loss,
-	cyclic_precursor_ion_co_loss_dehydrated,
-	cyclic_precursor_ion_co_loss_deamidated,
-	cyclic_precursor_ion_co_loss_dehydrated_dehydrated,
-	cyclic_precursor_ion_co_loss_deamidated_deamidated,
-	cyclic_precursor_ion_co_loss_dehydrated_deamidated,
-	cyclic_precursor_ion_co_loss_dehydrated_dehydrated_dehydrated,
-	cyclic_precursor_ion_co_loss_deamidated_deamidated_deamidated,
-	cyclic_precursor_ion_co_loss_dehydrated_dehydrated_deamidated,
-	cyclic_precursor_ion_co_loss_dehydrated_deamidated_deamidated,
-	cyclic_precursor_ion_co_loss_dehydrated_dehydrated_dehydrated_dehydrated,
-	cyclic_precursor_ion_co_loss_deamidated_deamidated_deamidated_deamidated,
-	cyclic_precursor_ion_co_loss_dehydrated_dehydrated_dehydrated_deamidated,
-	cyclic_precursor_ion_co_loss_dehydrated_dehydrated_deamidated_deamidated,
-	cyclic_precursor_ion_co_loss_dehydrated_deamidated_deamidated_deamidated,
-	cyclic_precursor_ion_co_loss_co_loss,
-	cyclic_precursor_ion_co_loss_co_loss_dehydrated,
-	cyclic_precursor_ion_co_loss_co_loss_deamidated,
-	cyclic_precursor_ion_co_loss_co_loss_dehydrated_dehydrated,
-	cyclic_precursor_ion_co_loss_co_loss_deamidated_deamidated,
-	cyclic_precursor_ion_co_loss_co_loss_dehydrated_deamidated,
-	cyclic_precursor_ion_co_loss_co_loss_dehydrated_dehydrated_dehydrated,
-	cyclic_precursor_ion_co_loss_co_loss_deamidated_deamidated_deamidated,
-	cyclic_precursor_ion_co_loss_co_loss_dehydrated_dehydrated_deamidated,
-	cyclic_precursor_ion_co_loss_co_loss_dehydrated_deamidated_deamidated,
-	cyclic_precursor_ion_co_loss_co_loss_dehydrated_dehydrated_dehydrated_dehydrated,
-	cyclic_precursor_ion_co_loss_co_loss_deamidated_deamidated_deamidated_deamidated,
-	cyclic_precursor_ion_co_loss_co_loss_dehydrated_dehydrated_dehydrated_deamidated,
-	cyclic_precursor_ion_co_loss_co_loss_dehydrated_dehydrated_deamidated_deamidated,
-	cyclic_precursor_ion_co_loss_co_loss_dehydrated_deamidated_deamidated_deamidated,
+	l0h_ion,
+	l1h_ion,
+	l2h_ion,
+	r1h_ion,
+	r2h_ion,
+	l1oh_ion,
+	l2oh_ion,
+	r1oh_ion,
+	r2oh_ion,
+	linear_polyketide_precursor_ion_h_h,
+	linear_polyketide_precursor_ion_h_oh,
+	linear_polyketide_precursor_ion_oh_oh,
+	cyclic_polyketide_precursor_ion,
 	ms_Hplus,
 	ms_Naplus,
 	ms_Kplus,
@@ -1145,6 +986,8 @@ enum eFragmentIonType {
 	ms_3MFe4H,
 	ms_3M2Fe7H,
 	ms_NH4plus,
+	ms_plus,
+	ms_minus,
 	ms_liplus,
 	ms_MMgH,
 	ms_MMg2HNa,
@@ -1194,162 +1037,6 @@ enum eFragmentIonType {
 	ms_MGa3HNa,
 	ms_MGa3HK,
 	ms_MGa4H,
-	l0h_ion,
-	l0h_ion_dehydrated,
-	l0h_ion_deamidated,
-	l0h_ion_dehydrated_dehydrated,
-	l0h_ion_deamidated_deamidated,
-	l0h_ion_dehydrated_deamidated,
-	l0h_ion_co_loss,
-	l0h_ion_co_loss_dehydrated,
-	l0h_ion_co_loss_deamidated,
-	l0h_ion_co_loss_dehydrated_dehydrated,
-	l0h_ion_co_loss_deamidated_deamidated,
-	l0h_ion_co_loss_dehydrated_deamidated,
-	l1h_ion,
-	l1h_ion_dehydrated,
-	l1h_ion_deamidated,
-	l1h_ion_dehydrated_dehydrated,
-	l1h_ion_deamidated_deamidated,
-	l1h_ion_dehydrated_deamidated,
-	l1h_ion_co_loss,
-	l1h_ion_co_loss_dehydrated,
-	l1h_ion_co_loss_deamidated,
-	l1h_ion_co_loss_dehydrated_dehydrated,
-	l1h_ion_co_loss_deamidated_deamidated,
-	l1h_ion_co_loss_dehydrated_deamidated,
-	l2h_ion,
-	l2h_ion_dehydrated,
-	l2h_ion_deamidated,
-	l2h_ion_dehydrated_dehydrated,
-	l2h_ion_deamidated_deamidated,
-	l2h_ion_dehydrated_deamidated,
-	l2h_ion_co_loss,
-	l2h_ion_co_loss_dehydrated,
-	l2h_ion_co_loss_deamidated,
-	l2h_ion_co_loss_dehydrated_dehydrated,
-	l2h_ion_co_loss_deamidated_deamidated,
-	l2h_ion_co_loss_dehydrated_deamidated,
-	r1h_ion,
-	r1h_ion_dehydrated,
-	r1h_ion_deamidated,
-	r1h_ion_dehydrated_dehydrated,
-	r1h_ion_deamidated_deamidated,
-	r1h_ion_dehydrated_deamidated,
-	r1h_ion_co_loss,
-	r1h_ion_co_loss_dehydrated,
-	r1h_ion_co_loss_deamidated,
-	r1h_ion_co_loss_dehydrated_dehydrated,
-	r1h_ion_co_loss_deamidated_deamidated,
-	r1h_ion_co_loss_dehydrated_deamidated,
-	r2h_ion,
-	r2h_ion_dehydrated,
-	r2h_ion_deamidated,
-	r2h_ion_dehydrated_dehydrated,
-	r2h_ion_deamidated_deamidated,
-	r2h_ion_dehydrated_deamidated,
-	r2h_ion_co_loss,
-	r2h_ion_co_loss_dehydrated,
-	r2h_ion_co_loss_deamidated,
-	r2h_ion_co_loss_dehydrated_dehydrated,
-	r2h_ion_co_loss_deamidated_deamidated,
-	r2h_ion_co_loss_dehydrated_deamidated,
-	l1oh_ion,
-	l1oh_ion_dehydrated,
-	l1oh_ion_deamidated,
-	l1oh_ion_dehydrated_dehydrated,
-	l1oh_ion_deamidated_deamidated,
-	l1oh_ion_dehydrated_deamidated,
-	l1oh_ion_co_loss,
-	l1oh_ion_co_loss_dehydrated,
-	l1oh_ion_co_loss_deamidated,
-	l1oh_ion_co_loss_dehydrated_dehydrated,
-	l1oh_ion_co_loss_deamidated_deamidated,
-	l1oh_ion_co_loss_dehydrated_deamidated,
-	l2oh_ion,
-	l2oh_ion_dehydrated,
-	l2oh_ion_deamidated,
-	l2oh_ion_dehydrated_dehydrated,
-	l2oh_ion_deamidated_deamidated,
-	l2oh_ion_dehydrated_deamidated,
-	l2oh_ion_co_loss,
-	l2oh_ion_co_loss_dehydrated,
-	l2oh_ion_co_loss_deamidated,
-	l2oh_ion_co_loss_dehydrated_dehydrated,
-	l2oh_ion_co_loss_deamidated_deamidated,
-	l2oh_ion_co_loss_dehydrated_deamidated,
-	r1oh_ion,
-	r1oh_ion_dehydrated,
-	r1oh_ion_deamidated,
-	r1oh_ion_dehydrated_dehydrated,
-	r1oh_ion_deamidated_deamidated,
-	r1oh_ion_dehydrated_deamidated,
-	r1oh_ion_co_loss,
-	r1oh_ion_co_loss_dehydrated,
-	r1oh_ion_co_loss_deamidated,
-	r1oh_ion_co_loss_dehydrated_dehydrated,
-	r1oh_ion_co_loss_deamidated_deamidated,
-	r1oh_ion_co_loss_dehydrated_deamidated,
-	r2oh_ion,
-	r2oh_ion_dehydrated,
-	r2oh_ion_deamidated,
-	r2oh_ion_dehydrated_dehydrated,
-	r2oh_ion_deamidated_deamidated,
-	r2oh_ion_dehydrated_deamidated,
-	r2oh_ion_co_loss,
-	r2oh_ion_co_loss_dehydrated,
-	r2oh_ion_co_loss_deamidated,
-	r2oh_ion_co_loss_dehydrated_dehydrated,
-	r2oh_ion_co_loss_deamidated_deamidated,
-	r2oh_ion_co_loss_dehydrated_deamidated,
-	linear_polyketide_precursor_ion_h_h,
-	linear_polyketide_precursor_ion_h_h_dehydrated,
-	linear_polyketide_precursor_ion_h_h_deamidated,
-	linear_polyketide_precursor_ion_h_h_dehydrated_dehydrated,
-	linear_polyketide_precursor_ion_h_h_deamidated_deamidated,
-	linear_polyketide_precursor_ion_h_h_dehydrated_deamidated,
-	linear_polyketide_precursor_ion_h_h_co_loss,
-	linear_polyketide_precursor_ion_h_h_co_loss_dehydrated,
-	linear_polyketide_precursor_ion_h_h_co_loss_deamidated,
-	linear_polyketide_precursor_ion_h_h_co_loss_dehydrated_dehydrated,
-	linear_polyketide_precursor_ion_h_h_co_loss_deamidated_deamidated,
-	linear_polyketide_precursor_ion_h_h_co_loss_dehydrated_deamidated,
-	linear_polyketide_precursor_ion_h_oh,
-	linear_polyketide_precursor_ion_h_oh_dehydrated,
-	linear_polyketide_precursor_ion_h_oh_deamidated,
-	linear_polyketide_precursor_ion_h_oh_dehydrated_dehydrated,
-	linear_polyketide_precursor_ion_h_oh_deamidated_deamidated,
-	linear_polyketide_precursor_ion_h_oh_dehydrated_deamidated,
-	linear_polyketide_precursor_ion_h_oh_co_loss,
-	linear_polyketide_precursor_ion_h_oh_co_loss_dehydrated,
-	linear_polyketide_precursor_ion_h_oh_co_loss_deamidated,
-	linear_polyketide_precursor_ion_h_oh_co_loss_dehydrated_dehydrated,
-	linear_polyketide_precursor_ion_h_oh_co_loss_deamidated_deamidated,
-	linear_polyketide_precursor_ion_h_oh_co_loss_dehydrated_deamidated,
-	linear_polyketide_precursor_ion_oh_oh,
-	linear_polyketide_precursor_ion_oh_oh_dehydrated,
-	linear_polyketide_precursor_ion_oh_oh_deamidated,
-	linear_polyketide_precursor_ion_oh_oh_dehydrated_dehydrated,
-	linear_polyketide_precursor_ion_oh_oh_deamidated_deamidated,
-	linear_polyketide_precursor_ion_oh_oh_dehydrated_deamidated,
-	linear_polyketide_precursor_ion_oh_oh_co_loss,
-	linear_polyketide_precursor_ion_oh_oh_co_loss_dehydrated,
-	linear_polyketide_precursor_ion_oh_oh_co_loss_deamidated,
-	linear_polyketide_precursor_ion_oh_oh_co_loss_dehydrated_dehydrated,
-	linear_polyketide_precursor_ion_oh_oh_co_loss_deamidated_deamidated,
-	linear_polyketide_precursor_ion_oh_oh_co_loss_dehydrated_deamidated,
-	cyclic_polyketide_precursor_ion,
-	cyclic_polyketide_precursor_ion_dehydrated,
-	cyclic_polyketide_precursor_ion_deamidated,
-	cyclic_polyketide_precursor_ion_dehydrated_dehydrated,
-	cyclic_polyketide_precursor_ion_deamidated_deamidated,
-	cyclic_polyketide_precursor_ion_dehydrated_deamidated,
-	cyclic_polyketide_precursor_ion_co_loss,
-	cyclic_polyketide_precursor_ion_co_loss_dehydrated,
-	cyclic_polyketide_precursor_ion_co_loss_deamidated,
-	cyclic_polyketide_precursor_ion_co_loss_dehydrated_dehydrated,
-	cyclic_polyketide_precursor_ion_co_loss_deamidated_deamidated,
-	cyclic_polyketide_precursor_ion_co_loss_dehydrated_deamidated,
 	fragmentIonTypeEnd
 };
 
@@ -1402,12 +1089,6 @@ struct fragmentDescription {
 
 
 	/**
-		\brief Parent fragment type.
-	*/ 
-	eFragmentIonType parent;
-
-
-	/**
 		\brief True when the fragment is charged positively; false when the fragment is charged negatively.
 	*/ 
 	bool positive;
@@ -1437,7 +1118,6 @@ struct fragmentDescription {
 		massdifference = 0;
 		nterminal = false;
 		cterminal = false;
-		parent = fragmentIonTypeEnd;
 		positive = true;
 		multiplier = 1;
 	}
@@ -1569,6 +1249,95 @@ void initializeFragmentIonsForDeNovoGraphOfLinearPolyketide(vector<eFragmentIonT
 	\param fragmentions reference to a vector of fragment ion types
 */ 
 void initializeFragmentIonsForDeNovoGraphOfCyclicPolyketide(vector<eFragmentIonType>& fragmentions);
+
+
+/**
+	\brief The structure for a detailed definition of a neutral loss.
+*/
+struct neutralLoss {
+
+	/**
+		\brief Summary formula of the loss.
+	*/
+	string summary;
+
+
+	/**
+		\brief A map of atoms corresponding to the summary formula.
+	*/
+	map<string, int> summarymap;
+
+
+	/**
+		\brief Mass difference of the loss.
+	*/
+	double massdifference;
+
+
+	/**
+		\brief The default constructor.
+	*/
+	neutralLoss() {
+		clear();
+	}
+
+
+	/**
+		\brief Clear the structure.
+	*/
+	void clear() {
+		summary = "";
+		summarymap.clear();
+		massdifference = 0;
+	}
+
+
+	/**
+		\brief Store the structure into an output stream.
+		\param os an output stream
+	*/
+	void store(ofstream& os);
+
+
+	/**
+		\brief Load the structure from an input stream.
+		\param is an input stream
+	*/
+	void load(ifstream& is);
+
+};
+
+
+/**
+	\brief The class representing a vector of default neutral losses.
+*/
+class cDefaultNeutralLosses {
+
+	vector<string> neutrallosses;
+
+public:
+
+	/**
+		\brief The constructor.
+	*/
+	cDefaultNeutralLosses();
+
+
+	/**
+		\brief Get the vector of neutral losses.
+		\retval vector<string> vector of neutral losses
+	*/	
+	vector<string>& getNeutralLosses() {
+		return neutrallosses;
+	}
+
+};
+
+
+/**
+	\brief Default neutral losses definitions.
+*/
+extern cDefaultNeutralLosses defaultneutrallosses;
 
 
 /**

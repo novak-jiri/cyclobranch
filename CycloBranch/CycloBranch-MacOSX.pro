@@ -62,6 +62,7 @@ HEADERS += core/cBrick.h \
            gui/cModificationsProxyModel.h \
            gui/cModificationsWidget.h \
            gui/cMultipleButtonDelegate.h \
+           gui/cNeutralLossesListWidget.h \
            gui/cParametersWidget.h \
            gui/cSequenceDatabaseProxyModel.h \
            gui/cSequenceDatabaseWidget.h \
@@ -120,6 +121,7 @@ SOURCES += core/cBrick.cpp \
            gui/cModificationsProxyModel.cpp \
            gui/cModificationsWidget.cpp \
            gui/cMultipleButtonDelegate.cpp \
+           gui/cNeutralLossesListWidget.cpp \
            gui/cParametersWidget.cpp \
            gui/cSequenceDatabaseProxyModel.cpp \
            gui/cSequenceDatabaseWidget.cpp \

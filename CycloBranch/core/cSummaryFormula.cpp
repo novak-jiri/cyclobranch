@@ -555,7 +555,10 @@ cPeaksList cSummaryFormula::getIsotopePattern(double fwhm, int charge, bool posi
 
 		do {
 			cPeak peak;
-			peak.mzratio = bricksdatabase.getMassOfComposition(combarray, numberofbasicbricks) + periodictablemap[atom]*(atomcount - maximumbricksincombination);
+			peak.mzratio = bricksdatabase.getMassOfComposition(combarray, numberofbasicbricks) + periodictablemap[atom] * (atomcount - maximumbricksincombination);
+			if (it->second < 0) {
+				peak.mzratio = -peak.mzratio;
+			}
 			peak.absoluteintensity = getIntensity(bricksprobabilities, combarray, mostintenseid, atomcount - maximumbricksincombination, (int)atomisotopes.size());
 			if (writedescription) {
 				getIsotopeSummary(peak.description, bricksdatabase, combarray, mostintenseid, atomcount - maximumbricksincombination, (int)atomisotopes.size(), positive);

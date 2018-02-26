@@ -85,12 +85,19 @@ private:
 
 	cParameters* parameters;
 	cTheoreticalSpectrum* theoreticalspectrum;
+
+	string visibleionseries;
+	string visibleneutralloss;
 	int visibletrotationid;
 
 	bool reportisomers;
 
 
 private slots:
+
+	void ionSeriesChanged(QString text);
+
+	void neutralLossChanged(QString text);
 
 	void trotationChanged(int index);
 

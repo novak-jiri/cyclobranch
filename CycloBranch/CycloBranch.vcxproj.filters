@@ -455,6 +455,15 @@
     <ClCompile Include="core\cIsotopePatternCache.cpp">
       <Filter>Source Files\core</Filter>
     </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_cNeutralLossesListWidget.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_cNeutralLossesListWidget.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="gui\cNeutralLossesListWidget.cpp">
+      <Filter>Source Files\gui</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="gui\cAboutWidget.h">
@@ -578,6 +587,9 @@
       <Filter>Header Files\gui</Filter>
     </CustomBuild>
     <CustomBuild Include="gui\cChromatogramWindowWidget.h">
+      <Filter>Header Files\gui</Filter>
+    </CustomBuild>
+    <CustomBuild Include="gui\cNeutralLossesListWidget.h">
       <Filter>Header Files\gui</Filter>
     </CustomBuild>
   </ItemGroup>

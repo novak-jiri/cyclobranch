@@ -35,6 +35,9 @@ cLinearWidget::cLinearWidget() {
 	parameters = 0;
 	theoreticalspectrum = 0;
 
+	visibleionseries = "";
+	visibleneutralloss = "all";
+
 	reportisomers = false;
 }
 
@@ -188,38 +191,72 @@ void cLinearWidget::paint(QPainter& painter) {
 
 		string name;
 		int len = (int)theoreticalspectrum->getVisualCoverage()[0].series.size();
+		int coverageindex = 0;
+		bool skipiontype, skipneutralloss;
 
-		for (int i = 0; i < (int)parameters->fragmentionsfortheoreticalspectra.size(); i++) {
-			if (((parameters->peptidetype == linear) && (parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].nterminal)) ||
-				((parameters->peptidetype == linearpolyketide) && ((parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].parent == l1h_ion) || (parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].parent == l2h_ion)
-				|| (parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].parent == l1oh_ion) || (parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].parent == l2oh_ion)))) {
-				for (int j = 0; j < len; j++) {
-					if (theoreticalspectrum->getVisualCoverage()[i].series[j] > 0) {
-						if (parameters->peptidetype == linearpolyketide) {
-							name = parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].name.substr(0, 2) + to_string(j + 1) + parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].name.substr(2);
-						}
-						else {
-							name = parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].name[0] + to_string(j + 1) + parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].name.substr(1);
-						}
-						insertLabel(labels, leftmargin + horizontalstep/4 + horizontalstep/8 + horizontalstep*j + horizontalstep/2, topmargin - 35, name, false);
+		for (int i = 0; i < (int)parameters->ionsfortheoreticalspectra.size(); i++) {
+
+			skipiontype = false;
+			if ((visibleionseries.compare("") != 0) && (parameters->iondefinitions[parameters->ionsfortheoreticalspectra[i]].name.compare(visibleionseries) != 0)) {
+				skipiontype = true;
+			}
+
+			for (int j = -1; j < (int)parameters->neutrallossesfortheoreticalspectra.size(); j++) {
+
+				skipneutralloss = false;
+				if (visibleneutralloss.compare("all") != 0) {
+					if ((j == -1) && (visibleneutralloss.compare("none") != 0)) {
+						skipneutralloss = true;
+					}
+					if ((j >= 0) && (parameters->neutrallossesdefinitions[parameters->neutrallossesfortheoreticalspectra[j]].summary.compare(visibleneutralloss) != 0)) {
+						skipneutralloss = true;
 					}
 				}
-			}
-			if (((parameters->peptidetype == linear) && (parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].cterminal)) ||
-				((parameters->peptidetype == linearpolyketide) && ((parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].parent == r1h_ion) || (parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].parent == r2h_ion)
-				|| (parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].parent == r1oh_ion) || (parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].parent == r2oh_ion)))) {
-				for (int j = len - 1; j >= 0; j--) {
-					if (theoreticalspectrum->getVisualCoverage()[i].series[len - j - 1] > 0) {
-						if (parameters->peptidetype == linearpolyketide) {
-							name = parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].name.substr(0, 2) + to_string(len - j) + parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].name.substr(2);
+
+				if (!skipiontype && !skipneutralloss) {
+
+					if (((parameters->peptidetype == linear) && (parameters->iondefinitions[parameters->ionsfortheoreticalspectra[i]].nterminal))
+						|| ((parameters->peptidetype == linearpolyketide) && ((parameters->ionsfortheoreticalspectra[i] == l1h_ion) || (parameters->ionsfortheoreticalspectra[i] == l2h_ion) || (parameters->ionsfortheoreticalspectra[i] == l1oh_ion) || (parameters->ionsfortheoreticalspectra[i] == l2oh_ion)))) {
+						for (int k = 0; k < len; k++) {
+							if (theoreticalspectrum->getVisualCoverage()[coverageindex].series[k] > 0) {
+								if (parameters->peptidetype == linearpolyketide) {
+									name = parameters->iondefinitions[parameters->ionsfortheoreticalspectra[i]].name.substr(0, 2) + to_string(k + 1) + parameters->iondefinitions[parameters->ionsfortheoreticalspectra[i]].name.substr(2);
+								}
+								else {
+									name = parameters->iondefinitions[parameters->ionsfortheoreticalspectra[i]].name[0] + to_string(k + 1) + parameters->iondefinitions[parameters->ionsfortheoreticalspectra[i]].name.substr(1);
+								}
+								if (j >= 0) {
+									name += "-" + parameters->neutrallossesdefinitions[parameters->neutrallossesfortheoreticalspectra[j]].summary;
+								}
+								insertLabel(labels, leftmargin + horizontalstep / 4 + horizontalstep / 8 + horizontalstep * k + horizontalstep / 2, topmargin - 35, name, false);
+							}
 						}
-						else {
-							name = parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].name[0] + to_string(len - j) + parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].name.substr(1);
-						}
-						insertLabel(labels, leftmargin + horizontalstep*(j + 1), topmargin + 35, name, false);
 					}
+
+					if (((parameters->peptidetype == linear) && (parameters->iondefinitions[parameters->ionsfortheoreticalspectra[i]].cterminal)) ||
+						((parameters->peptidetype == linearpolyketide) && ((parameters->ionsfortheoreticalspectra[i] == r1h_ion) || (parameters->ionsfortheoreticalspectra[i] == r2h_ion) || (parameters->ionsfortheoreticalspectra[i] == r1oh_ion) || (parameters->ionsfortheoreticalspectra[i] == r2oh_ion)))) {
+						for (int k = len - 1; k >= 0; k--) {
+							if (theoreticalspectrum->getVisualCoverage()[coverageindex].series[len - k - 1] > 0) {
+								if (parameters->peptidetype == linearpolyketide) {
+									name = parameters->iondefinitions[parameters->ionsfortheoreticalspectra[i]].name.substr(0, 2) + to_string(len - k) + parameters->iondefinitions[parameters->ionsfortheoreticalspectra[i]].name.substr(2);
+								}
+								else {
+									name = parameters->iondefinitions[parameters->ionsfortheoreticalspectra[i]].name[0] + to_string(len - k) + parameters->iondefinitions[parameters->ionsfortheoreticalspectra[i]].name.substr(1);
+								}
+								if (j >= 0) {
+									name += "-" + parameters->neutrallossesdefinitions[parameters->neutrallossesfortheoreticalspectra[j]].summary;
+								}
+								insertLabel(labels, leftmargin + horizontalstep * (k + 1), topmargin + 35, name, false);
+							}
+						}
+					}
+
 				}
+
+				coverageindex++;
+
 			}
+
 		}
 
 		painter.setPen(QPen(Qt::red, 2, Qt::SolidLine));
@@ -229,5 +266,34 @@ void cLinearWidget::paint(QPainter& painter) {
 	
 	}
 	
+}
+
+
+void cLinearWidget::ionSeriesChanged(QString text) {
+	if (!parameters) {
+		visibleionseries = "";
+		return;
+	}
+
+	if (text.compare("all") == 0) {
+		visibleionseries = "";
+	}
+	else {
+		visibleionseries = text.toStdString();
+	}
+
+	repaint();
+}
+
+
+void cLinearWidget::neutralLossChanged(QString text) {
+	if (!parameters) {
+		visibleneutralloss = "all";
+		return;
+	}
+
+	visibleneutralloss = text.toStdString();
+
+	repaint();
 }
 

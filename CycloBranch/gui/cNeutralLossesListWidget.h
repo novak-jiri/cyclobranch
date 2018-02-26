@@ -1,11 +1,11 @@
 /**
-	\file cFragmentIonsListWidget.h
-	\brief The implementation of a widget where types of fragment ions generated in theoretical spectra are selected.
+	\file cNeutralLossesListWidget.h
+	\brief The implementation of a widget where types of neutral losses generated in theoretical spectra are selected.
 */
 
 
-#ifndef _CFRAGMENTIONSLISTWIDGET_H
-#define _CFRAGMENTIONSLISTWIDGET_H
+#ifndef _CNEUTRALLOSSESLISTWIDGET_H
+#define _CNEUTRALLOSSESLISTWIDGET_H
 
 #include <string>
 #include <QListWidget>
@@ -20,9 +20,9 @@ class QVBoxLayout;
 
 
 /**
-	\brief The widget for selection of fragment ion types.
+	\brief The widget for selection of types of neutral losses.
 */
-class cFragmentIonsListWidget : public QWidget
+class cNeutralLossesListWidget : public QWidget
 {
 	Q_OBJECT
 
@@ -33,13 +33,13 @@ public:
 		\brief The constructor.
 		\param parent pointer to a parent widget
 	*/ 
-	cFragmentIonsListWidget(QObject* parent);
+	cNeutralLossesListWidget(QObject* parent);
 
 
 	/**
 		\brief The destructor.
 	*/ 
-	~cFragmentIonsListWidget();
+	~cNeutralLossesListWidget();
 
 
 	/**
@@ -49,13 +49,22 @@ public:
 	QListWidget* getList();
 
 
+	/**
+		\brief Add a neutral loss.
+		\param formula summary formula of a neutral loss
+	*/
+	void addItem(QString formula);
+
+
 private:
 	QObject* parent;
 
 	QListWidget* list;
 	QPushButton* selectallbutton;
 	QPushButton* clearallbutton;
-	QPushButton* resetbutton;
+	QPushButton* addbutton;
+	QPushButton* removebutton;
+	QPushButton* defaultbutton;
 	
 	QHBoxLayout* hbox;
 	QVBoxLayout* vbox;
@@ -67,15 +76,14 @@ private slots:
 
 	void clearAllItems();
 
-	void sendResetReleased();
+	void addEmptyItem();
 
-signals:
+	void removeItem();
 
-	/**
-		\brief Reset button has been released.
-	*/ 
-	void resetReleased();
+	void setDefaultItems();
 
+	void setHCON();
+	
 };
 
 #endif

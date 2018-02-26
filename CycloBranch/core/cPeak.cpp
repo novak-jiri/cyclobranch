@@ -25,6 +25,7 @@ cPeak& cPeak::operator=(const cPeak& peak) {
 	matchedabsoluteintensity = peak.matchedabsoluteintensity;
 	matchedppm = peak.matchedppm;
 	iontype = peak.iontype;
+	neutrallosstype = peak.neutrallosstype;
 	matched = peak.matched;
 	matchedid = peak.matchedid;
 	charge = peak.charge;
@@ -56,6 +57,7 @@ void cPeak::clear() {
 	matchedabsoluteintensity = 0;
 	matchedppm = 0;
 	iontype = fragmentIonTypeEnd;
+	neutrallosstype = -1;
 	matched = 0;
 	matchedid = -1;
 	charge = 1;
@@ -91,6 +93,7 @@ void cPeak::store(ofstream& os) {
 	os.write((char *)&matchedabsoluteintensity, sizeof(double));
 	os.write((char *)&matchedppm, sizeof(double));
 	os.write((char *)&iontype, sizeof(eFragmentIonType));
+	os.write((char *)&neutrallosstype, sizeof(int));
 	os.write((char *)&matched, sizeof(int));
 	os.write((char *)&matchedid, sizeof(int));
 	os.write((char *)&charge, sizeof(int));
@@ -119,6 +122,7 @@ void cPeak::load(ifstream& is) {
 	is.read((char *)&matchedabsoluteintensity, sizeof(double));
 	is.read((char *)&matchedppm, sizeof(double));
 	is.read((char *)&iontype, sizeof(eFragmentIonType));
+	is.read((char *)&neutrallosstype, sizeof(int));
 	is.read((char *)&matched, sizeof(int));
 	is.read((char *)&matchedid, sizeof(int));
 	is.read((char *)&charge, sizeof(int));

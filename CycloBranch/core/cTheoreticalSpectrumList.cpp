@@ -95,20 +95,19 @@ int cTheoreticalSpectrumList::parallelCompareAndStore(cCandidateSet& candidates,
 	string stmp;
 	
 	cBricksDatabase* bricksdb = 0;
-	switch (parameters->mode)
-	{
-	case denovoengine:
-		bricksdb = graph->getBrickDatabaseWithCombinations();
-		break;
-	case singlecomparison:
-		bricksdb = &parameters->bricksdatabase;
-		break;
-	case databasesearch:
-		bricksdb = &parameters->bricksdatabase;
-		break;
-	default:
-		return -1;
-		break;
+	switch (parameters->mode) {
+		case denovoengine:
+			bricksdb = graph->getBrickDatabaseWithCombinations();
+			break;
+		case singlecomparison:
+			bricksdb = &parameters->bricksdatabase;
+			break;
+		case databasesearch:
+			bricksdb = &parameters->bricksdatabase;
+			break;
+		default:
+			return -1;
+			break;
 	}
 	
 	vector<cTheoreticalSpectrum> resultspectra;
@@ -246,6 +245,7 @@ int cTheoreticalSpectrumList::parallelCompareAndStore(cCandidateSet& candidates,
 	*os << " ok" << endl << endl << "Preparing the report... " << endl;
 
 	// fill descriptions of peaks
+	cPeaksList unmatchedpeaksinmatchedpatterns;
 	resultspectra.resize(theoreticalspectra.size());
 	for (int i = 0; i < (int)theoreticalspectra.size(); i++) {
 
@@ -255,24 +255,26 @@ int cTheoreticalSpectrumList::parallelCompareAndStore(cCandidateSet& candidates,
 
 		theoreticalspectra[i].clear(true);
 
+		unmatchedpeaksinmatchedpatterns.clear();
+
 		switch (parameters->peptidetype) {
 			case linear:
-				theoreticalpeaksrealsize = tsp.compareLinear(peaklist, *bricksdb, true, rxsequencetag, rxsearchedsequence);
+				theoreticalpeaksrealsize = tsp.compareLinear(peaklist, *bricksdb, true, rxsequencetag, rxsearchedsequence, unmatchedpeaksinmatchedpatterns, &isotopeformuladesctoid);
 				break;
 			case cyclic:
-				theoreticalpeaksrealsize = tsp.compareCyclic(peaklist, *bricksdb, true, rxsequencetag, rxsearchedsequence);
+				theoreticalpeaksrealsize = tsp.compareCyclic(peaklist, *bricksdb, true, rxsequencetag, rxsearchedsequence, unmatchedpeaksinmatchedpatterns, &isotopeformuladesctoid);
 				break;
 			case branched:
-				theoreticalpeaksrealsize = tsp.compareBranched(peaklist, *bricksdb, true, rxsequencetag, rxsearchedsequence);
+				theoreticalpeaksrealsize = tsp.compareBranched(peaklist, *bricksdb, true, rxsequencetag, rxsearchedsequence, unmatchedpeaksinmatchedpatterns, &isotopeformuladesctoid);
 				break;
 			case branchcyclic:
-				theoreticalpeaksrealsize = tsp.compareBranchCyclic(peaklist, *bricksdb, true, rxsequencetag, rxsearchedsequence);
+				theoreticalpeaksrealsize = tsp.compareBranchCyclic(peaklist, *bricksdb, true, rxsequencetag, rxsearchedsequence, unmatchedpeaksinmatchedpatterns, &isotopeformuladesctoid);
 				break;
 			case linearpolyketide:
-				theoreticalpeaksrealsize = tsp.compareLinearPolyketide(peaklist, *bricksdb, true, rxsequencetag, rxsearchedsequence);
+				theoreticalpeaksrealsize = tsp.compareLinearPolyketide(peaklist, *bricksdb, true, rxsequencetag, rxsearchedsequence, unmatchedpeaksinmatchedpatterns, &isotopeformuladesctoid);
 				break;
 			case cyclicpolyketide:
-				theoreticalpeaksrealsize = tsp.compareCyclicPolyketide(peaklist, *bricksdb, true, rxsequencetag, rxsearchedsequence);
+				theoreticalpeaksrealsize = tsp.compareCyclicPolyketide(peaklist, *bricksdb, true, rxsequencetag, rxsearchedsequence, unmatchedpeaksinmatchedpatterns, &isotopeformuladesctoid);
 				break;
 			case other:
 				break;
@@ -284,10 +286,11 @@ int cTheoreticalSpectrumList::parallelCompareAndStore(cCandidateSet& candidates,
 		if (theoreticalpeaksrealsize == -2) {
 			continue;
 		}
+
 		resultspectra[i] = tsp;
 		resultspectra[i].resizePeakList(theoreticalpeaksrealsize);
 		resultspectra[i].getTheoreticalPeaks()->reducePeakDescriptions(peakdesctoid);
-		resultspectra[i].getTheoreticalPeaks()->reduceIsotopeFormulaDescriptions(isotopeformuladesctoid);
+		//resultspectra[i].getTheoreticalPeaks()->reduceIsotopeFormulaDescriptions(isotopeformuladesctoid);
 
 		if ((i + 1) % 100 == 0) {
 			*os << ".";
@@ -362,30 +365,23 @@ double cTheoreticalSpectrumList::updatekNNList(cTheoreticalSpectrum& theoretical
 
 	bool (*comparatorfunction)(const cTheoreticalSpectrum&, const cTheoreticalSpectrum&);
 
-	switch (parameters->scoretype) {
-		case b_ions:
-			comparatorfunction = &compareBandAllIonsDesc;
-			break;
-		case b_ions_and_b_dehydrated_ions:
-			comparatorfunction = &compareBBwaterLossAndAllIonsDesc;
-			break;
-		case b_ions_and_b_deamidated_ions:
-			comparatorfunction = &compareBBammoniaLossAndAllIonsDesc;
-			break;
-		case y_ions_and_b_ions:
-			comparatorfunction = &compareYBandAllIonsDesc;
-			break;
-		case y_ions:
-			comparatorfunction = &compareYandAllIonsDesc;
-			break;
-		case weighted_intensity:
-			comparatorfunction = &compareWeightedIntensityDesc;
-			break;
-		case matched_peaks:
+	switch (parameters->scoretype)	{
+		case number_of_matched_peaks:
 			comparatorfunction = &compareNumberOfMatchedPeaksDesc;
 			break;
-		case matched_bricks:
-			comparatorfunction = &compareNumberOfMatchedBricksDesc;
+		case sum_of_relative_intensities:
+			comparatorfunction = &compareSumOfRelIntDesc;
+			break;
+		case number_of_b_ions:
+			comparatorfunction = &compareBandAllIonsDesc;
+			break;
+		case number_of_y_ions:
+			comparatorfunction = &compareYandAllIonsDesc;
+			break;
+		case number_of_b_and_y_ions:
+			comparatorfunction = &compareYBandAllIonsDesc;
+			break;
+		default:
 			break;
 	}
 
@@ -397,29 +393,22 @@ double cTheoreticalSpectrumList::updatekNNList(cTheoreticalSpectrum& theoretical
 		double currentscore = 0;
 
 		switch (parameters->scoretype) {
-			case b_ions:
-				currentscore = it1->getNumberOfMatchedPeaks(b_ion);
-				break;
-			case b_ions_and_b_dehydrated_ions:
-				currentscore = it1->getNumberOfMatchedPeaks(b_ion) + it1->getNumberOfMatchedPeaks(b_ion_dehydrated);
-				break;
-			case b_ions_and_b_deamidated_ions:
-				currentscore = it1->getNumberOfMatchedPeaks(b_ion) + it1->getNumberOfMatchedPeaks(b_ion_deamidated);
-				break;
-			case y_ions_and_b_ions:
-				currentscore = it1->getNumberOfMatchedPeaksYB();
-				break;
-			case y_ions:
-				currentscore = it1->getNumberOfMatchedPeaks(y_ion);
-				break;
-			case weighted_intensity:
-				currentscore = it1->getWeightedIntensityScore();
-				break;
-			case matched_peaks:
+			case number_of_matched_peaks:
 				currentscore = it1->getNumberOfMatchedPeaks();
 				break;
-			case matched_bricks:
-				currentscore = it1->getNumberOfMatchedBricks();
+			case sum_of_relative_intensities:
+				currentscore = it1->getSumOfRelativeIntensities();
+				break;
+			case number_of_b_ions:
+				currentscore = it1->getNumberOfMatchedPeaksB();
+				break;
+			case number_of_y_ions:
+				currentscore = it1->getNumberOfMatchedPeaksY();
+				break;
+			case number_of_b_and_y_ions:
+				currentscore = it1->getNumberOfMatchedPeaksYB();
+				break;
+			default:
 				break;
 		}
 
@@ -439,32 +428,24 @@ double cTheoreticalSpectrumList::updatekNNList(cTheoreticalSpectrum& theoretical
 		spectrumbuffer.pop_back();
 
 		switch (parameters->scoretype) {
-			case b_ions:
-				currentworstscore = prev(spectrumbuffer.end())->getNumberOfMatchedPeaks(b_ion);
-				break;
-			case b_ions_and_b_dehydrated_ions:
-				currentworstscore = prev(spectrumbuffer.end())->getNumberOfMatchedPeaks(b_ion) + prev(spectrumbuffer.end())->getNumberOfMatchedPeaks(b_ion_dehydrated);
-				break;
-			case b_ions_and_b_deamidated_ions:
-				currentworstscore = prev(spectrumbuffer.end())->getNumberOfMatchedPeaks(b_ion) + prev(spectrumbuffer.end())->getNumberOfMatchedPeaks(b_ion_deamidated);
-				break;
-			case y_ions_and_b_ions:
-				currentworstscore = prev(spectrumbuffer.end())->getNumberOfMatchedPeaksYB();
-				break;
-			case y_ions:
-				currentworstscore = prev(spectrumbuffer.end())->getNumberOfMatchedPeaks(y_ion);
-				break;
-			case weighted_intensity:
-				currentworstscore = prev(spectrumbuffer.end())->getWeightedIntensityScore();
-				break;
-			case matched_peaks:
+			case number_of_matched_peaks:
 				currentworstscore = prev(spectrumbuffer.end())->getNumberOfMatchedPeaks();
 				break;
-			case matched_bricks:
-				currentworstscore = prev(spectrumbuffer.end())->getNumberOfMatchedBricks();
+			case sum_of_relative_intensities:
+				currentworstscore = prev(spectrumbuffer.end())->getSumOfRelativeIntensities();
+				break;
+			case number_of_b_ions:
+				currentworstscore = prev(spectrumbuffer.end())->getNumberOfMatchedPeaksB();
+				break;
+			case number_of_y_ions:
+				currentworstscore = prev(spectrumbuffer.end())->getNumberOfMatchedPeaksY();
+				break;
+			case number_of_b_and_y_ions:
+				currentworstscore = prev(spectrumbuffer.end())->getNumberOfMatchedPeaksYB();
+				break;
+			default:
 				break;
 		}
-
 	}
 
 	return currentworstscore;
@@ -474,29 +455,22 @@ double cTheoreticalSpectrumList::updatekNNList(cTheoreticalSpectrum& theoretical
 void cTheoreticalSpectrumList::sortAndFitSize() {
 
 	switch (parameters->scoretype) {
-		case b_ions:
-			sort(theoreticalspectra.begin(), theoreticalspectra.end(), compareBandAllIonsDesc);
-			break;
-		case b_ions_and_b_dehydrated_ions:
-			sort(theoreticalspectra.begin(), theoreticalspectra.end(), compareBBwaterLossAndAllIonsDesc);
-			break;
-		case b_ions_and_b_deamidated_ions:
-			sort(theoreticalspectra.begin(), theoreticalspectra.end(), compareBBammoniaLossAndAllIonsDesc);
-			break;
-		case y_ions_and_b_ions:
-			sort(theoreticalspectra.begin(), theoreticalspectra.end(), compareYBandAllIonsDesc);
-			break;
-		case y_ions:
-			sort(theoreticalspectra.begin(), theoreticalspectra.end(), compareYandAllIonsDesc);
-			break;
-		case weighted_intensity:
-			sort(theoreticalspectra.begin(), theoreticalspectra.end(), compareWeightedIntensityDesc);
-			break;
-		case matched_peaks:
+		case number_of_matched_peaks:
 			sort(theoreticalspectra.begin(), theoreticalspectra.end(), compareNumberOfMatchedPeaksDesc);
 			break;
-		case matched_bricks:
-			sort(theoreticalspectra.begin(), theoreticalspectra.end(), compareNumberOfMatchedBricksDesc);
+		case sum_of_relative_intensities:
+			sort(theoreticalspectra.begin(), theoreticalspectra.end(), compareSumOfRelIntDesc);
+			break;
+		case number_of_b_ions:
+			sort(theoreticalspectra.begin(), theoreticalspectra.end(), compareBandAllIonsDesc);
+			break;
+		case number_of_y_ions:
+			sort(theoreticalspectra.begin(), theoreticalspectra.end(), compareYandAllIonsDesc);
+			break;
+		case number_of_b_and_y_ions:
+			sort(theoreticalspectra.begin(), theoreticalspectra.end(), compareYBandAllIonsDesc);
+			break;
+		default:
 			break;
 	}
 

@@ -12,42 +12,42 @@ cFragmentIonsListWidget::cFragmentIonsListWidget(QObject* parent) {
 	hbox = new QHBoxLayout();
 
 	list = new QListWidget();
-	list->setMinimumHeight(280);
-	list->setMaximumHeight(280);
+	list->setMinimumHeight(110);
+	list->setMaximumHeight(110);
 	list->setSelectionMode(QAbstractItemView::MultiSelection);
 
-	selectall = new QPushButton("Select All");
-	selectall->setToolTip("Select all ion types in the list.");
-	clearall = new QPushButton("Clear All");
-	clearall->setToolTip("Unselect all ion types in the list.");
-	reset = new QPushButton("Reset");
-	reset->setToolTip("Reset to the default seletion of ions.");
+	selectallbutton = new QPushButton("Select All");
+	selectallbutton->setToolTip("Select all ion types in the list.");
+	clearallbutton = new QPushButton("Clear All");
+	clearallbutton->setToolTip("Unselect all ion types in the list.");
+	resetbutton = new QPushButton("Reset");
+	resetbutton->setToolTip("Reset to the default selection of ions.");
 
-	hbox->addWidget(selectall);
-	hbox->addWidget(clearall);
-	hbox->addWidget(reset);
-	hbox->addStretch(1);
+	vbox->addWidget(selectallbutton);
+	vbox->addWidget(clearallbutton);
+	vbox->addWidget(resetbutton);
+	vbox->addStretch(1);
 
-	vbox->setMargin(0);
-	vbox->addWidget(list);
-	vbox->addLayout(hbox);
+	hbox->setMargin(0);
+	hbox->addWidget(list);
+	hbox->addLayout(vbox);
 
-	connect(selectall, SIGNAL(released()), this, SLOT(selectAllItems()));
-	connect(clearall, SIGNAL(released()), this, SLOT(clearAllItems()));
-	connect(reset, SIGNAL(released()), this, SLOT(sendResetReleased()));
+	connect(selectallbutton, SIGNAL(released()), this, SLOT(selectAllItems()));
+	connect(clearallbutton, SIGNAL(released()), this, SLOT(clearAllItems()));
+	connect(resetbutton, SIGNAL(released()), this, SLOT(sendResetReleased()));
 
-	setLayout(vbox);
+	setLayout(hbox);
 }
 
 
 cFragmentIonsListWidget::~cFragmentIonsListWidget() {
 	delete list;
-	delete selectall;
-	delete clearall;
-	delete reset;
+	delete selectallbutton;
+	delete clearallbutton;
+	delete resetbutton;
 	
-	delete hbox;
 	delete vbox;
+	delete hbox;
 }
 
 

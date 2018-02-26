@@ -134,6 +134,8 @@ int cMzML::parse(string& filename, vector<cPeaksList>& peaklists, eModeType mode
 
 
 										string title = getAttribute(currentElement3, "id");
+										bool skipspectrum = false;
+										bool isprofilespectrum = false;
 
 
 										// childrens of spectrum
@@ -150,7 +152,7 @@ int cMzML::parse(string& filename, vector<cPeaksList>& peaklists, eModeType mode
 														string accession = getAttribute(currentElement4, "accession");
 
 														if (accession.compare("MS:1000128") == 0) {			
-															profilespectra = true;
+															isprofilespectrum = true;
 														}
 
 														if (accession.compare("MS:1000511") == 0) {
@@ -158,11 +160,11 @@ int cMzML::parse(string& filename, vector<cPeaksList>& peaklists, eModeType mode
 															int level = atoi(getAttribute(currentElement4, "value").c_str());
 
 															if ((level == 1) && (mode != dereplication)) {
-																continue;
+																skipspectrum = true;
 															}
 															
 															if ((level > 1) && (mode == dereplication)) {
-																continue;
+																skipspectrum = true;
 															}
 
 														}
@@ -170,12 +172,17 @@ int cMzML::parse(string& filename, vector<cPeaksList>& peaklists, eModeType mode
 
 												}
 
-												if (compareElementTagName(currentElement4, "binaryDataArrayList")) {
+												if (!skipspectrum && compareElementTagName(currentElement4, "binaryDataArrayList")) {
 
 
 													cPeaksList peaklist;
 													bool peaklistdefined = false;
-														
+
+													
+													if (isprofilespectrum) {
+														profilespectra = true;
+													}
+
 
 													// childrens of binaryDataArrayList
 													DOMNode* currentNode5 = currentNode4->getFirstChild();

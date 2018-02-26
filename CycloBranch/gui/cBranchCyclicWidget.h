@@ -31,10 +31,12 @@ class QPaintEvent;
 	\param topmargin top margin in pixels
 	\param horizontalstep horizontal step (determine width of blocks)
 	\param verticalstep vertical step (determine height of blocks)
+	\param visibleionseries name of a ion series to be visualized
+	\param visibleneutralloss name of a neutral loss to be visualized
 	\param visiblerotationid id of a rotation whose fragment ions are visualized
 	\param branchstart starting position of a branch
 */ 
-void generateBranchLabelsDown(bool nterminal, int rotationid, unordered_set<cIonLabel, hash_cIonLabel>& labels, cParameters* parameters, cTheoreticalSpectrum* theoreticalspectrum, int centerx, int topmargin, int horizontalstep, int verticalstep, int visiblerotationid, int branchstart);
+void generateBranchLabelsDown(bool nterminal, int rotationid, unordered_set<cIonLabel, hash_cIonLabel>& labels, cParameters* parameters, cTheoreticalSpectrum* theoreticalspectrum, int centerx, int topmargin, int horizontalstep, int verticalstep, string visibleionseries, string visibleneutralloss, int visiblerotationid, int branchstart);
 
 
 /**
@@ -48,10 +50,12 @@ void generateBranchLabelsDown(bool nterminal, int rotationid, unordered_set<cIon
 	\param topmargin top margin in pixels
 	\param horizontalstep horizontal step (determine width of blocks)
 	\param verticalstep vertical step (determine height of blocks)
+	\param visibleionseries name of a ion series to be visualized
+	\param visibleneutralloss name of a neutral loss to be visualized
 	\param visiblerotationid id of a rotation whose fragment ions are visualized
 	\param branchend end position of a branch
 */ 
-void generateBranchLabelsUp(bool nterminal, int rotationid, unordered_set<cIonLabel, hash_cIonLabel>& labels, cParameters* parameters, cTheoreticalSpectrum* theoreticalspectrum, int centerx, int topmargin, int horizontalstep, int verticalstep, int visiblerotationid, int branchend);
+void generateBranchLabelsUp(bool nterminal, int rotationid, unordered_set<cIonLabel, hash_cIonLabel>& labels, cParameters* parameters, cTheoreticalSpectrum* theoreticalspectrum, int centerx, int topmargin, int horizontalstep, int verticalstep, string visibleionseries, string visibleneutralloss, int visiblerotationid, int branchend);
 
 
 /**
@@ -123,6 +127,9 @@ private:
 
 	cParameters* parameters;
 	cTheoreticalSpectrum* theoreticalspectrum;
+
+	string visibleionseries;
+	string visibleneutralloss;
 	int visiblerotationid;
 	int visibletrotationid;
 
@@ -130,6 +137,10 @@ private:
 
 
 private slots:
+
+	void ionSeriesChanged(QString text);
+
+	void neutralLossChanged(QString text);
 
 	void rotationChanged(int index);
 

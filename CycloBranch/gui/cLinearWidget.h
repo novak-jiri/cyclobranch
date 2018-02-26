@@ -173,7 +173,17 @@ private:
 	cParameters* parameters;
 	cTheoreticalSpectrum* theoreticalspectrum;
 
+	string visibleionseries;
+	string visibleneutralloss;
+
 	bool reportisomers;
+
+
+private slots:
+
+	void ionSeriesChanged(QString text);
+
+	void neutralLossChanged(QString text);
 
 };
 

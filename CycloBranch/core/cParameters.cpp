@@ -1,6 +1,7 @@
 #include "core/cParameters.h"
 
 #include "gui/cMainThread.h"
+#include "core/cSummaryFormula.h"
 
 
 cParameters::cParameters() {
@@ -11,7 +12,7 @@ cParameters::cParameters() {
 void cParameters::clear() {
 	string s = "";
 	os = 0;
-	fragmentdefinitions.recalculateFragments(false, false, s);
+	iondefinitions.recalculateFragments(false, false, s);
 	peptidetype = linear;
 	peaklistfilename = "";
 	peaklistfileformat = txt;
@@ -23,7 +24,7 @@ void cParameters::clear() {
 	precursormasserrortolerance = 5;
 	precursorcharge = 1;
 	fragmentmasserrortolerance = 5;
-	masserrortolerancefordeisotoping = 0;
+	//masserrortolerancefordeisotoping = 0;
 	minimumrelativeintensitythreshold = 1;
 	minimumabsoluteintensitythreshold = 0;
 	minimummz = 150;
@@ -39,8 +40,10 @@ void cParameters::clear() {
 	searchedmodifications.clear();
 	maximumnumberofthreads = 1;
 	mode = denovoengine;
-	scoretype = matched_peaks;
-	clearhitswithoutparent = false;
+	scoretype = number_of_matched_peaks;
+	maximumcombinedlosses = 2;
+	//clearhitswithoutparent = false;
+	reportunmatchedtheoreticalpeaks = false;
 	generateisotopepattern = false;
 	minimumpatternsize = 1;
 	cyclicnterminus = false;
@@ -62,7 +65,23 @@ void cParameters::clear() {
 	sequencedatabasefilename = "";
 
 	fragmentionsfordenovograph.clear();
-	fragmentionsfortheoreticalspectra.clear();
+	ionsfortheoreticalspectra.clear();
+
+	neutrallossesdefinitions.clear();
+	neutralLoss loss;
+	cSummaryFormula tmpformula;
+	for (int i = 0; i < (int)defaultneutrallosses.getNeutralLosses().size(); i++) {
+		loss.clear();
+		loss.summary = defaultneutrallosses.getNeutralLosses()[i];
+		addStringFormulaToMap(loss.summary, loss.summarymap);
+		tmpformula.setFormula(loss.summary);
+		loss.massdifference = tmpformula.getMass();
+		neutrallossesdefinitions.push_back(loss);
+	}
+	neutrallossesfortheoreticalspectra.clear();
+
+	originalneutrallossesdefinitions = neutrallossesdefinitions;
+	originalneutrallossesfortheoreticalspectra = neutrallossesfortheoreticalspectra;
 
 	peakidtodesc.clear();
 	isotopeformulaidtodesc.clear();
@@ -90,6 +109,7 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 	int i, errtype;
 	string foldername;
 	string ibdfilename;
+	string mzmlname;
 
 	if (peaklistfilename.empty()) {
 		error = true;
@@ -126,6 +146,12 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 				// Bruker Analysis File
 				if (regex_search(peaklistfilename, rx)) {
 					peaklistfileformat = baf;
+				}
+
+				rx = "\\.[rR][aA][wW]$";
+				// Thermo RAW file
+				if (regex_search(peaklistfilename, rx)) {
+					peaklistfileformat = raw;
 				}
 
 				rx = "\\.[dD][aA][tT]$";
@@ -179,7 +205,7 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 						errormessage = "The file cannot be converted.\n";
 						errormessage += "Does the file '" + peaklistfilename + "' exist ?\n";
 						errormessage += "Is the directory with the file '" + peaklistfilename + "' writable ?\n";
-						errormessage += "Do you have FileConverter installed (sudo apt-get install topp) ?\n";
+						errormessage += "Do you have FileConverter installed (OpenMS 2.x must be installed) ?\n";
 						errormessage += "Do you have 'any2mgf.sh' file located in '" + installdir.toStdString() + "External/linux' folder ?\n";
 						errormessage += "Is the file 'any2mgf.sh' executable (sudo chmod +x " + installdir.toStdString() + "External/linux/any2mgf.sh) ? \n";
 					}
@@ -191,7 +217,7 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 							errormessage = "The file cannot be converted.\n";
 							errormessage += "Does the file '" + peaklistfilename + "' exist ?\n";
 							errormessage += "Is the directory with the file '" + peaklistfilename + "' writable ?\n";
-							errormessage += "Do you have FileConverter installed (OpenMS must be installed) ?\n";
+							errormessage += "Do you have FileConverter installed (OpenMS 2.x must be installed) ?\n";
 							errormessage += "Do you have 'any2mgf.sh' file located in '" + installdir.toStdString() + "External/macosx' folder ?\n";
 							errormessage += "Is the file 'any2mgf.sh' executable ? \n";
 						}
@@ -202,8 +228,8 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 							errormessage = "The file cannot be converted.\n";
 							errormessage += "Does the file '" + peaklistfilename + "' exist ?\n";
 							errormessage += "Is the directory with the file '" + peaklistfilename + "' writable ?\n";
-							errormessage += "Do you have FileConverter installed (OpenMS must be installed) ?\n";
-							errormessage += "Do you have a path to FileConverter in your PATH variable (e.g., 'C:/Program Files/OpenMS-2.0/bin') ?\n";
+							errormessage += "Do you have FileConverter installed (OpenMS 2.x must be installed) ?\n";
+							errormessage += "Do you have a path to FileConverter in your PATH variable (e.g., 'C:/Program Files/OpenMS-2.3.0/bin') ?\n";
 							errormessage += "Do you have 'any2mgf.bat' file located in the '" + appname.toStdString() + "/External/windows' folder ?\n";
 						}
 					#endif
@@ -234,6 +260,27 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 					}
 				#endif
 				break;
+			case raw:
+				#if OS_TYPE == WIN
+					* os << "Converting the file " + peaklistfilename + " ... ";
+					s = "External\\windows\\raw2mzml.bat \"" + peaklistfilename + "\"";
+					if (system(s.c_str()) != 0) {
+						error = true;
+						errormessage = "The file cannot be converted.\n";
+						errormessage += "Does the file '" + peaklistfilename + "' exist ?\n";
+						errormessage += "Is the directory with the file '" + peaklistfilename + "' writable ?\n";
+						errormessage += "Do you have msconvert.exe installed (OpenMS 2.x including ProteoWizard must be installed) ?\n";
+						errormessage += "Do you have a path to msconvert.exe in your PATH variable (e.g., 'C:/Program Files/OpenMS-2.3.0/share/OpenMS/THIRDPARTY/pwiz-bin') ?\n";
+						errormessage += "Do you have 'raw2mzml.bat' file located in the '" + appname.toStdString() + "/External/windows' folder ?\n";
+					}
+
+					if (!error) {
+						*os << "ok" << endl << endl;
+						mzmlname = peaklistfilename.substr(0, peaklistfilename.rfind('.')) + ".mzML";
+						peakliststream.open(mzmlname);
+					}
+				#endif
+				break;
 			case dat:
 				#if OS_TYPE == WIN
 					foldername = peaklistfilename.substr(0, peaklistfilename.rfind('/'));
@@ -251,7 +298,6 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 						*os << "ok" << endl << endl;
 						string mgfname = foldername.substr(0, foldername.rfind('.')) + ".mgf";
 						peakliststream.open(mgfname);
-						*os << mgfname << endl;
 					}
 				#endif
 				break;
@@ -329,7 +375,7 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 				}
 			}
 			else {
-				if (os && (peaklistfileformat != mzML) && (peaklistfileformat != imzML) && (peaklistfileformat != ser)) {
+				if (os && (peaklistfileformat != mzML) && (peaklistfileformat != imzML) && (peaklistfileformat != raw) && (peaklistfileformat != ser)) {
 					*os << "Loading the peaklist(s)... ";
 				}
 				switch (peaklistfileformat) {
@@ -343,6 +389,29 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 				case baf:
 					#if OS_TYPE == WIN
 						peaklistseries.loadFromBAFStream(peakliststream);
+					#endif
+					break;
+				case raw:
+					#if OS_TYPE == WIN
+						errtype = peaklistseries.loadFromMZMLStream(mzmlname, peakliststream, fwhm, mode, os, terminatecomputation);
+						if (errtype == -1) {
+							error = true;
+							errormessage = "Aborted by user.\n";
+						}
+						if (errtype == -2) {
+							error = true;
+							errormessage = "Raw data cannot be converted.\n";
+							errormessage += "Does the file '" + mzmlname + "' exist ?\n";
+							errormessage += "Is the directory with the file '" + mzmlname + "' writable ?\n";
+							errormessage += "Do you have enough space on your hard drive ?\n";
+							errormessage += "Do you have OpenMS 2.x installed ?\n";
+							errormessage += "Do you have a path to OpenMS binaries folder in your PATH variable (e.g., 'C:/Program Files/OpenMS-2.3.0/bin') ?\n";
+							errormessage += "Do you have 'raw2peaks.bat' file located in the '" + appname.toStdString() + "/External/windows' folder ?\n";
+						}
+						if (errtype == -3) {
+							error = true;
+							errormessage = "Failed to load the mzML file, zlib compression is not supported. The spectra must be stored in the mzML file with the attribute \"no compression\".\n";
+						}
 					#endif
 					break;
 				case dat:
@@ -371,8 +440,8 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 							errormessage += "Does the folder '" + peaklistfilename.substr(0, peaklistfilename.length() - 4) + "' exist ?\n";
 							errormessage += "Is the directory '" + peaklistfilename.substr(0, peaklistfilename.length() - 4) + "' writable ?\n";
 							errormessage += "Do you have enough space on your hard drive ?\n";
-							errormessage += "Do you have OpenMS installed ?\n";
-							errormessage += "Do you have a path to OpenMS binaries folder in your PATH variable (e.g., 'C:/Program Files/OpenMS-2.0/bin') ?\n";
+							errormessage += "Do you have OpenMS 2.x installed ?\n";
+							errormessage += "Do you have a path to OpenMS binaries folder in your PATH variable (e.g., 'C:/Program Files/OpenMS-2.3.0/bin') ?\n";
 							errormessage += "Do you have 'raw2peaks.bat' file located in the '" + appname.toStdString() + "/External/windows' folder ?\n";
 						}
 					#endif
@@ -390,7 +459,7 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 							errormessage += "Does the file '" + peaklistfilename + "' exist ?\n";
 							errormessage += "Is the directory with the file '" + peaklistfilename + "' writable ?\n";
 							errormessage += "Do you have enough space on your hard drive ?\n";
-							errormessage += "Do you have OpenMS installed (sudo apt-get install topp) ?\n";
+							errormessage += "Do you have OpenMS 2.x installed ?\n";
 							errormessage += "Do you have 'raw2peaks.sh' file located in '" + installdir.toStdString() + "External/linux' folder ?\n";
 							errormessage += "Is the file 'raw2peaks.sh' executable (sudo chmod +x " + installdir.toStdString() + "External/linux/raw2peaks.sh) ? \n";
 						#else
@@ -399,7 +468,7 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 								errormessage += "Does the file '" + peaklistfilename + "' exist ?\n";
 								errormessage += "Is the directory with the file '" + peaklistfilename + "' writable ?\n";
 								errormessage += "Do you have enough space on your hard drive ?\n";
-								errormessage += "Do you have OpenMS installed ?\n";
+								errormessage += "Do you have OpenMS 2.x installed ?\n";
 								errormessage += "Do you have 'raw2peaks.sh' file located in '" + installdir.toStdString() + "External/macosx' folder ?\n";
 								errormessage += "Is the file 'raw2peaks.sh' executable (sudo chmod +x " + installdir.toStdString() + "External/macosx/raw2peaks.sh) ? \n";
 							#else		
@@ -407,8 +476,8 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 								errormessage += "Does the file '" + peaklistfilename + "' exist ?\n";
 								errormessage += "Is the directory with the file '" + peaklistfilename + "' writable ?\n";
 								errormessage += "Do you have enough space on your hard drive ?\n";
-								errormessage += "Do you have OpenMS installed ?\n";
-								errormessage += "Do you have a path to OpenMS binaries folder in your PATH variable (e.g., 'C:/Program Files/OpenMS-2.0/bin') ?\n";
+								errormessage += "Do you have OpenMS 2.x installed ?\n";
+								errormessage += "Do you have a path to OpenMS binaries folder in your PATH variable (e.g., 'C:/Program Files/OpenMS-2.3.0/bin') ?\n";
 								errormessage += "Do you have 'raw2peaks.bat' file located in the '" + appname.toStdString() + "/External/windows' folder ?\n";
 							#endif
 						#endif
@@ -431,7 +500,7 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 							errormessage += "Does the file '" + peaklistfilename + "' exist ?\n";
 							errormessage += "Is the directory with the file '" + peaklistfilename + "' writable ?\n";
 							errormessage += "Do you have enough space on your hard drive ?\n";
-							errormessage += "Do you have OpenMS installed (sudo apt-get install topp) ?\n";
+							errormessage += "Do you have OpenMS 2.x installed ?\n";
 							errormessage += "Do you have 'raw2peaks.sh' file located in '" + installdir.toStdString() + "External/linux' folder ?\n";
 							errormessage += "Is the file 'raw2peaks.sh' executable (sudo chmod +x " + installdir.toStdString() + "External/linux/raw2peaks.sh) ? \n";
 						#else
@@ -440,7 +509,7 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 								errormessage += "Does the file '" + peaklistfilename + "' exist ?\n";
 								errormessage += "Is the directory with the file '" + peaklistfilename + "' writable ?\n";
 								errormessage += "Do you have enough space on your hard drive ?\n";
-								errormessage += "Do you have OpenMS installed ?\n";
+								errormessage += "Do you have OpenMS 2.x installed ?\n";
 								errormessage += "Do you have 'raw2peaks.sh' file located in '" + installdir.toStdString() + "External/macosx' folder ?\n";
 								errormessage += "Is the file 'raw2peaks.sh' executable (sudo chmod +x " + installdir.toStdString() + "External/macosx/raw2peaks.sh) ? \n";
 							#else		
@@ -448,8 +517,8 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 								errormessage += "Does the file '" + peaklistfilename + "' exist ?\n";
 								errormessage += "Is the directory with the file '" + peaklistfilename + "' writable ?\n";
 								errormessage += "Do you have enough space on your hard drive ?\n";
-								errormessage += "Do you have OpenMS installed ?\n";
-								errormessage += "Do you have a path to OpenMS binaries folder in your PATH variable (e.g., 'C:/Program Files/OpenMS-2.0/bin') ?\n";
+								errormessage += "Do you have OpenMS 2.x installed ?\n";
+								errormessage += "Do you have a path to OpenMS binaries folder in your PATH variable (e.g., 'C:/Program Files/OpenMS-2.3.0/bin') ?\n";
 								errormessage += "Do you have 'raw2peaks.bat' file located in the '" + appname.toStdString() + "/External/windows' folder ?\n";
 							#endif
 						#endif
@@ -462,7 +531,7 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 				default:
 					break;
 				}
-				if (os && (peaklistfileformat != mzML) && (peaklistfileformat != imzML) && (peaklistfileformat != ser)) {
+				if (os && (peaklistfileformat != mzML) && (peaklistfileformat != imzML) && (peaklistfileformat != raw) && (peaklistfileformat != ser)) {
 					*os << "ok" << endl << endl;
 				}
 			}
@@ -496,8 +565,6 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 		}
 		bricksdatabasestream.close();
 
-		bricksdatabase.sortbyMass();
-
 		// check for redundant acronyms and []
 		for (int i = 0; i < (int)bricksdatabase.size(); i++) {
 			for (int j = 0; j < (int)bricksdatabase[i].getAcronyms().size(); j++) {
@@ -521,6 +588,7 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 			}
 		}
 
+		bricksdatabase.sortbyMass();
 	}
 
 
@@ -604,35 +672,34 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 
 	// initialize fragment ions for de novo graph
 	fragmentionsfordenovograph.clear();
-	if (!error) {
-		switch (peptidetype)
-		{
-		case linear:
-			initializeFragmentIonsForDeNovoGraphOfLinearPeptides(fragmentionsfordenovograph);
-			break;
-		case cyclic:
-			initializeFragmentIonsForDeNovoGraphOfCyclicPeptides(fragmentionsfordenovograph);
-			break;
-		case branched:
-			initializeFragmentIonsForDeNovoGraphOfTPeptides(fragmentionsfordenovograph);
-			break;
-		case branchcyclic:
-			initializeFragmentIonsForDeNovoGraphOfBranchCyclicPeptides(fragmentionsfordenovograph);
-			break;
-		case linearpolyketide:
-			initializeFragmentIonsForDeNovoGraphOfLinearPolyketide(fragmentionsfordenovograph);
-			break;
-		case cyclicpolyketide:
-			initializeFragmentIonsForDeNovoGraphOfCyclicPolyketide(fragmentionsfordenovograph);
-			break;
-		case other:
-			error = true;
-			errormessage = "Invalid peptide type 'other'.\n\n";
-			break;
-		default:
-			error = true;
-			errormessage = "Undefined peptide type.\n\n";
-			break;
+	if (!error && (mode == denovoengine)) {
+		switch (peptidetype) {
+			case linear:
+				initializeFragmentIonsForDeNovoGraphOfLinearPeptides(fragmentionsfordenovograph);
+				break;
+			case cyclic:
+				initializeFragmentIonsForDeNovoGraphOfCyclicPeptides(fragmentionsfordenovograph);
+				break;
+			case branched:
+				initializeFragmentIonsForDeNovoGraphOfTPeptides(fragmentionsfordenovograph);
+				break;
+			case branchcyclic:
+				initializeFragmentIonsForDeNovoGraphOfBranchCyclicPeptides(fragmentionsfordenovograph);
+				break;
+			case linearpolyketide:
+				initializeFragmentIonsForDeNovoGraphOfLinearPolyketide(fragmentionsfordenovograph);
+				break;
+			case cyclicpolyketide:
+				initializeFragmentIonsForDeNovoGraphOfCyclicPolyketide(fragmentionsfordenovograph);
+				break;
+			case other:
+				error = true;
+				errormessage = "Invalid peptide type 'other'.\n\n";
+				break;
+			default:
+				error = true;
+				errormessage = "Undefined peptide type.\n\n";
+				break;
 		}
 	}
 
@@ -640,9 +707,9 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 	// check theoretical fragments in positive/negative mode
 	if (!error && (mode == dereplication)) {
 		i = 0;
-		while (i < (int)fragmentionsfortheoreticalspectra.size()) {
-			if (fragmentdefinitions[fragmentionsfortheoreticalspectra[i]].positive != (precursorcharge > 0)) {
-				fragmentionsfortheoreticalspectra.erase(fragmentionsfortheoreticalspectra.begin() + i);
+		while (i < (int)ionsfortheoreticalspectra.size()) {
+			if (iondefinitions[ionsfortheoreticalspectra[i]].positive != (precursorcharge > 0)) {
+				ionsfortheoreticalspectra.erase(ionsfortheoreticalspectra.begin() + i);
 			}
 			else {
 				i++;
@@ -650,7 +717,17 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 		}
 	}
 
-	
+
+	// calculate combinations of neutral losses
+	if (!error) {
+		errtype = calculateNeutralLosses(terminatecomputation);
+		if (errtype == -1) {
+			error = true;
+			errormessage = "Aborted by user.\n";
+		}
+	}
+
+
 	// report errors and return
 	if (error) {
 		if (os) {
@@ -669,32 +746,56 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 
 string cParameters::printToString() {
 	string s = "";
-	s += "Peptide Type: ";
-	switch (peptidetype) {
-	case linear:
-		s += "Linear\n";
+
+	s += "Mode: ";
+	switch ((eModeType)mode) {
+	case denovoengine:
+		s += "De Novo Search Engine";
 		break;
-	case cyclic:
-		s += "Cyclic\n";
+	case singlecomparison:
+		s += "Compare Peaklist with Spectrum of Searched Sequence";
 		break;
-	case branched:
-		s += "Branched\n";
+	case databasesearch:
+		s += "Compare Peaklist with Database - MS/MS data";
 		break;
-	case branchcyclic:
-		s += "Branch-cyclic\n";
-		break;
-	case linearpolyketide:
-		s += "Linear polyketide\n";
-		break;
-	case cyclicpolyketide:
-		s += "Cyclic polyketide\n";
-		break;
-	case other:
-		s += "Other\n";
+	case dereplication:
+		s += "Compare Peaklist(s) with Database - MS or MSI data";
 		break;
 	default:
 		break;
 	}
+	s += "\n";
+
+	s += "Maximum Number of Threads: " + to_string(maximumnumberofthreads) + "\n";
+
+	s += "Peptide Type: ";
+	switch (peptidetype) {
+		case linear:
+			s += "Linear";
+			break;
+		case cyclic:
+			s += "Cyclic";
+			break;
+		case branched:
+			s += "Branched";
+			break;
+		case branchcyclic:
+			s += "Branch-cyclic";
+			break;
+		case linearpolyketide:
+			s += "Linear polyketide";
+			break;
+		case cyclicpolyketide:
+			s += "Cyclic polyketide";
+			break;
+		case other:
+			s += "Other";
+			break;
+		default:
+			break;
+	}
+	s += "\n";
+
 	s += "File: " + peaklistfilename + "\n";
 	s += "Scan no.: " + to_string(scannumber) + "\n";
 	s += "Precursor m/z Ratio: " + to_string(precursormass) + "\n";
@@ -702,7 +803,7 @@ string cParameters::printToString() {
 	s += "Charge: " + to_string(precursorcharge) + "\n";
 	s += "Precursor m/z Error Tolerance: " + to_string(precursormasserrortolerance) + "\n";
 	s += "m/z Error Tolerance: " + to_string(fragmentmasserrortolerance) + "\n";
-	s += "m/z Error Tolerance for Deisotoping: " + to_string(masserrortolerancefordeisotoping) + "\n";
+	//s += "m/z Error Tolerance for Deisotoping: " + to_string(masserrortolerancefordeisotoping) + "\n";
 	s += "Minimum Threshold of Relative Intensity: " + to_string(minimumrelativeintensitythreshold) + "\n";
 	s += "Minimum Threshold of Absolute Intensity: " + to_string(minimumabsoluteintensitythreshold) + "\n";
 	s += "Minimum m/z Ratio: " + to_string(minimummz) + "\n";
@@ -715,17 +816,17 @@ string cParameters::printToString() {
 
 	s += "Incomplete Paths in De Novo Graph: ";
 	switch (blindedges) {
-	case 0:
-		s += "keep (you can see a complete de novo graph)";
-		break;
-	case 1:
-		s += "remove (speed up the search)";
-		break;
-	case 2:
-		s += "connect (allow detection of sequence tags)";
-		break;
-	default:
-		break;
+		case 0:
+			s += "keep (you can see a complete de novo graph)";
+			break;
+		case 1:
+			s += "remove (speed up the search)";
+			break;
+		case 2:
+			s += "connect (allow detection of sequence tags)";
+			break;
+		default:
+			break;
 	}
 	s += "\n";
 
@@ -749,75 +850,60 @@ string cParameters::printToString() {
 	s += regularblocksorder ? "on" : "off";
 	s += "\n";
 
-	s += "Mode: ";
-	switch ((eModeType)mode) {
-	case denovoengine:
-		s += "De Novo Search Engine";
-		break;
-	case singlecomparison:
-		s += "Compare Peaklist with Spectrum of Searched Sequence";
-		break;
-	case databasesearch:
-		s += "Compare Peaklist with Database - MS/MS data";
-		break;
-	case dereplication:
-		s += "Compare Peaklist(s) with Database - MS or MSI data";
-		break;
-	default:
-		break;
-	}
-	s += "\n";
-
 	s += "Sequence/Compound Database File: " + sequencedatabasefilename + "\n";
-
-	s += "Maximum Number of Threads: " + to_string(maximumnumberofthreads) + "\n";
 
 	s += "Score Type: ";
 	switch (scoretype) {
-	case b_ions:
-		s += "Number of b-ions";
-		break;
-	case b_ions_and_b_dehydrated_ions:
-		s += "Number of b-ions + dehydrated b-ions";
-		break;
-	case b_ions_and_b_deamidated_ions:
-		s += "Number of b-ions + deamidated b-ions";
-		break;
-	case y_ions_and_b_ions:
-		s += "Number of y-ions + b-ions (not for cyclic peptides)";
-		break;
-	case y_ions:
-		s += "Number of y-ions (not for cyclic peptides)";
-		break;
-	case weighted_intensity:
-		s += "Sum of relative intensities of matched peaks";
-		break;
-	case matched_peaks:
-		s += "Number of matched peaks";
-		break;
-	case matched_bricks:
-		s += "Number of matched bricks (cyclic peptides)";
-		break;
-	default:
-		s += "undefined";
-		break;
+		case number_of_matched_peaks:
+			s += "Number of matched peaks";
+			break;
+		case sum_of_relative_intensities:
+			s += "Sum of relative intensities of matched peaks";
+			break;
+		case number_of_b_ions:
+			s += "Number of b-ions";
+			break;
+		case number_of_y_ions:
+			s += "Number of y-ions";
+			break;
+		case number_of_b_and_y_ions:
+			s += "Number of b-ions and y-ions";
+			break;
+		default:
+			s += "undefined";
+			break;
 	}
 	s += "\n";
 
-	s += "Maximum Number of Sequence Candidates Reported: " + to_string(hitsreported) + "\n";
+	s += "Maximum Number of Reported Sequence Candidates: " + to_string(hitsreported) + "\n";
 	s += "Peptide Sequence Tag: " + originalsequencetag + "\n";
 
-	s += "Ion Types in Theoretical Spectra: ";
-	for (int i = 0; i < (int)fragmentionsfortheoreticalspectra.size(); i++) {
-		s += fragmentdefinitions[fragmentionsfortheoreticalspectra[i]].name;
-		if (i < (int)fragmentionsfortheoreticalspectra.size() - 1) {
+	s += "Ion Types: ";
+	for (int i = 0; i < (int)ionsfortheoreticalspectra.size(); i++) {
+		s += iondefinitions[ionsfortheoreticalspectra[i]].name;
+		if (i < (int)ionsfortheoreticalspectra.size() - 1) {
 			s += ", ";
 		}
 	}
 	s += "\n";
 
-	s += "Remove Hits of Fragments without Hits of Parent Fragments: ";
-	s += clearhitswithoutparent ? "on" : "off";
+	s += "Neutral Losses: ";
+	for (int i = 0; i < (int)originalneutrallossesfortheoreticalspectra.size(); i++) {
+		s += originalneutrallossesdefinitions[originalneutrallossesfortheoreticalspectra[i]].summary;
+		if (i < (int)originalneutrallossesfortheoreticalspectra.size() - 1) {
+			s += ", ";
+		}
+	}
+	s += "\n";
+
+	s += "Maximum Number of Combined Neutral Losses: " + to_string(maximumcombinedlosses) + "\n";
+
+	//s += "Remove Hits of Fragments without Hits of Parent Fragments: ";
+	//s += clearhitswithoutparent ? "on" : "off";
+	//s += "\n";
+
+	s += "Report Unmatched Theoretical Peaks: ";
+	s += reportunmatchedtheoreticalpeaks ? "on" : "off";
 	s += "\n";
 
 	s += "Generate Full Isotope Patterns: ";
@@ -844,11 +930,191 @@ void cParameters::setOutputStream(cMainThread& os) {
 
 void cParameters::updateFragmentDefinitions() {
 	if ((peptidetype == linear) || (peptidetype == linearpolyketide)) {
-		fragmentdefinitions.recalculateFragments(cyclicnterminus, cycliccterminus, precursoradduct);
+		iondefinitions.recalculateFragments(cyclicnterminus, cycliccterminus, precursoradduct);
 	}
 	else {
-		fragmentdefinitions.recalculateFragments(false, false, precursoradduct);
+		iondefinitions.recalculateFragments(false, false, precursoradduct);
 	}
+}
+
+
+int cParameters::calculateNeutralLosses(bool& terminatecomputation) {
+	neutrallossesdefinitions.clear();
+	neutrallossesfortheoreticalspectra.clear();
+
+	if (maximumcombinedlosses == 0) {
+		return 0;
+	}
+
+	cSummaryFormula tmpformula;
+	string tmpstring;
+	neutralLoss loss;
+	int i;
+
+	cBricksDatabase neutrallossesbrickdatabase;
+	cBrick tmpbrick;
+	int numberofbasicbricks = 0;
+	string compositionname;
+	vector<int> intcomposition;
+
+	int compressionlimit = 100000;
+	bool compressformulas;
+
+	bool undefinedelement;
+	int valence;
+	int atomscount;
+
+	//int stringsizeest = 0;
+	//int mapsizeest = 0;
+	//int doublesizeest = 0;
+	//int pruned = 0;
+
+	if (os) {
+		*os << "Calculating combinations of neutral losses... " << endl;
+	}
+
+	for (i = 0; i < (int)originalneutrallossesfortheoreticalspectra.size(); i++) {
+		tmpformula.setFormula(originalneutrallossesdefinitions[originalneutrallossesfortheoreticalspectra[i]].summary, false);
+
+		tmpbrick.clear();
+		tmpbrick.setComposition(to_string(numberofbasicbricks + 1), false);
+		tmpbrick.setMass(tmpformula.getMass());
+		tmpbrick.setSummary(originalneutrallossesdefinitions[originalneutrallossesfortheoreticalspectra[i]].summary);
+
+		neutrallossesbrickdatabase.push_back(tmpbrick);
+
+		numberofbasicbricks++;
+	}
+
+	neutrallossesbrickdatabase.sortbyMass();
+
+	vector<int> combarray;
+	for (i = 0; i < maximumcombinedlosses; i++) {
+		combarray.push_back(0);
+	}
+
+	i = 0;
+	compressformulas = false;
+	while (neutrallossesbrickdatabase.nextCombination(combarray, numberofbasicbricks, maximumcombinedlosses, 0, uncharge(precursormass, precursorcharge) - minimummz)) {
+		if (terminatecomputation) {
+			neutrallossesdefinitions.clear();
+			neutrallossesfortheoreticalspectra.clear();
+			return -1;
+		}
+
+		getNameOfCompositionFromIntVector(compositionname, combarray);
+
+		tmpbrick.clear();
+		tmpbrick.setComposition(compositionname, true);
+		tmpbrick.setMass(neutrallossesbrickdatabase.getMassOfComposition(combarray, numberofbasicbricks));
+
+		loss.clear();
+		loss.massdifference = -tmpbrick.getMass();
+
+		intcomposition.clear();
+		tmpbrick.explodeToIntComposition(intcomposition);
+		for (int j = 0; j < (int)intcomposition.size(); j++) {
+			loss.summary += neutrallossesbrickdatabase[intcomposition[j] - 1].getSummary();
+		}
+
+		tmpformula.clear();
+		tmpformula.addFormula(loss.summary, true);
+		tmpstring = tmpformula.getSummary();
+		addStringFormulaToMap(tmpstring, loss.summarymap);
+
+		undefinedelement = false;
+		for (auto it = loss.summarymap.begin(); it != loss.summarymap.end(); ++it) {
+			if ((it->first.compare("H") != 0) && (it->first.compare("C") != 0) && (it->first.compare("O") != 0) && (it->first.compare("N") != 0) && (it->first.compare("S") != 0)) {
+				undefinedelement = true;
+				break;
+			}
+		}
+
+		valence = 0;
+		atomscount = 0;
+		if (loss.summarymap.count("H") > 0) {
+			valence += -loss.summarymap["H"];
+			atomscount += -loss.summarymap["H"];
+		}
+		if (loss.summarymap.count("C") > 0) {
+			valence += -loss.summarymap["C"] * 4;
+			atomscount += -loss.summarymap["C"];
+		}
+		if (loss.summarymap.count("O") > 0) {
+			valence += -loss.summarymap["O"] * 2;
+			atomscount += -loss.summarymap["O"];
+		}
+		if (loss.summarymap.count("N") > 0) {
+			valence += -loss.summarymap["N"] * 3;
+			atomscount += -loss.summarymap["N"];
+		}
+		if (loss.summarymap.count("S") > 0) {
+			valence += -loss.summarymap["S"] * 6; /* the maximum valence state is used */
+			atomscount += -loss.summarymap["S"];
+		}
+
+		// SENIOR rule 1 - the sum of valences must be even
+		// SENIOR rule 3 - the sum of valences >= 2 * (atomscount - maximum number of allowed components in the graph); edges - nodes + components >= 0
+		if (!undefinedelement && ((valence % 2 == 1) || (valence < 2 * (atomscount - 10)))) {
+			//pruned++;
+			continue;
+		}
+
+		if (compressformulas) {
+			tmpformula.clear();
+			tmpformula.addFormula(loss.summary);
+			loss.summary = tmpformula.getSummary();
+		}
+
+		//stringsizeest += sizeof(string) + loss.summary.size();
+		//mapsizeest += sizeof(loss.summarymap) + loss.summarymap.size() * (sizeof(string) /* the length of string is 1 for HCONS */ + sizeof(int));
+		//doublesizeest += sizeof(double);
+
+		neutrallossesdefinitions.push_back(loss);
+		neutrallossesfortheoreticalspectra.push_back(i);
+
+		i++;
+
+		if (i == compressionlimit) {
+			compressformulas = true;
+		}
+
+		if (i % 100000 == 0) {
+			if (os) {
+				*os << i << " ";
+			}
+
+			//cout << i << " " << pruned << " - " << stringsizeest << " " << mapsizeest << " " << doublesizeest << " " << stringsizeest + mapsizeest + doublesizeest << endl;
+		}
+
+		if (i % 1000000 == 0) {
+			if (os) {
+				*os << endl;
+			}
+		}
+	}
+
+	if (os) {
+		*os << "ok" << endl;
+		*os << "Number of combined losses: " << neutrallossesfortheoreticalspectra.size() << endl << endl;
+	}
+
+	if (neutrallossesfortheoreticalspectra.size() >= compressionlimit) {
+		int size = (int)neutrallossesfortheoreticalspectra.size();
+		for (int i = 0; i < compressionlimit; i++) {
+			tmpformula.clear();
+			tmpformula.addFormula(neutrallossesdefinitions[neutrallossesfortheoreticalspectra[i]].summary);
+			neutrallossesdefinitions[neutrallossesfortheoreticalspectra[i]].summary = tmpformula.getSummary();
+
+			if (terminatecomputation) {
+				neutrallossesdefinitions.clear();
+				neutrallossesfortheoreticalspectra.clear();
+				return -1;
+			}
+		}
+	}
+
+	return 0;
 }
 
 
@@ -856,7 +1122,7 @@ void cParameters::store(ofstream& os) {
 	int size;
 	string s;
 	
-	fragmentdefinitions.store(os);
+	iondefinitions.store(os);
 
 	os.write((char *)&peptidetype, sizeof(ePeptideType));
 
@@ -873,7 +1139,7 @@ void cParameters::store(ofstream& os) {
 	os.write((char *)&precursormasserrortolerance, sizeof(double));
 	os.write((char *)&precursorcharge, sizeof(int));
 	os.write((char *)&fragmentmasserrortolerance, sizeof(double));
-	os.write((char *)&masserrortolerancefordeisotoping, sizeof(double));
+	//os.write((char *)&masserrortolerancefordeisotoping, sizeof(double));
 	os.write((char *)&minimumrelativeintensitythreshold, sizeof(double));
 	os.write((char *)&minimumabsoluteintensitythreshold, sizeof(unsigned));
 	os.write((char *)&minimummz, sizeof(double));
@@ -898,7 +1164,9 @@ void cParameters::store(ofstream& os) {
 	os.write((char *)&maximumnumberofthreads, sizeof(int));
 	os.write((char *)&mode, sizeof(eModeType));
 	os.write((char *)&scoretype, sizeof(eScoreType));
-	os.write((char *)&clearhitswithoutparent, sizeof(bool));
+	os.write((char *)&maximumcombinedlosses, sizeof(int));
+	//os.write((char *)&clearhitswithoutparent, sizeof(bool));
+	os.write((char *)&reportunmatchedtheoreticalpeaks, sizeof(bool));
 	os.write((char *)&generateisotopepattern, sizeof(bool));
 	os.write((char *)&minimumpatternsize, sizeof(int));
 	os.write((char *)&cyclicnterminus, sizeof(bool));
@@ -928,10 +1196,34 @@ void cParameters::store(ofstream& os) {
 		os.write((char *)&fragmentionsfordenovograph[i], sizeof(eFragmentIonType));
 	}
 
-	size = (int)fragmentionsfortheoreticalspectra.size();
+	size = (int)ionsfortheoreticalspectra.size();
 	os.write((char *)&size, sizeof(int));
-	for (int i = 0; i < (int)fragmentionsfortheoreticalspectra.size(); i++) {
-		os.write((char *)&fragmentionsfortheoreticalspectra[i], sizeof(eFragmentIonType));
+	for (int i = 0; i < (int)ionsfortheoreticalspectra.size(); i++) {
+		os.write((char *)&ionsfortheoreticalspectra[i], sizeof(eFragmentIonType));
+	}
+
+	size = (int)neutrallossesdefinitions.size();
+	os.write((char *)&size, sizeof(int));
+	for (int i = 0; i < (int)neutrallossesdefinitions.size(); i++) {
+		neutrallossesdefinitions[i].store(os);
+	}
+
+	size = (int)originalneutrallossesdefinitions.size();
+	os.write((char *)&size, sizeof(int));
+	for (int i = 0; i < (int)originalneutrallossesdefinitions.size(); i++) {
+		originalneutrallossesdefinitions[i].store(os);
+	}
+
+	size = (int)neutrallossesfortheoreticalspectra.size();
+	os.write((char *)&size, sizeof(int));
+	for (int i = 0; i < (int)neutrallossesfortheoreticalspectra.size(); i++) {
+		os.write((char *)&neutrallossesfortheoreticalspectra[i], sizeof(int));
+	}
+
+	size = (int)originalneutrallossesfortheoreticalspectra.size();
+	os.write((char *)&size, sizeof(int));
+	for (int i = 0; i < (int)originalneutrallossesfortheoreticalspectra.size(); i++) {
+		os.write((char *)&originalneutrallossesfortheoreticalspectra[i], sizeof(int));
 	}
 
 	storeStringVector(peakidtodesc, os);
@@ -951,7 +1243,7 @@ void cParameters::load(ifstream& is) {
 
 	os = 0;
 
-	fragmentdefinitions.load(is);
+	iondefinitions.load(is);
 
 	is.read((char *)&peptidetype, sizeof(ePeptideType));
 
@@ -968,7 +1260,7 @@ void cParameters::load(ifstream& is) {
 	is.read((char *)&precursormasserrortolerance, sizeof(double));
 	is.read((char *)&precursorcharge, sizeof(int));
 	is.read((char *)&fragmentmasserrortolerance, sizeof(double));
-	is.read((char *)&masserrortolerancefordeisotoping, sizeof(double));
+	//is.read((char *)&masserrortolerancefordeisotoping, sizeof(double));
 	is.read((char *)&minimumrelativeintensitythreshold, sizeof(double));
 	is.read((char *)&minimumabsoluteintensitythreshold, sizeof(unsigned));
 	is.read((char *)&minimummz, sizeof(double));
@@ -993,7 +1285,9 @@ void cParameters::load(ifstream& is) {
 	is.read((char *)&maximumnumberofthreads, sizeof(int));
 	is.read((char *)&mode, sizeof(eModeType));
 	is.read((char *)&scoretype, sizeof(eScoreType));
-	is.read((char *)&clearhitswithoutparent, sizeof(bool));
+	is.read((char *)&maximumcombinedlosses, sizeof(int));
+	//is.read((char *)&clearhitswithoutparent, sizeof(bool));
+	is.read((char *)&reportunmatchedtheoreticalpeaks, sizeof(bool));
 	is.read((char *)&generateisotopepattern, sizeof(bool));
 	is.read((char *)&minimumpatternsize, sizeof(int));
 	is.read((char *)&cyclicnterminus, sizeof(bool));
@@ -1024,9 +1318,33 @@ void cParameters::load(ifstream& is) {
 	}
 
 	is.read((char *)&size, sizeof(int));
-	fragmentionsfortheoreticalspectra.resize(size);
-	for (int i = 0; i < (int)fragmentionsfortheoreticalspectra.size(); i++) {
-		is.read((char *)&fragmentionsfortheoreticalspectra[i], sizeof(eFragmentIonType));
+	ionsfortheoreticalspectra.resize(size);
+	for (int i = 0; i < (int)ionsfortheoreticalspectra.size(); i++) {
+		is.read((char *)&ionsfortheoreticalspectra[i], sizeof(eFragmentIonType));
+	}
+
+	is.read((char *)&size, sizeof(int));
+	neutrallossesdefinitions.resize(size);
+	for (int i = 0; i < (int)neutrallossesdefinitions.size(); i++) {
+		neutrallossesdefinitions[i].load(is);
+	}
+
+	is.read((char *)&size, sizeof(int));
+	originalneutrallossesdefinitions.resize(size);
+	for (int i = 0; i < (int)originalneutrallossesdefinitions.size(); i++) {
+		originalneutrallossesdefinitions[i].load(is);
+	}
+
+	is.read((char *)&size, sizeof(int));
+	neutrallossesfortheoreticalspectra.resize(size);
+	for (int i = 0; i < (int)neutrallossesfortheoreticalspectra.size(); i++) {
+		is.read((char *)&neutrallossesfortheoreticalspectra[i], sizeof(int));
+	}
+
+	is.read((char *)&size, sizeof(int));
+	originalneutrallossesfortheoreticalspectra.resize(size);
+	for (int i = 0; i < (int)originalneutrallossesfortheoreticalspectra.size(); i++) {
+		is.read((char *)&originalneutrallossesfortheoreticalspectra[i], sizeof(int));
 	}
 
 	loadStringVector(peakidtodesc, is);

@@ -31,10 +31,23 @@ enum ePeakListFileFormat {
 	mzML,
 	mzXML,
 	baf,
+	raw,
 	dat, 
 	imzML,
 	mis,
 	ser
+};
+
+
+/**
+	\brief The types of scores between an experimental and a theoretical spectrum.
+*/
+enum eScoreType {
+	number_of_matched_peaks = 0,
+	sum_of_relative_intensities = 1,
+	number_of_b_ions = 2,
+	number_of_y_ions = 3,
+	number_of_b_and_y_ions = 4
 };
 
 
@@ -49,9 +62,9 @@ public:
 
 
 	/**
-		\brief Definitions of fragment ion types.
+		\brief Definitions of ion types.
     */
-	cFragmentIons fragmentdefinitions;
+	cFragmentIons iondefinitions;
 	
 
 	/**
@@ -123,7 +136,7 @@ public:
 	/**
 		\brief Mass error tolerance for deisotoping.
     */
-    double masserrortolerancefordeisotoping;
+    //double masserrortolerancefordeisotoping;
 
 
 	/**
@@ -215,11 +228,23 @@ public:
     */
     eScoreType scoretype;
 
+	
+	/**
+		\brief Maximum number of combined neutral losses.
+	*/
+	int maximumcombinedlosses;
+
 
 	/**
 		\brief True when matches of peaks which do not have parent peaks are removed.
     */
-    bool clearhitswithoutparent;
+    //bool clearhitswithoutparent;
+
+
+	/**
+		\brief Report unmatched theoretical peaks.
+	*/
+	bool reportunmatchedtheoreticalpeaks;
 
 
 	/**
@@ -349,9 +374,33 @@ public:
 
 
 	/**
-		\brief A vector of fragment ion types generated in theoretical spectra.
+		\brief A vector of ion types generated in theoretical spectra.
 	*/
-	vector<eFragmentIonType> fragmentionsfortheoreticalspectra;
+	vector<eFragmentIonType> ionsfortheoreticalspectra;
+
+
+	/**
+		\brief A vector of all neutral losses.
+	*/
+	vector<neutralLoss> neutrallossesdefinitions;
+
+
+	/**
+		\brief A vector of all neutral losses (without combinations of losses).
+	*/
+	vector<neutralLoss> originalneutrallossesdefinitions;
+
+
+	/**
+		\brief A vector of neutral losses generated in theoretical spectra.
+	*/
+	vector<int> neutrallossesfortheoreticalspectra;
+
+
+	/**
+		\brief A vector of neutral losses generated in theoretical spectra (without combinations).
+	*/
+	vector<int> originalneutrallossesfortheoreticalspectra;
 
 
 	/**
@@ -434,6 +483,14 @@ public:
 		\brief Update definitions of fragment ions when \a cyclicnterminus, \a cycliccterminus or \a precursoradduct have been changed.
 	*/ 
 	void updateFragmentDefinitions();
+
+
+	/**
+		\brief Calculate a list of neutral losses.
+		\param terminatecomputation reference to a variable determining that the computation must be stopped
+		\retval int -1 when an error occurred, 0 otherwise
+	*/
+	int calculateNeutralLosses(bool& terminatecomputation);
 
 
 	/**

@@ -752,22 +752,22 @@ double cCandidate::calculatePrecursorMass(cBricksDatabase& brickdatabasewithcomb
 	switch (parameters->peptidetype)
 	{
 	case linear:
-		mass = parameters->fragmentdefinitions[precursor_ion].massdifference + parameters->searchedmodifications[startmodifID].massdifference + parameters->searchedmodifications[endmodifID].massdifference;
+		mass = parameters->iondefinitions[precursor_ion].massdifference + parameters->searchedmodifications[startmodifID].massdifference + parameters->searchedmodifications[endmodifID].massdifference;
 		break;
 	case cyclic: 
-		mass = parameters->fragmentdefinitions[cyclic_precursor_ion].massdifference;
+		mass = parameters->iondefinitions[cyclic_precursor_ion].massdifference;
 		break;
 	case branched:
-		mass = parameters->fragmentdefinitions[precursor_ion].massdifference + parameters->searchedmodifications[startmodifID].massdifference + parameters->searchedmodifications[endmodifID].massdifference + parameters->searchedmodifications[middlemodifID].massdifference;
+		mass = parameters->iondefinitions[precursor_ion].massdifference + parameters->searchedmodifications[startmodifID].massdifference + parameters->searchedmodifications[endmodifID].massdifference + parameters->searchedmodifications[middlemodifID].massdifference;
 		break;
 	case branchcyclic:
-		mass = parameters->fragmentdefinitions[cyclic_precursor_ion].massdifference + parameters->searchedmodifications[middlemodifID].massdifference;
+		mass = parameters->iondefinitions[cyclic_precursor_ion].massdifference + parameters->searchedmodifications[middlemodifID].massdifference;
 		break;
 	case linearpolyketide:
 		// not supported because of terminal ambiguities H- -OH, H- -H, OH- -OH
 		break;
 	case cyclicpolyketide:
-		mass = parameters->fragmentdefinitions[cyclic_polyketide_precursor_ion].massdifference;
+		mass = parameters->iondefinitions[cyclic_polyketide_precursor_ion].massdifference;
 		break;
 	case other:
 		break;

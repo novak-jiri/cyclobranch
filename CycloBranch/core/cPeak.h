@@ -17,21 +17,6 @@ using namespace std;
 
 
 /**
-	\brief The types of scores between an experimental and a theoretical spectrum.
-*/
-enum eScoreType {
-	b_ions = 0,
-	b_ions_and_b_dehydrated_ions = 1,
-	b_ions_and_b_deamidated_ions = 2,
-	y_ions_and_b_ions = 3,
-	y_ions = 4,
-	weighted_intensity = 5,
-	matched_peaks = 6,
-	matched_bricks = 7
-};
-
-
-/**
 	\brief A structure representing a peak in a mass spectrum.
 */
 struct cPeak {
@@ -106,9 +91,15 @@ struct cPeak {
 
 
 	/**
-		\brief The type of a fragment ion corresponding to the peak.
+		\brief Ion type corresponding to the peak.
 	*/ 
 	eFragmentIonType iontype;
+
+
+	/**
+		\brief Neutral loss type corresponding to the peak.
+	*/
+	int neutrallosstype;
 
 	
 	/**

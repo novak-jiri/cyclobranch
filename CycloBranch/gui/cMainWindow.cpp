@@ -323,7 +323,7 @@ cMainWindow::cMainWindow() {
 
 	setCentralWidget(splitter);
 
-	resize(1280, 770);
+	resize(1280, 780);
 
 	resultsbasecolumncount = 9;
 	resultsspecificcolumncount = 0;
@@ -509,8 +509,6 @@ void cMainWindow::reportSpectrum(int row, cTheoreticalSpectrum& theoreticalspect
 			break;
 		case cyclic:
 		case cyclicpolyketide:
-			resultsmodel->setItem(row, 6 + searchspecificcolumncount, new QStandardItem());
-			resultsmodel->item(row, 6 + searchspecificcolumncount)->setData(QVariant::fromValue(theoreticalspectrum.getNumberOfMatchedBricks()), Qt::DisplayRole);	
 			break;
 		case branchcyclic:
 			resultsmodel->setItem(row, 6 + searchspecificcolumncount, new QStandardItem());
@@ -528,11 +526,16 @@ void cMainWindow::reportSpectrum(int row, cTheoreticalSpectrum& theoreticalspect
 		resultsmodel->item(row, 7 + searchspecificcolumncount + resultsspecificcolumncount)->setData(QVariant::fromValue(cropPrecisionToSixDecimalsByteArray(theoreticalspectrum.getRatioOfMatchedPeaks()*100)), Qt::DisplayRole);
 
 		resultsmodel->setItem(row, 8 + searchspecificcolumncount + resultsspecificcolumncount, new QStandardItem());
-		resultsmodel->item(row, 8 + searchspecificcolumncount + resultsspecificcolumncount)->setData(QVariant::fromValue(cropPrecisionToSixDecimalsByteArray(theoreticalspectrum.getWeightedIntensityScore())), Qt::DisplayRole);
+		resultsmodel->item(row, 8 + searchspecificcolumncount + resultsspecificcolumncount)->setData(QVariant::fromValue(cropPrecisionToSixDecimalsByteArray(theoreticalspectrum.getSumOfRelativeIntensities())), Qt::DisplayRole);
 
-		for (int i = 0; i < (int)parameters.fragmentionsfortheoreticalspectra.size(); i++) {
-			resultsmodel->setItem(row, resultsbasecolumncount  + searchspecificcolumncount + resultsspecificcolumncount + i, new QStandardItem());
-			resultsmodel->item(row, resultsbasecolumncount + searchspecificcolumncount + resultsspecificcolumncount + i)->setData(QVariant::fromValue(theoreticalspectrum.getNumberOfMatchedPeaks(parameters.fragmentionsfortheoreticalspectra[i])), Qt::DisplayRole);
+		int index = resultsbasecolumncount + searchspecificcolumncount + resultsspecificcolumncount;
+		for (int i = 0; i < (int)parameters.ionsfortheoreticalspectra.size(); i++) {
+			for (int j = -1; j < (int)parameters.neutrallossesfortheoreticalspectra.size(); j++) {
+				resultsmodel->setItem(row, index, new QStandardItem());
+				resultsmodel->item(row, index)->setData(QVariant::fromValue(theoreticalspectrum.getNumberOfMatchedPeaks(parameters.ionsfortheoreticalspectra[i], (j == -1) ? -1 : parameters.neutrallossesfortheoreticalspectra[j])), Qt::DisplayRole);
+
+				index++;
+			}
 		}
 
 		if ((parameters.peptidetype == cyclic) && parameters.enablescrambling) {
@@ -561,7 +564,7 @@ void cMainWindow::reportSpectrum(int row, cTheoreticalSpectrum& theoreticalspect
 		resultsmodel->item(row, 4)->setData(QVariant::fromValue(cropPrecisionToSixDecimalsByteArray(theoreticalspectrum.getRatioOfMatchedPeaks()*100)), Qt::DisplayRole);
 
 		resultsmodel->setItem(row, 5, new QStandardItem());
-		resultsmodel->item(row, 5)->setData(QVariant::fromValue(cropPrecisionToSixDecimalsByteArray(theoreticalspectrum.getWeightedIntensityScore())), Qt::DisplayRole);
+		resultsmodel->item(row, 5)->setData(QVariant::fromValue(cropPrecisionToSixDecimalsByteArray(theoreticalspectrum.getSumOfRelativeIntensities())), Qt::DisplayRole);
 
 		if ((parameters.peaklistfileformat == mis) || (parameters.peaklistfileformat == imzML)) {
 			resultsmodel->setItem(row, 6, new QStandardItem());
@@ -888,7 +891,7 @@ void cMainWindow::reportSpectra() {
 		break;
 	case cyclic:
 	case cyclicpolyketide:
-		resultsspecificcolumncount = 1;
+		resultsspecificcolumncount = 0;
 		break;
 	case branchcyclic:
 		resultsspecificcolumncount = 1;
@@ -909,7 +912,7 @@ void cMainWindow::reportSpectra() {
 
 	if ((parameters.mode == denovoengine) || (parameters.mode == singlecomparison) || (parameters.mode == databasesearch)) { 
 
-		resultsmodel->setColumnCount(resultsbasecolumncount + searchspecificcolumncount + resultsspecificcolumncount + (int)parameters.fragmentionsfortheoreticalspectra.size());
+		resultsmodel->setColumnCount(resultsbasecolumncount + searchspecificcolumncount + resultsspecificcolumncount + ((int)parameters.ionsfortheoreticalspectra.size() * ((int)parameters.neutrallossesfortheoreticalspectra.size() + 1)));
 
 		if ((parameters.peptidetype == cyclic) && parameters.enablescrambling) {
 			resultsmodel->setColumnCount(resultsmodel->columnCount() + 1);
@@ -977,9 +980,6 @@ void cMainWindow::reportSpectra() {
 			break;
 		case cyclic:
 		case cyclicpolyketide:
-			resultsmodel->setHorizontalHeaderItem(6 + searchspecificcolumncount, new QStandardItem());
-			resultsmodel->horizontalHeaderItem(6 + searchspecificcolumncount)->setText("Matched Bricks");
-			results->setItemDelegateForColumn(6 + searchspecificcolumncount, new QItemDelegate());
 			break;
 		case branchcyclic:
 			resultsmodel->setHorizontalHeaderItem(6 + searchspecificcolumncount, new QStandardItem());
@@ -1013,10 +1013,20 @@ void cMainWindow::reportSpectra() {
 		resultsmodel->horizontalHeaderItem(8 + searchspecificcolumncount + resultsspecificcolumncount)->setText("Sum of Relative Intensities");
 		results->setItemDelegateForColumn(8 + searchspecificcolumncount + resultsspecificcolumncount, new QItemDelegate());
 
-		for (int i = 0; i < (int)parameters.fragmentionsfortheoreticalspectra.size(); i++) {
-			resultsmodel->setHorizontalHeaderItem(resultsbasecolumncount + searchspecificcolumncount + resultsspecificcolumncount + i, new QStandardItem());
-			resultsmodel->horizontalHeaderItem(resultsbasecolumncount + searchspecificcolumncount + resultsspecificcolumncount + i)->setText(parameters.fragmentdefinitions[(eFragmentIonType)parameters.fragmentionsfortheoreticalspectra[i]].name.c_str());
-			results->setItemDelegateForColumn(resultsbasecolumncount + searchspecificcolumncount + resultsspecificcolumncount + i, new QItemDelegate());
+		string name;
+		int index = resultsbasecolumncount + searchspecificcolumncount + resultsspecificcolumncount;
+		for (int i = 0; i < (int)parameters.ionsfortheoreticalspectra.size(); i++) {
+			for (int j = -1; j < (int)parameters.neutrallossesfortheoreticalspectra.size(); j++) {
+				resultsmodel->setHorizontalHeaderItem(index, new QStandardItem());
+				name = parameters.iondefinitions[(eFragmentIonType)parameters.ionsfortheoreticalspectra[i]].name;
+				if (j >= 0) {
+					name += "-" + parameters.neutrallossesdefinitions[parameters.neutrallossesfortheoreticalspectra[j]].summary;
+				}
+				resultsmodel->horizontalHeaderItem(index)->setText(name.c_str());
+				results->setItemDelegateForColumn(index, new QItemDelegate());
+
+				index++;
+			}
 		}
 
 		if ((parameters.peptidetype == cyclic) && parameters.enablescrambling) {
@@ -1295,7 +1305,7 @@ void cMainWindow::exportToHTML() {
 			out << "</head>\n";
 			out << "<body style=\"font-family: Verdana, Arial; font-size: 10pt\">\n";
 
-			out << "<h1>" << QString(title.c_str()) << "</h1>\n";
+			out << "<h1><a href=\"http://ms.biomed.cas.cz/cyclobranch/\">" << QString(title.c_str()) << "</a></h1>\n";
 
 			if (htmlexportdialog->checkboxparameters->isChecked()) {	
 				out << "<h2>Parameters</h2>\n";

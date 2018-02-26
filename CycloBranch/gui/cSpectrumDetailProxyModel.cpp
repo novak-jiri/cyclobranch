@@ -5,23 +5,25 @@ cSpectrumDetailProxyModel::cSpectrumDetailProxyModel(QObject *parent) : QSortFil
 	hidematched = false;
 	hideunmatched = false;
 	hidescrambled = false;
+	hideionseries = false;
+	hideneutralloss = false;
 	hiderotations = false;
 	hidetrotations = false;
 }
 
 
-void cSpectrumDetailProxyModel::setFlags(bool hidematched, bool hideunmatched, bool hidescrambled, bool hiderotations, bool hidetrotations) {
+void cSpectrumDetailProxyModel::setFlags(bool hidematched, bool hideunmatched, bool hidescrambled, bool hideionseries, bool hideneutralloss, bool hiderotations, bool hidetrotations) {
 	this->hidematched = hidematched;
 	this->hideunmatched = hideunmatched;
 	this->hidescrambled = hidescrambled;
+	this->hideionseries = hideionseries;
+	this->hideneutralloss = hideneutralloss;
 	this->hiderotations = hiderotations;
 	this->hidetrotations = hidetrotations;
 }
 
 
 bool cSpectrumDetailProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const {
-	bool show = true;
-
 	if (hidematched 
 		&& ((QStandardItemModel *)sourceModel())->item(sourceRow, 1) 
 		&& ((QStandardItemModel *)sourceModel())->item(sourceRow, 2)
@@ -30,7 +32,7 @@ bool cSpectrumDetailProxyModel::filterAcceptsRow(int sourceRow, const QModelInde
 		&& !((QStandardItemModel *)sourceModel())->item(sourceRow, 2)->data(Qt::DisplayRole).toString().isEmpty()
 		&& !((QStandardItemModel *)sourceModel())->item(sourceRow, 3)->data(Qt::DisplayRole).toString().isEmpty()
 		) {
-		show = false;
+		return false;
 	}
 		
 	if (hideunmatched && (
@@ -41,15 +43,19 @@ bool cSpectrumDetailProxyModel::filterAcceptsRow(int sourceRow, const QModelInde
 		|| ((QStandardItemModel *)sourceModel())->item(sourceRow, 2)->data(Qt::DisplayRole).toString().isEmpty()
 		|| ((QStandardItemModel *)sourceModel())->item(sourceRow, 3)->data(Qt::DisplayRole).toString().isEmpty()
 		)) {
-		show = false;
+		return false;
+	}
+
+	if (hidescrambled && (((QStandardItemModel *)sourceModel())->item(sourceRow, 0) != 0) && ((QStandardItemModel *)sourceModel())->item(sourceRow, 0)->data(Qt::DisplayRole).toString().contains("scrambled")) {
+		return false;
 	}
 		
-	if ((hidescrambled || hiderotations || hidetrotations) && 
+	if ((hideionseries || hideneutralloss || hiderotations || hidetrotations) && 
 		((QStandardItemModel *)sourceModel())->item(sourceRow, 0) && (!sourceModel()->data(sourceModel()->index(sourceRow, 0, sourceParent)).toString().contains(filterRegExp()))) {
-		show = false;
+		return false;
 	}
 		
-    return show;
+	return true;
 }
 
 

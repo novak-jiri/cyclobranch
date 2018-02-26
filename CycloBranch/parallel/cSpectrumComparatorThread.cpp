@@ -32,68 +32,10 @@ bool comparePaths(vector<nodeEdge>& a, vector<nodeEdge>& b) {
 
 
 bool compareBandAllIonsDesc(const cTheoreticalSpectrum& a, const cTheoreticalSpectrum& b) {
-	if (a.getNumberOfMatchedPeaks(b_ion) > b.getNumberOfMatchedPeaks(b_ion)) {
+	if (a.getNumberOfMatchedPeaksB() > b.getNumberOfMatchedPeaksB()) {
 		return true;
 	}
-	if (a.getNumberOfMatchedPeaks(b_ion) < b.getNumberOfMatchedPeaks(b_ion)) {
-		return false;
-	}
-
-	if (a.getNumberOfMatchedPeaks() > b.getNumberOfMatchedPeaks()) {
-		return true;
-	}
-	if (a.getNumberOfMatchedPeaks() < b.getNumberOfMatchedPeaks()) {
-		return false;
-	}
-
-	if (a.getPathId() < b.getPathId()) {
-		return true;
-	}
-	if (a.getPathId() > b.getPathId()) {
-		return false;
-	}
-
-	vector<nodeEdge> v1 = ((cTheoreticalSpectrum&)a).getCandidate().getPath();
-	vector<nodeEdge> v2 = ((cTheoreticalSpectrum&)b).getCandidate().getPath();
-
-	return comparePaths(v1, v2);
-}
-
-
-bool compareBBwaterLossAndAllIonsDesc(const cTheoreticalSpectrum& a, const cTheoreticalSpectrum& b) {
-	if (a.getNumberOfMatchedPeaks(b_ion) + a.getNumberOfMatchedPeaks(b_ion_dehydrated) > b.getNumberOfMatchedPeaks(b_ion) + b.getNumberOfMatchedPeaks(b_ion_dehydrated)) {
-		return true;
-	}
-	if (a.getNumberOfMatchedPeaks(b_ion) + a.getNumberOfMatchedPeaks(b_ion_dehydrated) < b.getNumberOfMatchedPeaks(b_ion) + b.getNumberOfMatchedPeaks(b_ion_dehydrated)) {
-		return false;
-	}
-
-	if (a.getNumberOfMatchedPeaks() > b.getNumberOfMatchedPeaks()) {
-		return true;
-	}
-	if (a.getNumberOfMatchedPeaks() < b.getNumberOfMatchedPeaks()) {
-		return false;
-	}
-
-	if (a.getPathId() < b.getPathId()) {
-		return true;
-	}
-	if (a.getPathId() > b.getPathId()) {
-		return false;
-	}
-
-	vector<nodeEdge> v1 = ((cTheoreticalSpectrum&)a).getCandidate().getPath();
-	vector<nodeEdge> v2 = ((cTheoreticalSpectrum&)b).getCandidate().getPath();
-
-	return comparePaths(v1, v2);
-}
-
-
-bool compareBBammoniaLossAndAllIonsDesc(const cTheoreticalSpectrum& a, const cTheoreticalSpectrum& b) {
-	if (a.getNumberOfMatchedPeaks(b_ion) + a.getNumberOfMatchedPeaks(b_ion_deamidated) > b.getNumberOfMatchedPeaks(b_ion) + b.getNumberOfMatchedPeaks(b_ion_deamidated)) {
-		return true;
-	}
-	if (a.getNumberOfMatchedPeaks(b_ion) + a.getNumberOfMatchedPeaks(b_ion_deamidated) < b.getNumberOfMatchedPeaks(b_ion) + b.getNumberOfMatchedPeaks(b_ion_deamidated)) {
+	if (a.getNumberOfMatchedPeaksB() < b.getNumberOfMatchedPeaksB()) {
 		return false;
 	}
 
@@ -148,10 +90,10 @@ bool compareYBandAllIonsDesc(const cTheoreticalSpectrum& a, const cTheoreticalSp
 
 
 bool compareYandAllIonsDesc(const cTheoreticalSpectrum& a, const cTheoreticalSpectrum& b) {
-	if (a.getNumberOfMatchedPeaks(y_ion) > b.getNumberOfMatchedPeaks(y_ion)) {
+	if (a.getNumberOfMatchedPeaksY() > b.getNumberOfMatchedPeaksY()) {
 		return true;
 	}
-	if (a.getNumberOfMatchedPeaks(y_ion) < b.getNumberOfMatchedPeaks(y_ion)) {
+	if (a.getNumberOfMatchedPeaksY() < b.getNumberOfMatchedPeaksY()) {
 		return false;
 	}
 
@@ -176,11 +118,11 @@ bool compareYandAllIonsDesc(const cTheoreticalSpectrum& a, const cTheoreticalSpe
 }
 
 
-bool compareWeightedIntensityDesc(const cTheoreticalSpectrum& a, const cTheoreticalSpectrum& b) {
-	if (a.getWeightedIntensityScore() > b.getWeightedIntensityScore()) {
+bool compareSumOfRelIntDesc(const cTheoreticalSpectrum& a, const cTheoreticalSpectrum& b) {
+	if (a.getSumOfRelativeIntensities() > b.getSumOfRelativeIntensities()) {
 		return true;
 	}
-	if (a.getWeightedIntensityScore() < b.getWeightedIntensityScore()) {
+	if (a.getSumOfRelativeIntensities() < b.getSumOfRelativeIntensities()) {
 		return false;
 	}
 
@@ -203,28 +145,6 @@ bool compareNumberOfMatchedPeaksDesc(const cTheoreticalSpectrum& a, const cTheor
 		return true;
 	}
 	if (a.getNumberOfMatchedPeaks() < b.getNumberOfMatchedPeaks()) {
-		return false;
-	}
-
-	if (a.getPathId() < b.getPathId()) {
-		return true;
-	}
-	if (a.getPathId() > b.getPathId()) {
-		return false;
-	}
-
-	vector<nodeEdge> v1 = ((cTheoreticalSpectrum&)a).getCandidate().getPath();
-	vector<nodeEdge> v2 = ((cTheoreticalSpectrum&)b).getCandidate().getPath();
-
-	return comparePaths(v1, v2);
-}
-
-
-bool compareNumberOfMatchedBricksDesc(const cTheoreticalSpectrum& a, const cTheoreticalSpectrum& b) {
-	if (a.getNumberOfMatchedBricks() > b.getNumberOfMatchedBricks()) {
-		return true;
-	}
-	if (a.getNumberOfMatchedBricks() < b.getNumberOfMatchedBricks()) {
 		return false;
 	}
 
@@ -273,6 +193,8 @@ void cSpectrumComparatorThread::run() {
 
 	double unchargedprecursormass = charge(uncharge(parameters->precursormass, parameters->precursorcharge), (parameters->precursorcharge > 0)?1:-1);
 
+	cPeaksList unmatchedpeaksinmatchedpatterns;
+
 	for (auto i = permutations.getSet().begin(); i != permutations.getSet().end(); ++i) {
 
 		if (*terminatecomputation) {
@@ -290,24 +212,26 @@ void cSpectrumComparatorThread::run() {
 			}
 		}
 
+		unmatchedpeaksinmatchedpatterns.clear();
+
 		switch (parameters->peptidetype) {
 			case linear:
-				theoreticalpeaksrealsize = tsp.compareLinear(peaklist, *bricksdatabasewithcombinations, false, *rxsequencetag, *rxsearchedsequence);
+				theoreticalpeaksrealsize = tsp.compareLinear(peaklist, *bricksdatabasewithcombinations, false, *rxsequencetag, *rxsearchedsequence, unmatchedpeaksinmatchedpatterns, 0);
 				break;
 			case cyclic:
-				theoreticalpeaksrealsize = tsp.compareCyclic(peaklist, *bricksdatabasewithcombinations, false, *rxsequencetag, *rxsearchedsequence);
+				theoreticalpeaksrealsize = tsp.compareCyclic(peaklist, *bricksdatabasewithcombinations, false, *rxsequencetag, *rxsearchedsequence, unmatchedpeaksinmatchedpatterns, 0);
 				break;
 			case branched:
-				theoreticalpeaksrealsize = tsp.compareBranched(peaklist, *bricksdatabasewithcombinations, false, *rxsequencetag, *rxsearchedsequence);
+				theoreticalpeaksrealsize = tsp.compareBranched(peaklist, *bricksdatabasewithcombinations, false, *rxsequencetag, *rxsearchedsequence, unmatchedpeaksinmatchedpatterns, 0);
 				break;
 			case branchcyclic:
-				theoreticalpeaksrealsize = tsp.compareBranchCyclic(peaklist, *bricksdatabasewithcombinations, false, *rxsequencetag, *rxsearchedsequence);
+				theoreticalpeaksrealsize = tsp.compareBranchCyclic(peaklist, *bricksdatabasewithcombinations, false, *rxsequencetag, *rxsearchedsequence, unmatchedpeaksinmatchedpatterns, 0);
 				break;
 			case linearpolyketide:
-				theoreticalpeaksrealsize = tsp.compareLinearPolyketide(peaklist, *bricksdatabasewithcombinations, false, *rxsequencetag, *rxsearchedsequence);
+				theoreticalpeaksrealsize = tsp.compareLinearPolyketide(peaklist, *bricksdatabasewithcombinations, false, *rxsequencetag, *rxsearchedsequence, unmatchedpeaksinmatchedpatterns, 0);
 				break;
 			case cyclicpolyketide:
-				theoreticalpeaksrealsize = tsp.compareCyclicPolyketide(peaklist, *bricksdatabasewithcombinations, false, *rxsequencetag, *rxsearchedsequence);
+				theoreticalpeaksrealsize = tsp.compareCyclicPolyketide(peaklist, *bricksdatabasewithcombinations, false, *rxsequencetag, *rxsearchedsequence, unmatchedpeaksinmatchedpatterns, 0);
 				break;
 			case other:
 				break;
@@ -322,29 +246,22 @@ void cSpectrumComparatorThread::run() {
 
 		score = 0;
 		switch (parameters->scoretype) {
-			case b_ions:
-				score = tsp.getNumberOfMatchedPeaks(b_ion);
-				break;
-			case b_ions_and_b_dehydrated_ions:
-				score = tsp.getNumberOfMatchedPeaks(b_ion) + tsp.getNumberOfMatchedPeaks(b_ion_dehydrated);
-				break;
-			case b_ions_and_b_deamidated_ions:
-				score = tsp.getNumberOfMatchedPeaks(b_ion) + tsp.getNumberOfMatchedPeaks(b_ion_deamidated);
-				break;
-			case y_ions_and_b_ions:
-				score = tsp.getNumberOfMatchedPeaksYB();
-				break;
-			case y_ions:
-				score = tsp.getNumberOfMatchedPeaks(y_ion);
-				break;
-			case weighted_intensity:
-				score = tsp.getWeightedIntensityScore();
-				break;
-			case matched_peaks:
+			case number_of_matched_peaks:
 				score = tsp.getNumberOfMatchedPeaks();
 				break;
-			case matched_bricks:
-				score = tsp.getNumberOfMatchedBricks();
+			case sum_of_relative_intensities:
+				score = tsp.getSumOfRelativeIntensities();
+				break;
+			case number_of_b_ions:
+				score = tsp.getNumberOfMatchedPeaksB();
+				break;
+			case number_of_y_ions:
+				score = tsp.getNumberOfMatchedPeaksY();
+				break;			
+			case number_of_b_and_y_ions:
+				score = tsp.getNumberOfMatchedPeaksYB();
+				break;
+			default:
 				break;
 		}
 

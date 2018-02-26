@@ -157,6 +157,9 @@ private:
 	int origwidth;
 	int origheight;
 
+	string visibleionseriespart1;
+	string visibleionseriespart2;
+	string visibleneutralloss;
 	int coloredrotationid;
 	string coloredrotationstring;
 	int coloredtrotationid;
@@ -229,6 +232,12 @@ private slots:
 
 
 	void resetMZInterval();
+
+
+	void ionSeriesChanged(QString text);
+
+
+	void neutralLossChanged(QString text);
 
 
 	void rotationChanged(int index);

@@ -549,15 +549,25 @@ cSpectrumDetailWidget::~cSpectrumDetailWidget() {
 		delete hboxmz;
 		delete widgetmz;
 
-		delete labelrotation;
-		delete rotation;
-		delete hboxrotation;
-		delete widgetrotation;
+		delete ionserieslabel;
+		delete ionseriescombobox;
+		delete ionserieshbox;
+		delete ionserieswidget;
 
-		delete labeltrotation;
-		delete trotation;
-		delete hboxtrotation;
-		delete widgettrotation;
+		delete neutrallosslabel;
+		delete neutrallosscombobox;
+		delete neutrallosshbox;
+		delete neutrallosswidget;
+
+		delete rotationlabel;
+		delete rotationcombobox;
+		delete rotationhbox;
+		delete rotationwidget;
+
+		delete trotationlabel;
+		delete trotationcombobox;
+		delete trotationhbox;
+		delete trotationwidget;
 
 		if (parameters && ((parameters->mode == denovoengine) || (parameters->mode == singlecomparison) || (parameters->mode == databasesearch))) {
 
@@ -787,7 +797,7 @@ void cSpectrumDetailWidget::prepareToShow(ePeptideType peptidetype, QAction* act
 
 		if (parameters && ((parameters->mode == denovoengine) || (parameters->mode == singlecomparison) || (parameters->mode == databasesearch))) {
 
-			if ((parameters->peptidetype == cyclic) && parameters->enablescrambling) {
+			if ((peptidetype == cyclic) && parameters->enablescrambling) {
 				actionHideScrambled->setEnabled(true);
 				connect(actionHideScrambled, SIGNAL(toggled(bool)), this, SLOT(hideScrambledPeaks(bool)));
 			}
@@ -862,112 +872,192 @@ void cSpectrumDetailWidget::prepareToShow(ePeptideType peptidetype, QAction* act
 		addToolBarBreak();
 
 
-		labelrotation = new QLabel(tr("Ring break up point: "));
-		rotation = new QComboBox();
-		rotation->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+		ionserieslabel = new QLabel(tr("Fragment ion type: "));
+		ionseriescombobox = new QComboBox();
+		ionseriescombobox->setSizeAdjustPolicy(QComboBox::AdjustToContents);
 
-		hboxrotation = new QHBoxLayout();
-		hboxrotation->addWidget(labelrotation);
-		hboxrotation->addWidget(rotation);
+		ionserieshbox = new QHBoxLayout();
+		ionserieshbox->addWidget(ionserieslabel);
+		ionserieshbox->addWidget(ionseriescombobox);
 
-		widgetrotation = new QWidget();
-		widgetrotation->setLayout(hboxrotation);
+		ionserieswidget = new QWidget();
+		ionserieswidget->setLayout(ionserieshbox);
 
 
-		labeltrotation = new QLabel(tr("Linearized sequence: "));
-		trotation = new QComboBox();
-		trotation->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+		neutrallosslabel = new QLabel(tr("Neutral loss type: "));
+		neutrallosscombobox = new QComboBox();
+		neutrallosscombobox->setSizeAdjustPolicy(QComboBox::AdjustToContents);
 
-		hboxtrotation = new QHBoxLayout();
-		hboxtrotation->addWidget(labeltrotation);
-		hboxtrotation->addWidget(trotation);
+		neutrallosshbox = new QHBoxLayout();
+		neutrallosshbox->addWidget(neutrallosslabel);
+		neutrallosshbox->addWidget(neutrallosscombobox);
 
-		widgettrotation = new QWidget();
-		widgettrotation->setLayout(hboxtrotation);
+		neutrallosswidget = new QWidget();
+		neutrallosswidget->setLayout(neutrallosshbox);
+
+
+		rotationlabel = new QLabel(tr("Ring break up point: "));
+		rotationcombobox = new QComboBox();
+		rotationcombobox->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+
+		rotationhbox = new QHBoxLayout();
+		rotationhbox->addWidget(rotationlabel);
+		rotationhbox->addWidget(rotationcombobox);
+
+		rotationwidget = new QWidget();
+		rotationwidget->setLayout(rotationhbox);
+
+
+		trotationlabel = new QLabel(tr("Linearized sequence: "));
+		trotationcombobox = new QComboBox();
+		trotationcombobox->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+
+		trotationhbox = new QHBoxLayout();
+		trotationhbox->addWidget(trotationlabel);
+		trotationhbox->addWidget(trotationcombobox);
+
+		trotationwidget = new QWidget();
+		trotationwidget->setLayout(trotationhbox);
 
 
 		if (parameters && ((parameters->mode == denovoengine) || (parameters->mode == singlecomparison) || (parameters->mode == databasesearch))) {
 
+			toolbarIonSeries = addToolBar(tr("Fragment ion type"));
+			toolbarIonSeries->addWidget(ionserieswidget);
+
+			ionseriescombobox->addItem(tr("all"));
+			for (int i = 0; i < (int)parameters->ionsfortheoreticalspectra.size(); i++) {
+				ionseriescombobox->addItem(tr(parameters->iondefinitions[parameters->ionsfortheoreticalspectra[i]].name.c_str()));
+			}
+
+			connect(ionseriescombobox, SIGNAL(currentIndexChanged(QString)), spectrumscene, SLOT(ionSeriesChanged(QString)));
+			connect(ionseriescombobox, SIGNAL(currentIndexChanged(int)), this, SLOT(filterTableAfterIonSeriesChanged(int)));
+
+
+			toolbarNeutralLoss = addToolBar(tr("Neutral loss type"));
+			toolbarNeutralLoss->addWidget(neutrallosswidget);
+
+			neutrallosscombobox->addItem(tr("all"));
+			if (parameters->neutrallossesfortheoreticalspectra.size() > 0) {
+				neutrallosscombobox->addItem(tr("none"));
+				for (int i = 0; i < (int)parameters->neutrallossesfortheoreticalspectra.size(); i++) {
+					neutrallosscombobox->addItem(tr(parameters->neutrallossesdefinitions[parameters->neutrallossesfortheoreticalspectra[i]].summary.c_str()));
+				}
+			}
+			
+			connect(neutrallosscombobox, SIGNAL(currentIndexChanged(QString)), spectrumscene, SLOT(neutralLossChanged(QString)));
+			connect(neutrallosscombobox, SIGNAL(currentIndexChanged(int)), this, SLOT(filterTableAfterNeutralLossChanged(int)));
+
+
+			switch (peptidetype) {
+				case linear:
+				case linearpolyketide:
+					connect(ionseriescombobox, SIGNAL(currentIndexChanged(QString)), linearwidget, SLOT(ionSeriesChanged(QString)));
+					connect(neutrallosscombobox, SIGNAL(currentIndexChanged(QString)), linearwidget, SLOT(neutralLossChanged(QString)));
+					break;
+				case cyclic:
+				case cyclicpolyketide:
+					connect(ionseriescombobox, SIGNAL(currentIndexChanged(QString)), cyclicwidget, SLOT(ionSeriesChanged(QString)));
+					connect(neutrallosscombobox, SIGNAL(currentIndexChanged(QString)), cyclicwidget, SLOT(neutralLossChanged(QString)));
+					break;
+				case branched:
+					connect(ionseriescombobox, SIGNAL(currentIndexChanged(QString)), branchedwidget, SLOT(ionSeriesChanged(QString)));
+					connect(neutrallosscombobox, SIGNAL(currentIndexChanged(QString)), branchedwidget, SLOT(neutralLossChanged(QString)));
+					break;
+				case branchcyclic:
+					connect(ionseriescombobox, SIGNAL(currentIndexChanged(QString)), branchcyclicwidget, SLOT(ionSeriesChanged(QString)));
+					connect(neutrallosscombobox, SIGNAL(currentIndexChanged(QString)), branchcyclicwidget, SLOT(neutralLossChanged(QString)));
+					break;
+				case other:
+					break;
+				default:
+					break;
+			}
+
+
 			// cyclic
-			if (theoreticalspectrum && ((parameters->peptidetype == cyclic) || (parameters->peptidetype == cyclicpolyketide))) {
+			if (theoreticalspectrum && ((peptidetype == cyclic) || (peptidetype == cyclicpolyketide))) {
 				int r = (int)theoreticalspectrum->getCandidate().getAcronyms().size();
 				int hint = (int)theoreticalspectrum->getVisualCoverage().size()/(2*r);
 				
-				rotation->addItem(tr("all"));
+				rotationcombobox->addItem(tr("all"));
 
 				string s;
 				if (theoreticalspectrum->getVisualCoverage().size() > 0) {
 					for (int i = 0; i < 2*r; i++) {
 						s = theoreticalspectrum->getVisualCoverage()[i*hint].name.substr(0, theoreticalspectrum->getVisualCoverage()[i*hint].name.rfind('_'));
-						rotation->addItem(tr(s.c_str()));
+						rotationcombobox->addItem(tr(s.c_str()));
 					}
 				}
 
-				connect(rotation, SIGNAL(currentIndexChanged(int)), spectrumscene, SLOT(rotationChanged(int)));
-				connect(rotation, SIGNAL(currentIndexChanged(QString)), spectrumscene, SLOT(rotationChanged(QString)));
-				connect(rotation, SIGNAL(currentIndexChanged(int)), cyclicwidget, SLOT(rotationChanged(int)));
-				connect(rotation, SIGNAL(currentIndexChanged(int)), this, SLOT(filterTableAfterRotationChanged(int)));
+				connect(rotationcombobox, SIGNAL(currentIndexChanged(int)), spectrumscene, SLOT(rotationChanged(int)));
+				connect(rotationcombobox, SIGNAL(currentIndexChanged(QString)), spectrumscene, SLOT(rotationChanged(QString)));
+				connect(rotationcombobox, SIGNAL(currentIndexChanged(int)), cyclicwidget, SLOT(rotationChanged(int)));
+				connect(rotationcombobox, SIGNAL(currentIndexChanged(int)), this, SLOT(filterTableAfterRotationChanged(int)));
 
 				toolbarRotation = addToolBar(tr("Ring break up point"));
-				toolbarRotation->addWidget(widgetrotation);
+				toolbarRotation->addWidget(rotationwidget);
 			}
+
 
 			// branched
-			if (parameters->peptidetype == branched) {
-				trotation->addItem(tr("all"));
-				trotation->addItem(tr("1 (left-to-right)"));
-				trotation->addItem(tr("2 (top-to-right)"));
-				trotation->addItem(tr("3 (right-to-left)"));
-				trotation->addItem(tr("4 (left-to-top)"));
-				trotation->addItem(tr("5 (top-to-left)"));
-				trotation->addItem(tr("6 (right-to-top)"));
+			if (peptidetype == branched) {
+				trotationcombobox->addItem(tr("all"));
+				trotationcombobox->addItem(tr("1 (left-to-right)"));
+				trotationcombobox->addItem(tr("2 (top-to-right)"));
+				trotationcombobox->addItem(tr("3 (right-to-left)"));
+				trotationcombobox->addItem(tr("4 (left-to-top)"));
+				trotationcombobox->addItem(tr("5 (top-to-left)"));
+				trotationcombobox->addItem(tr("6 (right-to-top)"));
 
-				connect(trotation, SIGNAL(currentIndexChanged(int)), spectrumscene, SLOT(trotationChanged(int)));
-				connect(trotation, SIGNAL(currentIndexChanged(int)), branchedwidget, SLOT(trotationChanged(int)));
-				connect(trotation, SIGNAL(currentIndexChanged(int)), this, SLOT(filterTableAfterTRotationChanged(int)));
+				connect(trotationcombobox, SIGNAL(currentIndexChanged(int)), spectrumscene, SLOT(trotationChanged(int)));
+				connect(trotationcombobox, SIGNAL(currentIndexChanged(int)), branchedwidget, SLOT(trotationChanged(int)));
+				connect(trotationcombobox, SIGNAL(currentIndexChanged(int)), this, SLOT(filterTableAfterTRotationChanged(int)));
 
 				toolbarTrotation = addToolBar(tr("Linearized sequence"));
-				toolbarTrotation->addWidget(widgettrotation);
+				toolbarTrotation->addWidget(trotationwidget);
 			}
 
+
 			// branch-cyclic
-			if (parameters && theoreticalspectrum && (parameters->peptidetype == branchcyclic)) {
+			if (parameters && theoreticalspectrum && (peptidetype == branchcyclic)) {
 				int r = (int)theoreticalspectrum->getCandidate().getAcronyms().size() - (int)theoreticalspectrum->getCandidate().getBranchSize();
 				int hint = (int)theoreticalspectrum->getVisualCoverage().size()/(2*r);
 
-				rotation->addItem(tr("all"));
+				rotationcombobox->addItem(tr("all"));
 
 				string s;
 				if (theoreticalspectrum->getVisualCoverage().size() > 0) {
 					for (int i = 0; i < 2*r; i++) {
 						s = theoreticalspectrum->getVisualCoverage()[i*hint].name.substr(0, theoreticalspectrum->getVisualCoverage()[i*hint].name.find('_'));
-						rotation->addItem(tr(s.c_str()));
+						rotationcombobox->addItem(tr(s.c_str()));
 					}
 				}
 
-				connect(rotation, SIGNAL(currentIndexChanged(int)), spectrumscene, SLOT(rotationChanged(int)));
-				connect(rotation, SIGNAL(currentIndexChanged(QString)), spectrumscene, SLOT(rotationChanged(QString)));
-				connect(rotation, SIGNAL(currentIndexChanged(int)), branchcyclicwidget, SLOT(rotationChanged(int)));
-				connect(rotation, SIGNAL(currentIndexChanged(int)), this, SLOT(filterTableAfterRotationChanged(int)));
+				connect(rotationcombobox, SIGNAL(currentIndexChanged(int)), spectrumscene, SLOT(rotationChanged(int)));
+				connect(rotationcombobox, SIGNAL(currentIndexChanged(QString)), spectrumscene, SLOT(rotationChanged(QString)));
+				connect(rotationcombobox, SIGNAL(currentIndexChanged(int)), branchcyclicwidget, SLOT(rotationChanged(int)));
+				connect(rotationcombobox, SIGNAL(currentIndexChanged(int)), this, SLOT(filterTableAfterRotationChanged(int)));
 
 				toolbarRotation = addToolBar(tr("Ring break up point"));
-				toolbarRotation->addWidget(widgetrotation);
+				toolbarRotation->addWidget(rotationwidget);
 
-				trotation->addItem(tr("all"));
-				trotation->addItem(tr("1 (left-to-right)"));
-				trotation->addItem(tr("2 (top-to-right)"));
-				trotation->addItem(tr("3 (right-to-left)"));
-				trotation->addItem(tr("4 (left-to-top)"));
-				trotation->addItem(tr("5 (top-to-left)"));
-				trotation->addItem(tr("6 (right-to-top)"));
+				trotationcombobox->addItem(tr("all"));
+				trotationcombobox->addItem(tr("1 (left-to-right)"));
+				trotationcombobox->addItem(tr("2 (top-to-right)"));
+				trotationcombobox->addItem(tr("3 (right-to-left)"));
+				trotationcombobox->addItem(tr("4 (left-to-top)"));
+				trotationcombobox->addItem(tr("5 (top-to-left)"));
+				trotationcombobox->addItem(tr("6 (right-to-top)"));
 
-				connect(trotation, SIGNAL(currentIndexChanged(int)), spectrumscene, SLOT(trotationChanged(int)));
-				connect(trotation, SIGNAL(currentIndexChanged(int)), branchcyclicwidget, SLOT(trotationChanged(int)));
-				connect(trotation, SIGNAL(currentIndexChanged(int)), this, SLOT(filterTableAfterTRotationChanged(int)));
+				connect(trotationcombobox, SIGNAL(currentIndexChanged(int)), spectrumscene, SLOT(trotationChanged(int)));
+				connect(trotationcombobox, SIGNAL(currentIndexChanged(int)), branchcyclicwidget, SLOT(trotationChanged(int)));
+				connect(trotationcombobox, SIGNAL(currentIndexChanged(int)), this, SLOT(filterTableAfterTRotationChanged(int)));
 								
 				toolbarTrotation = addToolBar(tr("Linearized sequence"));
-				toolbarTrotation->addWidget(widgettrotation);
+				toolbarTrotation->addWidget(trotationwidget);
 			}
+
 
 		}
 
@@ -1048,7 +1138,7 @@ void cSpectrumDetailWidget::prepareToShow(ePeptideType peptidetype, QAction* act
 
 		setMenuBar(menuBar);
 
-		resize(1280, 770);
+		resize(1280, 780);
 
 		if (parameters && theoreticalspectrum) {
 
@@ -1922,33 +2012,93 @@ void cSpectrumDetailWidget::filterPeaksTable() {
 	bool hm = actionHideMatched->isChecked();
 	bool hu = actionHideUnmatched->isChecked();
 	bool hs = actionHideScrambled->isChecked();
+	bool hi = false;
+	bool hn = false;
 	bool hr = false;
 	bool ht = false;
 
 	QString pattern;
 
 	if (parameters && ((parameters->mode == denovoengine) || (parameters->mode == singlecomparison) || (parameters->mode == databasesearch))) {
+		
 		if ((parameters->peptidetype == cyclic) || (parameters->peptidetype == branchcyclic) || (parameters->peptidetype == cyclicpolyketide)) {
-			if (rotation->currentIndex() > 0) {
-				pattern += rotation->currentText() + "_";
+			if (rotationcombobox->currentIndex() > 0) {
+				pattern += rotationcombobox->currentText();
 				hr = true;
 			}
 		}
+		
 		if ((parameters->peptidetype == branched) || (parameters->peptidetype == branchcyclic)) {
-			if (trotation->currentIndex() > 0) {
-				pattern += QString::number(trotation->currentIndex()) + "_";
+			if (trotationcombobox->currentIndex() > 0) {
+				if (parameters->peptidetype == branchcyclic) {
+					pattern += "_";
+				}
+				pattern += QString::number(trotationcombobox->currentIndex());
 				ht = true;
 			}
+			else {
+				if (!pattern.isEmpty() && ((ionseriescombobox->currentIndex() > 0) || (neutrallosscombobox->currentIndex() > 0))) {
+					if (parameters->peptidetype == branchcyclic) {
+						pattern += "_";
+					}
+					pattern += "[0-9]";
+					ht = true;
+				}
+			}
 		}
+
+		if (!pattern.isEmpty() && (parameters->peptidetype != linear) && (parameters->peptidetype != linearpolyketide)) {
+			pattern += "_";
+		}
+
+		if (ionseriescombobox->currentIndex() > 0) {
+			if ((parameters->peptidetype == linear) || (parameters->peptidetype == linearpolyketide)) {
+				pattern += " ";
+			}
+			if (ionseriescombobox->currentText().size() > 2) {
+				pattern += ionseriescombobox->currentText().toStdString().substr(0, 2).c_str();
+				pattern += "[0-9]+\\";
+				pattern += ionseriescombobox->currentText().toStdString().substr(2).c_str();
+			}
+			else {
+				pattern += ionseriescombobox->currentText() + "[0-9]+(?!\\+2H|-2H)";
+			}
+			hi = true;
+		}
+		else {
+			if (!pattern.isEmpty() && (neutrallosscombobox->currentIndex() > 0)) {
+				pattern += "(?:A[0-9]+|B[0-9]+|C[0-9]+|X[0-9]+|Y[0-9]+|Z[0-9]+|LB[0-9]+|LB[0-9]+\\+2H|RB[0-9]+|RB[0-9]+\\+2H|LY[0-9]+-2H|LY[0-9]+|RY-2H[0-9]+|RY[0-9]+)";
+				hi = true;
+			}
+		}
+
+		if (neutrallosscombobox->currentIndex() > 0) {
+			if (neutrallosscombobox->currentIndex() == 1) {
+				if (pattern.isEmpty()) {
+					pattern = "^";
+				}
+				pattern += "((?!";
+				for (int i = 0; i < (int)parameters->neutrallossesfortheoreticalspectra.size(); i++) {
+					pattern += "-";
+					pattern += parameters->neutrallossesdefinitions[parameters->neutrallossesfortheoreticalspectra[i]].summary.c_str();
+					pattern += "(?:$|_| )";
+					if (i < (int)parameters->neutrallossesfortheoreticalspectra.size() - 1) {
+						pattern += "|";
+					}
+				}
+				pattern += ").)*$";
+			}
+			else {
+				pattern += "-";
+				pattern += neutrallosscombobox->currentText();
+				pattern += "(?:$|_| )";
+			}
+			hn = true;
+		}
+
 	}
 
-	if (hs) {
-		if (pattern.isEmpty()) {
-			pattern = "^((?!scrambled).)*$";
-		}
-	}
-
-	proxymodel->setFlags(hm, hu, hs, hr, ht);
+	proxymodel->setFlags(hm, hu, hs, hi, hn, hr, ht);
 	proxymodel->setFilterKeyColumn(-1);
 	proxymodel->setFilterRegExp(pattern);
 }
@@ -1968,6 +2118,16 @@ void cSpectrumDetailWidget::hideUnmatchedPeaks(bool hide) {
 
 void cSpectrumDetailWidget::hideScrambledPeaks(bool hide) {
 	spectrumscene->hideScrambledPeaks(hide);
+	filterPeaksTable();
+}
+
+
+void cSpectrumDetailWidget::filterTableAfterIonSeriesChanged(int index) {
+	filterPeaksTable();
+}
+
+
+void cSpectrumDetailWidget::filterTableAfterNeutralLossChanged(int index) {
 	filterPeaksTable();
 }
 

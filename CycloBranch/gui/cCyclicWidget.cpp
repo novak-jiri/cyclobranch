@@ -205,99 +205,172 @@ void paintCircle(QPainter& painter, vector<string>& acronymsofblocks, int center
 }
 
 
-void generateCyclicLabelsToRight(bool nterminal, int rotationid, int rotationstart, int fragmentstart, int fragmentend, int numberofringblocks, unordered_set<cIonLabel, hash_cIonLabel>& labels, cParameters* parameters, cTheoreticalSpectrum* theoreticalspectrum, int centerx, int centery, int radius, double angle, int linesize, int cornerlinesize, int visiblerotationid, int branchstart, int branchend) {
+void generateCyclicLabelsToRight(bool nterminal, int rotationid, int rotationstart, int fragmentstart, int fragmentend, int numberofringblocks, unordered_set<cIonLabel, hash_cIonLabel>& labels, cParameters* parameters, cTheoreticalSpectrum* theoreticalspectrum, int centerx, int centery, int radius, double angle, int linesize, int cornerlinesize, string visibleionseries, string visibleneutralloss, int visiblerotationid, int branchstart, int branchend) {
 	double cumulativeangle;
 	string name;
 	int m;
-	if ((visiblerotationid == -1) || ((parameters->peptidetype == cyclic) && (visiblerotationid == rotationid)) 
-		|| ((parameters->peptidetype == cyclicpolyketide) && (visiblerotationid == rotationid))
-		|| ((parameters->peptidetype == branchcyclic) && (visiblerotationid == rotationid/6))) {
-		for (int i = 0; i < (int)parameters->fragmentionsfortheoreticalspectra.size(); i++) {
-			if ((nterminal && parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].nterminal) || (!nterminal && parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].cterminal)
-				|| (parameters->peptidetype == cyclicpolyketide)) {
-				m = 0;
-				for (int j = fragmentstart; j < fragmentend; j++) {	
-					if ((branchstart == -1) || (branchend == -1) || ((branchstart >= 0) && (j < branchstart)) || ((branchend >= 0) && (j >= branchend))) {
-						if (theoreticalspectrum->getVisualCoverage()[rotationid*parameters->fragmentionsfortheoreticalspectra.size() + i].series[j] > 0) {
-							name = theoreticalspectrum->getVisualCoverage()[rotationid*parameters->fragmentionsfortheoreticalspectra.size() + i].name.substr(0, theoreticalspectrum->getVisualCoverage()[rotationid*parameters->fragmentionsfortheoreticalspectra.size() + i].name.rfind('_') + 1);
-							if (parameters->peptidetype == cyclicpolyketide) {
-								name += parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].name.substr(0, 2) + to_string(j + 1) + parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].name.substr(2);
-							}
-							else {
-								name += parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].name[0] + to_string(j + 1) + parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].name.substr(1);
-							}
-							
-							cumulativeangle = angle*(double)((rotationstart + m + 1) % numberofringblocks) + angle/(double)2;
-							if (cumulativeangle < pi/2) {
-								QPoint p3(centerx + sin(cumulativeangle)*(radius + linesize) - sin(pi/2 - cumulativeangle)*cornerlinesize, centery - sin(pi/2 - cumulativeangle)*(radius + linesize) - sin(cumulativeangle)*cornerlinesize);
-								insertLabel(labels, p3.x() + 10, p3.y() - 10, name, false);
-							}
-							else if ((cumulativeangle >= pi/2) && (cumulativeangle <= pi)) {
-								QPoint p3(centerx + sin(pi - cumulativeangle)*(radius + linesize) + sin(cumulativeangle - pi/2)*cornerlinesize, centery + sin(cumulativeangle - pi/2)*(radius + linesize) - sin(pi - cumulativeangle)*cornerlinesize);
-								insertLabel(labels, p3.x() + 10, p3.y() - 10, name, false);
-							}
-							else if ((cumulativeangle >= pi) && (cumulativeangle <= 3*pi/2)) {
-								QPoint p3(centerx - sin(cumulativeangle - pi)*(radius + linesize) + sin(3*pi/2 - cumulativeangle)*cornerlinesize, centery + sin(3*pi/2 - cumulativeangle)*(radius + linesize) + sin(cumulativeangle - pi)*cornerlinesize);
-								insertLabel(labels, p3.x() - 10, p3.y() - 10, name, true);
-							}
-							else {
-								QPoint p3(centerx - sin(2*pi - cumulativeangle)*(radius + linesize) - sin(cumulativeangle - 3*pi/2)*cornerlinesize, centery - sin(cumulativeangle - 3*pi/2)*(radius + linesize) + sin(2*pi - cumulativeangle)*cornerlinesize);
-								insertLabel(labels, p3.x() - 10, p3.y() - 10, name, true);
-							}
-						}
-						m++;
+	int coverageindex = rotationid * (int)parameters->ionsfortheoreticalspectra.size() * ((int)parameters->neutrallossesfortheoreticalspectra.size() + 1);
+	bool skipiontype, skipneutralloss;
+
+	if ((visiblerotationid == -1) || ((parameters->peptidetype == cyclic) && (visiblerotationid == rotationid)) || ((parameters->peptidetype == cyclicpolyketide) && (visiblerotationid == rotationid)) || ((parameters->peptidetype == branchcyclic) && (visiblerotationid == rotationid/6))) {
+		
+		for (int i = 0; i < (int)parameters->ionsfortheoreticalspectra.size(); i++) {
+
+			skipiontype = false;
+			if ((visibleionseries.compare("") != 0) && (parameters->iondefinitions[parameters->ionsfortheoreticalspectra[i]].name.compare(visibleionseries) != 0)) {
+				skipiontype = true;
+			}
+
+			for (int j = -1; j < (int)parameters->neutrallossesfortheoreticalspectra.size(); j++) {
+
+				skipneutralloss = false;
+				if (visibleneutralloss.compare("all") != 0) {
+					if ((j == -1) && (visibleneutralloss.compare("none") != 0)) {
+						skipneutralloss = true;
+					}
+					if ((j >= 0) && (parameters->neutrallossesdefinitions[parameters->neutrallossesfortheoreticalspectra[j]].summary.compare(visibleneutralloss) != 0)) {
+						skipneutralloss = true;
 					}
 				}
+
+				if (!skipiontype && !skipneutralloss) {
+
+					if ((nterminal && parameters->iondefinitions[parameters->ionsfortheoreticalspectra[i]].nterminal) || (!nterminal && parameters->iondefinitions[parameters->ionsfortheoreticalspectra[i]].cterminal) || (parameters->peptidetype == cyclicpolyketide)) {
+
+						m = 0;
+						for (int k = fragmentstart; k < fragmentend; k++) {
+							if ((branchstart == -1) || (branchend == -1) || ((branchstart >= 0) && (k < branchstart)) || ((branchend >= 0) && (k >= branchend))) {
+								if (theoreticalspectrum->getVisualCoverage()[coverageindex].series[k] > 0) {
+									name = theoreticalspectrum->getVisualCoverage()[coverageindex].name.substr(0, theoreticalspectrum->getVisualCoverage()[coverageindex].name.rfind('_') + 1);
+
+									if (parameters->peptidetype == cyclicpolyketide) {
+										name += parameters->iondefinitions[parameters->ionsfortheoreticalspectra[i]].name.substr(0, 2) + to_string(k + 1) + parameters->iondefinitions[parameters->ionsfortheoreticalspectra[i]].name.substr(2);
+									}
+									else {
+										name += parameters->iondefinitions[parameters->ionsfortheoreticalspectra[i]].name[0] + to_string(k + 1) + parameters->iondefinitions[parameters->ionsfortheoreticalspectra[i]].name.substr(1);
+									}
+
+									if (j >= 0) {
+										name += "-" + parameters->neutrallossesdefinitions[parameters->neutrallossesfortheoreticalspectra[j]].summary;
+									}
+
+									cumulativeangle = angle * (double)((rotationstart + m + 1) % numberofringblocks) + angle / (double)2;
+									if (cumulativeangle < pi / 2) {
+										QPoint p3(centerx + sin(cumulativeangle)*(radius + linesize) - sin(pi / 2 - cumulativeangle)*cornerlinesize, centery - sin(pi / 2 - cumulativeangle)*(radius + linesize) - sin(cumulativeangle)*cornerlinesize);
+										insertLabel(labels, p3.x() + 10, p3.y() - 10, name, false);
+									}
+									else if ((cumulativeangle >= pi / 2) && (cumulativeangle <= pi)) {
+										QPoint p3(centerx + sin(pi - cumulativeangle)*(radius + linesize) + sin(cumulativeangle - pi / 2)*cornerlinesize, centery + sin(cumulativeangle - pi / 2)*(radius + linesize) - sin(pi - cumulativeangle)*cornerlinesize);
+										insertLabel(labels, p3.x() + 10, p3.y() - 10, name, false);
+									}
+									else if ((cumulativeangle >= pi) && (cumulativeangle <= 3 * pi / 2)) {
+										QPoint p3(centerx - sin(cumulativeangle - pi)*(radius + linesize) + sin(3 * pi / 2 - cumulativeangle)*cornerlinesize, centery + sin(3 * pi / 2 - cumulativeangle)*(radius + linesize) + sin(cumulativeangle - pi)*cornerlinesize);
+										insertLabel(labels, p3.x() - 10, p3.y() - 10, name, true);
+									}
+									else {
+										QPoint p3(centerx - sin(2 * pi - cumulativeangle)*(radius + linesize) - sin(cumulativeangle - 3 * pi / 2)*cornerlinesize, centery - sin(cumulativeangle - 3 * pi / 2)*(radius + linesize) + sin(2 * pi - cumulativeangle)*cornerlinesize);
+										insertLabel(labels, p3.x() - 10, p3.y() - 10, name, true);
+									}
+								}
+								m++;
+							}
+						}
+
+					}
+
+				}
+
+				coverageindex++;
+
 			}
+
 		}
+
 	}
 }
 
 
-void generateCyclicLabelsToLeft(bool nterminal, int rotationid, int rotationstart, int fragmentstart, int fragmentend, int numberofringblocks, unordered_set<cIonLabel, hash_cIonLabel>& labels, cParameters* parameters, cTheoreticalSpectrum* theoreticalspectrum, int centerx, int centery, int radius, double angle, int linesize, int cornerlinesize, int visiblerotationid, int branchstart, int branchend) {
+void generateCyclicLabelsToLeft(bool nterminal, int rotationid, int rotationstart, int fragmentstart, int fragmentend, int numberofringblocks, unordered_set<cIonLabel, hash_cIonLabel>& labels, cParameters* parameters, cTheoreticalSpectrum* theoreticalspectrum, int centerx, int centery, int radius, double angle, int linesize, int cornerlinesize, string visibleionseries, string visibleneutralloss, int visiblerotationid, int branchstart, int branchend) {
 	double cumulativeangle;
 	string name;
 	int m;
-	if ((visiblerotationid == -1) || ((parameters->peptidetype == cyclic) && (visiblerotationid == rotationid)) 
-		|| ((parameters->peptidetype == cyclicpolyketide) && (visiblerotationid == rotationid))
-		|| ((parameters->peptidetype == branchcyclic) && (visiblerotationid == rotationid/6))) {
-		for (int i = 0; i < (int)parameters->fragmentionsfortheoreticalspectra.size(); i++) {
-			if ((nterminal && parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].nterminal) || (!nterminal && parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].cterminal)
-				|| (parameters->peptidetype == cyclicpolyketide)) {
-				m = 0;
-				for (int j = fragmentstart; j < fragmentend; j++) {		
-					if ((branchstart == -1) || (branchend == -1) || ((branchstart >= 0) && (j < branchstart)) || ((branchend >= 0) && (j >= branchend))) {
-						if (theoreticalspectrum->getVisualCoverage()[rotationid*parameters->fragmentionsfortheoreticalspectra.size() + i].series[j] > 0) {
-							name = theoreticalspectrum->getVisualCoverage()[rotationid*parameters->fragmentionsfortheoreticalspectra.size() + i].name.substr(0, theoreticalspectrum->getVisualCoverage()[rotationid*parameters->fragmentionsfortheoreticalspectra.size() + i].name.rfind('_') + 1);
-							if (parameters->peptidetype == cyclicpolyketide) {
-								name += parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].name.substr(0, 2) + to_string(j + 1) + parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].name.substr(2);
-							}
-							else {
-								name += parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].name[0] + to_string(j + 1) + parameters->fragmentdefinitions[parameters->fragmentionsfortheoreticalspectra[i]].name.substr(1);
-							}					
-							cumulativeangle = angle*(double)((2*numberofringblocks - rotationstart + numberofringblocks - m - 1) % numberofringblocks) + angle/(double)2;
-							if (cumulativeangle < pi/2) {
-								QPoint p4(centerx + sin(cumulativeangle)*(radius - linesize) + sin(pi/2 - cumulativeangle)*cornerlinesize, centery - sin(pi/2 - cumulativeangle)*(radius - linesize) + sin(cumulativeangle)*cornerlinesize);
-								insertLabel(labels, p4.x() - 5, p4.y() - 5, name, true);
-							}
-							else if ((cumulativeangle >= pi/2) && (cumulativeangle <= pi)) {
-								QPoint p4(centerx + sin(pi - cumulativeangle)*(radius - linesize) - sin(cumulativeangle - pi/2)*cornerlinesize, centery + sin(cumulativeangle - pi/2)*(radius - linesize) + sin(pi - cumulativeangle)*cornerlinesize);
-								insertLabel(labels, p4.x() - 5, p4.y() - 5, name, true);
-							}
-							else if ((cumulativeangle >= pi) && (cumulativeangle <= 3*pi/2)) {
-								QPoint p4(centerx - sin(cumulativeangle - pi)*(radius - linesize) - sin(3*pi/2 - cumulativeangle)*cornerlinesize, centery + sin(3*pi/2 - cumulativeangle)*(radius - linesize) - sin(cumulativeangle - pi)*cornerlinesize);
-								insertLabel(labels, p4.x() + 10, p4.y() - 10, name, false);
-							}
-							else {
-								QPoint p4(centerx - sin(2*pi - cumulativeangle)*(radius - linesize) + sin(cumulativeangle - 3*pi/2)*cornerlinesize, centery - sin(cumulativeangle - 3*pi/2)*(radius - linesize) - sin(2*pi - cumulativeangle)*cornerlinesize);
-								insertLabel(labels, p4.x() + 10, p4.y() - 10, name, false);
-							}
-						}
-						m++;
+	int coverageindex = rotationid * (int)parameters->ionsfortheoreticalspectra.size() * ((int)parameters->neutrallossesfortheoreticalspectra.size() + 1);
+	bool skipiontype, skipneutralloss;
+
+	if ((visiblerotationid == -1) || ((parameters->peptidetype == cyclic) && (visiblerotationid == rotationid)) || ((parameters->peptidetype == cyclicpolyketide) && (visiblerotationid == rotationid)) || ((parameters->peptidetype == branchcyclic) && (visiblerotationid == rotationid/6))) {
+
+		for (int i = 0; i < (int)parameters->ionsfortheoreticalspectra.size(); i++) {
+
+			skipiontype = false;
+			if ((visibleionseries.compare("") != 0) && (parameters->iondefinitions[parameters->ionsfortheoreticalspectra[i]].name.compare(visibleionseries) != 0)) {
+				skipiontype = true;
+			}
+
+			for (int j = -1; j < (int)parameters->neutrallossesfortheoreticalspectra.size(); j++) {
+
+				skipneutralloss = false;
+				if (visibleneutralloss.compare("all") != 0) {
+					if ((j == -1) && (visibleneutralloss.compare("none") != 0)) {
+						skipneutralloss = true;
+					}
+					if ((j >= 0) && (parameters->neutrallossesdefinitions[parameters->neutrallossesfortheoreticalspectra[j]].summary.compare(visibleneutralloss) != 0)) {
+						skipneutralloss = true;
 					}
 				}
+
+				if (!skipiontype && !skipneutralloss) {
+
+					if ((nterminal && parameters->iondefinitions[parameters->ionsfortheoreticalspectra[i]].nterminal) || (!nterminal && parameters->iondefinitions[parameters->ionsfortheoreticalspectra[i]].cterminal) || (parameters->peptidetype == cyclicpolyketide)) {
+
+						m = 0;
+						for (int k = fragmentstart; k < fragmentend; k++) {
+							if ((branchstart == -1) || (branchend == -1) || ((branchstart >= 0) && (k < branchstart)) || ((branchend >= 0) && (k >= branchend))) {
+								if (theoreticalspectrum->getVisualCoverage()[coverageindex].series[k] > 0) {
+									name = theoreticalspectrum->getVisualCoverage()[coverageindex].name.substr(0, theoreticalspectrum->getVisualCoverage()[coverageindex].name.rfind('_') + 1);
+
+									if (parameters->peptidetype == cyclicpolyketide) {
+										name += parameters->iondefinitions[parameters->ionsfortheoreticalspectra[i]].name.substr(0, 2) + to_string(k + 1) + parameters->iondefinitions[parameters->ionsfortheoreticalspectra[i]].name.substr(2);
+									}
+									else {
+										name += parameters->iondefinitions[parameters->ionsfortheoreticalspectra[i]].name[0] + to_string(k + 1) + parameters->iondefinitions[parameters->ionsfortheoreticalspectra[i]].name.substr(1);
+									}
+
+									if (j >= 0) {
+										name += "-" + parameters->neutrallossesdefinitions[parameters->neutrallossesfortheoreticalspectra[j]].summary;
+									}
+
+									cumulativeangle = angle * (double)((2 * numberofringblocks - rotationstart + numberofringblocks - m - 1) % numberofringblocks) + angle / (double)2;
+									if (cumulativeangle < pi / 2) {
+										QPoint p4(centerx + sin(cumulativeangle)*(radius - linesize) + sin(pi / 2 - cumulativeangle)*cornerlinesize, centery - sin(pi / 2 - cumulativeangle)*(radius - linesize) + sin(cumulativeangle)*cornerlinesize);
+										insertLabel(labels, p4.x() - 5, p4.y() - 5, name, true);
+									}
+									else if ((cumulativeangle >= pi / 2) && (cumulativeangle <= pi)) {
+										QPoint p4(centerx + sin(pi - cumulativeangle)*(radius - linesize) - sin(cumulativeangle - pi / 2)*cornerlinesize, centery + sin(cumulativeangle - pi / 2)*(radius - linesize) + sin(pi - cumulativeangle)*cornerlinesize);
+										insertLabel(labels, p4.x() - 5, p4.y() - 5, name, true);
+									}
+									else if ((cumulativeangle >= pi) && (cumulativeangle <= 3 * pi / 2)) {
+										QPoint p4(centerx - sin(cumulativeangle - pi)*(radius - linesize) - sin(3 * pi / 2 - cumulativeangle)*cornerlinesize, centery + sin(3 * pi / 2 - cumulativeangle)*(radius - linesize) - sin(cumulativeangle - pi)*cornerlinesize);
+										insertLabel(labels, p4.x() + 10, p4.y() - 10, name, false);
+									}
+									else {
+										QPoint p4(centerx - sin(2 * pi - cumulativeangle)*(radius - linesize) + sin(cumulativeangle - 3 * pi / 2)*cornerlinesize, centery - sin(cumulativeangle - 3 * pi / 2)*(radius - linesize) - sin(2 * pi - cumulativeangle)*cornerlinesize);
+										insertLabel(labels, p4.x() + 10, p4.y() - 10, name, false);
+									}
+								}
+								m++;
+							}
+						}
+
+					}
+
+				}
+
+				coverageindex++;
+
 			}
+
 		}
+
 	}
 }
 
@@ -305,6 +378,9 @@ void generateCyclicLabelsToLeft(bool nterminal, int rotationid, int rotationstar
 cCyclicWidget::cCyclicWidget() {
 	parameters = 0;
 	theoreticalspectrum = 0;
+
+	visibleionseries = "";
+	visibleneutralloss = "all";
 	visiblerotationid = -1;
 
 	reportisomers = false;
@@ -443,12 +519,12 @@ void cCyclicWidget::paint(QPainter& painter) {
 		
 	if (parameters && (theoreticalspectrum->getVisualCoverage().size() > 0)) {
 	
-		int half = (int)theoreticalspectrum->getVisualCoverage().size()/(int)parameters->fragmentionsfortheoreticalspectra.size()/2;
+		int half = (int)theoreticalspectrum->getVisualCoverage().size() / (int)parameters->ionsfortheoreticalspectra.size() / ((int)parameters->neutrallossesfortheoreticalspectra.size() + 1) / 2;
 		for (int i = 0; i < half; i++) {
-			generateCyclicLabelsToRight(true, i, i, 0, size - 1, size, labels, parameters, theoreticalspectrum, centerx, centery, radius, angle, linesize, cornerlinesize, visiblerotationid, -1, -1);
+			generateCyclicLabelsToRight(true, i, i, 0, size - 1, size, labels, parameters, theoreticalspectrum, centerx, centery, radius, angle, linesize, cornerlinesize, visibleionseries, visibleneutralloss, visiblerotationid, -1, -1);
 		}
 		for (int i = half; i < 2*half; i++) {
-			generateCyclicLabelsToLeft(true, i, i, 0, size - 1, size, labels, parameters, theoreticalspectrum, centerx, centery, radius, angle, linesize, cornerlinesize, visiblerotationid, -1, -1);
+			generateCyclicLabelsToLeft(true, i, i, 0, size - 1, size, labels, parameters, theoreticalspectrum, centerx, centery, radius, angle, linesize, cornerlinesize, visibleionseries, visibleneutralloss, visiblerotationid, -1, -1);
 		}
 
 		painter.setPen(QPen(Qt::red, 2, Qt::SolidLine));
@@ -463,6 +539,35 @@ void cCyclicWidget::paint(QPainter& painter) {
 
 	}
 	
+}
+
+
+void cCyclicWidget::ionSeriesChanged(QString text) {
+	if (!parameters) {
+		visibleionseries = "";
+		return;
+	}
+
+	if (text.compare("all") == 0) {
+		visibleionseries = "";
+	}
+	else {
+		visibleionseries = text.toStdString();
+	}
+
+	repaint();
+}
+
+
+void cCyclicWidget::neutralLossChanged(QString text) {
+	if (!parameters) {
+		visibleneutralloss = "all";
+		return;
+	}
+
+	visibleneutralloss = text.toStdString();
+
+	repaint();
 }
 
 

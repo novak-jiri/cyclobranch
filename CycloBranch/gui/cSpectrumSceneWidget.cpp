@@ -30,6 +30,9 @@ cSpectrumSceneWidget::cSpectrumSceneWidget(QWidget* parent) {
 	hidematched = false;
 	hidescrambled = false;
 	factor = 0.2;
+	visibleionseriespart1 = "";
+	visibleionseriespart2 = "";
+	visibleneutralloss = "all";
 	coloredrotationid = -1;
 	coloredrotationstring = "";
 	coloredtrotationid = -1;
@@ -453,7 +456,7 @@ void cSpectrumSceneWidget::redrawScene() {
 		}
 
 		// hide scrambled peaks
-		if ((parameters->peptidetype == cyclic) && hidescrambled && theoreticalspectrum->getExperimentalSpectrum()[i].scrambled) {
+		if ((parameters->mode != dereplication) && (parameters->peptidetype == cyclic) && hidescrambled && theoreticalspectrum->getExperimentalSpectrum()[i].scrambled) {
 			continue;
 		}
 
@@ -493,6 +496,9 @@ void cSpectrumSceneWidget::redrawScene() {
 
 
 	// visible peaks only
+	bool popit;
+	string tmpvisibleneutralloss;
+	size_t tmpposition;
 	for (int i = 0; i < (int)visiblepeaks.size(); i++) {
 
 		x = getXPositionFromMZRatio(visiblepeaks[i].mzratio, origwidth);
@@ -508,28 +514,98 @@ void cSpectrumSceneWidget::redrawScene() {
 
 		s = visiblepeaks[i].description;
 		int position = (int)s.find('@');
+		size_t tmppos;
+		string tmpstr;
 		while (position != (int)string::npos) {
 			hits.push_back(s.substr(0, position));
 			s = s.substr(position + 1);
 
-			if (parameters->peptidetype == cyclic) {
-				if (visiblepeaks[i].scrambled) {
-					if (hidescrambled) {
-						hits.pop_back();
+			popit = false;
+
+			if (parameters->mode != dereplication) {
+
+				if (visibleionseriespart1.compare("") != 0) {
+					tmppos = hits.back().find(visibleionseriespart1);
+					if (tmppos == string::npos) {
+						popit = true;
+					}
+					else {
+						if ((tmppos > 0) && ((hits.back()[tmppos - 1] == '_') || (hits.back()[tmppos - 1] == ' '))) {
+							tmpstr = hits.back().substr(tmppos + visibleionseriespart1.size());
+							while ((tmpstr.size() > 0) && (tmpstr[0] >= '0') && (tmpstr[0] <= '9')) {
+								tmpstr = tmpstr.substr(1);
+							}
+							if (visibleionseriespart2.compare("") != 0) {
+								tmpstr = tmpstr.substr(0, visibleionseriespart2.size());
+								if (tmpstr.compare(visibleionseriespart2) != 0) {
+									popit = true;
+								}
+							}
+							else {
+								if ((tmpstr.substr(0, 3).compare("+2H") == 0) || (tmpstr.substr(0, 3).compare("-2H") == 0)) {
+									popit = true;
+								}
+							}
+						}
+						else {
+							popit = true;
+						}
 					}
 				}
-				else {
-					if ((coloredrotationid != -1) && (hits.back().find(coloredrotationstring) == string::npos)) {
-						hits.pop_back();
+
+				if (visibleneutralloss.compare("all") != 0) {
+					if (visibleneutralloss.compare("none") == 0) {
+						for (int j = 0; j < (int)parameters->neutrallossesfortheoreticalspectra.size(); j++) {
+							tmpvisibleneutralloss = "-" + parameters->neutrallossesdefinitions[parameters->neutrallossesfortheoreticalspectra[j]].summary;
+							tmpposition = hits.back().find(tmpvisibleneutralloss);
+							if (tmpposition != string::npos) {
+								tmpstr = hits.back().substr(tmpposition + tmpvisibleneutralloss.size());
+								if ((tmpstr.size() == 0) || ((tmpstr.size() > 0) && ((tmpstr[0] == '_') || (tmpstr[0] == ' ')))) {
+									popit = true;
+									break;
+								}
+							}
+						}
 					}
-				}	
+					else {
+						tmpvisibleneutralloss = "-" + visibleneutralloss;
+						tmpposition = hits.back().find(tmpvisibleneutralloss);
+						if (tmpposition == string::npos) {
+							popit = true;
+						}
+						else {
+							tmpstr = hits.back().substr(tmpposition + tmpvisibleneutralloss.size());
+							if (!((tmpstr.size() == 0) || ((tmpstr.size() > 0) && ((tmpstr[0] == '_') || (tmpstr[0] == ' '))))) {
+								popit = true;
+							}
+						}
+					}
+				}
+
+				if (parameters->peptidetype == cyclic) {
+					if (visiblepeaks[i].scrambled) {
+						if (hidescrambled || (coloredrotationid != -1)) {
+							popit = true;
+						}
+					}
+					else {
+						if ((coloredrotationid != -1) && (hits.back().find(coloredrotationstring) == string::npos)) {
+							popit = true;
+						}
+					}
+				}
+
+				if ((parameters->peptidetype == branched) && (coloredtrotationid != -1) && (hits.back().find(coloredtrotationstring) == string::npos)) {
+					popit = true;
+				}
+
+				if ((parameters->peptidetype == branchcyclic) && (((coloredrotationid != -1) && (hits.back().find(coloredrotationstring) == string::npos)) || ((coloredtrotationid != -1) && (hits.back().find(coloredtrotationstring) == string::npos)))) {
+					popit = true;
+				}
+
 			}
 
-			if ((parameters->peptidetype == branched) && (coloredtrotationid != -1) && (hits.back().find(coloredtrotationstring) == string::npos)) {
-				hits.pop_back();
-			}
-
-			if ((parameters->peptidetype == branchcyclic) && (((coloredrotationid != -1) && (hits.back().find(coloredrotationstring) == string::npos)) || ((coloredtrotationid != -1) && (hits.back().find(coloredtrotationstring) == string::npos)))) {
+			if (popit) {
 				hits.pop_back();
 			}
 
@@ -539,24 +615,92 @@ void cSpectrumSceneWidget::redrawScene() {
 		if (s.size() > 0) {
 			hits.push_back(s);
 
-			if (parameters->peptidetype == cyclic) {
-				if (visiblepeaks[i].scrambled) {
-					if (hidescrambled) {
-						hits.pop_back();
+			popit = false;
+
+			if (parameters->mode != dereplication) {
+
+				if (visibleionseriespart1.compare("") != 0) {
+					tmppos = hits.back().find(visibleionseriespart1);
+					if (tmppos == string::npos) {
+						popit = true;
+					}
+					else {
+						if ((tmppos > 0) && ((hits.back()[tmppos - 1] == '_') || (hits.back()[tmppos - 1] == ' '))) {
+							tmpstr = hits.back().substr(tmppos + visibleionseriespart1.size());
+							while ((tmpstr.size() > 0) && (tmpstr[0] >= '0') && (tmpstr[0] <= '9')) {
+								tmpstr = tmpstr.substr(1);
+							}
+							if (visibleionseriespart2.compare("") != 0) {
+								tmpstr = tmpstr.substr(0, visibleionseriespart2.size());
+								if (tmpstr.compare(visibleionseriespart2) != 0) {
+									popit = true;
+								}
+							}
+							else {
+								if ((tmpstr.substr(0, 3).compare("+2H") == 0) || (tmpstr.substr(0, 3).compare("-2H") == 0)) {
+									popit = true;
+								}
+							}
+						}
+						else {
+							popit = true;
+						}
 					}
 				}
-				else {
-					if ((coloredrotationid != -1) && (hits.back().find(coloredrotationstring) == string::npos)) {
-						hits.pop_back();
+
+				if (visibleneutralloss.compare("all") != 0) {
+					if (visibleneutralloss.compare("none") == 0) {
+						for (int j = 0; j < (int)parameters->neutrallossesfortheoreticalspectra.size(); j++) {
+							tmpvisibleneutralloss = "-" + parameters->neutrallossesdefinitions[parameters->neutrallossesfortheoreticalspectra[j]].summary;
+							tmpposition = hits.back().find(tmpvisibleneutralloss);
+							if (tmpposition != string::npos) {
+								tmpstr = hits.back().substr(tmpposition + tmpvisibleneutralloss.size());
+								if ((tmpstr.size() == 0) || ((tmpstr.size() > 0) && ((tmpstr[0] == '_') || (tmpstr[0] == ' ')))) {
+									popit = true;
+									break;
+								}
+							}
+						}
 					}
-				}	
+					else {
+						tmpvisibleneutralloss = "-" + visibleneutralloss;
+						tmpposition = hits.back().find(tmpvisibleneutralloss);
+						if (tmpposition == string::npos) {
+							popit = true;
+						}
+						else {
+							tmpstr = hits.back().substr(tmpposition + tmpvisibleneutralloss.size());
+							if (!((tmpstr.size() == 0) || ((tmpstr.size() > 0) && ((tmpstr[0] == '_') || (tmpstr[0] == ' '))))) {
+								popit = true;
+							}
+						}
+					}
+				}
+
+				if (parameters->peptidetype == cyclic) {
+					if (visiblepeaks[i].scrambled) {
+						if (hidescrambled || (coloredrotationid != -1)) {
+							popit = true;
+						}
+					}
+					else {
+						if ((coloredrotationid != -1) && (hits.back().find(coloredrotationstring) == string::npos)) {
+							popit = true;
+						}
+					}
+				}
+
+				if ((parameters->peptidetype == branched) && (coloredtrotationid != -1) && (hits.back().find(coloredtrotationstring) == string::npos)) {
+					popit = true;
+				}
+
+				if ((parameters->peptidetype == branchcyclic) && (((coloredrotationid != -1) && (hits.back().find(coloredrotationstring) == string::npos)) || ((coloredtrotationid != -1) && (hits.back().find(coloredtrotationstring) == string::npos)))) {
+					popit = true;
+				}
+
 			}
 
-			if ((parameters->peptidetype == branched) && (coloredtrotationid != -1) && (hits.back().find(coloredtrotationstring) == string::npos)) {
-				hits.pop_back();
-			}
-
-			if ((parameters->peptidetype == branchcyclic) && (((coloredrotationid != -1) && (hits.back().find(coloredrotationstring) == string::npos)) || ((coloredtrotationid != -1) && (hits.back().find(coloredtrotationstring) == string::npos)))) {
+			if (popit) {
 				hits.pop_back();
 			}
 		}
@@ -755,6 +899,41 @@ void cSpectrumSceneWidget::resetMZInterval() {
 	minmzratio = 0;
 	maxmzratio = theoreticalspectrum->getExperimentalSpectrum().getMaximumMZRatio();
 	emit updateMZInterval(minmzratio, maxmzratio);
+
+	redrawScene();
+}
+
+
+void cSpectrumSceneWidget::ionSeriesChanged(QString text) {
+	if (!parameters) {
+		visibleionseriespart1 = "";
+		visibleionseriespart2 = "";
+		return;
+	}
+
+	if (text.compare("all") == 0) {
+		visibleionseriespart1 = "";
+		visibleionseriespart2 = "";
+	}
+	else {
+		visibleionseriespart1 = text.toStdString().substr(0, 2);
+		visibleionseriespart2 = "";
+		if (text.toStdString().size() > 2) {
+			visibleionseriespart2 = text.toStdString().substr(2);
+		}
+	}
+
+	redrawScene();
+}
+
+
+void cSpectrumSceneWidget::neutralLossChanged(QString text) {
+	if (!parameters) {
+		visibleneutralloss = "all";
+		return;
+	}
+
+	visibleneutralloss = text.toStdString();
 
 	redrawScene();
 }

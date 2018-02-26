@@ -230,9 +230,9 @@ void cMainThread::run() {
 			}
 			*os << endl;
 			*os << parameters.peaklistseries[i].print();
-			if (!parameters.generateisotopepattern && (parameters.masserrortolerancefordeisotoping > 0)) {
+			/*if (!parameters.generateisotopepattern && (parameters.masserrortolerancefordeisotoping > 0)) {
 				parameters.peaklistseries[i].removeIsotopes(parameters.precursorcharge, parameters.masserrortolerancefordeisotoping, this);
-			}
+			}*/
 		}
 	}
 
@@ -618,7 +618,7 @@ void cMainThread::run() {
 		}
 
 		for (int i = 0; i < (int)theoreticalspectrumlist->size(); i++) {
-			(*theoreticalspectrumlist)[i].finalizeMSSpectrum(unmatchedpeaks[i]);
+			(*theoreticalspectrumlist)[i].finalizeMSSpectrum(unmatchedpeaks[i], true);
 		}
 
 	}
@@ -651,6 +651,11 @@ void cMainThread::run() {
 
 void cMainThread::emitEndSignals() {
 	emit setGraph(graph.printGraph());
+
+	if ((parameters.mode == dereplication) || (parameters.neutrallossesfortheoreticalspectra.size() > 10000)) {
+		parameters.neutrallossesdefinitions.clear();
+		parameters.neutrallossesfortheoreticalspectra.clear();
+	}
 
 	emit sendParameters(parameters);
 	emit reportSpectra();

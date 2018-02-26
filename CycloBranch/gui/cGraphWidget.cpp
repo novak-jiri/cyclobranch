@@ -25,7 +25,7 @@ cGraphWidget::cGraphWidget() {
 
 	setLayout(layout);
 
-	resize(1280, 770);
+	resize(1280, 780);
 }
 
 

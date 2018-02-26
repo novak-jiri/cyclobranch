@@ -34,24 +34,6 @@ bool compareBandAllIonsDesc(const cTheoreticalSpectrum& a, const cTheoreticalSpe
 
 
 /**
-	\brief Compare scores of two theoretical spectra (number of b-ions + dehydrated b-ions and all ions as a secondary score).
-	\param a first theoretical spectrum
-	\param b second theoretical spectrum
-	\retval bool true if the score of \a a is greater than the score of \a b
-*/ 
-bool compareBBwaterLossAndAllIonsDesc(const cTheoreticalSpectrum& a, const cTheoreticalSpectrum& b);
-
-
-/**
-	\brief Compare scores of two theoretical spectra (number of b-ions + deamidated b-ions and all ions as a secondary score).
-	\param a first theoretical spectrum
-	\param b second theoretical spectrum
-	\retval bool true if the score of \a a is greater than the score of \a b
-*/ 
-bool compareBBammoniaLossAndAllIonsDesc(const cTheoreticalSpectrum& a, const cTheoreticalSpectrum& b);
-
-
-/**
 	\brief Compare scores of two theoretical spectra (number of b-ions + y-ions and all ions as a secondary score).
 	\param a first theoretical spectrum
 	\param b second theoretical spectrum
@@ -75,7 +57,7 @@ bool compareYandAllIonsDesc(const cTheoreticalSpectrum& a, const cTheoreticalSpe
 	\param b second theoretical spectrum
 	\retval bool true if the score of \a a is greater than the score of \a b
 */ 
-bool compareWeightedIntensityDesc(const cTheoreticalSpectrum& a, const cTheoreticalSpectrum& b);
+bool compareSumOfRelIntDesc(const cTheoreticalSpectrum& a, const cTheoreticalSpectrum& b);
 
 
 /**
@@ -85,15 +67,6 @@ bool compareWeightedIntensityDesc(const cTheoreticalSpectrum& a, const cTheoreti
 	\retval bool true if the score of \a a is greater than the score of \a b
 */ 
 bool compareNumberOfMatchedPeaksDesc(const cTheoreticalSpectrum& a, const cTheoreticalSpectrum& b);
-
-
-/**
-	\brief Compare scores of two theoretical spectra (number of matched bricks).
-	\param a first theoretical spectrum
-	\param b second theoretical spectrum
-	\retval bool true if the score of \a a is greater than the score of \a b
-*/ 
-bool compareNumberOfMatchedBricksDesc(const cTheoreticalSpectrum& a, const cTheoreticalSpectrum& b);
 
 
 /**

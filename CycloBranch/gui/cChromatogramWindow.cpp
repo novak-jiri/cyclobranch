@@ -162,7 +162,7 @@ cChromatogramWindow::cChromatogramWindow(cTheoreticalSpectrumList& theoreticalsp
 	setCentralWidget(chromatogramwindowwidget);
 	centralWidget()->setContentsMargins(0, 0, 0, 0);
 
-	resize(1280, 770);
+	resize(1280, 780);
 
 }
 

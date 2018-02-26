@@ -150,7 +150,7 @@ cSummaryPeaksTableWidget::cSummaryPeaksTableWidget(QWidget* parent) {
 
 	setCentralWidget(mainwidget);
 
-	resize(1280, 770);
+	resize(1280, 780);
 
 	lastdirexporttocsv = "./";
 	lastdirexportstatisticstocsv = "./";

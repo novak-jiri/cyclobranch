@@ -208,6 +208,8 @@ private:
 	QToolBar* toolbarView;
 	QToolBar* toolbarHelp;
 	QToolBar* toolbarMz;
+	QToolBar* toolbarIonSeries;
+	QToolBar* toolbarNeutralLoss;
 	QToolBar* toolbarRotation;
 	QToolBar* toolbarTrotation;
 
@@ -239,15 +241,25 @@ private:
 	QPushButton* setmzinterval;
 	QPushButton* resetmzinterval;
 
-	QWidget* widgetrotation;
-	QHBoxLayout* hboxrotation;
-	QLabel* labelrotation;
-	QComboBox* rotation;
+	QWidget* ionserieswidget;
+	QHBoxLayout* ionserieshbox;
+	QLabel* ionserieslabel;
+	QComboBox* ionseriescombobox;
 
-	QWidget* widgettrotation;
-	QHBoxLayout* hboxtrotation;
-	QLabel* labeltrotation;
-	QComboBox* trotation;
+	QWidget* neutrallosswidget;
+	QHBoxLayout* neutrallosshbox;
+	QLabel* neutrallosslabel;
+	QComboBox* neutrallosscombobox;
+
+	QWidget* rotationwidget;
+	QHBoxLayout* rotationhbox;
+	QLabel* rotationlabel;
+	QComboBox* rotationcombobox;
+
+	QWidget* trotationwidget;
+	QHBoxLayout* trotationhbox;
+	QLabel* trotationlabel;
+	QComboBox* trotationcombobox;
 
 	QTextBrowser* textbrowser;
 
@@ -334,6 +346,12 @@ private slots:
 
 
 	void hideScrambledPeaks(bool hide);
+
+
+	void filterTableAfterIonSeriesChanged(int index);
+
+
+	void filterTableAfterNeutralLossChanged(int index);
 
 
 	void filterTableAfterRotationChanged(int index);
