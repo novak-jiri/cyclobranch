@@ -24,6 +24,7 @@ An open-source and cross-platform tool for mass spectrometry data analysis.
   * raw (Thermo)
     * profile or centroid spectra
     * requires [OpenMS 2.x](https://sourceforge.net/projects/open-ms/files/OpenMS/OpenMS-2.3/) including ProteoWizard installed
+    * Windows only
   * raw (Waters)
     * centroid spectra
     * Windows only
