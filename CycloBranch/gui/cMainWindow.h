@@ -126,10 +126,12 @@ private:
 	QTableView* results;
 	QStandardItemModel* resultsmodel;
 	cMainWindowProxyModel* resultsproxymodel;
+
 	cTheoreticalSpectrumList theoreticalspectrumlist;
 	vector<cSpectrumDetailWidget> spectradetails;
 
 	cParameters parameters;
+	cPeakListSeries rawdata;
 
 	QTextEdit* logWindow;
 	QSplitter* splitter;
@@ -248,7 +250,7 @@ private slots:
 
 	void summaryPeaksTableCancelled();
 
-	void summaryPeaksTableRowDoubleClicked(int rowid);
+	void summaryPeaksTableRowDoubleClicked(int rowid, double experimentalmz);
 
 	void updateSummaryPeaksTableFilterSlot(int xmin, int xmax, int ymin, int ymax);
 

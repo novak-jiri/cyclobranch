@@ -142,6 +142,13 @@ public:
 	void setReportIsomers(bool reportisomers);
 
 
+	/**
+		\brief Hide/Show labels of peaks.
+		\param state the peak labels are hidden when \a state is true
+	*/
+	void hidePeakLabels(bool state);
+
+	
 protected:
 
 
@@ -164,6 +171,7 @@ private:
 	int visiblerotationid;
 
 	bool reportisomers;
+	bool hidelabels;
 
 
 private slots:

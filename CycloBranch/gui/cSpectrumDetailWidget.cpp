@@ -21,6 +21,8 @@
 cSpectrumDetailWidget::cSpectrumDetailWidget() {
 	parent = 0;
 	parameters = 0;
+	rawdata = 0;
+	rowid = 0;
 	preparedToShow = false;
 	theoreticalspectrum = new cTheoreticalSpectrum();
 }
@@ -33,16 +35,17 @@ cSpectrumDetailWidget::cSpectrumDetailWidget(const cSpectrumDetailWidget& sd) {
 
 cSpectrumDetailWidget& cSpectrumDetailWidget::operator=(const cSpectrumDetailWidget& sd) {
 	parameters = sd.parameters;
+	rawdata = sd.rawdata;
 
 	preparedToShow = false;
 	theoreticalspectrum = new cTheoreticalSpectrum();
 
 	if (parameters && sd.theoreticalspectrum) {
-		initialize(parameters, *sd.theoreticalspectrum, sd.parent);
+		initialize(rowid, parameters, *sd.theoreticalspectrum, sd.parent);
 	}
 
 	if (parameters && sd.preparedToShow) {
-		prepareToShow(parameters->peptidetype, actionShowIsomers);
+		prepareToShow(rawdata, actionShowIsomers);
 	}
 
 	setWindowTitle(sd.windowTitle());
@@ -51,7 +54,8 @@ cSpectrumDetailWidget& cSpectrumDetailWidget::operator=(const cSpectrumDetailWid
 }
 
 
-void cSpectrumDetailWidget::initialize(cParameters* parameters, cTheoreticalSpectrum& theoreticalspectrum, QWidget* parent) {
+void cSpectrumDetailWidget::initialize(int rowid, cParameters* parameters, cTheoreticalSpectrum& theoreticalspectrum, QWidget* parent) {
+	this->rowid = rowid;
 	this->parent = parent;
 	this->parameters = parameters;
 	*this->theoreticalspectrum = theoreticalspectrum;
@@ -610,9 +614,11 @@ cSpectrumDetailWidget::~cSpectrumDetailWidget() {
 		delete actionZoomOut;
 		delete actionZoomReset;
 		delete actionAbsoluteIntensity;
+		delete actionRawData;
 		delete actionHideMatched;
 		delete actionHideUnmatched;
 		delete actionHideScrambled;
+		delete actionHideLabels;
 		delete actionMouseMzSelection;
 		delete actionHTMLDocumentation;
 
@@ -636,9 +642,21 @@ void cSpectrumDetailWidget::closeEvent(QCloseEvent *event) {
 }
 
 
-void cSpectrumDetailWidget::prepareToShow(ePeptideType peptidetype, QAction* actionShowIsomers) {
+void cSpectrumDetailWidget::prepareToShow(cPeakListSeries* rawdata, QAction* actionShowIsomers) {
 
 	if (!preparedToShow) {
+
+		if (parameters) {
+			if ((parameters->mode == dereplication) || (parameters->mode == singlecomparison)) {
+				setWindowTitle(("Experimental Spectrum No. " + to_string(rowid)).c_str());
+			}
+			else {
+				setWindowTitle(("Theoretical Spectrum No. " + to_string(rowid)).c_str());
+			}
+
+		}
+
+		this->rawdata = rawdata;
 
 		connect(actionShowIsomers, SIGNAL(triggered()), this, SLOT(showIsomersStateChanged()));
 		this->actionShowIsomers = actionShowIsomers;
@@ -655,26 +673,25 @@ void cSpectrumDetailWidget::prepareToShow(ePeptideType peptidetype, QAction* act
 
 
 		if (parameters && ((parameters->mode == denovoengine) || (parameters->mode == singlecomparison) || (parameters->mode == databasesearch))) {
-			switch (peptidetype)
-			{
-			case linear:
-			case linearpolyketide:
-				linearwidget = new cLinearWidget();
-				break;
-			case cyclic:
-			case cyclicpolyketide:
-				cyclicwidget = new cCyclicWidget();
-				break;
-			case branched:
-				branchedwidget = new cBranchedWidget();
-				break;
-			case branchcyclic:
-				branchcyclicwidget = new cBranchCyclicWidget();
-				break;
-			case other:
-				break;
-			default:
-				break;
+			switch (parameters->peptidetype) {
+				case linear:
+				case linearpolyketide:
+					linearwidget = new cLinearWidget();
+					break;
+				case cyclic:
+				case cyclicpolyketide:
+					cyclicwidget = new cCyclicWidget();
+					break;
+				case branched:
+					branchedwidget = new cBranchedWidget();
+					break;
+				case branchcyclic:
+					branchcyclicwidget = new cBranchCyclicWidget();
+					break;
+				case other:
+					break;
+				default:
+					break;
 			}
 		}
 
@@ -762,6 +779,14 @@ void cSpectrumDetailWidget::prepareToShow(ePeptideType peptidetype, QAction* act
 		toolbarView->addAction(actionAbsoluteIntensity);
 		connect(actionAbsoluteIntensity, SIGNAL(toggled(bool)), spectrumscene, SLOT(absoluteIntensityStateChanged(bool)));
 
+		actionRawData = new QAction(QIcon(":/images/icons/chromatography.png"), tr("&Profile Spectrum"), this);
+		actionRawData->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_P));
+		actionRawData->setToolTip("Profile Spectrum (Ctrl + P)");
+		actionRawData->setCheckable(true);
+		toolbarView->addAction(actionRawData);
+		connect(actionRawData, SIGNAL(toggled(bool)), this, SLOT(rawDataStateChanged(bool)));
+		connect(this, SIGNAL(rawDataStateChangedSignal(bool)), spectrumscene, SLOT(rawDataStateChanged(bool)));
+
 		toolbarView->addSeparator();
 
 		actionHideMatched = new QAction(QIcon(":/images/icons/20.png"), tr("Hide &Matched Peaks"), this);
@@ -785,6 +810,13 @@ void cSpectrumDetailWidget::prepareToShow(ePeptideType peptidetype, QAction* act
 		actionHideScrambled->setEnabled(false);
 		toolbarView->addAction(actionHideScrambled);
 
+		actionHideLabels = new QAction(QIcon(":/images/icons/79.png"), tr("Hide Peak &Labels"), this);
+		actionHideLabels->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_L));
+		actionHideLabels->setToolTip("Hide Peak Labels (Ctrl + L)");
+		actionHideLabels->setCheckable(true);
+		toolbarView->addAction(actionHideLabels);
+		connect(actionHideLabels, SIGNAL(toggled(bool)), this, SLOT(hidePeakLabels(bool)));
+
 
 		toolbarHelp = addToolBar(tr("Help"));
 
@@ -797,7 +829,7 @@ void cSpectrumDetailWidget::prepareToShow(ePeptideType peptidetype, QAction* act
 
 		if (parameters && ((parameters->mode == denovoengine) || (parameters->mode == singlecomparison) || (parameters->mode == databasesearch))) {
 
-			if ((peptidetype == cyclic) && parameters->enablescrambling) {
+			if ((parameters->peptidetype == cyclic) && parameters->enablescrambling) {
 				actionHideScrambled->setEnabled(true);
 				connect(actionHideScrambled, SIGNAL(toggled(bool)), this, SLOT(hideScrambledPeaks(bool)));
 			}
@@ -818,6 +850,8 @@ void cSpectrumDetailWidget::prepareToShow(ePeptideType peptidetype, QAction* act
 		proxymodel->setDynamicSortFilter(false);
 		peakstable->setModel(proxymodel);
 		peakstable->setSortingEnabled(true);
+
+		connect(peakstable, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(tableDoubleClicked(const QModelIndex&)));
 
 		labelmz = new QLabel(tr("m/z: "));
 
@@ -949,7 +983,7 @@ void cSpectrumDetailWidget::prepareToShow(ePeptideType peptidetype, QAction* act
 			connect(neutrallosscombobox, SIGNAL(currentIndexChanged(int)), this, SLOT(filterTableAfterNeutralLossChanged(int)));
 
 
-			switch (peptidetype) {
+			switch (parameters->peptidetype) {
 				case linear:
 				case linearpolyketide:
 					connect(ionseriescombobox, SIGNAL(currentIndexChanged(QString)), linearwidget, SLOT(ionSeriesChanged(QString)));
@@ -976,7 +1010,7 @@ void cSpectrumDetailWidget::prepareToShow(ePeptideType peptidetype, QAction* act
 
 
 			// cyclic
-			if (theoreticalspectrum && ((peptidetype == cyclic) || (peptidetype == cyclicpolyketide))) {
+			if (theoreticalspectrum && ((parameters->peptidetype == cyclic) || (parameters->peptidetype == cyclicpolyketide))) {
 				int r = (int)theoreticalspectrum->getCandidate().getAcronyms().size();
 				int hint = (int)theoreticalspectrum->getVisualCoverage().size()/(2*r);
 				
@@ -1001,7 +1035,7 @@ void cSpectrumDetailWidget::prepareToShow(ePeptideType peptidetype, QAction* act
 
 
 			// branched
-			if (peptidetype == branched) {
+			if (parameters->peptidetype == branched) {
 				trotationcombobox->addItem(tr("all"));
 				trotationcombobox->addItem(tr("1 (left-to-right)"));
 				trotationcombobox->addItem(tr("2 (top-to-right)"));
@@ -1020,7 +1054,7 @@ void cSpectrumDetailWidget::prepareToShow(ePeptideType peptidetype, QAction* act
 
 
 			// branch-cyclic
-			if (parameters && theoreticalspectrum && (peptidetype == branchcyclic)) {
+			if (parameters && theoreticalspectrum && (parameters->peptidetype == branchcyclic)) {
 				int r = (int)theoreticalspectrum->getCandidate().getAcronyms().size() - (int)theoreticalspectrum->getCandidate().getBranchSize();
 				int hint = (int)theoreticalspectrum->getVisualCoverage().size()/(2*r);
 
@@ -1070,26 +1104,25 @@ void cSpectrumDetailWidget::prepareToShow(ePeptideType peptidetype, QAction* act
 
 		if ((parameters->mode == denovoengine) || (parameters->mode == singlecomparison) || (parameters->mode == databasesearch)) {
 
-			switch (peptidetype)
-			{
-			case linear:
-			case linearpolyketide:
-				hsplitter1->addWidget(linearwidget);
-				break;
-			case cyclic:
-			case cyclicpolyketide:
-				hsplitter1->addWidget(cyclicwidget);
-				break;
-			case branched:
-				hsplitter1->addWidget(branchedwidget);
-				break;
-			case branchcyclic:
-				hsplitter1->addWidget(branchcyclicwidget);
-				break;
-			case other:
-				break;
-			default:
-				break;
+			switch (parameters->peptidetype) {
+				case linear:
+				case linearpolyketide:
+					hsplitter1->addWidget(linearwidget);
+					break;
+				case cyclic:
+				case cyclicpolyketide:
+					hsplitter1->addWidget(cyclicwidget);
+					break;
+				case branched:
+					hsplitter1->addWidget(branchedwidget);
+					break;
+				case branchcyclic:
+					hsplitter1->addWidget(branchcyclicwidget);
+					break;
+				case other:
+					break;
+				default:
+					break;
 			}
 
 			hsplitter2->addWidget(textbrowser);
@@ -1124,10 +1157,12 @@ void cSpectrumDetailWidget::prepareToShow(ePeptideType peptidetype, QAction* act
 		menuView->addAction(actionZoomReset);
 		menuView->addSeparator();
 		menuView->addAction(actionAbsoluteIntensity);
+		menuView->addAction(actionRawData);
 		menuView->addSeparator();
 		menuView->addAction(actionHideMatched);
 		menuView->addAction(actionHideUnmatched);
 		menuView->addAction(actionHideScrambled);
+		menuView->addAction(actionHideLabels);
 
 		menuHelp->addAction(actionHTMLDocumentation);
 
@@ -1144,30 +1179,29 @@ void cSpectrumDetailWidget::prepareToShow(ePeptideType peptidetype, QAction* act
 
 			if ((parameters->mode == denovoengine) || (parameters->mode == singlecomparison) || (parameters->mode == databasesearch)) {
 
-				switch (peptidetype)
-				{
-				case linear:
-				case linearpolyketide:
-					linearwidget->initialize(parameters, theoreticalspectrum);
-					linearwidget->setReportIsomers(reportisomers);
-					break;
-				case cyclic:
-				case cyclicpolyketide:
-					cyclicwidget->initialize(parameters, theoreticalspectrum);
-					cyclicwidget->setReportIsomers(reportisomers);
-					break;
-				case branched:
-					branchedwidget->initialize(parameters, theoreticalspectrum);
-					branchedwidget->setReportIsomers(reportisomers);
-					break;
-				case branchcyclic:
-					branchcyclicwidget->initialize(parameters, theoreticalspectrum);
-					branchcyclicwidget->setReportIsomers(reportisomers);
-					break;
-				case other:
-					break;
-				default:
-					break;
+				switch (parameters->peptidetype) {
+					case linear:
+					case linearpolyketide:
+						linearwidget->initialize(parameters, theoreticalspectrum);
+						linearwidget->setReportIsomers(reportisomers);
+						break;
+					case cyclic:
+					case cyclicpolyketide:
+						cyclicwidget->initialize(parameters, theoreticalspectrum);
+						cyclicwidget->setReportIsomers(reportisomers);
+						break;
+					case branched:
+						branchedwidget->initialize(parameters, theoreticalspectrum);
+						branchedwidget->setReportIsomers(reportisomers);
+						break;
+					case branchcyclic:
+						branchcyclicwidget->initialize(parameters, theoreticalspectrum);
+						branchcyclicwidget->setReportIsomers(reportisomers);
+						break;
+					case other:
+						break;
+					default:
+						break;
 				}
 
 				string textinfo = getDetailsAsHTMLString() + theoreticalspectrum->getCoverageBySeries();
@@ -1178,8 +1212,8 @@ void cSpectrumDetailWidget::prepareToShow(ePeptideType peptidetype, QAction* act
 			
 			}
 
-			spectrumscene->initialize(parameters, theoreticalspectrum);
-
+			spectrumscene->initialize(parameters, theoreticalspectrum, rawdata, rowid);
+			
 			preparePeaksTable();
 
 		}
@@ -1295,6 +1329,13 @@ void cSpectrumDetailWidget::exportImage(bool exportspectrum) {
 	}
 	else {
 		exportPeptide();
+	}
+}
+
+
+void cSpectrumDetailWidget::zoomToPeak(double value) {
+	if (value > 0) {
+		emit emitMZInterval(value - 5.0, value + 5.0);
 	}
 }
 
@@ -2104,6 +2145,48 @@ void cSpectrumDetailWidget::filterPeaksTable() {
 }
 
 
+void cSpectrumDetailWidget::rawDataStateChanged(bool state) {
+	ifstream peakliststream;
+	int fileid;
+	int targetid;
+	string s;
+
+	if (parameters && theoreticalspectrum && parameters->useprofiledata && (parameters->peaklistfileformat == baf)) {
+							
+		if ((parameters->mode == denovoengine) || (parameters->mode == databasesearch)) {
+			fileid = parameters->scannumber;
+			targetid = 0;
+		}
+		else {
+			fileid = rowid;
+			targetid = rowid - 1;
+		}
+
+		if (state) {				
+			peakliststream.open(parameters->peaklistfilename + ".profile." + to_string(fileid) + ".csv");
+			while (peakliststream.good() && !(strstr(s.c_str(), "M/Z"))) {
+				getline(peakliststream, s);
+			}
+			(*rawdata)[targetid].loadFromBAFStream(peakliststream);
+			peakliststream.close();
+
+			if ((targetid >= 0) && (targetid < rawdata->size())) {
+				(*rawdata)[targetid].normalizeIntenzityByValue(theoreticalspectrum->getExperimentalSpectrum().getMaximumAbsoluteIntensity());
+			}
+		}
+		else {
+			if ((targetid >= 0) && (targetid < rawdata->size())) {
+				(*rawdata)[targetid].clear();
+			}
+		}
+
+		emit rawDataStateChangedSignal(state);
+				
+	}
+
+}
+
+
 void cSpectrumDetailWidget::hideMatchedPeaks(bool hide) {
 	spectrumscene->hideMatchedPeaks(hide);
 	filterPeaksTable();
@@ -2119,6 +2202,42 @@ void cSpectrumDetailWidget::hideUnmatchedPeaks(bool hide) {
 void cSpectrumDetailWidget::hideScrambledPeaks(bool hide) {
 	spectrumscene->hideScrambledPeaks(hide);
 	filterPeaksTable();
+}
+
+
+void cSpectrumDetailWidget::hidePeakLabels(bool hide) {
+	if (!preparedToShow) {
+		return;
+	}
+
+	spectrumscene->hidePeakLabels(hide);
+
+	if (parameters && (parameters->mode != dereplication)) {
+		switch (parameters->peptidetype) {
+			case linear:
+				linearwidget->hidePeakLabels(hide);
+				break;
+			case cyclic:
+				cyclicwidget->hidePeakLabels(hide);
+				break;
+			case branched:
+				branchedwidget->hidePeakLabels(hide);
+				break;
+			case branchcyclic:
+				branchcyclicwidget->hidePeakLabels(hide);
+				break;
+			case linearpolyketide:
+				linearwidget->hidePeakLabels(hide);
+				break;
+			case cyclicpolyketide:
+				cyclicwidget->hidePeakLabels(hide);
+				break;
+			case other:
+				break;
+			default:
+				break;
+		}
+	}
 }
 
 
@@ -2289,5 +2408,22 @@ void cSpectrumDetailWidget::showHTMLDocumentation() {
 
 void cSpectrumDetailWidget::closeWindow() {
 	hide();
+}
+
+
+void cSpectrumDetailWidget::tableDoubleClicked(const QModelIndex& index) {
+	int experimentalmzcolumn = 2;
+	if (parameters->generateisotopepattern) {
+		experimentalmzcolumn = 3;
+	}
+	
+	QStandardItem* item = peakstablemodel->item(proxymodel->mapToSource(index).row(), experimentalmzcolumn);
+	double value;
+	if (item) {
+		value = item->data(Qt::DisplayRole).toDouble();
+		if (value > 0) {
+			emit emitMZInterval(value - 5.0, value + 5.0);
+		}
+	}
 }
 

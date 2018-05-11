@@ -30,6 +30,11 @@ void cPeakListSeries::clear() {
 }
 
 
+void cPeakListSeries::resize(int size) {
+	peaklists.resize(size);
+}
+
+
 void cPeakListSeries::addPeakList(cPeaksList& peaklist) {
 	peaklists.push_back(peaklist);
 }
@@ -193,7 +198,14 @@ int cPeakListSeries::loadFromMZMLStream(string& mzmlfilename, ifstream &mzmlstre
 		string convertedmzmlfilename;
 		string mgfname = mzmlfilename.substr(0, (int)mzmlfilename.size() - 4);
 
-		*os << "ok" << endl << "Total number of spectra: " << peaklists.size() << endl << endl << "Converting raw data to peaklists... ";
+		*os << "ok" << endl;
+		if (mode == dereplication) {
+			*os << "Total number of MS spectra: ";
+		}
+		else {
+			*os << "Total number of MS/MS spectra: ";
+		}
+		*os << peaklists.size() << endl << endl << "Converting raw data to peaklists... ";
 
 		string s;
 		#if OS_TYPE == UNX
@@ -240,7 +252,14 @@ int cPeakListSeries::loadFromMZMLStream(string& mzmlfilename, ifstream &mzmlstre
 	}
 	else {
 
-		*os << "ok" << endl << endl;
+		*os << "ok" << endl;
+		if (mode == dereplication) {
+			*os << "Total number of MS spectra: ";
+		}
+		else {
+			*os << "Total number of MS/MS spectra: ";
+		}
+		*os << peaklists.size() << endl << endl;
 
 	}
 

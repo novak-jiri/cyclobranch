@@ -39,6 +39,7 @@ cLinearWidget::cLinearWidget() {
 	visibleneutralloss = "all";
 
 	reportisomers = false;
+	hidelabels = false;
 }
 
 
@@ -126,6 +127,12 @@ void cLinearWidget::setReportIsomers(bool reportisomers) {
 }
 
 
+void cLinearWidget::hidePeakLabels(bool state) {
+	this->hidelabels = state;
+	repaint();
+}
+
+
 void cLinearWidget::paintEvent(QPaintEvent *event) {
 	QPainter painter;
 	painter.begin(this);
@@ -184,7 +191,7 @@ void cLinearWidget::paint(QPainter& painter) {
 		}
 	}
 	
-	if (parameters && (theoreticalspectrum->getVisualCoverage().size() > 0)) {
+	if (parameters && !hidelabels && (theoreticalspectrum->getVisualCoverage().size() > 0)) {
 
 		unordered_set<cIonLabel, hash_cIonLabel> labels;
 		labels.clear();

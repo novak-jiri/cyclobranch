@@ -822,7 +822,7 @@ void cTheoreticalSpectrum::removeUnmatchedIsotopePatterns(cPeaksList& theoretica
 		return;
 	}
 
-	int minimumenvelopepeaks = (parameters->mode == dereplication)?parameters->minimumpatternsize:1;
+	int minimumenvelopepeaks = parameters->minimumpatternsize;
 	
 	int groupid = theoreticalpeaks[0].groupid;
 	int start = 0;

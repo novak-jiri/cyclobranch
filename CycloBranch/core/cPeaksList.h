@@ -198,6 +198,13 @@ public:
 
 
 	/**
+		\brief Normalize intensities of peaks using a value.
+		\param value normalization value
+	*/
+	void normalizeIntenzityByValue(double value);
+
+
+	/**
 		\brief Remove peaks with relative intensities lower than the threshold.
 		\param minimumrelativeintensitythreshold minimum threshold of relative intensity
 	*/
@@ -336,6 +343,13 @@ public:
 		\retval double maximum absolute intensity
 	*/
 	double getMaximumAbsoluteIntensityFromMZInterval(double minmz, double maxmz, bool hidematched, bool hideunmatched, ePeptideType peptidetype, bool hidescrambled);
+
+
+	/**
+		\brief Get the maximum absolute intensity.
+		\retval double maximum absolute intensity
+	*/
+	double getMaximumAbsoluteIntensity();
 
 
 	/**

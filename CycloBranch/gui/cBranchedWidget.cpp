@@ -18,6 +18,7 @@ cBranchedWidget::cBranchedWidget() {
 	visibletrotationid = -1;
 
 	reportisomers = false;
+	hidelabels = false;
 }
 
 
@@ -101,6 +102,12 @@ void cBranchedWidget::exportToSVG(QString filename) {
 
 void cBranchedWidget::setReportIsomers(bool reportisomers) {
 	this->reportisomers = reportisomers;
+	repaint();
+}
+
+
+void cBranchedWidget::hidePeakLabels(bool state) {
+	this->hidelabels = state;
 	repaint();
 }
 
@@ -194,7 +201,7 @@ void cBranchedWidget::paint(QPainter& painter) {
 		}
 	}
 
-	if (parameters && (theoreticalspectrum->getVisualCoverage().size() > 0)) {
+	if (parameters && !hidelabels && (theoreticalspectrum->getVisualCoverage().size() > 0)) {
 	
 		unordered_set<cIonLabel, hash_cIonLabel> labels;
 		labels.clear();
