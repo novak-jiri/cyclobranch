@@ -1,0 +1,285 @@
+/*! 
+
+\page crossvis Image Fusion
+
+\section crossvisinterface CrossVis
+
+<p>The tool is opened using the command "Tools -> CrossVis" from the [Main Window](@ref mainwindow). 
+The function is available if the imaging mass spectra are processed (*.imzML file). 
+Use F1 to open this help.
+</p>
+
+<p>
+\image html crossvis.png "CrossVis"
+\image latex crossvis.png "CrossVis" width=16cm
+</p>
+
+\subsection subsec_crossvistoolbar Toolbar
+
+<p><b>Open Image (CTRL + O)</b>
+\htmlonly
+<img src="52.png">
+\endhtmlonly
+\latexonly
+\includegraphics{52.png}
+\endlatexonly
+</p>
+<p>Open an optical/histology image.</p>
+
+<p><b>Save Image (CTRL + S)</b>
+\htmlonly
+<img src="22.png">
+\endhtmlonly
+\latexonly
+\includegraphics{22.png}
+\endlatexonly
+</p>
+<p>Save the modified image.</p>
+
+<p><b>Close (Esc)</b>
+\htmlonly
+<img src="33.png">
+\endhtmlonly
+\latexonly
+\includegraphics{33.png}
+\endlatexonly
+</p>
+<p>Close window.</p>
+
+<p><b>Show Selection (Ctrl + E)</b>
+\htmlonly
+<img src="rectangle.png">
+\endhtmlonly
+\latexonly
+\includegraphics{rectangle.png}
+\endlatexonly
+</p>
+<p>Show current selection rectangle.</p>
+
+<p><b>Color Scale and Ruler (CTRL + C)</b>
+\htmlonly
+<img src="50.png">
+\endhtmlonly
+\latexonly
+\includegraphics{50.png}
+\endlatexonly
+</p>
+<p>Show/Hide color scale and ruler.</p>
+
+<p><b>Absolute Intensity (CTRL + I)</b>
+\htmlonly
+<img src="11.png">
+\endhtmlonly
+\latexonly
+\includegraphics{11.png}
+\endlatexonly
+</p>
+<p>View absolute/relative intensities of peaks.</p>
+
+<p><b>Zoom In (CTRL +; mouse wheel up)</b>
+\htmlonly
+<img src="83.png">
+\endhtmlonly
+\latexonly
+\includegraphics{83.png}
+\endlatexonly
+</p>
+<p>Zoom in.</p>
+
+<p><b>Zoom Out (CTRL -; mouse wheel down)</b>
+\htmlonly
+<img src="82.png">
+\endhtmlonly
+\latexonly
+\includegraphics{82.png}
+\endlatexonly
+</p>
+<p>Zoom out.</p>
+
+<p><b>Zoom Reset (CTRL + R; mouse wheel pressed)</b>
+\htmlonly
+<img src="84.png">
+\endhtmlonly
+\latexonly
+\includegraphics{84.png}
+\endlatexonly
+</p>
+<p>Reset zoom.</p>
+
+<p><b>Ruler Size</b></p>
+<p>The current size of ruler [micrometers].</p>
+
+<p><b>HTML Documentation (F1)</b>
+\htmlonly
+<img src="3.png">
+\endhtmlonly
+\latexonly
+\includegraphics{3.png}
+\endlatexonly
+</p>
+<p>Show HTML documentation.</p>
+
+\subsection subsec_crossvislayers Layers
+
+<p>The list of layers is on the right side of the CrossVis tool. The radio button is used to select an active layer. The checkbox is used to show/hide a layer. 
+The slider and the number in the first spin box is the opacity of a layer (0 = layer is not visible; 100 = layer is not transparent). The second spin box is the order of a layer (z-value).
+</p>
+
+<p>Each layer has an associated toolbar. The toolbar associated with a layer is green if the corresponding layer is selected (i.e., the corresponding radiobutton is checked).
+The green values can be also modified by mouse selection.</p>
+
+<p><b>Compounds</b></p>
+
+<p>The range of X and Y coordinates to be selected. The button 'Select Region' applies the changes (Enter key can also be used if a corresponding text field is focused).
+The 'Reset Region' button clears the selection. The selection can also be performed using mouse. To draw a rectangle, press and hold the left mouse button. 
+Draw a rectangle as shown in the following figure and then release the left mouse button. 
+You can click on the right mouse button during the rectangle drawing to cancel the selection.
+The size of the region can be adjusted and the region can be moved by mouse.</p>
+
+<p>The number of selected points and the minimum bounding region of the selection is reported under the image.  
+The selection of X and Y intervals automatically filters rows in the [Summary Table of Matched Peaks](@ref summarypeakstable).
+If a compound was filtered by its name or m/z value in [Summary Table of Matched Peaks](@ref summarypeakstable), 
+the filtered text is shown. Both selection methods can be used together. 
+</p>
+
+<p>The standard HSL (hue, saturation, lightness) color model is used to visualize the points. The most intense point in a selected region is red and minimum intensity points are violet. 
+A color represents a sum of relative/absolute intensities of matched peaks in a single spectrum; or the intensity of a specific compound if it was filtered by its name or m/z value in the [Summary Table of Matched Peaks](@ref summarypeakstable). 
+</p>
+
+<p>
+\image html crossvis-compounds.png "CrossVis - selection of compounds"
+\image latex crossvis-compounds.png "CrossVis - selection of compounds" width=16cm
+</p>
+
+<p><b>Optical Image</b></p>
+
+<p>
+The toolbar is used to correlate the measured region of compounds with optical image (see below for vendor specific details). The region
+can also be adjusted or moved by mouse as stated above.
+</p>
+
+<ul>
+<li>'Horizontal Shift' - horizontal shift of points between measured area and the optical image [number of points] 
+<li>'Vertical Shift' - vertical shift of points between measured area and the optical image [number of points]
+<li>'Max X' and 'Max Y' - the [X,Y] coordinates of the bottom-right corner of an optical image [number of points] (see below for vendor specific details)
+<li>'Pixel Width' - width of a pixel [micrometers] 
+<li>'Pixel Height' - height of a pixel [micrometers] 
+<li>'Correlate' button (or Enter key if 'Horizontal Shift', 'Vertical Shift', 'Max X' or 'Max Y' are focused) - correlate the measured region of compounds with optical image
+<li>'Default' - use the default values from input imzML file (see below for vendor specific details)
+</ul>
+
+<p>
+\image html crossvis-correlation.png "CrossVis - correlation of imzML exported by FlexImaging 4.1 with optical image"
+\image latex crossvis-correlation.png "CrossVis - correlation of imzML exported by FlexImaging 4.1 with optical image" width=16cm
+</p>
+
+<p><b>Histology Image</b></p>
+
+<p>
+The toolbar is used to correlate the histology image with an optical image. Then the identified compounds are visualized in histology image.
+The size and position of histology image can also be adjusted by mouse.
+</p>
+
+<p><b>Flip Histology Horizontally (Ctrl + H)</b>
+\htmlonly
+<img src="flip_horizontal.png">
+\endhtmlonly
+\latexonly
+\includegraphics{flip_horizontal.png}
+\endlatexonly
+</p>
+<p>Flip histology image horizontally.</p>
+
+<p><b>Flip Histology Vertically (Ctrl + V)</b>
+\htmlonly
+<img src="flip_vertical.png">
+\endhtmlonly
+\latexonly
+\includegraphics{flip_vertical.png}
+\endlatexonly
+</p>
+<p>Flip histology image vertically.</p>
+
+<ul>
+<li>'X' - horizontal position of histology image [pixels]
+<li>'Y' - vertical position of histology image [pixels]
+<li>'Width' - width of histology image [pixels]
+<li>'Height' - height of histology image [pixels]
+<li>'Angle' - rotation angle of histology image [degrees]
+</ul>
+
+<p>
+\image html crossvis-histology.png "CrossVis - positioning of histology image with an optical image"
+\image latex crossvis-histology.png "CrossVis - positioning of histology image with an optical image" width=16cm
+</p>
+
+<p><b>Microscopy Image</b></p>
+
+<p>
+The toolbar is used to correlate a microscopy image with an optical image. Then the identified compounds are visualized in microscopy image.
+The toolbar is associated with one navigation microscopy image "Microscopy image (nav.)" and up to ten additional non-navigation microscopy images.
+The values of X, Y, Width, Height, and Angle correspond to an active microscopy image which is currently selected in the list of layers on the right side.
+</p>
+
+<ul>
+<li>'X' - horizontal position of microscopy image [micrometers]
+<li>'Y' - vertical position of microscopy image [micrometers]
+<li>'Width' - width of microscopy image [micrometers]
+<li>'Height' - height of microscopy image [micrometers]
+<li>'Angle' - rotation angle of microscopy image [degrees]
+<li>'Default' - use the default values from the TIFF file
+<li>'Go' - go to the coordinates of microscopy image
+</ul>
+
+<p>
+It is expected that an input image was generated in TIFF file format by FEI Nova NanoSEM 450. Then the size of image in micrometers is calculated automatically 
+from metadata stored in the input image file. If a different image was used the size of the image must be adjusted manually.
+The size and position of microscopy image can also be adjusted by mouse. 
+</p>
+
+<p>
+It is expected that the microscopy navigation image has a small maginification (e.g., 50x) and that non-navigation images have bigger magnification. 
+The size of the image in micrometers is adjusted automatically if the input TIFF file contains corresponding metadata. 
+In case of a microscopy navigation image, the size is adjusted automatically but the position in the optical image must be adjusted manually.
+In case of a microscopy non-navigation image, both - the size and the position are adjusted automatically.
+</p>
+
+
+\subsection subsec_crossvisvendordetails Vendor-specific Details
+
+<p><b>imzML exported from FlexImaging 4.1 (Bruker)</b></p>
+
+<p>The correct values of 'Max X' and 'Max Y' must be determined by hand as they are not included in the imzML file. 
+Open the dataset in FlexImaging 4.1 and determine the coordinates of the bottom-right corner of an optical image as shown in the following image.
+R00X451Y321 means that Max X = 451 and Max Y = 321.</p>
+
+<p>
+\image html regions.png "Coordinates of the bottom-right image corner."
+\image latex regions.png "Coordinates of the bottom-right image corner." width=16cm
+</p>
+
+<p>For the above example, the correct settings are
+<ul>
+<li>Horizontal Shift = 0
+<li>Vertical Shift = 0
+<li>Max X = 451
+<li>Max Y = 321
+</ul>
+</p>
+
+<p><b>imzML exported from HDImaging v1.4 (Waters)</b></p>
+
+<p>
+In HDImaging v1.4 click on the 'Acquire' tab, then open a pattern definition metafile (*.pdm). Click on the measured region and then click on the 'Export' icon.
+In the image export dialog, check the option 'Crop to selection' and uncheck the option 'Overlay regions'. Then click 'Export' and save the file. Hint: Enlarge
+the main window of HDImaging as much as possible to make the exported image bigger.
+</p>
+
+<p>
+The correct values of 'Max X' and 'Max Y' are determined automatically from the imzML file. It may be necessary to modifify the values of 'Horizontal Shift' and
+'Vertical Shift' manually to correlate the points with the optical image correctly. 
+</p>
+
+<br/>
+
+*/

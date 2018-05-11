@@ -1,0 +1,67 @@
+/*! 
+
+\page drawpeptide Draw Peptide Tool
+
+\section sec_drawpeptide Draw Peptide Tool
+
+<p>The tool is opened using the command "Tools -> Draw Peptide". Use F1 to open this help.</p>
+
+<p>
+\image html drawpeptide1.png "Draw Peptide Tool (draw a peptide from an input sequence)"
+\image latex drawpeptide1.png "Draw Peptide Tool (draw a peptide from an input sequence)" width=16cm
+</p>
+
+<br/>
+
+<p>
+\image html drawpeptide2.png "Draw Peptide Tool (draw a peptide using a set of building blocks)"
+\image latex drawpeptide2.png "Draw Peptide Tool (draw a peptide using a set of building blocks)" width=16cm
+</p>
+
+\subsection subsec_drawpeptidecontrols Controls
+
+<p><b>Peptide Type</b></p>
+<p>Select the type of peptide (linear, cyclic, branched, branch-cyclic, linear polyketide or cyclic polyketide).</p>
+
+<p><b>Sequence</b></p>
+<p>A peptide sequence to be drawn. See format of a peptide sequence in [Format of Sequence Databases](@ref sequenceeditordbformat).</p>
+
+<p>The tool automatically checks if the syntax of an entered sequence corresponds to the selected peptide type. If the syntax is correct then a green message "correct" is shown else a red message "incorrect"
+is shown at the end of the input line.</p>
+
+<p><b>Copy to Clipboard</b></p>
+<p>The button has following functions which are accessible under an arrow on its right side:
+<ul>
+<li> Copy to Clipboard - copy the sequence into the clipboard; the default action of the button.
+<li> Set as Searched Sequence - the dialog "Search -> Settings..." is opened; the values of "Peptide Type" and "Sequence" are changed to the values defined in the "Draw Peptide Tool".
+<li> Set as Sequence Tag - the dialog "Search -> Settings..." is opened; the values of "Peptide Type" and "Peptide Sequence Tag" are changed to the values defined in the "Draw Peptide Tool".
+<li> Insert into Sequence Database - the tool "Tools -> Sequence/Compound Database Editor" is opened and a new row is added at the end of the table; values of "Type" and "Sequence" on the new row are set up to the values defined in the "Draw Peptide Tool".
+</ul>
+</p>
+
+<p><b>Define Blocks Separately</b></p>
+<p>If the box is checked, the sequence to be drawn is specified by the fields "Number of Blocks at Backbone", "Number of Blocks at Branch", "Branch Connection Block No.", "Backbone Blocks" and "Branch Blocks".
+The field "Sequence" is disabled and updated automatically.</p>
+
+<p>If the box is unchecked, the sequence to be drawn is specified in the field "Sequence". The fields "Number of Blocks at Backbone", "Number of Blocks at Branch", "Branch Connection Block No.", "Backbone Blocks" and "Branch Blocks" are
+disabled and updated automatically.</p>
+
+<p><b>Number of Blocks at Backbone</b></p>
+<p>A number of blocks forming a backbone of a peptide.</p>
+
+<p><b>Number of Blocks at Branch</b></p>
+<p>A number of blocks forming a branch of a branched or a branch-cyclic peptide.</p>
+
+<p><b>Branch Connection Block No.</b></p>
+<p>A number of a block where a backbone of a branched or a branch-cyclic peptide is connected to a branch.</p>
+
+<p><b>Backbone Blocks</b></p>
+<p>Names of building blocks forming a backbone of a peptide. The number of fields is updated when the value of "Number of Blocks at Backbone" is changed. One name of a building block per field must be entered.</p>
+
+<p><b>Branch Blocks</b></p>
+<p>Names of building blocks forming a branch of a branched or a branch-cyclic peptide. The number of fields is updated when the value of "Number of Blocks at Branch" is changed. One name of a building block per field must be entered.</p>
+
+
+<br/>
+
+*/

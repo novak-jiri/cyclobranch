@@ -1,0 +1,101 @@
+/*! \mainpage Introduction
+
+<div align="center">
+<h1>CycloBranch</h1>
+<h2>(v. 1.2.xxx)</h2>
+</div>
+
+<div align="center">
+<table border="0" cellpadding="0" cellspacing="0">
+<tr>
+<td width="400" height="50" align="center" style="background-color:#C6CCE6">
+<b>Availability & Usability</b>
+</td>
+<td width="400" align="center" style="background-color:#C0C6E0">
+<b>Compound Search<br/> (MS and MSI)</b>
+</td>
+<td width="400" align="center" style="background-color:#C6CCE6">
+<b><i>De Novo</i> Sequencing &<br/>Database Search (MS/MS)</b>
+</td>
+</tr>
+<tr>
+<td height="150" style="vertical-align:top; background-color:#D6DCF6">
+<ul>
+<li>[Open-source](@ref download)
+<li>[Graphical user interface](@ref mainwindow)
+<li>User-friendly
+<li>Cross-platform
+<li>Stand-alone
+</ul>
+</td>
+<td style="vertical-align:top; background-color:#D0D6F0">
+<ul>
+<li>[MALDI-MS](@ref msdatadereplication)
+<li>[LC-MS](@ref lcmsdatadereplication)
+<li>[MALDI-MSI](@ref msidatadereplication)
+<li>[DESI-MSI](@ref msidatadereplication)
+</ul>
+</td>
+<td style="vertical-align:top; background-color:#D6DCF6">
+<ul>
+<li>[Ribosomal peptides](@ref lineardetail)
+<li>[Nonribosomal peptides](@ref cyclicdetail)
+<li>[Siderophores](@ref linearketidedetail)
+<li>[Polyketides](@ref linearketidedetail)
+</ul>
+</td>
+</tr>
+<tr>
+<td height="50" align="center" style="background-color:#C6CCE6">
+<b>Supported File Formats</b>
+</td>
+<td align="center" style="background-color:#C0C6E0">
+<b>Databases</b>
+</td>
+<td align="center" style="background-color:#C6CCE6">
+<b>Visualization</b>
+</td>
+</tr>
+<tr>
+<td height="150" style="vertical-align:top; background-color:#D6DCF6">
+<ul>
+<li>XML-based: [mzML](@ref settings_peaklistfile), [mzXML](@ref settings_peaklistfile), [imzML](@ref settings_peaklistfile)
+<li>Native: [baf](@ref settings_peaklistfile) (Bruker), [raw](@ref settings_peaklistfile) (Thermo), [raw](@ref settings_peaklistfile) (Waters)
+<li>Plain text: [mgf](@ref settings_peaklistfile), [txt](@ref settings_peaklistfile)
+</ul>
+</td>
+<td style="vertical-align:top; background-color:#D0D6F0">
+<ul>
+<li>[Building blocks](@ref availableblockdatabases) (MS/MS)
+<li>[Sequences](@ref availablesequencedatabases) (MS/MS)
+<li>[Compounds](@ref availablesequencedatabases) (MS and MSI)
+<li><a href="http://ms.biomed.cas.cz/cyclobranch/release/custom_databases_excel_sheets.zip" onclick="ga('send', 'event', 'Introduction', this.href);"><b>Custom</b></a>
+</ul>
+</td>
+<td style="vertical-align:top; background-color:#D6DCF6">
+<ul>
+<li>[Mass Spectra](@ref lineardetail) (MS, MSI, and MS/MS)
+<li>[Draw Peptide Tool](@ref drawpeptide) (MS/MS)
+<li>[Chromatogram](@ref chromatogram) (LC-MS)
+<li>[Image Fusion](@ref crossvis) (MSI, histology images, and SEM)
+</ul>
+</td>
+</tr>
+</table>
+</div>
+
+<br/>
+
+<hr>
+
+<p>
+Any work based on CycloBranch shall cite any of the following references:
+<ul>
+<li><i>J. Am. Soc. Mass Spectrom.</i> (2015), 26(10):1780-1786. DOI: <a href="http://dx.doi.org/10.1007/s13361-015-1211-1"><b>10.1007/s13361-015-1211-1</b></a>
+<li><i>BBA - Proteins Proteom.</i> (2017), 1865(7):768-775. DOI: <a href="http://dx.doi.org/10.1016/j.bbapap.2016.12.003"><b>10.1016/j.bbapap.2016.12.003</b></a>
+</ul>
+</p>
+
+<br/>
+
+*/

@@ -1,0 +1,186 @@
+/*! 
+
+\page modificationseditor Modifications Editor
+
+\section modificationseditorinterface Modifications Editor
+
+<p>The editor is opened using the command "Tools -> Modifications Editor" from the [Main Window](@ref mainwindow).
+Use F1 to open this help.</p>
+
+<p><b>Changes in the editor do not impact the settings of the engine until they are saved !</b></p>
+
+<p>
+\image html modificationseditor.png "Modifications Editor"
+\image latex modificationseditor.png "Modifications Editor" width=16cm
+</p>
+
+\subsection subsec_modificationseditortoolbar Toolbar
+
+<p><b>New Database (CTRL + N)</b>
+\htmlonly
+<img src="2.png">
+\endhtmlonly
+\latexonly
+\includegraphics{2.png}
+\endlatexonly
+</p>
+<p>Create a new database of modifications.</p>
+
+<p><b>Open Database (CTRL + O)</b>
+\htmlonly
+<img src="52.png">
+\endhtmlonly
+\latexonly
+\includegraphics{52.png}
+\endlatexonly
+</p>
+<p>Open a database of modifications.</p>
+
+<p><b>Save Database (CTRL + S)</b>
+\htmlonly
+<img src="22.png">
+\endhtmlonly
+\latexonly
+\includegraphics{22.png}
+\endlatexonly
+</p>
+<p>Save the database of modifications.</p>
+
+<p><b>Save Database As... (CTRL + D)</b>
+\htmlonly
+<img src="86.png">
+\endhtmlonly
+\latexonly
+\includegraphics{86.png}
+\endlatexonly
+</p>
+<p>Save the database of modifications with another file name.</p>
+
+<p><b>Import Database (CTRL + I)</b>
+\htmlonly
+<img src="63.png">
+\endhtmlonly
+\latexonly
+\includegraphics{63.png}
+\endlatexonly
+</p>
+<p>Import a database of modifications.</p>
+
+<p><b>Close (Esc)</b>
+\htmlonly
+<img src="33.png">
+\endhtmlonly
+\latexonly
+\includegraphics{33.png}
+\endlatexonly
+</p>
+<p>Close window.</p>
+
+<p><b>Insert Row (Insert)</b>
+\htmlonly
+<img src="13.png">
+\endhtmlonly
+\latexonly
+\includegraphics{13.png}
+\endlatexonly
+</p>
+<p>Insert a new row at the bottom of the table.</p>
+
+<p><b>Remove Selected Rows (Delete)</b>
+\htmlonly
+<img src="14.png">
+\endhtmlonly
+\latexonly
+\includegraphics{14.png}
+\endlatexonly
+</p>
+<p>Remove checked rows.</p>
+
+<p><b>Select All (CTRL + A)</b>
+\htmlonly
+<img src="38.png">
+\endhtmlonly
+\latexonly
+\includegraphics{38.png}
+\endlatexonly
+</p>
+<p>Select all rows.</p>
+
+<p><b>Unselect Rows (CTRL + U)</b>
+\htmlonly
+<img src="38b.png">
+\endhtmlonly
+\latexonly
+\includegraphics{38b.png}
+\endlatexonly
+</p>
+<p>Unselect all rows.</p>
+
+<p><b>HTML Documentation (F1)</b>
+\htmlonly
+<img src="3.png">
+\endhtmlonly
+\latexonly
+\includegraphics{3.png}
+\endlatexonly
+</p>
+<p>Show HTML documentation.</p>
+
+\subsection subsec_modificationseditorfilter Text Filter
+
+<p>See details [here](@ref filter).</p>
+
+\subsection subsec_modificationseditorcolumns Columns
+
+<p>
+<ul>
+<li> Name - Name of an N-terminal or a C-terminal modification.
+<li> Summary Formula - Summary formula of a modification (e.g., H2C2O for acetylation or HNO-1 for amidation). Negative numbers of atoms are supported (e.g., H-2O3N-5 means 
+remove two hydrogens, add three oxygens and remove five nitrogens).
+<li> Monoisotopic Mass - Monoisotopic mass corresponding to a modification. The value is recalculated when the summary formula is changed.
+<li> N-terminal - When checked, the modification is considered to be N-terminal.
+<li> C-terminal - When checked, the modification is considered to be C-terminal.
+</ul>
+</p>
+
+<hr>
+
+\section modificationseditorformat Format of Modification Databases
+
+<p>The list of modifications is a text file (*.txt) containing one modification per line. Each line contains the following items separated by tabulars: 
+<ul>
+<li> name of a modification
+<li> summary formula of a modification (important: an exact mass of the block is calculated from this value)
+<li> monoisotopic mass (the value is ignored; the mass is automatically calculated from the summary formula)
+<li> the value "1", when the modification is N-terminal; "0" otherwise
+<li> the value "1", when the modification is C-terminal; "0" otherwise
+</ul>
+
+A line starting with the hash '#' is a comment which is not processed.
+</p>
+
+<hr>
+
+\section availablemodificationdatabases List of Available Modification Databases
+
+<p>The following pre-defined databases of terminal modifications are available in "Modifications" folder:</p>
+
+<div align='center'>
+<table width="80%" class="doxtable">
+<tr><th>Location</th><th>Content</th></tr>
+<tr><td>acetyl.txt</td><td>acetylation</td></tr>
+<tr><td>acetyl_amidated.txt</td><td>acetylation and amidation</td></tr>
+<tr><td>amidated.txt</td><td>amidation</td></tr>
+<tr><td>default_inhouse.txt</td><td>4 modifications (compiled in-house)</td></tr>
+<tr><td>ethanolamine.txt</td><td>ethanolamine</td></tr>
+<tr><td>ethanolamine_formyl.txt</td><td>ethanolamine and formyl</td></tr>
+<tr><td>norine-terminal-blocks.txt</td><td>7 terminal blocks/modifications compiled from Norine (version July, 2013)</td></tr>
+<tr><td>putrescine.txt</td><td>putrescine</td></tr>
+<tr><td>tutorial5.txt</td><td>4 modifications used in [Tutorial 5](@ref tutorial5)</td></tr>
+<tr><td>custom</td><td><a href="http://ms.biomed.cas.cz/cyclobranch/release/custom_databases_excel_sheets.zip" onclick="ga('send', 'event', 'Modifications', this.href);">Download Template for Excel</a></td></tr>
+</table>
+</div>
+
+<br/>
+
+*/

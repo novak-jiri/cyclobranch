@@ -1,0 +1,140 @@
+/*!
+  
+\page brancheddetail Branched Peptides
+
+\section brancheddetailwindow Branched Peptide Detail Window
+ 
+<p>
+The window is opened by a double-click on a row in the output report if a branched peptide was identified. The Enter key can also be used if the row is selected.
+</p>
+
+<p>
+\image html brancheddetail.png "De novo sequencing of linearized pseudacyclin A."
+\image latex brancheddetail.png "De novo sequencing of linearized pseudacyclin A." width=16cm
+</p>
+
+<p>
+See also [Linear Peptide Detail Window](@ref lineardetailwindow). The differences for branched peptides are following:
+<ul>
+<li> The text window on the right at the bottom contains a list of all six linearized sequences derived from a singly branched peptide sequence.
+<li> A name of a fragment ion is prefixed with a number of a linearized sequence from which the fragment ion was generated 
+(e.g., 2_B1 means that the fragment ion b<sub>1</sub> was generated from the linearized sequence no. 2).
+</ul>
+</p>
+
+<p>
+Numbers of linearized sequences of a branched peptide sequence are defined as follows (with respect to the visualization of a branched peptide):
+<ul>
+<li> sequence no. 1 - starts on the left, ends on the right;
+<li> sequence no. 2 - starts at the top, ends on the right;
+<li> sequence no. 3 - starts on the right, ends on the left;
+<li> sequence no. 4 - starts on the left, ends at the top;
+<li> sequence no. 5 - starts at the top, ends on the left;
+<li> sequence no. 6 - starts on the right, ends at the top.
+</ul>
+The start point of a linearized sequence corresponds to a theoretical N-terminus. The end point corresponds to a theoretical C-terminus.
+</p>
+
+<hr>
+
+\section branchedtoolbar Toolbar for Branched Peptides
+
+<p>See also [Toolbar for Linear Peptides](@ref lineartoolbar). The differences for branched peptides are following:
+
+<p><b>Linearized sequence</b></p>
+<p>
+A dropdown menu is shown where you can choose which peaks are red in the spectrum of the left and which fragment ions are shown in the visualization of a branched peptide on the right. 
+You can choose that only theoretical peaks from one linearized sequence (e.g., 2) are red if they were matched with experimental peaks. 
+In this case, the visualization of the peptide on the right shows only matched fragment ions from the linearized sequence 2. The default value "all" means that all matched theoretical 
+peaks are red in the spectrum on the left and that all matched fragment ions are shown in the visualization of the peptide on the right.
+</p>
+
+<hr>
+
+\section brancheddetection Branched Sequence Detection
+
+<p>
+Series of fragment ions of a branched peptide are shown in the following picture.
+</p>
+
+<p>
+\image html branched-series.png "Theoretical fragmentation of a branched peptide."
+\image latex branched-series.eps "Theoretical fragmentation of a branched peptide." width=14cm
+</p>
+
+<br/>
+
+<p>
+A path in the de novo graph corresponding to a branched peptide is detected as is shown in the following scheme (an edge corresponds to a residue mass of
+a building block or a sum of residue masses of a combination of building blocks). An edge corresponding to the branch must include at least two building blocks (one block cannot form a branch).
+</p>
+
+<p>
+\image html branched-denovo.png "Detection of a path corresponding to a branched peptide in a de novo graph."
+\image latex branched-denovo.eps "Detection of a path corresponding to a branched peptide in a de novo graph." width=14cm
+</p>
+
+<br/>
+
+<p>
+Since peaks determining the begin and the end of a branch may be missing in an experimental spectrum, the algorithm generates 
+a set of peptide sequence candidates from a path in the graph instead of one sequence candidate. See the following scheme. 
+</p>
+
+<p>
+\image html branched-detection.png "Peptide sequence candidates generated from a path in a de novo graph (branched peptides)."
+\image latex branched-detection.eps "Peptide sequence candidates generated from a path in a de novo graph (branched peptides)." width=14cm
+</p>
+
+<br/>
+
+<hr>
+
+\section branchednomenclature Nomenclature of Branched Series
+
+<p>
+In the following picture, you can see a general scheme of a fragmentation of a singly branched peptide. A sequence of a branched peptide can be written by six different ways (called linearized sequences of a branched peptide sequence).
+Two series of ions can be generated from each linearized sequence (N-terminal and C-terminal), thus we get series of fragment ions <sup>1</sup>B to <sup>6</sup>B and <sup>1</sup>Y to <sup>6</sup>Y. However, the series <sup>3</sup>B, <sup>5</sup>B
+and <sup>6</sup>B are unsense because N-terminal fragments cannot be generated from a C-terminal side. Similarly, the series <sup>3</sup>Y, <sup>5</sup>Y and <sup>6</sup>Y are unsense because C-terminal fragments cannot be generated from an N-terminal side.
+The series <sup>2</sup>B and <sup>2</sup>Y exist only when the branch is N-terminal. The series <sup>4</sup>B and <sup>4</sup>Y exist only when the branch is C-terminal. 
+Thus for a branched peptide, only four series of fragment ions can be observed in total - two series of b-ions (N-terminal ions) and two series of y-ions (C-terminal ions).
+</p>
+
+<p>
+\image html tpeptidefragmentation.png "General scheme of a fragmentation of a branched peptide."
+\image latex tpeptidefragmentation.eps "General scheme of a fragmentation of a branched peptide." width=16cm
+</p>
+
+<hr>
+
+\section branchedfragmentationexample Fragmentation Example
+
+<p>
+A scheme of theoretical fragments generated from a linearized pseudacyclin A is shown in the following picture. We assume that a ion of a branched peptide is fragmented only once and that the branch is not fragmented, 
+thus some b-ions and y-ions do not exist in the theoretical spectrum (struck out in the following picture). If a branch was split, the ion would be fragmented for second time.
+</p>
+
+<p>
+\image html tpeptidefragmentation-v2-nocolor.png "Theoretical fragments of linearized pseudacyclin A and its six linearized sequences (P = proline; I = isoleucine, Or = ornithine; aI = acetylisoleucine; F = phenylalanine)."
+\image latex tpeptidefragmentation-v2-nocolor.eps "Theoretical fragments of linearized pseudacyclin A and its six linearized sequences (P = proline; I = isoleucine, Or = ornithine; aI = acetylisoleucine; F = phenylalanine)." width=16cm
+</p>
+
+<br>
+
+<p>
+\image html pseudacyclin-linearized.png "Linearized pseudacyclin A."
+\image latex pseudacyclin-linearized.eps "Linearized pseudacyclin A." width=10cm
+</p>
+
+<hr>
+
+\section branchednrpsiderophores Branched Siderophores
+
+<p>
+CycloBranch supports the identification of desferri- and ferri-forms of branched siderophores which are nonribosomal peptides. 
+For details, see [Linear Nonribosomal Peptide Siderophores](@ref linearnrpsiderophores).
+</p>
+
+<br/>
+
+*/

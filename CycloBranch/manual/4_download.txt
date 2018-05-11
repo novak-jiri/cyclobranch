@@ -1,0 +1,399 @@
+
+/*!
+  
+\page download Download
+
+<p>
+Any work based on CycloBranch shall cite any of the following references:
+<ul>
+<li><i>J. Am. Soc. Mass Spectrom.</i> (2015), 26(10):1780-1786. DOI: <a href="http://dx.doi.org/10.1007/s13361-015-1211-1"><b>10.1007/s13361-015-1211-1</b></a>
+<li><i>BBA - Proteins Proteom.</i> (2017), 1865(7):768-775. DOI: <a href="http://dx.doi.org/10.1016/j.bbapap.2016.12.003"><b>10.1016/j.bbapap.2016.12.003</b></a>
+</ul>
+</p>
+
+<hr>
+
+<p>The latest development version is available on <a href="http://github.com/novak-jiri/cyclobranch/">GitHub</a>.</p>
+
+<hr>
+ 
+<p>xx.x.2018</p>
+  
+<p>
+<b>CycloBranch 1.2.xxx</b>
+<ul>
+  <li> Changes:
+  <ul>
+    <li> Spectrum detail window improved:
+    <ul>
+        <li> Profile spectra can now be visualized (Bruker's baf files on Windows only).
+        <li> Visualization of mass spectra improved.
+        <li> Hide labels of peaks feature added.
+        <li> Mouse wheel function improved.
+        <li> Summary formulas of experimental peaks are now reported also in MS/MS mode.
+        <li> An experimental peak can now be focused in using a double-click.
+    </ul>
+    <li> Chromatogram - visualization and mouse wheel function improved.
+    <li> Summary Table of Matched Peaks - an experimental peak can now be focused using a double-click.
+    <li> "Compare Peaklist with Database - MS/MS data" mode - a bug fixed; different theoretical spectra with the same score were reported only once.
+    <li> LC-MS/MS data - all spectra in a dataset are now compared with a theoretical spectrum of a searched sequence if "Compare Peaklist(s) with Spectrum of Searched Sequence" mode is used (the parameter "Scan no." is not used in this mode).
+    <li> Settings dialog - layout fixed for macOS.
+    <li> FileConverter - collision of filenames between OpenMS and Xcalibur fixed.
+  </ul>
+  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.2.xxx_win_64bit.zip" onclick="ga('send', 'event', 'Download', this.href);">Download (Windows, 64 bit - tested on Windows 7/10)</a>
+  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.2.xxx_linux_64bit.tgz" onclick="ga('send', 'event', 'Download', this.href);">Download (Linux, 64 bit - tested on Ubuntu 16.04)</a>
+  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.2.xxx_osx_64bit.dmg" onclick="ga('send', 'event', 'Download', this.href);">Download (macOS, 64 bit - tested on macOS 10.12 Sierra)</a>
+  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/docs/refman.pdf" onclick="ga('send', 'event', 'Download', this.href);">PDF manual</a>
+  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.2.xxx_win_sources.zip" onclick="ga('send', 'event', 'Download', this.href);">Download Sources (Windows)</a>
+  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.2.xxx_linux_sources.tgz" onclick="ga('send', 'event', 'Download', this.href);">Download Sources (Linux)</a>
+  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.2.xxx_osx_sources.dmg" onclick="ga('send', 'event', 'Download', this.href);">Download Sources (OS X)</a>
+  <li> Additional databases: <a href="http://ms.biomed.cas.cz/cyclobranch/release/Lipids.zip" onclick="ga('send', 'event', 'Download', this.href);">Lipids</a>  
+</ul>
+</p>
+
+<hr>
+ 
+<p>26.2.2018</p>
+  
+<p>
+<b>CycloBranch 1.2.748</b>
+<ul>
+  <li> Changes:
+  <ul>
+    <li> A custom list of neutral losses can now be defined for MS, MSI and MS/MS data.
+    <li> Details of MS/MS spectra improved - matched peaks can now be filtered using a name of a ion series or using name of a neutral loss.
+    <li> Settings dialog improved:
+    <ul>
+        <li> "Neutral Losses" - a modifiable list added.
+        <li> "Maximum Number of Combined Losses" - settings added.
+        <li> "Report Unmatched Theoretical Peaks" - checkbox added; performance improved if unchecked.
+        <li> "m/z Error Tolerance for Deisotoping" - obsolete feature removed.
+        <li> "Remove Hits of Fragments without Hits of Parent Fragments" - obsolete feature removed.
+        <li> Obsolete scoring functions removed.
+    </ul>
+    <li> Unmatched theoretical isotope patterns can now be reported in MS, MSI and MS/MS mode.  
+    <li> Memory performance was improved.
+    <li> OpenMS 2.3 is now supported.
+    <li> Thermo raw files are now supported.
+    <li> mzML support improved.
+    <li> [M]+, [M]- ions added.
+    <li> Bug fixed: the number of electrons was wrong if the m/z ratio of negative ions was calculated in "Generate Full Isotope Patterns" mode.
+  </ul>
+  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.2.748_win_64bit.zip" onclick="ga('send', 'event', 'Download', this.href);">Download (Windows, 64 bit - tested on Windows 7/10)</a>
+  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.2.748_linux_64bit.tgz" onclick="ga('send', 'event', 'Download', this.href);">Download (Linux, 64 bit - tested on Ubuntu 16.04)</a>
+  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.2.748_osx_64bit.dmg" onclick="ga('send', 'event', 'Download', this.href);">Download (macOS, 64 bit - tested on macOS 10.12 Sierra)</a>
+  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.2.748_win_sources.zip" onclick="ga('send', 'event', 'Download', this.href);">Download Sources (Windows)</a>
+  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.2.748_linux_sources.tgz" onclick="ga('send', 'event', 'Download', this.href);">Download Sources (Linux)</a>
+  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.2.748_osx_sources.dmg" onclick="ga('send', 'event', 'Download', this.href);">Download Sources (OS X)</a>
+  <li> Additional databases: <a href="http://ms.biomed.cas.cz/cyclobranch/release/Lipids.zip" onclick="ga('send', 'event', 'Download', this.href);">Lipids</a>  
+</ul>
+</p>
+
+<hr>
+ 
+<p>15.12.2017</p>
+  
+<p>
+<b>CycloBranch 1.2.660</b>
+<ul>
+  <li> Changes:
+  <ul>
+    <li> <i>De novo</i> sequencing improved - sequence candidates with the same score and identical path in the <i>de novo</i> graph are now reported only once.
+    <li> Summary formulas of fragment ions are now reported.
+    <li> Fine isotope patterns of fragment ions are now generated.
+    <li> Visualization of mass spectra and chromatogram improved - they can be shifted left/right by mouse now.
+    <li> The list of peaks in a spectrum detail window can now be filtered using a ring break-up point (cyclic peptides) or linearized sequence type (branched peptides).
+    <li> CrossVis - support of microscopy images fixed; image export fixed; pixel width and height fields added.
+    <li> Summary Table of Matched Peaks - calculation of statistics fixed.
+    <li> Multiply dehydrated and deamidated fragment/precursor ions are now reported.
+    <li> imzML support improved.
+    <li> CompassXPort support improved.
+    <li> [M+Si-3H]+, [M+Si-4H+Na]+, [M+Si-4H+K]+, and [M+Si-5H]- ions added.
+    <li> Some minor bugs were fixed and performance was improved.
+  </ul>
+  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.2.660_win_64bit.zip" onclick="ga('send', 'event', 'Download', this.href);">Download (Windows, 64 bit - tested on Windows 7/10)</a>
+  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.2.660_linux_64bit.tgz" onclick="ga('send', 'event', 'Download', this.href);">Download (Linux, 64 bit - tested on Ubuntu 16.04)</a>
+  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.2.660_osx_64bit.dmg" onclick="ga('send', 'event', 'Download', this.href);">Download (macOS, 64 bit - tested on macOS 10.12 Sierra)</a>
+  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.2.660_win_sources.zip" onclick="ga('send', 'event', 'Download', this.href);">Download Sources (Windows)</a>
+  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.2.660_linux_sources.tgz" onclick="ga('send', 'event', 'Download', this.href);">Download Sources (Linux)</a>
+  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.2.660_osx_sources.dmg" onclick="ga('send', 'event', 'Download', this.href);">Download Sources (OS X)</a>
+  <li> Additional databases: <a href="http://ms.biomed.cas.cz/cyclobranch/release/Lipids.zip" onclick="ga('send', 'event', 'Download', this.href);">Lipids</a>  
+</ul>
+</p>
+
+<hr>
+ 
+<p>22.6.2017</p>
+  
+<p>
+<b>CycloBranch 1.2.495</b>
+<ul>
+  <li> Changes:
+  <ul>
+    <li> Image Window replaced by CrossVis tool (MALDI-MSI and DESI-MSI data can now be correlated with histology and microscopy images).
+    <li> Waters raw data folders can now be processed (Windows only).
+    <li> [M+Na-2H]-, [M+K-2H]-, and [M+NH4]+ ions added.
+    <li> Single spectra can now be opened also from the Summary Table of Matched Peaks using Enter key or a row double click.
+    <li> Filter options in Main Window, Summary Table of Matched Peaks, Building Blocks Editor, Sequence Database Editor and Modifications Editor improved.
+    <li> Minimum Threshold of Absolute Intensity option added into the Settings Dialog. 
+    <li> Minimum Pattern Size option added into the Settings Dialog. 
+    <li> Generate Permutations of Building Blocks option removed from Settings Dialog; the feature is now always enabled.
+    <li> Scores and FDRs of matched isotope patterns are computed for MS/MSI data.
+    <li> Summary Table of Matched Peaks - exported statistics improved.
+    <li> Show Isomers feature now affects Main Window, Summary Table of Matched Peaks, Spectra Details, De Novo Graph window, and HTML export.
+    <li> Single spectrum detail window and visualization of single spectra improved.
+    <li> Ppm error is now reported as a positive/negative number.
+    <li> Chromatogram window added.
+    <li> Icon sizes increased.
+    <li> Some bugs were fixed and some other minor improvements were made.
+  </ul>
+  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.2.495_win_64bit.zip" onclick="ga('send', 'event', 'Download', this.href);">Download (Windows, 64 bit - tested on Windows 7/10)</a>
+  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.2.495_linux_64bit.tgz" onclick="ga('send', 'event', 'Download', this.href);">Download (Linux, 64 bit - tested on Ubuntu 16.04)</a>
+  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.2.495_osx_64bit.dmg" onclick="ga('send', 'event', 'Download', this.href);">Download (macOS, 64 bit - tested on macOS 10.12 Sierra)</a>
+  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.2.495_win_sources.zip" onclick="ga('send', 'event', 'Download', this.href);">Download Sources (Windows)</a>
+  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.2.495_linux_sources.tgz" onclick="ga('send', 'event', 'Download', this.href);">Download Sources (Linux)</a>
+  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.2.495_osx_sources.dmg" onclick="ga('send', 'event', 'Download', this.href);">Download Sources (OS X)</a>
+  <li> Additional databases: <a href="http://ms.biomed.cas.cz/cyclobranch/release/Lipids.zip" onclick="ga('send', 'event', 'Download', this.href);">Lipids</a>  
+</ul>
+</p>
+
+<hr>
+ 
+<p>3.10.2016</p>
+  
+<p>
+<b>CycloBranch 1.2.192</b>
+<ul>
+  <li> Changes:
+  <ul>
+    <li> mzML file format support fixed.
+    <li> LC-MS/MS spectra support added - id of a scan can now be entered in the settings dialog.
+    <li> Absolute intensities of peaks are now reported.
+    <li> Summary Table of Matched Peaks improved - statistics of matched ions can now be exported.
+    <li> Image Window improved - number of selected points, color scale, average intensity, median intensity, and searched text are reported.
+    <li> Full isotope patterns of compounds can now be generated (MS and MSI data).
+    <li> Visualization of Waters imzML datasets is now supported. 
+    <li> Some bugs and performance issues were fixed and some other minor improvements were made.
+  </ul>
+  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.2.192_win_64bit.zip" onclick="ga('send', 'event', 'Download', this.href);">Download (Windows, 64 bit - tested on Windows 7/8/10)</a>
+  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.2.192_linux_64bit.tgz" onclick="ga('send', 'event', 'Download', this.href);">Download (Linux, 64 bit - tested on Ubuntu 14.04)</a>
+  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.2.192_osx_64bit.dmg" onclick="ga('send', 'event', 'Download', this.href);">Download (OS X, 64 bit - tested on OS X 10.8 (Mountain Lion))</a>
+  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.2.192_win_sources.zip" onclick="ga('send', 'event', 'Download', this.href);">Download Sources (Windows)</a>
+  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.2.192_linux_sources.tgz" onclick="ga('send', 'event', 'Download', this.href);">Download Sources (Linux)</a>
+  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.2.192_osx_sources.dmg" onclick="ga('send', 'event', 'Download', this.href);">Download Sources (OS X)</a>
+  <li> Additional databases: <a href="http://ms.biomed.cas.cz/cyclobranch/release/Lipids.zip" onclick="ga('send', 'event', 'Download', this.href);">Lipids</a> 
+</ul>
+</p>
+
+<hr>
+ 
+<p>19.5.2016</p>
+  
+<p>
+<b>CycloBranch 1.1.570</b>
+<ul>
+  <li> Changes:
+  <ul>
+    <li> New features have been added in the building blocks editor, sequence database editor and modifications editor - create a new database, import a database, un/select all rows.
+    <li> Menubars have been included in the building blocks editor, sequence database editor, modifications editor and summary table of matched peaks. 
+    <li> Some bugs and multiple performance issues have been fixed.
+    <li> Some keyboard shortcuts have been fixed.
+    <li> The support of biometals and polyketide siderophores have been improved.
+    <li> Group id is now reported for de novo sequence candidates.
+    <li> Imaging mass spectra and imzML data format are now supported.
+  </ul>
+  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.1.570_win_64bit.zip" onclick="ga('send', 'event', 'Download', this.href);">Download (Windows, 64 bit - tested on Windows 7/8/10)</a>
+  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.1.570_linux_64bit.tgz" onclick="ga('send', 'event', 'Download', this.href);">Download (Linux, 64 bit - tested on Ubuntu 14.04)</a>
+  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.1.570_osx_64bit.dmg" onclick="ga('send', 'event', 'Download', this.href);">Download (OS X, 64 bit - tested on OS X 10.8 (Mountain Lion))</a>
+  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.1.570_win_sources.zip" onclick="ga('send', 'event', 'Download', this.href);">Download Sources (Windows)</a>
+  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.1.570_linux_sources.tgz" onclick="ga('send', 'event', 'Download', this.href);">Download Sources (Linux)</a>
+  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.1.570_osx_sources.dmg" onclick="ga('send', 'event', 'Download', this.href);">Download Sources (OS X)</a>
+  <li> Additional databases: <a href="http://ms.biomed.cas.cz/cyclobranch/release/Lipids.zip" onclick="ga('send', 'event', 'Download', this.href);">Lipids</a>, <a href="http://ms.biomed.cas.cz/cyclobranch/release/Metabolites.zip" onclick="ga('send', 'event', 'Download', this.href);">Metabolites</a>    
+</ul>
+</p>
+
+<hr>
+ 
+<p>15.12.2015</p>
+  
+<p>
+<b>CycloBranch 1.1.170</b>
+<ul>
+  <li> Changes:
+  <ul>
+    <li> Support of siderophores and polyketides improved.
+    <li> Feature added - summary table of matched peaks.
+    <li> Feature added - cancel buttons have been added into some progress dialogs.
+    <li> Bug fix - program crashed from time to time when combinations of building blocks were generated.
+    <li> Bug fix - detection of branch-cyclic NRPs using series D) and H) fixed. 
+  </ul>
+  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.1.170_win_64bit.zip" onclick="ga('send', 'event', 'Download', this.href);">Download (Windows, 64 bit - tested on Windows 7/8/10)</a>
+  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.1.170_linux_64bit.tgz" onclick="ga('send', 'event', 'Download', this.href);">Download (Linux, 64 bit - tested on Ubuntu 14.04)</a>
+  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.1.170_osx_64bit.dmg" onclick="ga('send', 'event', 'Download', this.href);">Download (OS X, 64 bit - tested on OS X 10.8 (Mountain Lion))</a>
+  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.1.170_win_sources.zip" onclick="ga('send', 'event', 'Download', this.href);">Download Sources (Windows)</a>
+  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.1.170_linux_sources.tgz" onclick="ga('send', 'event', 'Download', this.href);">Download Sources (Linux)</a>
+  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.1.170_osx_sources.dmg" onclick="ga('send', 'event', 'Download', this.href);">Download Sources (OS X)</a>  
+</ul>
+</p>
+
+<hr>
+
+<p>21.9.2015</p>
+  
+<p>
+<b>CycloBranch 1.0.1512</b>
+<ul>
+  <li> Changes:
+  <ul>
+    <li> Peaks in a spectrum detail window are now reported in a table.
+    <li> The table of peaks can be exported into a csv file.
+    <li> Columns containing real numbers are now sorted correctly.
+    <li> HTML export was improved.
+    <li> Peaklist from multiple scans can now be processed in MS mode.
+    <li> Support of identification of NRP siderophores added.
+    <li> Support of linear and cyclic polyketide siderophores added.
+    <li> Support of common biometals added (MS and MS/MS mode).
+    <li> Some keyboard shortcuts were added in the building blocks editor, sequence database editor, modifications editor, draw peptide tool, main window, settings dialog, and de novo graph window.
+    <li> Terminal modifications are now reported in spectra detail windows.
+    <li> Links to Norine and Smiles2Monomers added.
+    <li> A compatibility issue with CompassXPort was fixed.
+    <li> Some bugs were fixed and minor improvements were made.
+  </ul>
+  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.0.1512_win_64bit.zip" onclick="ga('send', 'event', 'Download', this.href);">Download (Windows, 64 bit - tested on Windows 7/8/10)</a>
+  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.0.1512_linux_64bit.tgz" onclick="ga('send', 'event', 'Download', this.href);">Download (Linux, 64 bit - tested on Ubuntu 14.04)</a>
+  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.0.1512_osx_64bit.dmg" onclick="ga('send', 'event', 'Download', this.href);">Download (OS X, 64 bit - tested on OS X 10.8 (Mountain Lion))</a>
+  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.0.1512_win_sources.zip" onclick="ga('send', 'event', 'Download', this.href);">Download Sources (Windows)</a>
+  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.0.1512_linux_sources.tgz" onclick="ga('send', 'event', 'Download', this.href);">Download Sources (Linux)</a>
+  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.0.1512_osx_sources.dmg" onclick="ga('send', 'event', 'Download', this.href);">Download Sources (OS X)</a> 
+</ul>
+</p>
+
+<hr>
+
+<p>15.5.2015</p>
+  
+<p>
+<b>CycloBranch 1.0.1216</b>
+<ul>
+  <li> Changes:
+  <ul>
+    <li> Export of graphical visualization of spectra and peptides into SVG fixed for Windows.
+    <li> Feature added: show/hide isomers of building blocks in the output report.
+    <li> Bug fixed: HTML report was exported incorrectly when the order of rows was changed.
+    <li> Quit confirmation dialog added.
+    <li> Names of precursor ions of multiply charged ions and precursor ions with adducts fixed for MS/MS spectra.
+    <li> Peptide identification details in the main window can be also opened using Return/Enter key.
+    <li> Image export dialog improved in the spectrum detail window.
+    <li> Find text option added into the spectrum detail window.
+    <li> Similarity search can be performed when a peklist is searched against a database of MS/MS spectra.
+    <li> Monoisotopic masses of sequence candidates are now reported in the main window.
+    <li> Settings dialog was improved for monitors with small resolutions (scrollbars added).
+    <li> Export of PS images dropped in Linux (PDF files were generated instead of PS files; pdf2ps tool is now recommended to generate PS files).
+    <li> OS X is now supported.
+    <li> A text filter of rows was added into the main window, building blocks editor, sequence database editor and modifications editor.
+    <li> Save confirmation dialogs added into editors when closing editors.
+    <li> The internal periodic table has been extended.
+    <li> Some bugs and performance issues fixed.
+  </ul>
+  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.0.1216_win_64bit.zip" onclick="ga('send', 'event', 'Download', this.href);">Download (Windows, 64 bit - tested on Windows 7/8)</a>
+  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.0.1216_linux_64bit.tgz" onclick="ga('send', 'event', 'Download', this.href);">Download (Linux, 64 bit - tested on Ubuntu 14.04)</a>
+  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.0.1216_osx_64bit.dmg" onclick="ga('send', 'event', 'Download', this.href);">Download (OS X, 64 bit - tested on OS X 10.8 (Mountain Lion))</a>
+  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.0.1216_win_sources.zip" onclick="ga('send', 'event', 'Download', this.href);">Download Sources (Windows)</a>
+  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.0.1216_linux_sources.tgz" onclick="ga('send', 'event', 'Download', this.href);">Download Sources (Linux)</a>
+  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.0.1216_osx_sources.dmg" onclick="ga('send', 'event', 'Download', this.href);">Download Sources (OS X)</a>
+</ul>
+</p>
+
+<hr>
+
+<p>3.3.2015</p>
+  
+<p>
+<b>CycloBranch 1.0.1106</b>
+<ul>
+  <li> Changes:
+  <ul>
+    <li> Negatively charged ions are supported.
+    <li> c, x and z ions are supported.
+    <li> Precursor ion adducts are supported.
+    <li> Detection of scrambled peaks improved.
+    <li> Linux is now supported.
+    <li> Modifications editor added.
+    <li> A few building blocks were added which cannot eliminate H2O.
+    <li> Support of branched and branch-cyclic peptides improved.
+    <li> "Draw Peptide Tool" added.
+    <li> Keyboard shortcuts and toolbars added.
+    <li> Export of graphical visualization of spectra and peptides into PDF, PS, PNG and SVG (Linux only) added.
+    <li> Visualization of mass spectra improved.
+    <li> Some bugs and performance issues fixed.
+  </ul>
+  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.0.1106_win_64bit.zip" onclick="ga('send', 'event', 'Download', this.href);">Download (Windows, 64 bit - tested on Windows 7/8)</a>
+  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.0.1106_linux_64bit.tgz" onclick="ga('send', 'event', 'Download', this.href);">Download (Linux, 64 bit - tested on Ubuntu 14.04)</a>
+  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.0.1106_win_sources.zip" onclick="ga('send', 'event', 'Download', this.href);">Download Sources (Windows)</a>
+  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.0.1106_linux_sources.tgz" onclick="ga('send', 'event', 'Download', this.href);">Download Sources (Linux)</a>
+</ul>
+</p>
+
+<hr>
+
+<p>19.11.2014</p> 
+
+<p>
+<b>CycloBranch 1.0.850</b>
+<ul>
+  <li> Changes:
+  <ul>
+    <li> Database search added (for MS and MS/MS spectra).
+    <li> Databases of building blocks updated.
+    <li> Building blocks editor added.
+    <li> Sequence database editor added.
+    <li> A number of paths in a de novo graph forming sequence candidates is calculated before the search.
+    <li> The version of the application is checked when a results file (*.res) is opened.
+    <li> Number of matched scrambled fragment ions is reported when a cyclic peptide is searched.
+    <li> Small bugs fixed.
+  </ul>
+  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.0.850_win_64bit.zip" onclick="ga('send', 'event', 'Download', this.href);">Download (Windows, 64 bit)</a>
+  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.0.850_win_sources.zip" onclick="ga('send', 'event', 'Download', this.href);">Download Sources (Windows)</a>
+</ul>
+</p>
+
+<hr> 
+
+<p>3.10.2014</p>
+  
+<p>
+<b>CycloBranch 1.0.739</b>
+<ul>
+  <li> Changes:
+  <ul>
+    <li> Visualization of branch-cyclic peptides added.
+    <li> Visualization of branched peptides fixed.
+    <li> Visualization of mass spectra improved.
+    <li> Summary formulas of peptide sequence candidates added.
+  </ul>
+  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.0.739_win_64bit.zip" onclick="ga('send', 'event', 'Download', this.href);">Download (Windows, 64 bit)</a>
+  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.0.739_win_sources.zip" onclick="ga('send', 'event', 'Download', this.href);">Download Sources (Windows)</a>
+</ul>
+</p>
+
+<hr> 
+
+<p>3.9.2014</p>
+  
+<p>
+<b>CycloBranch 1.0.696</b>
+</p>
+
+<p>
+<ul>
+  <li> Initial release.
+  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.0.696_win_64bit.zip" onclick="ga('send', 'event', 'Download', this.href);">Download (Windows, 64 bit)</a>
+  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.0.696_win_sources.zip" onclick="ga('send', 'event', 'Download', this.href);">Download Sources (Windows)</a>
+</ul>
+</p>
+
+<hr>
+
+<br/>
+  
+*/

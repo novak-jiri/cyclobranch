@@ -1,0 +1,92 @@
+/*!
+  
+\page cyclicketidedetail Cyclic Siderophores
+
+\section cyclicnrpsiderophores Cyclic Nonribosomal Peptide Siderophores
+
+<p>There are no special requirements for identification of desferri-forms of cyclic siderophores which are nonribosomal peptides (see [Cyclic Peptides](@ref cyclicdetail)).
+The precursor ion adduct must be set up for identification of their ferri-forms (see [Linear Nonribosomal Peptide Siderophores](@ref linearnrpsiderophores)).</p>
+
+<hr>
+
+\section cyclicpolyketidedetailwindow Cyclic Polyketide Detail Window
+
+<p>
+The identification of cyclic polyketides requires an additional annotation of building blocks. See [Format of Ketide Building Blocks](@ref ketideblocks).
+</p> 
+ 
+<p>
+The window is opened by a double-click on a row in the output report if a cyclic polyketide was identified. The Enter key can also be used if the row is selected.
+See also [Cyclic Peptide Detail Window](@ref cyclicdetailwindow) and [Toolbar for Cyclic Peptides](@ref cyclictoolbar).
+</p>
+
+<br/>
+
+<p>
+\image html dfoxe.png "De novo sequencing of desferri-ferrioxamine E."
+\image latex dfoxe.png "De novo sequencing of desferri-ferrioxamine E." width=16cm
+</p>
+
+<br/>
+
+<p>
+\image html foxe.png "De novo sequencing of ferri-ferrioxamine E."
+\image latex foxe.png "De novo sequencing of ferri-ferrioxamine E." width=16cm
+</p>
+
+<hr>
+
+\section cyclicpolyketidenomenclature Nomenclature of Cyclic Polyketide Series
+
+<p>The nomenclature of cyclic polyketides is based on the nomenclatures of linear polyketides and cyclic peptides. 
+See [Nomenclature of Linear Polyketide Series](@ref linearpolyketidenomenclature) and [Nomenclature of Cyclic Series](@ref cyclicnomenclature).
+CycloBranch generates 2 basic series of fragment ions for cyclic polyketides (L and R stand for left and right, respectively):
+<ul>
+<li> <sup>L</sup>b (left b-ion)
+<li> <sup>L</sup>b + 2H (left b-ion + 2H)
+</ul>
+</p>
+
+<p>
+<sup>R</sup>b and <sup>R</sup>b + 2H series series are not generated because the fragment ions are redundant with the series <sup>L</sup>b and <sup>L</sup>b + 2H.
+The fragment ion series <sup>L</sup>y, <sup>L</sup>y - 2H, <sup>R</sup>y and <sup>R</sup>y - 2H (utilized in [Nomenclature of Linear Polyketide Series](@ref linearpolyketidenomenclature)) are 
+not applicable to cyclic polyketide siderophores due to head-to-tail cyclization.
+</p>
+
+<p>
+Like in the case of cyclic peptides, CycloBranch generates theoretical series of ions <sup>i-j,L</sup>b and <sup>i-j,L</sup>b + 2H where i-j are numbers of 
+building blocks between which a ring having n building blocks is opened (i,j <= n; i=1, j=n; or i=j+1, otherwise). 
+CycloBranch also generates reversed series of ions <sup>j-i,L</sup>b and <sup>j-i,L</sup>b + 2H. 
+</p>
+
+<p>
+When a metal is included in the precursor ion adduct field, the generated theoretical fragments are suffixed with its name and corresponding theoretical isotope fragments are generated 
+(e.g., the fragments LB3+2H_Fe and LB3+2H_54Fe are generated instead of LB3+2H when precursor ion adduct "FeH-2" is used). See also [Precursor Ion Adduct](@ref settings_adduct). 
+A mass spectrometry nomenclature for cyclic polyketide siderophore desferrioxamine E is shown in the following figure.
+</p>
+
+<p>
+\image html cyclicketideseries.png "Mass spectrometry nomenclature for cyclic polyketide siderophore desferrioxamine E."
+\image latex cyclicketideseries.eps "Mass spectrometry nomenclature for cyclic polyketide siderophore desferrioxamine E." width=16cm
+</p>
+
+
+<hr>
+
+\section cyclicpolyketidecandidatedetection Cyclic Polyketide Sequence Detection
+
+<p>
+The detection of cyclic polyketide sequence candidates is based on [Linear Polyketide Sequence Detection](@ref linearpolyketidecandidatedetection) and 
+[Cyclic Sequence Detection](@ref cycliccandidatedetection). The starting points applicable to cyclic polyketides are H<sup>+</sup> and H<sup>+</sup> + 2H.
+</p>
+
+<br/>
+
+<p>
+\image html foxedenovo.png "De novo graph created from the experimental spectrum of ferrioxamine E (Hpd = N-Hydroxy-1,5-pentanediamine; Suc = Succinic semialdehyde)."
+\image latex foxedenovo.eps "De novo graph created from the experimental spectrum of ferrioxamine E (Hpd = N-Hydroxy-1,5-pentanediamine; Suc = Succinic semialdehyde)." width=14cm
+</p>
+
+<br/>
+
+*/

@@ -1,0 +1,197 @@
+/*!
+  
+\page branchcyclicdetail Branch-cyclic Peptides
+
+\section branchcyclicdetailwindow Branch-cyclic Peptide Detail Window
+ 
+<p>
+The window is opened by a double-click on a row in the output report if a branch-cyclic peptide was identified. The Enter key can also be used if the row is selected.
+</p>
+
+<p>
+\image html branchcyclicdetail.png "De novo sequencing of pyoverdin E."
+\image latex branchcyclicdetail.png "De novo sequencing of pyoverdin E." width=16cm
+</p>
+
+<p>
+See details in [Linear Peptide Detail Window](@ref lineardetailwindow), [Cyclic Peptide Detail Window](@ref cyclicdetailwindow) and [Branched Peptide Detail Window](@ref brancheddetailwindow). 
+The differences for branch-cyclic peptides are following:
+<ul>
+<li> The text window on the right at the bottom contains a list of all linearized sequences derived from all possible ring opening sites of a branch-cyclic peptide. 
+If the ring is opened, a fragment ion corresponds to a branched peptide. Thus for each linearized sequence (derived from the ring opening), another list of linearized sequences is generated 
+(derived from a branched fragment). The nomenclature of linearized sequences of branch-cyclic peptides simply combines nomenclatures of linearized sequences derived 
+from cyclic and branched peptide sequences. For example, 1-4_5 is a linearized sequence no. 5 of a branched fragment ion arising after a ring opening at the position 1-4.
+</ul>
+
+<hr>
+
+\section branchcyclictoolbar Toolbar for Branch-cyclic Peptides
+
+<p>See [Toolbar for Linear Peptides](@ref lineartoolbar), [Toolbar for Cyclic Peptides](@ref cyclictoolbar) and [Toolbar for Branched Peptides](@ref branchedtoolbar).
+
+<hr>
+
+\section branchcyclicdetection Branch-cyclic Sequence Detection
+
+<p>
+Series of fragment ions of a branch-cyclic peptide are shown in the following picture.
+</p>
+
+<p>
+\image html branchcyclic-series.png "Theoretical fragment ion series generated due to ring opening of a branch-cyclic NRP - (a) a branched fragment, (b) a linear fragment."
+\image latex branchcyclic-series.eps "Theoretical fragment ion series generated due to ring opening of a branch-cyclic NRP - (a) a branched fragment, (b) a linear fragment." width=9cm
+</p>
+
+<br/>
+
+<p>
+A path in the de novo graph corresponding to a branch-cyclic peptide is detected as shown in the following scheme (an edge corresponds to a residue mass of
+a building block or a sum of residue masses of a combination of building blocks). The options E) and I) are currently not implemented.
+</p>
+
+<p>
+\image html branchcyclic-denovo.png "Detection of a path corresponding to a branch-cyclic peptide in a de novo graph."
+\image latex branchcyclic-denovo.eps "Detection of a path corresponding to a branch-cyclic peptide in a de novo graph." width=16cm
+</p>
+
+<br/>
+
+<p>Since peaks determining the begin and the end of a branch may be missing in an experimental spectrum, the algorithm generates 
+a set of peptide sequence candidates from a path in the graph instead of one sequence candidate. 
+See the following scheme and [Branched Sequence Detection](@ref brancheddetection) for details.</p>
+
+<p>
+\image html branch-cyclic-detection.png "Peptide sequence candidates generated from a path in a de novo graph (branch-cyclic peptides)."
+\image latex branch-cyclic-detection.eps "Peptide sequence candidates generated from a path in a de novo graph (branch-cyclic peptides)." width=14cm
+</p>
+
+<br/>
+
+<hr>
+
+\section branchcyclicnomenclature Nomenclature of Branch-cyclic Series
+
+<p>
+Since branch-cyclic peptides combine properties of cyclic and branched peptides, the nomenclature of branch-cyclic peptides combines nomenclatures 
+of both types of peptides. 
+</p>
+
+\subsection branchcyclicrotations Linearized Sequences (Derived from a Ring Opening)
+
+<p>
+The sequences are derived the same way like linearized sequences of a [cyclic peptide](@ref cyclicdetail) with a difference that 
+all building blocks between "(" and ")" are considered as one building block. For example, linearized sequences of pseudacyclin A
+are generated as follows:
+</p>
+    
+<p>
+Linearized sequences:<br/>
+1-5 ~ [Phe]-[Pro]-[Ile]-[Ile] ( [Orn]-[N-Ac-Ile] )<br/> 
+2-1 ~ [Pro]-[Ile]-[Ile] ( [Orn]-[N-Ac-Ile] ) [Phe]<br/>
+3-2 ~ [Ile]-[Ile] ( [Orn]-[N-Ac-Ile] ) [Phe]-[Pro]<br/>
+4-3 ~ [Ile] ( [Orn]-[N-Ac-Ile] ) [Phe]-[Pro]-[Ile]<br/>
+5-4 ~ ( [Orn]-[N-Ac-Ile] ) [Phe]-[Pro]-[Ile]-[Ile]
+</p>
+
+<p>
+Reverted linearized sequences:<br/>
+5-1 ~ ( [Orn]-[N-Ac-Ile] ) [Ile]-[Ile]-[Pro]-[Phe]<br/>
+4-5 ~ [Ile]-[Ile]-[Pro]-[Phe] ( [Orn]-[N-Ac-Ile] )<br/> 
+3-4 ~ [Ile]-[Pro]-[Phe] ( [Orn]-[N-Ac-Ile] ) [Ile]<br/>
+2-3 ~ [Pro]-[Phe] ( [Orn]-[N-Ac-Ile] ) [Ile]-[Ile]<br/>
+1-2 ~ [Phe] ( [Orn]-[N-Ac-Ile] ) [Ile]-[Ile]-[Pro]
+</p>
+
+<p>
+\image html pseudacyclin.png "Pseudacyclin A."
+\image latex pseudacyclin.png "Pseudacyclin A." width=8cm
+</p>
+
+<p>Each branch-cyclic peptide may form up to <i>k - 2</i> branched fragments (or <i>2*(k - 2)</i> when reverted fragments are considered) where <i>k</i> is the number of monomers forming the ring.
+Each branch-cyclic peptide may also produce up to 2 linear fragments (or 4 when reverted fragments are considered). These fragments are indicated by the brackets "( ... )" 
+on the left or on the right side of a linearized sequence. Linear fragments of pseudacyclin A are following: 
+</p>
+
+<p>
+Sequences:<br/>
+1-5 ~ [Phe]-[Pro]-[Ile]-[Ile] ( [Orn]-[N-Ac-Ile] ) corresponds to a linearized sequence [Phe]-[Pro]-[Ile]-[Ile]-[Orn]-[N-Ac-Ile]<br/> 
+5-4 ~ ( [Orn]-[N-Ac-Ile] ) [Phe]-[Pro]-[Ile]-[Ile] corresponds to a  linearized sequence [N-Ac-Ile]-[Orn]-[Phe]-[Pro]-[Ile]-[Ile]
+</p>
+
+<p>
+Reverted sequences:<br/>
+5-1 ~ ( [Orn]-[N-Ac-Ile] ) [Ile]-[Ile]-[Pro]-[Phe] corresponds to a linearized sequence [N-Ac-Ile]-[Orn]-[Ile]-[Ile]-[Pro]-[Phe]<br/>
+4-5 ~ [Ile]-[Ile]-[Pro]-[Phe] ( [Orn]-[N-Ac-Ile] ) corresponds to a linearized sequence [Ile]-[Ile]-[Pro]-[Phe]-[Orn]-[N-Ac-Ile]
+</p>
+
+<hr>
+
+\subsection branchcyclictpermutations Linearized Sequences (Derived from a Branched Fragment)
+
+<p>
+Linearized sequences of a branched fragment are derived similarly to linearized sequences of a [branched peptide](@ref brancheddetail) (see a general fragmentation scheme below).
+Because of a cyclization in a branch-cyclic peptide, the C-terminal series <sup>1</sup>Y and <sup>2</sup>Y are replaced with the N-terminal series <sup>3</sup>B and <sup>6</sup>B.
+</p>
+
+<p>
+\image html branchcyclicrotationfragmentation.png "General scheme of linearized sequences and fragmentation of a branched fragment 1-2(3-6)4-5."
+\image latex branchcyclicrotationfragmentation.eps "General scheme of linearized sequences and fragmentation of a branched fragment 1-2(3-6)4-5." width=16cm
+</p>
+
+<hr>
+
+\subsection branchcyclicexampletpermutations Example of Linearized Sequences of a Branched Fragment
+
+<p>
+Example of linearized sequences of a branched fragment <code>[Pro]-[Ile]-[Ile]([Orn]-[N-Ac-Ile])[Phe]</code> derived from a branch-cyclic peptide pseudacyclin A:
+</p>
+
+<p>
+2-1_1 ~ [Pro]-[Ile]-[Ile] ( [Orn]-[N-Ac-Ile] ) [Phe]<br/>
+2-1_2 ~ [N-Ac-Ile] ( [Orn]-[Ile]-[Ile]-[Pro] ) [Phe]<br/>
+2-1_3 ~ [Phe] ( [Orn]-[N-Ac-Ile] ) [Ile]-[Ile]-[Pro]<br/>
+2-1_4 ~ [Pro]-[Ile]-[Ile] ( [Orn]-[Phe] ) [N-Ac-Ile]<br/>
+2-1_5 ~ [N-Ac-Ile] ( [Orn]-[Phe] ) [Ile]-[Ile]-[Pro]<br/>
+2-1_6 ~ [Phe] ( [Orn]-[Ile]-[Ile]-[Pro] ) [N-Ac-Ile]
+</p>
+
+<p>
+The same example is shown in the picture below where the fragment ion series are illustrated for each linearized sequence. 
+We assume that a branched fragment is further fragmented only once, thus some b-ions do not exist in the theoretical spectrum (struck out in the following picture).
+</p>
+
+<p>
+\image html branchcyclicrotationfragmentation-v2.png "Linearized sequences of a branched fragment of pseudacyclin A (P = proline; I = isoleucine, Or = ornithine; aI = acetylisoleucine; F = phenylalanine)."
+\image latex branchcyclicrotationfragmentation-v2.eps "Linearized sequences of a branched fragment of pseudacyclin A (P = proline; I = isoleucine, Or = ornithine; aI = acetylisoleucine; F = phenylalanine)." width=16cm
+</p>
+
+<hr>
+
+\subsection branchcyclicexampletpermutations2 Example of Linearized Sequences of a Linear Fragment
+
+<p>
+A linear fragment (e.g., <code>[Phe]-[Pro]-[Ile]-[Ile]([Orn]-[N-Ac-Ile])</code>) may also be obtained instead of a branched one after a ring opening. 
+In this case, the notation of linearized sequences can also be understood as follows:
+</p>
+
+<p>
+1-5_1 ~ [Phe]-[Pro]-[Ile]-[Ile] ( [Orn]-[N-Ac-Ile] ) corresponds to [Phe]-[Pro]-[Ile]-[Ile]-[Orn]-[N-Ac-Ile]<br/>
+1-5_2 ~ [N-Ac-Ile] ( [Orn]-[Ile]-[Ile]-[Pro]-[Phe] ) corresponds to [N-Ac-Ile]-[Orn]-[Ile]-[Ile]-[Pro]-[Phe]<br/> 
+1-5_3 ~ ( [Orn]-[N-Ac-Ile] ) [Ile]-[Ile]-[Pro]-[Phe] corresponds to [N-Ac-Ile]-[Orn]-[Ile]-[Ile]-[Pro]-[Phe]<br/>
+1-5_4 ~ [Phe]-[Pro]-[Ile]-[Ile] ( [Orn] ) [N-Ac-Ile] corresponds to [Phe]-[Pro]-[Ile]-[Ile]-[Orn]-[N-Ac-Ile]<br/>
+1-5_5 ~ [N-Ac-Ile] ( [Orn] ) [Ile]-[Ile]-[Pro]-[Phe] corresponds to [N-Ac-Ile]-[Orn]-[Ile]-[Ile]-[Pro]-[Phe]<br/>
+1-5_6 ~ ( [Orn]-[Ile]-[Ile]-[Pro]-[Phe] ) [N-Ac-Ile] corresponds to [Phe]-[Pro]-[Ile]-[Ile]-[Orn]-[N-Ac-Ile]
+</p>
+
+<hr>
+
+\section branchcyclicnrpsiderophores Branch-cyclic Siderophores
+
+<p>
+CycloBranch supports the identification of desferri- and ferri- forms of branch-cyclic siderophores which are nonribosomal peptides. 
+For details, see [Linear Nonribosomal Peptide Siderophores](@ref linearnrpsiderophores).
+</p>
+
+<br/>
+
+*/

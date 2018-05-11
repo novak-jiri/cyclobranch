@@ -1,0 +1,47 @@
+/*! 
+
+\page filter Text Filter
+
+\section textfilterinterface Text Filter
+
+<p>
+\image html textfilter.png "Text filter."
+\image latex textfilter.png "Text filter." width=16cm
+</p>
+
+<p>
+The text filter is embedded in the [Main Window](@ref mainwindow), [Summary Table of Matched Peaks](@ref summarypeakstable), [Building Blocks Editor](@ref blockseditor),
+[Sequence/Compound Database Editor](@ref sequenceeditor), and [Modifications Editor](@ref modificationseditor).
+</p>
+
+<p><b>Dropdown menu - column</b></p>
+
+<p>Select the name of column to be searched.</p>
+
+<p><b>Dropdown menu - comparator</b></p>
+
+<p>Select the type of comparator. The value in a selected column can be =, <, <=, >, >= than a value entered in the input line.</p>
+
+<p><b>Input Line - Text to Find (CTRL + F)</b></p>
+
+<p>Enter the text to be found into the input line.</p>
+
+<p><b>Checkbox - Case In/sensitive (CTRL + T)</b></p>
+
+<p>If the checkbox is checked, the text is searched case sensitively, otherwise it is searched case insensitively.</p>
+
+<p><b>Checkbox - Whole Words Only (CTRL + W)</b></p>
+
+<p>If the checkbox is checked, only whole words are searched.</p>
+
+<p><b>Filter (Enter key, if the input line is focused)</b></p>
+
+<p>Press the button to select only the rows of the table which meet the defined criteria.</p>
+
+<p><b>Reset (CTRL + R)</b></p>
+
+<p>Press the button to reset the input line and to show the entire report.</p>
+
+<br/>
+
+*/

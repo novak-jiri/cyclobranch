@@ -1,0 +1,562 @@
+/*! 
+
+\page settings Settings
+
+\section settingsdialog Settings Dialog
+
+<p>The settings dialog is opened using the command "Search -> Settings... ". 
+Use F1 to open this help.
+</p>
+
+<p>
+\image html settings.png "Main settings of the engine."
+\image latex settings.png "Main settings of the engine." width=16cm
+</p>
+
+\subsection subsec_buttons Basic Buttons
+
+<p>
+<ul>
+<li> OK (Enter) - Accept changes and hide window.
+<li> Cancel (Esc) - Drop changes and hide window.
+<li> Apply - Accept changes and keep window opened.
+<li> Load (CTRL + L) - Load settings from a file (*.ini).
+<li> Save (CTRL + S) - Save settings in the current file (*.ini). When a file has not been loaded yet, the "Save As ..." file dialog is opened.
+<li> Save As... (CTRL + D) - Save settings into a file (*.ini).
+<li> Edit (CTRL + E) - Edit the peptide sequence using the [Draw Peptide Tool](@ref drawpeptide). The sequence is imported into the draw peptide tool and visualized if its syntax is correct 
+(see also [Format of Sequence Databases](@ref sequenceeditordbformat)).
+</ul> 
+</p>
+
+<hr>
+
+\section settingssearch Search
+
+\subsection settings_mode Mode
+
+<p>
+<ul>
+<li>'De Novo Search Engine' - the default mode of the application.
+<li>'Compare Peaklist(s) with Spectrum of Searched Sequence' - a theoretical spectrum is generated for the input "Searched Sequence" and is compared with the peaklist(s).
+<li>'Compare Peaklist with Database - MS/MS data' - a peaklist is compared with theoretical spectra generated from a database of sequences.
+<li>'Compare Peaklist(s) with Database - MS or MSI data' - compound search; dereplication; the peaklists are compared with theoretical peaks generated from a database of compounds/sequences.
+</ul>
+</p>
+
+\subsection settings_maxthreads Maximum Number of Threads
+
+<p>A maximum number of threads used if an experimental peaklist is compared with theoretical spectra of peptide sequence candidates.</p>
+
+<hr>
+
+\section settingsexperimentalspectrum Experimental Spectrum/Spectra
+
+\subsection settings_peptidetype Peptide Type
+
+<p>Select the type of peptide or polyketide.
+
+<ul>
+<li> [Linear](@ref lineardetail)
+<li> [Cyclic](@ref cyclicdetail)
+<li> [Branched](@ref brancheddetail)
+<li> [Branch-cyclic](@ref branchcyclicdetail)
+<li> [Linear polyketide](@ref linearketidedetail)
+<li> [Cyclic polyketide](@ref cyclicketidedetail)
+</ul>
+
+\subsection settings_peaklistfile File (CTRL + P)
+
+<p>Select a file. Supported file formats:
+
+<div align="center">
+<table width="90%" class="doxtable">
+<tr>
+<th>File format</th>
+<th>Supported data type</th>
+<th>Description</th>
+<th>Notes</th>
+</tr>
+<tr>
+<td>txt</td>
+<td>peaklists</td>
+<td>plain text file</td>
+<td>Mass-to-charge ratio and intensity on each line separated by tabulator; multiple peaklists must be separated by an empty line.</td>
+</tr>
+<tr>
+<td>mgf</td>
+<td>peaklists</td>
+<td>Mascot Generic File format</td>
+<td></td>
+</tr>
+<tr>
+<td>mzML</td>
+<td>profile spectra or peaklists</td>
+<td><a href="http://www.psidev.info/mzml_1_0_0">standard data format</a></td>
+<td>m/z values and intensities must be stored as 64-bit/32-bit floats; no compression. <a href="http://www.openms.de">OpenMS 2.x</a> must be installed.</td>
+</tr>
+<tr>
+<td>mzXML</td>
+<td>peaklists</td>
+<td>standard data format</td>
+<td><a href="http://www.openms.de">OpenMS 2.x</a> must be installed; the FileConverter tool is used to automatically convert this file format into mgf.</td>
+</tr>
+<tr>
+<td>imzML</td>
+<td>profile spectra or peaklists</td>
+<td><a href="http://www.imzml.org">standard data format</a></td>
+<td>Processed or continuos data file format; m/z values and intensities must be stored as 64-bit/32-bit floats; no compression. <a href="http://www.openms.de">OpenMS 2.x</a> must be installed.</td>
+</tr>
+<tr>
+<td>baf</td>
+<td>profile spectra</td>
+<td>Bruker's Analysis File</td>
+<td><a href="http://www.bruker.com/service/support-upgrades/software-downloads/mass-spectrometry.html">CompassXport 3.0</a> must be installed; Windows only.</td>
+</tr>
+<tr>
+<td>raw</td>
+<td>profile spectra or peaklists</td>
+<td>Thermo raw file</td>
+<td><a href="http://www.openms.de">OpenMS 2.x</a> including ProteoWizard must be installed; Windows only.</td>
+</tr>
+<tr>
+<td>raw</td>
+<td>peaklists</td>
+<td>Waters raw directory</td>
+<td>Select a *.dat file in the raw directory; Windows only.</td>
+</tr>
+<tr>
+<td>mis (deprecated)</td>
+<td>profile spectra</td>
+<td>Bruker's flexImaging File (old data format)</td>
+<td><a href="http://www.bruker.com/service/support-upgrades/software-downloads/mass-spectrometry.html">CompassXport 3.0</a> must be installed; Windows only. 
+If the file "[name].mis" is selected, all the "analysis.baf" files in the subfolders of "[name]" directory are searched and processed.</td>
+</tr>
+<tr>
+<td>ser (deprecated)</td>
+<td>profile spectra</td>
+<td>Apex file format</td>
+<td><a href="http://www.bruker.com/service/support-upgrades/software-downloads/mass-spectrometry.html">CompassXport 3.0</a> must be installed; Windows only. 
+</td>
+</tr>
+
+</table>
+</div>
+
+<p>CycloBranch supports the standard imzML data format for imaging mass spectra (see <a href="http://www.imzml.org">imzml.org</a>). 
+If the file includes profile spectra, they are automatically converted to centroided spectra using the OpenMS pipeline NoiseFilterGaussian &gt;&gt;
+BaseLineFilter &gt;&gt; PeakPickerHiRes (requires <a href="http://www.openms.de">OpenMS</a> 2.x installed). An external script is used to convert the raw data 
+thus the parameters of the pipeline (e.g., S/N ratio) can be adjusted (edit the file "External/windows/raw2peaks.bat", "External/linux/raw2peaks.sh" or "External/macosx/raw2peaks.sh" depending 
+on your data requirements and the platform). Since the data conversion may be very time-consuming (hrs/days) due to the size of a dataset (e.g., tens of gigabytes), 
+CycloBranch stores the converted files with centroided spectra for further use. The new filenames are "filename_converted_fwhm_value.imzML" and "filename_converted_fwhm_value.ibd". 
+CycloBranch automatically detects these files when the search process is repeated and opens a dialog to recommend their use. 
+The "filename_converted_fwhm_value.imzML" can be used directly as a peaklist file in [Settings](@ref settings) to skip the recommendation dialog.
+</p>
+
+<p>
+\image html msi-dialog.png "The dialog which recommends the use of centroided spectra instead of profile spectra."
+\image latex msi-dialog.png "The dialog which recommends the use of centroided spectra instead of profile spectra." width=10cm
+</p> 
+
+\subsection settings_scannumber Scan no.
+
+<p>Number of a spectrum to be processed in a LC-MS/MS data file. The number may be different from an internal scan number stored in the input data file.</p>
+
+\subsection settings_precursor Precursor m/z Ratio
+
+<p>Enter the precursor mass-to-charge (m/z) ratio. The value is decharged automatically. The precursor m/z ratio in the input peaklist file is ignored.</p>
+
+\subsection settings_adduct Precursor Ion Adduct
+
+<p>Enter the formula of a precursor ion adduct (e.g., Na, K, Li). H is used by default if the field is empty. If a metal is used (e.g., FeH-2) 
+and the option "Generate Full Isotope Patterns" is disabled, the peaks of isotopes having natural abundances greater than 3% are generated automatically 
+in theoretical peaklists next to the peaks of most abundant isotopes.
+</p>
+
+<p>Examples of precursor ion adducts:</p>
+
+<div align='center'>
+<table width="300" class="doxtable">
+<tr><th>Precursor Ion</th><th>Precursor Adduct</th></tr>
+<tr><td>[M+H]<sup>+</sup></td><td>H or empty</td></tr>
+<tr><td>[M+Na]<sup>+</sup></td><td>Na</td></tr>
+<tr><td>[M+K]<sup>+</sup></td><td>K</td></tr>
+<tr><td>[M-H]<sup>-</sup></td><td>H or empty</td></tr>
+<tr><td>[M+Fe-2H]<sup>+</sup></td><td>FeH-2</td></tr>
+<tr><td>[M+Fe-3H+Na]<sup>+</sup></td><td>FeH-3Na</td></tr>
+<tr><td>[M+Fe-4H]<sup>-</sup></td><td>FeH-4</td></tr>
+<tr><td>[M+Al-2H]<sup>+</sup></td><td>AlH-2</td></tr>
+<tr><td>[M+Si-3H]<sup>+</sup></td><td>SiH-3</td></tr>
+<tr><td>[M+Zn-H]<sup>+</sup></td><td>ZnH-1</td></tr>
+<tr><td>[M+Zn-2H+Na]<sup>+</sup></td><td>ZnH-2Na</td></tr>
+<tr><td>[M+Zn-3H]<sup>-</sup></td><td>ZnH-3</td></tr>
+</table>
+</div>
+
+\subsection settings_charge Charge
+
+<p>Enter the charge of precursor ion. Negative values are allowed. The charge of precursor ion in the input peaklist file is ignored.
+If the mode "Compare Peaklist(s) with Database - MS or MSI data" is used, the value determines the maximum charge of generated theoretical peaks.
+For example, 3 means that theoretical peaks of compouds are generated with charges 1+, 2+, and 3+. The value -1 means that theoretical
+peaks of compounds are generated with charge 1-.</p>
+
+\subsection settings_precursormz Precursor m/z Error Tolerance
+
+<p>Enter the precursor m/z error tolerance in ppm.</p>
+
+\subsection settings_fragmentmz m/z Error Tolerance
+
+<p>Enter the m/z error tolerance in MS mode or the fragment m/z error tolerance in MS/MS mode [ppm].</p>
+
+\subsection settings_relint Minimum Threshold of Relative Intensity
+
+<p>Enter the minimum threshold of relative intensity in %. Peaks with relative intensities below the threshold are removed from the peaklist.</p>
+
+\subsection settings_absint Minimum Threshold of Absolute Intensity
+
+<p>Enter the minimum threshold of absolute intensity. Peaks with absolute intensities below the threshold are removed from the peaklist.</p>
+
+\subsection settings_minmz Minimum m/z Ratio
+
+<p>Enter the minimum m/z ratio. Peaks with m/z ratios below the threshold are removed from the peaklist.</p>
+
+\subsection settings_fwhm FWHM
+
+<p>Full width at half maximum. The value is used if the profile spectra are converted into peaklists (mzML and imzML) and if the full isotope patterns of compounds are generated.</p>
+
+<hr>
+
+\section settingsbrickdatabase Database of Building Blocks
+
+\subsection settings_blocksdb Building Blocks Database File (CTRL + B)
+
+<p>A text file containing a database of building blocks. See [Format of Building Blocks Databases](@ref blockseditordbformat).</p>
+
+\subsection settings_maxblocks Maximum Number of Combined Blocks (start / middle / end)
+
+<p>Maximum number of combined building blocks to skip a gap in a de novo graph. A small value speeds up the search and vice versa.
+Depending on the position of a gap between peaks in a spectrum, the three different values are set up:</p>
+<ul>
+<li><b>Start:</b> Maximum number of combined building blocks to skip a gap leading <b>from a start point</b> in a de novo graph.
+<li><b>Middle:</b> Maximum number of combined building blocks to skip a gap in the middle of the graph. <b>Except gaps leading from a start point or to an end point.</b>
+<li><b>End:</b> Maximum number of combined building blocks to skip a gap leading <b>to an end point</b> in the de novo graph.
+</ul>
+
+<p>In the following scheme, beauverolide I is detected. Since the peak between m/z 1 and 304 is missing, the minimum values start/middle/end are 2/1/1.
+Otherwise, beauverolide I is not detected when "Incomplete Paths in De Novo Graph" is set up to "keep" or "remove".</p>
+
+<p>
+\image html denovograph-v4.png "De novo graph created from mass spectrum of beauverolide I."
+\image latex denovograph-v4.eps "De novo graph created from mass spectrum of beauverolide I." width=14cm
+</p>
+
+<p><b>Tip:</b> When an unknown molecule is analyzed, check peptide sequence tags first. Use the following settings:</p>
+<ul>
+<li><b>Set up start/middle/end to 1/1/1.</b>
+<li><b>Set up the "Peptide Type" to "linear" or "cyclic".</b>
+<li><b>Set up the "Incomplete Paths in De Novo Graph" to "connect".</b>
+</ul>
+
+<p>When a branched peptide is analyzed, the minimum values are 1/2/1 (the branch is in the middle), 1/1/3 (the branch is at the end) or 3/1/1 (the branch is at the beginning). If smaller values are used, the branch cannot be detected. See also [Branched Sequence Detection](@ref brancheddetection).</p>
+
+<p>When a branch-cyclic peptide is analyzed, the minimum values are 1/2/1, 1/1/2 or 2/1/1. See also [Branch-cyclic Sequence Detection](@ref branchcyclicdetection).</p>
+
+\subsection settings_maxblocksmass Maximum Cumulative Mass of Blocks
+
+<p>Enter the maximum cumulative mass of combined blocks (0 = the maximum mass is unlimited). A small value speeds up the search and vice versa.</p>
+
+\subsection settings_modif N-/C-terminal Modifications File (CTRL + M)
+
+<p>A text file containing a list of N-terminal and C-terminal modifications. See [Format of Modification Databases](@ref modificationseditorformat).</p>
+
+<hr>
+
+\section settingsmisc Miscellaneous
+
+\subsection settings_blindpaths Incomplete Paths in De Novo Graph
+
+<p>The operation to be performed with edges forming incomplete paths (i.e., the paths which do not lead from the start node or do not lead to the end node). 
+The following options can be selected:
+<ul>
+<li> keep (edges are kept - useful if you would like to see the whole de novo graph in 'View -> Graph')
+<li> remove (edges are removed - speeds up the search)
+<li> connect (edges are connected - useful if you are looking for sequence tags)
+</ul>
+</p>
+
+\subsection settings_cyclicnterm Cyclic N-terminus
+
+<p>The water molecule is subtracted from all theoretical N-terminal fragment ions and the theoretical precursor mass. This feature is useful if a linear peptide includes a small cycle close to the N-terminus. If the linear polyketide is selected as the peptide type, the water molecule is subtracted only from the precursor ion.</p>
+
+\subsection settings_cycliccterm Cyclic C-terminus
+
+<p>The water molecule is subtracted from all theoretical C-terminal fragment ions and the theoretical precursor mass. This feature is useful if a linear peptide includes a small cycle close to the C-terminus. If the linear polyketide is selected as the peptide type, the water molecule is subtracted only from the precursor ion.</p>
+
+\subsection settings_scrambling Enable Scrambling
+
+<p>Generate scrambled fragment ions of cyclic peptides in theoretical spectra.</p>
+
+\subsection settings_simsearch Disable Precursor Mass Filter
+
+<p>Disable the filtering of sequence candidates by precursor mass. This option can be used to determine a peptide family when a modified peptide is included in a sequence database.</p>
+
+\subsection settings_regularblocksorder Regular Order of Ketide Blocks
+
+<p>Keep only polyketide sequence candidates whose ketide building blocks are in the regular order [water eliminating block]-[2H eliminating block]-[water eliminating block]-[2H eliminating block], etc.</p>
+
+<hr>
+
+\section settingstheoreticalspectrum Theoretical Spectrum/Spectra
+
+\subsection settings_seqdb Sequence/Compound Database File (CTRL + T)
+
+<p>A text file containing a database of sequences/compounds. See [Format of Sequence/Compound Databases](@ref sequenceeditordbformat).</p>
+
+\subsection settings_score Score Type
+
+<p>A score for peptide-spectrum matches. The following scores are predefined:
+<ul>
+<li>Number of matched peaks
+<li>Sum of relative intensities of matched peaks
+<li>Number of b-ions
+<li>Number of y-ions
+<li>Number of b-ions + y-ions
+</ul>
+</p>
+
+\subsection settings_maxcandidates Maximum Number of Sequence Candidates Reported
+
+<p>A maximum length of an output report with peptide sequence candidates.</p>
+
+\subsection settings_seqtag Peptide Sequence Tag
+
+<p>Each peptide sequence candidate generated from a de novo graph must fulfil the peptide sequence tag. Otherwise, its theoretical spectrum is not generated and 
+the peptide sequence candidate is excluded from the search. A name of a building block must be enclosed in '[' and ']'. Enclosed building blocks must be separated by '-'. 
+A branch of a branched or a branch-cyclic peptide must be enclosed in "\(" and "\)". Additional backslashes must be used because of a special meaning of '(' and ')' in regular expressions. 
+The tag can be a regular expression in <a href="http://www.cplusplus.com/reference/regex/ECMAScript/">ECMAScript syntax</a> except symbols '[' and ']' which 
+have a special meaning and enclose a building block. Examples of peptide sequence tags:
+<ul>
+<li> <code>[Val]-[Lac]-[Val]-[Hiv]</code> (a peptide sequence candidate must contain the following subsequence: valine, lactic acid, valine, 2-hydroxyisovaleric acid)
+<li> <code>([Val]-[Lac]-[Val]-[Hiv]-*){3}</code> (the tag must be repeated exactly 3x in a peptide sequence candidate, i.e., the tag corresponds to valinomycin; the symbol '*' means that the previous symbol '-' may or may not be present)
+<li> <code>[Pro]-[Ile]-[Ile]\\([Orn]-[N-Ac-Ile]\\)[Phe]</code> (a tag corresponding to the branched peptide linearized pseudacyclin A)
+</ul>
+</p>
+
+<p>
+Note that a peptide sequence candidate is kept if the tag is detected in any linearized sequence of a cyclic, branched or branch-cyclic peptide sequence. See also [Format of Sequence Databases](@ref sequenceeditordbformat).
+</p>
+
+\subsection settings_iontypes Ion Types
+
+<p>The following types of fragment ions are defined for MS/MS spectra:
+<ul>
+<li> A (a-ion) 
+<li> B (b-ion) 
+<li> C (c-ion) 
+<li> X (x-ion) 
+<li> Y (y-ion) 
+<li> Z (z-ion) 
+</ul>
+</p>
+
+<p>
+Note that y-ions are not supported when cyclic peptides are searched. Fragment ions series of linear and cyclic polyketides are described on extra pages. See [Nomenclature of Linear Polyketide Series](@ref linearpolyketidenomenclature) 
+and [Nomenclature of Cyclic Polyketide Series](@ref cyclicpolyketidenomenclature).
+</p>
+
+<p>
+Buttons:
+<ul>
+<li> "Select All" - select all fragment ions in the list.
+<li> "Clear All" - unselect all fragment ions in the list.
+<li> "Reset" - b-ion is selected automatically if a cyclic peptide is choosen as "Peptide Type". B-ion and y-ion are selected if a linear, branched or branch-cyclic peptide is choosen.
+[M+H]+ ion is selected if the mode 'Compare Peaklist(s) with Database - MS or MSI data' is selected.
+</ul>  
+</p>
+
+<p>The following types of ions are defined for MS and MSI spectra:
+<ul>
+<li> [M+H]+ 
+<li> [M+Na]+
+<li> [M+K]+
+<li> [M-H]-
+<li> [M+Na-2H]-
+<li> [M+K-2H]-
+<li> [M+Fe-2H]+
+<li> [M+Fe-3H+Na]+
+<li> [M+Fe-3H+K]+
+<li> [2M+Fe-2H]+
+<li> [2M+Fe-3H+Na]+
+<li> [2M+Fe-3H+K]+
+<li> [3M+Fe-2H]+
+<li> [3M+Fe-3H+Na]+
+<li> [3M+Fe-3H+K]+
+<li> [3M+2Fe-5H]+ 
+<li> [3M+2Fe-6H+Na]+ 
+<li> [3M+2Fe-6H+K]+ 
+<li> [M+Fe-4H]-
+<li> [2M+Fe-4H]-
+<li> [3M+Fe-4H]-
+<li> [3M+2Fe-7H]-
+<li> [M+NH4]+
+<li> [M]+
+<li> [M]-
+<li> [M+Li]+
+<li> [M+Mg-H]+
+<li> [M+Mg-2H+Na]+
+<li> [M+Mg-2H+K]+
+<li> [M+Mg-3H]-
+<li> [M+Al-2H]+
+<li> [M+Al-3H+Na]+
+<li> [M+Al-3H+K]+
+<li> [M+Al-4H]-
+<li> [M+Si-3H]+
+<li> [M+Si-4H+Na]+
+<li> [M+Si-4H+K]+
+<li> [M+Si-5H]-
+<li> [M+Ca-H]+
+<li> [M+Ca-2H+Na]+
+<li> [M+Ca-2H+K]+
+<li> [M+Ca-3H]-
+<li> [M+Sc-2H]+
+<li> [M+Sc-3H+Na]+
+<li> [M+Sc-3H+K]+
+<li> [M+Sc-4H]-
+<li> [M+Cr-2H]+
+<li> [M+Cr-3H+Na]+
+<li> [M+Cr-3H+K]+
+<li> [M+Cr-4H]-
+<li> [M+Mn-H]+
+<li> [M+Mn-2H+Na]+
+<li> [M+Mn-2H+K]+
+<li> [M+Mn-3H]-
+<li> [M+Co-H]+
+<li> [M+Co-2H+Na]+
+<li> [M+Co-2H+K]+
+<li> [M+Co-3H]-
+<li> [M+Ni-H]+
+<li> [M+Ni-2H+Na]+
+<li> [M+Ni-2H+K]+
+<li> [M+Ni-3H]-
+<li> [M+Cu-H]+
+<li> [M+Cu-2H+Na]+
+<li> [M+Cu-2H+K]+
+<li> [M+Cu-3H]-
+<li> [M+Zn-H]+
+<li> [M+Zn-2H+Na]+
+<li> [M+Zn-2H+K]+
+<li> [M+Zn-3H]-
+<li> [M+Ga-2H]+
+<li> [M+Ga-3H+Na]+
+<li> [M+Ga-3H+K]+
+<li> [M+Ga-4H]-
+</ul>
+</p>
+
+<p>
+If a metallic ion is selected, the isotopes having natural abundance greater than 3% are generated automatically in theoretical peaklists next to the most abundant isotopes.
+If the option [Generate Full Isotope Patterns](@ref settings_isotopepatterns) is selected, this feature is disabled and vice versa.
+</p>
+
+\subsection settings_neutrallosses Neutral Losses
+
+<p>Define and select the types of neutral losses which will be generated in theoretical spectra.</p>
+
+<p>Buttons:
+<ul>
+<li> "Select All" - select all neutral losses in the list.
+<li> "Clear All" - unselect all neutral losses in the list.
+<li> "Add" - add a new item at the end of the list - a valid molecular formula must be entered.
+<li> "Remove" - remove selected items from the list. 
+<li> "Default" - clear the list and defines a list of default neutral losses.
+</ul>                 
+</p>
+
+<p>The default neutral losses are defined as follows:</p>
+
+<div align='center'>
+<table width="300" class="doxtable">
+<tr><th>Formula</th><th>Description</th></tr>
+<tr><td>H2O</td><td>water</td></tr>
+<tr><td>NH3</td><td>ammonia</td></tr>
+<tr><td>CO</td><td>formyl group</td></tr>
+<tr><td>CO2</td><td>carboxyl group</td></tr>
+<tr><td>CONH</td><td>carbamyl group</td></tr>
+<tr><td>CH2</td><td>shortened carbon chain</td></tr>
+<tr><td>C6H4</td><td>benzene ring removal</td></tr>
+<tr><td>CH2N2</td><td>part of Arg side chain</td></tr>
+<tr><td>CH2O</td><td>Ser side chain</td></tr>
+<tr><td>CH2S</td><td>Cys side chain</td></tr>
+<tr><td>C4H9N</td><td>Lys side chain</td></tr>
+<tr><td>C4H4N2</td><td>His side chain</td></tr>
+<tr><td>C4H9N3</td><td>Arg side chain</td></tr>
+<tr><td>C9H7N</td><td>Trp side chain</td></tr>
+</table>
+</div>
+
+<p>The molecular formulas of proteinogenic amino acids side chains can be optionally combined from the default values as follows:</p>
+
+<div align='center'>
+<table width="800" class="doxtable">
+<tr><th>Amino acid</th><th>Side chain</th><th></th><th>Amino acid</th><th>Side chain</th></tr>
+<tr><td>Gly</td><td>-</td><td rowspan="11"></td><td>Asp</td><td>C2H2O2 (CH2+CO2)</td></tr>
+<tr><td>Ala</td><td>CH2</td><td>Gln</td><td>C3H5NO (CH2+CH2+CONH)</td></tr>
+<tr><td>Ser</td><td>CH2O</td><td>Lys</td><td>C4H9N</td></tr>
+<tr><td>Pro</td><td>C3H4 (not defined)</td><td>Glu</td><td>C3H4O2 (CH2+CH2+CO2)</td></tr>
+<tr><td>Val</td><td>C3H6 (CH2+CH2+CH2)</td><td>Met</td><td>C3H6S (CH2+CH2+CH2S)</td></tr>
+<tr><td>Thr</td><td>C2H4O (CH2+CH2O)</td><td>His</td><td>C4H4N2</td></tr>
+<tr><td>Cys</td><td>CH2S</td><td>Phe</td><td>C7H6 (CH2+C6H4)</td></tr>
+<tr><td>Leu</td><td>C4H8 (CH2+CH2+CH2+CH2)</td><td>Arg</td><td>C4H9N3</td></tr>
+<tr><td>Ile</td><td>C4H8 (CH2+CH2+CH2+CH2)</td><td>Tyr</td><td>C7H6O (CH2O+C6H4)</td></tr>
+<tr><td>Asn</td><td>C2H3NO (CH2+CONH)</td><td>Trp</td><td>C9H7N</td></tr>
+</table>
+</div>
+
+\subsection settings_maximumcombinedlosses Maximum Number of Combined Losses
+
+<p>Maximum number of combined neutral losses.</p>
+
+\subsection settings_reportunmatched Report Unmatched Theoretical Peaks
+
+<p>If checked, all unmatched theoretical peaks are reported. If unchecked, unmatched theoretical peaks are reported only if a corresponding isotope pattern has been matched. 
+This feature may spend a lot of main memory, keep it disabled if possible.</p>
+
+\subsection settings_isotopepatterns Generate Full Isotope Patterns
+
+<p>
+The full isotope patterns of compounds are generated in theoretical spectra. The [FWHM](@ref settings_fwhm) value is used for this purpose. If checked, the deisotoping is disabled automatically.
+</p>
+
+\subsection settings_minimumpatternsize Minimum Pattern Size
+
+<p>
+The minimum number of matched peaks in an isotope pattern to be reported. The option "Generate Full Isotope Patterns" must be enabled.
+</p>
+
+<hr>
+
+\section settingssearchedseq Searched Sequence
+
+\subsection settings_searchedseq Sequence
+
+<p>A peptide sequence which you are searching for or a peptide sequence tag. A peptide sequence must be entered if "Mode" is set up to "Compare Peaklist(s) with Spectrum of Searched Sequence". 
+Otherwise, the option is similar to "Peptide Sequence Tag" with a difference that a peptide sequence candidate is not removed from the search but it is just highlighted in the
+output list of peptide sequence candidates. If "Compare Peaklist(s) with Spectrum of Searched Sequence" mode is used, the only possible format of the expression is a peptide sequence 
+(e.g., <p><code>[Val]-[Lac]-[Val]-[Hiv]-[Val]-[Lac]-[Val]-[Hiv]-[Val]-[Lac]-[Val]-[Hiv]</code></p> or <p><code>[Pro]-[Ile]-[Ile]\\([Orn]-[N-Ac-Ile]\\)[Phe]</code></p>).
+Regular expressions like <p><code>([Val]-[Lac]-[Val]-[Hiv]-*){3}</code></p> are not supported in this mode. See also [Format of Sequence Databases](@ref sequenceeditordbformat).
+</p>
+
+\subsection settings_ntermmodif N-terminal Modification
+
+<p>A name of an N-terminal modification which belongs to the searched peptide. The name must be defined in [N-/C-terminal Modifications File](@ref settings_modif).</p>
+
+\subsection settings_ctermmodif C-terminal Modification
+
+<p>A name of a C-terminal modification which belongs to the searched peptide. The name must be defined in [N-/C-terminal Modifications File](@ref settings_modif).</p>
+
+\subsection settings_branchmodif Branch Modification
+
+<p>A name of an N-terminal or C-terminal modification which belongs to a branch of a searched peptide (branched and branch-cyclic peptides only). The name must be defined in [N-/C-terminal Modifications File](@ref settings_modif).</p>
+
+<br/>
+
+*/

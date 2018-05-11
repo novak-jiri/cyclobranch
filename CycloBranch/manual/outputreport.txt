@@ -1,0 +1,132 @@
+/*!
+  
+\page outputreport Output Report
+
+<p>
+If the search is finished, an output report is shown. The report for MS/MS data is shown below. For other data, see [Dereplication in MS Data](@ref msdatadereplication),
+[Dereplication in LC-MS Data](@ref lcmsdatadereplication), and [Dereplication in MSI Data](@ref msidatadereplication).
+</p>                                                                                                                  
+
+<p>
+Peptide sequence candidates in yellow rows contain a regular expression used in [Searched Sequence](@ref settings_searchedseq). Note that
+the regular expression may be matched in any linearized sequence of a cyclic, branched, branch-cyclic peptide sequence or cyclic polyketide.
+</p>
+
+<p>
+The table can be exported into a csv file using the command 'File -> Export to CSV' and then imported, e.g., to MS Excel. 
+It can be also exported into a HTML page using the command 'File -> Export to HTML' including details about peptide sequence candidates. 
+The report can be saved using the command 'File -> Save Results...' and re-opened using the command 'File -> Open Results...' 
+(the files created using an older version of the software cannot be opened in a newer version).
+</p>
+
+<p>
+\image html outputreport.png "De novo sequencing - example of output report."
+\image latex outputreport.png "De novo sequencing - example of output report." width=16cm
+</p>
+
+<p>
+The report contains the following columns when a peptide is being searched:
+<ul>
+<li> <b>*</b> - it indicates that a row is highlighted; you can sort the list by this column to see all highlighted rows at the top
+<li> <b>Result ID</b> - a rank of a peptide sequence candidate according to a score defined in [Score Type](@ref settings_score) (if the mode "De Novo Search Engine" or "Compare Peaklist with Database - MS/MS data" is used; see [Mode](@ref settings_mode))
+<li> <b>Group ID</b> - an identifier of a group of peptide sequence candidates generated from the same path in a de novo graph (if the mode "De Novo Search Engine" is used; see [Mode](@ref settings_mode))
+<li> <b>Name</b> - a name of a peptide (if the mode "Compare Peaklist with Database - MS/MS data" is used; see [Mode](@ref settings_mode))
+<li> <b>Scan ID</b> - an id of a scan which is used as [Scan no.](@ref settings_scannumber) (if the mode "Compare Peaklist(s) with Spectrum of Searched Sequence" is used; see [Mode](@ref settings_mode))
+<li> <b>Title</b> - a title of an experimental spectrum (if the mode "Compare Peaklist(s) with Spectrum of Searched Sequence" is used; see [Mode](@ref settings_mode))
+<li> <b>Peptide Sequence</b> - a peptide sequence candidate 
+<li> <b>Summary Formula</b> - a summary formula of a neutral molecule. When a sequence tag is reported, the formula is incomplete. For example, a formula "C38H69N7O7 (partial)" of
+a sequence tag "[198.136914]-[Val/Ival]-[Me-Leu]-[Ala/bAla/Sar]-[Ala/bAla/Sar]-[Me-Leu]-[Me-Leu]-[Leu/Ile/NMe-Val]-[268.179095]" does not include the unknown blocks [198.136914] and [268.179095].
+<li> <b>Monoisotopic mass</b> - a monoisotopic mass of a neutral modlecule
+<li> <b>Number of Bricks</b> - a number of building blocks in a peptide sequence candidate
+<li> <b>Matched Peaks</b> - a number of matched peaks between an experimental spectrum and a theoretical spectrum of a peptide sequence candidate
+<li> <b>Ratio of Matched Peaks [%]</b> - a ratio of matched peaks to all peaks in an experimental spectrum
+<li> <b>Sum of Relative Intensities</b> - a sum of relative intensities of matched peaks
+<li> <b>A</b> - the number of a-ions 
+<li> <b>B</b> - the number of b-ions 
+<li> <b>C</b> - the number of c-ions 
+<li> <b>X</b> - the number of x-ions 
+<li> <b>Y</b> - the number of y-ions 
+<li> <b>Z</b> - the number of z-ions
+</ul>
+</p>
+
+Note that the numbers of fragment ions are reported if a desired type of a fragment ion has been selected in [Ion Types in Theoretical Spectra](@ref settings_iontypes).
+The different types of fragment ions are reported for linear and cyclic polyketides, see [Nomenclature of Linear Polyketide Series](@ref linearpolyketidenomenclature) for details.
+
+<p>
+The following additional columns are shown if a <b>linear</b> or <b>branched</b> peptide was searched:
+<ul>
+<li> <b>N-terminal Modification</b> - N-terminal modification of the peptide
+<li> <b>C-terminal Modification</b> - C-terminal modification of the peptide
+</ul>
+</p>
+
+<p>
+The following additional column is shown if a <b>branched</b> or <b>branch-cyclic</b> peptide was searched:
+<ul>
+<li> <b>Branch Modification</b> - a terminal modification of a branch
+</ul>
+</p>
+
+<p>
+The following additional column is shown if a <b>cyclic</b> peptide was searched:
+<ul>
+<li> <b>Scrambled Peaks</b> - a number of matched scrambled peaks between an experimental spectrum and a theoretical spectrum of a peptide sequence candidate
+</ul>
+</p>
+
+<p>
+The following additional columns are shown if a <b>linear polyketide</b> was searched:
+<ul>
+<li> <b>Left Terminal Modification</b> - a terminal modification (N- or C-terminal)
+<li> <b>Right Terminal Modification</b> - a terminal modification (N- or C-terminal)
+</ul>
+</p>
+          
+<p>
+The following columns are shown if the mode "Compare Peaklist(s) with Database - MS or MSI data" was selected (see [Mode](@ref settings_mode)): 
+<ul>
+<li> <b>*</b>
+<li> <b>Spectrum ID</b> - a number an experimental spectrum when a series of peaklists was processed (e.g., LC-MS or MSI data)
+<li> <b>Title</b> - a title of a spectrum
+<li> <b>Matched Peaks</b>
+<li> <b>Ratio of Matched Peaks [%]</b>
+<li> <b>Sum of Relative Intensities</b>
+</ul>
+</p>
+
+<p>
+The following columns are shown if the imaging mass spectra were processed: 
+<ul>
+<li> <b>Coordinate X</b> - x coordinate of a single mass spectrum
+<li> <b>Coordinate Y</b> - y coordinate of a single mass spectrum
+</ul>
+</p>
+
+<hr>
+
+<p>
+Details about a peptide sequence candidate are shown after a <b>double click (or Enter key press) on a row</b> in the output report. See the details on extra pages.
+</p>
+
+[Linear Peptide Detail Window](@ref lineardetailwindow)
+
+[Cyclic Peptide Detail Window](@ref cyclicdetailwindow)
+
+[Branched Peptide Detail Window](@ref brancheddetailwindow)
+
+[Branch-cyclic Peptide Detail Window](@ref branchcyclicdetailwindow)
+
+[Linear Polyketide Detail Window](@ref linearpolyketidedetailwindow)
+
+[Cyclic Polyketide Detail Window](@ref cyclicpolyketidedetailwindow)
+
+[Dereplication in MS Data](@ref msdatadereplication)
+
+[Dereplication in LC-MS Data](@ref lcmsdatadereplication)
+
+[Dereplication in MSI Data](@ref msidatadereplication)
+
+<br/>
+  
+*/

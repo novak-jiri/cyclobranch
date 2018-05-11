@@ -1,0 +1,1089 @@
+/*!
+  
+\page datasets Datasets
+
+\section listofdatasets List of Datasets
+
+<p>
+<ul>
+<li> [Dataset 1: MS/MS of Nonribosomal Peptides](@ref dataset1)
+<li> [Dataset 2: MALDI-MS of Siderophores](@ref dataset2)
+<li> [Dataset 3: MALDI-MSI and DESI-MSI of Siderophores](@ref dataset3)
+<li> [Dataset 4: LC-MS of Siderophores](@ref dataset4)
+<li> [Dataset 5: MS/MS of Siderophores](@ref dataset5)
+<li> [Dataset 6: Correlation of MALDI-MSI with Histology Image](@ref dataset6)
+</ul>
+</p>
+
+<hr>
+
+<p>
+Any work based on these datasets shall cite any of the following references:
+<ul>
+<li><i>J. Am. Soc. Mass Spectrom.</i> (2015), 26(10):1780-1786. DOI: <a href="http://dx.doi.org/10.1007/s13361-015-1211-1"><b>10.1007/s13361-015-1211-1</b></a>
+<li><i>BBA - Proteins Proteom.</i> (2017), 1865(7):768-775. DOI: <a href="http://dx.doi.org/10.1016/j.bbapap.2016.12.003"><b>10.1016/j.bbapap.2016.12.003</b></a>
+</ul>
+</p>
+
+<hr>
+
+\section dataset1 Dataset 1: MS/MS of Nonribosomal Peptides
+
+<div align="center">
+<table width="100%" class="doxtable">
+<tr>
+<th>Peptide type</th>
+<th>Peptide</th>
+<th>Spectrum</th>
+\htmlonly
+<th>Structure</th>
+\endhtmlonly
+</tr>
+<tr>
+<td rowspan="2">Linear</td>
+<td>Gramicidin C</td>
+<td>
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mzxml/Gramicidin_C.mzXML" onclick="ga('send', 'event', 'Datasets', this.href);">mzXML</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mzml/Gramicidin_C.mzML" onclick="ga('send', 'event', 'Datasets', this.href);">mzML</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mgf/Gramicidin_C.mgf" onclick="ga('send', 'event', 'Datasets', this.href);">mgf</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/txt/Gramicidin_C.txt" onclick="ga('send', 'event', 'Datasets', this.href);">txt</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/raw_data/Gramicidin_C.zip" onclick="ga('send', 'event', 'Datasets', this.href);">baf (raw data)</a>
+</td>
+\htmlonly
+<td>
+<div align="center"><a href="Gramicidin_C.png" onclick="ga('send', 'event', 'Datasets', this.href);"><img src="Gramicidin_C.png" width="400"></a></div>
+</td>
+\endhtmlonly
+</tr>
+<tr>
+<td>Substance P</td>
+<td>
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mzxml/Substance_P.mzXML" onclick="ga('send', 'event', 'Datasets', this.href);">mzXML</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mzml/Substance_P.mzML" onclick="ga('send', 'event', 'Datasets', this.href);">mzML</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mgf/Substance_P.mgf" onclick="ga('send', 'event', 'Datasets', this.href);">mgf</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/txt/Substance_P.txt" onclick="ga('send', 'event', 'Datasets', this.href);">txt</a>
+</td>
+\htmlonly
+<td>
+<div align="center"><a href="Substance_P.png" onclick="ga('send', 'event', 'Datasets', this.href);"><img src="Substance_P.png" width="400"></a></div>
+</td>
+\endhtmlonly
+</tr>
+<tr>
+<td rowspan="5">Cyclic</td>
+<td>Beauverolide I</td>
+<td>
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mzxml/Beauverolide_I.mzXML" onclick="ga('send', 'event', 'Datasets', this.href);">mzXML</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mzml/Beauverolide_I.mzML" onclick="ga('send', 'event', 'Datasets', this.href);">mzML</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mgf/Beauverolide_I.mgf" onclick="ga('send', 'event', 'Datasets', this.href);">mgf</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/txt/Beauverolide_I.txt" onclick="ga('send', 'event', 'Datasets', this.href);">txt</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/raw_data/Beauverolide_I.zip" onclick="ga('send', 'event', 'Datasets', this.href);">baf (raw data)</a>
+</td>
+\htmlonly
+<td>
+<div align="center"><a href="Beauverolide_I.png" onclick="ga('send', 'event', 'Datasets', this.href);"><img src="Beauverolide_I.png" width="400"></a></div>
+</td>
+\endhtmlonly
+</tr>
+<tr>
+<td>Roseotoxin A</td>
+<td>
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mzxml/Roseotoxin_A.mzXML" onclick="ga('send', 'event', 'Datasets', this.href);">mzXML</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mzml/Roseotoxin_A.mzML" onclick="ga('send', 'event', 'Datasets', this.href);">mzML</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mgf/Roseotoxin_A.mgf" onclick="ga('send', 'event', 'Datasets', this.href);">mgf</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/txt/Roseotoxin_A.txt" onclick="ga('send', 'event', 'Datasets', this.href);">txt</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/raw_data/Roseotoxin_A.zip" onclick="ga('send', 'event', 'Datasets', this.href);">baf (raw data)</a>
+</td>
+\htmlonly
+<td>
+<div align="center"><a href="Roseotoxin_A.png" onclick="ga('send', 'event', 'Datasets', this.href);"><img src="Roseotoxin_A.png" width="400"></a></div>
+</td>
+\endhtmlonly
+</tr>
+<tr>
+<td>Cyclosporin A</td>
+<td>
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mzxml/Cyclosporin_A.mzXML" onclick="ga('send', 'event', 'Datasets', this.href);">mzXML</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mzml/Cyclosporin_A.mzML" onclick="ga('send', 'event', 'Datasets', this.href);">mzML</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mgf/Cyclosporin_A.mgf" onclick="ga('send', 'event', 'Datasets', this.href);">mgf</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/txt/Cyclosporin_A.txt" onclick="ga('send', 'event', 'Datasets', this.href);">txt</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/raw_data/Cyclosporin_A.zip" onclick="ga('send', 'event', 'Datasets', this.href);">baf (raw data)</a>
+</td>
+\htmlonly
+<td>
+<div align="center"><a href="Cyclosporin_A.png" onclick="ga('send', 'event', 'Datasets', this.href);"><img src="Cyclosporin_A.png" width="400"></a></div>
+</td>
+\endhtmlonly
+</tr>
+<tr>
+<td>Surfactin C</td>
+<td>
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mzxml/Surfactin_C.mzXML" onclick="ga('send', 'event', 'Datasets', this.href);">mzXML</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mzml/Surfactin_C.mzML" onclick="ga('send', 'event', 'Datasets', this.href);">mzML</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mgf/Surfactin_C.mgf" onclick="ga('send', 'event', 'Datasets', this.href);">mgf</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/txt/Surfactin_C.txt" onclick="ga('send', 'event', 'Datasets', this.href);">txt</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/raw_data/Surfactin_C.zip" onclick="ga('send', 'event', 'Datasets', this.href);">baf (raw data)</a>
+</td>
+\htmlonly
+<td>
+<div align="center"><a href="Surfactin_C.png" onclick="ga('send', 'event', 'Datasets', this.href);"><img src="Surfactin_C.png" width="400"></a></div>
+</td>
+\endhtmlonly
+</tr>
+<tr>
+<td>Valinomycin</td>
+<td>
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mzxml/Valinomycin.mzXML" onclick="ga('send', 'event', 'Datasets', this.href);">mzXML</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mzml/Valinomycin.mzML" onclick="ga('send', 'event', 'Datasets', this.href);">mzML</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mgf/Valinomycin.mgf" onclick="ga('send', 'event', 'Datasets', this.href);">mgf</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/txt/Valinomycin.txt" onclick="ga('send', 'event', 'Datasets', this.href);">txt</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/raw_data/Valinomycin.zip" onclick="ga('send', 'event', 'Datasets', this.href);">baf (raw data)</a>
+</td>
+\htmlonly
+<td>
+<div align="center"><a href="Valinomycin.png" onclick="ga('send', 'event', 'Datasets', this.href);"><img src="Valinomycin.png" width="400"></a></div>
+</td>
+\endhtmlonly
+</tr>
+<tr>
+<td rowspan="2">Branched</td>
+<td>Linearized pseudacyclin A</td>
+<td>
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mzxml/Pseudacyclin_A_linearized.mzXML" onclick="ga('send', 'event', 'Datasets', this.href);">mzXML</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mzml/Pseudacyclin_A_linearized.mzML" onclick="ga('send', 'event', 'Datasets', this.href);">mzML</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mgf/Pseudacyclin_A_linearized.mgf" onclick="ga('send', 'event', 'Datasets', this.href);">mgf</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/txt/Pseudacyclin_A_linearized.txt" onclick="ga('send', 'event', 'Datasets', this.href);">txt</a>
+</td>
+\htmlonly
+<td>
+<div align="center"><a href="Pseudacyclin_A_linearized.png" onclick="ga('send', 'event', 'Datasets', this.href);"><img src="Pseudacyclin_A_linearized.png" width="400"></a></div>
+</td>
+\endhtmlonly
+</tr>
+<tr>
+<td>N-acetyl-ESL(KNFI)DQYG-NH2</td>
+<td>
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mzxml/T_peptide.mzXML" onclick="ga('send', 'event', 'Datasets', this.href);">mzXML</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mzml/T_peptide.mzML" onclick="ga('send', 'event', 'Datasets', this.href);">mzML</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mgf/T_peptide.mgf" onclick="ga('send', 'event', 'Datasets', this.href);">mgf</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/txt/T_peptide.txt" onclick="ga('send', 'event', 'Datasets', this.href);">txt</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/raw_data/T_peptide.zip" onclick="ga('send', 'event', 'Datasets', this.href);">baf (raw data)</a>
+</td>
+\htmlonly
+<td>
+<div align="center"><a href="T_peptide.png" onclick="ga('send', 'event', 'Datasets', this.href);"><img src="T_peptide.png" width="400"></a></div>
+</td>
+\endhtmlonly
+</tr>
+<tr>
+<td rowspan="2">Branch-cyclic</td>
+<td>Pseudacyclin A</td>
+<td>
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mzxml/Pseudacyclin_A.mzXML" onclick="ga('send', 'event', 'Datasets', this.href);">mzXML</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mzml/Pseudacyclin_A.mzML" onclick="ga('send', 'event', 'Datasets', this.href);">mzML</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mgf/Pseudacyclin_A.mgf" onclick="ga('send', 'event', 'Datasets', this.href);">mgf</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/txt/Pseudacyclin_A.txt" onclick="ga('send', 'event', 'Datasets', this.href);">txt</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/raw_data/Pseudacyclin_A.zip" onclick="ga('send', 'event', 'Datasets', this.href);">baf (raw data)</a>
+</td>
+\htmlonly
+<td>
+<div align="center"><a href="Pseudacyclin_A.png" onclick="ga('send', 'event', 'Datasets', this.href);"><img src="Pseudacyclin_A.png" width="400"></a></div>
+</td>
+\endhtmlonly
+</tr>
+<tr>
+<td>Pyoverdin Pa A</td>
+<td>
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mzxml/Pyoverdin_PaA.mzXML" onclick="ga('send', 'event', 'Datasets', this.href);">mzXML</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mzml/Pyoverdin_PaA.mzML" onclick="ga('send', 'event', 'Datasets', this.href);">mzML</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mgf/Pyoverdin_PaA.mgf" onclick="ga('send', 'event', 'Datasets', this.href);">mgf</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/txt/Pyoverdin_PaA.txt" onclick="ga('send', 'event', 'Datasets', this.href);">txt</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/raw_data/Pyoverdin_PaA.zip" onclick="ga('send', 'event', 'Datasets', this.href);">baf (raw data)</a>
+</td>
+\htmlonly
+<td>
+<div align="center"><a href="Pyoverdin_PaA.png" onclick="ga('send', 'event', 'Datasets', this.href);"><img src="Pyoverdin_PaA.png" width="400"></a></div>
+</td>
+\endhtmlonly
+</tr>
+</table>
+</div>
+
+\latexonly
+
+\begin{center}
+\includegraphics[width=16cm]{Gramicidin_C.png}
+\captionof{figure}{Gramicidin C}
+\end{center}
+
+\begin{center}
+\includegraphics[width=16cm]{Substance_P.png}
+\captionof{figure}{Substance P}
+\end{center}
+
+\begin{center}
+\includegraphics[width=16cm]{Beauverolide_I.png}
+\captionof{figure}{Beauverolide I}
+\end{center}
+
+\begin{center}
+\includegraphics[width=16cm]{Roseotoxin_A.png}
+\captionof{figure}{Roseotoxin A}
+\end{center}
+
+\begin{center}
+\includegraphics[width=16cm]{Cyclosporin_A.png}
+\captionof{figure}{Cyclosporin A}
+\end{center}
+
+\begin{center}
+\includegraphics[width=16cm]{Surfactin_C.png}
+\captionof{figure}{Surfactin C}
+\end{center}
+
+\begin{center}
+\includegraphics[width=16cm]{Valinomycin.png}
+\captionof{figure}{Valinomycin}
+\end{center}
+
+\begin{center}
+\includegraphics[width=16cm]{Pseudacyclin_A_linearized.png}
+\captionof{figure}{Linearized pseudacyclin A}
+\end{center}
+
+\begin{center}
+\includegraphics[width=16cm]{T_peptide.png}
+\captionof{figure}{N-acetyl-ESL(KNFI)DQYG-NH2}
+\end{center}
+
+\begin{center}
+\includegraphics[width=16cm]{Pseudacyclin_A.png}
+\captionof{figure}{Pseudacyclin A}
+\end{center}
+
+\begin{center}
+\includegraphics[width=16cm]{Pyoverdin_PaA.png}
+\captionof{figure}{Pyoverdin Pa A}
+\end{center}
+
+\endlatexonly
+
+<p>The dataset is also available in a public <a href="http://gnps.ucsd.edu/ProteoSAFe/gnpslibrary.jsp?library=all#%7B%22main.submit_user_input%22%3A%22novakj%22%7D" onclick="ga('send', 'event', 'Datasets', this.href);">GNPS library</a>.</p>
+
+<br/>
+
+<hr size="1">
+
+\section dataset2 Dataset 2: MALDI-MS of Siderophores
+
+<div align="center">
+<table width="750" class="doxtable">
+<tr>
+<th>Mixture</th>
+<th>Spectrum</th>
+</tr>
+<tr>
+<td>Ferrichromes</td>
+<td>
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mgf/siderophores/dereplication/ferrichromes.mgf" onclick="ga('send', 'event', 'Datasets', this.href);">mgf</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/txt/siderophores/dereplication/ferrichromes.txt" onclick="ga('send', 'event', 'Datasets', this.href);">txt</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/raw_data/siderophores/dereplication/ferrichromes.zip" onclick="ga('send', 'event', 'Datasets', this.href);">baf (raw data)</a>
+</td>
+</tr>
+<tr>
+<td>Ferrioxamines</td>
+<td>
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mgf/siderophores/dereplication/ferrioxamines.mgf" onclick="ga('send', 'event', 'Datasets', this.href);">mgf</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/txt/siderophores/dereplication/ferrioxamines.txt" onclick="ga('send', 'event', 'Datasets', this.href);">txt</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/raw_data/siderophores/dereplication/ferrioxamines.zip" onclick="ga('send', 'event', 'Datasets', this.href);">baf (raw data)</a>
+</td>
+</tr>
+<tr>
+<td>Fusarinines and coprogens</td>
+<td>
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mgf/siderophores/dereplication/fusarinines_and_coprogens.mgf" onclick="ga('send', 'event', 'Datasets', this.href);">mgf</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/txt/siderophores/dereplication/fusarinines_and_coprogens.txt" onclick="ga('send', 'event', 'Datasets', this.href);">txt</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/raw_data/siderophores/dereplication/fusarinines_and_coprogens.zip" onclick="ga('send', 'event', 'Datasets', this.href);">baf (raw data)</a>
+</td>
+</tr>
+<tr>
+<td>Ornibactins</td>
+<td>
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mgf/siderophores/dereplication/ornibactins.mgf" onclick="ga('send', 'event', 'Datasets', this.href);">mgf</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/txt/siderophores/dereplication/ornibactins.txt" onclick="ga('send', 'event', 'Datasets', this.href);">txt</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/raw_data/siderophores/dereplication/ornibactins.zip" onclick="ga('send', 'event', 'Datasets', this.href);">baf (raw data)</a>
+</td>
+</tr>
+<tr>
+<td>Pyoverdins</td>
+<td>
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mgf/siderophores/dereplication/pyoverdins.mgf" onclick="ga('send', 'event', 'Datasets', this.href);">mgf</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/txt/siderophores/dereplication/pyoverdins.txt" onclick="ga('send', 'event', 'Datasets', this.href);">txt</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/raw_data/siderophores/dereplication/pyoverdins.zip" onclick="ga('send', 'event', 'Datasets', this.href);">baf (raw data)</a>
+</td>
+</tr>
+<tr>
+<td>Rhodotulic acid</td>
+<td>
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mgf/siderophores/dereplication/rhodotulic_acid.mgf" onclick="ga('send', 'event', 'Datasets', this.href);">mgf</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/txt/siderophores/dereplication/rhodotulic_acid.txt" onclick="ga('send', 'event', 'Datasets', this.href);">txt</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/raw_data/siderophores/dereplication/rhodotulic_acid.zip" onclick="ga('send', 'event', 'Datasets', this.href);">baf (raw data)</a>
+</td>
+</tr>
+</table>
+</div>
+
+<br/>
+
+<hr size="1">
+
+\section dataset3 Dataset 3: MALDI-MSI and DESI-MSI of Siderophores
+
+<div align="center">
+<table width="1000" class="doxtable">
+<tr>
+<th>Type</th>
+<th>Mixture</th>
+<th>Spectra</th>
+\htmlonly
+<th>Optical image</th>
+\endhtmlonly
+</tr>
+<tr>
+<td width="200">
+MALDI-MSI (12T SolariX FTICR, Bruker)
+</td>
+<td width="300">
+01 - ferrichromes diluted 10x;<br/>
+02 - ferrichromes diluted 100x;<br/>
+03 - ferrichromes diluted 1000x;<br/>
+04 - ferrioxamines diluted 10x;<br/>
+05 - ferrioxamines diluted 100x;<br/>
+06 - ferrioxamines diluted 1000x;<br/>
+07 - coprogens/fusarinines diluted 10x;<br/>
+08 - coprogens/fusarinines diluted 100x;<br/>
+09 - coprogens/fusarinines diluted 1000x.
+</td>
+<td>
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/msi_data/siderophores_maldi_msi.zip" onclick="ga('send', 'event', 'Datasets', this.href);">imzML + ibd</a>
+(processed data format; centroided spectra; 64-bit floats; no compression)
+</td>
+\htmlonly
+<td>
+<div align="center"><img src="maldimsidataset.png" width="385"></div>
+</td>
+\endhtmlonly
+</tr>
+<tr>
+<td>
+DESI-MSI (Synapt G2Si, Waters)
+</td>
+<td>
+Left - ferrichromes;<br/>
+Middle - ferrioxamines;<br/>
+Right - coprogens/fusarinines.
+</td>
+<td>
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/msi_data/siderophores_desi_msi.zip" onclick="ga('send', 'event', 'Datasets', this.href);">imzML + ibd</a>
+(processed data format; profile + centroided spectra; 32-bit floats; no compression)
+</td>
+\htmlonly
+<td>
+<div align="center"><img src="desimsidataset.png" width="385"></div>
+</td>
+\endhtmlonly
+</tr>
+</table>
+</div>
+
+\latexonly
+
+\begin{center}
+\includegraphics[width=10cm]{maldimsidataset.png}
+\captionof{figure}{MALDI-MSI siderophore dataset - optical image.}
+\end{center}
+
+\begin{center}
+\includegraphics[width=10cm]{desimsidataset.png}
+\captionof{figure}{DESI-MSI siderophore dataset - optical image.}
+\end{center}
+
+\endlatexonly
+
+<br/>
+
+<hr size="1">
+
+\section dataset4 Dataset 4: LC-MS of Siderophores
+
+<div align="center">
+<table width="750" class="doxtable">
+<tr>
+<th>Mixture</th>
+<th>Spectra</th>
+</tr>
+<tr>
+<td>Ferrichromes + ferrioxamines + coprogens and fusarinines</td>
+<td>
+run no. 1: 
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/lcms_data/sid_mixture_10x_BA2_01_17.mgf" onclick="ga('send', 'event', 'Datasets', this.href);">mgf</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/lcms_data/sid_mixture_10x_BA2_01_17.mzML" onclick="ga('send', 'event', 'Datasets', this.href);">mzML</a>
+<br/>
+run no. 2:
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/lcms_data/sid_mixture_10x_BA2_01_14.mgf" onclick="ga('send', 'event', 'Datasets', this.href);">mgf</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/lcms_data/sid_mixture_10x_BA2_01_14.mzML" onclick="ga('send', 'event', 'Datasets', this.href);">mzML</a>
+</td>
+</tr>
+</table>
+</div>
+
+<br/>
+
+<hr size="1">
+
+\section dataset5 Dataset 5: MS/MS of Siderophores
+
+<div align="center">
+<table width="100%" class="doxtable">
+<tr>
+<th>Siderophore</th>
+<th>Spectrum</th>
+\htmlonly
+<th>Structure</th>
+\endhtmlonly
+</tr>
+<tr>
+<td>Desferri-ferrioxamine B</td>
+<td>
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mzxml/siderophores/Desferri_ferrioxamine_B.mzXML" onclick="ga('send', 'event', 'Datasets', this.href);">mzXML</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mzml/siderophores/Desferri_ferrioxamine_B.mzML" onclick="ga('send', 'event', 'Datasets', this.href);">mzML</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mgf/siderophores/Desferri_ferrioxamine_B.mgf" onclick="ga('send', 'event', 'Datasets', this.href);">mgf</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/txt/siderophores/Desferri_ferrioxamine_B.txt" onclick="ga('send', 'event', 'Datasets', this.href);">txt</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/raw_data/siderophores/Desferri_ferrioxamine_B.zip" onclick="ga('send', 'event', 'Datasets', this.href);">baf (raw data)</a>
+</td>
+\htmlonly
+<td>
+<div align="center"><a href="Desferri_ferrioxamine_B.png" onclick="ga('send', 'event', 'Datasets', this.href);"><img src="Desferri_ferrioxamine_B.png" width="400"></a></div>
+</td>
+\endhtmlonly
+</tr>
+<tr>
+<td>Ferri-ferrioxamine B</td>
+<td>
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mzxml/siderophores/Ferri_ferrioxamine_B.mzXML" onclick="ga('send', 'event', 'Datasets', this.href);">mzXML</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mzml/siderophores/Ferri_ferrioxamine_B.mzML" onclick="ga('send', 'event', 'Datasets', this.href);">mzML</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mgf/siderophores/Ferri_ferrioxamine_B.mgf" onclick="ga('send', 'event', 'Datasets', this.href);">mgf</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/txt/siderophores/Ferri_ferrioxamine_B.txt" onclick="ga('send', 'event', 'Datasets', this.href);">txt</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/raw_data/siderophores/Ferri_ferrioxamine_B.zip" onclick="ga('send', 'event', 'Datasets', this.href);">baf (raw data)</a>
+</td>
+\htmlonly
+<td>
+<div align="center"><a href="Ferri_ferrioxamine_B.png" onclick="ga('send', 'event', 'Datasets', this.href);"><img src="Ferri_ferrioxamine_B.png" width="400"></a></div>
+</td>
+\endhtmlonly
+</tr>
+<tr>
+<td>Desferri-ferrioxamine G<sub>1</sub></td>
+<td>
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mzxml/siderophores/Desferri_ferrioxamine_G1.mzXML" onclick="ga('send', 'event', 'Datasets', this.href);">mzXML</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mzml/siderophores/Desferri_ferrioxamine_G1.mzML" onclick="ga('send', 'event', 'Datasets', this.href);">mzML</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mgf/siderophores/Desferri_ferrioxamine_G1.mgf" onclick="ga('send', 'event', 'Datasets', this.href);">mgf</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/txt/siderophores/Desferri_ferrioxamine_G1.txt" onclick="ga('send', 'event', 'Datasets', this.href);">txt</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/raw_data/siderophores/Desferri_ferrioxamine_G1.zip" onclick="ga('send', 'event', 'Datasets', this.href);">baf (raw data)</a>
+</td>
+\htmlonly
+<td>
+<div align="center"><a href="Desferri_ferrioxamine_G1.png" onclick="ga('send', 'event', 'Datasets', this.href);"><img src="Desferri_ferrioxamine_G1.png" width="400"></a></div>
+</td>
+\endhtmlonly
+</tr>
+<tr>
+<td>Ferri-ferrioxamine G<sub>1</sub></td>
+<td>
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mzxml/siderophores/Ferri_ferrioxamine_G1.mzXML" onclick="ga('send', 'event', 'Datasets', this.href);">mzXML</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mzml/siderophores/Ferri_ferrioxamine_G1.mzML" onclick="ga('send', 'event', 'Datasets', this.href);">mzML</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mgf/siderophores/Ferri_ferrioxamine_G1.mgf" onclick="ga('send', 'event', 'Datasets', this.href);">mgf</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/txt/siderophores/Ferri_ferrioxamine_G1.txt" onclick="ga('send', 'event', 'Datasets', this.href);">txt</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/raw_data/siderophores/Ferri_ferrioxamine_G1.zip" onclick="ga('send', 'event', 'Datasets', this.href);">baf (raw data)</a>
+</td>
+\htmlonly
+<td>
+<div align="center"><a href="Ferri_ferrioxamine_G1.png" onclick="ga('send', 'event', 'Datasets', this.href);"><img src="Ferri_ferrioxamine_G1.png" width="400"></a></div>
+</td>
+\endhtmlonly
+</tr>
+<tr>
+<td>Desferri-ferrioxamine E</td>
+<td>
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mzxml/siderophores/Desferri_ferrioxamine_E.mzXML" onclick="ga('send', 'event', 'Datasets', this.href);">mzXML</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mzml/siderophores/Desferri_ferrioxamine_E.mzML" onclick="ga('send', 'event', 'Datasets', this.href);">mzML</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mgf/siderophores/Desferri_ferrioxamine_E.mgf" onclick="ga('send', 'event', 'Datasets', this.href);">mgf</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/txt/siderophores/Desferri_ferrioxamine_E.txt" onclick="ga('send', 'event', 'Datasets', this.href);">txt</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/raw_data/siderophores/Desferri_ferrioxamine_E.zip" onclick="ga('send', 'event', 'Datasets', this.href);">baf (raw data)</a>
+</td>
+\htmlonly
+<td>
+<div align="center"><a href="Desferri_ferrioxamine_E.png" onclick="ga('send', 'event', 'Datasets', this.href);"><img src="Desferri_ferrioxamine_E.png" width="400"></a></div>
+</td>
+\endhtmlonly
+</tr>
+<tr>
+<td>Ferri-ferrioxamine E</td>
+<td>
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mzxml/siderophores/Ferri_ferrioxamine_E.mzXML" onclick="ga('send', 'event', 'Datasets', this.href);">mzXML</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mzml/siderophores/Ferri_ferrioxamine_E.mzML" onclick="ga('send', 'event', 'Datasets', this.href);">mzML</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mgf/siderophores/Ferri_ferrioxamine_E.mgf" onclick="ga('send', 'event', 'Datasets', this.href);">mgf</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/txt/siderophores/Ferri_ferrioxamine_E.txt" onclick="ga('send', 'event', 'Datasets', this.href);">txt</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/raw_data/siderophores/Ferri_ferrioxamine_E.zip" onclick="ga('send', 'event', 'Datasets', this.href);">baf (raw data)</a>
+</td>
+\htmlonly
+<td>
+<div align="center"><a href="Ferri_ferrioxamine_E.png" onclick="ga('send', 'event', 'Datasets', this.href);"><img src="Ferri_ferrioxamine_E.png" width="400"></a></div>
+</td>
+\endhtmlonly
+</tr>
+<tr>
+<td>Desferri-ornibactin C<sub>4</sub></td>
+<td>
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mzxml/siderophores/Desferri_ornibactin_C4.mzXML" onclick="ga('send', 'event', 'Datasets', this.href);">mzXML</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mzml/siderophores/Desferri_ornibactin_C4.mzML" onclick="ga('send', 'event', 'Datasets', this.href);">mzML</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mgf/siderophores/Desferri_ornibactin_C4.mgf" onclick="ga('send', 'event', 'Datasets', this.href);">mgf</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/txt/siderophores/Desferri_ornibactin_C4.txt" onclick="ga('send', 'event', 'Datasets', this.href);">txt</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/raw_data/siderophores/Desferri_ornibactin_C4.zip" onclick="ga('send', 'event', 'Datasets', this.href);">baf (raw data)</a>
+</td>
+\htmlonly
+<td>
+<div align="center"><a href="Desferri_ornibactin_C4.png" onclick="ga('send', 'event', 'Datasets', this.href);"><img src="Desferri_ornibactin_C4.png" width="400"></a></div>
+</td>
+\endhtmlonly
+</tr>
+<tr>
+<td>Desferri-ornibactin C<sub>6</sub></td>
+<td>
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mzxml/siderophores/Desferri_ornibactin_C6.mzXML" onclick="ga('send', 'event', 'Datasets', this.href);">mzXML</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mzml/siderophores/Desferri_ornibactin_C6.mzML" onclick="ga('send', 'event', 'Datasets', this.href);">mzML</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mgf/siderophores/Desferri_ornibactin_C6.mgf" onclick="ga('send', 'event', 'Datasets', this.href);">mgf</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/txt/siderophores/Desferri_ornibactin_C6.txt" onclick="ga('send', 'event', 'Datasets', this.href);">txt</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/raw_data/siderophores/Desferri_ornibactin_C6.zip" onclick="ga('send', 'event', 'Datasets', this.href);">baf (raw data)</a>
+</td>
+\htmlonly
+<td>
+<div align="center"><a href="Desferri_ornibactin_C6.png" onclick="ga('send', 'event', 'Datasets', this.href);"><img src="Desferri_ornibactin_C6.png" width="400"></a></div>
+</td>
+\endhtmlonly
+</tr>
+<tr>
+<td>Desferri-ornibactin C<sub>8</sub></td>
+<td>
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mzxml/siderophores/Desferri_ornibactin_C8.mzXML" onclick="ga('send', 'event', 'Datasets', this.href);">mzXML</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mzml/siderophores/Desferri_ornibactin_C8.mzML" onclick="ga('send', 'event', 'Datasets', this.href);">mzML</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mgf/siderophores/Desferri_ornibactin_C8.mgf" onclick="ga('send', 'event', 'Datasets', this.href);">mgf</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/txt/siderophores/Desferri_ornibactin_C8.txt" onclick="ga('send', 'event', 'Datasets', this.href);">txt</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/raw_data/siderophores/Desferri_ornibactin_C8.zip" onclick="ga('send', 'event', 'Datasets', this.href);">baf (raw data)</a>
+</td>
+\htmlonly
+<td>
+<div align="center"><a href="Desferri_ornibactin_C8.png" onclick="ga('send', 'event', 'Datasets', this.href);"><img src="Desferri_ornibactin_C8.png" width="400"></a></div>
+</td>
+\endhtmlonly
+</tr>
+<tr>
+<td>Desferri-coprogen</td>
+<td>
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mzxml/siderophores/Desferri_coprogen.mzXML" onclick="ga('send', 'event', 'Datasets', this.href);">mzXML</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mzml/siderophores/Desferri_coprogen.mzML" onclick="ga('send', 'event', 'Datasets', this.href);">mzML</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mgf/siderophores/Desferri_coprogen.mgf" onclick="ga('send', 'event', 'Datasets', this.href);">mgf</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/txt/siderophores/Desferri_coprogen.txt" onclick="ga('send', 'event', 'Datasets', this.href);">txt</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/raw_data/siderophores/Desferri_coprogen.zip" onclick="ga('send', 'event', 'Datasets', this.href);">baf (raw data)</a>
+</td>
+\htmlonly
+<td>
+<div align="center"><a href="Desferri_coprogen.png" onclick="ga('send', 'event', 'Datasets', this.href);"><img src="Desferri_coprogen.png" width="400"></a></div>
+</td>
+\endhtmlonly
+</tr>
+<tr>
+<td>Ferri-coprogen</td>
+<td>
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mzxml/siderophores/Ferri_coprogen.mzXML" onclick="ga('send', 'event', 'Datasets', this.href);">mzXML</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mzml/siderophores/Ferri_coprogen.mzML" onclick="ga('send', 'event', 'Datasets', this.href);">mzML</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mgf/siderophores/Ferri_coprogen.mgf" onclick="ga('send', 'event', 'Datasets', this.href);">mgf</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/txt/siderophores/Ferri_coprogen.txt" onclick="ga('send', 'event', 'Datasets', this.href);">txt</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/raw_data/siderophores/Ferri_coprogen.zip" onclick="ga('send', 'event', 'Datasets', this.href);">baf (raw data)</a>
+</td>
+\htmlonly
+<td>
+<div align="center"><a href="Ferri_coprogen.png" onclick="ga('send', 'event', 'Datasets', this.href);"><img src="Ferri_coprogen.png" width="400"></a></div>
+</td>
+\endhtmlonly
+</tr>
+<tr>
+<td>Al-coprogen</td>
+<td>
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mzxml/siderophores/Al_coprogen.mzXML" onclick="ga('send', 'event', 'Datasets', this.href);">mzXML</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mzml/siderophores/Al_coprogen.mzML" onclick="ga('send', 'event', 'Datasets', this.href);">mzML</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mgf/siderophores/Al_coprogen.mgf" onclick="ga('send', 'event', 'Datasets', this.href);">mgf</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/txt/siderophores/Al_coprogen.txt" onclick="ga('send', 'event', 'Datasets', this.href);">txt</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/raw_data/siderophores/Al_coprogen.zip" onclick="ga('send', 'event', 'Datasets', this.href);">baf (raw data)</a>
+</td>
+\htmlonly
+<td>
+<div align="center"><a href="Al_coprogen.png" onclick="ga('send', 'event', 'Datasets', this.href);"><img src="Al_coprogen.png" width="400"></a></div>
+</td>
+\endhtmlonly
+</tr>
+<tr>
+<td>Desferri-neocoprogen I</td>
+<td>
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mzxml/siderophores/Desferri_neocoprogen_I.mzXML" onclick="ga('send', 'event', 'Datasets', this.href);">mzXML</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mzml/siderophores/Desferri_neocoprogen_I.mzML" onclick="ga('send', 'event', 'Datasets', this.href);">mzML</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mgf/siderophores/Desferri_neocoprogen_I.mgf" onclick="ga('send', 'event', 'Datasets', this.href);">mgf</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/txt/siderophores/Desferri_neocoprogen_I.txt" onclick="ga('send', 'event', 'Datasets', this.href);">txt</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/raw_data/siderophores/Desferri_neocoprogen_I.zip" onclick="ga('send', 'event', 'Datasets', this.href);">baf (raw data)</a>
+</td>
+\htmlonly
+<td>
+<div align="center"><a href="Desferri_neocoprogen_I.png" onclick="ga('send', 'event', 'Datasets', this.href);"><img src="Desferri_neocoprogen_I.png" width="400"></a></div>
+</td>
+\endhtmlonly
+</tr>
+<tr>
+<td>Ferri-neocoprogen I</td>
+<td>
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mzxml/siderophores/Ferri_neocoprogen_I.mzXML" onclick="ga('send', 'event', 'Datasets', this.href);">mzXML</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mzml/siderophores/Ferri_neocoprogen_I.mzML" onclick="ga('send', 'event', 'Datasets', this.href);">mzML</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mgf/siderophores/Ferri_neocoprogen_I.mgf" onclick="ga('send', 'event', 'Datasets', this.href);">mgf</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/txt/siderophores/Ferri_neocoprogen_I.txt" onclick="ga('send', 'event', 'Datasets', this.href);">txt</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/raw_data/siderophores/Ferri_neocoprogen_I.zip" onclick="ga('send', 'event', 'Datasets', this.href);">baf (raw data)</a>
+</td>
+\htmlonly
+<td>
+<div align="center"><a href="Ferri_neocoprogen_I.png" onclick="ga('send', 'event', 'Datasets', this.href);"><img src="Ferri_neocoprogen_I.png" width="400"></a></div>
+</td>
+\endhtmlonly
+</tr>
+<tr>
+<td>Al-neocoprogen I</td>
+<td>
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mzxml/siderophores/Al_neocoprogen_I.mzXML" onclick="ga('send', 'event', 'Datasets', this.href);">mzXML</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mzml/siderophores/Al_neocoprogen_I.mzML" onclick="ga('send', 'event', 'Datasets', this.href);">mzML</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mgf/siderophores/Al_neocoprogen_I.mgf" onclick="ga('send', 'event', 'Datasets', this.href);">mgf</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/txt/siderophores/Al_neocoprogen_I.txt" onclick="ga('send', 'event', 'Datasets', this.href);">txt</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/raw_data/siderophores/Al_neocoprogen_I.zip" onclick="ga('send', 'event', 'Datasets', this.href);">baf (raw data)</a>
+</td>
+\htmlonly
+<td>
+<div align="center"><a href="Al_neocoprogen_I.png" onclick="ga('send', 'event', 'Datasets', this.href);"><img src="Al_neocoprogen_I.png" width="400"></a></div>
+</td>
+\endhtmlonly
+</tr>
+<tr>
+<td>Desferri-rhodotulic acid</td>
+<td>
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mzxml/siderophores/Desferri_rhodotulic_acid.mzXML" onclick="ga('send', 'event', 'Datasets', this.href);">mzXML</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mzml/siderophores/Desferri_rhodotulic_acid.mzML" onclick="ga('send', 'event', 'Datasets', this.href);">mzML</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mgf/siderophores/Desferri_rhodotulic_acid.mgf" onclick="ga('send', 'event', 'Datasets', this.href);">mgf</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/txt/siderophores/Desferri_rhodotulic_acid.txt" onclick="ga('send', 'event', 'Datasets', this.href);">txt</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/raw_data/siderophores/Desferri_rhodotulic_acid.zip" onclick="ga('send', 'event', 'Datasets', this.href);">baf (raw data)</a>
+</td>
+\htmlonly
+<td>
+<div align="center"><a href="Desferri_rhodotulic_acid.png" onclick="ga('send', 'event', 'Datasets', this.href);"><img src="Desferri_rhodotulic_acid.png" width="400"></a></div>
+</td>
+\endhtmlonly
+</tr>
+<tr>
+<td>Al-dimerumic acid</td>
+<td>
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mzxml/siderophores/Al_dimerumic_acid.mzXML" onclick="ga('send', 'event', 'Datasets', this.href);">mzXML</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mzml/siderophores/Al_dimerumic_acid.mzML" onclick="ga('send', 'event', 'Datasets', this.href);">mzML</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mgf/siderophores/Al_dimerumic_acid.mgf" onclick="ga('send', 'event', 'Datasets', this.href);">mgf</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/txt/siderophores/Al_dimerumic_acid.txt" onclick="ga('send', 'event', 'Datasets', this.href);">txt</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/raw_data/siderophores/Al_dimerumic_acid.zip" onclick="ga('send', 'event', 'Datasets', this.href);">baf (raw data)</a>
+</td>
+\htmlonly
+<td>
+<div align="center"><a href="Al_dimerumic_acid.png" onclick="ga('send', 'event', 'Datasets', this.href);"><img src="Al_dimerumic_acid.png" width="400"></a></div>
+</td>
+\endhtmlonly
+</tr>
+<tr>
+<td>Desferri-TAFC (N',N',N'-triacetylfusarinin C)</td>
+<td>
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mzxml/siderophores/Desferri_TAFC.mzXML" onclick="ga('send', 'event', 'Datasets', this.href);">mzXML</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mzml/siderophores/Desferri_TAFC.mzML" onclick="ga('send', 'event', 'Datasets', this.href);">mzML</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mgf/siderophores/Desferri_TAFC.mgf" onclick="ga('send', 'event', 'Datasets', this.href);">mgf</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/txt/siderophores/Desferri_TAFC.txt" onclick="ga('send', 'event', 'Datasets', this.href);">txt</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/raw_data/siderophores/Desferri_TAFC.zip" onclick="ga('send', 'event', 'Datasets', this.href);">baf (raw data)</a>
+</td>
+\htmlonly
+<td>
+<div align="center"><a href="Desferri_TAFC.png" onclick="ga('send', 'event', 'Datasets', this.href);"><img src="Desferri_TAFC.png" width="400"></a></div>
+</td>
+\endhtmlonly
+</tr>
+<tr>
+<td>Fe-TAFC</td>
+<td>
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mzxml/siderophores/Fe_TAFC.mzXML" onclick="ga('send', 'event', 'Datasets', this.href);">mzXML</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mzml/siderophores/Fe_TAFC.mzML" onclick="ga('send', 'event', 'Datasets', this.href);">mzML</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mgf/siderophores/Fe_TAFC.mgf" onclick="ga('send', 'event', 'Datasets', this.href);">mgf</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/txt/siderophores/Fe_TAFC.txt" onclick="ga('send', 'event', 'Datasets', this.href);">txt</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/raw_data/siderophores/Fe_TAFC.zip" onclick="ga('send', 'event', 'Datasets', this.href);">baf (raw data)</a>
+</td>
+\htmlonly
+<td>
+<div align="center"><a href="Fe_TAFC.png" onclick="ga('send', 'event', 'Datasets', this.href);"><img src="Fe_TAFC.png" width="400"></a></div>
+</td>
+\endhtmlonly
+</tr>
+<tr>
+<td>Cr-TAFC</td>
+<td>
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mzxml/siderophores/Cr_TAFC.mzXML" onclick="ga('send', 'event', 'Datasets', this.href);">mzXML</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mzml/siderophores/Cr_TAFC.mzML" onclick="ga('send', 'event', 'Datasets', this.href);">mzML</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mgf/siderophores/Cr_TAFC.mgf" onclick="ga('send', 'event', 'Datasets', this.href);">mgf</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/txt/siderophores/Cr_TAFC.txt" onclick="ga('send', 'event', 'Datasets', this.href);">txt</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/raw_data/siderophores/Cr_TAFC.zip" onclick="ga('send', 'event', 'Datasets', this.href);">baf (raw data)</a>
+</td>
+\htmlonly
+<td>
+<div align="center"><a href="Cr_TAFC.png" onclick="ga('send', 'event', 'Datasets', this.href);"><img src="Cr_TAFC.png" width="400"></a></div>
+</td>
+\endhtmlonly
+</tr>
+<tr>
+<td>Al-TAFC</td>
+<td>
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mzxml/siderophores/Al_TAFC.mzXML" onclick="ga('send', 'event', 'Datasets', this.href);">mzXML</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mzml/siderophores/Al_TAFC.mzML" onclick="ga('send', 'event', 'Datasets', this.href);">mzML</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mgf/siderophores/Al_TAFC.mgf" onclick="ga('send', 'event', 'Datasets', this.href);">mgf</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/txt/siderophores/Al_TAFC.txt" onclick="ga('send', 'event', 'Datasets', this.href);">txt</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/raw_data/siderophores/Al_TAFC.zip" onclick="ga('send', 'event', 'Datasets', this.href);">baf (raw data)</a>
+</td>
+\htmlonly
+<td>
+<div align="center"><a href="Al_TAFC.png" onclick="ga('send', 'event', 'Datasets', this.href);"><img src="Al_TAFC.png" width="400"></a></div>
+</td>
+\endhtmlonly
+</tr>
+<tr>
+<td>Desferri-fusarinin C</td>
+<td>
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mzxml/siderophores/Desferri_fusarinin_C.mzXML" onclick="ga('send', 'event', 'Datasets', this.href);">mzXML</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mzml/siderophores/Desferri_fusarinin_C.mzML" onclick="ga('send', 'event', 'Datasets', this.href);">mzML</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mgf/siderophores/Desferri_fusarinin_C.mgf" onclick="ga('send', 'event', 'Datasets', this.href);">mgf</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/txt/siderophores/Desferri_fusarinin_C.txt" onclick="ga('send', 'event', 'Datasets', this.href);">txt</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/raw_data/siderophores/Desferri_fusarinin_C.zip" onclick="ga('send', 'event', 'Datasets', this.href);">baf (raw data)</a>
+</td>
+\htmlonly
+<td>
+<div align="center"><a href="Desferri_fusarinin_C.png" onclick="ga('send', 'event', 'Datasets', this.href);"><img src="Desferri_fusarinin_C.png" width="400"></a></div>
+</td>
+\endhtmlonly
+</tr>
+<tr>
+<td>Ferri-fusarinin C</td>
+<td>
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mzxml/siderophores/Ferri_fusarinin_C.mzXML" onclick="ga('send', 'event', 'Datasets', this.href);">mzXML</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mzml/siderophores/Ferri_fusarinin_C.mzML" onclick="ga('send', 'event', 'Datasets', this.href);">mzML</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mgf/siderophores/Ferri_fusarinin_C.mgf" onclick="ga('send', 'event', 'Datasets', this.href);">mgf</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/txt/siderophores/Ferri_fusarinin_C.txt" onclick="ga('send', 'event', 'Datasets', this.href);">txt</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/raw_data/siderophores/Ferri_fusarinin_C.zip" onclick="ga('send', 'event', 'Datasets', this.href);">baf (raw data)</a>
+</td>
+\htmlonly
+<td>
+<div align="center"><a href="Ferri_fusarinin_C.png" onclick="ga('send', 'event', 'Datasets', this.href);"><img src="Ferri_fusarinin_C.png" width="400"></a></div>
+</td>
+\endhtmlonly
+</tr>
+<tr>
+<td>Ferri-fusarinin B</td>
+<td>
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mzxml/siderophores/Ferri_fusarinin_B.mzXML" onclick="ga('send', 'event', 'Datasets', this.href);">mzXML</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mzml/siderophores/Ferri_fusarinin_B.mzML" onclick="ga('send', 'event', 'Datasets', this.href);">mzML</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mgf/siderophores/Ferri_fusarinin_B.mgf" onclick="ga('send', 'event', 'Datasets', this.href);">mgf</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/txt/siderophores/Ferri_fusarinin_B.txt" onclick="ga('send', 'event', 'Datasets', this.href);">txt</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/raw_data/siderophores/Ferri_fusarinin_B.zip" onclick="ga('send', 'event', 'Datasets', this.href);">baf (raw data)</a>
+</td>
+\htmlonly
+<td>
+<div align="center"><a href="Ferri_fusarinin_B.png" onclick="ga('send', 'event', 'Datasets', this.href);"><img src="Ferri_fusarinin_B.png" width="400"></a></div>
+</td>
+\endhtmlonly
+</tr>
+<tr>
+<td>Desferri-ferrichrome A</td>
+<td>
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mzxml/siderophores/Desferri_ferrichrome_A.mzXML" onclick="ga('send', 'event', 'Datasets', this.href);">mzXML</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mzml/siderophores/Desferri_ferrichrome_A.mzML" onclick="ga('send', 'event', 'Datasets', this.href);">mzML</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mgf/siderophores/Desferri_ferrichrome_A.mgf" onclick="ga('send', 'event', 'Datasets', this.href);">mgf</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/txt/siderophores/Desferri_ferrichrome_A.txt" onclick="ga('send', 'event', 'Datasets', this.href);">txt</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/raw_data/siderophores/Desferri_ferrichrome_A.zip" onclick="ga('send', 'event', 'Datasets', this.href);">baf (raw data)</a>
+</td>
+\htmlonly
+<td>
+<div align="center"><a href="Desferri_ferrichrome_A.png" onclick="ga('send', 'event', 'Datasets', this.href);"><img src="Desferri_ferrichrome_A.png" width="400"></a></div>
+</td>
+\endhtmlonly
+</tr>
+<tr>
+<td>Ferri-ferrichrome A</td>
+<td>
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mzxml/siderophores/Ferri_ferrichrome_A.mzXML" onclick="ga('send', 'event', 'Datasets', this.href);">mzXML</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mzml/siderophores/Ferri_ferrichrome_A.mzML" onclick="ga('send', 'event', 'Datasets', this.href);">mzML</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mgf/siderophores/Ferri_ferrichrome_A.mgf" onclick="ga('send', 'event', 'Datasets', this.href);">mgf</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/txt/siderophores/Ferri_ferrichrome_A.txt" onclick="ga('send', 'event', 'Datasets', this.href);">txt</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/raw_data/siderophores/Ferri_ferrichrome_A.zip" onclick="ga('send', 'event', 'Datasets', this.href);">baf (raw data)</a>
+</td>
+\htmlonly
+<td>
+<div align="center"><a href="Ferri_ferrichrome_A.png" onclick="ga('send', 'event', 'Datasets', this.href);"><img src="Ferri_ferrichrome_A.png" width="400"></a></div>
+</td>
+\endhtmlonly
+</tr>
+<tr>
+<td>Desferri-ferrirubin</td>
+<td>
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mzxml/siderophores/Desferri_ferrirubin.mzXML" onclick="ga('send', 'event', 'Datasets', this.href);">mzXML</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mzml/siderophores/Desferri_ferrirubin.mzML" onclick="ga('send', 'event', 'Datasets', this.href);">mzML</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mgf/siderophores/Desferri_ferrirubin.mgf" onclick="ga('send', 'event', 'Datasets', this.href);">mgf</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/txt/siderophores/Desferri_ferrirubin.txt" onclick="ga('send', 'event', 'Datasets', this.href);">txt</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/raw_data/siderophores/Desferri_ferrirubin.zip" onclick="ga('send', 'event', 'Datasets', this.href);">baf (raw data)</a>
+</td>
+\htmlonly
+<td>
+<div align="center"><a href="Desferri_ferrirubin.png" onclick="ga('send', 'event', 'Datasets', this.href);"><img src="Desferri_ferrirubin.png" width="400"></a></div>
+</td>
+\endhtmlonly
+</tr>
+<tr>
+<td>Ferri-ferrirubin</td>
+<td>
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mzxml/siderophores/Ferri_ferrirubin.mzXML" onclick="ga('send', 'event', 'Datasets', this.href);">mzXML</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mzml/siderophores/Ferri_ferrirubin.mzML" onclick="ga('send', 'event', 'Datasets', this.href);">mzML</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mgf/siderophores/Ferri_ferrirubin.mgf" onclick="ga('send', 'event', 'Datasets', this.href);">mgf</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/txt/siderophores/Ferri_ferrirubin.txt" onclick="ga('send', 'event', 'Datasets', this.href);">txt</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/raw_data/siderophores/Ferri_ferrirubin.zip" onclick="ga('send', 'event', 'Datasets', this.href);">baf (raw data)</a>
+</td>
+\htmlonly
+<td>
+<div align="center"><a href="Ferri_ferrirubin.png" onclick="ga('send', 'event', 'Datasets', this.href);"><img src="Ferri_ferrirubin.png" width="400"></a></div>
+</td>
+\endhtmlonly
+</tr>
+<tr>
+<td>Ferri-ferrichrysin</td>
+<td>
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mzxml/siderophores/Ferri_ferrichrysin.mzXML" onclick="ga('send', 'event', 'Datasets', this.href);">mzXML</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mzml/siderophores/Ferri_ferrichrysin.mzML" onclick="ga('send', 'event', 'Datasets', this.href);">mzML</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mgf/siderophores/Ferri_ferrichrysin.mgf" onclick="ga('send', 'event', 'Datasets', this.href);">mgf</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/txt/siderophores/Ferri_ferrichrysin.txt" onclick="ga('send', 'event', 'Datasets', this.href);">txt</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/raw_data/siderophores/Ferri_ferrichrysin.zip" onclick="ga('send', 'event', 'Datasets', this.href);">baf (raw data)</a>
+</td>
+\htmlonly
+<td>
+<div align="center"><a href="Ferri_ferrichrysin.png" onclick="ga('send', 'event', 'Datasets', this.href);"><img src="Ferri_ferrichrysin.png" width="400"></a></div>
+</td>
+\endhtmlonly
+</tr>
+<tr>
+<td>Desferri-ferricrocin</td>
+<td>
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mzxml/siderophores/Desferri_ferricrocin_extract.mzXML" onclick="ga('send', 'event', 'Datasets', this.href);">mzXML</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mzml/siderophores/Desferri_ferricrocin_extract.mzML" onclick="ga('send', 'event', 'Datasets', this.href);">mzML</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mgf/siderophores/Desferri_ferricrocin_extract.mgf" onclick="ga('send', 'event', 'Datasets', this.href);">mgf</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/txt/siderophores/Desferri_ferricrocin_extract.txt" onclick="ga('send', 'event', 'Datasets', this.href);">txt</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/raw_data/siderophores/Desferri_ferricrocin_extract.zip" onclick="ga('send', 'event', 'Datasets', this.href);">baf (raw data)</a>
+</td>
+\htmlonly
+<td>
+<div align="center"><a href="Desferri_ferricrocin.png" onclick="ga('send', 'event', 'Datasets', this.href);"><img src="Desferri_ferricrocin.png" width="400"></a></div>
+</td>
+\endhtmlonly
+</tr>
+<tr>
+<td>Desferri-pyoverdin E</td>
+<td>
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mzxml/siderophores/Desferri_pyoverdin_E.mzXML" onclick="ga('send', 'event', 'Datasets', this.href);">mzXML</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mzml/siderophores/Desferri_pyoverdin_E.mzML" onclick="ga('send', 'event', 'Datasets', this.href);">mzML</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/mgf/siderophores/Desferri_pyoverdin_E.mgf" onclick="ga('send', 'event', 'Datasets', this.href);">mgf</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/txt/siderophores/Desferri_pyoverdin_E.txt" onclick="ga('send', 'event', 'Datasets', this.href);">txt</a>,
+<a href="http://ms.biomed.cas.cz/cyclobranch/datasets/raw_data/siderophores/Desferri_pyoverdin_E.zip" onclick="ga('send', 'event', 'Datasets', this.href);">baf (raw data)</a>
+</td>
+\htmlonly
+<td>
+<div align="center"><a href="Desferri_pyoverdin_E.png" onclick="ga('send', 'event', 'Datasets', this.href);"><img src="Desferri_pyoverdin_E.png" width="400"></a></div>
+</td>
+\endhtmlonly
+</tr>
+</table>
+</div>
+
+\latexonly
+
+\begin{center}
+\includegraphics[width=16cm]{Desferri_ferrioxamine_B.png}
+\captionof{figure}{Desferri-ferrioxamine B}
+\end{center}
+
+\begin{center}
+\includegraphics[width=16cm]{Ferri_ferrioxamine_B.png}
+\captionof{figure}{Ferri-ferrioxamine B}
+\end{center}
+
+\begin{center}
+\includegraphics[width=16cm]{Desferri_ferrioxamine_G1.png}
+\captionof{figure}{Desferri-ferrioxamine G1}
+\end{center}
+
+\begin{center}
+\includegraphics[width=16cm]{Ferri_ferrioxamine_G1.png}
+\captionof{figure}{Ferri-ferrioxamine G1}
+\end{center}
+
+\begin{center}
+\includegraphics[width=16cm]{Desferri_ferrioxamine_E.png}
+\captionof{figure}{Desferri-ferrioxamine E}
+\end{center}
+
+\begin{center}
+\includegraphics[width=16cm]{Ferri_ferrioxamine_E.png}
+\captionof{figure}{Ferri-ferrioxamine E}
+\end{center}
+
+\begin{center}
+\includegraphics[width=16cm]{Desferri_ornibactin_C4.png}
+\captionof{figure}{Desferri-ornibactin C4}
+\end{center}
+
+\begin{center}
+\includegraphics[width=16cm]{Desferri_ornibactin_C6.png}
+\captionof{figure}{Desferri-ornibactin C6}
+\end{center}
+
+\begin{center}
+\includegraphics[width=16cm]{Desferri_ornibactin_C8.png}
+\captionof{figure}{Desferri-ornibactin C8}
+\end{center}
+
+\begin{center}
+\includegraphics[width=16cm]{Ferri_fusarinin_B.png}
+\captionof{figure}{Ferri-fusarinin B}
+\end{center}
+
+\begin{center}
+\includegraphics[width=16cm]{Desferri_coprogen.png}
+\captionof{figure}{Desferri-coprogen}
+\end{center}
+
+\begin{center}
+\includegraphics[width=16cm]{Ferri_coprogen.png}
+\captionof{figure}{Ferri-coprogen}
+\end{center}
+
+\begin{center}
+\includegraphics[width=16cm]{Desferri_neocoprogen_I.png}
+\captionof{figure}{Desferri-neocoprogen I}
+\end{center}
+
+\begin{center}
+\includegraphics[width=16cm]{Ferri_neocoprogen_I.png}
+\captionof{figure}{Ferri-neocoprogen I}
+\end{center}
+
+\begin{center}
+\includegraphics[width=16cm]{Desferri_rhodotulic_acid.png}
+\captionof{figure}{Desferri-rhodotulic acid}
+\end{center}
+
+\begin{center}
+\includegraphics[width=16cm]{Desferri_TAFC.png}
+\captionof{figure}{Desferri-TAFC}
+\end{center}
+
+\begin{center}
+\includegraphics[width=16cm]{Fe_TAFC.png}
+\captionof{figure}{Fe-TAFC}
+\end{center}
+
+\begin{center}
+\includegraphics[width=16cm]{Cr_TAFC.png}
+\captionof{figure}{Cr-TAFC}
+\end{center}
+
+\begin{center}
+\includegraphics[width=16cm]{Desferri_Fusarinin_C.png}
+\captionof{figure}{Desferri-fusarinin C}
+\end{center}
+
+\begin{center}
+\includegraphics[width=16cm]{Ferri_fusarinin_C.png}
+\captionof{figure}{Ferri-fusarinin C}
+\end{center}
+
+\begin{center}
+\includegraphics[width=16cm]{Ferri_fusarinin_B.png}
+\captionof{figure}{Ferri-fusarinin B}
+\end{center}
+
+\begin{center}
+\includegraphics[width=16cm]{Desferri_ferrichrome_A.png}
+\captionof{figure}{Desferri-ferrichrome A}
+\end{center}
+
+\begin{center}
+\includegraphics[width=16cm]{Ferri_ferrichrome_A.png}
+\captionof{figure}{Ferri-ferrichrome A}
+\end{center}
+
+\begin{center}
+\includegraphics[width=16cm]{Desferri_ferrirubin.png}
+\captionof{figure}{Desferri-ferrirubin}
+\end{center}
+
+\begin{center}
+\includegraphics[width=16cm]{Ferri_ferrirubin.png}
+\captionof{figure}{Ferri-ferrirubin}
+\end{center}
+
+\begin{center}
+\includegraphics[width=16cm]{Ferri_ferrichrysin.png}
+\captionof{figure}{Ferri-ferrichrysin}
+\end{center}
+
+\begin{center}
+\includegraphics[width=16cm]{Desferri_ferricrocin.png}
+\captionof{figure}{Desferri-ferricrocin}
+\end{center}
+
+\begin{center}
+\includegraphics[width=16cm]{Desferri_pyoverdin_E.png}
+\captionof{figure}{Desferri-pyoverdin E}
+\end{center}
+
+\endlatexonly
+
+<p>The dataset is also available in a public <a href="http://gnps.ucsd.edu/ProteoSAFe/gnpslibrary.jsp?library=all#%7B%22main.submit_user_input%22%3A%22novakj%22%7D" onclick="ga('send', 'event', 'Datasets', this.href);">GNPS library</a>.</p>
+
+<br/>
+  
+<hr size="1">
+
+\section dataset6 Dataset 6: Correlation of MALDI-MSI with Histology Image
+
+<p>The dataset includes imzML and ibd file (processed data format; centroided spectra; 64-bit floats; no compression), optical scan of ITO MALDI plate and histology image and 
+can be downloaded <a href="http://ms.biomed.cas.cz/cyclobranch/datasets/msi_data/aspergillus_correlation_with_histology.zip" onclick="ga('send', 'event', 'Datasets', this.href);">here</a>.</p>
+
+<p>
+Reference:<br/>
+Dominika Luptakova, Tomas Pluhacek, Milos Petrik, Jiri Novak, Andrea Palyzova, Lucie Sokolova, Anton Skriba, Blanka Sediva, Karel Lemr and Vladimir Havlicek.<br/>
+<b>Non-invasive and Invasive Diagnoses of Aspergillosis in a Rat Model by Mass Spectrometry.</b><br/>
+<i>Scientific Reports</i>, vol. 7, pp. 16523, 2017. DOI: <a href="http://dx.doi.org/10.1038/s41598-017-16648-z"><b>10.1038/s41598-017-16648-z</b></a>.<br/>
+</p>
+
+<hr size="1">
+
+<br/>
+
+*/
