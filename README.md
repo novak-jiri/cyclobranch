@@ -1,15 +1,29 @@
 # CycloBranch
 
-An open-source and cross-platform tool for mass spectrometry data analysis.
+An open-source, cross-platform and stand-alone tool for mass spectrometry data analysis.
 
 ## Main features
-  * *De novo* sequencing of nonribosomal peptides.
-  * Compound search (dereplication) in:
-    * conventional mass spectra (MS)
-    * liquid-chromatography mass spectra (LC-MS)
-    * imaging mass spectra (MSI)
-  * Image fusion
+  * designed for identification of small molecules
   
+  * *de novo* sequencing
+    * non-ribosomal peptides (NRPs) [1]
+    * siderophores (including metals) [2]
+    * supports linear, cyclic, branched, and branch-cyclic structures
+    * based on custom databases of building blocks
+      * 19 proteinogenic amino acids (20 including isomers)
+      * 287 NRP blocks (512 including isomers)
+  
+  * dereplication / database search:
+    * conventional mass spectra (MS)
+    * liquid-chromatography mass spectra (LC-MS) [2]
+      * batch-processing
+    * imaging mass spectra (MSI)
+      * pixel-by-pixel analysis of imaging mass spectra (imzML) [2]
+      * fusion of imzML files with optical and histology images [3]
+    * tandem mass spectra (MS/MS)
+      * single spectra analysis
+      * supports also a direct comparison of an experimental spectrum with a theoretical one
+    
 ## Supported file formats
   * mzML, imzML
     * profile or centroid spectra
@@ -38,6 +52,6 @@ An open-source and cross-platform tool for mass spectrometry data analysis.
 http://ms.biomed.cas.cz/cyclobranch/
   
 ## Publications
-  * *J. Am. Soc. Mass Spectrom.* (2015), 26(10):1780-1786. DOI: [10.1007/s13361-015-1211-1](http://dx.doi.org/10.1007/s13361-015-1211-1)
-  * *BBA - Proteins Proteom.* (2017), 1865(7):768-775. DOI: [10.1016/j.bbapap.2016.12.003](http://dx.doi.org/10.1016/j.bbapap.2016.12.003)
-  * *Sci. Rep.* (2017), 7:16523. DOI: [10.1038/s41598-017-16648-z](http://dx.doi.org/10.1038/s41598-017-16648-z)
+  * [1] *J. Am. Soc. Mass Spectrom.* (2015), 26(10):1780-1786. DOI: [10.1007/s13361-015-1211-1](http://dx.doi.org/10.1007/s13361-015-1211-1)
+  * [2] *BBA - Proteins Proteom.* (2017), 1865(7):768-775. DOI: [10.1016/j.bbapap.2016.12.003](http://dx.doi.org/10.1016/j.bbapap.2016.12.003)
+  * [3] *Sci. Rep.* (2017), 7:16523. DOI: [10.1038/s41598-017-16648-z](http://dx.doi.org/10.1038/s41598-017-16648-z)
