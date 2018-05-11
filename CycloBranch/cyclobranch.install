@@ -1,0 +1,12 @@
+BrickDatabases/* /usr/share/cyclobranch/BrickDatabases
+docs/* /usr/share/cyclobranch/docs
+External/* /usr/share/cyclobranch/External
+PeakLists/* /usr/share/cyclobranch/PeakLists
+SequenceDatabases/* /usr/share/cyclobranch/SequenceDatabases
+Modifications/* /usr/share/cyclobranch/Modifications
+Settings/* /usr/share/cyclobranch/Settings
+Tutorials/* /usr/share/cyclobranch/Tutorials
+CycloBranch /bin
+images/cb.png /usr/share/cyclobranch/images
+CycloBranch.desktop /usr/share/applications
+licence.txt /usr/share/cyclobranch
