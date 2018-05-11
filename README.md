@@ -4,7 +4,6 @@ An open-source, cross-platform and stand-alone tool for mass spectrometry data a
 
 ## Main features
   * designed for identification of small molecules
-  
   * *de novo* sequencing
     * non-ribosomal peptides (NRPs) [1]
     * siderophores (including metals) [2]
@@ -12,8 +11,7 @@ An open-source, cross-platform and stand-alone tool for mass spectrometry data a
     * based on custom databases of building blocks
       * 19 proteinogenic amino acids (20 including isomers)
       * 287 NRP blocks (512 including isomers)
-  
-  * dereplication / database search:
+  * dereplication / database search
     * conventional mass spectra (MS)
     * liquid-chromatography mass spectra (LC-MS) [2]
       * batch-processing
