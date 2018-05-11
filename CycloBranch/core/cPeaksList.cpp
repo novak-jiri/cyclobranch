@@ -347,11 +347,13 @@ int cPeaksList::normalizeIntenzity() {
 	}
 
 	double maximum = 0.0f;
+
 	for (int i = 0; i < (int)peaks.size(); i++) {
 		if (peaks[i].absoluteintensity > maximum) {
 			maximum = peaks[i].absoluteintensity;
 		}
 	}
+
 	if (maximum > 0) {
 		for (int i = 0; i < (int)peaks.size(); i++) {
 			peaks[i].relativeintensity = peaks[i].absoluteintensity/maximum*100.0f;
@@ -359,6 +361,19 @@ int cPeaksList::normalizeIntenzity() {
 	}
 
 	return 0;
+}
+
+
+void cPeaksList::normalizeIntenzityByValue(double value) {
+	if (peaks.size() == 0) {
+		return;
+	}
+
+	if (value > 0) {
+		for (int i = 0; i < (int)peaks.size(); i++) {
+			peaks[i].relativeintensity = peaks[i].absoluteintensity / value * 100.0f;
+		}
+	}
 }
 
 
@@ -688,6 +703,17 @@ double cPeaksList::getMaximumAbsoluteIntensityFromMZInterval(double minmz, doubl
 			continue;
 		}
 
+		if (peaks[i].absoluteintensity > intensity) {
+			intensity = peaks[i].absoluteintensity;
+		}
+	}
+	return intensity;
+}
+
+
+double cPeaksList::getMaximumAbsoluteIntensity() {
+	double intensity = 0;
+	for (int i = 0; i < (int)peaks.size(); i++) {
 		if (peaks[i].absoluteintensity > intensity) {
 			intensity = peaks[i].absoluteintensity;
 		}
