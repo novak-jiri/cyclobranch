@@ -118,11 +118,12 @@ public:
 
 	/**
 		\brief Initialize the widget.
+		\param rowid id of a row
 		\param parameters a pointer to parameters
 		\param theoreticalspectrum a reference to a theoretical spectrum
 		\param parent pointer to a parent widget
 	*/ 
-	void initialize(cParameters* parameters, cTheoreticalSpectrum& theoreticalspectrum, QWidget* parent);
+	void initialize(int rowid, cParameters* parameters, cTheoreticalSpectrum& theoreticalspectrum, QWidget* parent);
 
 
 	/**
@@ -160,10 +161,10 @@ public:
 
 	/**
 		\brief Prepare the widget to show.
-		\param peptidetype a type of peptide
+		\param rawdata a pointer to a structure handling raw data
 		\param actionShowIsomers reference to QAction to show isomers of building blocks
 	*/ 
-	void prepareToShow(ePeptideType peptidetype, QAction* actionShowIsomers);
+	void prepareToShow(cPeakListSeries* rawdata, QAction* actionShowIsomers);
 	
 
 	/**
@@ -180,6 +181,13 @@ public:
 		\param exportspectrum if true, a spectrum image is exported; if false, a peptide image is exported
 	*/ 
 	void exportImage(bool exportspectrum);
+
+
+	/**
+		\brief Zoom to a peak determined by the value.
+		\param value mz ratio of a peak
+	*/
+	void zoomToPeak(double value);
 
 
 protected:
@@ -223,9 +231,11 @@ private:
 	QAction* actionZoomOut;
 	QAction* actionZoomReset;
 	QAction* actionAbsoluteIntensity;
+	QAction* actionRawData;
 	QAction* actionHideMatched;
 	QAction* actionHideUnmatched;
 	QAction* actionHideScrambled;
+	QAction* actionHideLabels;
 	QAction* actionMouseMzSelection;
 	QAction* actionHTMLDocumentation;
 	QSplitter* hsplitter1;
@@ -277,9 +287,12 @@ private:
 	cSpectrumSceneWidget* spectrumscene;
 
 	cTheoreticalSpectrum* theoreticalspectrum;
-
+	
+	int rowid;
 	bool preparedToShow;
+
 	cParameters* parameters;
+	cPeakListSeries* rawdata;
 
 	cFindDialog* finddialog;
 	cExportDialog* exportdialog;
@@ -301,6 +314,13 @@ signals:
 		\param maxmz a maximum threshold of m/z ratio
 	*/ 
 	void emitMZInterval(double minmz, double maxmz);
+
+
+	/**
+		\brief The signal is emitted when raw data state was changed.
+		\param state current state
+	*/
+	void rawDataStateChangedSignal(bool state);
 
 
 private slots:
@@ -339,6 +359,9 @@ private slots:
 	void filterPeaksTable();
 
 
+	void rawDataStateChanged(bool state);
+
+
 	void hideMatchedPeaks(bool hide);
 
 
@@ -346,6 +369,9 @@ private slots:
 
 
 	void hideScrambledPeaks(bool hide);
+
+
+	void hidePeakLabels(bool hide);
 
 
 	void filterTableAfterIonSeriesChanged(int index);
@@ -367,6 +393,9 @@ private slots:
 
 
 	void closeWindow();
+
+	
+	void tableDoubleClicked(const QModelIndex& index);
 
 };
 

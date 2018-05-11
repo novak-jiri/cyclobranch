@@ -121,6 +121,13 @@ protected:
 	void showEvent(QShowEvent *event);
 
 
+	/**
+		\brief Handle the widget resize event.
+		\param event pointer to QResizeEvent
+	*/
+	void resizeEvent(QResizeEvent *event);
+
+
 private:
 
 	cTheoreticalSpectrumList* theoreticalspectrumlist;

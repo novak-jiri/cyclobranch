@@ -384,6 +384,7 @@ cCyclicWidget::cCyclicWidget() {
 	visiblerotationid = -1;
 
 	reportisomers = false;
+	hidelabels = false;
 }
 
 
@@ -471,6 +472,12 @@ void cCyclicWidget::setReportIsomers(bool reportisomers) {
 }
 
 
+void cCyclicWidget::hidePeakLabels(bool state) {
+	this->hidelabels = state;
+	repaint();
+}
+
+
 void cCyclicWidget::paintEvent(QPaintEvent *event) {
 	QPainter painter;
 	painter.begin(this);
@@ -517,7 +524,7 @@ void cCyclicWidget::paint(QPainter& painter) {
 
 	paintCircle(painter, acronyms, centerx, centery, radius, angle, horizontalstep, linesize, cornerlinesize, theoreticalspectrum->getVisualCoverage().size() > 0, visiblerotationid, labels);
 		
-	if (parameters && (theoreticalspectrum->getVisualCoverage().size() > 0)) {
+	if (parameters && !hidelabels && (theoreticalspectrum->getVisualCoverage().size() > 0)) {
 	
 		int half = (int)theoreticalspectrum->getVisualCoverage().size() / (int)parameters->ionsfortheoreticalspectra.size() / ((int)parameters->neutrallossesfortheoreticalspectra.size() + 1) / 2;
 		for (int i = 0; i < half; i++) {

@@ -243,7 +243,7 @@ cMainWindow::cMainWindow() {
 	connect(rowsfilterclearbutton, SIGNAL(released()), this, SLOT(resetFilter()));
 
 	connect(summarytableofmatchedpeaks, SIGNAL(tableCancelled()), this, SLOT(summaryPeaksTableCancelled()));
-	connect(summarytableofmatchedpeaks, SIGNAL(summaryPeaksTableRowDoubleClicked(int)), this, SLOT(summaryPeaksTableRowDoubleClicked(int)));
+	connect(summarytableofmatchedpeaks, SIGNAL(summaryPeaksTableRowDoubleClicked(int, double)), this, SLOT(summaryPeaksTableRowDoubleClicked(int, double)));
 	connect(summarytableofmatchedpeaks, SIGNAL(sendFilterOptionsToImageWindow(vector<cCoordinates>, string, string, string, bool, bool)), imagewindow, SLOT(setFilterOptionsSlot(vector<cCoordinates>, string, string, string, bool, bool)));
 	connect(summarytableofmatchedpeaks, SIGNAL(sendFilterOptionsToChromatogram(cPeaksList)), chromatogramwindow, SLOT(setFilterOptionsSlot(cPeaksList)));
 	connect(summarytableofmatchedpeaks, SIGNAL(resetRegion()), imagewindow, SLOT(clearSelection()));
@@ -325,12 +325,15 @@ cMainWindow::cMainWindow() {
 
 	resize(1280, 780);
 
+	theoreticalspectrumlist.clear();
+	spectradetails.clear();
+
+	parameters.clear();
+	rawdata.clear();
+
 	resultsbasecolumncount = 9;
 	resultsspecificcolumncount = 0;
 	searchspecificcolumncount = 0;
-
-	theoreticalspectrumlist.clear();
-	spectradetails.clear();
 
 	lastdirexporttocsv = "./";
 	lastdirexporttohtml = "./";
@@ -470,6 +473,11 @@ void cMainWindow::reportSpectrum(int row, cTheoreticalSpectrum& theoreticalspect
 			resultsmodel->item(row, 2)->setData(QVariant::fromValue(theoreticalspectrum.getPathId() + 1), Qt::DisplayRole);
 		}
 
+		if (parameters.mode == singlecomparison) {
+			resultsmodel->setItem(row, 2, new QStandardItem());
+			resultsmodel->item(row, 2)->setText(theoreticalspectrum.getExperimentalSpectrum().getTitle().c_str());
+		}
+
 		if (parameters.mode == databasesearch) {
 			resultsmodel->setItem(row, 2, new QStandardItem());
 			resultsmodel->item(row, 2)->setText(theoreticalspectrum.getCandidate().getName().c_str());
@@ -543,7 +551,7 @@ void cMainWindow::reportSpectrum(int row, cTheoreticalSpectrum& theoreticalspect
 			resultsmodel->item(row, resultsmodel->columnCount() - 1)->setData(QVariant::fromValue(theoreticalspectrum.getNumberOfScrambledPeaks()), Qt::DisplayRole);
 		}
 
-		if (theoreticalspectrum.isValid()) {
+		if (((parameters.mode == denovoengine) || (parameters.mode == databasesearch)) && theoreticalspectrum.isValid()) {
 			resultsmodel->item(row, 0)->setText("*");
 			for (int i = 0; i < resultsmodel->columnCount(); i++) {
 				resultsmodel->item(row, i)->setBackground(Qt::yellow);
@@ -576,13 +584,7 @@ void cMainWindow::reportSpectrum(int row, cTheoreticalSpectrum& theoreticalspect
 	}
 
 
-	spectradetails[row].initialize(&parameters, theoreticalspectrum, this);
-	if (parameters.mode == dereplication) {
-		spectradetails[row].setWindowTitle(("Experimental Spectrum No. " + to_string(row + 1)).c_str());
-	}
-	else {
-		spectradetails[row].setWindowTitle(("Theoretical Spectrum No. " + to_string(row + 1)).c_str());
-	}
+	spectradetails[row].initialize(row + 1, &parameters, theoreticalspectrum, this);
 }
 
 
@@ -733,6 +735,9 @@ void cMainWindow::run() {
 	theoreticalspectrumlist.clear();
 	spectradetails.clear();
 
+	parameters.clear();
+	rawdata.clear();
+
 	cParameters localparameters = parameterswidget->getParameters();
 
 	regex rx;
@@ -781,6 +786,42 @@ void cMainWindow::run() {
 			}
 		}
 	}
+
+	#if OS_TYPE == WIN
+		if (localparameters.useprofiledata) {
+			rx = "\\.[bB][aA][fF]$";
+			if (regex_search(localparameters.peaklistfilename, rx)) {
+				int i = 1;
+				string profiledata = localparameters.peaklistfilename + ".profile.1.csv";
+				while (QFile::exists(profiledata.c_str())) {
+					i++;
+					profiledata = localparameters.peaklistfilename + ".profile." + to_string(i) + ".csv";
+				}
+				i--;
+
+				if (i > 0) {
+					QMessageBox::StandardButton reply;
+					string s = "The file '" + localparameters.peaklistfilename.substr(localparameters.peaklistfilename.rfind('/') + 1) + ".profile.1.csv'";
+					if (i > 1) {
+						s += " and " + to_string(i - 1) + " other files containing profile spectra have been found.";
+					}
+					else {
+						s += " containing a profile spectrum has been found.";
+					}
+
+					s += "\n\nDo you want to proceed the existing file(s) ?";
+					s += "\n\nClick 'Yes' to proceed the existing file(s).\nClick 'No' to convert the profile data again. Note: The conversion of many profile spectra may be time-consuming.";
+
+					reply = QMessageBox::question(this, "Do you want to proceed the existing file(s) ?", s.c_str(), QMessageBox::Yes | QMessageBox::No);
+
+					localparameters.convertprofiledata = true;
+					if (reply == QMessageBox::Yes) {
+						localparameters.convertprofiledata = false;
+					}
+				}
+			}
+		}
+	#endif
 
 	cMainThread* thread = new cMainThread(localparameters, theoreticalspectrumlist, true, false);
 	connect(thread, SIGNAL(message(QString)), this, SLOT(updateLog(QString)));
@@ -902,7 +943,7 @@ void cMainWindow::reportSpectra() {
 	}
 
 
-	if ((parameters.mode == denovoengine) || (parameters.mode == databasesearch)) {
+	if ((parameters.mode == denovoengine) || (parameters.mode == singlecomparison) || (parameters.mode == databasesearch)) {
 		searchspecificcolumncount = 1;
 	}
 	else {
@@ -923,12 +964,23 @@ void cMainWindow::reportSpectra() {
 		results->setItemDelegateForColumn(0, new QItemDelegate());
 
 		resultsmodel->setHorizontalHeaderItem(1, new QStandardItem());
-		resultsmodel->horizontalHeaderItem(1)->setText("Result ID");
+		if (parameters.mode == singlecomparison) {
+			resultsmodel->horizontalHeaderItem(1)->setText("Scan ID");
+		}
+		else {
+			resultsmodel->horizontalHeaderItem(1)->setText("Result ID");
+		}
 		results->setItemDelegateForColumn(1, new QItemDelegate());
 
 		if (parameters.mode == denovoengine) {
 			resultsmodel->setHorizontalHeaderItem(2, new QStandardItem());
 			resultsmodel->horizontalHeaderItem(2)->setText("Group ID");
+			results->setItemDelegateForColumn(2, new QItemDelegate());
+		}
+
+		if (parameters.mode == singlecomparison) {
+			resultsmodel->setHorizontalHeaderItem(2, new QStandardItem());
+			resultsmodel->horizontalHeaderItem(2)->setText("Title");
 			results->setItemDelegateForColumn(2, new QItemDelegate());
 		}
 		
@@ -1088,6 +1140,15 @@ void cMainWindow::reportSpectra() {
 
 	results->resizeColumnsToContents();
 
+	if (parameters.useprofiledata && (parameters.peaklistfileformat == baf)) {
+		if ((parameters.mode == denovoengine) || (parameters.mode == databasesearch)) {
+			rawdata.resize(1);
+		}
+		else {
+			rawdata.resize(theoreticalspectrumlist.size());
+		}
+	}
+	
 	QProgressDialog progress("Preparing the report...", /*"Cancel"*/0, 0, theoreticalspectrumlist.size(), this);
 	progress.setMinimumWidth(250);
 	cEventFilter filter;
@@ -1186,7 +1247,7 @@ void cMainWindow::rowDoubleClicked(const QModelIndex& item) {
 	int row = resultsproxymodel->mapToSource(item).row();
 	int rowid = resultsmodel->item(row, 1)->data(Qt::DisplayRole).toInt() - 1;
 
-	spectradetails[rowid].prepareToShow(parameters.peptidetype, actionShowIsomers);
+	spectradetails[rowid].prepareToShow(&rawdata, actionShowIsomers);
 	spectradetails[rowid].show();
 	spectradetails[rowid].activateWindow();
 	if (spectradetails[rowid].isMinimized()) {
@@ -1678,6 +1739,9 @@ void cMainWindow::openResultsFile() {
 			
 			theoreticalspectrumlist.clear();
 			spectradetails.clear();
+
+			parameters.clear();
+			rawdata.clear();
 			
 			// load graph window
 			graph->load(infile);
@@ -1833,13 +1897,14 @@ void cMainWindow::summaryPeaksTableCancelled() {
 }
 
 
-void cMainWindow::summaryPeaksTableRowDoubleClicked(int rowid) {
-	spectradetails[rowid].prepareToShow(parameters.peptidetype, actionShowIsomers);
+void cMainWindow::summaryPeaksTableRowDoubleClicked(int rowid, double experimentalmz) {
+	spectradetails[rowid].prepareToShow(&rawdata, actionShowIsomers);
 	spectradetails[rowid].show();
 	spectradetails[rowid].activateWindow();
 	if (spectradetails[rowid].isMinimized()) {
 		spectradetails[rowid].showNormal();
 	}
+	spectradetails[rowid].zoomToPeak(experimentalmz);
 }
 
 

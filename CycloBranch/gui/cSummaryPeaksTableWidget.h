@@ -375,8 +375,9 @@ signals:
 	/**
 		\brief A row was double clicked.
 		\param rowid id of a row in the main window
+		\param experimentalmz experimental mz of a peak
 	*/
-	void summaryPeaksTableRowDoubleClicked(int rowid);
+	void summaryPeaksTableRowDoubleClicked(int rowid, double experimentalmz);
 
 
 	/**

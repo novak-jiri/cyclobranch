@@ -1,5 +1,5 @@
 @echo off
-SET PATH=%PATH%
+SET PATH=%PATH:C:\Xcalibur\system\programs;=%
 
 (type NUL 2>NUL) > "%~1mgf"
 for %%f in ("%~d1%~p1%~n1.00*.mgf") do (

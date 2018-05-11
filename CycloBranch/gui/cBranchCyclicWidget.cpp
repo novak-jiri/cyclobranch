@@ -135,6 +135,7 @@ cBranchCyclicWidget::cBranchCyclicWidget() {
 	visibletrotationid = -1;
 
 	reportisomers = false;
+	hidelabels = false;
 }
 
 
@@ -218,6 +219,12 @@ void cBranchCyclicWidget::exportToSVG(QString filename) {
 
 void cBranchCyclicWidget::setReportIsomers(bool reportisomers) {
 	this->reportisomers = reportisomers;
+	repaint();
+}
+
+
+void cBranchCyclicWidget::hidePeakLabels(bool state) {
+	this->hidelabels = state;
 	repaint();
 }
 
@@ -314,7 +321,7 @@ void cBranchCyclicWidget::paint(QPainter& painter) {
 	}
 
 
-	if (parameters && (theoreticalspectrum->getVisualCoverage().size() > 0)) {
+	if (parameters && !hidelabels && (theoreticalspectrum->getVisualCoverage().size() > 0)) {
 
 		// get branch-cyclic rotations
 		vector<cCandidate> branchcyclicrotations;

@@ -22,13 +22,16 @@ cSpectrumSceneWidget::cSpectrumSceneWidget(QWidget* parent) {
 	this->parent = parent;
 	parameters = 0;
 	theoreticalspectrum = 0;
-	origwidth = 500;
-	origheight = 200;
+	rawdatapeaklist = 0;
+	origwidth = 0;
+	origheight = 0;
 	currentscale = 1;
 	absoluteintensity = false;
+	rawdatastate = false;
 	hideunmatched = false;
 	hidematched = false;
 	hidescrambled = false;
+	hidelabels = false;
 	factor = 0.2;
 	visibleionseriespart1 = "";
 	visibleionseriespart2 = "";
@@ -67,12 +70,14 @@ cSpectrumSceneWidget::~cSpectrumSceneWidget() {
 }
 
 
-void cSpectrumSceneWidget::initialize(cParameters* parameters, cTheoreticalSpectrum* theoreticalspectrum) {
+void cSpectrumSceneWidget::initialize(cParameters* parameters, cTheoreticalSpectrum* theoreticalspectrum, cPeakListSeries* rawdata, int rowid) {
 	this->parameters = parameters;
 	this->theoreticalspectrum = theoreticalspectrum;
 
-	if (parameters->mode == dereplication) {
-		origwidth = 800;
+	if (parameters && parameters->useprofiledata && (parameters->peaklistfileformat == baf)) {
+		if ((rowid > 0) && (rowid <= rawdata->size())) {
+			this->rawdatapeaklist = &((*rawdata)[rowid - 1]);
+		}
 	}
 
 	minmzratio = 0;
@@ -80,7 +85,14 @@ void cSpectrumSceneWidget::initialize(cParameters* parameters, cTheoreticalSpect
 	emit updateMZInterval(minmzratio, maxmzratio);
 
 	setScene(scene);
-	redrawScene();
+
+	origwidth = viewport()->width() * 4 / 5;
+	origheight = viewport()->height() * 3 / 5;
+
+	// a visualization fix
+	origwidth = (origwidth / 10) * 10;
+	origheight = (origheight / 10) * 10;
+
 	originalmatrix = matrix();
 }
 
@@ -157,47 +169,47 @@ void cSpectrumSceneWidget::exportToPNG(QString filename) {
 
 
 void cSpectrumSceneWidget::hideUnmatchedPeaks(bool state) {
-	if (state == false) {
-		hideunmatched = false;
-	}
-	else {
-		hideunmatched = true;
-	}
-
+	hideunmatched = state;
 	redrawScene();
 }
 
 
 void cSpectrumSceneWidget::hideMatchedPeaks(bool state) {
-	if (state == false) {
-		hidematched = false;
-	}
-	else {
-		hidematched = true;
-	}
-
+	hidematched = state;
 	redrawScene();
 }
 
 
 void cSpectrumSceneWidget::hideScrambledPeaks(bool state) {
-	if (state == false) {
-		hidescrambled = false;
-	}
-	else {
-		hidescrambled = true;
-	}
+	hidescrambled = state;
+	redrawScene();
+}
 
+
+void cSpectrumSceneWidget::hidePeakLabels(bool state) {
+	hidelabels = state;
 	redrawScene();
 }
 
 
 void cSpectrumSceneWidget::wheelEvent(QWheelEvent *event) {
+	double part, newmin, newmax;
 	if (event->delta() > 0) {
-		zoomIn();
+		part = fabs(maxmzratio - minmzratio) / 10.0;
+		newmin = minmzratio + part;
+		newmax = maxmzratio - part;
 	}
 	else {
-		zoomOut();
+		part = fabs(maxmzratio - minmzratio) / 8.0;
+		newmin = max(minmzratio - part, 0.0);
+		newmax = min(maxmzratio + part, theoreticalspectrum->getExperimentalSpectrum().getMaximumMZRatio());
+	}
+
+	if (newmin < newmax) {
+		minmzratio = newmin;
+		maxmzratio = newmax;
+		emit updateMZInterval(minmzratio, maxmzratio);
+		redrawScene();
 	}
 
 	event->accept();
@@ -279,7 +291,7 @@ void cSpectrumSceneWidget::mousePressEvent(QMouseEvent *event) {
 		redrawScene();
 	}
 
-	if (enablemousemzselection) {
+	//if (enablemousemzselection) {
 		if (event->button() == Qt::MiddleButton) {
 			pressedx = -1;
 			pressedy = -1;
@@ -288,19 +300,33 @@ void cSpectrumSceneWidget::mousePressEvent(QMouseEvent *event) {
 
 			redrawScene();
 		}
-	}
+	//}
 	
 	event->accept();
 }
 
 
 void cSpectrumSceneWidget::showEvent(QShowEvent *event) {
+	QGraphicsView::showEvent(event);
+
 	if (firstshow) {
 		normalSize();
 		firstshow = false;
 	}
+}
 
-	event->accept();
+
+void cSpectrumSceneWidget::resizeEvent(QResizeEvent *event) {
+	QGraphicsView::resizeEvent(event);
+	
+	origwidth = viewport()->width() * 4 / 5;
+	origheight = viewport()->height() * 3 / 5;
+
+	// a visualization fix
+	origwidth = (origwidth / 10) * 10;
+	origheight = (origheight / 10) * 10;
+
+	redrawScene();	
 }
 
 
@@ -319,9 +345,9 @@ int cSpectrumSceneWidget::getXPositionFromMZRatio(double mzratio, int w) {
 
 
 void cSpectrumSceneWidget::redrawScene() {
-
 	QGraphicsSimpleTextItem* simpletext;
 	QGraphicsTextItem* text;
+	QGraphicsLineItem* line;
 
 	int x;
 	double y;
@@ -335,6 +361,8 @@ void cSpectrumSceneWidget::redrawScene() {
 	int h = origheight;
 	int rulergranularity = 10;
 
+	int size;
+
 	cPeaksList visiblepeaks;
 	visiblepeaks.clear();
 
@@ -345,15 +373,35 @@ void cSpectrumSceneWidget::redrawScene() {
 
 	QFont myFont("Arial", 8);
 	QFontMetrics fm(myFont);
-
-
+	
+	
 	// maximum intensity in the interval <minmzratio, maxmzratio>
-	double maxintensity;
-	if (absoluteintensity) {
-		maxintensity = theoreticalspectrum->getExperimentalSpectrum().getMaximumAbsoluteIntensityFromMZInterval(minmzratio, maxmzratio, hidematched, hideunmatched, parameters->peptidetype, hidescrambled);
+	double maxintensity = 0; 
+
+	if (parameters->useprofiledata && (parameters->peaklistfileformat == baf) && rawdatastate && (rawdatapeaklist->size() > 0)) {
+		if (absoluteintensity) {
+			maxintensity = theoreticalspectrum->getExperimentalSpectrum().getMaximumAbsoluteIntensityFromMZInterval(minmzratio, maxmzratio, false, false, other, false);
+		}
+		else {
+			maxintensity = theoreticalspectrum->getExperimentalSpectrum().getMaximumRelativeIntensityFromMZInterval(minmzratio, maxmzratio, false, false, other, false);
+		}
+
+		if (maxintensity == 0) {
+			if (absoluteintensity) {
+				maxintensity = rawdatapeaklist->getMaximumAbsoluteIntensityFromMZInterval(minmzratio, maxmzratio, false, false, other, false);
+			}
+			else {
+				maxintensity = rawdatapeaklist->getMaximumRelativeIntensityFromMZInterval(minmzratio, maxmzratio, false, false, other, false);
+			}
+		}
 	}
 	else {
-		maxintensity = theoreticalspectrum->getExperimentalSpectrum().getMaximumRelativeIntensityFromMZInterval(minmzratio, maxmzratio, hidematched, hideunmatched, parameters->peptidetype, hidescrambled);
+		if (absoluteintensity) {
+			maxintensity = theoreticalspectrum->getExperimentalSpectrum().getMaximumAbsoluteIntensityFromMZInterval(minmzratio, maxmzratio, hidematched, hideunmatched, parameters->peptidetype, hidescrambled);
+		}
+		else {
+			maxintensity = theoreticalspectrum->getExperimentalSpectrum().getMaximumRelativeIntensityFromMZInterval(minmzratio, maxmzratio, hidematched, hideunmatched, parameters->peptidetype, hidescrambled);
+		}
 	}
 
 
@@ -364,39 +412,48 @@ void cSpectrumSceneWidget::redrawScene() {
 
 
 	// x axis
-	scene->addLine(leftmargin, h - bottommargin, w - rightmargin, h - bottommargin, QPen(Qt::black, 2, Qt::SolidLine));
+	line = scene->addLine(leftmargin, h - bottommargin, w - rightmargin, h - bottommargin, QPen(Qt::black, 2, Qt::SolidLine));
+	line->setZValue(1);
 
 	// x axis ruler
 	xstep = (w - leftmargin - rightmargin) / rulergranularity;
 	for (int i = 0; i < rulergranularity; i++) {
-		scene->addLine(leftmargin + xstep * i, h - bottommargin, leftmargin + xstep * i, h - bottommargin + 10, QPen(Qt::black, 2, Qt::SolidLine));
+		line = scene->addLine(leftmargin + xstep * i, h - bottommargin, leftmargin + xstep * i, h - bottommargin + 10, QPen(Qt::black, 2, Qt::SolidLine));
+		line->setZValue(1);
 	}	
-	scene->addLine(w - rightmargin, h - bottommargin, w - rightmargin, h - bottommargin + 10, QPen(Qt::black, 2, Qt::SolidLine));
+	line = scene->addLine(w - rightmargin, h - bottommargin, w - rightmargin, h - bottommargin + 10, QPen(Qt::black, 2, Qt::SolidLine));
+	line->setZValue(1);
 
 	simpletext = scene->addSimpleText(QString::number(minmzratio), myFont);
 	simpletext->setPos(QPointF(leftmargin - simpletext->boundingRect().width() / 2, h - bottommargin + 12));
+	simpletext->setZValue(1);
 
 	if (maxmzratio - minmzratio > 0.01) {
 		xstep = (w - leftmargin - rightmargin) / rulergranularity;
 		for (int i = 1; i < rulergranularity; i++) {
 			simpletext = scene->addSimpleText(QString::number(minmzratio + (maxmzratio - minmzratio) / (double)rulergranularity * (double)i), myFont);
 			simpletext->setPos(QPointF(leftmargin + xstep * i - simpletext->boundingRect().width() / 2, h - bottommargin + 12));
+			simpletext->setZValue(1);
 		}
 	}
 
 	simpletext = scene->addSimpleText(QString::number(maxmzratio), myFont);
 	simpletext->setPos(QPointF(w - rightmargin - simpletext->boundingRect().width() / 2, h - bottommargin + 12));
+	simpletext->setZValue(1);
 
 
 	// y axis
-	scene->addLine(leftmargin, h - bottommargin, leftmargin, h - bottommargin - std::max(h - topmargin - bottommargin, 5), QPen(Qt::black, 2, Qt::SolidLine));
+	line = scene->addLine(leftmargin, h - bottommargin, leftmargin, h - bottommargin - std::max(h - topmargin - bottommargin, 0), QPen(Qt::black, 2, Qt::SolidLine));
+	line->setZValue(1);
 	
 	// y axis ruler
 	ystep = (h - topmargin - bottommargin) / rulergranularity;
 	for (int i = 0; i < rulergranularity; i++) {
-		scene->addLine(leftmargin - 10, h - bottommargin - ystep * i, leftmargin, h - bottommargin - ystep * i, QPen(Qt::black, 2, Qt::SolidLine));
+		line = scene->addLine(leftmargin - 10, h - bottommargin - ystep * i, leftmargin, h - bottommargin - ystep * i, QPen(Qt::black, 2, Qt::SolidLine));
+		line->setZValue(1);
 	}
-	scene->addLine(leftmargin - 10, h - bottommargin - std::max(h - topmargin - bottommargin, 5), leftmargin, h - bottommargin - std::max(h - topmargin - bottommargin, 5), QPen(Qt::black, 2, Qt::SolidLine));
+	line = scene->addLine(leftmargin - 10, h - bottommargin - std::max(h - topmargin - bottommargin, 0), leftmargin, h - bottommargin - std::max(h - topmargin - bottommargin, 0), QPen(Qt::black, 2, Qt::SolidLine));
+	line->setZValue(1);
 
 	if (absoluteintensity) {
 		simpletext = scene->addSimpleText(QString::number(0), myFont);
@@ -405,6 +462,7 @@ void cSpectrumSceneWidget::redrawScene() {
 		simpletext = scene->addSimpleText(QString::number(0) + " %", myFont);
 	}
 	simpletext->setPos(QPointF(leftmargin - 15 - simpletext->boundingRect().width(), h - bottommargin - simpletext->boundingRect().height() / 2));
+	simpletext->setZValue(1);
 
 	ystep = (h - topmargin - bottommargin) / rulergranularity;
 	if (absoluteintensity) {
@@ -412,6 +470,7 @@ void cSpectrumSceneWidget::redrawScene() {
 			for (int i = 1; i < rulergranularity; i++) {
 				simpletext = scene->addSimpleText(QString::number((unsigned long long)maxintensity / (unsigned long long)rulergranularity * (unsigned long long)i), myFont);
 				simpletext->setPos(QPointF(leftmargin - 15 - simpletext->boundingRect().width(), h - bottommargin - simpletext->boundingRect().height() / 2 - ystep * i));
+				simpletext->setZValue(1);
 			}
 		}
 	}
@@ -420,6 +479,7 @@ void cSpectrumSceneWidget::redrawScene() {
 			for (int i = 1; i < rulergranularity; i++) {
 				simpletext = scene->addSimpleText(QString::number(maxintensity / (double)rulergranularity * (double)i) + " %", myFont);
 				simpletext->setPos(QPointF(leftmargin - 15 - simpletext->boundingRect().width(), h - bottommargin - simpletext->boundingRect().height() / 2 - ystep * i));
+				simpletext->setZValue(1);
 			}
 		}
 	}
@@ -430,12 +490,13 @@ void cSpectrumSceneWidget::redrawScene() {
 	else {
 		simpletext = scene->addSimpleText(QString::number(maxintensity) + " %", myFont);
 	}
-	simpletext->setPos(QPointF(leftmargin - 15 - simpletext->boundingRect().width(), h - bottommargin - std::max(h - topmargin - bottommargin, 5) - simpletext->boundingRect().height() / 2));
+	simpletext->setPos(QPointF(leftmargin - 15 - simpletext->boundingRect().width(), h - bottommargin - std::max(h - topmargin - bottommargin, 0) - simpletext->boundingRect().height() / 2));
+	simpletext->setZValue(1);
 
 
 	cPeaksList thpeaks = *theoreticalspectrum->getTheoreticalPeaks();
 	thpeaks.sortbyOrderId();
-
+	
 	// all experimental peaks
 	int visiblepeakscount = 0;
 	for (int i = 0; i < (int)theoreticalspectrum->getExperimentalSpectrum().size(); i++) {
@@ -474,6 +535,15 @@ void cSpectrumSceneWidget::redrawScene() {
 			}
 			else {
 				visiblepeaks[visiblepeakscount].description += parameters->peakidtodesc[thpeaks[*it].descriptionid].substr(0, parameters->peakidtodesc[thpeaks[*it].descriptionid].find(':'));
+
+				visiblepeaks[visiblepeakscount].description += " (";
+				if (parameters->generateisotopepattern) {
+					visiblepeaks[visiblepeakscount].description += thpeaks[*it].isotopeformula;
+				}
+				else {
+					visiblepeaks[visiblepeakscount].description += thpeaks[*it].formula.getFancySummary(thpeaks[*it].charge);
+				}
+				visiblepeaks[visiblepeakscount].description += ")";
 			}
 		}
 
@@ -501,7 +571,7 @@ void cSpectrumSceneWidget::redrawScene() {
 	size_t tmpposition;
 	for (int i = 0; i < (int)visiblepeaks.size(); i++) {
 
-		x = getXPositionFromMZRatio(visiblepeaks[i].mzratio, origwidth);
+		x = getXPositionFromMZRatio(visiblepeaks[i].mzratio, w);
 
 		if (absoluteintensity) {
 			y = visiblepeaks[i].absoluteintensity / maxintensity * (h - topmargin - bottommargin);
@@ -709,11 +779,10 @@ void cSpectrumSceneWidget::redrawScene() {
 		sprintf_s(tmpbuf,"%.5f\0",visiblepeaks[i].mzratio);
 		s = tmpbuf;
 		hits.push_back(s);
-		QGraphicsLineItem* line;
 
 		if (hits.size() > 1) {
-			line = scene->addLine(x, h - bottommargin - 2, x, h - bottommargin - std::max((int)y, 5), QPen(Qt::red, 2, Qt::SolidLine));
-			line->setZValue(1);
+			line = scene->addLine(x, h - bottommargin - 2, x, h - bottommargin - std::max((int)y, 2), QPen(Qt::red, 2, Qt::SolidLine));
+			line->setZValue(2);
 			
 			hiddenitems.clear();
 			sumh = 0;
@@ -730,8 +799,9 @@ void cSpectrumSceneWidget::redrawScene() {
 				th = text->boundingRect().height();
 				sumh += th + 1;
 				tx = x - 2 - 4;
-				ty = h - bottommargin - std::max((int)y, 5) - sumh - 4;
+				ty = h - bottommargin - std::max((int)y, 2) - sumh - 4;
 				text->setPos(tx, ty);
+				text->setZValue(2);
 
 				hiddenitems.append(text);
 				
@@ -741,23 +811,71 @@ void cSpectrumSceneWidget::redrawScene() {
 					}
 					break;
 				}
+
+				if (hidelabels) {
+					break;
+				}
 			}
 		}
 		else {
-			scene->addLine(x, h - bottommargin - 2, x, h - bottommargin - std::max((int)y, 5), QPen(Qt::black, 2, Qt::SolidLine));
+			line = scene->addLine(x, h - bottommargin - 2, x, h - bottommargin - std::max((int)y, 2), QPen(Qt::black, 2, Qt::SolidLine));
+			line->setZValue(1);
 
 			simpletext = scene->addSimpleText(hits[0].c_str(), myFont);
 			tw = simpletext->boundingRect().width();
 			th = simpletext->boundingRect().height();
 			tx = x - 2;
-			ty = h - bottommargin - std::max((int)y, 5) - th - 1 - 4;
+			ty = h - bottommargin - std::max((int)y, 2) - th - 1 - 4;
 			simpletext->setPos(tx, ty);
 			simpletext->setBrush(Qt::black);
+			simpletext->setZValue(1);
 	
 			if (scene->items(tx, ty, tw, th, Qt::IntersectsItemBoundingRect, Qt::AscendingOrder).size() > 1) {
 				scene->removeItem(simpletext);
 			}
 		}
+
+	}
+
+
+	// raw data (intersections with other objects are not tested)
+	if ((maxintensity > 0) && parameters->useprofiledata && (parameters->peaklistfileformat == baf) && rawdatastate && (rawdatapeaklist->size() > 0)) {
+
+		QPainterPath rpath;
+		int rx, ry, lastrx, lastry;
+		bool two = false;
+
+		size = rawdatapeaklist->size();
+		for (int i = 0; i < size; i++) {
+			// skip peaks which are out of range
+			if (((*rawdatapeaklist)[i].mzratio < minmzratio) || ((*rawdatapeaklist)[i].mzratio > maxmzratio)) {
+				continue;
+			}
+
+			rx = getXPositionFromMZRatio((*rawdatapeaklist)[i].mzratio, w);
+
+			if (absoluteintensity) {
+				ry = (maxintensity - (*rawdatapeaklist)[i].absoluteintensity) / maxintensity * (h - topmargin - bottommargin);
+			}
+			else {
+				ry = (maxintensity - (*rawdatapeaklist)[i].relativeintensity) / maxintensity * (h - topmargin - bottommargin);
+			}
+
+			if (two) {
+				if ((rx != lastrx) || (ry != lastry)) {
+					rpath.lineTo(rx, ry);
+				}
+			}
+			else {
+				rpath.moveTo(rx, ry);
+				two = true;
+			}
+
+			lastrx = rx;
+			lastry = ry;
+		}
+
+		scene->addPath(rpath, QPen(Qt::gray, 1, Qt::SolidLine));
 
 	}
 
@@ -876,6 +994,12 @@ void cSpectrumSceneWidget::normalSize() {
 
 void cSpectrumSceneWidget::absoluteIntensityStateChanged(bool state) {
 	absoluteintensity = state;
+	redrawScene();
+}
+
+
+void cSpectrumSceneWidget::rawDataStateChanged(bool state) {
+	rawdatastate = state;
 	redrawScene();
 }
 

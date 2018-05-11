@@ -60,6 +60,13 @@ public:
 
 
 	/**
+		\brief Resize the peaklist series.
+		\param size new size
+	*/
+	void resize(int size);
+
+
+	/**
 		\brief Add a peaklist.
 		\param peaklist peaklist which will be added
 	*/ 

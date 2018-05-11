@@ -80,6 +80,18 @@ public:
 
 
 	/**
+		\brief Use profile data.
+	*/
+	bool useprofiledata;
+
+
+	/**
+		\brief Convert profile data.
+	*/
+	bool convertprofiledata;
+
+
+	/**
 		\brief A file format of peak list.
     */
 	ePeakListFileFormat peaklistfileformat;

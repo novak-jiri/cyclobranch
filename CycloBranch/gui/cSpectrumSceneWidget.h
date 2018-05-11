@@ -53,8 +53,10 @@ public:
 		\brief Initialize the widget.
 		\param parameters a pointer to parameters
 		\param theoreticalspectrum a pointer to a theoretical spectrum
+		\param rawdata a pointer to a structure handling raw data
+		\param rowid id of a row
 	*/ 
-	void initialize(cParameters* parameters, cTheoreticalSpectrum* theoreticalspectrum);
+	void initialize(cParameters* parameters, cTheoreticalSpectrum* theoreticalspectrum, cPeakListSeries* rawdata, int rowid);
 
 
 	/**
@@ -96,8 +98,15 @@ public:
 	/**
 		\brief Hide/Show scrambled peaks.
 		\param state the peaks are hidden when \a state is true
-	*/ 
+	*/
 	void hideScrambledPeaks(bool state);
+
+
+	/**
+		\brief Hide/Show labels of peaks.
+		\param state the peak labels are hidden when \a state is true
+	*/
+	void hidePeakLabels(bool state);
 
 
 protected:
@@ -134,8 +143,15 @@ protected:
 	/**
 		\brief Handle the widget show event.
 		\param event pointer to QShowEvent
-	*/ 
+	*/
 	void showEvent(QShowEvent *event);
+
+
+	/**
+		\brief Handle the widget resize event.
+		\param event pointer to QResizeEvent
+	*/
+	void resizeEvent(QResizeEvent *event);
 
 
 private:
@@ -150,6 +166,7 @@ private:
 
 	cParameters* parameters;
 	cTheoreticalSpectrum* theoreticalspectrum;
+	cPeaksList* rawdatapeaklist;
 
 	qreal currentscale;
 	qreal factor;
@@ -165,9 +182,11 @@ private:
 	int coloredtrotationid;
 
 	bool absoluteintensity;
+	bool rawdatastate;
 	bool hideunmatched;
 	bool hidematched;
 	bool hidescrambled;
+	bool hidelabels;
 
 	int pressedx;
 	int pressedy;
@@ -226,6 +245,9 @@ private slots:
 
 
 	void absoluteIntensityStateChanged(bool state);
+
+
+	void rawDataStateChanged(bool state);
 
 	
 	void setMZInterval(double minmz, double maxmz);

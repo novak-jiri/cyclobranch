@@ -128,20 +128,21 @@ private:
 	QPushButton* save;
 	QPushButton* saveas;
 
-	QGridLayout* searchgridlayout;
 	QGroupBox* searchgroupbox;
+	QGridLayout* searchgridlayout;
 	QLabel* modelabel;
 	QComboBox* mode;
 	eModeType oldmodetype;
 	QSpinBox* maximumnumberofthreads;
 	QLabel* maximumnumberofthreadslabel;
 
-	QGridLayout* experimentalspectragridlayout;
 	QGroupBox* experimentalspectragroupbox;
+	QGridLayout* experimentalspectragridlayout;
 	QLabel* peptidetypelabel;
 	QComboBox* peptidetype;
 	QLabel* peaklistlabel;
 	QLineEdit* peaklistline;
+	QCheckBox* useprofiledata;
 	QPushButton* peaklistbutton;
 	QHBoxLayout* peaklistlayout;
 	QWidget* peaklistwidget;
@@ -167,8 +168,8 @@ private:
 	QLabel* fwhmlabel;
 	QDoubleSpinBox* fwhm;
 
-	QGridLayout* brickdatabasegridlayout;
 	QGroupBox* brickdatabasegroupbox;
+	QGridLayout* brickdatabasegridlayout;
 	QLabel* brickdatabaselabel;
 	QLineEdit* brickdatabaseline;
 	QPushButton* brickdatabasebutton;
@@ -203,29 +204,45 @@ private:
 	QLabel* regularblocksorderlabel;
 	QCheckBox* regularblocksorder;
 
-	QFormLayout* theoreticalspectraformlayout;
 	QGroupBox* theoreticalspectragroupbox;
+	QGridLayout* theoreticalspectragridlayout;
+	QLabel* sequencedatabaselabel;
 	QLineEdit* sequencedatabaseline;
 	QPushButton* sequencedatabasebutton;
 	QHBoxLayout* sequencedatabaselayout;
+	QWidget* sequencedatabasewidget;
+	QLabel* scoretypelabel;
 	QComboBox* scoretype;
+	QLabel* hitsreportedlabel;
 	QSpinBox* hitsreported;
+	QLabel* sequencetaglabel;
 	QLineEdit* sequencetag;
-	cFragmentIonsListWidget* fragmentiontypes;
+	QLabel* iontypeslabel;
+	cFragmentIonsListWidget* iontypes;
+	QLabel* neutrallosstypeslabel;
 	cNeutralLossesListWidget* neutrallosstypes;
+	QLabel* maximumcombinedlosseslabel;
 	QSpinBox* maximumcombinedlosses;
 	//QCheckBox* clearhitswithoutparent;
+	QLabel* reportunmatchedtheoreticalpeakslabel;
 	QCheckBox* reportunmatchedtheoreticalpeaks;
+	QLabel* generateisotopepatternlabel;
 	QCheckBox* generateisotopepattern;
+	QLabel* minimumpatternsizelabel;
 	QSpinBox* minimumpatternsize;
 
 	QGroupBox* searchedsequencegroupbox;
-	QFormLayout* searchedsequenceformlayout;
+	QGridLayout* searchedsequencegridlayout;
+	QLabel* searchedsequencelabel;
 	QLineEdit* searchedsequenceline;
 	QPushButton* searchedsequencebutton;
 	QHBoxLayout* searchedsequencelayout;
+	QWidget* searchedsequencewidget;
+	QLabel* searchedsequenceNtermmodiflabel;
 	QLineEdit* searchedsequenceNtermmodif;
+	QLabel* searchedsequenceCtermmodiflabel;
 	QLineEdit* searchedsequenceCtermmodif;
+	QLabel* searchedsequenceTmodiflabel;
 	QLineEdit* searchedsequenceTmodif;
 
 	QString lastdirloadsettings;

@@ -15,6 +15,8 @@ void cParameters::clear() {
 	iondefinitions.recalculateFragments(false, false, s);
 	peptidetype = linear;
 	peaklistfilename = "";
+	useprofiledata = false;
+	convertprofiledata = true;
 	peaklistfileformat = txt;
 	peaklistseries.clear();
 	scannumber = 1;
@@ -242,7 +244,9 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 				break;
 			case baf:
 				#if OS_TYPE == WIN
-					*os << "Converting the file " + peaklistfilename + " ... ";
+					*os << "Processing the file " + peaklistfilename + ":" << endl;
+
+					*os << "centroid spectra ... ";
 					s = "External\\windows\\baf2csv.bat \"" + peaklistfilename + "\"";
 					if (system(s.c_str()) != 0) {
 						error = true;
@@ -255,18 +259,39 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 					}
 
 					if (!error) {
-						*os << "ok" << endl << endl;
+						*os << "ok" << endl;
 						peakliststream.open(peaklistfilename + ".csv");
 					}
+
+					if (useprofiledata && convertprofiledata) {
+						*os << "profile spectra ... ";
+						s = "External\\windows\\baf2profile.bat \"" + peaklistfilename + "\"";
+						if (system(s.c_str()) != 0) {
+							error = true;
+							errormessage = "The file cannot be converted.\n";
+							errormessage += "Does the file '" + peaklistfilename + "' exist ?\n";
+							errormessage += "Do you have Bruker Daltonik's CompassXport installed ?\n";
+							errormessage += "Do you have path to the CompassXport.exe in your PATH variable ?\n";
+							errormessage += "Is the directory with the file '" + peaklistfilename + "' writable ?\n";
+							errormessage += "Do you have 'baf2profile.bat' file located in the 'External/windows' folder ?\n";
+						}
+
+						if (!error) {
+							*os << "ok" << endl;
+						}
+					}
+
+					*os << endl;
 				#endif
 				break;
 			case raw:
 				#if OS_TYPE == WIN
-					* os << "Converting the file " + peaklistfilename + " ... ";
+					*os << "Converting the file " + peaklistfilename + " ... ";
 					s = "External\\windows\\raw2mzml.bat \"" + peaklistfilename + "\"";
 					if (system(s.c_str()) != 0) {
 						error = true;
 						errormessage = "The file cannot be converted.\n";
+						errormessage += "Is the file '" + peaklistfilename + "' opened elsewhere ?\n";
 						errormessage += "Does the file '" + peaklistfilename + "' exist ?\n";
 						errormessage += "Is the directory with the file '" + peaklistfilename + "' writable ?\n";
 						errormessage += "Do you have msconvert.exe installed (OpenMS 2.x including ProteoWizard must be installed) ?\n";
@@ -753,7 +778,7 @@ string cParameters::printToString() {
 		s += "De Novo Search Engine";
 		break;
 	case singlecomparison:
-		s += "Compare Peaklist with Spectrum of Searched Sequence";
+		s += "Compare Peaklist(s) with Spectrum of Searched Sequence";
 		break;
 	case databasesearch:
 		s += "Compare Peaklist with Database - MS/MS data";
@@ -797,6 +822,11 @@ string cParameters::printToString() {
 	s += "\n";
 
 	s += "File: " + peaklistfilename + "\n";
+
+	s += "Use Profile Data: ";
+	s += useprofiledata ? "on" : "off";
+	s += "\n";
+
 	s += "Scan no.: " + to_string(scannumber) + "\n";
 	s += "Precursor m/z Ratio: " + to_string(precursormass) + "\n";
 	s += "Precursor Ion Adduct: " + precursoradduct + "\n";
@@ -1130,6 +1160,9 @@ void cParameters::store(ofstream& os) {
 	os.write((char *)&peaklistfileformat, sizeof(ePeakListFileFormat));
 	peaklistseries.store(os);
 
+	os.write((char *)&useprofiledata, sizeof(bool));
+	os.write((char *)&convertprofiledata, sizeof(bool));
+
 	os.write((char *)&scannumber, sizeof(int));
 	os.write((char *)&precursormass, sizeof(double));
 
@@ -1250,6 +1283,9 @@ void cParameters::load(ifstream& is) {
 	loadString(peaklistfilename, is);
 	is.read((char *)&peaklistfileformat, sizeof(ePeakListFileFormat));
 	peaklistseries.load(is);
+
+	is.read((char *)&useprofiledata, sizeof(bool));
+	is.read((char *)&convertprofiledata, sizeof(bool));
 
 	is.read((char *)&scannumber, sizeof(int));
 	is.read((char *)&precursormass, sizeof(double));

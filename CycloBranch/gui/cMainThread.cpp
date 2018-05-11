@@ -187,15 +187,15 @@ void cMainThread::run() {
 		return;
 	}
 
-	if ((parameters.mode != dereplication) && (parameters.scannumber > parameters.peaklistseries.size())) {
+	if (((parameters.mode == denovoengine) || (parameters.mode == databasesearch)) && (parameters.scannumber > parameters.peaklistseries.size())) {
 		*os << "Number of spectra in the file: " << parameters.peaklistseries.size() << endl;
 		*os << "Error: no peaklist found (scan no. " << parameters.scannumber << ")." << endl;
 		emitEndSignals();
 		return;
 	}
 
-	int startscanno = (parameters.mode == dereplication)?0:parameters.scannumber-1;
-	int endscanno = (parameters.mode == dereplication)?parameters.peaklistseries.size():parameters.scannumber;
+	int startscanno = ((parameters.mode == dereplication) || (parameters.mode == singlecomparison)) ? 0 : parameters.scannumber - 1;
+	int endscanno = ((parameters.mode == dereplication) || (parameters.mode == singlecomparison)) ? parameters.peaklistseries.size() : parameters.scannumber;
 	for (int i = startscanno; i < endscanno; i++) {
 		parameters.peaklistseries[i].sortbyMass();
 		parameters.peaklistseries[i].cropMinimumMZRatio(parameters.minimummz, parameters.fragmentmasserrortolerance);
@@ -207,7 +207,7 @@ void cMainThread::run() {
 		parameters.peaklistseries[i].cropAbsoluteIntenzity(parameters.minimumabsoluteintensitythreshold);
 
 		if (parameters.peaklistseries[i].normalizeIntenzity() == -1) {
-			if (parameters.mode == dereplication) {
+			if ((parameters.mode == dereplication) || (parameters.mode == singlecomparison)) {
 				*os << "Warning: the spectrum no. " << i + 1 << " is empty or the format of peaklist is incorrect." << endl;
 			}
 			else {
@@ -222,7 +222,7 @@ void cMainThread::run() {
 
 		//parameters.peaklistseries[i].maxHighestPeaksInWindow(10, 50);
 
-		if (parameters.mode != dereplication) {
+		if ((parameters.mode == denovoengine) || (parameters.mode == databasesearch) || ((parameters.mode == singlecomparison) && (parameters.peaklistseries.size() == 1))) {
 			*os << "Number of spectra in the file: " << parameters.peaklistseries.size() << endl;
 			*os << "Processing spectrum no.: " << i + 1; 
 			if (parameters.peaklistseries[i].getTitle().size() > 0) {

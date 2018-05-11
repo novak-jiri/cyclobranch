@@ -225,7 +225,10 @@ int cTheoreticalSpectrumList::parallelCompareAndStore(cCandidateSet& candidates,
 	else {
 
 		cTheoreticalSpectrum t(parameters, (cCandidate &)(*candidates.getSet().begin()));
-		theoreticalspectra.push_back(t);
+		int cnt = parameters->peaklistseries.size();
+		for (int i = 0; i < cnt; i++) {
+			theoreticalspectra.push_back(t);
+		}
 
 	}
 
@@ -246,6 +249,7 @@ int cTheoreticalSpectrumList::parallelCompareAndStore(cCandidateSet& candidates,
 
 	// fill descriptions of peaks
 	cPeaksList unmatchedpeaksinmatchedpatterns;
+	cPeaksList tmppeaklist;
 	resultspectra.resize(theoreticalspectra.size());
 	for (int i = 0; i < (int)theoreticalspectra.size(); i++) {
 
@@ -257,24 +261,32 @@ int cTheoreticalSpectrumList::parallelCompareAndStore(cCandidateSet& candidates,
 
 		unmatchedpeaksinmatchedpatterns.clear();
 
+		if (parameters->mode == singlecomparison) {
+			tmppeaklist = parameters->peaklistseries[i];
+			tmppeaklist.sortbyMass();
+		}
+		else {
+			tmppeaklist = peaklist;
+		}
+
 		switch (parameters->peptidetype) {
 			case linear:
-				theoreticalpeaksrealsize = tsp.compareLinear(peaklist, *bricksdb, true, rxsequencetag, rxsearchedsequence, unmatchedpeaksinmatchedpatterns, &isotopeformuladesctoid);
+				theoreticalpeaksrealsize = tsp.compareLinear(tmppeaklist, *bricksdb, true, rxsequencetag, rxsearchedsequence, unmatchedpeaksinmatchedpatterns, &isotopeformuladesctoid);
 				break;
 			case cyclic:
-				theoreticalpeaksrealsize = tsp.compareCyclic(peaklist, *bricksdb, true, rxsequencetag, rxsearchedsequence, unmatchedpeaksinmatchedpatterns, &isotopeformuladesctoid);
+				theoreticalpeaksrealsize = tsp.compareCyclic(tmppeaklist, *bricksdb, true, rxsequencetag, rxsearchedsequence, unmatchedpeaksinmatchedpatterns, &isotopeformuladesctoid);
 				break;
 			case branched:
-				theoreticalpeaksrealsize = tsp.compareBranched(peaklist, *bricksdb, true, rxsequencetag, rxsearchedsequence, unmatchedpeaksinmatchedpatterns, &isotopeformuladesctoid);
+				theoreticalpeaksrealsize = tsp.compareBranched(tmppeaklist, *bricksdb, true, rxsequencetag, rxsearchedsequence, unmatchedpeaksinmatchedpatterns, &isotopeformuladesctoid);
 				break;
 			case branchcyclic:
-				theoreticalpeaksrealsize = tsp.compareBranchCyclic(peaklist, *bricksdb, true, rxsequencetag, rxsearchedsequence, unmatchedpeaksinmatchedpatterns, &isotopeformuladesctoid);
+				theoreticalpeaksrealsize = tsp.compareBranchCyclic(tmppeaklist, *bricksdb, true, rxsequencetag, rxsearchedsequence, unmatchedpeaksinmatchedpatterns, &isotopeformuladesctoid);
 				break;
 			case linearpolyketide:
-				theoreticalpeaksrealsize = tsp.compareLinearPolyketide(peaklist, *bricksdb, true, rxsequencetag, rxsearchedsequence, unmatchedpeaksinmatchedpatterns, &isotopeformuladesctoid);
+				theoreticalpeaksrealsize = tsp.compareLinearPolyketide(tmppeaklist, *bricksdb, true, rxsequencetag, rxsearchedsequence, unmatchedpeaksinmatchedpatterns, &isotopeformuladesctoid);
 				break;
 			case cyclicpolyketide:
-				theoreticalpeaksrealsize = tsp.compareCyclicPolyketide(peaklist, *bricksdb, true, rxsequencetag, rxsearchedsequence, unmatchedpeaksinmatchedpatterns, &isotopeformuladesctoid);
+				theoreticalpeaksrealsize = tsp.compareCyclicPolyketide(tmppeaklist, *bricksdb, true, rxsequencetag, rxsearchedsequence, unmatchedpeaksinmatchedpatterns, &isotopeformuladesctoid);
 				break;
 			case other:
 				break;
@@ -412,7 +424,7 @@ double cTheoreticalSpectrumList::updatekNNList(cTheoreticalSpectrum& theoretical
 				break;
 		}
 
-		if ((currentscore == score) && (it1->getCandidate().getPath() == theoreticalspectrum.getCandidate().getPath())) {
+		if ((parameters->mode == denovoengine) && (currentscore == score) && (it1->getCandidate().getPath() == theoreticalspectrum.getCandidate().getPath())) {
 			if (!it1->isValid() && theoreticalspectrum.isValid()) {
 				*it1 = theoreticalspectrum;
 				it1->resizePeakList(theoreticalpeaksrealsize);

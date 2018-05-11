@@ -1623,36 +1623,57 @@ void cSummaryPeaksTableWidget::showHTMLDocumentation() {
 void cSummaryPeaksTableWidget::rowDoubleClicked(const QModelIndex& item) {
 	int size;
 
+	int idcolumn = 0;
+	int experimentalmzcolumn = 0;
+
 	if (parameters->mode == dereplication) {
 		if ((parameters->peaklistfileformat == mis) || (parameters->peaklistfileformat == imzML)) {
 			if (parameters->generateisotopepattern) {
 				size = 14;
+				experimentalmzcolumn = 6;
 			}
 			else {
 				size = 11;
+				experimentalmzcolumn = 5;
 			}
 		}
 		else {
 			if (parameters->generateisotopepattern) {
 				size = 12;
+				experimentalmzcolumn = 4;
 			}
 			else {
 				size = 9;
+				experimentalmzcolumn = 3;
 			}
 		}
 	}
 	else if (parameters->mode == denovoengine) {
-		size = 9;
+		if (parameters->generateisotopepattern) {
+			size = 11;
+			experimentalmzcolumn = 5;
+		}
+		else {
+			size = 10;
+			experimentalmzcolumn = 4;
+		}
 	}
 	else {
-		size = 8;
+		if (parameters->generateisotopepattern) {
+			size = 10;
+			experimentalmzcolumn = 4;
+		}
+		else {
+			size = 9;
+			experimentalmzcolumn = 3;
+		}
 	}
 
 	int row = proxymodel->mapToSource(item).row();
 	int column = proxymodel->mapToSource(item).column();
 
 	if (column < size) {
-		emit summaryPeaksTableRowDoubleClicked(databasemodel->item(row, 0)->data(Qt::DisplayRole).toInt() - 1);
+		emit summaryPeaksTableRowDoubleClicked(databasemodel->item(row, idcolumn)->data(Qt::DisplayRole).toInt() - 1, databasemodel->item(row, experimentalmzcolumn)->data(Qt::DisplayRole).toDouble());
 	}
 }
 
