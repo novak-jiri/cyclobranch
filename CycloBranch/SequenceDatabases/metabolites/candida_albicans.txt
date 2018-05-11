@@ -1,0 +1,11 @@
+other	Candida albicans; Tyrosol 4-(2-Hydroxyethyl)phenol	C8H10O2	138.0680795652					
+other	Candida albicans; Phenylalanol   2-Amino-3-phenyl-propan-1-ol  	C9H13NO	151.0997140446					
+other	Candida albicans; D-arabinitol	C5H12O5	152.0684734957					
+other	Candida albicans; Tryptophol (3-indoleethanol)	C10H11NO	161.0840639804					
+other	Candida albicans; Indole-3-acetic acid (IAA) auxin	C10H9NO2	175.0633285383					
+other	Candida albicans; 3-indolelactic acid 	C11H11NO3	205.0738932246					
+other	Candida albicans; Farnesol (2Z.6Z)-3.7.11-trimethyldodeca-2.6.10-trien-1-ol	C15H26O	222.1983654567					
+other	Candida albicans; Glutathione	C10H17N3O6S	307.0838059839					
+other	Candida albicans; Gliotoxin (3R.6S.10aR)-6-hydroxy-3-(hydroxymethyl)-2-methyl-2.3.6.10-tetrahydro-5aH-3.10a-epidithiopyrazino[1.2-a]indole-1.4-dione	C13H14N2O4S2	326.0394983282					
+other	Candida albicans; Resolvin E1(RvE1; 5S.12R.18R-trihydroxyeicosapentaenoic acid)	C20H30O5	350.2093240735					
+other	Candida albicans; Prostaglandin E2 (PGE2) (Z)-7-((1R.2R.3R)-3-hydroxy-2-((S.E)-3-hydroxyoct-1-enyl)-5-oxocyclopentyl)hept-5-enoic acid	C20H32O5	352.2249741377					

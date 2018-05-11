@@ -1,0 +1,97 @@
+other	patulin; Paecilomyces sp.; 4H-Furo[3.2-c]pyran-2(6H)-one. 4-hydroxy-	C7H6O4	154.0266086810					CAS: 149-29-1
+other	Paecilomyces lilacinus; 2-Piperidinecarboxylic acid. 4-methyl-6-(2-oxobutyl)-. (2S.4R.6S)-	C11H19NO3	213.1364934814					CAS: 74235-25-9
+other	Paecilomyces varioti; 1H-Pyrrole-3-propanoic acid. 4-(1-butenyl)-2.5-dihydro-2.5-dioxo-. (E)-	C11H13NO4	223.0844579109					CAS: 75780-35-7
+other	Paecilomyces varioti; 3-Furanpropanoic acid. 4-(1-butenyl)-2.5-dihydro-2.5-dioxo-. (E)-	C11H12O5	224.0684734957					CAS: 75780-33-5
+other	Paecilomyces varioti; 3-Furanpropanoic acid. 4-(1-butenyl)-2.5-dihydro-2.5-dioxo-. methyl ester. (E)-	C12H14O5	238.0841235599					CAS: 75780-34-6
+other	Paecilomyces carneus; 1.6-Methanonaphthalene-2-methanol. decahydro-4a-hydroxy-5.5.8a-trimethyl-. (1a.2a.4ab.6a.8ab)-	C15H26O2	238.1932800788					CAS: 57576-18-8
+other	Paecilomyces carneus; 1.6-Methanonaphthalene-1.4a(2H.5H)-diol. hexahydro-2.5.5.8a-tetramethyl-. [1S-(1a.2b.4aa.6b.8aa)]-	C15H26O2	238.1932800788					CAS: 66865-18-7
+other	Paecilomyces carneus; 1.6-Methanonaphthalene-1.5(2H)-diol. octahydro-4.8a.9.9-tetramethyl-	C15H26O2	238.1932800788					CAS: 66865-19-8
+other	Paecilomyces carneus; 1.6-Methanonaphthalene-1.6(2H.5H)-diol. hexahydro-4.8a.9.9-tetramethyl-. [1S-(1a.4b.4aa.6a.8aa)]-	C15H26O2	238.1932800788					CAS: 66865-20-1
+other	Paecilomyces carneus; 1.6-Methanonaphthalene-1.7(2H)-diol. octahydro-4.8a.9.9-tetramethyl-. [1S-(1a.4b.4aa.6b.7b.8aa)]-	C15H26O2	238.1932800788					CAS: 66865-21-2
+other	Paecilomyces carneus; 1.6-Methanonaphthalene-1.8(2H)-diol. octahydro-4.8a.9.9-tetramethyl-. [1S-(1a.4b.4aa.6b.8a.8aa)]-	C15H26O2	238.1932800788					CAS: 66865-22-3
+other	Paecilomyces carneus; 1.6-Methanonaphthalene-1.8(2H)-diol. octahydro-4.8a.9.9-tetramethyl-. (1a.4b.4aa.6b.8b.8aa)-	C15H26O2	238.1932800788					CAS: 66964-44-1
+other	Paecilomyces varioti; 3-Furanpropanoic acid. 4-butyl-2.5-dihydro-2.5-dioxo-. methyl ester	C12H16O5	240.0997736241					CAS: 75780-38-0
+other	Paecilomyces varioti; 1.3.4-Octanetricarboxylic acid	C11H18O6	246.1103383104					CAS: 75780-42-6
+other	Paecilomyces; 2-Oxaspiro[4.5]dec-8-ene-1.7-dione. 4.6-dihydroxy-3-methylene-10-(1-propenyl)-. [5a(S*).6a.10a(E)]-	C13H14O5	250.0841235599					CAS: 135048-14-5
+other	Paecilomyces carneus; 1.6-Methanonaphthalene-1.6.8(2H.5H)-triol. hexahydro-4.8a.9.9-tetramethyl-. [1S-(1a.4b.4aa.6a.8a.8aa)]-	C15H26O3	254.1881947009					CAS: 66865-23-4
+other	kurasoin A; Paecilomyces sp.; 2-Butanone. 3-hydroxy-4-(4-hydroxyphenyl)-1-phenyl-. (S)-	C16H16O3	256.1099443799					CAS: 182232-62-8
+other	aspergillomarasmine A; Aspartic acid. N-[2-carboxy-2-[(carboxymethyl)amino]ethyl]-	C9H14N2O8	278.0750154366					CAS: 3262-58-6
+other	kurasoin B; Paecilomyces sp.; 2-Butanone. 3-hydroxy-4-(1H-indol-3-yl)-1-phenyl-. (S)-	C18H17NO2	279.1259287951					CAS: 182232-66-2
+other	Paecilomyces varioti; 5-Octene-1.3.4-tricarboxylic acid. trimethyl ester	C14H22O6	286.1416384388					CAS: 75780-40-4
+other	Paecilomyces carneus; 9.10-Anthracenedione. 1.3.6.8-tetrahydroxy-2-(hydroxymethyl)-	C15H10O7	302.0426526757					CAS: 92439-42-4
+other	aspergillomarasmine B; L-Aspartic acid. N-[2-[(2-amino-2-carboxyethyl)amino]-2-carboxyethyl]-. [R-(R*.R*)]-	C10H17N3O8	307.1015645381					CAS: 3484-65-9
+other	cornexistin; Paecilomyces varioti; 1H-Cyclonona[c]furan-1.3.6-trione. 9-ethylidene-4.5.7.8.9.10-hexahydro-5.8-dihydroxy-4-propyl-. (4R*.5R*.8R*)-	C16H20O6	308.1259883746					CAS: 123068-35-9
+other	Paecilomyces species; 2H-Pyrrol-2-one. 1.5-dihydro-3-(2-hydroxy-2-methyl-1-oxooctyl)-5-methoxy-5-(1-methylethyl)-	C17H29NO4	311.2096584245					CAS: 129051-63-4
+other	Paecilomyces carneus; 4-Thia-1-azabicyclo[3.2.0]heptane-2-carboxylic acid. 6-[(5-hydroxy-1-oxopentyl)amino]-3.3-dimethyl-7-oxo-. (2S.5R.6R)-	C13H20N2O5S	316.1092924529					CAS: 60553-17-5
+other	Paecilomyces variotii; 1H-Naphtho[2.3-c]pyran-3-acetic acid. 3.4-dihydro-9.10-dihydroxy-7-methoxy-1-oxo-	C16H14O7	318.0739528041					CAS: 134044-66-9
+other	hydroxycornexistin; Paecilomyces varioti; 1H-Cyclonona[c]furan-1.3.6-trione. 4.5.7.8.9.10-hexahydro-5.8-dihydroxy-9-(2-hydroxyethylidene)-4-propyl-. (4R*.5R*.8R*)-	C16H20O7	324.1209029967					CAS: 168986-13-8
+other	Paecilomyces varioti; 1H-Cyclonona[c]furan-1.3.6-trione. 4.5.7.8.9.10-hexahydro-5.8-dihydroxy-9-(2-hydroxyethylidene)-4-propyl-. (4R*.5R*.8R*)-	C16H20O7	324.1209029967					CAS: 168986-13-8
+other	Paecilomyces tenuipes; Trichothec-9-ene-3.4.15-triol. 12.13-epoxy-. 4-acetate. (3a.4b)-	C17H24O6	324.1572885030					CAS: 11/5/2531
+other	Paecilomyces variotii; 1H-Naphtho[2.3-c]pyran-3-acetic acid. 3.4-dihydro-9.10-dihydroxy-7-methoxy-1-oxo-. methyl ester. (S)-	C17H16O7	332.0896028683					CAS: 134044-42-1
+other	saintopin; 5.12-Naphthacenedione. 1.3.8.10.11-pentahydroxy-	C18H10O7	338.0426526757					CAS: 131190-63-1
+other	Paecilomyces carneus; 1H-Phenalene-1.3(2H)-dione. 2.4.9-trihydroxy-6-methoxy-7-methyl-2-(2-oxopropyl)-. (-)-	C18H16O7	344.0896028683					CAS: 124190-19-8
+other	Paecilomyces viridis; 1-Naphthaleneheptanoic acid. 1.2.3.5.6.7.8.8a-octahydro-b.d.3-trihydroxy-2-methyl-. monosodium salt. [1R-[1a(bR*.dR*).2a.3b.8aa]]-	C18H30O5Na	349.1990950735					CAS: 154417-69-3
+other	Paecilomyces carneus; 9.10-Anthracenedione. 1.3.6.8-tetrahydroxy-2-(tetrahydro-2-oxo-3-furanyl)-. (�)-	C18H12O8	356.0532173620					CAS: 162797-33-3
+other	Paecilomyces carneus; 9.10-Anthracenedione. 1.3.6.8-tetrahydroxy-2-[3-hydroxy-1-(hydroxymethyl)propyl]-. (S)-	C18H16O8	360.0845174904					CAS: 22268-13-9
+other	Paecilomyces persicinus; D-Valine. N-[N-(5-amino-5-carboxy-1-oxopentyl)-L-cysteinyl]-. (S)-	C14H25N3O6S	363.1464062407					CAS: 32467-88-2
+other	Paecilomyces carneus; 2.5-Ethanoanthra[2.3-d]-1.3-dioxepin-7.12-dione. 4.5-dihydro-6.8.10-trihydroxy-2-methyl-	C20H16O7	368.0896028683					CAS: 162797-36-6
+other	Paecilomyces carneus; 2-Anthraceneacetic acid. 9.10-dihydro-1.3.6.8-tetrahydroxy-a-(2-hydroxyethyl)-9.10-dioxo-. (�)-	C18H14O9	374.0637820483					CAS: 162797-35-5
+other	Paecilomyces viridis; Butanoic acid. 2-methyl-. (1S.7S.8S.8aR)-1.2.3.7.8.8a-hexahydro-7-methyl-8-[2-[(2R.4R)-tetrahydro-4-hydroxy-6-oxo-2H-pyran-2-yl]ethyl]-1-naphthalenyl ester. (2S)-	C23H34O5	390.2406242019					CAS: 73573-88-3
+other	Paecilomyces carneus; 2.5-Epoxyanthra[2.3-b]oxepin-5(2H)-carboxylic acid. 3.4.7.12-tetrahydro-6.8.10-trihydroxy-2-methyl-7.12-dioxo-	C20H14O9	398.0637820483					CAS: 162797-37-7
+other	Paecilomyces carneus; 9.10-Anthracenedione. 8-hydroxy-1.3.6-trimethoxy-2-(tetrahydro-2-oxo-3-furanyl)-	C21H18O8	398.1001675546					CAS: 162759-50-4
+other	Paecilomyces carneus; 2-Anthraceneacetic acid. 9.10-dihydro-1.3.6.8-tetrahydroxy-9.10-dioxo-a-(3-oxobutyl)-. (�)-	C20H16O9	400.0794321125					CAS: 162797-34-4
+other	sphingofungins F; Paecilomyces variotii; 6-Eicosenoic acid. 2-amino-3.4.5-trihydroxy-2-methyl-14-oxo-	C21H39NO6	401.2777379897					CAS: 145401-48-5
+other	ochratoxin A; Paecilomyces lilacinus; L-Phenylalanine. N-[[(3R)-5-chloro-3.4-dihydro-8-hydroxy-3-methyl-1-oxo-1H-2-benzopyran-7-yl]carbonyl]-	C20H18ClNO6	403.0822653156					CAS: 303-47-9
+other	Paecilomyces carneus; 2-Anthraceneacetic acid. 9.10-dihydro-1.3.6.8-tetrahydroxy-9.10-dioxo-a-(3-oxobutyl)-. methyl ester	C21H18O9	414.0950821767					CAS: 162111-42-4
+other	Paecilomyces persicinus; 5-Thia-1-azabicyclo[4.2.0]oct-2-ene-2-carboxylic acid. 3-[(acetyloxy)methyl]-7-[[(5R)-5-amino-5-carboxy-1-oxopentyl]amino]-8-oxo-. (6R.7R)-	C16H21N3O8S	415.1049353565					CAS: 61-24-5
+other	sphingofungins E; Paecilomyces variotii; 6-Eicosenoic acid. 2-amino-3.4.5-trihydroxy-2-(hydroxymethyl)-14-oxo-	C21H39NO7	417.2726526118					CAS: 145401-47-4
+other	Paecilomyces; 5.12-Naphthacenedione. 1.3.8.11-tetrahydroxy-10-(sulfooxy)-	C18H10O10S	417.9994672320					CAS: 158243-10-8
+other	Paecilomyces persicinus; L-Lysine. N6-[2-[(1-carboxy-2-methylpropyl)amino]-1-(mercaptomethyl)-2-oxoethyl]-N2-glycyl-6-oxo-. [R-(R*.R*)]-	C16H28N4O7S	420.1678699643					CAS: 71790-55-1
+other	ascofuranone; Paecilomyces variotii Bainier; Benzaldehyde. 3-chloro-4.6-dihydroxy-2-methyl-5-[(2E.6E)-3-methyl-7-[(2S)-tetrahydro-5.5-dimethyl-4-oxo-2-furanyl]-2.6-octadienyl]-	C23H29ClO5	420.1703520414					CAS: 38462-04-3
+other	deoxynortrichoharzin; Paecilomyces; 2-Pentenedioic acid. 3-methyl-. 1-[(1S.2R.4R.4aS.5S.6S.8aR)-5-acetyl-1.2.3.4.4a.5.6.8a-octahydro-1-hydroxy-4.5-dimethyl-6-[(1R)-1-methylpropyl]-2-naphthalenyl] ester. (2E)-	C24H36O6	420.2511888882					CAS: 218290-53-0
+other	Paecilomyces tenuipes; Ergosta-6.22-dien-3-ol. 5.8-epidioxy-. (3b.5a.8a.22E)-	C28H44O3	428.3290452787					CAS: 2061-64-5
+other	Paecilomyces carneus; 2-Anthraceneacetic acid. 9.10-dihydro-8-hydroxy-a-(2-hydroxyethyl)-1.3.6-trimethoxy-9.10-dioxo-. methyl ester	C22H22O9	430.1263823051					CAS: 162759-53-7
+other	Paecilomyces carneus; 2-Anthraceneacetic acid. 9.10-dihydro-1-hydroxy-a-(2-hydroxyethyl)-3.6.8-trimethoxy-9.10-dioxo-. methyl ester	C22H22O9	430.1263823051					CAS: 162759-54-8
+other	Paecilomyces persicinus; L-Norleucine. 6-[[2-[(1-carboxy-2-hydroxy-2-methylpropyl)amino]-1-(mercaptomethyl)-2-oxoethyl]amino]-N-glycyl-6-oxo-. [R-(R*.R*)]-	C16H28N4O8S	436.1627845864					CAS: 71852-03-4
+other	Paecilomyces carneus; 2.5-Epoxyanthra[2.3-b]oxepin-5(2H)-carboxylic acid. 3.4.7.12-tetrahydro-8-hydroxy-6.10-dimethoxy-2-methyl-7.12-dioxo-. methyl ester	C23H20O9	440.1107322409					CAS: 162759-55-9
+other	Paecilomyces carneus; 2.5-Epoxyanthra[2.3-b]oxepin-5(2H)-carboxylic acid. 3.4.7.12-tetrahydro-6.8.10-trimethoxy-2-methyl-7.12-dioxo-. methyl ester	C24H22O9	454.1263823051					CAS: 162759-56-0
+other	Paecilomyces carneus; 2-Anthraceneacetic acid. 9.10-dihydro-8-hydroxy-1.3.6-trimethoxy-9.10-dioxo-a-(3-oxobutyl)-. methyl ester	C24H24O9	456.1420323693					CAS: 162759-51-5
+other	Paecilomyces carneus; 2-Anthraceneacetic acid. 9.10-dihydro-1-hydroxy-3.6.8-trimethoxy-9.10-dioxo-a-(3-oxobutyl)-. methyl ester	C24H24O9	456.1420323693					CAS: 162759-52-6
+other	militarinone A; Paecilomyces militaris; 2(1H)-Pyridinone. 5-(cis-1.4-dihydroxycyclohexyl)-1.4-dihydroxy-3-[(2E.4E.6E)-6.8.10-trimethyl-1-oxo-2.4.6-dodecatrienyl]-	C26H37NO6	459.2620879255					CAS: 400604-05-9
+other	Paecilomyces; 1-Nonanone. 1-[(1'R.3R.4S)-3-heptyl-3.4-dihydro-4.4'-dihydroxyspiro[2H-1-benzopyran-2.1'(3'H)-isobenzofuran]-5-yl]-. rel-(+)-	C32H44O5	508.3188745229					CAS: 272774-23-9
+other	paecilospirone; Paecilomyces sp.; 1-Nonanone. 1-[(1'R.3R.4S)-3-heptyl-3.4-dihydro-4.4'-dihydroxyspiro[2H-1-benzopyran-2.1'(3'H)-isobenzofuran]-5-yl]-. rel-(+)-	C32H44O5	508.3188745229					CAS: 272774-23-9
+other	beauverolides L; Paecilomyces fumosoroseus; D-Leucine. N-[N-[N-(3-hydroxy-4-methyl-1-oxodecyl)-L-phenylalanyl]-L-alanyl]-. l-lactone. [S-(R*.R*)]-	C29H45N3O5	515.3359215706					CAS: 154491-56-2
+other	beauverolides La; Paecilomyces fumosoroseus; D-Alloisoleucine. N-[N-[N-(3-hydroxy-4-methyl-1-oxodecyl)-L-phenylalanyl]-L-alanyl]-. l-lactone	C29H45N3O5	515.3359215706					CAS: 160825-68-3
+other	Paecilomyces inflatus; Heptanoic acid. 3-hydroxy-3.5-dimethyl-. (1R.4R.4aR.7aR.8aR.10S.11S.11aR.12aR.13aR)-1.2.4.4a.5.7a.8.8a.9.10.11.11a.12.12a.13.13a-hexadecahydro-1.13a-dihydroxy-4.7.8a-trimethyl-13-methylene-11-(1-methylethyl)-2-oxoindeno[5'.6':4.5]cycloocta[1.2-c]pyran-10-yl ester. rel-	C34H54O7	574.3869540881					CAS: 200880-34-8
+other	Paecilomyces inflatus; Heptanoic acid. 3-hydroxy-3.5-dimethyl-. (1R.4R.4aR.7S.7aR.8aR.10S.11S.11aR.12aR.13aR)-hexadecahydro-1-hydroxy-4.7.8a-trimethyl-13-methylene-11-(1-methylethyl)-2-oxo-4H-7.13a-epoxyindeno[5'.6':4.5]cycloocta[1.2-c]pyran-10-yl ester. rel-	C34H54O7	574.3869540881					CAS: 216385-73-8
+other	Paecilomyces inflatus; Heptanoic acid. 3-hydroxy-3.5-dimethyl-. (1R.4R.4aR.7aS.8aR.10S.11S.11aR.12aR.13aS)-octadecahydro-1.13a-dihydroxy-4.7.8a.13-tetramethyl-11-(1-methylethyl)-2-oxoindeno[5'.6':4.5]cycloocta[1.2-c]pyran-10-yl ester. rel-	C34H58O7	578.4182542165					CAS: 216451-52-4
+other	Paecilomyces inflatus; Heptanoic acid. 3-hydroxy-3.5-dimethyl-. (1R.4R.4aR.7aR.8aR.10S.11S.11aR.12aR.13aR)-1-(acetyloxy)-1.2.4.4a.5.7a.8.8a.9.10.11.11a.12.12a.13.13a-hexadecahydro-13a-hydroxy-4.7.8a-trimethyl-13-methylene-11-(1-methylethyl)-2-oxoindeno[5'.6':4.5]cycloocta[1.2-c]pyran-10-yl ester. rel-	C36H56O8	616.3975187744					CAS: 216451-51-3
+other	Paecilomyces varioti; [8.8'-Bi-1H-naphtho[2.3-c]pyran]-1.1'-dione. 3.3'.4.4'-tetrahydro-9.9'.10.10'-tetrahydroxy-7.7'-dimethoxy-3.3'-bis(2-oxopropyl)-	C34H30O12	630.1737264282					CAS: 64596-90-3
+other	Lipohexin; Paecilomyces sp.	C39H68N6O9	764.5047778129					CAS: 193751-58-5
+other	Beauvericin; Paecilomyces tenuipes	C45H57N3O9	783.4094804442					CAS: 26048-05-5
+other	Beauvericin A; Paecilomyces tenuipes	C46H59N3O9	797.4251305084					CAS: 165467-50-5
+other	Leucinostatin T; Paecilomyces lilacinus	C55H99N11O11	1089.7525530782					CAS: 147450-24-6
+other	Leucinostatin F; Paecilomyces lilacinus	C56H101N11O11	1103.7682031424					CAS: 100349-85-7
+other	Leucinostatin F; Paecilomyces marquandii	C56H101N11O11	1103.7682031424					CAS: 100349-85-7
+other	Leucinostatin D; Paecilomyces lilacinus	C57H103N11O11	1117.7838532066					CAS: 108426-90-0
+other	Leucinostatin D; Paecilomyces marquandii	C57H103N11O11	1117.7838532066					CAS: 108426-90-0
+other	Leucinostatin N; Paecilomyces lilacinus	C56H101N11O12	1119.7631177645					CAS: 147450-28-0
+other	Leucinostatin H; Paecilomyces lilacinus	C57H103N11O12	1133.7787678287					CAS: 109539-58-4
+other	Leucinostatin H; Paecilomyces marquandii	C57H103N11O12	1133.7787678287					CAS: 109539-58-4
+other	Leucinostatin B2; Paecilomyces lilacinus	C61H107N11O12	1185.8100679571					CAS: 147450-26-8
+other	Leucinostatin V; Paecilomyces lilacinus	C61H109N11O12	1187.8257180213					CAS: 147468-22-2
+other	Leucinostatin C; Paecilomyces lilacinus	C60H107N11O13	1189.8049825792					CAS: 110483-88-0
+other	Leucinostatin C; Paecilomyces marquandii	C60H107N11O13	1189.8049825792					CAS: 110483-88-0
+other	Leucinostatin L; Paecilomyces lilacinus	C60H107N11O13	1189.8049825792					CAS: 147450-27-9
+other	Leucinostatin A2; Paecilomyces lilacinus	C62H109N11O12	1199.8257180213					CAS: 147450-25-7
+other	Leucinostatin R; Paecilomyces lilacinus	C62H111N11O12	1201.8413680855					CAS: 147468-25-5
+other	Leucinostatin B; Paecilomyces lilacinus	C61H109N11O13	1203.8206326434					CAS: 76663-52-0
+other	Leucinostatin S; Paecilomyces lilacinus	C62H113N11O12	1203.8570181497					CAS: 147468-26-6
+other	U 53946; Paecilomyces abruptus	C61H107N11O14	1217.7998972013					CAS: 69345-28-4
+other	Leucinostatin U; Paecilomyces lilacinus	C62H111N11O13	1217.8362827076					CAS: 147468-21-1
+other	Leucinostatin A; Paecilomyces lilacinus	C62H111N11O13	1217.8362827076					CAS: 76600-38-9
+other	Leucinostatin K; Paecilomyces lilacinus	C62H111N11O14	1233.8311973297					CAS: 109539-57-3
+other	Leucinostatin K; Paecilomyces marquandii	C62H111N11O14	1233.8311973297					CAS: 109539-57-3
+other	Leucinostatin W; Paecilomyces lilacinus	C66H115N11O14	1285.8624974581					CAS: 147468-23-3
+other	Leucinostatin Q; Paecilomyces lilacinus	C67H117N11O14	1299.8781475223					CAS: 147450-35-9
+other	Leucinostatin O; Paecilomyces lilacinus	C68H119N11O14	1313.8937975865					CAS: 147468-24-4

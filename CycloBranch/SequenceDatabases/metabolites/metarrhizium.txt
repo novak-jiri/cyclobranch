@@ -1,0 +1,79 @@
+other	Metarrhizium anisopliae; Glycine. N-[(1.1-dimethylethoxy)carbonyl]-. 4-nitrophenyl ester	C13H16N2O6	296.1008362566					CAS: 5/8/3655
+other	Metarrhizium anisopliae; L-Alanine. N-[(1.1-dimethylethoxy)carbonyl]-. 4-nitrophenyl ester	C14H18N2O6	310.1164863208					CAS: 2483-49-0
+other	Metarrhizium anisopliae; b-Alanine. N-[(1.1-dimethylethoxy)carbonyl]-. 4-nitrophenyl ester	C14H18N2O6	310.1164863208					CAS: 17547-09-0
+other	Metarrhizium anisopliae; Glycine. N-[(phenylmethoxy)carbonyl]-. 4-nitrophenyl ester	C16H14N2O6	330.0851861924					CAS: 1738-86-9
+other	Metarrhizium anisopliae; L-Alanine. N-[(phenylmethoxy)carbonyl]-. 4-nitrophenyl ester	C17H16N2O6	344.1008362566					CAS: 1168-87-2
+other	Metarrhizium anisopliae; L-Leucine. N-[(1.1-dimethylethoxy)carbonyl]-. 4-nitrophenyl ester	C17H24N2O6	352.1634365134					CAS: 3350-19-4
+other	Metarrhizium anisopliae; L-Isoleucine. N-[(1.1-dimethylethoxy)carbonyl]-. 4-nitrophenyl ester. erythro-	C17H24N2O6	352.1634365134					CAS: 16948-38-2
+other	Metarrhizium anisopliae; 1.2-Pyrrolidinedicarboxylic acid. 2-(4-nitrophenyl) 1-(phenylmethyl) ester. (S)-	C19H18N2O6	370.1164863208					CAS: 3304-59-4
+other	Metarrhizium anisopliae; L-Valine. N-[(phenylmethoxy)carbonyl]-. 4-nitrophenyl ester	C19H20N2O6	372.1321363850					CAS: 10512-93-3
+other	Metarrhizium anisopliae; L-Leucine. N-[(phenylmethoxy)carbonyl]-. 4-nitrophenyl ester	C20H22N2O6	386.1477864492					CAS: 1738-87-0
+other	Metarrhizium anisopliae; L-Isoleucine. N-[(phenylmethoxy)carbonyl]-. 4-nitrophenyl ester	C20H22N2O6	386.1477864492					CAS: 2130-99-6
+other	Metarrhizium anisopliae; L-Lysine. N2-[(phenylmethoxy)carbonyl]-. 4-nitrophenyl ester	C20H23N3O6	401.1586854865					CAS: 4272-71-3
+other	Metarrhizium anisopliae; L-Alaninamide. N-acetyl-L-alanyl-L-prolyl-N-(4-nitrophenyl)-	C19H25N5O6	419.1804835611					CAS: 61596-39-2
+other	L-Prolinamide. L-seryl-L-prolyl-N-(4-nitrophenyl)-	C19H25N5O6	419.1804835611					CAS: 83329-38-8
+other	Metarrhizium anisopliae; L-Phenylalanine. N-[(phenylmethoxy)carbonyl]-. 4-nitrophenyl ester	C23H20N2O6	420.1321363850					CAS: 2578-84-9
+other	Metarrhizium anisopliae; L-Tyrosine. N-[(phenylmethoxy)carbonyl]-. 4-nitrophenyl ester	C23H20N2O7	436.1270510071					CAS: 3556-56-7
+other	L-Valinamide. 5-oxo-L-prolyl-L-prolyl-N-(4-nitrophenyl)-	C21H27N5O6	445.1961336253					CAS: 83329-36-6
+other	L-Argininamide. 5-oxo-L-prolylglycyl-N-(4-nitrophenyl)-	C19H26N8O6	462.1975306088					CAS: 74661-31-7
+other	L-Methioninamide. D-seryl-L-leucyl-N-(4-nitrophenyl)-	C20H31N5O6S	469.1995044437					CAS: 83218-68-2
+other	Metarrhizium anisopliae; L-Lysinamide. D-valyl-L-leucyl-N-(4-nitrophenyl)-	C23H38N6O5	478.2903683615					CAS: 63589-93-5
+other	L-Lysinamide. D-valyl-L-leucyl-N-(4-nitrophenyl)-	C23H38N6O5	478.2903683615					CAS: 63589-93-5
+other	2H-Oxacyclotetradecino[2.3-d]isoindole-2.18(5H)-dione. 6.7.8.9.10.12a.13.14.15.15a.16.17-dodecahydro-5.13-dihydroxy-9.15-dimethyl-14-methylene-16-(phenylmethyl)-. [5R-(3E.5R*.9R*.11E.12aS*.13S*.15S*.15aS*.16S*.18aS*)]-	C29H37NO5	479.2671733034					CAS: 14930-96-2
+other	L-Argininamide. D-valyl-L-seryl-N-(4-nitrophenyl)-	C20H32N8O6	480.2444808014					CAS: 94888-17-2
+other	Metarrhizium anisopliae; L-Alaninamide. N-acetyl-L-alanyl-L-alanyl-L-prolyl-N-(4-nitrophenyl)-	C22H30N6O7	490.2175973489					CAS: 96699-74-0
+other	L-Argininamide. D-isoleucyl-L-prolyl-N-(4-nitrophenyl)-	C23H36N8O5	504.2808663077					CAS: 77672-35-6
+other	L-Argininamide. D-valyl-L-leucyl-N-(4-nitrophenyl)-	C23H38N8O5	506.2965163719					CAS: 64816-14-4
+other	1H-Cycloundec[d]isoindole-1.11(2H)-dione. 15-(acetyloxy)-3.3a.4.5.6.6a.9.10.12.15-decahydro-6.12-dihydroxy-4.10.12-trimethyl-5-methylene-3-(phenylmethyl)-. [3S-(3R*.3aS*.4R*.6R*.6aS*.7E.10R*.12S*.13E.15S*.15aS*)]-	C30H37NO6	507.2620879255					CAS: 22144-77-0
+other	L-Argininamide. L-phenylalanyl-L-alanyl-N-(4-nitrophenyl)-	C24H32N8O5	512.2495661793					CAS: 94888-16-1
+other	Metarrhizium anisopliae; L-Phenylalaninamide. N-(3-carboxy-1-oxopropyl)-L-alanyl-L-alanyl-N-(4-nitrophenyl)-	C25H29N5O8	527.2016129337					CAS: 61043-53-6
+other	L-Argininamide. D-prolyl-L-phenylalanyl-N-(4-nitrophenyl)-	C26H34N8O5	538.2652162435					CAS: 64816-19-9
+other	Metarhizium anisopliae; b-Alanine. N-[N-[N-[N-[1-(2-hydroxy-1-oxo-4-pentenyl)-L-prolyl]-L-valyl]-L-valyl]-N-methyl-L-alanyl]-. r-lactone. (R)-	C27H43N5O7	549.3162487610					CAS: 165052-24-4
+other	L-Argininamide. D-phenylalanyl-(2S)-2-piperidinecarbonyl-N-(4-nitrophenyl)-	C27H36N8O5	552.2808663077					CAS: 64815-81-2
+other	L-Phenylalaninamide. N-(3-carboxy-1-oxopropyl)-L-alanyl-L-prolyl-N-(4-nitrophenyl)-	C27H31N5O8	553.2172629979					CAS: 83329-41-3
+other	Metarrhizium anisopliae; L-Argininamide. N-benzoyl-L-valylglycyl-N-(4-nitrophenyl)-	C26H34N8O6	554.2601308656					CAS: 64717-41-5
+other	Metarrhizium anisopliae; Butanamide. N-(3-carboxy-1-oxopropyl)-L-alanyl-L-alanyl-L-prolyl-N-(4-nitrophenyl)-L-2-amino-	C25H34N6O9	562.2387267215					CAS: 108392-27-4
+other	Metarhizium anisopliae; b-Alanine. N-[N-[N-[N-[1-(2-hydroxy-1-oxo-4-pentenyl)-L-prolyl]-L-valyl]-N-methyl-L-valyl]-N-methyl-L-alanyl]-. r-lactone. (R)-	C28H45N5O7	563.3318988252					CAS: 79386-02-0
+other	Metarhizium anisopliae; b-Alanine. N-[N-[N-[N-[1-(2-hydroxy-1-oxo-4-pentenyl)-L-prolyl]-L-isoleucyl]-L-valyl]-N-methyl-L-alanyl]-. r-lactone. (R)-	C28H45N5O7	563.3318988252					CAS: 149437-28-5
+other	b-Alanine. (2R)-2-hydroxy-4-pentenoyl-L-prolyl-L-valyl-N-methyl-L-valyl-N-methyl-L-alanyl-. (6�1)-lactone	C28H45N5O7	563.3318988252					CAS: 79386-02-0
+other	Metarhizium anisopliae; b-Alanine. N-[N-[N-[N-[N-(2-hydroxy-1-oxo-4-pentenyl)-N-methyl-L-alanyl]-L-isoleucyl]-N-methyl-L-valyl]-N-methyl-L-alanyl]-. r-lactone. (R)-	C28H47N5O7	565.3475488894					CAS: 148440-84-0
+other	Metarhizium anisopliae; b-Alanine. N-[N-[N-[N-[1-(2-hydroxy-4-methyl-1-oxopentyl)-L-prolyl]-L-valyl]-L-valyl]-N-methyl-L-alanyl]-. r-lactone. (R)-	C28H47N5O7	565.3475488894					CAS: 165052-23-3
+other	Metarrhizium anisopliae; L-Phenylalaninamide. N-acetyl-L-alanyl-L-alanyl-L-prolyl-N-(4-nitrophenyl)-	C28H34N6O7	566.2488974773					CAS: 70967-94-1
+other	Metarhizium anisopliae; Destruxin A	C29H47N5O7	577.3475488894					CAS: 6686-70-0
+other	Destruxin A	C29H47N5O7	577.3475488894					CAS: 6686-70-0
+other	Metarhizium anisopliae; dihydrodestruxin A; b-Alanine. N-[N-[N-[N-[1-(2-hydroxy-1-oxopentyl)-L-prolyl]-L-isoleucyl]-N-methyl-L-valyl]-N-methyl-L-alanyl]-. r-lactone. (R)-	C29H49N5O7	579.3631989536					CAS: 30845-05-7
+other	Metarhizium anisopliae; b-Alanine. N-[N-[N-[N-[1-(2-hydroxy-4-methyl-1-oxopentyl)-L-prolyl]-L-isoleucyl]-L-valyl]-N-methyl-L-alanyl]-. r-lactone. (R)-	C29H49N5O7	579.3631989536					CAS: 27482-48-0
+other	Metarhizium anisopliae; b-Alanine. N-[N-[N-[N-[1-(2-hydroxy-4-methyl-1-oxopentyl)-L-prolyl]-L-valyl]-N-methyl-L-valyl]-N-methyl-L-alanyl]-. r-lactone. (R)-	C29H49N5O7	579.3631989536					CAS: 79386-00-8
+other	Destruxin B. 6-L-valine-	C29H49N5O7	579.3631989536					CAS: 27482-48-0
+other	Destruxin B2	C29H49N5O7	579.3631989536					CAS: 79386-00-8
+other	Destruxin A. 3-[(2R)-2-hydroxypentanoic acid]	C29H49N5O7	579.3631989536					CAS: 30845-05-7
+other	Metarrhizium anisopliae; L-Phenylalaninamide. N-(3-carboxy-1-oxopropyl)-L-valyl-L-prolyl-N-(4-nitrophenyl)-	C29H35N5O8	581.2485631263					CAS: 95192-11-3
+other	Metarrhizium anisopliae; L-Leucinamide. N-(3-carboxy-1-oxopropyl)-L-alanyl-L-alanyl-L-prolyl-N-(4-nitrophenyl)-	C27H38N6O9	590.2700268499					CAS: 70968-04-6
+other	b-Alanine. N-[N-[N-[N-[[1-(2-hydroxy-1-oxo-4-pentenyl)-2-piperidinyl]carbonyl]-L-isoleucyl]-N-methyl-L-valyl]-N-methyl-L-alanyl]-. r-lactone	C30H49N5O7	591.3631989536					CAS: 79386-03-1
+other	Metarhizium anisopliae; Destruxin E	C29H47N5O8	593.3424635115					CAS: 76689-14-0
+other	Destruxin E	C29H47N5O8	593.3424635115					CAS: 76689-14-0
+other	Metarhizium anisopliae; Destruxin B	C30H51N5O7	593.3788490178					CAS: 2503-26-6
+other	Destruxin B	C30H51N5O7	593.3788490178					CAS: 2503-26-6
+other	Metarhizium anisopliae; b-Alanine. N-[N-[N-[N-[1-(2.4-dihydroxy-1-oxopentyl)-L-prolyl]-L-isoleucyl]-N-methyl-L-valyl]-N-methyl-L-alanyl]-. r-lactone	C29H49N5O8	595.3581135757					CAS: 148440-85-1
+other	Metarhizium anisopliae; b-Alanine. N-[N-[N-[N-[1-(2.5-dihydroxy-4-methyl-1-oxopentyl)-L-prolyl]-L-isoleucyl]-L-valyl]-N-methyl-L-alanyl]-. r-lactone	C29H49N5O8	595.3581135757					CAS: 148471-93-6
+other	b-Alanine. 2.5-dihydroxy-4-methylpentanoyl-L-prolyl-L-valyl-N-methyl-L-valyl-N-methyl-L-alanyl-. (6�1)-lactone	C29H49N5O8	595.3581135757					CAS: 79385-99-2
+other	Metarrhizium anisopliae; L-Phenylalaninamide. N-(3-carboxy-1-oxopropyl)-L-alanyl-L-alanyl-L-alanyl-N-(4-nitrophenyl)-	C28H34N6O9	598.2387267215					CAS: 70967-93-0
+other	b-Alanine. a-hydroxyoxiranepropanoyl-2-piperidinecarbonyl-L-isoleucyl-N-methyl-L-valyl-N-methyl-L-alanyl-. (6�1)-lactone	C30H49N5O8	607.3581135757					CAS: 79385-96-9
+other	Destruxin B1	C31H53N5O7	607.3944990820					CAS: 79386-01-9
+other	Metarrhizium anisopliae; L-Methioninamide. N-(3-carboxy-1-oxopropyl)-L-alanyl-L-alanyl-L-prolyl-N-(4-nitrophenyl)-	C26H36N6O9S	608.2264474757					CAS: 72682-73-6
+other	b-Alanine. 4-carboxy-2-hydroxypentanoyl-L-prolyl-L-valyl-N-methyl-L-valyl-N-methyl-L-alanyl-. (6�1)-lactone	C29H47N5O9	609.3373781336					CAS: 79385-97-0
+other	Destruxin C	C30H51N5O8	609.3737636399					CAS: 27482-49-1
+other	Metarhizium anisopliae; b-Alanine. N-[N-methyl-N-[N-methyl-N-[N-[1-(2.4.5-trihydroxy-1-oxopentyl)-L-prolyl]-L-isoleucyl]-L-valyl]-L-alanyl]-. r-lactone	C29H49N5O9	611.3530281978					CAS: 134316-37-3
+other	Destruxin A. 3-[(4x)-3-deoxy-D-glycero-pentonic acid]-	C29H49N5O9	611.3530281978					CAS: 134316-37-3
+other	Destruxin D	C30H49N5O9	623.3530281978					CAS: 27482-50-4
+other	Metarrhizium anisopliae; L-Phenylalaninamide. N-(3-carboxy-1-oxopropyl)-L-alanyl-L-alanyl-L-prolyl-N-(4-nitrophenyl)-	C30H36N6O9	624.2543767857					CAS: 70967-97-4
+other	Destruxin E chlorohydrin	C29H48ClN5O8	629.3191415436					CAS: 121723-07-7
+other	b-Alanine. 4-carboxy-2-hydroxypentanoyl-2-piperidinecarbonyl-L-isoleucyl-N-methyl-L-valyl-N-methyl-L-alanyl-. (6�1)-lactone	C31H51N5O9	637.3686782620					CAS: 79385-98-1
+other	L-Argininamide. N-benzoyl-L-phenylalanyl-L-valyl-N-(4-nitrophenyl)-	C33H40N8O6	644.3070810582					CAS: 54799-93-8
+other	Metarrhizium anisopliae; L-Phenylalaninamide. N-(3-carboxy-1-oxopropyl)-L-phenylalanyl-L-leucyl-N-(4-nitrophenyl)-	C34H39N5O8	645.2798632547					CAS: 75651-69-3
+other	Metarrhizium anisopliae; L-Phenylalaninamide. N-(3-carboxy-1-oxopropyl)-L-alanyl-L-prolyl-L-leucyl-N-(4-nitrophenyl)-	C33H42N6O9	666.3013269783					CAS: 70968-02-4
+other	L-Argininamide. N-benzoyl-L-isoleucyl-L-a-glutamylglycyl-N-(4-nitrophenyl)-	C32H43N9O9	697.3183740260					CAS: 59068-47-2
+other	L-Argininamide. N-benzoyl-L-isoleucyl-5-oxo-5-(1-piperidinyloxy)-L-norvalylglycyl-N-(4-nitrophenyl)-	C37H52N10O9	780.3918733201					CAS: 67608-06-4
+other	Myroridin KA	C41H74N16O11	966.5722973017					CAS: 74899-62-0
+other	Myroridin KB	C41H74N18O12	1010.5733599342					CAS: 74899-63-1
+other	Myroridin KA. 6-(threo-4-hydroxy-L-arginine)-. hydrochloride	C41H74N18O12ClH	1046.5500379663					CAS: 74899-65-3

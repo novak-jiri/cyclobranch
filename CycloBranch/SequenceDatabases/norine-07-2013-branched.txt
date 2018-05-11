@@ -1,0 +1,5 @@
+branched	pyoverdin C	C50H76N14O25	1272.5106040649	[ChrP]-[Asp]\([D-OH-Orn]-[C4:0-OH(3)]\)[D-Dab]-[Thr]-[Gly]-[D-Ser]-[Ser]-[OH-Asp]-[Thr]				NOR00205
+branched	pyoverdin BTP16	C50H76N14O25	1272.5106040649	[ChrP]-[Asp]\([D-OH-Orn]-[C4:0-OH(3)]\)[D-Dab]-[Thr]-[Gly]-[Ser]-[Ser]-[OH-Asp]-[aThr]				NOR00206
+branched	azotobactin 87 -1	C55H82N14O28	1386.5422981238	[ChrA]-[Ser]-[D-Ser]-[Hse]-[Gly]-[D-OH-Asp]-[Hse]-[Hse]-[Hse]\([OH-Orn]-[C4:0-OH(3)]\)[Hse]				NOR00207
+branched	vibriobactin	C35H39N5O12	721.2595217431	[diOH-Bz]\([NSpd]-[DMOG]\)[DMOG]				NOR00250
+branched	azotobactin 87 -2	C55H80N14O27	1368.5317334375	[ChrA]-[Ser]-[D-Ser]-[Hse]-[Gly]-[D-OH-Asp]-[Hse]-[Hse]-[Hse]\([OH-Orn]-[C4:0-OH(3)]\)[HseL]				NOR00901

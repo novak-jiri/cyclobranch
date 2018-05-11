@@ -1,0 +1,44 @@
+other	Eurotium herbariorum; Bicyclo[2.2.1]heptan-2-one. 1.7.7-trimethyl	C10H16O	152.1201151357					CAS: 76-22-2
+other	Aspergillus pulvinus; 2-Cyclopenten-1-one. 4.5-dihydroxy-3-(1E)-1-propenyl-. (4S.5R)-	C8H10O3	154.0629941873					CAS: 582-46-7
+other	Eurotium Aspergillus cristatus; 9.10-Anthracenedione	C14H8O2	208.0524295010					CAS: 84-65-1
+other	Eurotium chevalieri; 2.5-Piperazinedione. 3-(1H-indol-3-ylmethyl)-6-methyl-. (3S.6S)-	C14H15N3O2	257.1164267413					CAS: 17079-37-7
+other	Eurotium chevalieri; Benzoic acid. 3-hydroxy-4-[(2S)-tetrahydro-2.6.6-trimethyl-2H-pyran-2-yl]-	C15H20O4	264.1361591304					CAS: 55708-43-5
+other	Eurotium chevalieri; Benzoic acid. 3-hydroxy-4-(1-hydroxy-1.5-dimethylhexyl)-	C15H22O4	266.1518091946					CAS: 65967-73-9
+other	Eurotium Aspergillus cristatus; 9.10-Anthracenedione. 1.3.8-trihydroxy-6-methyl-	C15H10O5	270.0528234315					CAS: 518-82-1
+other	Eurotium Aspergillus cristatus; 9.10-Anthracenedione. 1.3.5.8-tetrahydroxy-	C14H8O6	272.0320879894					CAS: 2961-06-0
+other	Eurotium Aspergillus cristatus; 1.4-Anthracenedione. 7.10-dihydroxy-5-methoxy-2-methyl	C16H12O5	284.0684734957					CAS: 74815-60-4
+other	Eurotium Aspergillus cristatus; 9.10-Anthracenedione. 1.6-dihydroxy-8-methoxy-3-methyl-	C16H12O5	284.0684734957					CAS: 3774-64-9
+other	Eurotium Aspergillus cristatus; 9.10-Anthracenedione. 1.8-dihydroxy-3-methoxy-6-methyl-	C16H12O5	284.0684734957					CAS: 521-61-9
+other	Eurotium repens Aspergillus repens ; 9.10-Anthracenedione. 1.8-dihydroxy-3-methoxy-6-methyl-	C16H12O5	284.0684734957					CAS: 521-61-9
+other	Eurotium repens; 9.10-Anthracenedione. 1.8-dihydroxy-3-methoxy-6-methyl-	C16H12O5	284.0684734957					CAS: 521-61-9
+other	Aspergillus pulvinus; Octadecanoic acid	C18H36O2	284.2715303998					CAS: 57-11-4
+other	Eurotium Aspergillus cristatus; 9.10-Anthracenedione. 1.4.5.7-tetrahydroxy-2-methyl	C15H10O6	286.0477380536					CAS: 476-46-0
+other	Eurotium Aspergillus cristatus; 9(10H)-Anthracenone. 1.8.10-trihydroxy-3-methoxy-6-methyl	C16H14O5	286.0841235599					CAS: 75207-07-7
+other	Eurotium repens Aspergillus repens ; 1H-2-Benzopyran-1-one. 3.4-dihydro-6.8-dihydroxy-3-[[(2R.6S)-tetrahydro-6-methyl-2H-pyran-2-yl]methyl]-. (3R)	C16H20O5	292.1310737525					CAS: 35818-31-6
+other	Eurotium Aspergillus cristatus; 9.10-Anthracenedione. 1-hydroxy-6.8-dimethoxy-3-methyl-	C17H14O5	298.0841235599					CAS: 5018-84-8
+other	Eurotium chevalieri. Eurotium echinulatum. Eurotium repens; Benzaldehyde. 2-(1.3.5-heptatrienyl)-3.6-dihydroxy-5-(3-methyl-2-butenyl)-. (E.E.E)-	C19H22O3	298.1568945725					CAS: 41451-81-4
+other	Eurotium Aspergillus cristatus; 9.10-Anthracenedione. 1.4.5-trihydroxy-7-methoxy-2-methyl-	C16H12O6	300.0633881178					CAS: 476-57-3
+other	Eurotium Aspergillus cristatus; 9.10-Anthracenedione. 1.4.7-trihydroxy-5-methoxy-2-methyl	C16H12O6	300.0633881178					CAS: 74815-59-1
+other	Eurotium repens Aspergillus repens; 9.10-Anthracenedione. 1.4.5-trihydroxy-7-methoxy-2-methyl-	C16H12O6	300.0633881178					CAS: 476-57-3
+other	Eurotium repens; 9.10-Anthracenedione. 1.4.5-trihydroxy-7-methoxy-2-methyl-	C16H12O6	300.0633881178					CAS: 476-57-3
+other	Eurotium chevalieri. Eurotium echinulatum. Eurotium repens; Benzaldehyde. 2-(1E.3E)-1.3-heptadienyl-3.6-dihydroxy-5-(3-methyl-2-butenyl)-	C19H24O3	300.1725446367					CAS: 77102-91-1
+other	Eurotium chevalieri. Eurotium echinulatum. Eurotium repens; Benzaldehyde. 2-(3E.5E)-3.5-heptadienyl-3.6-dihydroxy-5-(3-methyl-2-butenyl)-	C19H24O3	300.1725446367					CAS: 74886-31-0
+other	Eurotium chevalieri; Benzaldehyde. 2-(3E.5E)-3.5-heptadienyl-3.6-dihydroxy-5-(3-methyl-2-butenyl)-	C19H24O3	300.1725446367					CAS: 74886-31-0
+other	Eurotium chevalieri. Eurotium echinulatum. Eurotium repens; Benzaldehyde. 2-(1-heptenyl)-3.6-dihydroxy-5-(3-methyl-2-butenyl)-. (E)	C19H26O3	302.1881947009					CAS: 40434-07-9
+other	Eurotium chevalieri. Eurotium echinulatum. Eurotium repens; Benzaldehyde. 2-(5E)-5-heptenyl-3.6-dihydroxy-5-(3-methyl-2-butenyl)-	C19H26O3	302.1881947009					CAS: 74886-32-1
+other	Eurotium repens Aspergillus repens ; Benzaldehyde. 2-heptyl-3.6-dihydroxy-5-(3-methyl-2-butenyl)	C19H28O3	304.2038447651					CAS: 523-73-9
+other	Eurotium repens; Benzaldehyde. 2-heptyl-3.6-dihydroxy-5-(3-methyl-2-butenyl)-	C19H28O3	304.2038447651					CAS: 523-73-9
+other	Eurotium repens Aspergillus repens ; 1H-2-Benzopyran-1-one. 3.4-dihydro-6-hydroxy-8-methoxy-3-[(tetrahydro-6-methyl-2H-pyran-2-yl)methyl]-	C17H22O5	306.1467238167					CAS: 38747-37-4
+other	Eurotium chevalieri; Benzaldehyde. 2-heptyl-3.6-dihydroxy-5-(3-methylbutyl)	C19H30O3	306.2194948293					CAS: 74886-30-9
+other	Eurotium Aspergillus cristatus; 9.10-Anthracenedione. 1.4-dihydroxy-5.7-dimethoxy-2-methyl-	C17H14O6	314.0790381820					CAS: 37501-62-5
+other	Eurotium Aspergillus cristatus; 9.10-Anthracenedione. 1.4-dihydroxy-5.7-dimethoxy-2-methyl-	C17H14O6	314.0790381820					CAS: 37501-62-5
+other	Eurotium chevalieri; 2.5-Piperazinedione. 3-[[2-(1.1-dimethyl-2-propenyl)-1H-indol-3-yl]methyl]-6-methyl-. (3S.6S)-	C19H23N3O2	325.1790269981					CAS: 21008-43-5
+other	Eurotium Aspergillus cristatus; 9.10-Anthracenedione. 7-(acetyloxy)-1.4-dihydroxy-5-methoxy-2-methyl	C18H14O7	342.0739528041					CAS: 75207-08-8
+other	Aspergillus pulvinus; Ergosta-5.7.22-trien-3-ol. (3b.22E)-	C28H44O	396.3392160345					CAS: 57-87-4
+other	Eurotium chevalieri; Pyrano[3.2-a]xanthen-12(1H)-one. 2.3-dihydro-1.11-dihydroxy-5-methyl-8-(3-methyl-2-butenyl)-2-(1-methylethenyl)-. (1R.2S)-	C25H26O5	406.1780239451					CAS: 35660-46-9
+other	Eurotium chevalieri; 2H-1-Benzopyran-6-ol. 3.4-dihydro-2.7.8-trimethyl-2-(4.8.12-trimethyltridecyl)-	C28H48O2	416.3654307850					CAS: 7616-22-0
+other	Eurotium chevalieri; 2.5-Piperazinedione. 3-[[2-(1.1-dimethyl-2-propenyl)-5.7-bis(3-methyl-2-butenyl)-1H-indol-3-yl]methyl]-6-methyl-. (3S.6S)-	C29H39N3O2	461.3042275117					CAS: 1859-87-6
+other	Eurotium repens Aspergillus repens ; 2.5-Piperazinedione. 3-[[2-(1.1-dimethyl-2-propenyl)-5.7-bis(3-methyl-2-butenyl)-1H-indol-3-yl]methyl]-6-methyl-. (3S.6S)-	C29H39N3O2	461.3042275117					CAS: 1859-87-6
+other	Eurotium repens; 2.5-Piperazinedione. 3-[[2-(1.1-dimethyl-2-propenyl)-5.7-bis(3-methyl-2-butenyl)-1H-indol-3-yl]methyl]-6-methyl-. (3S.6S)-	C29H39N3O2	461.3042275117					CAS: 1859-87-6
+other	Eurotium chevalieri; Naphtho[1.2-c]furan-3(1H)-one. 6.9a-bis[(acetyloxy)methyl]-5-(benzoyloxy)-4.5.5a.6.7.8.9.9a-octahydro-6-methyl-. (5R.5aS.6S.9aR)-	C26H30O8	470.1940679398					CAS: 55778-98-8
+other	Eurotium chevalieri; Naphtho[1.2-c]furan-3(1H)-one. 6.9a-bis[(acetyloxy)methyl]-5-(benzoyloxy)-4.5.5a.6.7.8.9.9a-octahydro-6-methyl-. (5R.5aS.6S.9aR)-	C26H30O8	470.1940679398					CAS: 55778-98-8

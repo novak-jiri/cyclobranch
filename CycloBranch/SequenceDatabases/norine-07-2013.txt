@@ -1,0 +1,1041 @@
+branched	pyoverdin C	C50H76N14O25	1272.5106040649	[ChrP]-[Asp]\([D-OH-Orn]-[C4:0-OH(3)]\)[D-Dab]-[Thr]-[Gly]-[D-Ser]-[Ser]-[OH-Asp]-[Thr]				NOR00205
+branched	pyoverdin BTP16	C50H76N14O25	1272.5106040649	[ChrP]-[Asp]\([D-OH-Orn]-[C4:0-OH(3)]\)[D-Dab]-[Thr]-[Gly]-[Ser]-[Ser]-[OH-Asp]-[aThr]				NOR00206
+branched	azotobactin 87 -1	C55H82N14O28	1386.5422981238	[ChrA]-[Ser]-[D-Ser]-[Hse]-[Gly]-[D-OH-Asp]-[Hse]-[Hse]-[Hse]\([OH-Orn]-[C4:0-OH(3)]\)[Hse]				NOR00207
+branched	vibriobactin	C35H39N5O12	721.2595217431	[diOH-Bz]\([NSpd]-[DMOG]\)[DMOG]				NOR00250
+branched	azotobactin 87 -2	C55H80N14O27	1368.5317334375	[ChrA]-[Ser]-[D-Ser]-[Hse]-[Gly]-[D-OH-Asp]-[Hse]-[Hse]-[Hse]\([OH-Orn]-[C4:0-OH(3)]\)[HseL]				NOR00901
+cyclic	cyclosporin A	C62H111N11O12	1201.8413680855	[D-Ala]-[NMe-Leu]-[NMe-Leu]-[NMe-Val]-[NMe-Bmt]-[Abu]-[NMe-Gly]-[NMe-Leu]-[Val]-[NMe-Leu]-[Ala]				NOR00033
+cyclic	cyclosporin B	C61H109N11O12	1187.8257180213	[D-Ala]-[NMe-Leu]-[NMe-Leu]-[NMe-Val]-[NMe-Bmt]-[Ala]-[NMe-Gly]-[NMe-Leu]-[Val]-[NMe-Leu]-[Ala]				NOR00034
+cyclic	cyclosporin C	C62H111N11O13	1217.8362827076	[D-Ala]-[NMe-Leu]-[NMe-Leu]-[NMe-Val]-[NMe-Bmt]-[Thr]-[NMe-Gly]-[NMe-Leu]-[Val]-[NMe-Leu]-[Ala]				NOR00035
+cyclic	cyclosporin D	C63H113N11O12	1215.8570181497	[D-Ala]-[NMe-Leu]-[NMe-Leu]-[NMe-Val]-[NMe-Bmt]-[Val]-[NMe-Gly]-[NMe-Leu]-[Val]-[NMe-Leu]-[Ala]				NOR00036
+cyclic	cyclosporin E	C61H109N11O12	1187.8257180213	[D-Ala]-[NMe-Leu]-[NMe-Leu]-[Val]-[NMe-Bmt]-[Abu]-[NMe-Gly]-[NMe-Leu]-[Val]-[NMe-Leu]-[Ala]				NOR00037
+cyclic	cyclosporin F	C63H113N11O11	1199.8621035276	[D-Ala]-[NMe-Leu]-[NMe-Leu]-[NMe-Val]-[3d-NMe-Bmt]-[Nva]-[NMe-Gly]-[NMe-Leu]-[Val]-[NMe-Leu]-[Ala]				NOR00038
+cyclic	cyclosporin G	C63H113N11O12	1215.8570181497	[D-Ala]-[NMe-Leu]-[NMe-Leu]-[NMe-Val]-[NMe-Bmt]-[Nva]-[NMe-Gly]-[NMe-Leu]-[Val]-[NMe-Leu]-[Ala]				NOR00039
+cyclic	cyclosporin H	C62H111N11O12	1201.8413680855	[D-Ala]-[NMe-Leu]-[NMe-Leu]-[D-NMe-Val]-[NMe-Bmt]-[Abu]-[NMe-Gly]-[NMe-Leu]-[Val]-[NMe-Leu]-[Ala]				NOR00040
+cyclic	cyclosporin I	C62H111N11O12	1201.8413680855	[D-Ala]-[Leu]-[NMe-Leu]-[NMe-Val]-[NMe-Bmt]-[Val]-[NMe-Gly]-[NMe-Leu]-[Val]-[NMe-Leu]-[Ala]				NOR00041
+cyclic	cyclosporin K	C63H113N11O11	1199.8621035276	[D-Ala]-[NMe-Leu]-[NMe-Leu]-[NMe-Val]-[3d-NMe-Bmt]-[Val]-[NMe-Gly]-[NMe-Leu]-[Val]-[NMe-Leu]-[Ala]				NOR00042
+cyclic	cyclosporin L	C61H109N11O12	1187.8257180213	[D-Ala]-[NMe-Leu]-[NMe-Leu]-[NMe-Val]-[Bmt]-[Abu]-[NMe-Gly]-[NMe-Leu]-[Val]-[NMe-Leu]-[Ala]				NOR00043
+cyclic	cyclosporin M	C63H113N11O12	1215.8570181497	[D-Ala]-[NMe-Leu]-[NMe-Leu]-[NMe-Val]-[NMe-Bmt]-[Nva]-[NMe-Gly]-[NMe-Leu]-[Nva]-[NMe-Leu]-[Ala]				NOR00044
+cyclic	cyclosporin N	C62H111N11O12	1201.8413680855	[D-Ala]-[Leu]-[NMe-Leu]-[NMe-Val]-[NMe-Bmt]-[Nva]-[NMe-Gly]-[NMe-Leu]-[Val]-[NMe-Leu]-[Ala]				NOR00045
+cyclic	cyclosporin O	C60H109N11O11	1159.8308033992	[D-Ala]-[NMe-Leu]-[NMe-Leu]-[NMe-Val]-[NMe-Leu]-[Nva]-[NMe-Gly]-[NMe-Leu]-[Val]-[NMe-Leu]-[Ala]				NOR00046
+cyclic	cyclosporin P	C61H109N11O13	1203.8206326434	[D-Ala]-[NMe-Leu]-[NMe-Leu]-[NMe-Val]-[Bmt]-[Thr]-[NMe-Gly]-[NMe-Leu]-[Val]-[NMe-Leu]-[Ala]				NOR00047
+cyclic	cyclosporin Q	C60H107N11O12	1173.8100679571	[D-Ala]-[NMe-Leu]-[NMe-Leu]-[NMe-Val]-[NMe-Bmt]-[Abu]-[NMe-Gly]-[Val]-[Val]-[NMe-Leu]-[Ala]				NOR00048
+cyclic	cyclosporin R	C61H109N11O12	1187.8257180213	[D-Ala]-[Leu]-[NMe-Leu]-[NMe-Val]-[NMe-Bmt]-[Abu]-[NMe-Gly]-[NMe-Leu]-[Val]-[NMe-Leu]-[Ala]				NOR00049
+cyclic	cyclosporin S	C60H107N11O13	1189.8049825792	[D-Ala]-[NMe-Leu]-[NMe-Leu]-[NMe-Val]-[NMe-Bmt]-[Thr]-[NMe-Gly]-[Val]-[Val]-[NMe-Leu]-[Ala]				NOR00050
+cyclic	cyclosporin U	C60H107N11O12	1173.8100679571	[D-Ala]-[Leu]-[NMe-Leu]-[NMe-Val]-[NMe-Bmt]-[Abu]-[NMe-Gly]-[NMe-Leu]-[Val]-[Leu]-[Ala]				NOR00051
+cyclic	cyclosporin V	C63H113N11O12	1215.8570181497	[D-Ala]-[NMe-Leu]-[NMe-Leu]-[NMe-Val]-[NMe-Bmt]-[Abu]-[NMe-Gly]-[NMe-Leu]-[Val]-[NMe-Leu]-[Abu]				NOR00052
+cyclic	cyclosporin W	C61H109N11O13	1203.8206326434	[D-Ala]-[NMe-Leu]-[NMe-Leu]-[Val]-[NMe-Bmt]-[Thr]-[NMe-Gly]-[NMe-Leu]-[Val]-[NMe-Leu]-[Ala]				NOR00053
+cyclic	cyclosporin X	C62H111N11O12	1201.8413680855	[D-Ala]-[Leu]-[NMe-Leu]-[NMe-Val]-[NMe-Bmt]-[Nva]-[NMe-Gly]-[NMe-Leu]-[Val]-[NMe-Leu]-[Ala]				NOR00054
+cyclic	cyclosporin Y	C62H111N11O12	1201.8413680855	[D-Ala]-[NMe-Leu]-[NMe-Leu]-[NMe-Val]-[NMe-Bmt]-[Nva]-[NMe-Gly]-[NMe-Leu]-[Val]-[Leu]-[Ala]				NOR00055
+cyclic	cyclosporin Z	C61H111N11O11	1173.8464534634	[D-Ala]-[NMe-Leu]-[NMe-Leu]-[NMe-Val]-[Me-AOA]-[Abu]-[NMe-Gly]-[NMe-Leu]-[Val]-[NMe-Leu]-[Ala]				NOR00056
+cyclic	cyclosporin 26	C64H115N11O12	1229.8726682139	[D-Ala]-[NMe-Leu]-[NMe-Leu]-[NMe-Val]-[NMe-Bmt]-[Nva]-[NMe-Gly]-[NMe-Leu]-[Leu]-[NMe-Leu]-[Ala]				NOR00057
+cyclic	cyclosporin 27	C62H111N11O12	1201.8413680855	[D-Ala]-[NMe-Leu]-[NMe-Leu]-[NMe-Val]-[Bmt]-[Val]-[NMe-Gly]-[NMe-Leu]-[Val]-[NMe-Leu]-[Ala]				NOR00058
+cyclic	cyclosporin 28	C59H107N11O11	1145.8151533350	[D-Ala]-[NMe-Leu]-[NMe-Leu]-[NMe-Val]-[NMe-Leu]-[Abu]-[NMe-Gly]-[NMe-Leu]-[Val]-[NMe-Leu]-[Ala]				NOR00059
+cyclic	cyclosporin 29	C62H111N11O12	1201.8413680855	[D-Ala]-[NMe-Leu]-[NMe-Leu]-[NMe-Val]-[NMe-Bmt]-[Abu]-[NMe-Gly]-[NMe-Ile]-[Val]-[NMe-Leu]-[Ala]				NOR00060
+cyclic	cyclosporin 30	C60H109N11O11	1159.8308033992	[D-Ala]-[NMe-Leu]-[NMe-Leu]-[NMe-Val]-[NMe-Leu]-[Val]-[NMe-Gly]-[NMe-Leu]-[Val]-[NMe-Leu]-[Ala]				NOR00061
+cyclic	cyclosporin 31	C61H109N11O12	1187.8257180213	[D-Ala]-[NMe-Leu]-[NMe-Leu]-[NMe-Val]-[NMe-Bmt]-[Abu]-[NMe-Gly]-[Ile]-[Val]-[NMe-Leu]-[Ala]				NOR00062
+cyclic	cyclosporin 32	C61H109N11O12	1187.8257180213	[D-Ala]-[NMe-Leu]-[NMe-Leu]-[NMe-Val]-[NMe-Bmt]-[Abu]-[Gly]-[NMe-Leu]-[Val]-[NMe-Leu]-[Ala]				NOR00063
+cyclic	destruxin A	C28H45N5O7	563.3318988252	[Pro]-[Ile]-[NMe-Val]-[NMe-Ala]-[bAla]-[C4:1(3)-OH(2)]				NOR00064
+cyclic	destruxin B	C29H49N5O7	579.3631989536	[Pro]-[Ile]-[NMe-Val]-[NMe-Ala]-[bAla]-[Hiv]				NOR00065
+cyclic	destruxin A1	C29H47N5O7	577.3475488894	[Hpr]-[Ile]-[NMe-Val]-[NMe-Ala]-[bAla]-[C4:1(3)-OH(2)]				NOR00066
+cyclic	destruxin B1	C30H51N5O7	593.3788490178	[Hpr]-[Ile]-[NMe-Val]-[NMe-Ala]-[bAla]-[Hiv]				NOR00067
+cyclic	destruxin A2	C27H43N5O7	549.3162487610	[Pro]-[Val]-[NMe-Val]-[NMe-Ala]-[bAla]-[C4:1(3)-OH(2)]				NOR00068
+cyclic	destruxin B2	C28H47N5O7	565.3475488894	[Pro]-[Val]-[NMe-Val]-[NMe-Ala]-[bAla]-[Hiv]				NOR00069
+cyclic	destruxin A3	C26H43N5O7	537.3162487610	[Ala]-[Ile]-[NMe-Val]-[NMe-Ala]-[bAla]-[C4:1(3)-OH(2)]				NOR00070
+cyclic	destruxin A4	C29H47N5O7	577.3475488894	[Pro]-[Ile]-[NMe-Ile]-[NMe-Ala]-[bAla]-[C4:1(3)-OH(2)]				NOR00071
+cyclic	destruxin A4 chlorohydrin	C29ClH48N5O8	629.3191415436	[Pro]-[Ile]-[NMe-Ile]-[NMe-Ala]-[bAla]-[C4:0-OH(2.3)-Cl(4)]				NOR00072
+cyclic	desmethylDestruxin A	C27H43N5O7	549.3162487610	[Pro]-[Ile]-[Val]-[NMe-Ala]-[bAla]-[C4:1(3)-OH(2)]				NOR00073
+cyclic	desmethylDestruxin B2	C27H45N5O7	551.3318988252	[Pro]-[Val]-[Val]-[NMe-Ala]-[bAla]-[Hiv]				NOR00074
+cyclic	homoDestruxin B	C30H51N5O7	593.3788490178	[Pro]-[Ile]-[NMe-Ile]-[NMe-Ala]-[bAla]-[Hiv]				NOR00075
+cyclic	protoDestruxin	C27H45N5O7	551.3318988252	[Pro]-[Ile]-[Val]-[Ala]-[bAla]-[Hiv]				NOR00076
+cyclic	hydroxyDestruxin B	C29H49N5O8	595.3581135757	[Pro]-[Ile]-[NMe-Val]-[NMe-Ala]-[bAla]-[iC5:0-OH(2.3)]				NOR00077
+cyclic	hydroxyhomoDestruxin B	C30H51N5O8	609.3737636399	[Pro]-[Ile]-[NMe-Ile]-[NMe-Ala]-[bAla]-[iC5:0-OH(2.3)]				NOR00078
+cyclic	destruxin C	C29H49N5O8	595.3581135757	[Pro]-[Ile]-[NMe-Val]-[NMe-Ala]-[bAla]-[iC5:0-OH(2.4)]				NOR00080
+cyclic	destruxin C2	C28H47N5O8	581.3424635115	[Pro]-[Val]-[NMe-Val]-[NMe-Ala]-[bAla]-[iC5:0-OH(2.4)]				NOR00081
+cyclic	desmethylDestruxin C	C28H47N5O8	581.3424635115	[Pro]-[Ile]-[Val]-[NMe-Ala]-[bAla]-[iC5:0-OH(2.4)]				NOR00082
+cyclic	destruxin D	C29H47N5O9	609.3373781336	[Pro]-[Ile]-[NMe-Val]-[NMe-Ala]-[bAla]-[iC5:0-OH(2)-CA(4)]				NOR00083
+cyclic	destruxin D1	C30H49N5O9	623.3530281978	[Hpr]-[Ile]-[NMe-Val]-[NMe-Ala]-[bAla]-[iC5:0-OH(2)-CA(4)]				NOR00084
+cyclic	destruxin D2	C28H45N5O9	595.3217280694	[Pro]-[Val]-[NMe-Val]-[NMe-Ala]-[bAla]-[iC5:0-OH(2)-CA(4)]				NOR00085
+cyclic	destruxin E	C28H45N5O8	579.3268134473	[Pro]-[Ile]-[NMe-Val]-[NMe-Ala]-[bAla]-[C4:0-OH(2)-Ep(3)]				NOR00086
+cyclic	destruxin E1	C29H47N5O8	593.3424635115	[Hpr]-[Ile]-[NMe-Val]-[NMe-Ala]-[bAla]-[C4:0-OH(2)-Ep(3)]				NOR00087
+cyclic	destruxin E2	C27H43N5O8	565.3111633831	[Pro]-[Val]-[NMe-Val]-[NMe-Ala]-[bAla]-[C4:0-OH(2)-Ep(3)]				NOR00088
+cyclic	destruxin E chlorohydrin	C28ClH46N5O8	615.3034914794	[Pro]-[Ile]-[NMe-Val]-[NMe-Ala]-[bAla]-[C4:0-OH(2.3)-Cl(4)]				NOR00089
+cyclic	destruxin E2 chlorohydrin	C27ClH44N5O8	601.2878414152	[Pro]-[Val]-[NMe-Val]-[NMe-Ala]-[bAla]-[C4:0-OH(2.3)-Cl(4)]				NOR00090
+cyclic	destruxin E diol	C28H47N5O9	597.3373781336	[Pro]-[Ile]-[NMe-Val]-[NMe-Ala]-[bAla]-[C4:0-OH(2.3.4)]				NOR00091
+cyclic	enniatin A	C36H63N3O9	681.4564306368	[D-Hiv]-[NMe-Ile]-[D-Hiv]-[NMe-Ile]-[D-Hiv]-[NMe-Ile]				NOR00092
+cyclic	enniatin A1	C35H61N3O9	667.4407805726	[D-Hiv]-[NMe-Ile]-[D-Hiv]-[NMe-Ile]-[D-Hiv]-[NMe-Val]				NOR00093
+cyclic	enniatin B	C33H57N3O9	639.4094804442	[D-Hiv]-[NMe-Val]-[D-Hiv]-[NMe-Val]-[D-Hiv]-[NMe-Val]				NOR00094
+cyclic	enniatin B1	C34H59N3O9	653.4251305084	[D-Hiv]-[NMe-Val]-[D-Hiv]-[NMe-Val]-[D-Hiv]-[NMe-Ile]				NOR00095
+cyclic	enniatin L	C34H59N3O10	669.4200451305	[aC6:0-OH(2.3)]-[NMe-Val]-[D-Hiv]-[NMe-Val]-[D-Hiv]-[NMe-Val]				NOR00096
+cyclic	enniatin N	C36H63N3O10	697.4513452589	[aC6:0-OH(2.3)]-[NMe-Val]-[Hmp]-[NMe-Val]-[Hmp]-[NMe-Val]				NOR00097
+cyclic	enniatin  H	C34H59N3O9	653.4251305084	[Hmp]-[NMe-Val]-[D-Hiv]-[NMe-Val]-[D-Hiv]-[NMe-Val]				NOR00098
+cyclic	enniatin I	C35H61N3O9	667.4407805726	[Hmp]-[NMe-Val]-[Hmp]-[NMe-Val]-[D-Hiv]-[NMe-Val]				NOR00099
+cyclic	enniatin C	C36H63N3O9	681.4564306368	[D-Hiv]-[NMe-Leu]-[D-Hiv]-[NMe-Leu]-[D-Hiv]-[NMe-Leu]				NOR00100
+cyclic	MK1688	C36H63N3O9	681.4564306368	[Hmp]-[NMe-Val]-[Hmp]-[NMe-Val]-[Hmp]-[NMe-Val]				NOR00101
+cyclic	enniatin B4	C34H59N3O9	653.4251305084	[D-Hiv]-[NMe-Leu]-[D-Hiv]-[NMe-Val]-[D-Hiv]-[NMe-Val]				NOR00102
+cyclic	enniatin F	C36H63N3O9	681.4564306368	[D-Hiv]-[NMe-Leu]-[D-Hiv]-[NMe-Ile]-[D-Hiv]-[NMe-Ile]				NOR00104
+cyclic	enniatin G	C35H61N3O9	667.4407805726	[D-Hiv]-[NMe-Leu]-[D-Hiv]-[NMe-Leu]-[D-Hiv]-[NMe-Val]				NOR00105
+cyclic	microcystin LA	C46H67N7O12	909.4847706523	[D-Ala]-[Leu]-[D-bMe-Asp]-[Ala]-[Adda]-[D-Glu]-[NMe-Dha]				NOR00106
+cyclic	microcystin RR	C49H75N13O12	1037.5658149403	[D-Ala]-[Arg]-[D-bMe-Asp]-[Arg]-[Adda]-[D-Glu]-[NMe-Dha]				NOR00107
+cyclic	microcystin YR	C52H72N10O13	1044.5280324505	[D-Ala]-[Tyr]-[D-bMe-Asp]-[Arg]-[Adda]-[D-Glu]-[NMe-Dha]				NOR00108
+cyclic	microcystin LR	C49H74N10O12	994.5487678926	[D-Ala]-[Leu]-[D-bMe-Asp]-[Arg]-[Adda]-[D-Glu]-[NMe-Dha]				NOR00109
+cyclic	microcystin LW	C54H72N8O12	1024.5269698180	[D-Ala]-[Leu]-[D-bMe-Asp]-[Trp]-[Adda]-[D-Glu]-[NMe-Dha]				NOR00110
+cyclic	microcystin LL	C49H73N7O12	951.5317208449	[D-Ala]-[Leu]-[D-bMe-Asp]-[Leu]-[Adda]-[D-Glu]-[NMe-Dha]				NOR00111
+cyclic	microcystin AR	C46H68N10O12	952.5018177000	[D-Ala]-[Ala]-[D-bMe-Asp]-[Arg]-[Adda]-[D-Glu]-[NMe-Dha]				NOR00112
+cyclic	microcystin YA	C49H65N7O13	959.4640352102	[D-Ala]-[Tyr]-[D-bMe-Asp]-[Ala]-[Adda]-[D-Glu]-[NMe-Dha]				NOR00113
+cyclic	[D-Asp3.Dha7]mycrocystin-LR	C47H70N10O12	966.5174677642	[D-Ala]-[Leu]-[D-Asp]-[Arg]-[Adda]-[D-Glu]-[dh-Ala]				NOR00114
+cyclic	[D-Asp3.Dha7]microcystin-EE(OMe)	C46H63N7O16	969.4331290123	[D-Ala]-[Glu]-[D-Asp]-[MeO-Glu]-[Adda]-[D-Glu]-[dh-Ala]				NOR00115
+cyclic	microcystin VF	C51H69N7O12	971.5004207165	[D-Ala]-[Val]-[D-bMe-Asp]-[Phe]-[Adda]-[D-Glu]-[NMe-Dha]				NOR00116
+cyclic	[D-Asp3]microcystin-LR	C48H72N10O12	980.5331178284	[D-Ala]-[Leu]-[D-Asp]-[Arg]-[Adda]-[D-Glu]-[NMe-Dha]				NOR00117
+cyclic	[Dha7]microcystin-LR	C48H72N10O12	980.5331178284	[D-Ala]-[Leu]-[D-bMe-Asp]-[Arg]-[Adda]-[D-Glu]-[dh-Ala]				NOR00118
+cyclic	[Dha7]microcystin-EE(OMe)	C47H65N7O16	983.4487790765	[D-Ala]-[Glu]-[D-bMe-Asp]-[MeO-Glu]-[Adda]-[D-Glu]-[dh-Ala]				NOR00119
+cyclic	[D-Asp3.Dha7]microcystin-E(OMe)E(OMe)	C47H65N7O16	983.4487790765	[D-Ala]-[MeO-Glu]-[D-Asp]-[MeO-Glu]-[Adda]-[D-Glu]-[dh-Ala]				NOR00120
+cyclic	microcystin LF	C52H71N7O12	985.5160707807	[D-Ala]-[Leu]-[D-bMe-Asp]-[Phe]-[Adda]-[D-Glu]-[NMe-Dha]				NOR00121
+cyclic	[D-Asp3.D-Glu(OCH3)6]microcystin-LR	C49H74N10O12	994.5487678926	[D-Ala]-[Leu]-[D-Asp]-[Arg]-[Adda]-[MeO-D-Glu]-[NMe-Dha]				NOR00122
+cyclic	[Dha7]MCYST-E(OMe)E(OMe)	C48H67N7O16	997.4644291407	[D-Ala]-[MeO-Glu]-[D-bMe-Asp]-[MeO-Glu]-[Adda]-[D-Glu]-[dh-Ala]				NOR00123
+cyclic	[L-Ser7]microcystin-LR	C48H74N10O13	998.5436825147	[D-Ala]-[Leu]-[D-bMe-Asp]-[Arg]-[Adda]-[D-Glu]-[Ser]				NOR00124
+cyclic	microcystin LY	C52H71N7O13	1001.5109854028	[D-Ala]-[Leu]-[D-bMe-Asp]-[Tyr]-[Adda]-[D-Glu]-[NMe-Dha]				NOR00125
+cyclic	[L-Ser7]microcytin-EE(OMe)	C47H67N7O17	1001.4593437628	[D-Ala]-[Glu]-[D-bMe-Asp]-[MeO-Glu]-[Adda]-[D-Glu]-[Ser]				NOR00126
+cyclic	[D-Asp3.Ser7]microcystin-E(OMe)E(OMe)	C47H67N7O17	1001.4593437628	[D-Ala]-[MeO-Glu]-[D-Asp]-[MeO-Glu]-[Adda]-[D-Glu]-[Ser]				NOR00127
+cyclic	microcystin HilR	C50H76N10O12	1008.5644179568	[D-Ala]-[Hil]-[D-bMe-Asp]-[Arg]-[Adda]-[D-Glu]-[NMe-Dha]				NOR00128
+cyclic	[DMAdda5]microcystin-LR	C48H72N10O12	980.5331178284	[D-Ala]-[Leu]-[D-bMe-Asp]-[Arg]-[DMAdda]-[D-Glu]-[NMe-Dha]				NOR00129
+cyclic	[D-Asp3.ADMAdda5]microcystin-LR	C49H72N10O13	1008.5280324505	[D-Ala]-[Leu]-[D-Asp]-[Arg]-[ADMAdda]-[D-Glu]-[NMe-Dha]				NOR00130
+cyclic	[D-Glu(OCH3)6]microcystin-LR	C50H76N10O12	1008.5644179568	[D-Ala]-[Leu]-[D-bMe-Asp]-[Arg]-[Adda]-[MeO-D-Glu]-[NMe-Dha]				NOR00131
+cyclic	[D-Asp3.Dha7]microcystin-RR	C47H71N13O12	1009.5345148119	[D-Ala]-[Arg]-[D-Asp]-[Arg]-[Adda]-[D-Glu]-[dh-Ala]				NOR00132
+cyclic	[L-MeSer7]microcytin-LR	C49H76N10O13	1012.5593325789	[D-Ala]-[Leu]-[D-bMe-Asp]-[Arg]-[Adda]-[D-Glu]-[NMe-Ser]				NOR00133
+cyclic	[Dha7]microcystin-FR	C51H70N10O12	1014.5174677642	[D-Ala]-[Phe]-[D-bMe-Asp]-[Arg]-[Adda]-[D-Glu]-[dh-Ala]				NOR00134
+cyclic	[L-Ser7]microcystin-E(OMe)E(OMe)	C48H69N7O17	1015.4749938270	[D-Ala]-[MeO-Glu]-[D-bMe-Asp]-[MeO-Glu]-[Adda]-[D-Glu]-[Ser]				NOR00135
+cyclic	[ADMAdda5]microcystin-LR	C50H74N10O13	1022.5436825147	[D-Ala]-[Leu]-[D-bMe-Asp]-[Arg]-[ADMAdda]-[D-Glu]-[NMe-Dha]				NOR00136
+cyclic	[D-Asp3.ADMAdda5]microcystin-LHar	C50H74N10O13	1022.5436825147	[D-Ala]-[Leu]-[D-Asp]-[Har]-[ADMAdda]-[D-Glu]-[NMe-Dha]				NOR00137
+cyclic	[D-Asp3]microcystin-RR	C48H73N13O12	1023.5501648761	[D-Ala]-[Arg]-[D-Asp]-[Arg]-[Adda]-[D-Glu]-[NMe-Dha]				NOR00138
+cyclic	[Dha7]microcystin-RR	C48H73N13O12	1023.5501648761	[D-Ala]-[Arg]-[D-bMe-Asp]-[Arg]-[Adda]-[D-Glu]-[dh-Ala]				NOR00139
+cyclic	microcystin FR	C52H72N10O12	1028.5331178284	[D-Ala]-[Phe]-[D-bMe-Asp]-[Arg]-[Adda]-[D-Glu]-[NMe-Dha]				NOR00140
+cyclic	[Dha7]microcystin-YR	C51H70N10O13	1030.5123823863	[D-Ala]-[Tyr]-[D-bMe-Asp]-[Arg]-[Adda]-[D-Glu]-[dh-Ala]				NOR00141
+cyclic	[D-Asp3]microcystin-YR	C51H70N10O13	1030.5123823863	[D-Ala]-[Tyr]-[D-Asp]-[Arg]-[Adda]-[D-Glu]-[NMe-Dha]				NOR00142
+cyclic	[ADMAdda5]microcystin-LHar	C51H76N10O13	1036.5593325789	[D-Ala]-[Leu]-[D-bMe-Asp]-[Har]-[ADMAdda]-[D-Glu]-[NMe-Dha]				NOR00143
+cyclic	[D-Ser1. ADMAdda5]microcystin-LR	C50H74N10O14	1038.5385971368	[D-Ser]-[Leu]-[D-bMe-Asp]-[Arg]-[ADMAdda]-[D-Glu]-[NMe-Dha]				NOR00144
+cyclic	[ADMAdda5.MeSer7]microcystin-LR	C50H76N10O14	1040.5542472010	[D-Ala]-[Leu]-[D-bMe-Asp]-[Arg]-[ADMAdda]-[D-Glu]-[NMe-Ser]				NOR00145
+cyclic	[L-Ser7]microcystin-RR	C48H75N13O13	1041.5607295624	[D-Ala]-[Arg]-[D-bMe-Asp]-[Arg]-[Adda]-[D-Glu]-[Ser]				NOR00146
+cyclic	[D-Asp3.MeSer7]microcystin-RR	C48H75N13O13	1041.5607295624	[D-Ala]-[Arg]-[D-Asp]-[Arg]-[Adda]-[D-Glu]-[NMe-Ser]				NOR00147
+cyclic	microcystin-WR	C54H73N11O12	1067.5440168657	[D-Ala]-[Trp]-[D-bMe-Asp]-[Arg]-[Adda]-[D-Glu]-[NMe-Dha]				NOR00148
+cyclic	[L-MeLan7]microcystin-LR	C51H79N11O15S	1117.5477816146	[D-Ala]-[Leu]-[D-bMe-Asp]-[Arg]-[Adda]-[D-Glu]-[NMe-Lan]				NOR00149
+cyclic	[D-Asp3]microcystin-HtyR	C52H72N10O13	1044.5280324505	[D-Ala]-[Hty]-[D-Asp]-[Arg]-[Adda]-[D-Glu]-[NMe-Dha]				NOR00150
+cyclic	[Dha7]microcystin-HtyR	C52H72N10O13	1044.5280324505	[D-Ala]-[Hty]-[D-bMe-Asp]-[Arg]-[Adda]-[D-Glu]-[dh-Ala]				NOR00151
+cyclic	microcystin-HtyR	C53H74N10O13	1058.5436825147	[D-Ala]-[Hty]-[D-bMe-Asp]-[Arg]-[Adda]-[D-Glu]-[NMe-Dha]				NOR00152
+cyclic	[L-Ser7]microcystin-HtyR	C52H74N10O14	1062.5385971368	[D-Ala]-[Hty]-[D-bMe-Asp]-[Arg]-[Adda]-[D-Glu]-[Ser]				NOR00153
+cyclic	[DAsp3.ADMAdda5.Dhb7]microcystin-HtyR	C53H72N10O14	1072.5229470726	[D-Ala]-[Hty]-[D-Asp]-[Arg]-[ADMAdda]-[D-Glu]-[dhAbu]				NOR00154
+cyclic	microcystin-M(O)R	C48H72N10O13S	1028.5001031405	[D-Ala]-[O-Met]-[D-bMe-Asp]-[Arg]-[Adda]-[D-Glu]-[NMe-Dha]				NOR00155
+cyclic	microcystin-YM(O)	C51H69N7O14S	1035.4623206507	[D-Ala]-[Tyr]-[D-bMe-Asp]-[O-Met]-[Adda]-[D-Glu]-[NMe-Dha]				NOR00156
+cyclic	[D-Asp3. Dha7]microcystin-HtyR	C51H70N10O13	1030.5123823863	[D-Ala]-[Hty]-[D-Asp]-[Arg]-[Adda]-[D-Glu]-[dh-Ala]				NOR00157
+cyclic	[Dha7]microcystin-HphR	C52H72N10O12	1028.5331178284	[D-Ala]-[Hph]-[D-bMe-Asp]-[Arg]-[Adda]-[D-Glu]-[dh-Ala]				NOR00158
+cyclic	[D-Asp3.ADMAdda5.Dhb7]microcystin-RR	C49H73N13O13	1051.5450794982	[D-Ala]-[Arg]-[D-Asp]-[Arg]-[ADMAdda]-[D-Glu]-[dhAbu]				NOR00159
+cyclic	surfactin aC15	C53H93N7O13	1035.6831361090	[aC15:0-OH(3)]-[Glu]-[Leu]-[D-Leu]-[Val]-[Asp]-[D-Leu]-[Leu]				NOR00211
+cyclic	[Gln1]surfactin	C53H94N8O12	1034.6991205242	[C15:0-OH(3)]-[Gln]-[Leu]-[D-Leu]-[Val]-[Asp]-[D-Leu]-[Ile]				NOR00212
+cyclic	[Val7]surfactin	C52H91N7O13	1021.6674860448	[aC15:0-OH(3)]-[Glu]-[Leu]-[D-Leu]-[Val]-[Asp]-[D-Leu]-[Val]				NOR00213
+cyclic	[Ile7]surfactin	C53H93N7O13	1035.6831361090	[aC15:0-OH(3)]-[Glu]-[Leu]-[D-Leu]-[Val]-[Asp]-[D-Leu]-[Ile]				NOR00214
+cyclic	[Ala4]surfactin iC14	C50H87N7O13	993.6361859164	[iC14:0-OH(3)]-[Glu]-[Leu]-[D-Leu]-[Ala]-[Asp]-[D-Leu]-[Leu]				NOR00215
+cyclic	[Leu4]surfactin	C54H95N7O13	1049.6987861732	[aC15:0-OH(3)]-[Glu]-[Leu]-[D-Leu]-[Leu]-[Asp]-[D-Leu]-[Leu]				NOR00216
+cyclic	[Ile4]surfactin	C54H95N7O13	1049.6987861732	[aC15:0-OH(3)]-[Glu]-[Leu]-[D-Leu]-[Ile]-[Asp]-[D-Leu]-[Leu]				NOR00217
+cyclic	[Ile4.7]surfactin	C54H95N7O13	1049.6987861732	[aC15:0-OH(3)]-[Glu]-[Leu]-[D-Leu]-[Ile]-[Asp]-[D-Leu]-[Ile]				NOR00218
+cyclic	[Ile2.4.7]surfactin	C54H95N7O13	1049.6987861732	[aC15:0-OH(3)]-[Glu]-[Ile]-[D-Leu]-[Ile]-[Asp]-[D-Leu]-[Ile]				NOR00219
+cyclic	iturin A-2	C48H74N12O14	1042.5447451472	[C14:0-NH2(3)]-[Asn]-[D-Tyr]-[D-Asn]-[Gln]-[Pro]-[D-Asn]-[Ser]				NOR00220
+cyclic	iturin C-1	C48H73N11O15	1043.5287607320	[iC14:0-NH2(3)]-[Asp]-[D-Tyr]-[D-Asn]-[Gln]-[Pro]-[D-Asn]-[Ser]				NOR00221
+cyclic	mycosubtilin 4	C51H80N12O14	1084.5916953398	[aC17:0-NH2(3)]-[Asn]-[D-Tyr]-[D-Asn]-[Gln]-[Pro]-[D-Ser]-[Asn]				NOR00222
+cyclic	bacillomycin L-1	C46H72N10O16	1020.5127763168	[C14:0-NH2(3)]-[Asn]-[D-Tyr]-[D-Asn]-[Ser]-[Glu]-[D-Ser]-[Thr]				NOR00223
+cyclic	bacillomycin F-6	C52H82N12O14	1098.6073454040	[aC17:0-NH2(3)]-[Asn]-[D-Tyr]-[D-Asn]-[Gln]-[Pro]-[D-Asn]-[Thr]				NOR00224
+cyclic	bacillomycin D-1	C48H74N10O15	1030.5335117589	[C14:0-NH2(3)]-[Asn]-[D-Tyr]-[D-Asn]-[Pro]-[Glu]-[D-Ser]-[Thr]				NOR00225
+cyclic	gramicidin S	C60H92N12O10	1140.7059372366	[Val]-[Orn]-[Leu]-[D-Phe]-[Pro]-[Val]-[Orn]-[Leu]-[D-Phe]-[Pro]				NOR00249
+cyclic	beauvericin	C45H57N3O9	783.4094804442	[NMe-Phe]-[D-Hiv]-[NMe-Phe]-[D-Hiv]-[NMe-Phe]-[D-Hiv]				NOR00252
+cyclic	beauvericin A	C46H59N3O9	797.4251305084	[NMe-Phe]-[D-Hmp]-[NMe-Phe]-[D-Hiv]-[NMe-Phe]-[D-Hiv]				NOR00253
+cyclic	beauvericin D	C44H55N3O9	769.3938303800	[Phe]-[D-Hiv]-[NMe-Phe]-[D-Hiv]-[NMe-Phe]-[D-Hiv]				NOR00254
+cyclic	beauvericin E	C41H57N3O9	735.4094804442	[Ile]-[D-Hiv]-[NMe-Phe]-[D-Hiv]-[NMe-Phe]-[D-Hiv]				NOR00255
+cyclic	beauvericin F	C46H59N3O9	797.4251305084	[NMe-Phe]-[4Me-D-Hva]-[NMe-Phe]-[D-Hiv]-[NMe-Phe]-[D-Hiv]				NOR00256
+cyclic	nodularin R	C41H60N8O10	824.4432401886	[D-bMe-Asp]-[Arg]-[Adda]-[D-Glu]-[2Dh-Mabu]				NOR00279
+cyclic	aureobasidin A	C60H92N8O11	1100.6885558379	[D-Hmp]-[NMe-Val]-[Phe]-[NMe-Phe]-[Pro]-[aIle]-[NMe-Val]-[Leu]-[bOH-NMe-Val]				NOR00281
+cyclic	aureobasidin B	C59H90N8O11	1086.6729057737	[D-Hiv]-[NMe-Val]-[Phe]-[NMe-Phe]-[Pro]-[aIle]-[NMe-Val]-[Leu]-[bOH-NMe-Val]				NOR00282
+cyclic	aureobasidin C	C59H90N8O11	1086.6729057737	[D-Hmp]-[NMe-Val]-[Phe]-[NMe-Phe]-[Pro]-[Val]-[NMe-Val]-[Leu]-[bOH-NMe-Val]				NOR00283
+cyclic	aureobasidin D	C60H92N8O11	1100.6885558379	[D-Hmp]-[NMe-Val]-[Phe]-[NMe-Phe]-[Pro]-[aIle]-[NMe-Val]-[Leu]-[gOH-NMe-Val]				NOR00284
+cyclic	aureobasidin E	C60H92N8O12	1116.6834704600	[D-Hmp]-[NMe-Val]-[Phe]-[bOH-NMe-Phe]-[Pro]-[aIle]-[NMe-Val]-[Leu]-[bOH-NMe-Val]				NOR00285
+cyclic	aureobasidin F	C59H90N8O11	1086.6729057737	[D-Hmp]-[NMe-Val]-[Phe]-[NMe-Phe]-[Pro]-[aIle]-[Val]-[Leu]-[bOH-NMe-Val]				NOR00286
+cyclic	aureobasidin G	C60H92N8O10	1084.6936412158	[D-Hmp]-[NMe-Val]-[Phe]-[NMe-Phe]-[Pro]-[aIle]-[NMe-Val]-[Leu]-[NMe-Val]				NOR00287
+cyclic	aureobasidin R	C60H92N8O11	1100.6885558379	[D-Hmp]-[NMe-Val]-[Phe]-[bOH-NMe-Phe]-[Pro]-[aIle]-[NMe-Val]-[Leu]-[NMe-Val]				NOR00288
+cyclic	PF1022A	C52H76N4O12	948.5459739256	[D-Ph-Lac]-[NMe-Leu]-[D-Lac]-[NMe-Leu]-[D-Ph-Lac]-[NMe-Leu]-[D-Lac]-[NMe-Leu]				NOR00289
+cyclic	PF1022B	C64H84N4O12	1100.6085741824	[D-Ph-Lac]-[NMe-Leu]-[D-Ph-Lac]-[NMe-Leu]-[D-Ph-Lac]-[NMe-Leu]-[D-Ph-Lac]-[NMe-Leu]				NOR00290
+cyclic	PF1022C	C58H80N4O12	1024.5772740540	[D-Ph-Lac]-[NMe-Leu]-[D-Ph-Lac]-[NMe-Leu]-[D-Lac]-[NMe-Leu]-[D-Ph-Lac]-[NMe-Leu]				NOR00291
+cyclic	PF1022D	C46H72N4O12	872.5146737972	[D-Lac]-[NMe-Leu]-[D-Lac]-[NMe-Leu]-[D-Lac]-[NMe-Leu]-[D-Ph-Lac]-[NMe-Leu]				NOR00292
+cyclic	PF1022E	C52H76N4O13	964.5408885477	[D-Lac]-[NMe-Leu]-[4OH-D-Ph-Lac]-[NMe-Leu]-[D-Lac]-[NMe-Leu]-[D-Ph-Lac]-[NMe-Leu]				NOR00293
+cyclic	tyrocidine A	C66H87N13O13	1269.6546299476	[D-Phe]-[Pro]-[Phe]-[D-Phe]-[Asn]-[Gln]-[Tyr]-[Val]-[Orn]-[Leu]				NOR00298
+cyclic	tyrocidine B	C68H88N14O13	1308.6655289849	[D-Phe]-[Pro]-[Trp]-[D-Phe]-[Asn]-[Gln]-[Tyr]-[Val]-[Orn]-[Leu]				NOR00299
+cyclic	tyrocidine C	C70H89N15O13	1347.6764280222	[D-Phe]-[Pro]-[Trp]-[D-Trp]-[Asn]-[Gln]-[Tyr]-[Val]-[Orn]-[Leu]				NOR00300
+cyclic	tyrocidine D	C72H90N16O12	1370.6924124374	[D-Phe]-[Pro]-[Trp]-[D-Trp]-[Asn]-[Gln]-[Trp]-[Val]-[Orn]-[Leu]				NOR00301
+cyclic	brevianamide F	C16H17N3O2	283.1320768055	[Trp]-[Pro]				NOR00303
+cyclic	HC-toxin	C21H32N4O6	436.2321847806	[D-Pro]-[Ala]-[D-Ala]-[C10:0-NH2(2)-Ep(9)-oxo(8)]				NOR00304
+cyclic	AM-toxin I	C23H31N3O6	445.2212857433	[Amv]-[Hiv]-[Ala]-[dh-Ala]				NOR00305
+cyclic	AM-toxin II	C22H29N3O5	415.2107210570	[Apv]-[Hiv]-[Ala]-[dh-Ala]				NOR00306
+cyclic	AM-toxin III	C22H29N3O6	431.2056356791	[Ahv]-[Hiv]-[Ala]-[dh-Ala]				NOR00307
+cyclic	beauverolide A	C30H47N3O5	529.3515716348	[C10:0-Me(4)-OH(3)]-[Phe]-[Val]-[D-Val]				NOR00308
+cyclic	beauverolide B	C31H49N3O5	543.3672216990	[C10:0-Me(4)-OH(3)]-[Val]-[Phe]-[D-Ile]				NOR00309
+cyclic	beauverolide Ba	C31H49N3O5	543.3672216990	[C10:0-Me(4)-OH(3)]-[Val]-[Phe]-[D-aIle]				NOR00310
+cyclic	beauverolide C	C35H49N3O5	591.3672216990	[C10:0-Me(4)-OH(3)]-[Phe]-[Phe]-[D-Ile]				NOR00311
+cyclic	beauverolide Ca	C35H49N3O5	591.3672216990	[C10:0-Me(4)-OH(3)]-[Phe]-[Phe]-[D-aIle]				NOR00312
+cyclic	beauverolide D	C28H43N3O5	501.3202715064	[C8:0-Me(4)-OH(3)]-[Phe]-[Val]-[D-Val]				NOR00313
+cyclic	beauverolide E	C29H45N3O5	515.3359215706	[C8:0-Me(4)-OH(3)]-[Val]-[Phe]-[D-Ile]				NOR00314
+cyclic	beauverolide Ea	C29H45N3O5	515.3359215706	[C8:0-Me(4)-OH(3)]-[Val]-[Phe]-[D-aIle]				NOR00315
+cyclic	beauverolide F	C33H45N3O5	563.3359215706	[C8:0-Me(4)-OH(3)]-[Phe]-[Phe]-[D-Ile]				NOR00316
+cyclic	beauverolide Fa	C33H45N3O5	563.3359215706	[C8:0-Me(4)-OH(3)]-[Phe]-[Phe]-[D-aIle]				NOR00317
+cyclic	beauverolide i	C29H45N3O5	515.3359215706	[C11:0-OH(3)]-[Phe]-[Ala]-[D-Leu]				NOR00318
+cyclic	beauverolide H	C27H41N3O5	487.3046214422	[C9:0-OH(3)]-[Phe]-[Ala]-[D-Leu]				NOR00319
+cyclic	beauverolide Ja	C35H46N4O5	602.3468206079	[C8:0-Me(4)-OH(3)]-[Trp]-[Phe]-[D-aIle]				NOR00320
+cyclic	beauverolide Ka	C37H50N4O5	630.3781207363	[C10:0-Me(4)-OH(3)]-[Trp]-[Phe]-[D-aIle]				NOR00321
+cyclic	beauverolide L	C29H45N3O5	515.3359215706	[C10:0-Me(4)-OH(3)]-[Phe]-[Ala]-[D-Ile]				NOR00322
+cyclic	beauverolide La	C29H45N3O5	515.3359215706	[C10:0-Me(4)-OH(3)]-[Phe]-[Ala]-[D-aIle]				NOR00323
+cyclic	beauverolide M	C23H41N3O5	439.3046214422	[C8:0-Me(4)-OH(3)]-[Val]-[Ala]-[D-Leu]				NOR00324
+cyclic	beauverolide N	C27H41N3O6	503.2995360643	[C8:0-Me(4)-OH(3)]-[Tyr]-[Ala]-[D-Leu]				NOR00325
+cyclic	beauverolide I	C27H41N3O5	487.3046214422	[C8:0-Me(4)-OH(3)]-[Phe]-[Ala]-[D-Leu]				NOR00326
+cyclic	beauverolide II	C29H45N3O5	515.3359215706	[C10:0-Me(4)-OH(3)]-[Phe]-[Ala]-[D-Leu]				NOR00327
+cyclic	beauverolide III	C27H41N3O5	487.3046214422	[C8:0-Me(4)-OH(3)]-[Phe]-[Ala]-[D-aIle]				NOR00328
+cyclic	jaspamide	BrC36H45N4O6	708.2522371979	[C9:1(4)-Me(2.4.6)-OH(8)]-[Ala]-[NMe-Br-Trp]-[bTyr]				NOR00329
+cyclic	lichenysin A iC12	C50H88N8O12	992.6521703316	[iC12:0-OH(3)]-[Gln]-[Leu]-[D-Leu]-[Val]-[Asp]-[D-Leu]-[Ile]				NOR00364
+cyclic	dolastatin 11	C50H80N8O12	984.5895700748	[Gly]-[NMe-Val]-[NMe-OMe-Tyr]-[Ibu]-[Ala]-[Map]-[Hmp]-[Gly]-[NMe-Leu]				NOR00371
+cyclic	dolastatin 12	C50H80N8O12	984.5895700748	[Gly]-[NMe-Val]-[NMe-Tyr]-[Ibu]-[NMe-Ala]-[Map]-[Hmp]-[Gly]-[NMe-Leu]				NOR00372
+cyclic	kahalalide D	C31H45N7O5	595.3482175914	[iC9:0-OH(3)]-[D-Trp]-[Pro]-[Arg]				NOR00394
+cyclic	kahalalide E	C45H69N7O8	835.5207622281	[iC11:0-OH(3)]-[D-Ala]-[D-Ala]-[Leu]-[Pro]-[Leu]-[Trp]				NOR00395
+cyclic	kahalalide K	C46H65N7O11	891.4742059660	[iC11:0-OH(3)]-[D-Phe]-[4OH-Pro]-[D-Ala]-[Val]-[D-Asn]-[Tyr]				NOR00399
+cyclic	serrawettin W2	C38H61N5O9	731.4469285830	[C10:0-OH(3)]-[D-Leu]-[Ser]-[Thr]-[D-Phe]-[Ile]				NOR00404
+cyclic	serrawettin W1	C26H46N2O8	514.3254164638	[C10:0-OH(3)]-[Ser]-[C10:0-OH(3)]-[Ser]				NOR00405
+cyclic	cyclonellin	C45H62N12O12	962.4610155178	[Asn]-[Ala]-[Thr]-[Tyr]-[Pro]-[Tyr]-[Arg]-[Pro]				NOR00415
+cyclic	aurilide	C44H75N5O10	833.5513936545	[C11:2(t2.t8)-Me(2.6.8)-OH(5.7)]-[D-Hmp]-[Val]-[D-NMe-Leu]-[NMe-Gly]-[Val]-[NMe-Ala]				NOR00427
+cyclic	aurilide B	C44H75N5O10	833.5513936545	[C11:2(t2.t8)-Me(2.6.8)-OH(5.7)]-[D-Hmp]-[Val]-[NMe-aIle]-[NMe-Gly]-[Val]-[NMe-Ala]				NOR00428
+cyclic	aurilide C	C43H73N5O10	819.5357435903	[C11:2(t2.t8)-Me(2.6.8)-OH(5.7)]-[D-Hiv]-[Val]-[NMe-aIle]-[NMe-Gly]-[Val]-[NMe-Ala]				NOR00429
+cyclic	onchidin	C60H98N6O14	1126.7141018864	[NMe-Val]-[C8:0:1(7)-Me(2)-NH2(3)]-[Val]-[Hiv]-[Hiv]-[NMe-Val]-[C8:0:1(7)-Me(2)-NH2(3)]-[Val]-[Hiv]-[Hiv]				NOR00430
+cyclic	onchidin B	C62H96N4O16	1152.6821330560	[Pro]-[Hmp]-[Hiv]-[D-NMe-Val]-[C8:0:1(7)-Me(2)-OH(3)]-[D-Pro]-[Hmp]-[Hiv]-[D-NMe-Val]-[C8:0:1(7)-Me(2)-OH(3)]				NOR00431
+cyclic	guineamide A	C31H44N5O6S	614.3012298610	[Lac]-[NMe-Val]-[NMe-Phe]-[Ala-Thz]-[Map]				NOR00434
+cyclic	guineamide B	C32H46N5O6S	628.3168799252	[Hiv]-[NMe-Val]-[NMe-Phe]-[Ala-Thz]-[Mab]				NOR00435
+cyclic	guineamide C	C35H52N4O7	640.3836000447	[Hmp]-[NMe-OMe-Tyr]-[Val]-[NMe-Ala]-[C8:0:1(7)-Me(2)-NH2(3)]				NOR00436
+cyclic	guineamide D	C34H53N3O8	631.3832656937	[Hiv]-[D-NMe-OMe-Tyr]-[C6:0-Me(2)-NH2(3)]-[Hiv]-[NMe-Val]				NOR00437
+cyclic	guineamide E	C39H59N5O9	741.4312785188	[NMe-Val]-[Pro]-[D-NMe-Phe]-[Gly]-[C6:0-Me(2.2)-OH(3)]-[Hiv]-[Ala]				NOR00438
+cyclic	guineamide F	C40H55N5O7	717.4101491462	[NMe-Phe]-[Pro]-[NMe-Phe]-[Gly]-[C6:0-Me(2.2)-OH(3)]-[Val]				NOR00439
+cyclic	obyanamide	C30H42N5O6S	600.2855797968	[Lac]-[NMe-Val]-[NMe-Phe]-[Ala-Thz]-[C5:0-NH2(3)]				NOR00440
+cyclic	nagahamide A	C39H64N8O14	868.4541988054	[Ser]-[Gly]-[bMe-Asn]-[OH-Asn]-[Val]-[DHMDA]-[OH-4Abu]				NOR00441
+cyclic	halipeptin A	C31H56N4O8S	644.3818854852	[C10:0-Me(2.2.4)-OH(3)-OMe(7)]-[Ala]-[aMe-Cys]-[NMe-OH-Ile]-[Ala]				NOR00452
+cyclic	halipeptin B	C30H54N4O8S	630.3662354210	[C10:0-Me(2.2.4)-OH(3.7)]-[Ala]-[aMe-Cys]-[NMe-OH-Ile]-[Ala]				NOR00453
+cyclic	halipeptin C	C29H52N4O7S	600.3556707347	[C10:0-Me(2.2.4)-OH(3.7)]-[Ala]-[aMe-Cys]-[NMe-Val]-[Ala]				NOR00454
+cyclic	halipeptin D	C31H56N4O7S	628.3869708631	[C10:0-Me(2.2.4)-OH(3)-OMe(7)]-[Ala]-[aMe-Cys]-[NMe-Ile]-[Ala]				NOR00455
+cyclic	eurypamide A	C24H30N6O8	530.2125119710	[diOH-Phe]-[Tyr]-[diOH-Arg]				NOR00462
+cyclic	eurypamide B	C22H25N3O7	443.1692501728	[diOH-Phe]-[Tyr]-[Thr]				NOR00463
+cyclic	eurypamide C	C21H23N3O7	429.1536001086	[diOH-Phe]-[Tyr]-[Ser]				NOR00464
+cyclic	eurypamide D	C22H25N3O7	443.1692501728	[diOH-Phe]-[Tyr]-[aThr]				NOR00465
+cyclic	renieramide	C24H29N3O6	455.2056356791	[diOH-Phe]-[Tyr]-[Leu]				NOR00466
+cyclic	dihydrocyclotheonamide A	C36H47N9O8	733.3547595323	[hk-Arg]-[D-Phe]-[v-Tyr]-[NFo-Dpr]-[Pro]				NOR00470
+cyclic	cyclotheonamide A	C36H45N9O8	731.3391094681	[k-Arg]-[D-Phe]-[v-Tyr]-[NFo-Dpr]-[Pro]				NOR00471
+cyclic	cyclotheonamide B	C37H47N9O8	745.3547595323	[k-Arg]-[D-Phe]-[v-Tyr]-[NAc-Dpr]-[Pro]				NOR00472
+cyclic	cyclotheonamide C	C36H43N9O8	729.3234594039	[k-Arg]-[D-Phe]-[dv-Tyr]-[NFo-Dpr]-[Pro]				NOR00473
+cyclic	cyclotheonamide D	C33H47N9O8	697.3547595323	[k-Arg]-[D-Leu]-[v-Tyr]-[NFo-Dpr]-[Pro]				NOR00474
+cyclic	dysamide A	C14Cl6H20N2O2	457.9655958966	[Cl3-NMe-Leu]-[Cl3-NMe-Leu]				NOR00503
+cyclic	dysamide B	C14Cl4H22N2O2	390.0435399608	[Cl2-NMe-Leu]-[Cl2-NMe-Leu]				NOR00504
+cyclic	dysamide C	C14Cl6H16N2O2	453.9342957682	[Cl3-NMe-dhLeu]-[Cl3-NMe-dhLeu]				NOR00505
+cyclic	dyhydrodysamide C	C14Cl6H18N2O2	455.9499458324	[Cl3-NMe-Leu]-[Cl3-NMe-dhLeu]				NOR00506
+cyclic	dysamide D	C14Cl5H21N2O2	424.0045679287	[Cl3-NMe-Leu]-[Cl2-NMe-Leu]				NOR00507
+cyclic	dysamide K	C14Cl5H19N2O2	421.9889178645	[Cl2-NMe-Leu]-[Cl3-NMe-dhLeu]				NOR00508
+cyclic	dysamide M	C14Cl4H20N2O2	388.0278898966	[Cl2-NMe-Leu]-[Cl2-NMe-dhLeu]				NOR00509
+cyclic	dysamide N	C14Cl5H19N2O2	421.9889178645	[Cl3-NMe-Leu]-[Cl2-NMe-dhLeu]				NOR00510
+cyclic	dysamide O	C14Cl6H18N2O3	471.9448604545	[Cl3-5OH-NMe-Leu]-[Cl3-NMe-dhLeu]				NOR00511
+cyclic	dysamide P	C14Cl6H20N2O3	473.9605105187	[Cl3-2OH-NMe-Leu]-[Cl3-NMe-Leu]				NOR00512
+cyclic	dysamide Q	C14Cl6H18N2O3	471.9448604545	[Cl3-2OH-NMe-Leu]-[Cl3-NMe-dhLeu]				NOR00513
+cyclic	pallidin	C21H27N3O4	385.2001563707	[N1-COOH-bhTrp]-[NMe-Ile]				NOR00514
+cyclic	axinastatin 1	C38H56N8O8	752.4221108160	[Pro]-[Phe]-[Val]-[Val]-[Pro]-[Val]-[Asn]				NOR00515
+cyclic	axinastatin 2	C39H58N8O8	766.4377608802	[Pro]-[Phe]-[Val]-[Leu]-[Pro]-[Val]-[Asn]				NOR00516
+cyclic	axinastatin 3	C40H60N8O8	780.4534109444	[Pro]-[Phe]-[Ile]-[Leu]-[Pro]-[Val]-[Asn]				NOR00517
+cyclic	axinastatin 4	C42H62N8O8	806.4690610086	[Pro]-[Leu]-[Thr]-[Pro]-[Leu]-[Trp]-[Val]				NOR00518
+cyclic	axinastatin 5	C47H72N8O9	892.5422259517	[Pro]-[Tyr]-[Val]-[Pro]-[Leu]-[Ile]-[Leu]-[Pro]				NOR00519
+cyclic	axinellin A	C42H56N8O9	816.4170254381	[Pro]-[Phe]-[Thr]-[Ile]-[Phe]-[Pro]-[Asn]				NOR00520
+cyclic	axinellin B	C50H67N9O9	937.5061747964	[Pro]-[Phe]-[Pro]-[Thr]-[Leu]-[Val]-[Pro]-[Trp]				NOR00521
+cyclic	axinellin C	C50H67N9O9	937.5061747964	[Thr]-[Val]-[Pro]-[Trp]-[Pro]-[Phe]-[Pro]-[Leu]				NOR00522
+cyclic	phakellistatin 1	C45H61N7O8	827.4581619713	[Pro]-[Tyr]-[Pro]-[Ile]-[Pro]-[Ile]-[Phe]				NOR00523
+cyclic	phakellistatin 2	C45H61N7O8	827.4581619713	[Pro]-[Phe]-[Pro]-[Ile]-[Ile]-[Pro]-[Tyr]				NOR00524
+cyclic	phakellistatin 3	C42H54N8O9	814.4013753739	[Pro]-[Phe]-[Gly]-[Pro]-[Thr]-[Leu]-[pTrp]				NOR00525
+cyclic	phakellistatin 4	C41H55N7O9	789.4061264008	[Pro]-[Phe]-[Ile]-[Phe]-[Ser]-[Pro]-[Thr]				NOR00526
+cyclic	phakellistatin 5	C35H52N8O8S	744.3628813776	[Pro]-[Phe]-[Asn]-[Ala]-[Met]-[Ala]-[Ile]				NOR00527
+cyclic	phakellistatin 6	C47H62N8O7	850.4741463865	[Pro]-[Phe]-[Pro]-[Trp]-[Leu]-[Pro]-[Ile]				NOR00528
+cyclic	phakellistatin 7	C59H84N10O11	1108.6321035915	[Pro]-[Tyr]-[Ile]-[Pro]-[Pro]-[Ile]-[Phe]-[Ala]-[Leu]-[Pro]				NOR00529
+cyclic	phakellistatin 8	C61H88N10O11	1136.6634037199	[Pro]-[Tyr]-[Ile]-[Pro]-[Pro]-[Ile]-[Phe]-[Val]-[Leu]-[Pro]				NOR00530
+cyclic	phakellistatin 9	C60H86N10O11	1122.6477536557	[Pro]-[Tyr]-[Val]-[Pro]-[Pro]-[Ile]-[Phe]-[Val]-[Leu]-[Pro]				NOR00531
+cyclic	phakellistatin 10	C45H68N8O10	880.5058404454	[Pro]-[Tyr]-[Val]-[Pro]-[Leu]-[Thr]-[Pro]-[Ile]				NOR00532
+cyclic	phakellistatin 11	C53H67N9O9	973.5061747964	[Pro]-[Phe]-[Pro]-[Phe]-[Ile]-[Phe]-[Pro]-[Gln]				NOR00533
+cyclic	phakellistatin 12	C60H86N10O12	1138.6426682778	[Ile]-[Phe]-[Thr]-[Leu]-[Pro]-[Pro]-[Tyr]-[Ile]-[Pro]-[Pro]				NOR00534
+cyclic	phakellistatin 13	C42H54N8O8	798.4064607518	[Pro]-[Trp]-[Leu]-[Thr]-[Pro]-[Gly]-[Phe]				NOR00535
+cyclic	phakellistatin 14	C36H53N7O10S	775.3574616487	[Phe]-[bOMe-Asp]-[Ala]-[O-Met]-[Ala]-[Ile]-[Pro]				NOR00536
+cyclic	hymenamide A	C46H61N11O7	879.4755433700	[Pro]-[Phe]-[Trp]-[Arg]-[Pro]-[Pro]-[Val]				NOR00537
+cyclic	hymenamide B	C42H54N8O10	830.3962899960	[Pro]-[Asn]-[Phe]-[Val]-[Glu]-[Phe]-[Pro]				NOR00538
+cyclic	hymenamide C	C43H54N8O9	826.4013753739	[Pro]-[Phe]-[Gly]-[Pro]-[Glu]-[Leu]-[Trp]				NOR00539
+cyclic	hymenamide D	C38H55N7O10	769.4010410229	[Pro]-[Tyr]-[Asp]-[Pro]-[Leu]-[Ala]-[Ile]				NOR00540
+cyclic	hymenamide E	C45H55N7O10	853.4010410229	[Pro]-[Tyr]-[Phe]-[Phe]-[Pro]-[Thr]-[Thr]				NOR00541
+cyclic	hymenamide F	C35H60N10O7S	764.4367150227	[Pro]-[Ala]-[Val]-[Met]-[Leu]-[Arg]-[Pro]				NOR00542
+cyclic	hymenamide G	C47H72N8O9	892.5422259517	[Pro]-[Tyr]-[Val]-[Pro]-[Leu]-[Ile]-[Leu]-[Pro]				NOR00543
+cyclic	hymenamide H	C47H69N9O9	903.5218248606	[Pro]-[Trp]-[Val]-[Pro]-[Leu]-[Thr]-[Pro]-[Leu]				NOR00544
+cyclic	hymenamide J	C58H70N10O12	1098.5174677642	[Pro]-[Tyr]-[Asp]-[Phe]-[Trp]-[Lys]-[Val]-[Tyr]				NOR00545
+cyclic	hymenamide K	C52H66N10O11	1006.4912530137	[Pro]-[Tyr]-[Asp]-[Phe]-[Trp]-[Lys]-[Ala]-[Val]				NOR00546
+cyclic	hymenistatin I	C47H72N8O9	892.5422259517	[Pro]-[Tyr]-[Val]-[Pro]-[Leu]-[Ile]-[Ile]-[Pro]				NOR00547
+cyclic	stylopeptide I	C40H61N7O8	767.4581619713	[Pro]-[Ile]-[Pro]-[Leu]-[Ile]-[Phe]-[Ser]				NOR00548
+cyclic	stylostatin 1	C36H54N8O9	742.4013753739	[Pro]-[Phe]-[Asn]-[Ser]-[Leu]-[Ala]-[Ile]				NOR00549
+cyclic	wainunuamide	C38H51N9O7	745.3911450386	[Pro]-[His]-[Pro]-[Pro]-[Gly]-[Leu]-[Phe]				NOR00550
+cyclic	microsclerodermin A	C45H59N7O13	905.4170850176	[C12:1(11)-Me(6)-OH(2.4.5)-NH2(3)-mPhe(11)]-[OH-Pyr]-[NMe-Gly]-[D-COOH-Trp]-[Gly]-[OH-4Abu]				NOR00551
+cyclic	microsclerodermin B	C45H59N7O12	889.4221703955	[C12:1(11)-Me(6)-OH(2.4.5)-NH2(3)-mPhe(11)]-[Pyr]-[NMe-Gly]-[D-COOH-Trp]-[Gly]-[OH-4Abu]				NOR00552
+cyclic	microsclerodermin C	C39ClH47N8O10	822.3103677713	[C8:1(7)-OH(2.4.5)-NH2(3)-Ph(8)]-[Pyr]-[NMe-Gly]-[D-Cl-CONH2-Trp]-[Gly]-[OH-4Abu]				NOR00553
+cyclic	microsclerodermin D	C38ClH46N7O9	779.3045541119	[C8:1(7)-OH(2.4.5)-NH2(3)-Ph(8)]-[Pyr]-[NMe-Gly]-[D-Cl-Trp]-[Gly]-[OH-4Abu]				NOR00554
+cyclic	microsclerodermin E	C45H54N8O14	930.3759484844	[C10:2(7.9)-OH(2.4.5)-NH2(3)-ePh(10)]-[dPyr]-[NMe-Gly]-[D-COOH-Trp]-[Gly]-[OH-4Abu]				NOR00555
+cyclic	microsclerodermin F	C43H53N7O9	811.3904763366	[C12:3(7.9.11)-Me(6)-OH(2.4.5)-NH2(3)-Ph(12)]-[Pyr]-[NMe-Gly]-[D-Trp]-[Gly]-[OH-4Abu]				NOR00556
+cyclic	microsclerodermin G	C44H55N7O9	825.4061264008	[C12:3(7.9.11)-Me(6.10)-OH(2.4.5)-NH2(3)-Ph(12)]-[Pyr]-[NMe-Gly]-[D-Trp]-[Gly]-[OH-4Abu]				NOR00557
+cyclic	microsclerodermin H	C43H51N7O9	809.3748262724	[C12:3(7.9.11)-Me(6)-OH(2.4.5)-NH2(3)-Ph(12)]-[Pyr]-[NMe-Gly]-[dh-Trp]-[Gly]-[OH-4Abu]				NOR00558
+cyclic	microsclerodermin I	C44H53N7O9	823.3904763366	[C12:3(7.9.11)-Me(6.10)-OH(2.4.5)-NH2(3)-Ph(12)]-[Pyr]-[NMe-Gly]-[dh-Trp]-[Gly]-[OH-4Abu]				NOR00559
+cyclic	cyclolinopeptide A	C57H85N9O9	1039.6470253742	[Pro]-[Pro]-[Phe]-[Phe]-[Leu]-[Ile]-[Ile]-[Leu]-[Val]				NOR00560
+cyclic	barangamide A	C54H97N11O12	1091.7318176361	[Thr]-[bAla]-[D-Leu]-[NMe-Ile]-[bAla]-[D-aIle]-[NMe-Val]-[Ala]-[bAla]-[D-Leu]-[D-NMe-aIle]				NOR00561
+cyclic	barangamide B	C53H95N11O12	1077.7161675719	[Thr]-[bAla]-[D-Leu]-[NMe-Val]-[bAla]-[D-aIle]-[NMe-Val]-[Ala]-[bAla]-[D-Leu]-[D-NMe-aIle]				NOR00562
+cyclic	barangamide C	C53H95N11O12	1077.7161675719	[Thr]-[bAla]-[D-Leu]-[NMe-Ile]-[bAla]-[D-Val]-[NMe-Val]-[Ala]-[bAla]-[D-Leu]-[D-NMe-aIle]				NOR00563
+cyclic	barangamide D	C53H95N11O12	1077.7161675719	[Thr]-[bAla]-[D-Leu]-[NMe-Ile]-[bAla]-[D-aIle]-[NMe-Val]-[Ala]-[bAla]-[D-Leu]-[D-NMe-Val]				NOR00564
+cyclic	perthamide B	BrC44H65N10O14	1036.3864988479	[aC9:0-OH(2)-NH2(3)]-[dhAbu]-[NMe-Gly]-[OH-Asn]-[OMe-Thr]-[4Me-Pro]-[Br-Tyr]-[Asn]				NOR00573
+cyclic	waiakeamide	C37H49N7O8S3	815.2804736561	[O-Met]-[Phe-Thz]-[Pro]-[O-Met]-[Pro]-[Pro]				NOR00575
+cyclic	haligramide A	C37H49N7O6S3	783.2906444119	[Met]-[Phe-Thz]-[Pro]-[Met]-[Pro]-[Pro]				NOR00576
+cyclic	haligramide B	C37H49N7O7S3	799.2855590340	[O-Met]-[Phe-Thz]-[Pro]-[Met]-[Pro]-[Pro]				NOR00577
+cyclic	ceratospongamide	C42H51N7O5S	765.3672384740	[Pro-Thz]-[Phe]-[Pro]-[MeOx-Ile]-[Phe]				NOR00578
+cyclic	geodiamolide H	C34H44IN3O7	733.2223827827	[C9:1(4)-Me(2.4.6)-OH(8)]-[Ala]-[D-I-NMe-Tyr]-[bTyr]				NOR00601
+cyclic	geodiamolide I	BrC34H44N3O7	685.2362527827	[C9:1(4)-Me(2.4.6)-OH(8)]-[Ala]-[D-Br-NMe-Tyr]-[bTyr]				NOR00602
+cyclic	geodiamolide A	C28H40IN3O6	641.1961680322	[C9:1(4)-Me(2.4.6)-OH(8)]-[Ala]-[D-I-NMe-Tyr]-[Ala]				NOR00603
+cyclic	geodiamolide B	BrC28H40N3O6	593.2100380322	[C9:1(4)-Me(2.4.6)-OH(8)]-[Ala]-[D-Br-NMe-Tyr]-[Ala]				NOR00604
+cyclic	geodiamolide C	C28ClH40N3O6	549.2605640322	[C9:1(4)-Me(2.4.6)-OH(8)]-[Ala]-[D-Cl-NMe-Tyr]-[Ala]				NOR00605
+cyclic	geodiamolide D	C27H38IN3O6	627.1805179680	[C9:1(4)-Me(2.4.6)-OH(8)]-[Gly]-[D-I-NMe-Tyr]-[Ala]				NOR00606
+cyclic	geodiamolide E	BrC27H38N3O6	579.1943879680	[C9:1(4)-Me(2.4.6)-OH(8)]-[Gly]-[D-Br-NMe-Tyr]-[Ala]				NOR00607
+cyclic	geodiamolide F	C27ClH38N3O6	535.2449139680	[C9:1(4)-Me(2.4.6)-OH(8)]-[Gly]-[D-Cl-NMe-Tyr]-[Ala]				NOR00608
+cyclic	geodiamolide L	C28H40IN3O7	657.1910826543	[C9:1(4)-Me(2.4.6)-OH(8)]-[Ala]-[D-I-NMe-Tyr]-[Ser]				NOR00609
+cyclic	geodiamolide M	BrC28H40N3O7	609.2049526543	[C9:1(4)-Me(2.4.6)-OH(8)]-[Ala]-[D-Br-NMe-Tyr]-[Ser]				NOR00610
+cyclic	geodiamolide N	C28ClH40N3O7	565.2554786543	[C9:1(4)-Me(2.4.6)-OH(8)]-[Ala]-[D-Cl-NMe-Tyr]-[Ser]				NOR00611
+cyclic	geodiamolide O	C28H40IN3O7	657.1910826543	[C9:1(4)-Me(2.4.6)-OH(8)]-[Ser]-[D-I-NMe-Tyr]-[Ala]				NOR00612
+cyclic	geodiamolide P	BrC28H40N3O7	609.2049526543	[C9:1(4)-Me(2.4.6)-OH(8)]-[Ser]-[D-Br-NMe-Tyr]-[Ala]				NOR00613
+cyclic	geodiamolide Q	C28ClH40N3O7	565.2554786543	[C9:1(4)-Me(2.4.6)-OH(8)]-[Ser]-[D-Cl-NMe-Tyr]-[Ala]				NOR00614
+cyclic	geodiamolide R	C27H38IN3O7	643.1754325901	[C9:1(4)-Me(2.4.6)-OH(8)]-[Gly]-[D-I-NMe-Tyr]-[Ser]				NOR00615
+cyclic	geodiamolide TA	C30ClH44N3O6	577.2918641606	[C9:1(4)-Me(2.4.6)-OH(8)]-[Ala]-[D-Cl-NMe-Tyr]-[Val]				NOR00616
+cyclic	neosiphoniamolide A	C29H42IN3O6	655.2118180964	[C9:1(4)-Me(2.4.6)-OH(8)]-[Gly]-[D-I-NMe-Tyr]-[Val]				NOR00617
+cyclic	geodiamolide G	C28H38IN3O7	655.1754325901	[C9:1(Me4)-Me(2.4.6)-OH(8)-Oxo(5)]-[Ala]-[D-I-NMe-Tyr]-[Ala]				NOR00618
+cyclic	geodiamolide J	BrC28H38N3O7	607.1893025901	[C9:1(Me4)-Me(2.4.6)-OH(8)-Oxo(5)]-[Ala]-[D-Br-NMe-Tyr]-[Ala]				NOR00619
+cyclic	geodiamolide K	C28ClH38N3O7	563.2398285901	[C9:1(Me4)-Me(2.4.6)-OH(8)-Oxo(5)]-[Ala]-[D-Cl-NMe-Tyr]-[Ala]				NOR00620
+cyclic	majusculamide C	C50H80N8O12	984.5895700748	[Map]-[Ala]-[Ibu]-[NMe-OMe-Tyr]-[NMe-Val]-[Gly]-[NMe-Ile]-[Gly]-[Hmp]				NOR00621
+cyclic	chlamydocin	C28H38N4O6	526.2791349732	[Aib]-[Phe]-[D-Pro]-[C10:0-NH2(2)-Ep(9)-oxo(8)]				NOR00623
+cyclic	tentoxin	C22H30N4O4	414.2267054722	[NMe-Ala]-[Leu]-[NMe-dPhe]-[Gly]				NOR00624
+cyclic	cyclochlorotine	C24Cl2H31N5O7	571.1600543758	[bPhe]-[Ser]-[Cl2-Pro]-[Abu]-[Ser]				NOR00626
+cyclic	tuberactinamine	C19H31N11O8	541.2357070291	[Dpr]-[Ser]-[Ser]-[bU-dAla]-[Cap]				NOR00637
+cyclic	capreomycin IIA	C19H32N12O7	540.2516914443	[Dpr]-[bU-dAla]-[Cap]-[Dpr]-[Ser]				NOR00640
+cyclic	capreomycin IIB	C19H32N12O6	524.2567768222	[Dpr]-[bU-dAla]-[Cap]-[Dpr]-[Ala]				NOR00641
+cyclic	kulolide 1	C43H63N5O9	793.4625786472	[Ala]-[Val]-[Pro]-[Ph-Lac]-[D-NMe-Val]-[Val]-[C8:0:1(7)-Me(2.2)-OH(3)]				NOR00642
+cyclic	kulokainalide	C48H70N6O10	890.5153424992	[Phe]-[Val]-[Pro]-[Pro]-[Lac]-[D-NMe-Val]-[Val]-[C8:0:1(7)-Me(2.2)-OH(3)]				NOR00643
+cyclic	kulomo opunalide 1	C39H64N4O8	716.4724150520	[Hmp]-[NMe-Ile]-[Val]-[C8:0:1(7)-Me(2)-OH(3)]-[NMe-Ile]-[Pro]				NOR00645
+cyclic	globomycin	C32H57N5O9	655.4156284546	[Gly]-[aThr]-[Ser]-[aIle]-[NMe-Leu]-[C9:0-Me(2)-OH(3)]				NOR00646
+cyclic	SF-1902 A3	C31H55N5O9	641.3999783904	[Gly]-[aThr]-[Ser]-[Val]-[NMe-Leu]-[C9:0-Me(2)-OH(3)]				NOR00647
+cyclic	isariin	C33H59N5O7	637.4414492746	[Gly]-[Val]-[D-Leu]-[Ala]-[Val]-[C12:0-OH(3)]				NOR00648
+cyclic	isaridin B	C40H56N6O7	732.4210481835	[bAla]-[3OH-Leu]-[3Me-Pro]-[Phe]-[NMe-Val]-[NMe-Phe]				NOR00649
+cyclic	isaridin A	C39H54N6O7	718.4053981193	[bAla]-[3OH-Leu]-[Pro]-[Phe]-[NMe-Val]-[NMe-Phe]				NOR00650
+cyclic	empedopeptin	C49H79N11O19	1125.5553694130	[OH-Asp]-[3OH-Pro]-[D-Ser]-[D-OH-Asp]-[Arg]-[Pro]-[D-Ser]-[D-Pro]-[C14:0-OH(3)]				NOR00651
+cyclic	tripropeptin A	C49H79N11O19	1125.5553694130	[OH-Asp]-[3OH-Pro]-[Ser]-[OH-Asp]-[Arg]-[Pro]-[Pro]-[Thr]-[iC13:0-OH(3)]				NOR00652
+cyclic	plusbacin A1	C48H79N11O20	1129.5502840351	[OH-Asp]-[3OH-Pro]-[D-Ser]-[D-OH-Asp]-[Arg]-[3OH-Pro]-[D-Ala]-[D-aThr]-[C14:0-OH(3)]				NOR00653
+cyclic	plusbacin B1	C48H79N11O19	1113.5553694130	[OH-Asp]-[3OH-Pro]-[D-Ser]-[D-OH-Asp]-[Arg]-[Pro]-[D-Ala]-[D-aThr]-[C14:0-OH(3)]				NOR00654
+cyclic	cereulide	C57H96N6O18	1152.6781103106	[D-Hmp]-[D-Ala]-[Hiv]-[Val]-[D-Hmp]-[D-Ala]-[Hiv]-[Val]-[D-Hmp]-[D-Ala]-[Hiv]-[Val]				NOR00656
+cyclic	gratisin	C78H110N14O14	1466.8325943132	[Val]-[Orn]-[Leu]-[D-Phe]-[Pro]-[D-Tyr]-[Val]-[Orn]-[Leu]-[D-Phe]-[Pro]-[D-Tyr]				NOR00657
+cyclic	valinomycin	C54H90N6O18	1110.6311601180	[D-Val]-[Lac]-[Val]-[D-Hiv]-[D-Val]-[Lac]-[Val]-[D-Hiv]-[D-Val]-[Lac]-[Val]-[D-Hiv]				NOR00658
+cyclic	montanastatin	C36H60N4O12	740.4207734120	[D-Hiv]-[D-Val]-[Lac]-[Val]-[D-Hiv]-[D-Val]-[Lac]-[Val]				NOR00659
+cyclic	mycobacillin	C65H85N13O30	1527.5525284591	[Pro]-[D-Asp]-[D-Glu]-[Tyr]-[Asp]-[Tyr]-[Ser]-[D-Asp]-[Leu]-[D-Glu]-[D-Asp]-[Ala]-[D-Asp]				NOR00660
+cyclic	beauvericin B	C47H61N3O9	811.4407805726	[NMe-Phe]-[D-Hmp]-[NMe-Phe]-[D-Hmp]-[NMe-Phe]-[D-Hiv]				NOR00712
+cyclic	beauvericin C	C48H63N3O9	825.4564306368	[NMe-Phe]-[D-Hmp]-[NMe-Phe]-[D-Hmp]-[NMe-Phe]-[D-Hmp]				NOR00713
+cyclic	beauverolide IV	C22H39N3O5	425.2889713780	[C8:0-Me(4)-OH(3)]-[Ala]-[Val]-[D-Val]				NOR00735
+cyclic	beauverolide V	C23H41N3O5	439.3046214422	[C8:0-Me(4)-OH(3)]-[Ala]-[Val]-[D-aIle]				NOR00736
+cyclic	beauverolide VI	C23H41N3O5	439.3046214422	[C8:0-Me(4)-OH(3)]-[Ala]-[Val]-[D-Leu]				NOR00737
+cyclic	beauverolide VII	C26H39N3O5	473.2889713780	[C8:0-Me(4)-OH(3)]-[Ala]-[Phe]-[D-Val]				NOR00738
+cyclic	beauverolide VIII	C25H45N3O5	467.3359215706	[C10:0-Me(4)-OH(3)]-[Ala]-[Val]-[D-aIle]				NOR00739
+cyclic	hydroxycyclochlorotine	C24Cl2H31N5O8	587.1549689979	[bPhe]-[Ser]-[Cl2-Pro]-[aThr]-[Ser]				NOR00753
+cyclic	astin B	C25Cl2H33N5O7	585.1757044400	[bPhe]-[Abu]-[Cl2-Pro]-[aThr]-[Ser]				NOR00754
+cyclic	desmethylDestruxin B	C28H47N5O7	565.3475488894	[Pro]-[Ile]-[Val]-[NMe-Ala]-[bAla]-[Hiv]				NOR00760
+cyclic	destruxin F	C28H47N5O8	581.3424635115	[Pro]-[Ile]-[NMe-Val]-[NMe-Ala]-[bAla]-[C4:0-OH(2.3)]				NOR00761
+cyclic	SF-1902 A2	C30H53N5O9	627.3843283262	[Gly]-[aThr]-[Ser]-[aIle]-[NMe-Leu]-[C7:0-Me(2)-OH(3)]				NOR00769
+cyclic	SF-1902 A4a	C33H59N5O9	669.4312785188	[Gly]-[aThr]-[Ser]-[aIle]-[NMe-Leu]-[C10:0-Me(2)-OH(3)]				NOR00770
+cyclic	SF-1902 A4b	C33H59N5O9	669.4312785188	[Gly]-[aThr]-[Ser]-[Val]-[NMe-Leu]-[C11:0-Me(2)-OH(3)]				NOR00771
+cyclic	SF-1902 A5	C34H61N5O9	683.4469285830	[Gly]-[aThr]-[Ser]-[aIle]-[NMe-Leu]-[C11:0-Me(2)-OH(3)]				NOR00772
+cyclic	isariin B	C30H53N5O7	595.3944990820	[Gly]-[Val]-[D-Leu]-[Ala]-[Val]-[C9:0-OH(3)]				NOR00773
+cyclic	isariin C	C28H49N5O7	567.3631989536	[Gly]-[Val]-[D-Leu]-[Ala]-[Ala]-[C9:0-OH(3)]				NOR00774
+cyclic	isariin D	C26H45N5O7	539.3318988252	[Gly]-[Val]-[D-Leu]-[Ala]-[Ala]-[C7:0-OH(3)]				NOR00775
+cyclic	bacillomycin D-2	C49H76N10O15	1044.5491618231	[iC15:0-NH2(3)]-[Asn]-[D-Tyr]-[D-Asn]-[Pro]-[Glu]-[D-Ser]-[Thr]				NOR00776
+cyclic	bacillomycin D-3	C49H76N10O15	1044.5491618231	[aC15:0-NH2(3)]-[Asn]-[D-Tyr]-[D-Asn]-[Pro]-[Glu]-[D-Ser]-[Thr]				NOR00777
+cyclic	bacillomycin D-4	C50H78N10O15	1058.5648118873	[C16:0-NH2(3)]-[Asn]-[D-Tyr]-[D-Asn]-[Pro]-[Glu]-[D-Ser]-[Thr]				NOR00778
+cyclic	bacillomycin D-5	C50H78N10O15	1058.5648118873	[iC16:0-NH2(3)]-[Asn]-[D-Tyr]-[D-Asn]-[Pro]-[Glu]-[D-Ser]-[Thr]				NOR00779
+cyclic	bacillomycin L-2	C47H74N10O16	1034.5284263810	[iC15:0-NH2(3)]-[Asn]-[D-Tyr]-[D-Asn]-[Ser]-[Glu]-[D-Ser]-[Thr]				NOR00780
+cyclic	bacillomycin L-3	C47H74N10O16	1034.5284263810	[aC15:0-NH2(3)]-[Asn]-[D-Tyr]-[D-Asn]-[Ser]-[Glu]-[D-Ser]-[Thr]				NOR00781
+cyclic	bacillomycin L-4	C48H76N10O16	1048.5440764452	[C16:0-NH2(3)]-[Asn]-[D-Tyr]-[D-Asn]-[Ser]-[Glu]-[D-Ser]-[Thr]				NOR00782
+cyclic	bacillomycin L-5	C48H76N10O16	1048.5440764452	[iC16:0-NH2(3)]-[Asn]-[D-Tyr]-[D-Asn]-[Ser]-[Glu]-[D-Ser]-[Thr]				NOR00783
+cyclic	bacillomycin F-1	C50H78N12O14	1070.5760452756	[iC15:0-NH2(3)]-[Asn]-[D-Tyr]-[D-Asn]-[Gln]-[Pro]-[D-Asn]-[Thr]				NOR00784
+cyclic	bacillomycin F-2	C50H78N12O14	1070.5760452756	[aC15:0-NH2(3)]-[Asn]-[D-Tyr]-[D-Asn]-[Gln]-[Pro]-[D-Asn]-[Thr]				NOR00785
+cyclic	bacillomycin F-3	C51H80N12O14	1084.5916953398	[iC16:0-NH2(3)]-[Asn]-[D-Tyr]-[D-Asn]-[Gln]-[Pro]-[D-Asn]-[Thr]				NOR00786
+cyclic	bacillomycin F-4	C51H80N12O14	1084.5916953398	[C16:0-NH2(3)]-[Asn]-[D-Tyr]-[D-Asn]-[Gln]-[Pro]-[D-Asn]-[Thr]				NOR00787
+cyclic	bacillomycin F-5	C52H82N12O14	1098.6073454040	[iC17:0-NH2(3)]-[Asn]-[D-Tyr]-[D-Asn]-[Gln]-[Pro]-[D-Asn]-[Thr]				NOR00788
+cyclic	iturin A-1	C47H72N12O14	1028.5290950830	[C13:0-NH2(3)]-[Asn]-[D-Tyr]-[D-Asn]-[Gln]-[Pro]-[D-Asn]-[Ser]				NOR00789
+cyclic	iturin A-3	C49H76N12O14	1056.5603952114	[aC15:0-NH2(3)]-[Asn]-[D-Tyr]-[D-Asn]-[Gln]-[Pro]-[D-Asn]-[Ser]				NOR00790
+cyclic	iturin A-4	C49H76N12O14	1056.5603952114	[iC15:0-NH2(3)]-[Asn]-[D-Tyr]-[D-Asn]-[Gln]-[Pro]-[D-Asn]-[Ser]				NOR00791
+cyclic	iturin A-5	C49H76N12O14	1056.5603952114	[C15:0-NH2(3)]-[Asn]-[D-Tyr]-[D-Asn]-[Gln]-[Pro]-[D-Asn]-[Ser]				NOR00792
+cyclic	iturin A-6	C50H78N12O14	1070.5760452756	[iC16:0-NH2(3)]-[Asn]-[D-Tyr]-[D-Asn]-[Gln]-[Pro]-[D-Asn]-[Ser]				NOR00793
+cyclic	iturin A-7	C50H78N12O14	1070.5760452756	[C16:0-NH2(3)]-[Asn]-[D-Tyr]-[D-Asn]-[Gln]-[Pro]-[D-Asn]-[Ser]				NOR00794
+cyclic	iturin A-8	C51H80N12O14	1084.5916953398	[aC17:0-NH2(3)]-[Asn]-[D-Tyr]-[D-Asn]-[Gln]-[Pro]-[D-Asn]-[Ser]				NOR00795
+cyclic	iturin C-2	C49H75N11O15	1057.5444107962	[aC15:0-NH2(3)]-[Asp]-[D-Tyr]-[D-Asn]-[Gln]-[Pro]-[D-Asn]-[Ser]				NOR00796
+cyclic	iturin C-3	C50H77N11O15	1071.5600608604	[iC16:0-NH2(3)]-[Asp]-[D-Tyr]-[D-Asn]-[Gln]-[Pro]-[D-Asn]-[Ser]				NOR00797
+cyclic	iturin C-4	C51H79N11O15	1085.5757109246	[aC17:0-NH2(3)]-[Asp]-[D-Tyr]-[D-Asn]-[Gln]-[Pro]-[D-Asn]-[Ser]				NOR00798
+cyclic	mycosubtilin 1	C50H78N12O14	1070.5760452756	[C16:0-NH2(3)]-[Asn]-[D-Tyr]-[D-Asn]-[Gln]-[Pro]-[D-Ser]-[Asn]				NOR00799
+cyclic	mycosubtilin 2	C50H78N12O14	1070.5760452756	[iC16:0-NH2(3)]-[Asn]-[D-Tyr]-[D-Asn]-[Gln]-[Pro]-[D-Ser]-[Asn]				NOR00800
+cyclic	mycosubtilin 3	C51H80N12O14	1084.5916953398	[iC17:0-NH2(3)]-[Asn]-[D-Tyr]-[D-Asn]-[Gln]-[Pro]-[D-Ser]-[Asn]				NOR00801
+cyclic	kahalalide W	C31H45N7O6	611.3431322135	[iC9:0-OH(3)]-[D-Trp]-[4OH-Pro]-[Arg]				NOR00805
+cyclic	kahalalide Y	C46H65N7O10	875.4792913439	[iC11:0-OH(3)]-[D-Phe]-[Pro]-[D-Ala]-[Val]-[D-Asn]-[Tyr]				NOR00807
+cyclic	kulolide 2	C43H65N5O9	795.4782287114	[Ala]-[Val]-[Pro]-[Ph-Lac]-[D-NMe-Val]-[Val]-[C8:1(7)-Me(2.2)-OH(3)]				NOR00808
+cyclic	kulolide 3	C43H67N5O9	797.4938787756	[Ala]-[Val]-[Pro]-[Ph-Lac]-[D-NMe-Val]-[Val]-[C8:0-Me(2.2)-OH(3)]				NOR00809
+cyclic	kulomo opunalide 2	C38H62N4O8	702.4567649878	[Hiv]-[NMe-Ile]-[Val]-[C8:0:1(7)-Me(2)-OH(3)]-[NMe-Ile]-[Pro]				NOR00810
+cyclic	microcystin LAib	C47H69N7O12	923.5004207165	[D-Ala]-[Leu]-[D-bMe-Asp]-[Aib]-[Adda]-[D-Glu]-[NMe-Dha]				NOR00816
+cyclic	[D-Asp3.ADMAdda5.Dhb7]microcystin-LR	C49H72N10O13	1008.5280324505	[D-Ala]-[Leu]-[D-Asp]-[Arg]-[ADMAdda]-[D-Glu]-[dhAbu]				NOR00817
+cyclic	nodularin-Har	C42H62N8O10	838.4588902528	[D-bMe-Asp]-[Har]-[Adda]-[D-Glu]-[2Dh-Mabu]				NOR00824
+cyclic	motuporin	C40H57N5O10	767.4105430767	[D-bMe-Asp]-[Val]-[Adda]-[D-Glu]-[2Dh-Mabu]				NOR00825
+cyclic	[D-Asp1]nodularin	C40H58N8O10	810.4275901244	[D-Asp]-[Arg]-[Adda]-[D-Glu]-[2Dh-Mabu]				NOR00827
+cyclic	[DMAdda3]nodularin	C40H58N8O10	810.4275901244	[D-bMe-Asp]-[Arg]-[DMAdda]-[D-Glu]-[2Dh-Mabu]				NOR00828
+cyclic	[Dhb5]nodularin	C40H58N8O10	810.4275901244	[D-bMe-Asp]-[Arg]-[Adda]-[D-Glu]-[dhAbu]				NOR00829
+cyclic	[MeO-Glu4]nodularin	C42H62N8O10	838.4588902528	[D-bMe-Asp]-[Arg]-[Adda]-[D-MeO-Glu]-[2Dh-Mabu]				NOR00830
+cyclic	plusbacin A2	C49H81N11O20	1143.5659340993	[OH-Asp]-[3OH-Pro]-[D-Ser]-[D-OH-Asp]-[Arg]-[3OH-Pro]-[D-Ala]-[D-aThr]-[iC15:0-OH(3)]				NOR00834
+cyclic	plusbacin A3	C50H83N11O20	1157.5815841635	[OH-Asp]-[3OH-Pro]-[D-Ser]-[D-OH-Asp]-[Arg]-[3OH-Pro]-[D-Ala]-[D-aThr]-[iC16:0-OH(3)]				NOR00835
+cyclic	plusbacin A4	C50H83N11O20	1157.5815841635	[OH-Asp]-[3OH-Pro]-[D-Ser]-[D-OH-Asp]-[Arg]-[3OH-Pro]-[D-Ala]-[D-aThr]-[C16:0-OH(3)]				NOR00836
+cyclic	plusbacin B2	C49H81N11O19	1127.5710194772	[OH-Asp]-[3OH-Pro]-[D-Ser]-[D-OH-Asp]-[Arg]-[Pro]-[D-Ala]-[D-aThr]-[iC15:0-OH(3)]				NOR00837
+cyclic	plusbacin B3	C50H83N11O19	1141.5866695414	[OH-Asp]-[3OH-Pro]-[D-Ser]-[D-OH-Asp]-[Arg]-[Pro]-[D-Ala]-[D-aThr]-[iC16:0-OH(3)]				NOR00838
+cyclic	plusbacin B4	C50H83N11O19	1141.5866695414	[OH-Asp]-[3OH-Pro]-[D-Ser]-[D-OH-Asp]-[Arg]-[Pro]-[D-Ala]-[D-aThr]-[C16:0-OH(3)]				NOR00839
+cyclic	stylopeptide II	C63H84N10O12	1172.6270182136	[Pro]-[Thr]-[Pro]-[Phe]-[Leu]-[Leu]-[Pro]-[Phe]-[Pro]-[Tyr]				NOR00846
+cyclic	[Ala4]surfactin nC14	C50H87N7O13	993.6361859164	[C14:0-OH(3)]-[Glu]-[Leu]-[D-Leu]-[Ala]-[Asp]-[D-Leu]-[Leu]				NOR00847
+cyclic	[Ala4]surfactin iC15	C51H89N7O13	1007.6518359806	[iC15:0-OH(3)]-[Glu]-[Leu]-[D-Leu]-[Ala]-[Asp]-[D-Leu]-[Leu]				NOR00848
+cyclic	[Ala4]surfactin aC15	C51H89N7O13	1007.6518359806	[aC15:0-OH(3)]-[Glu]-[Leu]-[D-Leu]-[Ala]-[Asp]-[D-Leu]-[Leu]				NOR00849
+cyclic	[Ala4]surfactin nC15	C51H89N7O13	1007.6518359806	[C15:0-OH(3)]-[Glu]-[Leu]-[D-Leu]-[Ala]-[Asp]-[D-Leu]-[Leu]				NOR00850
+cyclic	[Gln1]surfactin iC15	C53H94N8O12	1034.6991205242	[iC15:0-OH(3)]-[Gln]-[Leu]-[D-Leu]-[Val]-[Asp]-[D-Leu]-[Ile]				NOR00851
+cyclic	[Gln1]surfactin aC15	C53H94N8O12	1034.6991205242	[aC15:0-OH(3)]-[Gln]-[Leu]-[D-Leu]-[Val]-[Asp]-[D-Leu]-[Ile]				NOR00852
+cyclic	surfactin nC14	C52H91N7O13	1021.6674860448	[C14:0-OH(3)]-[Glu]-[Leu]-[D-Leu]-[Val]-[Asp]-[D-Leu]-[Leu]				NOR00853
+cyclic	surfactin iC14	C52H91N7O13	1021.6674860448	[iC14:0-OH(3)]-[Glu]-[Leu]-[D-Leu]-[Val]-[Asp]-[D-Leu]-[Leu]				NOR00854
+cyclic	surfactin nC15	C53H93N7O13	1035.6831361090	[C15:0-OH(3)]-[Glu]-[Leu]-[D-Leu]-[Val]-[Asp]-[D-Leu]-[Leu]				NOR00855
+cyclic	surfactin iC15	C53H93N7O13	1035.6831361090	[iC15:0-OH(3)]-[Glu]-[Leu]-[D-Leu]-[Val]-[Asp]-[D-Leu]-[Leu]				NOR00856
+cyclic	surfactin aC13	C51H89N7O13	1007.6518359806	[aC13:0-OH(3)]-[Glu]-[Leu]-[D-Leu]-[Val]-[Asp]-[D-Leu]-[Leu]				NOR00857
+cyclic	surfactin nC13	C51H89N7O13	1007.6518359806	[C13:0-OH(3)]-[Glu]-[Leu]-[D-Leu]-[Val]-[Asp]-[D-Leu]-[Leu]				NOR00858
+cyclic	surfactin iC16	C54H95N7O13	1049.6987861732	[iC16:0-OH(3)]-[Glu]-[Leu]-[D-Leu]-[Val]-[Asp]-[D-Leu]-[Leu]				NOR00859
+cyclic	surfactin iC12	C50H87N7O13	993.6361859164	[iC12:0-OH(3)]-[Glu]-[Leu]-[D-Leu]-[Val]-[Asp]-[D-Leu]-[Leu]				NOR00860
+cyclic	tripropeptin B	C50H81N11O19	1139.5710194772	[OH-Asp]-[3OH-Pro]-[Ser]-[OH-Asp]-[Arg]-[Pro]-[Pro]-[Thr]-[iC14:0-OH(3)]				NOR00877
+cyclic	tripropeptin C	C51H83N11O19	1153.5866695414	[OH-Asp]-[3OH-Pro]-[Ser]-[OH-Asp]-[Arg]-[Pro]-[Pro]-[Thr]-[iC15:0-OH(3)]				NOR00878
+cyclic	tripropeptin D	C52H85N11O19	1167.6023196056	[OH-Asp]-[3OH-Pro]-[Ser]-[OH-Asp]-[Arg]-[Pro]-[Pro]-[Thr]-[iC16:0-OH(3)]				NOR00879
+cyclic	tripropeptin E	C53H87N11O19	1181.6179696698	[OH-Asp]-[3OH-Pro]-[Ser]-[OH-Asp]-[Arg]-[Pro]-[Pro]-[Thr]-[iC17:0-OH(3)]				NOR00880
+cyclic	tripropeptin Z	C48H77N11O19	1111.5397193488	[OH-Asp]-[3OH-Pro]-[Ser]-[OH-Asp]-[Arg]-[Pro]-[Pro]-[Thr]-[iC12:0-OH(3)]				NOR00881
+cyclic	lichenysin A nC12	C50H88N8O12	992.6521703316	[C12:0-OH(3)]-[Gln]-[Leu]-[D-Leu]-[Val]-[Asp]-[D-Leu]-[Ile]				NOR00888
+cyclic	lichenysin A iC13	C51H90N8O12	1006.6678203958	[iC13:0-OH(3)]-[Gln]-[Leu]-[D-Leu]-[Val]-[Asp]-[D-Leu]-[Ile]				NOR00889
+cyclic	lichenysin A aC13	C51H90N8O12	1006.6678203958	[aC13:0-OH(3)]-[Gln]-[Leu]-[D-Leu]-[Val]-[Asp]-[D-Leu]-[Ile]				NOR00890
+cyclic	lichenysin A nC13	C51H90N8O12	1006.6678203958	[C13:0-OH(3)]-[Gln]-[Leu]-[D-Leu]-[Val]-[Asp]-[D-Leu]-[Ile]				NOR00891
+cyclic	lichenysin A iC14	C52H92N8O12	1020.6834704600	[iC14:0-OH(3)]-[Gln]-[Leu]-[D-Leu]-[Val]-[Asp]-[D-Leu]-[Ile]				NOR00892
+cyclic	lichenysin A nC14	C52H92N8O12	1020.6834704600	[C14:0-OH(3)]-[Gln]-[Leu]-[D-Leu]-[Val]-[Asp]-[D-Leu]-[Ile]				NOR00893
+cyclic	lichenysin A iC15	C53H94N8O12	1034.6991205242	[iC15:0-OH(3)]-[Gln]-[Leu]-[D-Leu]-[Val]-[Asp]-[D-Leu]-[Ile]				NOR00894
+cyclic	lichenysin A aC15	C53H94N8O12	1034.6991205242	[aC15:0-OH(3)]-[Gln]-[Leu]-[D-Leu]-[Val]-[Asp]-[D-Leu]-[Ile]				NOR00895
+cyclic	lichenysin A nC15	C53H94N8O12	1034.6991205242	[C15:0-OH(3)]-[Gln]-[Leu]-[D-Leu]-[Val]-[Asp]-[D-Leu]-[Ile]				NOR00896
+cyclic	lichenysin A iC16	C54H96N8O12	1048.7147705884	[iC16:0-OH(3)]-[Gln]-[Leu]-[D-Leu]-[Val]-[Asp]-[D-Leu]-[Ile]				NOR00897
+cyclic	lichenysin A nC16	C54H96N8O12	1048.7147705884	[C16:0-OH(3)]-[Gln]-[Leu]-[D-Leu]-[Val]-[Asp]-[D-Leu]-[Ile]				NOR00898
+cyclic	lichenysin A iC17	C55H98N8O12	1062.7304206526	[iC17:0-OH(3)]-[Gln]-[Leu]-[D-Leu]-[Val]-[Asp]-[D-Leu]-[Ile]				NOR00899
+cyclic	lichenysin A aC17	C55H98N8O12	1062.7304206526	[aC17:0-OH(3)]-[Gln]-[Leu]-[D-Leu]-[Val]-[Asp]-[D-Leu]-[Ile]				NOR00900
+cyclic	apicidin	C34H49N5O6	623.3682843315	[C10:0-NH2(2)-oxo(8)]-[D-Hpr]-[Ile]-[OMe-Trp]				NOR01107
+cyclic	apicidin A	C33H47N5O5	593.3577196452	[C10:0-NH2(2)-oxo(8)]-[D-Hpr]-[Ile]-[Trp]				NOR01108
+cyclic	apicidin D2	C34H51N5O6	625.3839343957	[C10:0-OH(8)-NH2(2)]-[D-Hpr]-[Ile]-[OMe-Trp]				NOR01109
+cyclic	apicidin D1	C34H49N5O7	639.3631989536	[C10:0-OH(9)-NH2(2)-oxo(8)]-[D-Hpr]-[Ile]-[OMe-Trp]				NOR01110
+cyclic	apicidin D3	C34H51N5O6	625.3839343957	[C10:0-OH(9)-NH2(2)]-[D-Hpr]-[Ile]-[OMe-Trp]				NOR01111
+cyclic	apicidin C	C33H47N5O6	609.3526342673	[C10:0-NH2(2)-oxo(8)]-[D-Hpr]-[Val]-[OMe-Trp]				NOR01112
+cyclic	apicidin B	C33H47N5O6	609.3526342673	[C10:0-NH2(2)-oxo(8)]-[D-Pro]-[Ile]-[OMe-Trp]				NOR01113
+cyclic	scytalidamide A	C50H67N7O7	877.5101975418	[Phe]-[NMe-Phe]-[Phe]-[Aib]-[NMe-Leu]-[Pro]-[Leu]				NOR01142
+cyclic	scytalidamide B	C51H69N7O7	891.5258476060	[Phe]-[NMe-Phe]-[Phe]-[Aib]-[NMe-Leu]-[3Me-Pro]-[Leu]				NOR01143
+branch-cyclic	daptomycin	C72H101N17O26	1619.7103665051	[Gly]-[Orn]-[Asp]-[D-Ala]-[Asp]-[Gly]-[D-Ser]-[3Me-Glu]-[Kyn]\([Thr]-[Asp]-[D-Asn]-[Trp]-[C10:0]\)				NOR00001
+branch-cyclic	A54145 A	C72H109N17O27	1643.7678813840	[NMe-Gly]-[Ala]-[Asp]-[D-Lys]-[OMe-Asp]-[Gly]-[D-Asn]-[Glu]-[Ile]\([Thr]-[OH-Asn]-[D-Glu]-[Trp]-[iC10:0]\)				NOR00002
+branch-cyclic	A54145 B	C73H111N17O27	1657.7835314482	[NMe-Gly]-[Ala]-[Asp]-[D-Lys]-[OMe-Asp]-[Gly]-[D-Asn]-[3Me-Glu]-[Ile]\([Thr]-[OH-Asn]-[D-Glu]-[Trp]-[C10:0]\)				NOR00003
+branch-cyclic	A54145 C	C73H111N17O27	1657.7835314482	[NMe-Gly]-[Ala]-[Asp]-[D-Lys]-[OMe-Asp]-[Gly]-[D-Asn]-[3Me-Glu]-[Val]\([Thr]-[OH-Asn]-[D-Glu]-[Trp]-[aC11:0]\)				NOR00004
+branch-cyclic	A54145 F	C71H107N17O27	1629.7522313198	[NMe-Gly]-[Ala]-[Asp]-[D-Lys]-[OMe-Asp]-[Gly]-[D-Asn]-[Glu]-[Val]\([Thr]-[OH-Asn]-[D-Glu]-[Trp]-[iC10:0]\)				NOR00005
+branch-cyclic	CDA1b	C66H79N14O29P	1562.4874991596	[D-Trp]-[Asp]-[Asp]-[D-Hpg]-[Asp]-[Gly]-[D-PO-Asn]-[Glu]-[Trp]\([Thr]-[Ser]-[C6:0-Ep(2)]\)				NOR00023
+branch-cyclic	CDA2a	C67H79N14O29P	1574.4874991596	[D-Trp]-[Asp]-[Asp]-[D-Hpg]-[Asp]-[Gly]-[D-PO-Asn]-[3Me-Glu]-[dh-Trp]\([Thr]-[Ser]-[C6:0-Ep(2)]\)				NOR00024
+branch-cyclic	CDA2b	C67H81N14O29P	1576.5031492238	[D-Trp]-[Asp]-[Asp]-[D-Hpg]-[Asp]-[Gly]-[D-PO-Asn]-[3Me-Glu]-[Trp]\([Thr]-[Ser]-[C6:0-Ep(2)]\)				NOR00025
+branch-cyclic	CDA3a	C66H76N14O26	1480.5055186870	[D-Trp]-[Asp]-[Asp]-[D-Hpg]-[Asp]-[Gly]-[D-OH-Asn]-[Glu]-[dh-Trp]\([Thr]-[Ser]-[C6:0-Ep(2)]\)				NOR00026
+branch-cyclic	CDA3b	C66H78N14O26	1482.5211687512	[D-Trp]-[Asp]-[Asp]-[D-Hpg]-[Asp]-[Gly]-[D-OH-Asn]-[Glu]-[Trp]\([Thr]-[Ser]-[C6:0-Ep(2)]\)				NOR00027
+branch-cyclic	CDA4a	C67H78N14O26	1494.5211687512	[D-Trp]-[Asp]-[Asp]-[D-Hpg]-[Asp]-[Gly]-[D-OH-Asn]-[3Me-Glu]-[dh-Trp]\([Thr]-[Ser]-[C6:0-Ep(2)]\)				NOR00028
+branch-cyclic	CDA4b	C67H80N14O26	1496.5368188154	[D-Trp]-[Asp]-[Asp]-[D-Hpg]-[Asp]-[Gly]-[D-OH-Asn]-[3Me-Glu]-[Trp]\([Thr]-[Ser]-[C6:0-Ep(2)]\)				NOR00029
+branch-cyclic	CDA2d	C67H81N14O28P	1560.5082346017	[D-Trp]-[Asp]-[Asp]-[D-ph-Gly]-[Asp]-[Gly]-[D-PO-Asn]-[3Me-Glu]-[Trp]\([Thr]-[Ser]-[C6:0-Ep(2)]\)				NOR00030
+branch-cyclic	CDA2fa	C67FH78N14O28P	1576.4831635054	[D-Trp]-[Asp]-[Asp]-[D-F-ph-Gly]-[Asp]-[Gly]-[D-PO-Asn]-[3Me-Glu]-[dh-Trp]\([Thr]-[Ser]-[C6:0-Ep(2)]\)				NOR00031
+branch-cyclic	CDA2fb	C67FH80N14O28P	1578.4988135696	[D-Trp]-[Asp]-[Asp]-[D-F-ph-Gly]-[Asp]-[Gly]-[D-PO-Asn]-[3Me-Glu]-[Trp]\([Thr]-[Ser]-[C6:0-Ep(2)]\)				NOR00032
+branch-cyclic	beta-D-Glucopyranosyl-hydroxyDestruxin B	C35H59N5O12	741.4160223851	[Pro]-[Ile]-[NMe-Val]-[NMe-Ala]-[bAla]\([Hiv]-[D-Glc]\)				NOR00079
+branch-cyclic	pyoverdin G173	C45H67N13O18	1077.4727024161	[D-Asp]-[Ac-OH-Orn]-[Ser]\([Orn]-[Ac-OH-Orn]-[Ala]-[D-Ser]-[ChrP]\)				NOR00187
+branch-cyclic	pyoverdin 96-312	C46H72N14O17	1092.5199869597	[Fo-OH-Orn]-[Lys]-[Ser]\([Lys]-[Fo-OH-Orn]-[Ser]-[D-Ser]-[ChrP]\)				NOR00188
+branch-cyclic	pyoverdin 96.188	C48H74N14O18	1134.5305516460	[D-Fo-OH-Orn]-[D-Glu]-[D-Ser]\([Lys]-[Fo-OH-Orn]-[Lys]-[D-Ser]-[ChrP]\)				NOR00189
+branch-cyclic	pyoverdin C-E	C51H81N17O19	1235.5894635084	[Fo-OH-Orn]-[Thr]-[Thr]\([Lys]-[Fo-OH-Orn]-[D-Ser]-[Arg]-[D-Ser]-[ChrP]\)				NOR00190
+branch-cyclic	pyoverdin 95-275	C52H82N16O21	1266.5840437795	[Fo-OH-Orn]-[Lys]-[Ser]\([Lys]-[Ser]-[Ser]-[Fo-OH-Orn]-[Ser]-[D-Ser]-[ChrP]\)				NOR00191
+branch-cyclic	pyoverdin 12	C58H90N18O24	1422.6375359130	[D-Fo-OH-Orn]-[Glu]-[Ser]\([Lys]-[Gly]-[Ser]-[D-Ser]-[Fo-OH-Orn]-[Gly]-[Lys]-[D-Ser]-[ChrP]\)				NOR00192
+branch-cyclic	pyoverdin 13525	C45H70N14O16	1062.5094222734	[D-Fo-OH-Orn]-[Ser]\([Lys]-[Fo-OH-Orn]-[Gly]-[Lys]-[D-Ser]-[ChrP]\)				NOR00193
+branch-cyclic	pyoverdin 96-318	C48H75N15O19	1165.5363653054	[Fo-OH-Orn]-[Ser]\([Lys]-[Ser]-[D-Ser]-[Fo-OH-Orn]-[Orn]-[D-Ser]-[ChrP]\)				NOR00194
+branch-cyclic	pyoverdin 18-1	C53H83N17O21	1293.5949428168	[D-Fo-OH-Orn]-[Ser]\([Lys]-[Gly]-[D-Ser]-[Ser]-[Fo-OH-Orn]-[Gly]-[Lys]-[D-Ser]-[ChrP]\)				NOR00195
+branch-cyclic	PaB	C40H57N11O19	995.3832187068	[Gly]-[D-OH-Asp]-[Ser]\([Thr]-[Thr]-[D-OH-Asp]-[Lys]-[ChrP]\)				NOR00198
+branch-cyclic	pyoverdin 19310	C41H59N11O20	1025.3937833931	[Ser]-[D-OH-Asp]-[Ser]\([Thr]-[Thr]-[D-OH-Asp]-[Lys]-[ChrP]\)				NOR00199
+branch-cyclic	pseudobactin A214	C42H60N12O19	1036.4097678083	[Ala]-[OH-Asp]-[Thr]\([D-Ser]-[Gly]-[Ala]-[D-Ac-OH-Orn]-[D-Ser]-[ChrP]\)				NOR00201
+branch-cyclic	pyoverdin P19	C42H60N12O20	1052.4046824304	[Ser]-[D-OH-Asp]-[Thr]\([D-Ser]-[Gly]-[Ala]-[D-Ac-OH-Orn]-[D-Ser]-[ChrP]\)				NOR00202
+branch-cyclic	pyoverdin D-TR133	C48H72N14O18	1132.5149015818	[Ala]-[Ala]-[D-Fo-OH-Orn]-[Ala]\([Thr]-[Lys]-[D-Fo-OH-Orn]-[Asp]-[ChrP]\)				NOR00203
+branch-cyclic	pyoverdin I-III	C51H80N16O17	1188.5887352269	[Ala]-[Ala]-[D-Fo-OH-Orn]-[Lys]\([Thr]-[Lys]-[D-Fo-OH-Orn]-[Asn]-[ChrP]\)				NOR00204
+branch-cyclic	fengycin A	C72H109N11O21	1463.7799496202	[D-aThr]-[Glu]-[D-Ala]-[Pro]-[Glu]-[D-Tyr]-[Ile]\([Tyr]-[D-Orn]-[Glu]-[C16:0-OH(3)]\)				NOR00226
+branch-cyclic	fengycin B	C74H113N11O21	1491.8112497486	[D-aThr]-[Glu]-[D-Val]-[Pro]-[Glu]-[D-Tyr]-[Ile]\([Tyr]-[D-Orn]-[Glu]-[C16:0-OH(3)]\)				NOR00227
+branch-cyclic	anabaenopeptilide 90A	C50H71N9O16	1053.5018772795	[Hty]-[Ahp]-[Thr]-[NMe-OMe-Tyr]-[Ile]\([Thr]-[NFo-Gln]\)				NOR00257
+branch-cyclic	anabaenopeptilide 90B	C49ClH68N9O16	1073.4472551832	[Hty]-[Ahp]-[Thr]-[Cl-NMe-Tyr]-[Ile]\([Thr]-[NFo-Gln]\)				NOR00258
+branch-cyclic	anabaenopeptilide 202A	C55H78N10O17	1150.5546411315	[Hty]-[Ahp]-[Thr]-[NMe-OMe-Tyr]-[Ile]\([Thr]-[Gln]-[NFo-Pro]\)				NOR00259
+branch-cyclic	anabaenopeptilide 202B	C54ClH75N10O17	1170.5000190352	[Hty]-[Ahp]-[Thr]-[Cl-NMe-Tyr]-[Ile]\([Thr]-[Gln]-[NFo-Pro]\)				NOR00260
+branch-cyclic	anabaenopeptin A	C44H57N7O9	827.4217764650	[Phe]-[NMe-Ala]-[Hty]-[Val]\([D-Lys]-[CO]-[Tyr]\)				NOR00261
+branch-cyclic	anabaenopeptin B	C41H60N10O8	820.4595589548	[Phe]-[NMe-Ala]-[Hty]-[Val]\([D-Lys]-[CO]-[Arg]\)				NOR00262
+branch-cyclic	anabaenopeptin C	C41H60N8O8	792.4534109444	[Phe]-[NMe-Ala]-[Hty]-[Val]\([D-Lys]-[CO]-[Lys]\)				NOR00263
+branch-cyclic	anabaenopeptin D	C44H57N7O8	811.4268618429	[Phe]-[NMe-Ala]-[Hty]-[Val]\([D-Lys]-[CO]-[Phe]\)				NOR00264
+branch-cyclic	anabaenopeptin E	C42H62N10O8	834.4752090190	[Phe]-[NMe-Ala]-[3Me-Hty]-[Val]\([D-Lys]-[CO]-[Arg]\)				NOR00265
+branch-cyclic	anabaenopeptin F	C42H62N10O8	834.4752090190	[Phe]-[NMe-Ala]-[Hty]-[Ile]\([D-Lys]-[CO]-[Arg]\)				NOR00266
+branch-cyclic	anabaenopeptin G	C45H68N10O9	892.5170738337	[Tyr]-[NMe-Leu]-[Hty]-[Ile]\([D-Lys]-[CO]-[Arg]\)				NOR00267
+branch-cyclic	anabaenopeptin H	C46H70N10O9	906.5327238979	[Ile]-[NMe-Hty]-[Hty]-[Ile]\([D-Lys]-[CO]-[Arg]\)				NOR00268
+branch-cyclic	anabaenopeptin I	C38H61N7O8	743.4581619713	[Leu]-[NMe-Ala]-[Hty]-[Val]\([D-Lys]-[CO]-[Ile]\)				NOR00269
+branch-cyclic	anabaenopeptin J	C41H59N7O8	777.4425119071	[Phe]-[NMe-Ala]-[Hty]-[Val]\([D-Lys]-[CO]-[Ile]\)				NOR00270
+branch-cyclic	anabaenopeptin T	C45H67N7O9	849.5000267860	[Ile]-[NMe-Hty]-[Hty]-[Val]\([D-Lys]-[CO]-[Ile]\)				NOR00271
+branch-cyclic	ferintoic acid A	C46H58N8O8	850.4377608802	[Phe]-[NMe-Ala]-[Hty]-[Val]\([D-Lys]-[CO]-[Trp]\)				NOR00272
+branch-cyclic	ferintoic acid B	C47H60N8O8	864.4534109444	[Phe]-[NMe-Ala]-[Hty]-[aIle]\([D-Lys]-[CO]-[Trp]\)				NOR00273
+branch-cyclic	nodulapeptin A	C44H63N7O12S	913.4255412139	[Ac-Ser]-[NMe-Hty]-[Hph]-[O2-Met]\([D-Lys]-[CO]-[Ile]\)				NOR00274
+branch-cyclic	nodulapeptin B	C44H63N7O11S	897.4306265918	[Ac-Ser]-[NMe-Hty]-[Hph]-[O-Met]\([D-Lys]-[CO]-[Ile]\)				NOR00275
+branch-cyclic	oscillamide B	C41H60N10O8S	852.4316296448	[Phe]-[NMe-Ala]-[Hty]-[Met]\([D-Lys]-[CO]-[Arg]\)				NOR00276
+branch-cyclic	oscillamide C	C49H68N10O9	940.5170738337	[Phe]-[NMe-Hty]-[Hty]-[Ile]\([D-Lys]-[CO]-[Arg]\)				NOR00277
+branch-cyclic	oscillamide Y	C45H59N7O9	841.4374265292	[Phe]-[NMe-Ala]-[Hty]-[Ile]\([D-Lys]-[CO]-[Tyr]\)				NOR00278
+branch-cyclic	friulimicin A	C58H92N14O19	1288.6663168459	[Hpr]-[bMe-Asp]-[Asp]-[Gly]-[Asp]-[Gly]-[D-Dbu]-[Val]-[Pro]\([L-Dbu]-[Asn]-[iC13:1(3)]\)				NOR00296
+branch-cyclic	amphomycin A1437 A	C58H91N13O20	1289.6503324307	[Hpr]-[bMe-Asp]-[Asp]-[Gly]-[Asp]-[Gly]-[D-Dbu]-[Val]-[Pro]\([Dbu]-[Asp]-[iC13:1(3)]\)				NOR00297
+branch-cyclic	viscosin	C54H95N9O16	1125.6896780499	[D-Val]-[Leu]-[D-Ser]-[Leu]-[D-Ser]-[Ile]\([D-aThr]-[D-Glu]-[Leu]-[C10:0-OH(3)]\)				NOR00331
+branch-cyclic	viscosinamide	C54H96N10O15	1124.7056624651	[D-Val]-[Leu]-[D-Ser]-[Leu]-[D-Ser]-[Ile]\([D-aThr]-[D-Gln]-[Leu]-[C10:0-OH(3)]\)				NOR00332
+branch-cyclic	massetolide A	C55H97N9O16	1139.7053281141	[D-aIle]-[Leu]-[D-Ser]-[Leu]-[D-Ser]-[Ile]\([D-aThr]-[D-Glu]-[Leu]-[C10:0-OH(3)]\)				NOR00333
+branch-cyclic	massetolide D	C55H97N9O16	1139.7053281141	[D-aIle]-[Leu]-[D-Ser]-[Leu]-[D-Ser]-[Leu]\([D-aThr]-[D-Glu]-[Leu]-[C10:0-OH(3)]\)				NOR00334
+branch-cyclic	massetolide E	C53H93N9O16	1111.6740279857	[D-Val]-[Leu]-[D-Ser]-[Leu]-[D-Ser]-[Val]\([D-aThr]-[D-Glu]-[Leu]-[C10:0-OH(3)]\)				NOR00335
+branch-cyclic	massetolide F	C54H95N9O16	1125.6896780499	[D-Val]-[Leu]-[D-Ser]-[Leu]-[D-Ser]-[Leu]\([D-aThr]-[D-Glu]-[Leu]-[C10:0-OH(3)]\)				NOR00336
+branch-cyclic	White Line Inducing Principle	C54H95N9O16	1125.6896780499	[D-Val]-[D-Leu]-[D-Ser]-[Leu]-[D-Ser]-[Ile]\([D-aThr]-[D-Glu]-[Leu]-[C10:0-OH(3)]\)				NOR00337
+branch-cyclic	pseudophomin A	C55H97N9O16	1139.7053281141	[D-Ile]-[D-Leu]-[D-Ser]-[Leu]-[D-Ser]-[Ile]\([D-aThr]-[D-Glu]-[Leu]-[C10:0-OH(3)]\)				NOR00338
+branch-cyclic	amphisin	C66H114N12O20	1394.8272341638	[D-Leu]-[D-Leu]-[D-Ser]-[Leu]-[D-Gln]-[Leu]-[Ile]-[Asp]\([D-aThr]-[D-Asp]-[D-Leu]-[C10:0-OH(3)]\)				NOR00339
+branch-cyclic	tensin	C67H116N12O20	1408.8428842280	[D-Leu]-[D-Leu]-[D-Ser]-[Leu]-[D-Gln]-[Leu]-[Ile]-[Glu]\([D-aThr]-[D-Asp]-[D-Leu]-[C10:0-OH(3)]\)				NOR00340
+branch-cyclic	pholipeptin	C64H111N11O20	1353.8006850623	[D-Leu]-[D-Leu]-[D-Ser]-[D-Leu]-[D-Ser]-[D-Leu]-[Ile]-[D-Asp]\([Thr]-[Asp]-[D-Leu]-[C10:0-OH(3)]\)				NOR00341
+branch-cyclic	lokisin	C64H111N11O20	1353.8006850623	[D-Leu]-[D-Leu]-[D-Ser]-[Leu]-[D-Ser]-[Leu]-[Ile]-[Asp]\([D-aThr]-[D-Asp]-[D-Leu]-[C10:0-OH(3)]\)				NOR00342
+branch-cyclic	arthrofactin	C64H111N11O20	1353.8006850623	[D-Leu]-[D-Leu]-[D-Ser]-[Leu]-[D-Ser]-[Ile]-[Ile]-[Asp]\([D-Thr]-[D-Asp]-[D-Leu]-[C10:0-OH(3)]\)				NOR00343
+branch-cyclic	tolaasin I	C94H163N21O25	1986.2128998940	[Ile]-[D-Hse]-[D-Dab]-[Lys]\([D-aThr]-[dhAbu]-[D-Val]-[Leu]-[D-Gln]-[Val]-[D-Val]-[D-Leu]-[D-Ser]-[D-Val]-[D-Leu]-[D-Ser]-[D-Pro]-[dhAbu]-[C8:0-OH(3)]\)				NOR00344
+branch-cyclic	tolaasin II	C92H159N21O24	1942.1866851435	[Ile]-[Gly]-[D-Dab]-[Lys]\([D-aThr]-[dhAbu]-[D-Val]-[Leu]-[D-Gln]-[Val]-[D-Val]-[D-Leu]-[D-Ser]-[D-Val]-[D-Leu]-[D-Ser]-[D-Pro]-[dhAbu]-[C8:0-OH(3)]\)				NOR00345
+branch-cyclic	tolaasin B	C93H161N21O25	1972.1972498298	[Val]-[D-Hse]-[D-Dab]-[Lys]\([D-aThr]-[dhAbu]-[D-Val]-[Leu]-[D-Gln]-[Val]-[D-Val]-[D-Leu]-[D-Ser]-[D-Val]-[D-Leu]-[D-Ser]-[D-Pro]-[dhAbu]-[C8:0-OH(3)]\)				NOR00346
+branch-cyclic	tolaasin D	C94H163N21O25	1986.2128998940	[Leu]-[D-Hse]-[D-Dab]-[Lys]\([D-aThr]-[dhAbu]-[D-Val]-[Leu]-[D-Gln]-[Val]-[D-Val]-[D-Leu]-[D-Ser]-[D-Val]-[D-Leu]-[D-Ser]-[D-Pro]-[dhAbu]-[C8:0-OH(3)]\)				NOR00347
+branch-cyclic	tolaasin E	C92H159N21O24	1942.1866851435	[Leu]-[Gly]-[D-Dab]-[Lys]\([D-aThr]-[dhAbu]-[D-Val]-[Leu]-[D-Gln]-[Val]-[D-Val]-[D-Leu]-[D-Ser]-[D-Val]-[D-Leu]-[D-Ser]-[D-Pro]-[dhAbu]-[C8:0-OH(3)]\)				NOR00348
+branch-cyclic	fuscopeptin A	C86H139N21O22	1818.0403552573	[Ala]-[Dab]-[D-Dab]-[Phe]\([D-aThr]-[dhAbu]-[D-Val]-[D-Ala]-[D-Val]-[D-Ala]-[Gly]-[D-Val]-[D-Ala]-[D-Ala]-[D-Ala]-[D-Ala]-[Leu]-[D-Pro]-[dhAbu]-[C8:0-OH(3)]\)				NOR00349
+branch-cyclic	corpeptin A	C98H163N23O27	2094.2088771486	[Ala]-[Dab]-[Ser]-[Ile]\([aThr]-[dhAbu]-[Val]-[Ala]-[Ala]-[Ala]-[dh-Ala]-[aIle]-[Val]-[Hse]-[dhAbu]-[Val]-[Val]-[Ala]-[Ala]-[Ala]-[Pro]-[dhAbu]-[C10:0-OH(3)]\)				NOR00350
+branch-cyclic	syringopeptin 22A	C101H162N24O27	2143.2041261217	[D-Ser]-[D-Ala]-[dhAbu]-[Ala]-[Dab]-[D-Dab]-[Tyr]\([D-aThr]-[dhAbu]-[D-Ala]-[Ala]-[D-Val]-[D-Ala]-[dhAbu]-[D-Val]-[D-Val]-[D-Ala]-[D-Ala]-[Val]-[D-Val]-[D-Pro]-[dhAbu]-[C10:0-OH(3)]\)				NOR00351
+branch-cyclic	syringopeptin 25A	C113H183N27O30	2398.3624176777	[D-Ser]-[D-Ala]-[Val]-[Ala]-[Dab]-[D-Dab]-[Tyr]\([D-aThr]-[dhAbu]-[D-Ala]-[D-Ala]-[D-Val]-[D-Ala]-[dhAbu]-[D-Val]-[dhAbu]-[D-Ala]-[D-Ala]-[D-Leu]-[Val]-[D-Ala]-[Ala]-[D-Val]-[D-Pro]-[dhAbu]-[C10:0-OH(3)]\)				NOR00352
+branch-cyclic	syringopeptin SC 1	C102H164N24O27	2157.2197761859	[Ser]-[Ala]-[dhAbu]-[Ala]-[Dab]-[Dab]-[Tyr]\([aThr]-[dhAbu]-[Ala]-[Ala]-[Val]-[Ala]-[dh-Ala]-[Val]-[Leu]-[Ala]-[Ala]-[Leu]-[Val]-[Pro]-[dhAbu]-[C10:0-OH(3)]\)				NOR00353
+branch-cyclic	syringopeptin 22 PhvA	C100H160N24O27	2129.1884760575	[Ser]-[Ala]-[dhAbu]-[Ala]-[Dab]-[Dab]-[Tyr]\([aThr]-[dhAbu]-[Ala]-[Ala]-[Val]-[Ala]-[dhAbu]-[Val]-[Ala]-[Ala]-[Ala]-[Leu]-[Val]-[Pro]-[dhAbu]-[C10:0-OH(3)]\)				NOR00354
+branch-cyclic	[Phe25]syringopeptin 25A	C113H183N27O29	2382.3675030556	[D-Ser]-[D-Ala]-[Val]-[Ala]-[Dab]-[D-Dab]-[Phe]\([D-aThr]-[dhAbu]-[D-Ala]-[D-Ala]-[D-Val]-[D-Ala]-[dhAbu]-[D-Val]-[dhAbu]-[D-Ala]-[D-Ala]-[D-Leu]-[Val]-[D-Ala]-[Ala]-[D-Val]-[D-Pro]-[dhAbu]-[C10:0-OH(3)]\)				NOR00355
+branch-cyclic	syringomycin E	C53ClH85N14O17	1224.5905653770	[D-Ser]-[Dab]-[D-Dab]-[Arg]-[Phe]-[dhAbu]-[OH-Asp]-[4Cl-Thr]\([Ser]-[C12:0-OH(3)]\)				NOR00356
+branch-cyclic	syringostatin A	C50ClH87N12O18	1178.5949820529	[D-Dab]-[Dab]-[D-Hse]-[Orn]-[aThr]-[dhAbu]-[OH-Asp]-[4Cl-Thr]\([Ser]-[C14:0-OH(3)]\)				NOR00357
+branch-cyclic	syringotoxin B	C48ClH82N11O18	1135.5527828872	[D-Dab]-[Gly]-[D-Hse]-[Orn]-[aThr]-[dhAbu]-[OH-Asp]-[4Cl-Thr]\([Ser]-[C14:0-OH(3)]\)				NOR00358
+branch-cyclic	pseudomycin A	C51ClH87N12O20	1222.5848112971	[D-Dab]-[Asp]-[Lys]-[Dab]-[aThr]-[dhAbu]-[OH-Asp]-[4Cl-Thr]\([Ser]-[C14:0-OH(3.4)]\)				NOR00359
+branch-cyclic	cormycin A	C54ClH88N13O20	1273.5957103344	[D-Orn]-[Asn]-[D-Hse]-[His]-[aThr]-[dhAbu]-[OH-Asp]-[4Cl-Thr]\([Ser]-[C16:0-OH(3.4)]\)				NOR00360
+branch-cyclic	putisolvin I	C65H113N13O19	1379.8275685148	[Leu]-[Val]-[Ser]\([Ser]-[Ile]-[Val]-[Ser]-[Gln]-[Ile]-[Leu]-[Glu]-[Leu]-[C6:0]\)				NOR00361
+branch-cyclic	putisolvin II	C66H115N13O19	1393.8432185790	[Leu]-[Leu]-[Ser]\([Ser]-[Ile]-[Val]-[Ser]-[Gln]-[Ile]-[Leu]-[Glu]-[Leu]-[C6:0]\)				NOR00362
+branch-cyclic	dehydrodidemnin B	C57H87N7O15	1109.6260151606	[Ist]-[Hip]-[Leu]-[Pro]-[NMe-OMe-Tyr]\([Thr]-[D-NMe-Leu]-[Pro]-[Pya]\)				NOR00373
+branch-cyclic	didemnin B	C57H89N7O15	1111.6416652248	[Ist]-[Hip]-[Leu]-[Pro]-[NMe-OMe-Tyr]\([Thr]-[D-NMe-Leu]-[Pro]-[Lac]\)				NOR00374
+branch-cyclic	didemnin A	C49H78N6O12	942.5677720002	[Ist]-[Hip]-[Leu]-[Pro]-[NMe-OMe-Tyr]\([Thr]-[D-NMe-Leu]\)				NOR00375
+branch-cyclic	didemnin C	C52H82N6O14	1014.5889013728	[Ist]-[Hip]-[Leu]-[Pro]-[NMe-OMe-Tyr]\([Thr]-[D-NMe-Leu]-[Lac]\)				NOR00376
+branch-cyclic	nordidemnin B	C56H87N7O15	1097.6260151606	[Nst]-[Hip]-[Leu]-[Pro]-[NMe-OMe-Tyr]\([Thr]-[D-NMe-Leu]-[Pro]-[Lac]\)				NOR00377
+branch-cyclic	nordidemnin A	C48H76N6O12	928.5521219360	[Nst]-[Hip]-[Leu]-[Pro]-[NMe-OMe-Tyr]\([Thr]-[D-NMe-Leu]\)				NOR00378
+branch-cyclic	nordidemnin C	C51H80N6O14	1000.5732513086	[Nst]-[Hip]-[Leu]-[Pro]-[NMe-OMe-Tyr]\([Thr]-[D-NMe-Leu]-[Lac]\)				NOR00379
+branch-cyclic	didemnin M	C67H102N10O19	1350.7322711461	[Ist]-[Hip]-[Leu]-[Pro]-[NMe-OMe-Tyr]\([Thr]-[D-NMe-Leu]-[Pro]-[Lac]-[Gln]-[pGlu]\)				NOR00380
+branch-cyclic	didemnin N	C55H85N7O15	1083.6103650964	[Ist]-[Hip]-[Leu]-[Pro]-[Tyr]\([Thr]-[D-NMe-Leu]-[Pro]-[Lac]\)				NOR00381
+branch-cyclic	didemnin X	C82H131N13O23	1665.9480775810	[Ist]-[Hip]-[Leu]-[Pro]-[NMe-OMe-Tyr]\([Thr]-[D-NMe-Leu]-[Pro]-[Lac]-[Gln]-[Gln]-[Gln]-[C10:0-OH(3)]\)				NOR00382
+branch-cyclic	didemnin Y	C87H139N15O25	1794.0066550924	[Ist]-[Hip]-[Leu]-[Pro]-[NMe-OMe-Tyr]\([Thr]-[D-NMe-Leu]-[Pro]-[Lac]-[Gln]-[Gln]-[Gln]-[Gln]-[C10:0-OH(3)]\)				NOR00383
+branch-cyclic	nordidemnin N	C54H83N7O15	1069.5947150322	[Nst]-[Hip]-[Leu]-[Pro]-[Tyr]\([Thr]-[D-NMe-Leu]-[Pro]-[Lac]\)				NOR00384
+branch-cyclic	[Hysp2]didemnin B	C58H91N7O15	1125.6573152890	[Ist]-[Hysp]-[Leu]-[Pro]-[NMe-OMe-Tyr]\([Thr]-[D-NMe-Leu]-[Pro]-[Lac]\)				NOR00386
+branch-cyclic	[Hap2]didemnin B	C54H83N7O15	1069.5947150322	[Ist]-[Hap]-[Leu]-[Pro]-[NMe-OMe-Tyr]\([Thr]-[D-NMe-Leu]-[Pro]-[Lac]\)				NOR00387
+branch-cyclic	tamandarin A	C54H85N7O14	1055.6154504743	[Ist]-[Hiv]-[Leu]-[Pro]-[NMe-OMe-Tyr]\([Thr]-[D-NMe-Leu]-[Pro]-[Lac]\)				NOR00388
+branch-cyclic	tamandarin B	C53H83N7O14	1041.5998004101	[Nst]-[Hiv]-[Leu]-[Pro]-[NMe-OMe-Tyr]\([Thr]-[D-NMe-Leu]-[Pro]-[Lac]\)				NOR00389
+branch-cyclic	kahalalide F	C75H124N14O16	1476.9319740068	[D-aIle]-[D-Val]-[Phe]-[dhAbu]-[Val]\([D-aThr]-[D-aIle]-[Orn]-[D-Pro]-[D-Val]-[Val]-[Thr]-[D-Val]-[iC7:0]\)				NOR00390
+branch-cyclic	kahalalide A	C46H67N7O11	893.4898560302	[D-Leu]-[D-Phe]-[D-Leu]-[Thr]-[Ser]\([Thr]-[D-Phe]-[C4:0-Me(2)]\)				NOR00391
+branch-cyclic	kahalalide B	C45H63N7O11	877.4585559018	[Phe]-[D-Leu]-[Pro]-[Thr]-[Gly]\([D-Ser]-[Tyr]-[iC7:0]\)				NOR00392
+branch-cyclic	kahalalide C	C47H63N9O10	913.4697892901	[D-Tyr]-[Arg]-[D-Tyr]-[Ile]\([Thr]-[D-Phe]-[C4:0]\)				NOR00393
+branch-cyclic	petrosifungin A	C33H45N5O7	623.3318988252	[Hpr]-[Hpr]-[Pro]-[Val]\([Thr]-[Bz]\)				NOR00406
+branch-cyclic	petrosifungin B	C33H45N5O8	639.3268134473	[Hpr]-[Hpr]-[Pro]-[Val]\([Thr]-[pOH-Bz]\)				NOR00407
+branch-cyclic	callynormine A	C61H93N11O13	1187.6954321298	[Ile]-[4OH-Pro]-[Val]-[Leu]-[Pro]-[Pro]-[Leu]\([aFo-Gly]-[Pro]-[Phe]-[Leu]\)				NOR00413
+branch-cyclic	neamphamide A	C75H125N21O21	1655.9358901858	[D-aThr]-[D-Arg]-[Leu]-[NMe-Gln]-[bOMe-Tyr]-[D-Asn]-[Hpr]\([D-aThr]-[3Me-4Me-Gln]-[Agdha]-[Asn]-[iC8:0-Me(2.4)-OH(3)]\)				NOR00416
+branch-cyclic	callipeltin A	C68H116N18O18	1472.8714990150	[D-aThr]-[D-Arg]-[Leu]-[NMe-Gln]-[bOMe-Tyr]-[NMe-Ala]\([D-aThr]-[3Me-4Me-Gln]-[Agdha]-[D-Ala]-[iC8:0-Me(2.4)-OH(3)]\)				NOR00417
+branch-cyclic	callipeltin B	C47H74N12O12	998.5549159030	[D-aThr]-[D-Arg]-[Leu]-[NMe-Gln]-[bOMe-Tyr]-[NMe-Ala]\([D-aThr]-[2Me-3Me-pGlu]\)				NOR00418
+branch-cyclic	papuamide A	C66H105N13O20	1399.7598828801	[Hpr]-[bOMe-Tyr]-[NMe-Thr]-[Ala]-[Gly]-[D-3OMe-Ala]\([3OH-Leu]-[3Me-4Me-Gln]-[L-Dbu]-[Thr]-[Gly]-[aC11:2(4.6)-Me(2.6)-OH(2.3)]\)				NOR00422
+branch-cyclic	papuamide B	C65H103N13O20	1385.7442328159	[Hpr]-[bOMe-Tyr]-[Thr]-[Ala]-[Gly]-[D-3OMe-Ala]\([3OH-Leu]-[3Me-4Me-Gln]-[L-Dbu]-[Thr]-[Gly]-[aC11:2(4.6)-Me(2.6)-OH(2.3)]\)				NOR00423
+branch-cyclic	papuamide C	C66H102N12O20	1382.7333337786	[Hpr]-[bOMe-Tyr]-[NMe-Thr]-[Ala]-[Gly]-[D-3OMe-Ala]\([3OH-Leu]-[3Me-4Me-Gln]-[dhAbu]-[Thr]-[Gly]-[aC11:2(4.6)-Me(2.6)-OH(2.3)]\)				NOR00424
+branch-cyclic	papuamide D	C65H100N12O20	1368.7176837144	[Hpr]-[bOMe-Tyr]-[Thr]-[Ala]-[Gly]-[D-3OMe-Ala]\([3OH-Leu]-[3Me-4Me-Gln]-[dhAbu]-[Thr]-[Gly]-[aC11:2(4.6)-Me(2.6)-OH(2.3)]\)				NOR00425
+branch-cyclic	phoriospongin A	C52ClH82N11O15	1135.5680390209	[D-Nva]-[Gly]-[Phe]-[D-aThr]-[D-Asn]-[Cl-Ile]-[D-NMe-Nva]-[D-Ala]\([C6:0-OH(3.5)-NH2(4)]-[NFo-Leu]\)				NOR00442
+branch-cyclic	phoriospongin B	C53ClH84N11O15	1149.5836890851	[D-Nva]-[Gly]-[Phe]-[D-aThr]-[Asn]-[Cl-Ile]-[D-NMe-Leu]-[D-Ala]\([C6:0-OH(3.5)-NH2(4)]-[NFo-Leu]\)				NOR00443
+branch-cyclic	cyclolithistide A	C54ClH86N11O15	1163.5993391493	[Nva]-[Gly]-[Phe]-[aThr]-[Gln]-[Cl-Ile]-[NMe-Leu]-[Ala]\([C6:0-OH(3.5)-NH2(4)]-[NFo-Leu]\)				NOR00444
+branch-cyclic	microspinosamide	BrC75H109N18O20S	1692.6969507245	[NMe-Gln]-[D-Val]-[Pro]-[D-Asp]\([Thr]-[D-CysA]-[Arg]-[D-Trp]-[bMe-Ile]-[t-Leu]-[Pro]-[bOH-Br-Phe]-[D-NFo-Ala]\)				NOR00445
+branch-cyclic	polydiscamide A	BrC75H110N19O18S	1675.7180205176	[NMe-Gln]-[D-Val]-[Pro]-[D-Asn]\([Thr]-[D-CysA]-[Arg]-[D-Trp]-[bMe-Ile]-[D-t-Leu]-[Pro]-[Br-Phe]-[D-NFo-Ala]\)				NOR00446
+branch-cyclic	discodermin A	C77H116N20O20S	1672.8395469596	[NMe-Gln]-[D-Leu]-[Thr]-[Asn]-[NMe-Gly]\([Thr]-[D-CysA]-[Arg]-[D-Trp]-[t-Leu]-[D-t-Leu]-[Pro]-[Phe]-[D-NFo-Ala]\)				NOR00447
+branch-cyclic	discodermin E	C76H116N20O21S	1676.8344615817	[NMe-Gln]-[D-Leu]-[Thr]-[Asn]-[NMe-Gly]\([Thr]-[D-CysA]-[Arg]-[D-Kyn]-[t-Leu]-[D-t-Leu]-[Pro]-[Phe]-[D-NFo-Ala]\)				NOR00448
+branch-cyclic	discodermin F	C78H118N20O20S	1686.8551970238	[NMe-Gln]-[D-Leu]-[Thr]-[Asn]-[NMe-Gly]\([Thr]-[D-CysA]-[Arg]-[D-Trp]-[bMe-Ile]-[D-t-Leu]-[Pro]-[Phe]-[D-NFo-Ala]\)				NOR00449
+branch-cyclic	discodermin G	C78H118N20O20S	1686.8551970238	[NMe-Gln]-[D-Leu]-[Thr]-[Asn]-[NMe-Gly]\([Thr]-[D-CysA]-[Arg]-[D-Trp]-[t-Leu]-[D-t-Leu]-[Pro]-[Phe]-[NFo-D-Abu]\)				NOR00450
+branch-cyclic	discodermin H	C77H116N20O21S	1688.8344615817	[NMe-Gln]-[D-Leu]-[Thr]-[Asn]-[NMe-Gly]\([Thr]-[D-CysA]-[Arg]-[D-Trp]-[t-Leu]-[D-t-Leu]-[Pro]-[Tyr]-[D-NFo-Ala]\)				NOR00451
+branch-cyclic	pseudotheonamide A1	C36H45N9O7	715.3441948460	[D-Phe]\([e-Tyr]-[NFo-Dpr]-[Pro]-[ck-Arg]\)				NOR00467
+branch-cyclic	cyclotheonamide E	C43H58N10O9	858.4388235127	[Pro]-[k-Arg]-[D-aIle]-[v-Tyr]\([Dpr]-[Ala]-[Pha]\)				NOR00475
+branch-cyclic	cyclotheonamide E2	C42H56N10O9	844.4231734485	[Pro]-[k-Arg]-[D-aIle]-[v-Tyr]\([Dpr]-[Ala]-[Bz]\)				NOR00476
+branch-cyclic	cyclotheonamide E3	C40H60N10O10	840.4493881990	[Pro]-[k-Arg]-[D-aIle]-[v-Tyr]\([Dpr]-[Ala]-[Hiv]\)				NOR00477
+branch-cyclic	cyclotheonamide E4	C41H62N10O9	838.4701236411	[Pro]-[k-Arg]-[D-aIle]-[v-Tyr]\([Dpr]-[Ala]-[Me-Vaa]\)				NOR00478
+branch-cyclic	cyclotheonamide E5	C41H62N10O10	854.4650382632	[Pro]-[k-Arg]-[D-aIle]-[v-OH-Tyr]\([Dpr]-[Ala]-[Me-Vaa]\)				NOR00479
+branch-cyclic	halicylindramide A	BrC78H109N20O20S	1756.7030987349	[NMe-Gln]-[D-Phe]-[Thr]-[Asn]-[NMe-Gly]\([Thr]-[D-CysA]-[Arg]-[D-Trp]-[Val]-[D-Val]-[Pro]-[Br-Phe]-[D-NFo-Ala]\)				NOR00492
+branch-cyclic	halicylindramide B	BrC78H109N20O20S	1756.7030987349	[NMe-Gln]-[D-Phe]-[Thr]-[Asn]-[Gly]\([Thr]-[D-CysA]-[Arg]-[D-Trp]-[t-Leu]-[D-Val]-[Pro]-[Br-Phe]-[D-NFo-Ala]\)				NOR00493
+branch-cyclic	halicylindramide C	BrC79H111N20O20S	1770.7187487991	[NMe-Gln]-[D-Phe]-[Thr]-[Asn]-[NMe-Gly]\([Thr]-[D-CysA]-[Arg]-[D-Trp]-[t-Leu]-[D-Val]-[Pro]-[Br-Phe]-[D-NFo-Ala]\)				NOR00494
+branch-cyclic	halicylindramide D	BrC73H100N19O18S	1641.6397701966	[NMe-Gln]-[D-Phe]-[Gly]-[Asn]\([Thr]-[D-CysA]-[Arg]-[D-Trp]-[Val]-[D-Val]-[Pro]-[Br-Phe]-[D-NFo-Ala]\)				NOR00495
+branch-cyclic	theonellapeptolide Ia	C69H123N13O16	1389.9210749695	[bAla]-[D-Leu]-[NMe-Ile]-[bAla]-[D-Val]-[NMe-Val]-[NMe-Ala]-[bAla]-[D-Leu]-[D-NMe-aIle]\([Thr]-[D-NMe-Leu]-[NOMe-Ac-Val]\)				NOR00497
+branch-cyclic	theonellapeptolide Id	C70H125N13O16	1403.9367250337	[bAla]-[D-Leu]-[NMe-Ile]-[bAla]-[D-aIle]-[NMe-Val]-[NMe-Ala]-[bAla]-[D-Leu]-[D-NMe-aIle]\([Thr]-[D-NMe-Leu]-[NOMe-Ac-Val]\)				NOR00498
+branch-cyclic	theonellapeptolide Ie	C71H127N13O16	1417.9523750979	[NMe-bAla]-[D-Leu]-[NMe-Ile]-[bAla]-[D-aIle]-[NMe-Val]-[NMe-Ala]-[bAla]-[D-Leu]-[D-NMe-aIle]\([Thr]-[D-NMe-Leu]-[NOMe-Ac-Val]\)				NOR00499
+branch-cyclic	theonellapeptolide IId	C69H123N13O16	1389.9210749695	[bAla]-[D-Leu]-[NMe-Ile]-[bAla]-[D-aIle]-[NMe-Val]-[Ala]-[bAla]-[D-Leu]-[D-NMe-aIle]\([Thr]-[D-NMe-Leu]-[NOMe-Ac-Val]\)				NOR00500
+branch-cyclic	theonellapeptolide IIe	C70H125N13O16	1403.9367250337	[NMe-bAla]-[D-Leu]-[NMe-Ile]-[bAla]-[D-aIle]-[NMe-Val]-[Ala]-[bAla]-[D-Leu]-[D-NMe-aIle]\([Thr]-[D-NMe-Leu]-[NOMe-Ac-Val]\)				NOR00501
+branch-cyclic	theonellapeptolide IIIe	C71H127N13O16	1417.9523750979	[NMe-bAla]-[D-Val]-[NMe-Ile]-[bAla]-[D-aIle]-[NMe-Ile]-[NMe-Ala]-[Ala]-[D-Leu]-[D-NMe-Leu]\([Thr]-[D-NMe-Leu]-[NOMe-Ac-Val]\)				NOR00502
+branch-cyclic	cupolamide A	C42H63N11O12	913.4657665447	[Val]-[D-Ser]-[D-Leu]-[D-Har]-[Val]-[4OH-Pro]\([Dab]-[pOH-Bz]\)				NOR00574
+branch-cyclic	konbamide	BrC40H61N8O8	860.3795629765	[Ala]-[Leu]-[NMe-Leu]-[Br-OH-Trp]\([Lys]-[CO]-[Leu]\)				NOR00579
+branch-cyclic	mozamide A	C45H64N8O8	844.4847110728	[D-Val]-[Leu]-[NMe-OH-Trp]-[Phe]\([Lys]-[CO]-[aIle]\)				NOR00580
+branch-cyclic	mozamide B	C46H66N8O8	858.5003611370	[D-Ile]-[Leu]-[NMe-OH-Trp]-[Phe]\([Lys]-[CO]-[aIle]\)				NOR00581
+branch-cyclic	keramamide A	C49ClH63N8O8	926.4457390407	[Leu]-[Leu]-[NMe-Cl-OH-Trp]-[Phe]\([Lys]-[CO]-[Phe]\)				NOR00582
+branch-cyclic	keramamide L	C49ClH63N8O7	910.4508244186	[Leu]-[Leu]-[NMe-Cl-Trp]-[Phe]\([Lys]-[CO]-[Phe]\)				NOR00583
+branch-cyclic	keramamide K	C44H60N10O11S	936.4163735111	[Ala]-[Ile]-[CO]-[PMST]-[1Me-Trp]\([Dpr]-[Ile]-[NFo-Iser]\)				NOR00584
+branch-cyclic	keramamide F	C43H56N10O11S	920.3850733827	[Ala]-[Ile]-[CO]-[PMST]-[dh-Trp]\([Dpr]-[Ile]-[NFo-Iser]\)				NOR00585
+branch-cyclic	keramamide G	C43H56N10O11S	920.3850733827	[Ala]-[D-Ile]-[CO]-[PMST]-[dh-Trp]\([Dpr]-[Ile]-[NFo-Iser]\)				NOR00586
+branch-cyclic	keramamide H	BrC43H57N10O12S	1016.3061400369	[Ala]-[Ile]-[CO]-[PMST]-[Br-OH-Trp]\([Dpr]-[Ile]-[NFo-Iser]\)				NOR00587
+branch-cyclic	keramamide J	C43H58N10O11S	922.4007234469	[Ala]-[Ile]-[CO]-[PMST]-[Trp]\([Dpr]-[Ile]-[NFo-Iser]\)				NOR00588
+branch-cyclic	keramamide E	BrC52H72N9O12	1093.4483708232	[Pro]-[k-Leu]-[PALOA]-[Br-OH-Trp]\([Orn]-[Nva]-[Ile]-[Hmp]\)				NOR00589
+branch-cyclic	keramamide B	BrC53H74N9O12	1107.4640208874	[Pro]-[k-Leu]-[PAOA]-[Br-OH-Trp]\([Orn]-[Nva]-[Ile]-[Hmp]\)				NOR00590
+branch-cyclic	keramamide C	BrC52H72N9O12	1093.4483708232	[Pro]-[k-Leu]-[PAOA]-[Br-OH-Trp]\([Orn]-[Abu]-[Ile]-[Hmp]\)				NOR00591
+branch-cyclic	keramamide D	BrC51H70N9O12	1079.4327207590	[Pro]-[k-Leu]-[PALOA]-[Br-OH-Trp]\([Orn]-[Abu]-[Ile]-[Hmp]\)				NOR00592
+branch-cyclic	keramamide M	BrC51H70N9O15S	1159.3895353153	[Pro]-[k-Leu]-[PALOA]-[Br-OH-Trp]\([Orn]-[Abu]-[Ile]-[OSu-Hmp]\)				NOR00593
+branch-cyclic	keramamide N	BrC52H72N9O15S	1173.4051853795	[Pro]-[k-Leu]-[PALOA]-[Br-OH-Trp]\([Orn]-[Nva]-[Ile]-[OSu-Hmp]\)				NOR00594
+branch-cyclic	orbiculamide A	BrC45H59N8O10	950.3537421565	[Pro]-[k-Leu]-[PALOA]-[Br-OH-Trp]\([Orn]-[Abu]-[Me-Vaa]\)				NOR00595
+branch-cyclic	discobahamin A	C50H69N9O12	987.5065687269	[Pro]-[k-Leu]-[PALOA]-[OH-Trp]\([Orn]-[Nva]-[Hmp]-[Abu]\)				NOR00596
+branch-cyclic	discobahamin B	C51H71N9O12	1001.5222187911	[Pro]-[k-Leu]-[PALOA]-[OH-Trp]\([Orn]-[Leu]-[Hmp]-[Abu]\)				NOR00597
+branch-cyclic	oriamide	C44H55N9O15S2	1013.3259035238	[Nva]-[Ile]-[CO]-[PTTA]-[CysA]\([Dpr]-[Ala]-[Gly]-[diOH-Bz]\)				NOR00598
+branch-cyclic	cyclocinamide A	BrC29ClH33N9O8	749.1323890829	[Asn]-[Iser]-[Br-Trp]\([Dpr]-[Gly]-[MCP]\)				NOR00599
+branch-cyclic	foroxymithine	C22H37N7O11	575.2551050672	[Fo-OH-Orn]\([OH-Orn]-[Ser]-[NAc-Fo-OH-Orn]\)				NOR00622
+branch-cyclic	bottromycin A2	C42H62N8O7S	822.4462170765	[Gly]-[3Me-Pro]-[Val]\([t-Leu]-[t-Leu]-[3Me-Phe]-[OMe-bAla-Thz]\)				NOR00625
+branch-cyclic	viomycin	C25H43N13O10	685.3255846689	[Ser]-[Ser]-[bU-dAla]-[5OH-Cap]\([Dpr]-[bLys]\)				NOR00633
+branch-cyclic	tuberactinomycin A	C24H41N13O11	687.3048492268	[Ser]-[Ser]-[bU-dAla]-[5OH-Cap]\([Dpr]-[OH-bLys]\)				NOR00634
+branch-cyclic	tuberactinomycin N	C24H41N13O10	671.3099346047	[Ser]-[Ser]-[bU-dAla]-[Cap]\([Dpr]-[OH-bLys]\)				NOR00635
+branch-cyclic	tuberactinomycin O	C25H43N13O9	669.3306700468	[Ser]-[Ser]-[bU-dAla]-[Cap]\([Dpr]-[bLys]\)				NOR00636
+branch-cyclic	capreomycin IA	C25H44N14O8	668.3466544620	[bU-dAla]-[Cap]-[Dpr]-[Ser]\([Dpr]-[bLys]\)				NOR00638
+branch-cyclic	capreomycin IB	C25H44N14O7	652.3517398399	[bU-dAla]-[Cap]-[Dpr]-[Ala]\([Dpr]-[bLys]\)				NOR00639
+branch-cyclic	lysobactin	C58H97N15O17	1275.7186867674	[3OH-Leu]-[Leu]-[D-Arg]-[Ile]-[D-aThr]-[Gly]-[OH-Asn]-[Ser]\([Ph-Ser]-[Leu]-[D-Leu]\)				NOR00655
+branch-cyclic	enduracidin A	C107Cl2H138N26O31	2352.9398378501	[D-Hpg]-[D-Orn]-[D-aThr]-[Hpg]-[D-Hpg]-[aThr]-[Cit]-[D-End]-[Hpg]-[D-Ser]-[Cl2-Hpg]-[Gly]-[End]-[D-Ala]-[Hpg]\([Thr]-[Asp]-[iC12:2(2.t4)]\)				NOR00661
+branch-cyclic	nocardicin A	C23H24N4O9	500.1543283901	[Hpg]\([Ser]-[OH-dHpg]-[Hse]\)				NOR00663
+branch-cyclic	viridogrisein	C44H62N8O11	878.4538048749	[NMe-Ph-Gly]-[Ala]-[NMe-bMe-Leu]-[NMe-Gly]-[D-4OH-Pro]-[D-Leu]\([Thr]-[Hpa]\)				NOR00672
+branch-cyclic	neoviridogrisein I	C45H64N8O10	876.4745403170	[NMe-Ph-Gly]-[Abu]-[NMe-bMe-Leu]-[NMe-Gly]-[D-Pro]-[D-Leu]\([Thr]-[Hpa]\)				NOR00673
+branch-cyclic	neoviridogrisein II	C44H62N8O10	862.4588902528	[NMe-Ph-Gly]-[Ala]-[NMe-bMe-Leu]-[NMe-Gly]-[D-Pro]-[D-Leu]\([Thr]-[Hpa]\)				NOR00674
+branch-cyclic	neoviridogrisein III	C45H64N8O11	892.4694549391	[NMe-Ph-Gly]-[Abu]-[NMe-bMe-Leu]-[NMe-Gly]-[D-4OH-Pro]-[D-Leu]\([Thr]-[Hpa]\)				NOR00675
+branch-cyclic	pristinamycin IA	C45H54N8O10	866.3962899960	[D-Abu]-[Pro]-[NMe-Me2A-Phe]-[4oxo-Hpr]-[Ph-Gly]\([Thr]-[Hpa]\)				NOR00676
+branch-cyclic	pristinamycin IB	C44H52N8O10	852.3806399318	[D-Abu]-[Pro]-[NMe-MeA-Phe]-[4oxo-Hpr]-[Ph-Gly]\([Thr]-[Hpa]\)				NOR00677
+branch-cyclic	pristinamycin IC	C44H52N8O10	852.3806399318	[D-Ala]-[Pro]-[NMe-Me2A-Phe]-[4oxo-Hpr]-[Ph-Gly]\([Thr]-[Hpa]\)				NOR00678
+branch-cyclic	virginiamycin S	C43H49N7O10	823.3540908303	[D-Abu]-[Pro]-[NMe-Phe]-[4oxo-Hpr]-[Ph-Gly]\([Thr]-[Hpa]\)				NOR00679
+branch-cyclic	A54145 A1	C72H109N17O27	1643.7678813840	[NMe-Gly]-[Ala]-[Asp]-[D-Lys]-[OMe-Asp]-[Gly]-[D-Asn]-[Glu]-[Ile]\([Thr]-[OH-Asn]-[D-Glu]-[Trp]-[C10:0]\)				NOR00714
+branch-cyclic	A54145 D	C73H111N17O27	1657.7835314482	[NMe-Gly]-[Ala]-[Asp]-[D-Lys]-[OMe-Asp]-[Gly]-[D-Asn]-[Glu]-[Ile]\([Thr]-[OH-Asn]-[D-Glu]-[Trp]-[aC11:0]\)				NOR00715
+branch-cyclic	A54145 B1	C73H111N17O27	1657.7835314482	[NMe-Gly]-[Ala]-[Asp]-[D-Lys]-[OMe-Asp]-[Gly]-[D-Asn]-[3Me-Glu]-[Ile]\([Thr]-[OH-Asn]-[D-Glu]-[Trp]-[iC10:0]\)				NOR00716
+branch-cyclic	A54145 E	C74H113N17O27	1671.7991815124	[NMe-Gly]-[Ala]-[Asp]-[D-Lys]-[OMe-Asp]-[Gly]-[D-Asn]-[3Me-Glu]-[Ile]\([Thr]-[OH-Asn]-[D-Glu]-[Trp]-[aC11:0]\)				NOR00717
+branch-cyclic	callipeltin L	C67H114N18O18	1458.8558489508	[NMe-Ala]\([bOH-Tyr]-[NMe-Gln]-[Leu]-[D-Arg]-[D-aThr]-[D-aThr]-[3Me-4Me-Gln]-[Agdha]-[D-Ala]-[iC8:0-Me(2.4)-OH(3)]\)				NOR00746
+branch-cyclic	cyclocinamide B	BrC29Cl2H32N9O8	783.0934170508	[Asn]-[Iser]-[Br-Trp]\([Dpr]-[Gly]-[MdCP]\)				NOR00755
+branch-cyclic	corticiamide A	Br2C80H112N20O20S	1862.6449008312	[NMe-Gln]-[Br-Phe]-[Thr]-[NMe-Asn]-[Gly]\([Thr]-[CysA]-[Arg]-[Trp]-[Val]-[bMe-Ile]-[Pro]-[Br-Phe]-[NFo-Ala]\)				NOR00756
+branch-cyclic	A21978C1	C73H103N17O26	1633.7260165693	[Gly]-[Orn]-[Asp]-[D-Ala]-[Asp]-[Gly]-[D-Ser]-[3Me-Glu]-[Kyn]\([Thr]-[Asp]-[D-Asn]-[Trp]-[aC11:0]\)				NOR00757
+branch-cyclic	A21978C2	C74H105N17O26	1647.7416666335	[Gly]-[Orn]-[Asp]-[D-Ala]-[Asp]-[Gly]-[D-Ser]-[3Me-Glu]-[Kyn]\([Thr]-[Asp]-[D-Asn]-[Trp]-[iC12:0]\)				NOR00758
+branch-cyclic	A21978C3	C75H107N17O26	1661.7573166977	[Gly]-[Orn]-[Asp]-[D-Ala]-[Asp]-[Gly]-[D-Ser]-[3Me-Glu]-[Kyn]\([Thr]-[Asp]-[D-Asn]-[Trp]-[aC13:0]\)				NOR00759
+branch-cyclic	enduracidin B	C108Cl2H140N26O31	2366.9554879143	[D-Hpg]-[D-Orn]-[D-aThr]-[Hpg]-[D-Hpg]-[aThr]-[Cit]-[D-End]-[Hpg]-[D-Ser]-[Cl2-Hpg]-[Gly]-[End]-[D-Ala]-[Hpg]\([Thr]-[Asp]-[aC13:2(2.t4)]\)				NOR00762
+branch-cyclic	amphomycin A1437 B	C59H93N13O20	1303.6659824949	[Hpr]-[bMe-Asp]-[Asp]-[Gly]-[Asp]-[Gly]-[D-Dbu]-[Val]-[Pro]\([Dbu]-[Asp]-[iC14:1(3)]\)				NOR00763
+branch-cyclic	amphomycin A1437 E	C58H91N13O20	1289.6503324307	[Hpr]-[bMe-Asp]-[Asp]-[Gly]-[Asp]-[Gly]-[D-Dbu]-[Val]-[Pro]\([Dbu]-[Asp]-[aC13:1(3)]\)				NOR00764
+branch-cyclic	amphomycin A1437 D	C60H95N13O20	1317.6816325591	[Hpr]-[bMe-Asp]-[Asp]-[Gly]-[Asp]-[Gly]-[D-Dbu]-[Val]-[Pro]\([Dbu]-[Asp]-[aC15:1(3)]\)				NOR00765
+branch-cyclic	friulimicin B	C59H94N14O19	1302.6819669101	[Hpr]-[bMe-Asp]-[Asp]-[Gly]-[Asp]-[Gly]-[D-Dbu]-[Val]-[Pro]\([L-Dbu]-[Asn]-[iC14:1(3)]\)				NOR00766
+branch-cyclic	friulimicin C	C58H92N14O19	1288.6663168459	[Hpr]-[bMe-Asp]-[Asp]-[Gly]-[Asp]-[Gly]-[D-Dbu]-[Val]-[Pro]\([L-Dbu]-[Asn]-[aC13:1(3)]\)				NOR00767
+branch-cyclic	friulimicin D	C60H96N14O19	1316.6976169743	[Hpr]-[bMe-Asp]-[Asp]-[Gly]-[Asp]-[Gly]-[D-Dbu]-[Val]-[Pro]\([L-Dbu]-[Asn]-[aC15:1(3)]\)				NOR00768
+branch-cyclic	kahalalide R	C74H122N14O16	1462.9163239426	[D-aIle]-[D-Val]-[Phe]-[dhAbu]-[Val]\([D-aThr]-[D-Val]-[Orn]-[D-Pro]-[D-Val]-[Val]-[Thr]-[D-Val]-[iC7:0]\)				NOR00802
+branch-cyclic	kahalalide S	C76H126N14O16	1490.9476240710	[D-aIle]-[D-Val]-[Phe]-[dhAbu]-[Val]\([D-aThr]-[D-aIle]-[Lys]-[D-Pro]-[D-Val]-[Val]-[Thr]-[D-Val]-[iC7:0]\)				NOR00803
+branch-cyclic	nocardicin B	C23H24N4O9	500.1543283901	[Hpg]\([Ser]-[D-OH-dHpg]-[Hse]\)				NOR00818
+branch-cyclic	nocardicin C	C23H26N4O8	486.1750638322	[Hpg]\([Ser]-[Hpg]-[Hse]\)				NOR00819
+branch-cyclic	nocardicin D	C23H23N3O9	485.1434293528	[Hpg]\([Ser]-[Hpoe]-[Hse]\)				NOR00820
+branch-cyclic	nocardicin E	C19H17N3O7	399.1066499160	[Hpg]\([Ser]-[OH-dHpg]\)				NOR00821
+branch-cyclic	nocardicin F	C19H17N3O7	399.1066499160	[Hpg]\([Ser]-[D-OH-dHpg]\)				NOR00822
+branch-cyclic	nocardicin G	C19H19N3O6	385.1273853581	[Hpg]\([Ser]-[Hpg]\)				NOR00823
+branch-cyclic	polydiscamide B	BrC75H109N18O19S	1676.7020361024	[NMe-Gln]-[D-Val]-[Pro]-[D-Asp]\([Thr]-[D-CysA]-[Arg]-[D-Trp]-[bMe-Ile]-[D-t-Leu]-[Pro]-[Br-Phe]-[D-NFo-Ala]\)				NOR00840
+branch-cyclic	polydiscamide C	BrC74H107N18O19S	1662.6863860382	[NMe-Gln]-[D-Val]-[Pro]-[D-Asp]\([Thr]-[D-CysA]-[Arg]-[D-Trp]-[bMe-Ile]-[D-Val]-[Pro]-[Br-Phe]-[D-NFo-Ala]\)				NOR00841
+branch-cyclic	polydiscamide D	BrC73H105N18O19S	1648.6707359740	[NMe-Gln]-[D-Val]-[Pro]-[D-Asp]\([Thr]-[D-CysA]-[Arg]-[D-Trp]-[t-Leu]-[D-Val]-[Pro]-[Br-Phe]-[D-NFo-Ala]\)				NOR00842
+branch-cyclic	pseudomycin B	C51ClH87N12O19	1206.5898966750	[D-Dab]-[Asp]-[Lys]-[Dab]-[aThr]-[dhAbu]-[OH-Asp]-[4Cl-Thr]\([Ser]-[C14:0-OH(3)]\)				NOR00861
+branch-cyclic	pseudomycin C	C53ClH91N12O20	1250.6161114255	[D-Dab]-[Asp]-[Lys]-[Dab]-[aThr]-[dhAbu]-[OH-Asp]-[4Cl-Thr]\([Ser]-[C16:0-OH(3.4)]\)				NOR00862
+branch-cyclic	pseudomycin C2	C53ClH91N12O19	1234.6211968034	[D-Dab]-[Asp]-[Lys]-[Dab]-[aThr]-[dhAbu]-[OH-Asp]-[4Cl-Thr]\([Ser]-[C16:0-OH(3)]\)				NOR00863
+branch-cyclic	syringomycin A1	C51ClH81N14O17	1196.5592652486	[D-Ser]-[Dab]-[D-Dab]-[Arg]-[Phe]-[dhAbu]-[OH-Asp]-[4Cl-Thr]\([Ser]-[C10:0-OH(3)]\)				NOR00864
+branch-cyclic	syringomycin G	C55ClH89N14O17	1252.6218655054	[D-Ser]-[Dab]-[D-Dab]-[Arg]-[Phe]-[dhAbu]-[OH-Asp]-[4Cl-Thr]\([Ser]-[C14:0-OH(3)]\)				NOR00865
+branch-cyclic	syringostatin B	C50ClH87N12O19	1194.5898966750	[D-Dab]-[Dab]-[D-Hse]-[Orn]-[aThr]-[dhAbu]-[OH-Asp]-[4Cl-Thr]\([Ser]-[C14:0-OH(3.4)]\)				NOR00866
+branch-cyclic	corpeptin B	C100H165N23O27	2120.2245272128	[Ala]-[Dab]-[Ser]-[Ile]\([aThr]-[dhAbu]-[Val]-[Ala]-[Ala]-[Ala]-[dh-Ala]-[aIle]-[Val]-[Hse]-[dhAbu]-[Val]-[Val]-[Ala]-[Ala]-[Ala]-[Pro]-[dhAbu]-[C12:1(5)-OH(3)]\)				NOR00867
+branch-cyclic	fuscopeptin B	C88H143N21O22	1846.0716553857	[Ala]-[Dab]-[D-Dab]-[Phe]\([D-aThr]-[dhAbu]-[D-Val]-[D-Ala]-[D-Val]-[D-Ala]-[Gly]-[D-Val]-[D-Ala]-[D-Ala]-[D-Ala]-[D-Ala]-[Leu]-[D-Pro]-[dhAbu]-[C10:0-OH(3)]\)				NOR00868
+branch-cyclic	syringopeptin 22B	C103H166N24O27	2171.2354262501	[D-Ser]-[D-Ala]-[dhAbu]-[Ala]-[Dab]-[D-Dab]-[Tyr]\([D-aThr]-[dhAbu]-[D-Ala]-[Ala]-[D-Val]-[D-Ala]-[dhAbu]-[D-Val]-[D-Val]-[D-Ala]-[D-Ala]-[Val]-[D-Val]-[D-Pro]-[dhAbu]-[C12:0-OH(3)]\)				NOR00869
+branch-cyclic	syringopeptin 22 PhvB	C102H164N24O27	2157.2197761859	[Ser]-[Ala]-[dhAbu]-[Ala]-[Dab]-[Dab]-[Tyr]\([aThr]-[dhAbu]-[Ala]-[Ala]-[Val]-[Ala]-[dhAbu]-[Val]-[Ala]-[Ala]-[Ala]-[Leu]-[Val]-[Pro]-[dhAbu]-[C12:0-OH(3)]\)				NOR00870
+branch-cyclic	syringopeptin SC 2	C104H168N24O27	2185.2510763143	[Ser]-[Ala]-[dhAbu]-[Ala]-[Dab]-[Dab]-[Tyr]\([aThr]-[dhAbu]-[Ala]-[Ala]-[Val]-[Ala]-[dh-Ala]-[Val]-[Leu]-[Ala]-[Ala]-[Leu]-[Val]-[Pro]-[dhAbu]-[C12:0-OH(3)]\)				NOR00871
+branch-cyclic	syringopeptin 25B	C115H187N27O30	2426.3937178061	[D-Ser]-[D-Ala]-[Val]-[Ala]-[Dab]-[D-Dab]-[Tyr]\([D-aThr]-[dhAbu]-[D-Ala]-[D-Ala]-[D-Val]-[D-Ala]-[dhAbu]-[D-Val]-[dhAbu]-[D-Ala]-[D-Ala]-[D-Leu]-[Val]-[D-Ala]-[Ala]-[D-Val]-[D-Pro]-[dhAbu]-[C12:0-OH(3)]\)				NOR00872
+branch-cyclic	syringopeptin 508A	C104H170N24O27	2187.2667263785	[Ser]-[Ala]-[dhAbu]-[Ala]-[Dab]-[Dab]-[Tyr]\([aThr]-[dhAbu]-[Ala]-[Ala]-[Val]-[Ala]-[Ala]-[Val]-[Leu]-[Ala]-[Ala]-[Leu]-[Val]-[Pro]-[dhAbu]-[C12:0-OH(3)]\)				NOR00873
+branch-cyclic	syringopeptin 508B	C106H174N24O27	2215.2980265069	[Ser]-[Ala]-[dhAbu]-[Ala]-[Dab]-[Dab]-[Tyr]\([aThr]-[dhAbu]-[Ala]-[Ala]-[Val]-[Ala]-[Ala]-[Val]-[Leu]-[Ala]-[Ala]-[Leu]-[Val]-[Pro]-[dhAbu]-[C14:0-OH(3)]\)				NOR00874
+branch-cyclic	tolaasin A	C91H155N21O26	1958.1452142593	[Ile]-[D-Hse]-[D-Dab]-[Lys]\([D-aThr]-[dhAbu]-[D-Val]-[Leu]-[D-Gln]-[Val]-[D-Val]-[D-Leu]-[D-Ser]-[D-Val]-[D-Leu]-[D-Ser]-[D-Pro]-[dhAbu]-[Pda]\)				NOR00875
+branch-cyclic	massetolide B	C56H99N9O16	1153.7209781783	[D-aIle]-[Leu]-[D-Ser]-[Leu]-[D-Ser]-[Ile]\([D-aThr]-[D-Glu]-[Leu]-[C11:0-OH(3)]\)				NOR00882
+branch-cyclic	massetolide C	C57H101N9O16	1167.7366282425	[D-aIle]-[Leu]-[D-Ser]-[Leu]-[D-Ser]-[Ile]\([D-aThr]-[D-Glu]-[Leu]-[C12:0-OH(3)]\)				NOR00883
+branch-cyclic	massetolide G	C55H97N9O16	1139.7053281141	[D-Val]-[Leu]-[D-Ser]-[Leu]-[D-Ser]-[Ile]\([D-aThr]-[D-Glu]-[Leu]-[C11:0-OH(3)]\)				NOR00884
+branch-cyclic	massetolide H	C56H99N9O16	1153.7209781783	[D-Val]-[Leu]-[D-Ser]-[Leu]-[D-Ser]-[Ile]\([D-aThr]-[D-Glu]-[Leu]-[C12:0-OH(3)]\)				NOR00885
+branch-cyclic	pseudophomin B	C57H101N9O16	1167.7366282425	[D-Ile]-[D-Leu]-[D-Ser]-[Leu]-[D-Ser]-[Ile]\([D-aThr]-[D-Glu]-[Leu]-[C12:0-OH(3)]\)				NOR00886
+branch-cyclic	massetolide L	C54H95N9O16	1125.6896780499	[D-aIle]-[Leu]-[D-Ser]-[Leu]-[D-Ser]-[Val]\([D-aThr]-[D-Glu]-[Leu]-[C10:0-OH(3)]\)				NOR00887
+branch-cyclic	pyoverdin 1.2 dihydro	C58H92N18O24	1424.6531859772	[D-Fo-OH-Orn]-[Glu]-[Ser]\([Lys]-[Gly]-[Ser]-[D-Ser]-[Fo-OH-Orn]-[Gly]-[Lys]-[D-Ser]-[ChrD]\)				NOR00904
+branch-cyclic	pyoverdin CHAO	C51H79N15O18	1189.5727508117	[Ala]-[Ala]-[D-Fo-OH-Orn]-[Lys]\([Thr]-[Lys]-[D-Fo-OH-Orn]-[Asp]-[ChrP]\)				NOR00905
+branch-cyclic	pseudobactin 36167-II	C42H60N12O19	1036.4097678083	[Ala]-[Ac-OH-Orn]-[Gly]-[Ala]-[OH-Asp]-[Ser]-[Thr]\([Ser]-[ChrP]\)				NOR00907
+branch-cyclic	pseudobactin A225-II	C42H60N12O20	1052.4046824304	[Ala]-[Ac-OH-Orn]-[Gly]-[Ser]-[OH-Asp]-[Ser]-[Thr]\([Ser]-[ChrP]\)				NOR00909
+branch-cyclic	pyoverdin D47	C47H72N14O18	1120.5149015818	[D-Fo-OH-Orn]-[Glu]-[Ser]\([Lys]-[Fo-OH-Orn]-[Orn]-[D-Ser]-[ChrP]\)				NOR00912
+branch-cyclic	putisolvin III	C66H115N13O19	1393.8432185790	[Leu]-[Ile]-[Ser]\([Ser]-[Ile]-[Val]-[Ser]-[Gln]-[Ile]-[Leu]-[Glu]-[Leu]-[C6:0]\)				NOR00924
+branch-cyclic	polymyxin B1	C56H98N16O13	1202.7499273163	[Dab]-[D-Phe]-[Leu]-[Dab]-[Dab]-[Thr]\([Dab]-[Dab]-[Thr]-[Dab]-[aC9:0]\)				NOR01056
+branch-cyclic	Ile-polymyxin B1	C56H98N16O13	1202.7499273163	[Dab]-[D-Phe]-[Ile]-[Dab]-[Dab]-[Thr]\([Dab]-[Dab]-[Thr]-[Dab]-[aC9:0]\)				NOR01057
+branch-cyclic	polymyxin E1	C53H100N16O13	1168.7655773805	[Dab]-[D-Leu]-[Leu]-[Dab]-[Dab]-[Thr]\([Dab]-[Dab]-[Thr]-[Dab]-[aC9:0]\)				NOR01058
+branch-cyclic	Ile-polymyxin E1	C53H100N16O13	1168.7655773805	[Dab]-[D-Leu]-[Ile]-[Dab]-[Dab]-[Thr]\([Dab]-[Dab]-[Thr]-[Dab]-[aC9:0]\)				NOR01059
+branch-cyclic	Val-polymyxin E1	C52H98N16O13	1154.7499273163	[Dab]-[D-Leu]-[Val]-[Dab]-[Dab]-[Thr]\([Dab]-[Dab]-[Thr]-[Dab]-[aC9:0]\)				NOR01060
+branch-cyclic	Nva-polymyxin E1	C52H98N16O13	1154.7499273163	[Dab]-[D-Leu]-[Nva]-[Dab]-[Dab]-[Thr]\([Dab]-[Dab]-[Thr]-[Dab]-[aC9:0]\)				NOR01061
+branch-cyclic	polymyxin M	C51H96N16O14	1156.7291918742	[Dab]-[D-Leu]-[Thr]-[Dab]-[Dab]-[Thr]\([Dab]-[Dab]-[Thr]-[Dab]-[aC9:0]\)				NOR01062
+branch-cyclic	polymyxin B2	C55H96N16O13	1188.7342772521	[Dab]-[D-Phe]-[Leu]-[Dab]-[Dab]-[Thr]\([Dab]-[Dab]-[Thr]-[Dab]-[iC8:0]\)				NOR01063
+branch-cyclic	polymyxin B3	C55H96N16O13	1188.7342772521	[Dab]-[D-Phe]-[Leu]-[Dab]-[Dab]-[Thr]\([Dab]-[Dab]-[Thr]-[Dab]-[C8:0]\)				NOR01064
+branch-cyclic	polymyxin B4	C54H94N16O13	1174.7186271879	[Dab]-[D-Phe]-[Leu]-[Dab]-[Dab]-[Thr]\([Dab]-[Dab]-[Thr]-[Dab]-[C7:0]\)				NOR01065
+branch-cyclic	polymyxin B5	C56H98N16O13	1202.7499273163	[Dab]-[D-Phe]-[Leu]-[Dab]-[Dab]-[Thr]\([Dab]-[Dab]-[Thr]-[Dab]-[C9:0]\)				NOR01066
+branch-cyclic	polymyxin B6	C56H98N16O14	1218.7448419384	[Dab]-[D-Phe]-[Leu]-[Dab]-[Dab]-[Thr]\([Dab]-[Dab]-[Thr]-[Dab]-[aC9:0-OH(3)]\)				NOR01067
+branch-cyclic	polymyxin E2	C52H98N16O13	1154.7499273163	[Dab]-[D-Leu]-[Leu]-[Dab]-[Dab]-[Thr]\([Dab]-[Dab]-[Thr]-[Dab]-[iC8:0]\)				NOR01068
+branch-cyclic	Ile-polymyxin E2	C52H98N16O13	1154.7499273163	[Dab]-[D-Leu]-[Ile]-[Dab]-[Dab]-[Thr]\([Dab]-[Dab]-[Thr]-[Dab]-[iC8:0]\)				NOR01069
+branch-cyclic	Val-polymyxin E2	C51H96N16O13	1140.7342772521	[Dab]-[D-Leu]-[Val]-[Dab]-[Dab]-[Thr]\([Dab]-[Dab]-[Thr]-[Dab]-[iC8:0]\)				NOR01070
+branch-cyclic	polymyxin E3	C52H98N16O13	1154.7499273163	[Dab]-[D-Leu]-[Leu]-[Dab]-[Dab]-[Thr]\([Dab]-[Dab]-[Thr]-[Dab]-[C8:0]\)				NOR01071
+branch-cyclic	polymyxin E4	C51H96N16O13	1140.7342772521	[Dab]-[D-Leu]-[Leu]-[Dab]-[Dab]-[Thr]\([Dab]-[Dab]-[Thr]-[Dab]-[C7:0]\)				NOR01072
+branch-cyclic	polymyxin E7	C53H100N16O13	1168.7655773805	[Dab]-[D-Leu]-[Leu]-[Dab]-[Dab]-[Thr]\([Dab]-[Dab]-[Thr]-[Dab]-[iC9:0]\)				NOR01073
+branch-cyclic	Ile-polymyxin E8	C54H102N16O13	1182.7812274447	[Dab]-[D-Leu]-[Ile]-[Dab]-[Dab]-[Thr]\([Dab]-[Dab]-[Thr]-[Dab]-[aC10:0]\)				NOR01074
+branch-cyclic	arylomycin A1	C41H58N6O10	794.4214421140	[Ala]-[Tyr]\([NMe-Hpg]-[Gly]-[D-Ala]-[D-NMe-Ser]-[iC11:0]\)				NOR01114
+branch-cyclic	arylomycin A2	C42H60N6O10	808.4370921782	[Ala]-[Tyr]\([NMe-Hpg]-[Gly]-[D-Ala]-[D-NMe-Ser]-[iC12:0]\)				NOR01115
+branch-cyclic	arylomycin A3	C42H60N6O10	808.4370921782	[Ala]-[Tyr]\([NMe-Hpg]-[Gly]-[D-Ala]-[D-NMe-Ser]-[C12:0]\)				NOR01116
+branch-cyclic	arylomycin A4	C43H62N6O10	822.4527422424	[Ala]-[Tyr]\([NMe-Hpg]-[Gly]-[D-Ala]-[D-NMe-Ser]-[aC13:0]\)				NOR01117
+branch-cyclic	arylomycin A5	C44H64N6O10	836.4683923066	[Ala]-[Tyr]\([NMe-Hpg]-[Gly]-[D-Ala]-[D-NMe-Ser]-[iC14:0]\)				NOR01118
+branch-cyclic	arylomycin B1	C41H57N7O12	839.4065203313	[Ala]-[3NO2-Tyr]\([NMe-Hpg]-[Gly]-[D-Ala]-[D-NMe-Ser]-[iC11:0]\)				NOR01119
+branch-cyclic	arylomycin B2	C42H59N7O12	853.4221703955	[Ala]-[3NO2-Tyr]\([NMe-Hpg]-[Gly]-[D-Ala]-[D-NMe-Ser]-[iC12:0]\)				NOR01120
+branch-cyclic	arylomycin B3	C42H59N7O12	853.4221703955	[Ala]-[3NO2-Tyr]\([NMe-Hpg]-[Gly]-[D-Ala]-[D-NMe-Ser]-[C12:0]\)				NOR01121
+branch-cyclic	arylomycin B4	C43H61N7O12	867.4378204597	[Ala]-[3NO2-Tyr]\([NMe-Hpg]-[Gly]-[D-Ala]-[D-NMe-Ser]-[aC13:0]\)				NOR01122
+branch-cyclic	arylomycin B5	C43H61N7O12	867.4378204597	[Ala]-[3NO2-Tyr]\([NMe-Hpg]-[Gly]-[D-Ala]-[D-NMe-Ser]-[iC13:0]\)				NOR01123
+branch-cyclic	arylomycin B6	C44H63N7O12	881.4534705239	[Ala]-[3NO2-Tyr]\([NMe-Hpg]-[Gly]-[D-Ala]-[D-NMe-Ser]-[iC14:0]\)				NOR01124
+branch-cyclic	arylomycin B7	C45H65N7O12	895.4691205881	[Ala]-[3NO2-Tyr]\([NMe-Hpg]-[Gly]-[D-Ala]-[D-NMe-Ser]-[aC15:0]\)				NOR01125
+branch-cyclic	ADEP-1	C38H50N6O8	718.3690126130	[Pro]-[NMe-Ala]-[Ala]-[4Me-Pro]\([Ser]-[Phe]-[C8:3(t2.t4.t6)]\)				NOR01131
+branch-cyclic	micropeptin A	C58H87N9O15	1149.6321631710	[Val]-[NMe-Tyr]-[Leu]-[Ahp]-[Lys]\([Tyr]-[Glu]-[C8:0]\)				NOR01132
+branch-cyclic	micropeptin B	C51H81N9O15	1059.5852129784	[Val]-[NMe-Tyr]-[Leu]-[Ahp]-[Lys]\([Thr]-[Glu]-[C6:0]\)				NOR01133
+branch-cyclic	somamide A	C52H76N8O14S	1068.5201698806	[Abu]-[Ahp]-[Phe]-[NMe-Tyr]-[Val]\([Thr]-[O-Met]-[C6:0]\)				NOR01144
+branch-cyclic	somamide B	C50H71N9O14	1021.5120480353	[Abu]-[Ahp]-[Phe]-[NMe-Tyr]-[Val]\([Thr]-[Gln]-[C4:0]\)				NOR01145
+branch-cyclic	tiglicamide A	C45H61N7O13	825.3908702671	[Ala]-[Abu]-[Glu]-[Hty]\([Thr]-[Tyr]-[Val]\)			Tig	NOR01156
+branch-cyclic	tiglicamide B	C44H59N7O12	795.3803055808	[Ala]-[Abu]-[Glu]-[Phe]\([Thr]-[Tyr]-[Val]\)			Tig	NOR01157
+branch-cyclic	tiglicamide C	C40H59N7O13S	795.3472908929	[Ala]-[Abu]-[Glu]-[O-Met]\([Thr]-[Tyr]-[Val]\)			Tig	NOR01158
+branch-cyclic	largamide A	C41H61N7O12	761.3959556450	[Ala]-[Abu]-[Glu]-[Leu]\([Thr]-[Tyr]-[Val]\)			Tig	NOR01159
+branch-cyclic	Methyl ester largamide A	C42H63N7O12	775.4116057092	[Ala]-[Abu]-[MeO-Glu]-[Leu]\([Thr]-[Tyr]-[Val]\)			Tig	NOR01160
+branch-cyclic	kempopeptin A	C54H77N9O15	1091.5539128500	[Val]-[NMe-Tyr]-[Phe]-[Ahp]-[Leu]\([Thr]-[Thr]-[Ac-Pro]\)				NOR01173
+linear	ACV	C14H25N3O6S	363.1464062407	[Aad]-[Cys]-[D-Val]				NOR00006
+linear	alamethicin F50	C92H151N23O24	1962.1302328971	[Ac-Aib]-[Pro]-[Aib]-[Ala]-[Aib]-[Ala]-[Gln]-[Aib]-[Val]-[Aib]-[Gly]-[Leu]-[Aib]-[Pro]-[Val]-[Aib]-[Aib]-[Gln]-[Gln]-[Pheol]				NOR00007
+linear	[des(1-6).Pyr7] alamethicin F50	C67H108N16O17	1408.8078361257	[pGlu]-[Aib]-[Val]-[Aib]-[Gly]-[Leu]-[Aib]-[Pro]-[Val]-[Aib]-[Aib]-[Gln]-[Gln]-[Pheol]				NOR00008
+linear	[Aib6] alamethicin F30	C93H152N22O25	1977.1298985461	[Ac-Aib]-[Pro]-[Aib]-[Ala]-[Aib]-[Aib]-[Gln]-[Aib]-[Val]-[Aib]-[Gly]-[Leu]-[Aib]-[Pro]-[Val]-[Aib]-[Aib]-[Glu]-[Gln]-[Pheol]				NOR00009
+linear	alamethicin F30	C92H150N22O25	1963.1142484819	[Ac-Aib]-[Pro]-[Aib]-[Ala]-[Aib]-[Ala]-[Gln]-[Aib]-[Val]-[Aib]-[Gly]-[Leu]-[Aib]-[Pro]-[Val]-[Aib]-[Aib]-[Glu]-[Gln]-[Pheol]				NOR00010
+linear	[Glu19] alamethicin F30	C92H149N21O26	1964.0982640667	[Ac-Aib]-[Pro]-[Aib]-[Ala]-[Aib]-[Ala]-[Gln]-[Aib]-[Val]-[Aib]-[Gly]-[Leu]-[Aib]-[Pro]-[Val]-[Aib]-[Aib]-[Glu]-[Glu]-[Pheol]				NOR00011
+linear	[Aib6.Glu19] alamethicin F30	C93H151N21O26	1978.1139141309	[Ac-Aib]-[Pro]-[Aib]-[Ala]-[Aib]-[Aib]-[Gln]-[Aib]-[Val]-[Aib]-[Gly]-[Leu]-[Aib]-[Pro]-[Val]-[Aib]-[Aib]-[Glu]-[Glu]-[Pheol]				NOR00012
+linear	[des(1-6).Pyr7] alamethicin F30	C67H107N15O18	1409.7918517105	[pGlu]-[Aib]-[Val]-[Aib]-[Gly]-[Leu]-[Aib]-[Pro]-[Val]-[Aib]-[Aib]-[Glu]-[Gln]-[Pheol]				NOR00013
+linear	[desPheol] alamethicin F30	C83H139N21O25	1830.0250991236	[Ac-Aib]-[Pro]-[Aib]-[Ala]-[Aib]-[Ala]-[Gln]-[Aib]-[Val]-[Aib]-[Gly]-[Leu]-[Aib]-[Pro]-[Val]-[Aib]-[Aib]-[Glu]-[Gln]				NOR00014
+linear	[Aib6.desPheol] alamethicin F30	C84H141N21O25	1844.0407491878	[Ac-Aib]-[Pro]-[Aib]-[Ala]-[Aib]-[Aib]-[Gln]-[Aib]-[Val]-[Aib]-[Gly]-[Leu]-[Aib]-[Pro]-[Val]-[Aib]-[Aib]-[Glu]-[Gln]				NOR00015
+linear	[Aib6.Glu7] alamethicin F30	C93H150N20O27	1979.0979297157	[Ac-Aib]-[Pro]-[Aib]-[Ala]-[Aib]-[Aib]-[Glu]-[Aib]-[Val]-[Aib]-[Gly]-[Leu]-[Aib]-[Pro]-[Val]-[Aib]-[Aib]-[Glu]-[Glu]-[Pheol]				NOR00016
+linear	[Glu7] alamethicin F30	C92H149N21O26	1964.0982640667	[Ac-Aib]-[Pro]-[Aib]-[Ala]-[Aib]-[Ala]-[Glu]-[Aib]-[Val]-[Aib]-[Gly]-[Leu]-[Aib]-[Pro]-[Val]-[Aib]-[Aib]-[Glu]-[Gln]-[Pheol]				NOR00017
+linear	pseudobactin	C38H57N11O14	891.4086455963	[ChrP]-[Lys]-[D-OH-Asp]-[Ala]-[D-aThr]-[Ala]-[D-OH-cOrn]				NOR00160
+linear	pyoverdin 9AW	C40H59N13O14	945.4304436709	[ChrP]-[D-Ser]-[Lys]-[OH-His]-[D-aThr]-[Ser]-[OH-cOrn]				NOR00161
+linear	pyoverdin 4a	C41H64N12O14	948.4664948262	[ChrP]-[D-Ala]-[Lys]-[Thr]-[D-Ser]-[Ac-OH-Orn]-[OH-cOrn]				NOR00162
+linear	isopyoverdin BTP1	C39H55N11O17	949.3777393984	[ChrI]-[Asp]-[Ala]-[Asp]-[D-Ac-OH-Orn]-[Ser]-[OH-cOrn]				NOR00163
+linear	pyoverdin PL7	C40H60N12O15	948.4301093199	[ChrP]-[D-Ser]-[D-Ac-OH-Orn]-[Ala]-[Gly]-[D-aThr]-[Ala]-[OH-cOrn]				NOR00164
+linear	pyoverdin BTP2	C39H57N11O17	951.3933894626	[ChrP]-[D-Ser]-[Val]-[OH-Asp]-[Gly]-[Thr]-[D-Ser]-[OH-cOrn]				NOR00165
+linear	pyoverdin 2908	C39H58N12O18	982.3992031220	[ChrP]-[D-Ser]-[Orn]-[OH-Asp]-[Ser]-[Ser]-[D-Ser]-[OH-cOrn]				NOR00167
+linear	pyoverdin T II	C41H63N13O16	993.4515730435	[ChrP]-[D-Ser]-[D-Fo-OH-Orn]-[Orn]-[Gly]-[D-aThr]-[Ser]-[OH-cOrn]				NOR00168
+linear	pyoverdin PL8	C43H67N13O15	1005.4879585498	[ChrP]-[D-Lys]-[D-Ac-OH-Orn]-[Ala]-[Gly]-[D-aThr]-[Ser]-[OH-cOrn]				NOR00169
+linear	pyoverdin 11370	C41H60N12O18	1008.4148531862	[ChrP]-[Asp]-[Lys]-[D-OH-Asp]-[D-Ser]-[Ala]-[D-Ser]-[OH-cOrn]				NOR00170
+linear	isopyoverdin 90-33	C49H73N13O22	1195.4993110971	[Glu]-[ChrI]-[Asp]-[Lys]-[Thr]-[D-OH-Asp]-[Thr]-[D-aThr]-[OH-cOrn]				NOR00171
+linear	pyoverdin 90-51	C47H72N14O19	1136.5098162039	[ChrP]-[Asp]-[Lys]-[D-OH-Asp]-[Ser]-[Gly]-[D-aThr]-[Lys]-[OH-cOrn]				NOR00172
+linear	pyoverdin Pau	C48H73N15O20	1179.5156298633	[ChrP]-[D-Ser]-[D-Ac-OH-Orn]-[Gly]-[D-aThr]-[Thr]-[Gln]-[Gly]-[D-Ser]-[D-OH-cOrn]				NOR00173
+linear	pyoverdin 2392	C51H80N16O19	1220.5785644711	[ChrP]-[D-Lys]-[D-Ac-OH-Orn]-[Gly]-[D-aThr]-[Thr]-[Gln]-[Gly]-[D-Ser]-[OH-cOrn]				NOR00174
+linear	pseudobactin 589A	C50H74N14O23	1238.5051247565	[ChrP]-[Asp]-[Lys]-[D-OH-Asp]-[Ser]-[Thr]-[D-Ala]-[D-Glu]-[Ser]-[OH-cOrn]				NOR00175
+linear	pyoverdin 2461	C52H81N15O21	1251.5731447422	[ChrP]-[Asp]-[Lys]-[D-OH-Asp]-[Ser]-[D-aThr]-[D-Ala]-[Thr]-[D-Lys]-[OH-cOrn]				NOR00176
+linear	pyoverdin 2192	C54H86N16O23	1326.6051731521	[ChrP]-[D-Ser]-[Lys]-[Ser]-[D-Ser]-[Thr]-[D-Ser]-[Ac-OH-Orn]-[Thr]-[D-Ser]-[OH-cOrn]				NOR00182
+linear	isopyoverdin 90-44	C53H82N16O23	1310.5738730237	[ChrI]-[Asp]-[Lys]-[D-Ac-OH-Orn]-[Thr]-[Ser]-[Ser]-[Gly]-[Ser]-[Ser]-[D-OH-cOrn]				NOR00183
+linear	pyoverdin 51W	C52H79N17O21	1277.5636426884	[ChrP]-[D-Ala]-[D-Lys]-[Gly]-[Gly]-[D-OH-Asp]-[D-Gln]-[D-Ser]-[Ala]-[Gly]-[D-aThr]-[OH-cOrn]				NOR00184
+linear	pyoverdin GM	C55H84N18O21	1332.6058418541	[ChrP]-[D-Ala]-[D-Lys]-[Gly]-[Gly]-[D-OH-Asp]-[D-Gln]-[D-Ser]-[Ala]-[D-Ala]-[D-Ala]-[Ala]-[OH-cOrn]				NOR00185
+linear	pyoverdin 1547	C60H95N19O23	1449.6848204566	[ChrP]-[D-Ser]-[Lys]-[D-Ala]-[Ac-OH-Orn]-[Thr]-[D-Ala]-[Gly]-[D-Gln]-[D-Ala]-[Ser]-[Ser]-[OH-cOrn]				NOR00186
+linear	azotobactin D	C55H80N16O28	1412.5327960700	[ChrA]-[Asp]-[D-Ser]-[Hse]-[Gly]-[D-OH-Asp]-[Ser]-[D-Cit]-[Hse]-[D-Ac-OH-Orn]-[Hse]				NOR00208
+linear	bacilysin	C12H18N2O5	270.1215716987	[Ala]-[Aca]				NOR00209
+linear	chrysobactin	C16H23N3O7	369.1536001086	[diOH-Bz]-[D-Lys]-[Ser]				NOR00210
+linear	Val-gramicidin A	C99H140N20O17	1881.0705331737	[NFo-Val]-[Gly]-[Ala]-[D-Leu]-[Ala]-[D-Val]-[Val]-[D-Val]-[Trp]-[D-Leu]-[Trp]-[D-Leu]-[Trp]-[D-Leu]-[Trp]-[Eta]				NOR00243
+linear	Val-gramicidin B	C97H139N19O17	1842.0596341364	[NFo-Val]-[Gly]-[Ala]-[D-Leu]-[Ala]-[D-Val]-[Val]-[D-Val]-[Trp]-[D-Leu]-[Phe]-[D-Leu]-[Trp]-[D-Leu]-[Trp]-[Eta]				NOR00244
+linear	Val-gramicidin C	C97H139N19O18	1858.0545487585	[NFo-Val]-[Gly]-[Ala]-[D-Leu]-[Ala]-[D-Val]-[Val]-[D-Val]-[Trp]-[D-Leu]-[Tyr]-[D-Leu]-[Trp]-[D-Leu]-[Trp]-[Eta]				NOR00245
+linear	Ile-gramicidin A	C100H142N20O17	1895.0861832379	[NFo-Ile]-[Gly]-[Ala]-[D-Leu]-[Ala]-[D-Val]-[Val]-[D-Val]-[Trp]-[D-Leu]-[Trp]-[D-Leu]-[Trp]-[D-Leu]-[Trp]-[Eta]				NOR00246
+linear	Ile-gramicidin B	C98H141N19O17	1856.0752842006	[NFo-Ile]-[Gly]-[Ala]-[D-Leu]-[Ala]-[D-Val]-[Val]-[D-Val]-[Trp]-[D-Leu]-[Phe]-[D-Leu]-[Trp]-[D-Leu]-[Trp]-[Eta]				NOR00247
+linear	Ile-gramicidin C	C98H141N19O18	1872.0701988227	[NFo-Ile]-[Gly]-[Ala]-[D-Leu]-[Ala]-[D-Val]-[Val]-[D-Val]-[Trp]-[D-Leu]-[Tyr]-[D-Leu]-[Trp]-[D-Leu]-[Trp]-[Eta]				NOR00248
+linear	anguibactin	C16H21N3O5S	367.1201914902	[DHPT]-[N-OH-Hta]				NOR00280
+linear	coronatine	C18H25NO4	319.1783582961	[CMA]-[CFA]				NOR00294
+linear	norcoronatine	C17H23NO4	305.1627082319	[norCMA]-[CFA]				NOR00295
+linear	dolastatin 10	C42H68N6O6S	784.4921046366	[Dov]-[Val]-[Dil]-[Dap]		Doe		NOR00369
+linear	dolastatin 15	C45H68N6O9	836.5047778129	[Dov]-[Val]-[NMe-Val]-[Pro]-[Pro]-[Hiv]-[Dpy]				NOR00370
+linear	acyclodidemnin A	C49H80N6O13	960.5783366865	[Ist]-[Hip]-[Leu]-[Pro]-[NMe-OMe-Tyr]-[Thr]-[D-NMe-Leu]				NOR00385
+linear	kahalalide G	C75H126N14O17	1494.9425386931	[iC7:0]-[D-Val]-[Thr]-[Val]-[D-Val]-[D-Pro]-[Orn]-[D-aIle]-[D-aThr]-[D-aIle]-[D-Val]-[Phe]-[dhAbu]-[Val]				NOR00396
+linear	kahalalide H	C55H82N8O16	1110.5848786274	[iC11:0-OH(3)]-[D-Asp]-[D-Phe]-[Ser]-[D-Val]-[4OH-Pro]-[Ser]-[D-Leu]-[Phe]				NOR00397
+linear	kahalalide J	C61H94N10O17	1238.6798416451	[iC11:0-OH(3)]-[D-Asp]-[D-Phe]-[Ser]-[D-Val]-[4OH-Pro]-[Ser]-[D-Leu]-[Phe]-[Lys]				NOR00398
+linear	aquachelin A	C44H74N10O20	1062.5080848694	[C12:1(5)]-[D-OH-Asp]-[D-Ser]-[Ser]-[D-Gln]-[D-Ac-OH-Orn]-[D-Ser]-[Ac-OH-Orn]				NOR00401
+linear	amphibactin B	C38H69N7O14	847.4902499607	[C14:0-OH(3)]-[Ac-OH-Orn]-[D-Ac-OH-Orn]-[Ser]-[D-Ac-OH-Orn]				NOR00402
+linear	ornibactin C4	C26H48N8O13	680.3340836697	[C4:0-OH(3)]-[OH-Orn]-[D-OH-Asp]-[Ser]-[Fo-OH-Orn]		Put		NOR00403
+linear	micromide	C49H73N7O7S	903.5292184244	[C6:0-OMe(3)]-[Phe]-[D-NMe-Val]-[Val]-[NMe-Ile]-[NMe-Phe]		NMe-Gly-Thz		NOR00408
+linear	apramide A	C52H80N8O8S	976.5819822764	[C8:0:1(7)-Me(2)]-[NMe-Ala]-[NMe-Val]-[Pro]-[NMe-Val]-[NMe-Val]-[NMe-OMe-Tyr]		NMe-Gly-Thz		NOR00409
+linear	apramide D	C55H82N8O10S	1046.5874615848	[C8:0:1(7)-Me(2)]-[NMe-Ala]-[NMe-Val]-[Pro]-[NMe-Val]-[NMe-Val]-[NMe-OMe-Tyr]-[Pro-Thz]				NOR00410
+linear	apramide G	C51H84N8O9S	984.6081970269	[C8:0:1(7)-Me(2)]-[NMe-Ala]-[NMe-Val]-[NMe-Val]-[NMe-Val]-[NMe-Val]-[NMe-Val]-[Pro-Thz]				NOR00411
+linear	oscillarin	C27H32N2O6	480.2260367702	[D-Ph-Lac]-[D-Phe]-[Choi]				NOR00412
+linear	corrugatin	C40H67N13O19	1033.4676170382	[C8:0]-[OH-His]-[Dab]-[Dab]-[Ser]-[D-Ser]-[OH-Asp]-[Dab]-[OH-Asp]				NOR00414
+linear	callipeltin C	C68H118N18O19	1490.8820637013	[iC8:0-Me(2.4)-OH(3)]-[D-Ala]-[Agdha]-[3Me-4Me-Gln]-[D-aThr]-[D-aThr]-[D-Arg]-[Leu]-[NMe-Gln]-[bOMe-Tyr]-[NMe-Ala]				NOR00419
+linear	callipeltin D	C32H60N8O11	732.4381548107	[iC8:0-Me(2.4)-OH(3)]-[D-Ala]-[Agdha]-[3Me-4Me-Gln]-[D-aThr]				NOR00420
+linear	callipeltin E	C36H60N10O9	776.4544735769	[D-aThr]-[D-Arg]-[Leu]-[NMe-Gln]-[bOMe-Tyr]-[NMe-Ala]				NOR00421
+linear	gymnangiamide	C35H58N8O10	750.4275901244	[gSer]-[Ile]-[dDil]-[dDap]-[Ph-Ser]				NOR00426
+linear	carmabin A	C40H57N5O6	703.4308845883	[C10:0:1(9)-Me(2.4)]-[NMe-Phe]-[Ala]-[NMe-Ala]-[NMe-OMe-TyrC]				NOR00432
+linear	carmabin B	C40H59N5O7	721.4414492746	[C10:0-Me(2.4)-oxo(9)]-[NMe-Phe]-[Ala]-[NMe-Ala]-[NMe-OMe-TyrC]				NOR00433
+linear	hemiasterlin	C30H46N4O4	526.3519059858	[bbNMe-NMe-Trp]-[t-Leu]-[NMe-hv-Val]				NOR00456
+linear	hemiasterlin A	C29H44N4O4	512.3362559216	[bbMe-NMe-Trp]-[t-Leu]-[NMe-hv-Val]				NOR00457
+linear	hemiasterlin B	C28H42N4O4	498.3206058574	[bbMe-NMe-Trp]-[Val]-[NMe-hv-Val]				NOR00458
+linear	hemiasterlin C	C29H44N4O4	512.3362559216	[bbNMe-NMe-Trp]-[Val]-[NMe-hv-Val]				NOR00459
+linear	criamide A	C35H56N8O5	668.4373669497	[bbMe-NMe-Trp]-[t-Leu]-[NMe-hv-Val]-[Arg]				NOR00460
+linear	criamide B	C36H58N8O5	682.4530170139	[bbNMe-NMe-Trp]-[t-Leu]-[NMe-hv-Val]-[Arg]				NOR00461
+linear	pseudotheonamide C	C36H45N9O8	731.3391094681	[D-Phe]-[v-Tyr]-[NFo-Dpr]-[Pro]-[ck-Arg]				NOR00468
+linear	pseudotheonamide D	C29H36N6O6	564.2696329194	[D-Phe]-[v-Tyr]-[NFo-Dpr]-[ProC]				NOR00469
+linear	andrimid	C27H33N3O5	479.2420211854	[C8:3(t2.t4.t6)]-[D-bPhe]-[Val]-[Me-Suc]				NOR00485
+linear	tokaramide A	C23H36N6O5	476.2747182973	[pOH-Bz]-[Val]-[Val]-[Argal]				NOR00486
+linear	leupeptin	C20H38N6O4	426.2954537394	[NAc-Leu]-[Leu]-[Argal]				NOR00487
+linear	miraziridine A	C30H52N8O9	668.3857253097	[Azd]-[Leu]-[Sta]-[Abu]-[v-Arg]				NOR00488
+linear	nazumamide A	C28H43N7O8	605.3173113935	[diOH-Bz]-[Arg]-[Pro]-[Ile]-[Abu]				NOR00489
+linear	koshikamide A1	C66H100N12O15	1300.7431106039	[NOMe-Ac-D-Phe]-[NMe-Val]-[NMe-Asn]-[NMe-aIle]-[NMe-Val]-[NMe-Leu]-[Asn]-[D-Phe]-[Pro]-[Pro]				NOR00490
+linear	koshikamide A2	C72H112N16O16	1456.8442216320	[NOMe-Ac-D-Phe]-[NMe-Val]-[NMe-Asn]-[NMe-aIle]-[NMe-Val]-[NMe-Leu]-[Asn]-[D-Phe]-[Pro]-[Pro]-[Arg]				NOR00491
+linear	halicylindramide E	BrC68H95N16O16S	1502.6015937763	[D-NFo-Ala]-[Br-Phe]-[Pro]-[D-Val]-[t-Leu]-[D-Trp]-[Arg]-[D-CysA]-[Thr]-[NMe-Gln]-[D-Phe]				NOR00496
+linear	pupukeamide	C34H56N4O7	632.4149001731	[C4:0]-[NMe-Val]-[Val]-[NMe-OMe-Tyr]-[NMe-OMe-Ile]				NOR00644
+linear	antipain	C27H44N10O5	588.3496145749	[Phe]-[CO]-[Arg]-[Val]-[Argal]				NOR00664
+linear	edeine A	C33H58N10O10	754.4337381348	[bTyr]-[Iser]-[Dpr]-[Daz]-[Gly]		Spd		NOR00665
+linear	edeine B	C34H60N12O10	796.4555362094	[bTyr]-[Iser]-[Dpr]-[Daz]-[Gly]		GSpd		NOR00666
+linear	edeine D	C33H58N10O9	738.4388235127	[bPhe]-[Iser]-[Dpr]-[Daz]-[Gly]		Spd		NOR00667
+linear	edeine F	C34H60N12O9	780.4606215873	[bPhe]-[Iser]-[Dpr]-[Daz]-[Gly]		GSpd		NOR00668
+linear	polytheonamide B	C219H376N60O72S	5030.7325758628	[C6:0-Me(5.5)-oxo(2)]-[Gly]-[bMe-Ile]-[Gly]-[t-Leu]-[D-t-Leu]-[t-Leu]-[D-Ala]-[D-t-Leu]-[t-Leu]-[D-Ala]-[Gly]-[Ala]-[D-t-Leu]-[Ala]-[D-N2Me-Asn]-[bOH-Val]-[Gly]-[Ala]-[Gly]-[t-Leu]-[D-N2Me-Asn]-[bMe-Gln]-[D-bOH-Val]-[Ala]-[Gly]-[Gly]-[D-N2Me-Asn]-[Ile]-[D-N2Me-bOH-Asn]-[t-Leu]-[D-bOH-Val]-[Gly]-[D-N2Me-Asn]-[Ile]-[D-N2Me-Asn]-[Val]-[D-N2Me-bOH-Asn]-[Ala]-[D-N2Me-Asn]-[Val]-[D-Ser]-[Val]-[D-Asn]-[bbMe2-O-Met]-[D-Asn]-[Gln]-[D-aThr]-[Thr]				NOR00669
+linear	phosphinothricin tripeptide	C11H22N3O6P	323.1246219644	[PT]-[Ala]-[Ala]				NOR00670
+linear	BT1583	C81H146N16O15	1583.1153581013	[Me2-Bmt]-[Leu]-[D-Orn]-[Ile]-[Val]-[Val]-[D-Lys]-[Val]-[D-Leu]-[Lys]-[D-Tyr]-[Leu]-[Valol]				NOR00680
+linear	amphibactin C	C40H71N7O14	873.5059000249	[C16:1(9)-OH(3)]-[Ac-OH-Orn]-[D-Ac-OH-Orn]-[Ser]-[D-Ac-OH-Orn]				NOR00720
+linear	amphibactin D	C38H69N7O13	831.4953353386	[C14:0]-[Ac-OH-Orn]-[D-Ac-OH-Orn]-[Ser]-[D-Ac-OH-Orn]				NOR00721
+linear	amphibactin E	C40H71N7O13	857.5109854028	[C16:1(9)]-[Ac-OH-Orn]-[D-Ac-OH-Orn]-[Ser]-[D-Ac-OH-Orn]				NOR00722
+linear	amphibactin F	C40H73N7O14	875.5215500891	[C16:0-OH(3)]-[Ac-OH-Orn]-[D-Ac-OH-Orn]-[Ser]-[D-Ac-OH-Orn]				NOR00723
+linear	amphibactin G	C42H75N7O14	901.5372001533	[C18:1(9)-OH(3)]-[Ac-OH-Orn]-[D-Ac-OH-Orn]-[Ser]-[D-Ac-OH-Orn]				NOR00724
+linear	amphibactin H	C40H73N7O13	859.5266354670	[C16:0]-[Ac-OH-Orn]-[D-Ac-OH-Orn]-[Ser]-[D-Ac-OH-Orn]				NOR00725
+linear	amphibactin I	C42H75N7O13	885.5422855312	[C18:1(9)]-[Ac-OH-Orn]-[D-Ac-OH-Orn]-[Ser]-[D-Ac-OH-Orn]				NOR00726
+linear	moiramide B	C25H31N3O5	453.2263711212	[C6:2(t2.t4)]-[D-bPhe]-[Val]-[Me-Suc]				NOR00727
+linear	apramide B	C51H78N8O8S	962.5663322122	[C8:0:1(7)]-[NMe-Ala]-[NMe-Val]-[Pro]-[NMe-Val]-[NMe-Val]-[NMe-OMe-Tyr]		NMe-Gly-Thz		NOR00728
+linear	apramide C	C53H84N8O8S	992.6132824048	[C9:1(8)-Me(2)]-[NMe-Ala]-[NMe-Val]-[Pro]-[NMe-Val]-[NMe-Val]-[NMe-OMe-Tyr]		NMe-Gly-Thz		NOR00729
+linear	apramide E	C54H80N8O10S	1032.5718115206	[C8:0:1(7)]-[NMe-Ala]-[NMe-Val]-[Pro]-[NMe-Val]-[NMe-Val]-[NMe-OMe-Tyr]-[Pro-Thz]				NOR00730
+linear	apramide F	C56H86N8O10S	1062.6187617132	[C9:1(8)-Me(2)]-[NMe-Ala]-[NMe-Val]-[Pro]-[NMe-Val]-[NMe-Val]-[NMe-OMe-Tyr]-[Pro-Thz]				NOR00731
+linear	aquachelin B	C44H76N10O20	1064.5237349336	[C12:0]-[D-OH-Asp]-[D-Ser]-[Ser]-[D-Gln]-[D-Ac-OH-Orn]-[D-Ser]-[Ac-OH-Orn]				NOR00732
+linear	aquachelin C	C46H78N10O20	1090.5393849978	[C14:1(7)]-[D-OH-Asp]-[D-Ser]-[Ser]-[D-Gln]-[D-Ac-OH-Orn]-[D-Ser]-[Ac-OH-Orn]				NOR00733
+linear	aquachelin D	C46H80N10O20	1092.5550350620	[C14:0]-[D-OH-Asp]-[D-Ser]-[Ser]-[D-Gln]-[D-Ac-OH-Orn]-[D-Ser]-[Ac-OH-Orn]				NOR00734
+linear	callipeltin F	C42H79N13O14	989.5869443129	[iC8:0-Me(2.4)-OH(3)]-[D-Ala]-[Agdha]-[3Me-4Me-Gln]-[D-aThr]-[D-aThr]-[D-Arg]				NOR00740
+linear	callipeltin G	C54H100N16O15	1212.7554066247	[iC8:0-Me(2.4)-OH(3)]-[D-Ala]-[Agdha]-[3Me-4Me-Gln]-[D-aThr]-[D-aThr]-[D-Arg]-[Leu]-[NMe-Gln]				NOR00741
+linear	callipeltin H	C68H116N18O18	1472.8714990150	[iC8:0-Me(2.4)-OH(3)]-[D-Ala]-[Agdha]-[3Me-4Me-Gln]-[dhAbu]-[D-aThr]-[D-Arg]-[Leu]-[NMe-Gln]-[bOMe-Tyr]-[NMe-Ala]				NOR00742
+linear	callipeltin I	C42H77N13O13	971.5763796266	[iC8:0-Me(2.4)-OH(3)]-[D-Ala]-[Agdha]-[3Me-4Me-Gln]-[dhAbu]-[D-aThr]-[D-Arg]				NOR00743
+linear	callipeltin J	C31H58N8O11	718.4225047465	[iC8:0-Me(2.4)-OH(3)]-[D-Ala]-[Agdha]-[D-bMe-Gln]-[D-aThr]				NOR00744
+linear	callipeltin K	C67H116N18O19	1476.8664136371	[iC8:0-Me(2.4)-OH(3)]-[D-Ala]-[Agdha]-[D-bMe-Gln]-[D-aThr]-[D-aThr]-[D-Arg]-[Leu]-[NMe-Gln]-[bOMe-Tyr]-[NMe-Ala]				NOR00745
+linear	callipeltin M	C47H76N12O13	1016.5654805893	[2Me-3Me-pGlu]-[D-aThr]-[D-aThr]-[D-Arg]-[Leu]-[NMe-Gln]-[bOMe-Tyr]-[NMe-Ala]				NOR00747
+linear	N-coronafacoyl-L-valine	C17H25NO4	307.1783582961	[Val]-[CFA]				NOR00748
+linear	N-coronafacoyl-L-isoleucine	C18H27NO4	321.1940083603	[Ile]-[CFA]				NOR00749
+linear	N-coronafacoyl-L-alloisoleucine	C18H27NO4	321.1940083603	[aIle]-[CFA]				NOR00750
+linear	N-coronafacoyl-L-serine	C15H21NO5	295.1419727898	[Ser]-[CFA]				NOR00751
+linear	N-coronafacoyl-L-threonine	C16H23NO5	309.1576228540	[Thr]-[CFA]				NOR00752
+linear	kahalalide V	C31H47N7O6	613.3587822777	[iC9:0-OH(3)]-[D-Trp]-[Pro]-[Arg]				NOR00804
+linear	kahalalide X	C47H65N9O11	931.4803539764	[C4:0]-[D-Phe]-[Thr]-[D-Tyr]-[Arg]-[D-Tyr]-[Ile]				NOR00806
+linear	linear nodularin	C41H62N8O11	842.4538048749	[Adda]-[D-Glu]-[2Dh-Mabu]-[D-bMe-Asp]-[Arg]				NOR00826
+linear	ornibactin C6	C28H52N8O13	708.3653837981	[C6:0-OH(3)]-[OH-Orn]-[D-OH-Asp]-[Ser]-[Fo-OH-Orn]		Put		NOR00832
+linear	ornibactin C8	C30H56N8O13	736.3966839265	[C8:0-OH(3)]-[OH-Orn]-[D-OH-Asp]-[Ser]-[Fo-OH-Orn]		Put		NOR00833
+linear	tolaasin C	C94H165N21O26	2004.2234645803	[C8:0-OH(3)]-[dhAbu]-[D-Pro]-[D-Ser]-[D-Leu]-[D-Val]-[D-Ser]-[D-Leu]-[D-Val]-[Val]-[D-Gln]-[Leu]-[D-Val]-[dhAbu]-[D-aThr]-[Ile]-[D-Hse]-[D-Dab]-[Lys]				NOR00876
+linear	azotobactin delta	C55H78N16O27	1394.5222313837	[ChrA]-[Asp]-[D-Ser]-[Hse]-[Gly]-[D-OH-Asp]-[Ser]-[D-Cit]-[Hse]-[D-Ac-OH-Orn]-[HseL]				NOR00902
+linear	pseudobactin A	C38H59N11O14	893.4242956605	[ChrD]-[Lys]-[D-OH-Asp]-[Ala]-[D-aThr]-[Ala]-[D-OH-cOrn]				NOR00903
+linear	pseudobactin 36167-I	C42H62N12O20	1054.4203324946	[ChrP]-[Ser]-[Ala]-[Ac-OH-Orn]-[Gly]-[Ala]-[OH-Asp]-[Ser]-[Thr]				NOR00906
+linear	pseudobactin A225-I	C42H62N12O21	1070.4152471167	[ChrP]-[Ser]-[Ala]-[Ac-OH-Orn]-[Gly]-[Ser]-[OH-Asp]-[Ser]-[Thr]				NOR00908
+linear	pyoverdin 6-10	C29H54N10O12	734.3922672506	[D-Ala]-[Orn]-[OH-Asp]-[Dab]-[Ac-OH-Orn]-[Lys]				NOR00911
+linear	ampullosporin A	C77H127N19O19	1621.9555629954	[Ac-Trp]-[Ala]-[Aib]-[Aib]-[Leu]-[Aib]-[Gln]-[Aib]-[Aib]-[Aib]-[Gln]-[Leu]-[Aib]-[Gln]-[Leuol]				NOR00937
+linear	ampullosporin B	C76H125N19O19	1607.9399129312	[Ac-Trp]-[Ala]-[Aib]-[Aib]-[Leu]-[Aib]-[Gln]-[Ala]-[Aib]-[Aib]-[Gln]-[Leu]-[Aib]-[Gln]-[Leuol]				NOR00938
+linear	ampullosporin C	C76H125N19O19	1607.9399129312	[Ac-Trp]-[Ala]-[Aib]-[Aib]-[Leu]-[Aib]-[Gln]-[Aib]-[Ala]-[Aib]-[Gln]-[Leu]-[Aib]-[Gln]-[Leuol]				NOR00939
+linear	ampullosporin D	C76H125N19O19	1607.9399129312	[Ac-Trp]-[Ala]-[Aib]-[Aib]-[Leu]-[Aib]-[Gln]-[Aib]-[Aib]-[Ala]-[Gln]-[Leu]-[Aib]-[Gln]-[Leuol]				NOR00940
+linear	ampullosporin E1	C75H123N19O19	1593.9242628670	[Ac-Trp]-[Ala]-[Aib]-[Aib]-[Leu]-[Aib]-[Gln]-[Ala]-[Aib]-[Aib]-[Gln]-[Leu]-[Ala]-[Gln]-[Leuol]				NOR00941
+linear	ampullosporin E2	C75H123N19O19	1593.9242628670	[Ac-Trp]-[Ala]-[Aib]-[Aib]-[Leu]-[Aib]-[Gln]-[Aib]-[Ala]-[Ala]-[Gln]-[Leu]-[Aib]-[Gln]-[Leuol]				NOR00942
+linear	ampullosporin E3	C75H123N19O19	1593.9242628670	[Ac-Trp]-[Ala]-[Aib]-[Aib]-[Leu]-[Aib]-[Gln]-[Aib]-[Aib]-[Ala]-[Gln]-[Leu]-[Ala]-[Gln]-[Leuol]				NOR00943
+linear	ampullosporin E4	C75H123N19O19	1593.9242628670	[Ac-Trp]-[Ala]-[Aib]-[Aib]-[Leu]-[Aib]-[Gln]-[Ala]-[Ala]-[Aib]-[Gln]-[Leu]-[Aib]-[Gln]-[Leuol]				NOR00944
+linear	antiamoebin I	C82H127N17O20	1669.9443296071	[Ac-Phe]-[Aib]-[Aib]-[Aib]-[D-Ival]-[Gly]-[Leu]-[Aib]-[Aib]-[4OH-Pro]-[Gln]-[D-Ival]-[4OH-Pro]-[Aib]-[Pro]-[Pheol]				NOR00945
+linear	antiamoebin II	C82H127N17O19	1653.9494149850	[Ac-Phe]-[Aib]-[Aib]-[Aib]-[D-Ival]-[Gly]-[Leu]-[Aib]-[Aib]-[4OH-Pro]-[Gln]-[D-Ival]-[Pro]-[Aib]-[Pro]-[Pheol]				NOR00946
+linear	antiamoebin III	C81H125N17O20	1655.9286795429	[Ac-Phe]-[Aib]-[Aib]-[Aib]-[Aib]-[Gly]-[Leu]-[Aib]-[Aib]-[4OH-Pro]-[Gln]-[D-Ival]-[4OH-Pro]-[Aib]-[Pro]-[Pheol]				NOR00947
+linear	antiamoebin IV	C81H125N17O20	1655.9286795429	[Ac-Phe]-[Aib]-[Aib]-[Ala]-[D-Ival]-[Gly]-[Leu]-[Aib]-[Aib]-[4OH-Pro]-[Gln]-[D-Ival]-[4OH-Pro]-[Aib]-[Pro]-[Pheol]				NOR00948
+linear	antiamoebin V	C83H129N17O20	1683.9599796713	[Ac-Phe]-[Aib]-[Aib]-[Aib]-[D-Ival]-[Ala]-[Leu]-[Aib]-[Aib]-[4OH-Pro]-[Gln]-[D-Ival]-[4OH-Pro]-[Aib]-[Pro]-[Pheol]				NOR00949
+linear	antiamoebin VI	C80H123N17O20	1641.9130294787	[Ac-Phe]-[Aib]-[Aib]-[Aib]-[Aib]-[Gly]-[Leu]-[Aib]-[Aib]-[4OH-Pro]-[Gln]-[Aib]-[4OH-Pro]-[Aib]-[Pro]-[Pheol]				NOR00950
+linear	antiamoebin VII	C81H125N17O20	1655.9286795429	[Ac-Phe]-[Ala]-[Aib]-[D-Ival]-[Aib]-[Gly]-[Leu]-[Aib]-[Aib]-[4OH-Pro]-[Gln]-[D-Ival]-[4OH-Pro]-[Aib]-[Pro]-[Pheol]				NOR00951
+linear	antiamoebin VIII	C81H125N17O20	1655.9286795429	[Ac-Phe]-[Aib]-[Aib]-[Aib]-[D-Ival]-[Gly]-[Leu]-[Aib]-[Aib]-[4OH-Pro]-[Gln]-[Aib]-[4OH-Pro]-[Aib]-[Pro]-[Pheol]				NOR00952
+linear	antiamoebin IX	C81H125N17O20	1655.9286795429	[Ac-Phe]-[Aib]-[Ala]-[Aib]-[D-Ival]-[Gly]-[Leu]-[Aib]-[Aib]-[4OH-Pro]-[Gln]-[D-Ival]-[4OH-Pro]-[Aib]-[Pro]-[Pheol]				NOR00953
+linear	antiamoebin X	C82H127N17O20	1669.9443296071	[Ac-Phe]-[Aib]-[Aib]-[Aib]-[D-Ival]-[Gly]-[Leu]-[D-Ival]-[Aib]-[4OH-Pro]-[Gln]-[Aib]-[4OH-Pro]-[Aib]-[Pro]-[Pheol]				NOR00954
+linear	antiamoebin XI	C82H127N17O20	1669.9443296071	[Ac-Phe]-[Aib]-[Aib]-[Aib]-[Aib]-[Ala]-[Leu]-[Aib]-[Aib]-[4OH-Pro]-[Gln]-[D-Ival]-[4OH-Pro]-[Aib]-[Pro]-[Pheol]				NOR00955
+linear	antiamoebin XII	C80H123N17O20	1641.9130294787	[Ac-Phe]-[Aib]-[Aib]-[Aib]-[Aib]-[Gly]-[Leu]-[Ala]-[Aib]-[4OH-Pro]-[Gln]-[D-Ival]-[4OH-Pro]-[Aib]-[Pro]-[Pheol]				NOR00956
+linear	antiamoebin XIII	C77H125N17O20	1607.9286795429	[Ac-Val]-[Aib]-[Aib]-[Aib]-[Aib]-[Gly]-[Leu]-[Aib]-[Aib]-[4OH-Pro]-[Gln]-[D-Ival]-[4OH-Pro]-[Aib]-[Pro]-[Pheol]				NOR00957
+linear	antiamoebin XIV	C78H127N17O20	1621.9443296071	[Ac-Val]-[Aib]-[Aib]-[Aib]-[Val]-[Gly]-[Leu]-[Aib]-[Aib]-[4OH-Pro]-[Gln]-[D-Ival]-[4OH-Pro]-[Aib]-[Pro]-[Pheol]				NOR00958
+linear	antiamoebin XV	C78H127N17O20	1621.9443296071	[NAc-Leu]-[Aib]-[Aib]-[Aib]-[Aib]-[Gly]-[Leu]-[Aib]-[Aib]-[4OH-Pro]-[Gln]-[D-Ival]-[4OH-Pro]-[Aib]-[Pro]-[Pheol]				NOR00959
+linear	antiamoebin XVI	C79H129N17O20	1635.9599796713	[NAc-Leu]-[Aib]-[Aib]-[Aib]-[D-Ival]-[Gly]-[Leu]-[Aib]-[Aib]-[4OH-Pro]-[Gln]-[D-Ival]-[4OH-Pro]-[Aib]-[Pro]-[Pheol]				NOR00960
+linear	atroviridin A	C92H151N23O24	1962.1302328971	[Ac-Aib]-[Pro]-[Aib]-[Ala]-[Aib]-[Ala]-[Gln]-[Aib]-[Val]-[Aib]-[Gly]-[Leu]-[Aib]-[Pro]-[Val]-[Aib]-[Aib]-[Gln]-[Gln]-[Pheol]				NOR00961
+linear	atroviridin B	C93H153N23O24	1976.1458829613	[Ac-Aib]-[Pro]-[Aib]-[Ala]-[Aib]-[Ala]-[Gln]-[Aib]-[Val]-[Aib]-[Gly]-[Leu]-[Aib]-[Pro]-[Val]-[Aib]-[Ival]-[Gln]-[Gln]-[Pheol]				NOR00962
+linear	atroviridin C	C94H155N23O24	1990.1615330255	[Ac-Aib]-[Pro]-[Aib]-[Ala]-[Aib]-[Aib]-[Gln]-[Aib]-[Val]-[Aib]-[Gly]-[Leu]-[Aib]-[Pro]-[Val]-[Aib]-[Ival]-[Gln]-[Gln]-[Pheol]				NOR00963
+linear	bergofungin A	C73H120N16O19	1524.8915657551	[Ac-Val]-[Aib]-[Aib]-[Aib]-[Val]-[Gly]-[Leu]-[Aib]-[Aib]-[4OH-Pro]-[Gln]-[Ival]-[4OH-Pro]-[Aib]-[Pheol]				NOR00964
+linear	bergofungin B	C73H120N16O19	1524.8915657551	[Ac-Val]-[Aib]-[Aib]-[Aib]-[Val]-[Gly]-[Leu]-[Val]-[Aib]-[4OH-Pro]-[Gln]-[Aib]-[4OH-Pro]-[Aib]-[Pheol]				NOR00965
+linear	bergofungin C	C72H118N16O19	1510.8759156909	[Ac-Val]-[Aib]-[Aib]-[Aib]-[Val]-[Gly]-[Leu]-[Aib]-[Aib]-[4OH-Pro]-[Gln]-[Aib]-[4OH-Pro]-[Aib]-[Pheol]				NOR00966
+linear	bergofungin D	C68H111N15O18	1425.8231518389	[Ac-Val]-[Aib]-[Aib]-[Val]-[Gly]-[Leu]-[Aib]-[Aib]-[4OH-Pro]-[Gln]-[Aib]-[4OH-Pro]-[Aib]-[Pheol]				NOR00967
+linear	boletusin	C91H142N22O22	1895.0669043588	[Ac-Phe]-[Aib]-[Ala]-[Aib]-[Ival]-[Leu]-[Gln]-[Gly]-[Aib]-[Aib]-[Ala]-[Ala]-[Aib]-[Pro]-[Aib]-[Aib]-[Aib]-[Gln]-[Trpol]				NOR00968
+linear	cephaibol A	C82H127N17O20	1669.9443296071	[Ac-Phe]-[Aib]-[Aib]-[Aib]-[Aib]-[Gly]-[Leu]-[D-Ival]-[Aib]-[4OH-Pro]-[Gln]-[D-Ival]-[4OH-Pro]-[Aib]-[Pro]-[Pheol]				NOR00969
+linear	cephaibol A2	C83H129N17O20	1683.9599796713	[Ac-Phe]-[Aib]-[Aib]-[Aib]-[Aib]-[Ala]-[Leu]-[D-Ival]-[Aib]-[4OH-Pro]-[Gln]-[D-Ival]-[4OH-Pro]-[Aib]-[Pro]-[Pheol]				NOR00970
+linear	cephaibol B	C83H129N17O20	1683.9599796713	[Ac-Phe]-[Aib]-[Aib]-[Aib]-[D-Ival]-[Gly]-[Leu]-[D-Ival]-[Aib]-[4OH-Pro]-[Gln]-[D-Ival]-[4OH-Pro]-[Aib]-[Pro]-[Pheol]				NOR00971
+linear	cephaibol C	C81H125N17O20	1655.9286795429	[Ac-Phe]-[Aib]-[Aib]-[Aib]-[Aib]-[Gly]-[Leu]-[D-Ival]-[Aib]-[4OH-Pro]-[Gln]-[Aib]-[4OH-Pro]-[Aib]-[Pro]-[Pheol]				NOR00972
+linear	cephaibol D	C80H123N17O20	1641.9130294787	[Ac-Phe]-[Aib]-[Aib]-[Aib]-[Aib]-[Gly]-[Leu]-[Aib]-[Aib]-[4OH-Pro]-[Gln]-[Aib]-[4OH-Pro]-[Aib]-[Pro]-[Pheol]				NOR00973
+linear	cephaibol E	C81H125N17O20	1655.9286795429	[Ac-Phe]-[Aib]-[Aib]-[Aib]-[Aib]-[Gly]-[Leu]-[Aib]-[Aib]-[4OH-Pro]-[Gln]-[D-Ival]-[4OH-Pro]-[Aib]-[Pro]-[Pheol]				NOR00974
+linear	cephaibol P	C89H139N19O24	1858.0240364911	[Ac-Phe]-[D-Ival]-[Gln]-[Aib]-[Ile]-[Thr]-[Aib]-[Leu]-[Aib]-[4OH-Pro]-[Gln]-[Aib]-[4OH-Pro]-[Aib]-[Pro]-[Phe]-[Serol]				NOR00975
+linear	cephaibol Q	C89H139N19O23	1842.0291218690	[Ac-Phe]-[D-Ival]-[Gln]-[Aib]-[Ile]-[Thr]-[Aib]-[Leu]-[Aib]-[Pro]-[Gln]-[Aib]-[4OH-Pro]-[Aib]-[Pro]-[Phe]-[Serol]				NOR00976
+linear	cervinin 1	C59H102N12O13	1186.7689314239	[NAc-Leu]-[Aib]-[Pro]-[Aib]-[Leu]-[Aib]-[Pro]-[Ala]-[Aib]-[Pro]-[Val]-[Leuol]				NOR00977
+linear	cervinin 2	C61H104N12O14	1228.7794961102	[NAc-Leu]-[Aib]-[Pro]-[Aib]-[Leu]-[Aib]-[Pro]-[Ala]-[Aib]-[Pro]-[Val]-[OAc-Leuol]				NOR00978
+linear	chrysospermin A	C90H140N22O23	1897.0461689167	[Ac-Phe]-[Aib]-[Ser]-[Aib]-[Aib]-[Leu]-[Gln]-[Gly]-[Aib]-[Aib]-[Ala]-[Ala]-[Aib]-[Pro]-[Aib]-[Aib]-[Aib]-[Gln]-[Trpol]				NOR00979
+linear	chrysospermin B	C91H142N22O23	1911.0618189809	[Ac-Phe]-[Aib]-[Ser]-[Aib]-[Aib]-[Leu]-[Gln]-[Gly]-[Aib]-[Aib]-[Ala]-[Ala]-[Aib]-[Pro]-[D-Ival]-[Aib]-[Aib]-[Gln]-[Trpol]				NOR00980
+linear	chrysospermin C	C91H142N22O23	1911.0618189809	[Ac-Phe]-[Aib]-[Ser]-[Aib]-[D-Ival]-[Leu]-[Gln]-[Gly]-[Aib]-[Aib]-[Ala]-[Ala]-[Aib]-[Pro]-[Aib]-[Aib]-[Aib]-[Gln]-[Trpol]				NOR00981
+linear	chrysospermin D	C92H144N22O23	1925.0774690451	[Ac-Phe]-[Aib]-[Ser]-[Aib]-[D-Ival]-[Leu]-[Gln]-[Gly]-[Aib]-[Aib]-[Ala]-[Ala]-[Aib]-[Pro]-[D-Ival]-[Aib]-[Aib]-[Gln]-[Trpol]				NOR00982
+linear	emerimicin IIA	C89H137N19O22	1824.0185571827	[Ac-Trp]-[Ile]-[Gln]-[Aib]-[Ile]-[Thr]-[Aib]-[Leu]-[Aib]-[4OH-Pro]-[Gln]-[Aib]-[4OH-Pro]-[Aib]-[Pro]-[Pheol]				NOR00983
+linear	emerimicin IIB	C90H139N19O22	1838.0342072469	[Ac-Trp]-[Ile]-[Gln]-[Ival]-[Ile]-[Thr]-[Aib]-[Leu]-[Aib]-[4OH-Pro]-[Gln]-[Aib]-[4OH-Pro]-[Aib]-[Pro]-[Pheol]				NOR00984
+linear	emerimicin III	C76H118N16O19	1558.8759156909	[Ac-Phe]-[Aib]-[Aib]-[Aib]-[Val]-[Gly]-[Leu]-[Aib]-[Aib]-[4OH-Pro]-[Gln]-[D-Ival]-[4OH-Pro]-[Ala]-[Pheol]				NOR00985
+linear	emerimicin IV	C77H120N16O19	1572.8915657551	[Ac-Phe]-[Aib]-[Aib]-[Aib]-[Val]-[Gly]-[Leu]-[Aib]-[Aib]-[4OH-Pro]-[Gln]-[D-Ival]-[4OH-Pro]-[Aib]-[Pheol]				NOR00986
+linear	harzianin HB I	C57H100N12O13	1160.7532813597	[Ac-Aib]-[Asn]-[Leu]-[Ile]-[Aib]-[Pro]-[Ival]-[Leu]-[Aib]-[Pro]-[Leuol]				NOR00987
+linear	harzianin HC I	C67H115N15O17	1401.8595373452	[Ac-Aib]-[Asn]-[Leu]-[Aib]-[Pro]-[Ser]-[Val]-[Aib]-[Pro]-[Aib]-[Leu]-[Aib]-[Pro]-[Leuol]				NOR00988
+linear	harzianin HC III	C68H117N15O17	1415.8751874094	[Ac-Aib]-[Asn]-[Leu]-[Aib]-[Pro]-[Ser]-[Val]-[Aib]-[Pro]-[Ival]-[Leu]-[Aib]-[Pro]-[Leuol]				NOR00989
+linear	harzianin HC VI	C67H115N15O16	1385.8646227231	[Ac-Aib]-[Asn]-[Leu]-[Aib]-[Pro]-[Ala]-[Val]-[Aib]-[Pro]-[Aib]-[Leu]-[Aib]-[Pro]-[Leuol]				NOR00990
+linear	harzianin HC VIII	C68H117N15O16	1399.8802727873	[Ac-Aib]-[Asn]-[Leu]-[Aib]-[Pro]-[Ala]-[Val]-[Aib]-[Pro]-[Ival]-[Leu]-[Aib]-[Pro]-[Leuol]				NOR00991
+linear	harzianin HC IX	C69H119N15O16	1413.8959228515	[Ac-Aib]-[Asn]-[Leu]-[Aib]-[Pro]-[Ala]-[Ile]-[Aib]-[Pro]-[Ival]-[Leu]-[Aib]-[Pro]-[Leuol]				NOR00992
+linear	harzianin HC X	C69H119N15O16	1413.8959228515	[Ac-Aib]-[Gln]-[Leu]-[Aib]-[Pro]-[Ala]-[Val]-[Aib]-[Pro]-[Ival]-[Leu]-[Aib]-[Pro]-[Leuol]				NOR00993
+linear	harzianin HC XII	C69H119N15O17	1429.8908374736	[Ac-Aib]-[Asn]-[Leu]-[Aib]-[Pro]-[Ser]-[Ile]-[Aib]-[Pro]-[Ival]-[Leu]-[Aib]-[Pro]-[Leuol]				NOR00994
+linear	harzianin HC XV	C70H121N15O16	1427.9115729157	[Ac-Aib]-[Gln]-[Leu]-[Aib]-[Pro]-[Ala]-[Ile]-[Aib]-[Pro]-[Ival]-[Leu]-[Aib]-[Pro]-[Leuol]				NOR00995
+linear	harzianin HC XI	C68H117N15O17	1415.8751874094	[Ac-Aib]-[Asn]-[Leu]-[Aib]-[Pro]-[Ser]-[Ile]-[Aib]-[Pro]-[Aib]-[Leu]-[Aib]-[Pro]-[Leuol]				NOR00996
+linear	harzianin HC XIII	C70H121N15O17	1443.9064875378	[Ac-Aib]-[Gln]-[Leu]-[Aib]-[Pro]-[Ser]-[Ile]-[Aib]-[Pro]-[Ival]-[Leu]-[Aib]-[Pro]-[Leuol]				NOR00997
+linear	harzianin HC XIV	C68H117N15O16	1399.8802727873	[Ac-Aib]-[Asn]-[Leu]-[Aib]-[Pro]-[Ala]-[Ile]-[Aib]-[Pro]-[Aib]-[Leu]-[Aib]-[Pro]-[Leuol]				NOR00998
+linear	harzianin HK VI	C58H102N12O13	1174.7689314239	[Ac-Aib]-[Asn]-[Ile]-[Ile]-[Aib]-[Pro]-[Leu]-[Leu]-[Aib]-[Pro]-[Leuol]				NOR00999
+linear	harzianin PCU4	C67H115N15O17	1401.8595373452	[Ac-Aib]-[Asn]-[Leu]-[Aib]-[Pro]-[Ser]-[Ile]-[Aib]-[Pro]-[Aib]-[Leu]-[Aib]-[Pro]-[Valol]				NOR01000
+linear	heptaibin	C76H118N16O19	1558.8759156909	[Ac-Phe]-[Aib]-[Aib]-[Aib]-[Val]-[Gly]-[Leu]-[Aib]-[Aib]-[4OH-Pro]-[Gln]-[Aib]-[4OH-Pro]-[Aib]-[Pheol]				NOR01001
+linear	hypomurocin A1	C57H100N12O13	1160.7532813597	[Ac-Aib]-[Gln]-[Val]-[Val]-[Aib]-[Pro]-[Leu]-[Leu]-[Aib]-[Pro]-[Leuol]				NOR01002
+linear	hypomurocin A2	C58H102N12O13	1174.7689314239	[Ac-Ival]-[Gln]-[Val]-[Val]-[Aib]-[Pro]-[Leu]-[Leu]-[Aib]-[Pro]-[Leuol]				NOR01003
+linear	hypomurocin A3	C58H102N12O13	1174.7689314239	[Ac-Aib]-[Gln]-[Val]-[Leu]-[Aib]-[Pro]-[Leu]-[Ile]-[Aib]-[Pro]-[Leuol]				NOR01004
+linear	hypomurocin A4	C58H102N12O13	1174.7689314239	[Ac-Aib]-[Gln]-[Ile]-[Val]-[Aib]-[Pro]-[Leu]-[Leu]-[Aib]-[Pro]-[Leuol]				NOR01005
+linear	hypomurocin A5	C59H104N12O13	1188.7845814881	[Ac-Aib]-[Gln]-[Ile]-[Ile]-[Aib]-[Pro]-[Leu]-[Leu]-[Aib]-[Pro]-[Leuol]				NOR01006
+linear	hypomurocin A5a	C59H104N12O13	1188.7845814881	[Ac-Aib]-[Gln]-[Ile]-[Leu]-[Aib]-[Pro]-[Leu]-[Ile]-[Aib]-[Pro]-[Leuol]				NOR01007
+linear	hypomurocin B1	C79H138N20O22	1719.0294562200	[Ac-Aib]-[Ser]-[Ala]-[Leu]-[Aib]-[Gln]-[Aib]-[Val]-[Aib]-[Gly]-[Aib]-[Aib]-[Pro]-[Leu]-[Aib]-[Aib]-[Gln]-[Valol]				NOR01008
+linear	hypomurocin B2	C80H140N20O22	1733.0451062842	[Ac-Aib]-[Ser]-[Ala]-[Leu]-[Aib]-[Gln]-[Aib]-[Val]-[Aib]-[Gly]-[Aib]-[Aib]-[Pro]-[Leu]-[Aib]-[Aib]-[Gln]-[Leuol]				NOR01009
+linear	hypomurocin B3a	C79H138N20O21	1703.0345415979	[Ac-Aib]-[Ala]-[Ala]-[Leu]-[Aib]-[Gln]-[Aib]-[Val]-[Aib]-[Gly]-[Aib]-[Aib]-[Pro]-[Leu]-[Aib]-[Aib]-[Gln]-[Valol]				NOR01010
+linear	hypomurocin B3b	C80H140N20O22	1733.0451062842	[Ac-Aib]-[Ser]-[Ala]-[Leu]-[Aib]-[Gln]-[Ival]-[Val]-[Aib]-[Gly]-[Aib]-[Aib]-[Pro]-[Leu]-[Aib]-[Aib]-[Gln]-[Valol]				NOR01011
+linear	hypomurocin B4	C80H140N20O22	1733.0451062842	[Ac-Aib]-[Ser]-[Ala]-[Leu]-[Aib]-[Gln]-[Aib]-[Val]-[Aib]-[Gly]-[Ival]-[Aib]-[Pro]-[Leu]-[Aib]-[Aib]-[Gln]-[Valol]				NOR01012
+linear	hypomurocin B5	C81H142N20O22	1747.0607563484	[Ac-Aib]-[Ser]-[Ala]-[Leu]-[Aib]-[Gln]-[Aib]-[Val]-[Aib]-[Gly]-[Ival]-[Aib]-[Pro]-[Leu]-[Aib]-[Aib]-[Gln]-[Leuol]				NOR01013
+linear	longibrachin A1	C90H149N23O24	1936.1145828329	[Ac-Aib]-[Ala]-[Aib]-[Ala]-[Aib]-[Ala]-[Gln]-[Aib]-[Val]-[Aib]-[Gly]-[Leu]-[Aib]-[Pro]-[Val]-[Aib]-[Aib]-[Gln]-[Gln]-[Pheol]				NOR01014
+linear	longibrachin A2	C91H151N23O24	1950.1302328971	[Ac-Aib]-[Ala]-[Aib]-[Ala]-[Aib]-[Ala]-[Gln]-[Aib]-[Val]-[Aib]-[Gly]-[Leu]-[Aib]-[Pro]-[Val]-[Aib]-[Ival]-[Gln]-[Gln]-[Pheol]				NOR01015
+linear	longibrachin A3	C91H151N23O24	1950.1302328971	[Ac-Aib]-[Ala]-[Aib]-[Ala]-[Aib]-[Aib]-[Gln]-[Aib]-[Val]-[Aib]-[Gly]-[Leu]-[Aib]-[Pro]-[Val]-[Aib]-[Aib]-[Gln]-[Gln]-[Pheol]				NOR01016
+linear	longibrachin A4	C92H153N23O24	1964.1458829613	[Ac-Aib]-[Ala]-[Aib]-[Ala]-[Aib]-[Aib]-[Gln]-[Aib]-[Val]-[Aib]-[Gly]-[Leu]-[Aib]-[Pro]-[Val]-[Aib]-[Ival]-[Gln]-[Gln]-[Pheol]				NOR01017
+linear	longibrachin B1	C90H148N22O25	1937.0985984177	[Ac-Aib]-[Ala]-[Aib]-[Ala]-[Aib]-[Ala]-[Gln]-[Aib]-[Val]-[Aib]-[Gly]-[Leu]-[Aib]-[Pro]-[Val]-[Aib]-[Aib]-[Glu]-[Gln]-[Pheol]				NOR01018
+linear	longibrachin B2	C91H150N22O25	1951.1142484819	[Ac-Aib]-[Ala]-[Aib]-[Ala]-[Aib]-[Ala]-[Gln]-[Aib]-[Val]-[Aib]-[Gly]-[Leu]-[Aib]-[Pro]-[Val]-[Aib]-[Ival]-[Glu]-[Gln]-[Pheol]				NOR01019
+linear	LP237 F8	C65H108N14O15	1324.8118588711	[C8:0]-[Aib]-[Pro]-[Phe]-[Aib]-[Gln]-[Gln]-[Aib]-[Et-Nva]-[Gln]-[Ala]-[Leuol]				NOR01020
+linear	LP237 F5	C65H108N14O16	1340.8067734932	[C8:0]-[Aib]-[Pro]-[Tyr]-[Aib]-[Gln]-[Gln]-[Aib]-[Et-Nva]-[Gln]-[Ala]-[Leuol]				NOR01021
+linear	LP237 F7	C64H106N14O15	1310.7962088069	[C10:0]-[Aib]-[Pro]-[Phe]-[Aib]-[Gln]-[Gln]-[Aib]-[Aib]-[Gln]-[Ala]-[Leuol]				NOR01022
+linear	paracelsin A	C88H145N23O24	1908.0832827045	[Ac-Aib]-[Ala]-[Aib]-[Ala]-[Aib]-[Ala]-[Gln]-[Aib]-[Val]-[Aib]-[Gly]-[Aib]-[Aib]-[Pro]-[Val]-[Aib]-[Aib]-[Gln]-[Gln]-[Pheol]				NOR01023
+linear	paracelsin B	C89H147N23O24	1922.0989327687	[Ac-Aib]-[Ala]-[Aib]-[Ala]-[Aib]-[Ala]-[Gln]-[Aib]-[Leu]-[Aib]-[Gly]-[Aib]-[Aib]-[Pro]-[Val]-[Aib]-[Aib]-[Gln]-[Gln]-[Pheol]				NOR01024
+linear	paracelsin C	C89H147N23O24	1922.0989327687	[Ac-Aib]-[Ala]-[Aib]-[Ala]-[Aib]-[Aib]-[Gln]-[Aib]-[Val]-[Aib]-[Gly]-[Aib]-[Aib]-[Pro]-[Val]-[Aib]-[Aib]-[Gln]-[Gln]-[Pheol]				NOR01025
+linear	paracelsin D	C90H149N23O24	1936.1145828329	[Ac-Aib]-[Ala]-[Aib]-[Ala]-[Aib]-[Aib]-[Gln]-[Aib]-[Leu]-[Aib]-[Gly]-[Aib]-[Aib]-[Pro]-[Val]-[Aib]-[Aib]-[Gln]-[Gln]-[Pheol]				NOR01026
+linear	paracelsin E	C88H145N23O24	1908.0832827045	[Ac-Aib]-[Ala]-[Aib]-[Ala]-[Aib]-[Ala]-[Gln]-[Aib]-[Leu]-[Aib]-[Gly]-[Aib]-[Ala]-[Pro]-[Val]-[Aib]-[Aib]-[Gln]-[Gln]-[Pheol]				NOR01027
+linear	peptaibolin	C31H51N5O6	589.3839343957	[NAc-Leu]-[Aib]-[Leu]-[Aib]-[Pheol]				NOR01028
+linear	peptaivirin A	C92H144N22O22	1909.0825544230	[Ac-Phe]-[Aib]-[Ala]-[Aib]-[Ival]-[Leu]-[Gln]-[Gly]-[Aib]-[Aib]-[Ala]-[Ala]-[Aib]-[Pro]-[Ival]-[Aib]-[Aib]-[Gln]-[Trpol]				NOR01029
+linear	peptaivirin B	C90H143N21O23	1886.0665700078	[Ac-Phe]-[Aib]-[Ser]-[Aib]-[Ival]-[Leu]-[Gln]-[Gly]-[Aib]-[Aib]-[Ala]-[Ala]-[Aib]-[Pro]-[Ival]-[Aib]-[Aib]-[Gln]-[Pheol]				NOR01030
+linear	stilboflavin A1	C86H146N22O25	1887.0829483535	[Ac-Aib]-[Pro]-[Aib]-[Ala]-[Aib]-[Ala]-[Gln]-[Aib]-[Val]-[Aib]-[Gly]-[Aib]-[Aib]-[Pro]-[Val]-[Aib]-[Aib]-[Glu]-[Gln]-[Valol]				NOR01031
+linear	stilboflavin A2	C87H148N22O25	1901.0985984177	[Ac-Aib]-[Pro]-[Aib]-[Ala]-[Aib]-[Ala]-[Gln]-[Aib]-[Leu]-[Aib]-[Gly]-[Aib]-[Aib]-[Pro]-[Val]-[Aib]-[Aib]-[Glu]-[Gln]-[Valol]				NOR01032
+linear	stilboflavin A3	C87H148N22O25	1901.0985984177	[Ac-Aib]-[Pro]-[Aib]-[Ala]-[Aib]-[Aib]-[Gln]-[Aib]-[Val]-[Aib]-[Gly]-[Aib]-[Ala]-[Pro]-[Val]-[Aib]-[Aib]-[Glu]-[Gln]-[Leuol]				NOR01033
+linear	stilboflavin A4	C88H150N22O25	1915.1142484819	[Ac-Aib]-[Pro]-[Aib]-[Ala]-[Aib]-[Ala]-[Gln]-[Aib]-[Leu]-[Aib]-[Gly]-[Aib]-[Aib]-[Pro]-[Val]-[Aib]-[Aib]-[Glu]-[Gln]-[Leuol]				NOR01034
+linear	stilboflavin A5	C88H150N22O25	1915.1142484819	[Ac-Aib]-[Pro]-[Aib]-[Ala]-[Aib]-[Aib]-[Gln]-[Aib]-[Leu]-[Aib]-[Gly]-[Aib]-[Aib]-[Pro]-[Val]-[Aib]-[Aib]-[Glu]-[Gln]-[Valol]				NOR01035
+linear	stilboflavin A6	C87H148N22O25	1901.0985984177	[Ac-Aib]-[Pro]-[Aib]-[Ala]-[Aib]-[Ala]-[Gln]-[Aib]-[Leu]-[Aib]-[Gly]-[Aib]-[Aib]-[Pro]-[Val]-[Aib]-[Aib]-[Glu]-[Gln]-[Ivalol]				NOR01036
+linear	stilboflavin A7	C89H152N22O25	1929.1298985461	[Ac-Aib]-[Pro]-[Aib]-[Ala]-[Aib]-[Aib]-[Gln]-[Aib]-[Leu]-[Aib]-[Gly]-[Aib]-[Aib]-[Pro]-[Val]-[Aib]-[Aib]-[Glu]-[Gln]-[Ileol]				NOR01037
+linear	stilboflavin B1	C86H147N23O24	1886.0989327687	[Ac-Aib]-[Pro]-[Aib]-[Ala]-[Aib]-[Ala]-[Gln]-[Aib]-[Val]-[Aib]-[Gly]-[Aib]-[Aib]-[Pro]-[Val]-[Aib]-[Aib]-[Gln]-[Gln]-[Valol]				NOR01038
+linear	stilboflavin B2	C87H149N23O24	1900.1145828329	[Ac-Aib]-[Pro]-[Aib]-[Ala]-[Aib]-[Ala]-[Gln]-[Aib]-[Leu]-[Aib]-[Gly]-[Aib]-[Aib]-[Pro]-[Val]-[Aib]-[Aib]-[Gln]-[Gln]-[Valol]				NOR01039
+linear	stilboflavin B3	C87H149N23O24	1900.1145828329	[Ac-Aib]-[Pro]-[Aib]-[Ala]-[Aib]-[Ala]-[Gln]-[Aib]-[Val]-[Aib]-[Gly]-[Aib]-[Aib]-[Pro]-[Val]-[Aib]-[Aib]-[Gln]-[Gln]-[Leuol]				NOR01040
+linear	stilboflavin B4	C88H151N23O24	1914.1302328971	[Ac-Aib]-[Pro]-[Aib]-[Ala]-[Aib]-[Ala]-[Gln]-[Aib]-[Leu]-[Aib]-[Gly]-[Aib]-[Aib]-[Pro]-[Val]-[Aib]-[Aib]-[Gln]-[Gln]-[Leuol]				NOR01041
+linear	stilboflavin B5	C88H151N23O24	1914.1302328971	[Ac-Aib]-[Pro]-[Aib]-[Ala]-[Aib]-[Aib]-[Gln]-[Aib]-[Leu]-[Aib]-[Gly]-[Aib]-[Aib]-[Pro]-[Val]-[Aib]-[Aib]-[Gln]-[Gln]-[Valol]				NOR01042
+linear	stilboflavin B6	C87H149N23O24	1900.1145828329	[Ac-Aib]-[Pro]-[Aib]-[Ala]-[Aib]-[Aib]-[Gln]-[Aib]-[Val]-[Aib]-[Gly]-[Aib]-[Aib]-[Pro]-[Val]-[Aib]-[Aib]-[Gln]-[Gln]-[Valol]				NOR01043
+linear	stilboflavin B7	C89H153N23O24	1928.1458829613	[Ac-Aib]-[Pro]-[Aib]-[Ala]-[Aib]-[Aib]-[Gln]-[Aib]-[Leu]-[Aib]-[Gly]-[Aib]-[Aib]-[Pro]-[Val]-[Aib]-[Aib]-[Gln]-[Gln]-[Leuol]				NOR01044
+linear	stilboflavin B8	C88H151N23O24	1914.1302328971	[Ac-Aib]-[Pro]-[Aib]-[Ala]-[Aib]-[Aib]-[Gln]-[Aib]-[Val]-[Aib]-[Gly]-[Aib]-[Aib]-[Pro]-[Val]-[Aib]-[Aib]-[Gln]-[Gln]-[Leuol]				NOR01045
+linear	stilboflavin B9	C89H153N23O24	1928.1458829613	[Ac-Aib]-[Pro]-[Aib]-[Ala]-[Aib]-[Aib]-[Gln]-[Aib]-[Leu]-[Aib]-[Gly]-[Aib]-[Aib]-[Pro]-[Val]-[Aib]-[Aib]-[Gln]-[Gln]-[Ileol]				NOR01046
+linear	stilboflavin B10	C88H151N23O24	1914.1302328971	[Ac-Aib]-[Pro]-[Aib]-[Ala]-[Aib]-[Aib]-[Gln]-[Aib]-[Val]-[Aib]-[Gly]-[Aib]-[Aib]-[Pro]-[Val]-[Aib]-[Aib]-[Gln]-[Gln]-[Ileol]				NOR01047
+linear	trichobrachin A1	C56H98N12O13	1146.7376312955	[Ac-Aib]-[Asn]-[Leu]-[Leu]-[Aib]-[Pro]-[Leu]-[Aib]-[Aib]-[Pro]-[Leuol]				NOR01048
+linear	trichobrachin A2	C56H98N12O13	1146.7376312955	[Ac-Aib]-[Asn]-[Leu]-[Leu]-[Aib]-[Pro]-[Val]-[Leu]-[Aib]-[Pro]-[Valol]				NOR01049
+linear	trichobrachin A3	C56H98N12O13	1146.7376312955	[Ac-Aib]-[Asn]-[Val]-[Leu]-[Aib]-[Pro]-[Leu]-[Leu]-[Aib]-[Pro]-[Valol]				NOR01050
+linear	trichobrachin A4	C56H98N12O13	1146.7376312955	[Ac-Aib]-[Asn]-[Leu]-[Val]-[Aib]-[Pro]-[Leu]-[Leu]-[Aib]-[Pro]-[Valol]				NOR01051
+linear	trichobrachin B1	C56H98N12O13	1146.7376312955	[Ac-Aib]-[Asn]-[Leu]-[Leu]-[Aib]-[Pro]-[Val]-[Aib]-[Val]-[Pro]-[Leuol]				NOR01052
+linear	trichobrachin B2	C56H98N12O13	1146.7376312955	[Ac-Aib]-[Asn]-[Val]-[Leu]-[Aib]-[Pro]-[Leu]-[Aib]-[Val]-[Pro]-[Leuol]				NOR01053
+linear	trichobrachin B3	C56H98N12O13	1146.7376312955	[Ac-Aib]-[Asn]-[Leu]-[Val]-[Aib]-[Pro]-[Leu]-[Aib]-[Val]-[Pro]-[Leuol]				NOR01054
+linear	trichobrachin B4	C56H98N12O13	1146.7376312955	[Ac-Aib]-[Asn]-[Leu]-[Leu]-[Aib]-[Pro]-[Leu]-[Aib]-[Val]-[Pro]-[Valol]				NOR01055
+linear	syringafactin A	C54H99N9O13	1081.7362343120	[C10:0-OH(3)]-[Leu]-[Leu]-[Gln]-[Leu]-[Thr]-[Val]-[Leu]-[Leu]				NOR01075
+linear	syringafactin B	C55H101N9O13	1095.7518843762	[C10:0-OH(3)]-[Leu]-[Leu]-[Gln]-[Leu]-[Thr]-[Leu]-[Leu]-[Leu]				NOR01076
+linear	syringafactin C	C55H101N9O13	1095.7518843762	[C10:0-OH(3)]-[Leu]-[Leu]-[Gln]-[Leu]-[Thr]-[Ile]-[Leu]-[Leu]				NOR01077
+linear	syringafactin D	C56H103N9O13	1109.7675344404	[C12:0-OH(3)]-[Leu]-[Leu]-[Gln]-[Leu]-[Thr]-[Val]-[Leu]-[Leu]				NOR01078
+linear	syringafactin E	C57H105N9O13	1123.7831845046	[C12:0-OH(3)]-[Leu]-[Leu]-[Gln]-[Leu]-[Thr]-[Leu]-[Leu]-[Leu]				NOR01079
+linear	syringafactin F	C57H105N9O13	1123.7831845046	[C12:0-OH(3)]-[Leu]-[Leu]-[Gln]-[Leu]-[Thr]-[Ile]-[Leu]-[Leu]				NOR01080
+linear	feglymycin	C95H97N13O30	1899.6464288443	[D-Hpg]-[D-Dhpg]-[Val]-[D-Dhpg]-[Hpg]-[D-Dhpg]-[Hpg]-[D-Dhpg]-[Val]-[D-Dhpg]-[Hpg]-[Phe]-[Asp]				NOR01081
+linear	zervamicin II-1	C88H135N19O22	1810.0029071185	[Ac-Trp]-[Ile]-[Gln]-[Aib]-[Val]-[Thr]-[Aib]-[Leu]-[Aib]-[4OH-Pro]-[Gln]-[Aib]-[4OH-Pro]-[Aib]-[Pro]-[Pheol]				NOR01082
+linear	zervamicin II-2	C88H135N19O22	1810.0029071185	[Ac-Trp]-[Ile]-[Gln]-[Aib]-[Ile]-[Thr]-[Aib]-[Val]-[Aib]-[4OH-Pro]-[Gln]-[Aib]-[4OH-Pro]-[Aib]-[Pro]-[Pheol]				NOR01083
+linear	zervamicin II-3	C88H135N19O22	1810.0029071185	[Ac-Trp]-[Val]-[Gln]-[Aib]-[Ile]-[Thr]-[Aib]-[Leu]-[Aib]-[4OH-Pro]-[Gln]-[Aib]-[4OH-Pro]-[Aib]-[Pro]-[Pheol]				NOR01084
+linear	zervamicin II-4	C89H137N19O22	1824.0185571827	[Ac-Trp]-[Ile]-[Gln]-[D-Ival]-[Val]-[Thr]-[Aib]-[Leu]-[Aib]-[4OH-Pro]-[Gln]-[Aib]-[4OH-Pro]-[Aib]-[Pro]-[Pheol]				NOR01085
+linear	zervamicin II-5	C89H137N19O22	1824.0185571827	[Ac-Trp]-[Ile]-[Gln]-[D-Ival]-[Ile]-[Thr]-[Aib]-[Val]-[Aib]-[4OH-Pro]-[Gln]-[Aib]-[4OH-Pro]-[Aib]-[Pro]-[Pheol]				NOR01086
+linear	zervamicin IA	C89H136N18O23	1825.0025727675	[Ac-Trp]-[Ile]-[Glu]-[D-Ival]-[Val]-[Thr]-[Aib]-[Leu]-[Aib]-[4OH-Pro]-[Gln]-[Aib]-[4OH-Pro]-[Aib]-[Pro]-[Pheol]				NOR01087
+linear	zervamicin IB	C89H136N18O23	1825.0025727675	[Ac-Trp]-[Val]-[Glu]-[D-Ival]-[Ile]-[Thr]-[Aib]-[Leu]-[Aib]-[4OH-Pro]-[Gln]-[Aib]-[4OH-Pro]-[Aib]-[Pro]-[Pheol]				NOR01088
+linear	zervamicin IB prime	C89H136N18O23	1825.0025727675	[Ac-Trp]-[Ile]-[Glu]-[Aib]-[Ile]-[Thr]-[Aib]-[Leu]-[Aib]-[4OH-Pro]-[Gln]-[Aib]-[4OH-Pro]-[Aib]-[Pro]-[Pheol]				NOR01089
+linear	zervamicin IC	C90H138N18O23	1839.0182228317	[Ac-Trp]-[Ile]-[Glu]-[D-Ival]-[Ile]-[Thr]-[Aib]-[Leu]-[Aib]-[4OH-Pro]-[Gln]-[Aib]-[4OH-Pro]-[Aib]-[Pro]-[Pheol]				NOR01090
+linear	zervamicin IIA	C89H137N19O22	1824.0185571827	[Ac-Trp]-[Ile]-[Gln]-[Aib]-[Ile]-[Thr]-[Aib]-[Leu]-[Aib]-[4OH-Pro]-[Gln]-[Aib]-[4OH-Pro]-[Aib]-[Pro]-[Pheol]				NOR01091
+linear	zervamicin IIB	C90H139N19O22	1838.0342072469	[Ac-Trp]-[Ile]-[Gln]-[D-Ival]-[Ile]-[Thr]-[Aib]-[Leu]-[Aib]-[4OH-Pro]-[Gln]-[Aib]-[4OH-Pro]-[Aib]-[Pro]-[Pheol]				NOR01092
+linear	Leu1-zervamicin	C85H140N18O22	1765.0389582738	[NAc-Leu]-[Ile]-[Gln]-[D-Ival]-[Ile]-[Thr]-[Aib]-[Leu]-[Aib]-[4OH-Pro]-[Gln]-[Aib]-[4OH-Pro]-[Aib]-[Pro]-[Pheol]				NOR01093
+linear	trichotoxin A-40	C80H139N19O22	1718.0342072469	[Ac-Aib]-[Gly]-[Aib]-[Leu]-[Aib]-[Glu]-[Aib]-[Aib]-[Aib]-[Ala]-[Aib]-[Aib]-[Pro]-[Leu]-[Aib]-[D-Ival]-[Gln]-[Valol]				NOR01094
+linear	trichotoxin A-40 I	C78H135N19O22	1690.0029071185	[Ac-Aib]-[Gly]-[Aib]-[Leu]-[Aib]-[Gln]-[Aib]-[Aib]-[Ala]-[Ala]-[Aib]-[Aib]-[Pro]-[Leu]-[Aib]-[Aib]-[Glu]-[Valol]				NOR01095
+linear	trichotoxin A-40 II	C78H135N19O22	1690.0029071185	[Ac-Aib]-[Gly]-[Aib]-[Leu]-[Aib]-[Gln]-[Aib]-[Aib]-[Aib]-[Ala]-[Ala]-[Aib]-[Pro]-[Leu]-[Aib]-[Aib]-[Glu]-[Valol]				NOR01096
+linear	trichotoxin A-40 III	C79H137N19O22	1704.0185571827	[Ac-Aib]-[Gly]-[Aib]-[Leu]-[Aib]-[Gln]-[Aib]-[Aib]-[Ala]-[Ala]-[Aib]-[Aib]-[Pro]-[Leu]-[Aib]-[D-Ival]-[Glu]-[Valol]				NOR01097
+linear	trichotoxin A-40 IV	C79H137N19O22	1704.0185571827	[Ac-Aib]-[Gly]-[Aib]-[Leu]-[Aib]-[Gln]-[Aib]-[Aib]-[Aib]-[Ala]-[Aib]-[Aib]-[Pro]-[Leu]-[Aib]-[Aib]-[Glu]-[Valol]				NOR01098
+linear	trichotoxin A-40 V	C80H139N19O22	1718.0342072469	[Ac-Aib]-[Gly]-[Aib]-[Leu]-[Aib]-[Gln]-[Aib]-[Aib]-[Aib]-[Ala]-[Aib]-[Aib]-[Pro]-[Leu]-[Aib]-[D-Ival]-[Glu]-[Valol]				NOR01099
+linear	trichotoxin A-40 Va	C80H139N19O22	1718.0342072469	[Ac-Aib]-[Ala]-[Aib]-[Leu]-[Aib]-[Gln]-[Aib]-[Aib]-[Aib]-[Ala]-[Aib]-[Aib]-[Pro]-[Leu]-[Aib]-[Aib]-[Glu]-[Valol]				NOR01100
+linear	trichotoxin A-50 E	C78H136N20O21	1689.0188915337	[Ac-Aib]-[Gly]-[Aib]-[Leu]-[Aib]-[Gln]-[Aib]-[Aib]-[Aib]-[Ala]-[Ala]-[Aib]-[Pro]-[Leu]-[Aib]-[Aib]-[Gln]-[Valol]				NOR01101
+linear	trichotoxin A-50 F	C78H136N20O21	1689.0188915337	[Ac-Aib]-[Gly]-[Aib]-[Leu]-[Aib]-[Gln]-[Aib]-[Aib]-[Ala]-[Ala]-[Ala]-[Aib]-[Pro]-[Leu]-[Aib]-[D-Ival]-[Gln]-[Valol]				NOR01102
+linear	trichotoxin A-50 G	C79H138N20O21	1703.0345415979	[Ac-Aib]-[Gly]-[Aib]-[Leu]-[Aib]-[Gln]-[Aib]-[Aib]-[Aib]-[Ala]-[Ala]-[Aib]-[Pro]-[Leu]-[Aib]-[D-Ival]-[Gln]-[Valol]				NOR01103
+linear	trichotoxin A-50 H	C80H140N20O21	1717.0501916621	[Ac-Aib]-[Ala]-[Aib]-[Leu]-[Aib]-[Gln]-[Aib]-[Aib]-[Aib]-[Ala]-[Ala]-[Aib]-[Pro]-[Leu]-[Aib]-[D-Ival]-[Gln]-[Valol]				NOR01104
+linear	trichotoxin A-50 I	C80H140N20O21	1717.0501916621	[Ac-Aib]-[Gly]-[Aib]-[Leu]-[Aib]-[Gln]-[Aib]-[Aib]-[Aib]-[Ala]-[Aib]-[Aib]-[Pro]-[Leu]-[Aib]-[D-Ival]-[Gln]-[Valol]				NOR01105
+linear	trichotoxin A-50 J	C81H142N20O21	1731.0658417263	[Ac-Aib]-[Ala]-[Aib]-[Leu]-[Aib]-[Gln]-[Aib]-[Aib]-[Aib]-[Ala]-[Aib]-[Aib]-[Pro]-[Leu]-[Aib]-[D-Ival]-[Gln]-[Valol]				NOR01106
+linear	cyanostatin A	C48H65N5O9	855.4782287114	[Adda]-[Ala]-[Val]-[NMe-Tyr]-[Hty]				NOR01134
+linear	cyanostatin B	C50H67N5O9	881.4938787756	[Adda]-[Tyr]-[NMe-Ile]-[Pro]-[Tyr]				NOR01135
+linear	microginin T2	C46H59N5O9	825.4312785188	[Adda]-[Ala]-[Pro]-[Tyr]-[Tyr]				NOR01136
+linear	microginin 711	C47H61N5O9	839.4469285830	[Adda]-[Hty]-[Ala]-[Pro]-[Tyr]				NOR01137
+linear	microginin FR5	C48H63N5O9	853.4625786472	[Adda]-[Val]-[Pro]-[Tyr]-[Tyr]				NOR01138
+linear	microginin FR3	C47H61N5O10	855.4418432051	[Adda]-[Thr]-[Pro]-[Tyr]-[Tyr]				NOR01139
+linear	microginin FR9	C49H62N6O9	878.4578276203	[Adda]-[Thr]-[Pro]-[Tyr]-[Trp]				NOR01140
+linear	coelichelin	C21H39N7O11	565.2707551314	[D-Fo-OH-Orn]-[D-aThr]-[OH-Orn]-[D-Fo-OH-Orn]				NOR01141
+linear	TVB I	C78H136N20O22	1705.0138061558	[Ac-Aib]-[Gly]-[Ala]-[Val]-[Aib]-[Gln]-[Aib]-[Ala]-[Aib]-[Ser]-[Leu]-[Aib]-[Pro]-[Leu]-[Aib]-[Aib]-[Gln]-[Valol]				NOR01146
+linear	TVB II	C79H138N20O22	1719.0294562200	[Ac-Aib]-[Gly]-[Ala]-[Leu]-[Aib]-[Gln]-[Aib]-[Ala]-[Aib]-[Ser]-[Leu]-[Aib]-[Pro]-[Leu]-[Aib]-[Aib]-[Gln]-[Valol]				NOR01147
+linear	TVB IV	C80H140N20O22	1733.0451062842	[Ac-Aib]-[Gly]-[Ala]-[Leu]-[Aib]-[Gln]-[Ival]-[Ala]-[Aib]-[Ser]-[Leu]-[Aib]-[Pro]-[Leu]-[Aib]-[Aib]-[Gln]-[Valol]				NOR01148
+linear	PAU4	C85H139N21O22	1806.0403552573	[Ac-Aib]-[Ser]-[Ala]-[Aib]-[Aib]-[Gln]-[Aib]-[Val]-[Aib]-[Gly]-[Leu]-[Aib]-[Pro]-[Leu]-[Aib]-[Aib]-[Gln]-[Trpol]				NOR01149
+linear	PA II	C86H141N21O22	1820.0560053215	[Ac-Aib]-[Ser]-[Ala]-[Aib]-[Ival]-[Gln]-[Aib]-[Val]-[Aib]-[Gly]-[Leu]-[Aib]-[Pro]-[Leu]-[Aib]-[Aib]-[Gln]-[Trpol]				NOR01150
+linear	PA IV	C87H143N21O22	1834.0716553857	[Ac-Aib]-[Ser]-[Ala]-[Aib]-[Ival]-[Gln]-[Ival]-[Val]-[Aib]-[Gly]-[Leu]-[Aib]-[Pro]-[Leu]-[Aib]-[Aib]-[Gln]-[Trpol]				NOR01151
+linear	PA V	C87H143N21O22	1834.0716553857	[Ac-Aib]-[Ser]-[Ala]-[Ival]-[Ival]-[Gln]-[Aib]-[Val]-[Aib]-[Gly]-[Leu]-[Aib]-[Pro]-[Leu]-[Aib]-[Aib]-[Gln]-[Trpol]				NOR01152
+linear	PA VI	C84H140N20O22	1781.0451062842	[Ac-Aib]-[Ser]-[Ala]-[Aib]-[Ival]-[Gln]-[Aib]-[Val]-[Aib]-[Gly]-[Leu]-[Aib]-[Pro]-[Leu]-[Aib]-[Aib]-[Gln]-[Pheol]				NOR01153
+linear	PA VIII	C85H142N20O22	1795.0607563484	[Ac-Aib]-[Ser]-[Ala]-[Aib]-[Ival]-[Gln]-[Ival]-[Val]-[Aib]-[Gly]-[Leu]-[Aib]-[Pro]-[Leu]-[Aib]-[Aib]-[Gln]-[Pheol]				NOR01154
+linear	PA IX	C85H142N20O22	1795.0607563484	[Ac-Aib]-[Ser]-[Ala]-[Ival]-[Ival]-[Gln]-[Aib]-[Val]-[Aib]-[Gly]-[Leu]-[Aib]-[Pro]-[Leu]-[Aib]-[Aib]-[Gln]-[Pheol]				NOR01155
+linear	HM A1	C57H100N12O13	1160.7532813597	[Ac-Aib]-[Gln]-[Val]-[Val]-[Aib]-[Pro]-[Leu]-[Leu]-[Aib]-[Pro]-[Leuol]				NOR01161
+linear	HM A2	C58H102N12O13	1174.7689314239	[Ac-Ival]-[Gln]-[Val]-[Val]-[Aib]-[Pro]-[Leu]-[Leu]-[Aib]-[Pro]-[Leuol]				NOR01162
+linear	HM A3	C58H102N12O13	1174.7689314239	[Ac-Aib]-[Gln]-[Val]-[Leu]-[Aib]-[Pro]-[Leu]-[Ile]-[Aib]-[Pro]-[Leuol]				NOR01163
+linear	HM A4	C58H102N12O13	1174.7689314239	[Ac-Aib]-[Gln]-[Val]-[Leu]-[Aib]-[Pro]-[Leu]-[Ile]-[Aib]-[Pro]-[Leuol]				NOR01164
+linear	HM A5	C59H104N12O13	1188.7845814881	[Ac-Aib]-[Gln]-[Ile]-[Ile]-[Aib]-[Pro]-[Leu]-[Leu]-[Aib]-[Pro]-[Leuol]				NOR01165
+linear	HM A5a	C59H104N12O13	1188.7845814881	[Ac-Aib]-[Gln]-[Ile]-[Leu]-[Aib]-[Pro]-[Leu]-[Ile]-[Aib]-[Pro]-[Leuol]				NOR01166
+linear	HM B1	C79H138N20O22	1719.0294562200	[Ac-Aib]-[Ser]-[Ala]-[Leu]-[Aib]-[Gln]-[Aib]-[Val]-[Aib]-[Gly]-[Aib]-[Aib]-[Pro]-[Leu]-[Aib]-[Aib]-[Gln]-[Valol]				NOR01167
+linear	HM B2	C80H140N20O22	1733.0451062842	[Ac-Aib]-[Ser]-[Ala]-[Leu]-[Aib]-[Gln]-[Aib]-[Val]-[Aib]-[Gly]-[Aib]-[Aib]-[Pro]-[Leu]-[Aib]-[Aib]-[Gln]-[Leuol]				NOR01168
+linear	HM B3a	C79H138N20O21	1703.0345415979	[Ac-Aib]-[Ala]-[Ala]-[Leu]-[Aib]-[Gln]-[Aib]-[Val]-[Aib]-[Gly]-[Aib]-[Aib]-[Pro]-[Leu]-[Aib]-[Aib]-[Gln]-[Valol]				NOR01169
+linear	HM B3b	C80H140N20O22	1733.0451062842	[Ac-Aib]-[Ser]-[Ala]-[Leu]-[Aib]-[Gln]-[Ival]-[Val]-[Aib]-[Gly]-[Aib]-[Aib]-[Pro]-[Leu]-[Aib]-[Aib]-[Gln]-[Valol]				NOR01170
+linear	HM B4	C80H140N20O22	1733.0451062842	[Ac-Aib]-[Ser]-[Ala]-[Leu]-[Aib]-[Gln]-[Aib]-[Val]-[Aib]-[Gly]-[Ival]-[Aib]-[Pro]-[Leu]-[Aib]-[Aib]-[Gln]-[Valol]				NOR01171
+linear	HM B5	C81H142N20O22	1747.0607563484	[Ac-Aib]-[Ser]-[Ala]-[Leu]-[Aib]-[Gln]-[Aib]-[Val]-[Aib]-[Gly]-[Ival]-[Aib]-[Pro]-[Leu]-[Aib]-[Aib]-[Gln]-[Leuol]				NOR01172

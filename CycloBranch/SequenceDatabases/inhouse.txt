@@ -1,0 +1,12 @@
+cyclic	beauverolide I	C27H41N3O5	487.3046214422	[C8:0-Me(4)-OH(3)]-[Phe]-[Ala]-[Leu]				NOR00326
+cyclic	cyclosporin A	C62H111N11O12	1201.8413680855	[NMe-Bmt]-[Abu]-[NMe-Gly]-[NMe-Leu]-[Val]-[NMe-Leu]-[Ala]-[Ala]-[NMe-Leu]-[NMe-Leu]-[NMe-Val]				CSID: 25027415
+branched	dau 677 T2	C61H91N15O20	1353.6564804411	[Glu]-[Ser]-[Leu]\([Lys]-[Asn]-[Phe]-[Ile]\)[Asp]-[Gln]-[Tyr]-[Gly]	Acetyl	Amidated		
+linear	gramicidin C	C97H139N19O18	1858.0545487585	[Val]-[Gly]-[Ala]-[Leu]-[Ala]-[Val]-[Val]-[Val]-[Trp]-[Leu]-[Tyr]-[Leu]-[Trp]-[Leu]-[Trp]	Formyl	Ethanolamine		NOR00245
+branched	linearized pseudacyclin A	C39H63N7O8	757.4738120355	[Pro]-[Ile]-[Ile]\([Orn]-[NAc-Ile]\)[Phe]				
+cyclic	pseudacyclin A	C39H61N7O7	739.4632473492	[Phe]-[Pro]-[Ile]-[Ile]-[Orn]-[NAc-Ile]				CSID: 25028474
+branch-cyclic	pseudacyclin A	C39H61N7O7	739.4632473492	[Phe]-[Pro]-[Ile]-[Ile]\([Orn]-[NAc-Ile]\)				CSID: 25028474
+branch-cyclic	pyoverdin Pa A (pyoverdin D)	C55H83N17O22	1333.5898574389	[Fo-OH-Orn]-[Thr]-[Thr]\([Lys]-[Fo-OH-Orn]-[Ser]-[Arg]-[Ser]-[ChrPaA]-[Suc]\)				
+cyclic	roseotoxin A	C31H53N5O7	607.3944990820	[C5:0-Me(4)-OH(2)]-[3Me-Pro]-[Ile]-[NMe-Val]-[NMe-Ala]-[bAla]				
+linear	substance P	C63H98N18O13S	1346.7281460167	[L-Arg]-[Pro]-[Lys]-[Pro]-[Gln]-[Gln]-[Phe]-[Phe]-[Gly]-[Leu]-[Met]		Amidated		CSID: 33558
+cyclic	surfactin C	C53H93N7O13	1035.6831361090	[C14:0-Me(13)-OH(3)]-[Glu]-[Leu]-[Leu]-[Val]-[Asp]-[Leu]-[Leu]				CSID: 391754
+cyclic	valinomycin	C54H90N6O18	1110.6311601180	[Val]-[Lac]-[Val]-[Hiv]-[Val]-[Lac]-[Val]-[Hiv]-[Val]-[Lac]-[Val]-[Hiv]				CSID: 21493802

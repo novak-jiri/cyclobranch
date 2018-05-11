@@ -1,0 +1,54 @@
+other	Cladosporium herbarum; 2-Furancarboxylic acid. 5-(hydroxymethyl)-	C6H6O4	142.0266086810					CAS: 6338-41-6
+other	Cladosporium herbarum; 2-Furancarboxylic acid. 5-[(acetyloxy)methyl]-	C8H8O5	184.0371733673					CAS: 90345-66-7
+other	cladospolide D; Cladosporium sp.; Oxacyclododec-3-ene-2.5-dione. 6-hydroxy-12-methyl-. (3E)-	C12H18O4	226.1205090662					CAS: 371229-61-7
+other	Cladosporium herbarum; 2(5H)-Furanone. 5-[(1S.7R)-1.7-dihydroxyoctyl]-	C12H20O4	228.1361591304					CAS: 164521-26-0
+other	cladospolide A; Cladosporium fulvum; Oxacyclododec-3-en-2-one. 5.6-dihydroxy-12-methyl-. (3E.5R.6S.12R)	C12H20O4	228.1361591304					CAS: 77663-54-8
+other	cladospolide A; Cladosporium cladosporioides; Oxacyclododec-3-en-2-one. 5.6-dihydroxy-12-methyl-. (3E.5R.6S.12R)-	C12H20O4	228.1361591304					CAS: 77663-54-8
+other	Cladosporium herbarum; Oxacyclododec-3-en-2-one. 5.6-dihydroxy-12-methyl-. (3Z.5S.6S.12R)-	C12H20O4	228.1361591304					CAS: 96443-55-9
+other	Cladosporium cladosporioides; Oxacyclododec-3-en-2-one. 5.6-dihydroxy-12-methyl-. (3Z.5S.6S.12R)-	C12H20O4	228.1361591304					CAS: 96443-55-9
+other	Cladosporium cladosporioides; 3-Furanpentanoic acid. 5-(carboxymethylene)-2.5-dihydro-4-hydroxy-2-oxo-. (E)-	C11H12O7	256.0583027399					CAS: 54854-94-3
+other	Cladosporin (asperentin); 1H-2-Benzopyran-1-one. 3.4-dihydro-6.8-dihydroxy-3-[[(2R.6S)-tetrahydro-6-methyl-2H-pyran-2-yl]methyl]-. (3R)-	C16H20O5	292.1310737525					CAS: 35818-31-6
+other	Cladosporium cladosporioides; 1H-2-Benzopyran-1-one. 3.4-dihydro-6.8-dihydroxy-3-[(tetrahydro-6-methyl-2H-pyran-2-yl)methyl]-. [2R-[2a(R*).6b]]-	C16H20O5	292.1310737525					CAS: 35818-31-6
+other	Cladosporium; 3.10-Perylenedione. 4.9-dihydroxy-	C20H10O4	314.0579088094					CAS: 10190-97-3
+other	Cladosporium herbarum; Acetic acid. [(6-hydroxy-12-methyl-2.5-dioxooxacyclododec-4-yl)thio]-. (-)-	C14H22O6S	318.1137091288					CAS: 256451-86-2
+other	Cladosporium cf. cladosporioides; Benzo[j]fluoranthene-4.11-dione. 5.6.12.12a-tetrahydro-3.10-dihydroxy-12-methoxy-. (12R.12aS)-	C21H16O5	348.0997736241					CAS: 357933-11-0
+other	Cladosporium cf. cladosporioides; Benzo[j]fluoranthen-3(2H)-one. 1.6b.7.8-tetrahydro-4.8.9-trihydroxy-7-methoxy-. (6bS.7R.8S)-	C21H18O5	350.1154236883					CAS: 339320-58-0
+other	Cladosporium cf. cladosporioides; Benzo[j]fluoranthen-4(5H)-one. 6.11.12.12a-tetrahydro-3.10.11-trihydroxy-12-methoxy-. (11S.12R.12aR)-	C21H18O5	350.1154236883					CAS: 357933-09-6
+other	Cladosporium herbarum; Propanoic acid. 2-hydroxy-3-[(6-hydroxy-12-methyl-2.5-dioxooxacyclododec-4-yl)thio]-. methyl ester. (-)-	C16H26O7S	362.1399238793					CAS: 341520-53-4
+other	Cladosporium cf. cladosporioides; Benzo[j]fluoranthen-4(5H)-one. 6.11.12.12a-tetrahydro-3.10-dihydroxy-11.12-dimethoxy-. (11S.12R.12aS)-	C22H20O5	364.1310737525					CAS: 357933-13-2
+other	Cladosporium cladosporioides; 2.6-Epoxy-2H-anthra[2.3-b]oxocin-8.13-dione. 3.4.5.6-tetrahydro-7.9.11-trihydroxy-2-methyl-. (2S)-	C20H16O7	368.0896028683					CAS: 14016-29-6
+other	cladosporide B; Cladosporium sp.; Pregna-7.9(11)-diene-4-carboxaldehyde. 3.21-dihydroxy-4.14.20-trimethyl-. (3b.4b.5a.20S)-	C25H38O3	386.2820950861					CAS: 376368-81-9
+other	cladosporide D; Cladosporium sp.; Pregna-7.9(11)-diene-4-carboxaldehyde. 3.21-dihydroxy-4.14.20-trimethyl-. (3a.4b.5a.20S)-	C25H38O3	386.2820950861					CAS: 376368-83-1
+other	cladosporide A; Cladosporium sp.; Pregn-8-ene-4-carboxaldehyde. 3.21-dihydroxy-4.14.20-trimethyl-. (3b.4b.5a.20S)-	C25H40O3	388.2977451503					CAS: 310897-84-8
+other	cladosporide C; Cladosporium sp.; Pregn-8-ene-4-carboxaldehyde. 3.21-dihydroxy-4.14.20-trimethyl-. (3a.4b.5a.20S)-	C25H40O3	388.2977451503					CAS: 376368-82-0
+other	Cladosporium sp.; Pregn-8-ene-20-carboxylic acid. 4-formyl-4.14-dimethyl-3-oxo-. (4a.5a.20S)-	C25H36O4	400.2613596440					CAS: 310878-72-9
+other	Cladosporium herbicola; Ergost-5-en-3-ol. (3b.24R)-	C28H48O	400.3705161629					CAS: 474-62-4
+other	Cladosporium herbicola; Stigmasta-7.22.25-trien-3-ol. (3b.22E)-	C29H46O	410.3548660987					CAS: 18070-05-8
+other	Cladosporium herbicola; Stigmast-7-en-3-ol. (3b)-	C29H50O	414.3861662271					CAS: 6869-99-4
+other	Cladosporium herbicola; Stigmast-5-en-3-ol. (3b)-	C29H50O	414.3861662271					CAS: 83-46-5
+other	Cladosporium herbarum; Oxacyclododecane-2.5-dione. 4.4'-thiobis[6-hydroxy-12-methyl-	C24H38O8S	486.2287388866					CAS: 341520-55-6
+other	Cladosporium; a-D-ribo-Hexopyranosid-3-ulose. (4R.5R.6R.6aS.9R.10aR)-1.2.4.5.6.6a.7.8.9.10a-decahydro-5.9-dihydroxy-9-(methoxymethyl)-6.10a-dimethyl-3-(1-methylethyl)dicyclopenta[a.d]cycloocten-4-yl 6-O-methyl-	C28H44O9	524.2985330113					CAS: 70577-38-7
+other	phleichrome; Cladosporium phlei; 3.10-Perylenedione. 4.9-dihydroxy-1.12-bis(2-hydroxypropyl)-2.6.7.11-tetramethoxy-. stereoisomer	C30H30O10	550.1838971840					CAS: 56974-44-8
+other	Cladosporium; a-D-Glucopyranoside. (4R.5R.6R.6aS.9R.10aR)-1.2.4.5.6.6a.7.8.9.10a-decahydro-5.9-dihydroxy-9-(methoxymethyl)-6.10a-dimethyl-3-(1-methylethyl)dicyclopenta[a.d]cycloocten-4-yl 4-O-(1.1-dimethyl-2-propenyl)-6-O-methyl-	C33H54O9	594.3767833323					CAS: 70475-95-5
+other	Cladosporium	C33H50O11	622.3353124481					CAS: 12708-37-1
+other	Cladosporium; a-D-Glucopyranoside. (4R.5R.6R.6aS.9R.10aR)-1.2.4.5.6.6a.7.8.9.10a-decahydro-5.9-dihydroxy-9-(methoxymethyl)-6.10a-dimethyl-3-(1-methylethyl)dicyclopenta[a.d]cycloocten-4-yl 3.4-O-[(1R.2R)-1-hydroxy-2-methyl-2-[(2S)-oxiranyl]-1.2-ethanediyl]-6-O-methyl-	C33H52O11	624.3509625123					CAS: 55956-47-3
+other	Cladosporium herbarum; L-Serine. N-[N2-[N-[N-[N2-[N-(N-L-isoleucyl-L-a-glutamyl)-L-cysteinyl]-L-asparaginyl]glycyl]glycyl]-L-asparaginyl]-	C29H48N10O14S	792.3072169922					CAS: 145703-15-7
+other	Cladosporium herbarum; L-Tryptophan. N-[N-[N-[N2-[N-(1-glycyl-L-prolyl)-L-leucyl]-L-glutaminyl]-L-isoleucyl]-L-threonyl]-	C39H59N9O10	813.4384891617					CAS: 145703-11-3
+other	Cladosporium herbarum; L-Tyrosine. N-[N-[N2-[N2-[N-[1-(N2-L-cysteinyl-L-asparaginyl)-L-prolyl]-L-seryl]-L-lysyl]-L-glutaminyl]-L-tyrosyl]-	C44H63N11O14S	1001.4276664789					CAS: 145703-14-6
+other	Cladosporium herbarum; L-Alanine. N-[N2-[N-[N-[N-[N2-[N2-(N-L-alanylglycyl)-L-lysyl]-L-arginyl]-L-phenylalanyl]-L-tyrosyl]-L-threonyl]-L-arginyl]-	C48H76N16O12	1068.5828619880					CAS: 145703-13-5
+other	Cladosporium herbarum; L-Glutamine. N2-[N-[N-[N2-[N-[N-[N-[N-[N-[N2-(N-L-threonyl-L-alanyl)-L-arginyl]-L-valyl]glycyl]-L-tyrosyl]-L-tyrosyl]-L-threonyl]-L-glutaminyl]-L-tyrosyl]-L-cysteinyl]-	C64H93N17O20S	1451.6503492057					CAS: 145703-16-8
+other	Cladosporium herbarum; L-Arginine. L-seryl-L-isoleucylglycyl-L-phenylalanyl-L-a-aspartylglycyl-L-leucyl-L-asparaginyl-L-alanyl-L-prolyl-L-a-glutamyl-L-threonyl-L-valyl-L-alanyl-L-asparaginyl-L-asparaginyl-L-alanyl-L-valyl-L-threonyl-L-alanyl-L-phenylalanyl-	C99H154N28O33	2263.1233096183					CAS: 145703-10-2
+other	Cladosporium herbarum; L-Isoleucine. L-threonyl-L-alanyl-L-phenylalanyl-L-tryptophyl-L-phenylalanyl-L-tryptophyl-L-methionyl-L-asparaginyl-L-asparaginyl-L-valyl-L-histidyl-L-seryl-L-valyl-L-isoleucyl-L-valyl-L-asparaginylglycyl-L-glutaminylglycyl-L-phenylalanylglycyl-L-alanyl-L-seryl-	C126H176N32O32S	2681.2849124132					CAS: 145703-12-4
+other	Cladosporium fulvum; Peptide (Cladosporium fulvum gene A9 necrosis-inducing reduced)	C125H193N39O39S6	3056.2642118000					CAS: 117653-68-6
+other	Cladosporium fulvum; Peptide (Cladosporium fulvum gene A9 necrosis-inducing reduced)	C125H193N39O39S7	3088.2362824900					CAS: 117653-68-7
+other	Cladosporium fulvum	C125H190N42O40S6	3111.2448733414					CAS: 219844-07-2
+other	Cladosporium fulvum	C125H190N42O40S6	3111.2448733414					CAS: 219844-09-4
+other	Cladosporium fulvum; L-Histidine. L-tyrosyl-L-cysteinyl-L-asparaginyl-L-seryl-L-seryl-L-cysteinyl-L-threonyl-L-arginyl-L-alanyl-L-alanyl-L-a-aspartyl-L-cysteinyl-L-leucylglycyl-L-glutaminyl-L-cysteinylglycyl-L-arginyl-L-cysteinyl-L-a-aspartyl-L-phenylalanyl-L-histidyl-L-lysyl-L-leucyl-L-glutaminyl-L-cysteinyl-L-valyl-	C125H196N42O40S6	3117.2918235340					CAS: 219844-02-7
+other	Cladosporium fulvum; L-Histidine. L-tyrosyl-L-cysteinyl-L-asparaginyl-L-seryl-L-seryl-L-cysteinyl-L-threonyl-L-arginyl-L-alanyl-L-phenylalanyl-L-a-aspartyl-L-cysteinyl-L-leucylglycyl-L-glutaminyl-L-cysteinylglycyl-L-arginyl-L-cysteinyl-L-a-aspartyl-L-alanyl-L-histidyl-L-lysyl-L-leucyl-L-glutaminyl-L-cysteinyl-L-valyl-	C125H196N42O40S6	3117.2918235340					CAS: 219844-03-8
+other	Cladosporium fulvum; L-Histidine. L-tyrosyl-L-cysteinyl-L-asparaginyl-L-seryl-L-seryl-L-cysteinyl-L-threonyl-L-arginyl-L-alanyl-L-phenylalanyl-L-a-aspartyl-L-cysteinyl-L-leucylglycyl-L-glutaminyl-L-cysteinylglycyl-L-arginyl-L-cysteinyl-L-a-aspartyl-L-phenylalanyl-L-histidyl-L-alanyl-L-leucyl-L-glutaminyl-L-cysteinyl-L-valyl-. cyclic (2�16).(6�19).(12�26)-tris(disulfide)	C128H187N41O40S6	3130.2183242399					CAS: 247176-97-2
+other	Cladosporium fulvum; L-Histidine. L-tyrosyl-L-cysteinyl-L-asparaginyl-L-seryl-L-seryl-L-cysteinyl-L-threonyl-L-arginyl-L-alanyl-L-phenylalanyl-L-a-aspartyl-L-cysteinyl-L-leucylglycyl-L-glutaminyl-L-cysteinylglycyl-L-arginyl-L-cysteinyl-L-a-aspartyl-L-phenylalanyl-L-histidyl-L-lysyl-L-alanyl-L-glutaminyl-L-cysteinyl-L-valyl-	C128H194N42O40S6	3151.2761734698					CAS: 219844-04-9
+other	Cladosporium fulvum	C131H194N40O40S6	3159.2700254594					CAS: 219844-06-1
+other	Cladosporium fulvum; L-Histidine. L-tyrosyl-L-cysteinyl-L-asparaginyl-L-seryl-L-seryl-L-cysteinyl-L-threonyl-L-lysyl-L-alanyl-L-phenylalanyl-L-a-aspartyl-L-cysteinyl-L-leucylglycyl-L-glutaminyl-L-cysteinylglycyl-L-arginyl-L-cysteinyl-L-a-aspartyl-L-phenylalanyl-L-histidyl-L-lysyl-L-leucyl-L-glutaminyl-L-cysteinyl-L-valyl-	C131H200N40O40S6	3165.3169756520					CAS: 219844-01-6
+other	Cladosporium fulvum	C131H194N42O40S6	3187.2761734698					CAS: 219844-05-0
+other	Cladosporium fulvum; Peptide (Cladosporium fulvum gene A9 necrosis-inducing reduced). 27a-L-histidine-	C131H200N42O40S6	3193.3231236624					CAS: 138689-08-4
+other	Cladosporium fulvum; L-Histidine. N-[5-[(3aS.4S.6aR)-hexahydro-2-oxo-1H-thieno[3.4-d]imidazol-4-yl]-1-oxopentyl]glycylglycyl-L-tyrosyl-L-cysteinyl-L-asparaginyl-L-seryl-L-seryl-L-cysteinyl-L-threonyl-L-arginyl-L-alanyl-L-phenylalanyl-L-a-aspartyl-L-cysteinyl-L-leucylglycyl-L-glutaminyl-L-cysteinylglycyl-L-arginyl-L-cysteinyl-L-a-aspartyl-L-phenylalanyl-L-histidyl-L-lysyl-L-leucyl-L-glutaminyl-L-cysteinyl-L-valyl-. cyclic (4�18).(8�21).(14�28)-tris(disulfide)	C145H214N46O44S7	3527.3966993110					CAS: 247176-98-3

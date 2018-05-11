@@ -1,0 +1,2 @@
+branch-cyclic	Pyoverdin Pa (E; PaO1)	C55H84N18O21	1332.6058418541	[Fo-OH-Orn]-[Thr]-[Thr]\([Lys]-[Fo-OH-Orn]-[Ser]-[Arg]-[Ser]-[ChrPaA]-[Suca]\)				
+branch-cyclic	pyoverdin Pa A (pyoverdin D)	C55H83N17O22	1333.5898574389	[Fo-OH-Orn]-[Thr]-[Thr]\([Lys]-[Fo-OH-Orn]-[Ser]-[Arg]-[Ser]-[ChrPaA]-[Suc]\)				

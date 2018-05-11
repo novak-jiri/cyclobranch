@@ -1,0 +1,10 @@
+@ARTICLE{CycloBranch-JASMS-2015,
+author={Novak, Jiri and Lemr, Karel and Schug, Kevin A. and Havlicek, Vladimir},
+title={CycloBranch: De Novo Sequencing of Nonribosomal Peptides from Accurate Product Ion Mass Spectra},
+journal={J. Am. Soc. Mass Spectrom.},
+volume={26},
+number={10},
+year={2015},
+pages={1780--1786},
+doi={10.1007/s13361-015-1211-1}
+}

@@ -1,0 +1,17 @@
+TY  - JOUR
+TI  - Batch-processing of imaging or liquid-chromatography mass spectrometry datasets and De Novo sequencing of polyketide siderophores
+T2  - BBA - Proteins Proteom.
+VL  - 1865
+IS  - 7
+SP  - 768-775
+PY  - 2017
+AU  - Novak,Jiri
+AU  - Sokolova,Lucie
+AU  - Lemr,Karel
+AU  - Pluhacek,Tomas
+AU  - Palyzova,Andrea
+AU  - Havlicek,Vladimir
+N1  - 
+DB  - 
+DO  - 10.1016/j.bbapap.2016.12.003
+ER  - 

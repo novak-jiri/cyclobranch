@@ -1,0 +1,10 @@
+@ARTICLE{CycloBranch-BBA-2017,
+author={Novak, Jiri and Sokolova, Lucie and Lemr, Karel and Pluhacek, Tomas and Palyzova, Andrea and Havlicek, Vladimir},
+title={Batch-processing of imaging or liquid-chromatography mass spectrometry datasets and De Novo sequencing of polyketide siderophores},
+journal={BBA - Proteins Proteom.},
+volume={1865},
+number={7},
+year={2017},
+pages={768--775},
+doi={10.1016/j.bbapap.2016.12.003.}
+}

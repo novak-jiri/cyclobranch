@@ -1,0 +1,15 @@
+TY  - JOUR
+TI  - CycloBranch: De Novo Sequencing of Nonribosomal Peptides from Accurate Product Ion Mass Spectra
+T2  - J. Am. Soc. Mass Spectrom.
+VL  - 26
+IS  - 10
+SP  - 1780-1786
+PY  - 2015
+AU  - Novak,Jiri
+AU  - Lemr,Karel
+AU  - Schug,Kevin A.
+AU  - Havlicek,Vladimir
+N1  - 
+DB  - 
+DO  - 10.1007/s13361-015-1211-1
+ER  - 

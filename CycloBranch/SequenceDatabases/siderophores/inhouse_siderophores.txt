@@ -1,0 +1,18 @@
+linear-polyketide	Coprogen	C35H56N6O13	768.3905359161	[OH-MP]-[Ahp]-[OH-MP]-[OH-Orn]-[OH-Orn]-[OH-MP]				
+linear-polyketide	Dimerumic acid	C22H36N4O8	484.2533141532	[OH-MP]-[OH-Orn]-[OH-Orn]-[OH-MP]				
+cyclic	Ferrichrome A	C41H61N9O20	999.4032854469	[Ser]-[Ser]-[Gly]-[Mga]-[OH-Orn]-[Mga]-[OH-Orn]-[Mga]-[OH-Orn]				
+cyclic	Ferrichrysin	C29H49N9O14	747.3398973291	[Ser]-[Ser]-[Gly]-[D-Ac-OH-Orn]-[D-Ac-OH-Orn]-[D-Ac-OH-Orn]				
+cyclic	Ferricrocin	C28H47N9O13	717.3293326428	[Gly]-[Ser]-[Gly]-[D-Ac-OH-Orn]-[D-Ac-OH-Orn]-[D-Ac-OH-Orn]				
+linear-polyketide	Ferrioxamine B	C25H48N6O8	560.3533625488	[Hpd]-[Suc]-[Hpd]-[Suc]-[Hpd]	Acetyl			CSID: 2867
+cyclic-polyketide	Ferrioxamine E	C27H48N6O9	600.3482771709	[Hpd]-[Suc]-[Hpd]-[Suc]-[Hpd]-[Suc]				CSID: 141883
+linear-polyketide	Ferrioxamine G1	C27H50N6O10	618.3588418572	[Hpd]-[Suc]-[Hpd]-[Suc]-[Hpd]-[Suc]				CSID: 9619796
+cyclic	Ferrirubin	C41H67N9O17	957.4654917732	[Ser]-[Ser]-[Gly]-[OH-MP]-[OH-Orn]-[OH-MP]-[OH-Orn]-[OH-MP]-[OH-Orn]				
+linear	Fusarinin B (linear fusigen)	C33H56N6O13	744.3905359161	[OH-MP]-[OH-Orn]-[OH-MP]-[OH-Orn]-[OH-MP]-[OH-Orn]				
+cyclic	Fusarinin C (cyclic fusigen)	C33H54N6O12	726.3799712298	[OH-Orn]-[OH-MP]-[OH-Orn]-[OH-MP]-[OH-Orn]-[OH-MP]				
+cyclic	N'.N'.N'- triacetylfusarinin C (TAFC)	C39H60N6O15	852.4116652887	[N2Ac-OH-Orn]-[OH-MP]-[N2Ac-OH-Orn]-[OH-MP]-[N2Ac-OH-Orn]-[OH-MP]				
+linear-polyketide	Neocoprogen I	C31H50N6O12	698.3486711014	[OH-MP]-[Ahp]-[OH-MP]-[OH-Orn]-[OH-Orn]		Acetyl		
+linear-polyketide	Ornibactin C4	C26H48N8O13	680.3340836697	[C4:0-OH(3)]-[OH-Orn]-[D-OH-Asp]-[Ser]-[N5-Fo-OH-Orn]-[Put]				
+linear-polyketide	Ornibactin C6	C28H52N8O13	708.3653837981	[C6:0-OH(3)]-[OH-Orn]-[D-OH-Asp]-[Ser]-[N5-Fo-OH-Orn]-[Put]				
+linear-polyketide	Ornibactin C8	C30H56N8O13	736.3966839265	[C8:0-OH(3)]-[OH-Orn]-[D-OH-Asp]-[Ser]-[N5-Fo-OH-Orn]-[Put]				
+branch-cyclic	Pyoverdin Pa (E; PaO1)	C55H84N18O21	1332.6058418541	[Fo-OH-Orn]-[Thr]-[Thr]\([Lys]-[Fo-OH-Orn]-[Ser]-[Arg]-[Ser]-[ChrPaA]-[Suca]\)				
+cyclic	Rhodotorulic acid	C14H24N4O6	344.1695845238	[D-Ac-OH-Orn]-[D-Ac-OH-Orn]				

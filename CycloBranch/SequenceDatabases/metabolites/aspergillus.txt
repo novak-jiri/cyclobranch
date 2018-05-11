@@ -1,0 +1,306 @@
+other	Aspergillus wentii; 2.5-Furandione. 3-methyl-	C5H4O3	112.0160439947					CAS: 616-02-4
+other	Aspergillus flavus; 1H-Indole	C8H7N	117.0578492299					CAS: 120-72-9
+other	Aspergillus terreus ; Ethanone. 1-(4-methyl-1H-pyrrol-3-yl)	C7H9NO	123.0684139162					CAS: 18818-30-9
+other	Aspergillus terreus; 7-Oxabicyclo[4.1.0]hept-3-ene-2.5-dione. 3-methyl-	C7H6O3	138.0316940589					CAS: 15254-70-3
+other	Aspergillus terreus; 2.5-Cyclohexadiene-1.4-dione. 2-hydroxy-3-methyl-	C7H6O3	138.0316940589					CAS: 2913-48-6
+other	Aspergillus candidus; 4H-Pyran-4-one. 5-hydroxy-2-(hydroxymethyl)-	C6H6O4	142.0266086810					CAS: 501-30-4
+other	Aspergillus terreus ; Benzaldehyde-formyl-14C. 2.4-dihydroxy-6-methyl-	C8H8O3	152.0473441231					CAS: 19512-36-8
+other	Aspergillus terreus; 7-Oxabicyclo[4.1.0]hept-3-ene-2.5-dione. 3-hydroxy-4-methyl-. (1R.6S)-	C7H6O4	154.0266086810					CAS: 121-40-4
+other	Aspergillus terreus; 2.5-Cyclohexadiene-1.4-dione. 2.5-dihydroxy-3-methyl-	C7H6O4	154.0266086810					CAS: 2207-58-1
+other	Aspergillus terreus; 2-Cyclopenten-1-one. 4.5-dihydroxy-3-(1E)-1-propenyl-. (4S.5R)-	C8H10O3	154.0629941873					CAS: 582-46-7
+other	Aspergillus terreus; 7-Oxabicyclo[4.1.0]hept-3-en-2-one. 4.5-dihydroxy-3-methyl-. (1S.5S.6S)-	C7H8O4	156.0422587452					CAS: 18746-82-2
+other	Aspergillus terreus; 2-Cyclohexen-1-one. 3.4.6-trihydroxy-2-methyl-. trans-	C7H10O4	158.0579088094					CAS: 63647-57-4
+other	Aspergillus terreus ; Benzoic-carboxy-14C acid. 2.4-dihydroxy-6-methyl-	C8H8O4	168.0422587452					CAS: 31621-40-6
+other	Aspergillus melleus; 2.5-Hexadienoic acid. 3-methoxy-5-methyl-4-oxo-	C8H10O4	170.0579088094					CAS: 90-65-3
+other	Aspergillus terreus ; Hexanoic acid. 3-methoxy-4.5-dimethyl-	C9H18O3	174.1255944441					CAS: 86925-88-4
+other	Aspergillus melleus; 1H-2-Benzopyran-1-one. 3.4-dihydro-8-hydroxy-3-methyl-. (3R)-	C10H10O3	178.0629941873					CAS: 480-33-1
+other	Aspergillus versicolor; 1(3H)-Isobenzofuranone. 5.7-dihydroxy-6-methyl-	C9H8O4	180.0422587452					CAS: 55483-01-7
+other	Aspergillus silvaticus; Benzaldehyde. 4-hydroxy-2-methoxy-3.6-dimethyl-	C10H12O3	180.0786442515					CAS: 114090-44-7
+other	Aspergillus terreus ; Hydrazinecarboxamide. 2-[1-(4-methyl-1H-pyrrol-3-yl)ethylidene]-	C8H12N4O	180.1011110281					CAS: 86925-90-8
+other	Aspergillus silvaticus; Benzoic acid. 2.4-dihydroxy-3.6-dimethyl-	C9H10O4	182.0579088094					CAS: 4707-46-4
+other	Aspergillus terreus ; Benzoic acid. 4-hydroxy-2-(methoxy-14C)-6-methyl-	C9H10O4	182.0579088094					CAS: 57372-88-0
+other	Aspergillus melleus; 2H-Pyran-2-one. 5.6-dihydro-5-hydroxy-6-methyl-3-[(2S.3S)-3-methyloxiranyl]-. (5S.6R)-	C9H12O4	184.0735588736					CAS: 17398-00-4
+other	Aspergillus terreus; 2.5-Cyclohexadiene-1.4-dione. 2-chloro-3.6-dihydroxy-5-methyl-	C7H5ClO4	187.9876366489					CAS: 63647-58-5
+other	4(1H)-Quinazolinone. 2-[(1S)-1-hydroxyethyl]	C10H10N2O2	190.0742275756					CAS: 42599-89-3
+other	Aspergillus silvaticus; 1H-Isoindol-1-one. 2.3-dihydro-6-hydroxy-4-methoxy-5-methyl-	C10H11NO3	193.0738932246					CAS: 114090-43-6
+other	Aspergillus melleus; 1H-2-Benzopyran-1-one. 3.4-dihydro-4.8-dihydroxy-3-methyl-. (3R.4R)-	C10H10O4	194.0579088094					CAS: 32885-83-9
+other	Aspergillus silvaticus; 1(3H)-Isobenzofuranone. 6-hydroxy-4-methoxy-5-methyl-	C10H10O4	194.0579088094					CAS: 17811-36-8
+other	Aspergillus silvaticus; 1.2-Benzenedicarboxaldehyde. 5-hydroxy-3-methoxy-4-methyl-	C10H10O4	194.0579088094					CAS: 642-27-3
+other	Aspergillus terreus; 1H-2-Benzopyran-1-one. 3.4-dihydro-6.8-dihydroxy-3-methyl	C10H10O4	194.0579088094					CAS: 19314-92-2
+other	Aspergillus versicolor; 1(3H)-Isobenzofuranone. 5-hydroxy-7-methoxy-6-methyl-	C10H10O4	194.0579088094					CAS: 17811-38-0
+other	Aspergillus versicolor; 1(3H)-Isobenzofuranone. 4-hydroxy-6-methoxy-5-methyl-	C10H10O4	194.0579088094					CAS: 75238-36-7
+other	Aspergillus versicolor; 1(3H)-Isobenzofuranone. 5.7-dihydroxy-4.6-dimethyl-	C10H10O4	194.0579088094					CAS: 98567-35-2
+other	Aspergillus terreus ; 6H-Furo[2.3-b]pyran-2.6(3H)-dione. 3a.7a-dihydro-4-methoxy-3-methyl-	C9H10O5	198.0528234315					CAS: 86925-86-2
+other	Aspergillus terreus ; 6H-Furo[2.3-b]pyran-6-one. 2.3.3a.7a-tetrahydro-2-hydroxy-4-methoxy-3-methyl	C9H12O5	200.0684734957					CAS: 86925-92-0
+other	Aspergillus terreus; Naphth[2.3-b]oxirene-2.7-dione. 1a.7a-dihydro-3.6-dihydroxy-	C10H6O5	206.0215233031					CAS: 15254-67-8
+other	Aspergillus variecolor; 1H-2-Benzopyran-1-one. 3.4-dihydro-8-hydroxy-6-methoxy-3-methyl-. (3R)-	C11H12O4	208.0735588736					CAS: 13410-15-6
+other	Aspergillus silvaticus; Benzoic acid. 2.4-dihydroxy-3.6-dimethyl-. ethyl ester	C11H14O4	210.0892089378					CAS: 31581-32-5
+other	Aspergillus nidulans; D-galacto-Oct-2-enonic acid. 6.7-anhydro-2.3.8-trideoxy-. d-lactone. 4-acetate	C10H12O5	212.0684734957					CAS: 30387-51-0
+other	Aspergillus variecolor; 2-Cyclohexene-1-carboxylic acid. 2-hydroxy-5.6-dimethyl-4-oxo-. ethyl ester	C11H16O4	212.1048590020					CAS: 81515-90-4
+other	Aspergillus niger; Butanedioic acid. hexylmethylene-. (2R)-	C11H18O4	214.1205090662					CAS: 94513-51-6
+other	Aspergillus terreus ; 2-Propenoic acid. 3-methoxy-3-(tetrahydro-5-methoxy-4-methyl-3-furanyl)-	C10H16O5	216.0997736241					CAS: 86944-86-7
+other	Aspergillus variecolor; 2H-1-Benzopyran-2-one. 4.7-dimethoxy-5-methyl-	C12H12O4	220.0735588736					CAS: 53377-54-1
+other	Aspergillus parvulus; 1(2H)-Naphthalenone. 3.4-dihydro-4.8-dihydroxy-7-(1-hydroxyethyl)-	C12H14O4	222.0892089378					CAS: 73027-01-7
+other	Piperazine. 1.2.5-trimethyl-4-[(2E.4E)-1-oxo-2.4-hexadienyl]-. (2R.5S)-rel-(+)-	C13H22N2O	222.1732133387					CAS: 24779-38-2
+other	Aspergillus versicolor; 1(3H)-Isobenzofuranone. 5-hydroxy-4-(hydroxymethyl)-7-methoxy-6-methyl-	C11H12O5	224.0684734957					CAS: 98567-38-5
+other	Aspergillus parvulus; 1.4-Naphthalenedione. 6-ethyl-5-hydroxy-7-methoxy-	C13H12O4	232.0735588736					CAS: 56496-01-6
+other	Aspergillus carneus; 1H-2-Benzopyran-1.3(4H)-dione. 8-hydroxy-4.5.6.7-tetramethyl-. (+)-	C13H14O4	234.0892089378					CAS: 13277-76-4
+other	Aspergillus parvulus; 1(2H)-Naphthalenone. 7-ethyl-3.4-dihydro-4.8-dihydroxy-6-methoxy-. (R)-	C13H16O4	236.1048590020					CAS: 56495-98-8
+other	Aspergillus parvulus; 1(2H)-Naphthalenone. 3.4-dihydro-4.8-dihydroxy-7-(1-methoxyethyl)-	C13H16O4	236.1048590020					CAS: 73026-98-9
+other	Aspergillus versicolor; 4-Isobenzofurancarboxaldehyde. 1.3-dihydro-3.5-dihydroxy-7-methoxy-6-methyl-1-oxo-	C11H10O6	238.0477380536					CAS: 477-99-6
+other	Aspergillus niger; 3-Furanacetic acid. 4-hexyl-2.5-dihydro-2.5-dioxo-	C12H16O5	240.0997736241					CAS: 39212-21-0
+other	Aspergillus carneus; 3H-2-Benzopyran-7-carboxylic acid. 4.6-dihydro-8-hydroxy-3.4.5-trimethyl-6-oxo-. (3R.4S)-	C13H14O5	250.0841235599					CAS: 518-75-2
+other	Aspergillus panamensis; 3(2H)-Furanone. 4-acetyl-2-(1E.3E)-1.3-hexadienyl-5-methoxy-2-methyl-. (+)-	C14H18O4	250.1205090662					CAS: 58801-71-1
+other	Aspergillus parvulus; 1(2H)-Naphthalenone. 7-(1-ethoxyethyl)-3.4-dihydro-4.8-dihydroxy-	C14H18O4	250.1205090662					CAS: 73026-96-7
+other	2(1H)-Quinolinone. 3-methoxy-4-phenyl-	C16H13NO2	251.0946286667					CAS: 6152-57-4
+other	Sydonol;  1.4-Benzenedimethanol. 2-hydroxy-a1-methyl-a1-(4-methylpentyl)-	C15H24O3	252.1725446367					CAS: 77782-90-2
+other	Aspergillus terreus ; 1H-2-Benzopyran-1-one. 3.4-dihydro-4.8-dihydroxy-6.7-dimethoxy-3-methyl-. (3R-cis)-	C12H14O6	254.0790381820					CAS: 86925-91-9
+other	Aspergillus versicolor; 1(3H)-Isobenzofuranone. 5-hydroxy-4-(hydroxymethyl)-3.7-dimethoxy-6-methyl-	C12H14O6	254.0790381820					CAS: 83440-07-7
+other	Aspergillus flavipes; Benzamide. N-[(1S)-1-(hydroxymethyl)-2-phenylethyl]-	C16H17NO2	255.1259287951					CAS: 4503-96-2
+other	Aspergillus chevalieri; 2.5-Piperazinedione. 3-(1H-indol-3-ylmethyl)-6-methyl-. (3S.6S)-	C14H15N3O2	257.1164267413					CAS: 17079-37-7
+other	6H-Dibenzo[b.d]pyran-6-one. 3.7.9-trihydroxy-1-methyl-	C14H10O5	258.0528234315					CAS: 641-38-3
+other	Aspergillus ustus; 7H-Furo[3.2-h][2]benzopyran-3(2H)-one. 6.9-dihydro-7-hydroxy-7-methyl-2-(1-methylethylidene)-. (7R)-	C15H16O4	260.1048590020					CAS: 74798-20-2
+other	Aspergillus sydowi; 1.2-Benzenediol. 3.3'-oxybis[5-methyl-	C14H14O5	262.0841235599					CAS: 68027-81-6
+other	versiol; Aspergillus versicolor; 1H-Naphtho[2.1-b]pyran-1-one. 2.3.4a.8.9.10.10a.10b-octahydro-10-hydroxy-4a.8.10b-trimethyl-	C16H22O3	262.1568945725					CAS: 59684-36-5
+other	Aspergillus nidulans; 2.5-Furandione. 3-phenyl-4-(phenylmethyl)-	C17H12O3	264.0786442515					CAS: 65641-17-0
+other	Aspergillus variecolor; 1.5-Heptadiene-3.4-diol. 1-[2-(hydroxymethyl)-3-methoxyphenyl]-	C15H20O4	264.1361591304					CAS: 72330-50-8
+other	Aspergillus carneus; 1H-2-Benzopyran-7-carboxylic acid. 3.4-dihydro-6.8-dihydroxy-3.4.5-trimethyl-1-oxo-. (3R.4S)-	C13H14O6	266.0790381820					CAS: 65718-85-6
+other	Aspergillus sydowi; Benzoic acid. 3-hydroxy-4-(1-hydroxy-1.5-dimethylhexyl)-	C15H22O4	266.1518091946					CAS: 65967-73-9
+other	Aspergillus terreus; 1H-3.9a-Methanocyclopent[c]oxocin-4-carboxylic acid. octahydro-4-hydroxy-7-(1-methylethylidene)-. [3R-(3a.4a.6aa.9aa)]-	C15H22O4	266.1518091946					CAS: 67309-95-9
+other	Aspergillus versicolor; 1(3H)-Isobenzofuranone. 3-ethoxy-5-hydroxy-4-(hydroxymethyl)-7-methoxy-6-methyl-	C13H16O6	268.0946882462					CAS: 83440-14-6
+other	Aspergillus niger; 1.2-Pentanedione. 1-(2-hydroxyphenyl)-3-phenyl-	C17H16O3	268.1099443799					CAS: 119465-30-4
+other	Aspergillus niger; 2.4-Cyclohexadien-1-one. 6-(1-hydroxy-2-oxo-3-phenylpentylidene)-. (E)-	C17H16O3	268.1099443799					CAS: 119465-31-5
+other	Aspergillus niger; 2.4-Cyclohexadien-1-one. 6-(1-hydroxy-2-oxo-3-phenylpentylidene)-. (Z)-	C17H16O3	268.1099443799					CAS: 119465-32-6
+other	Aspergillus terreus; 9.10-Anthracenedione. 1.3.8-trihydroxy-6-methyl-	C15H10O5	270.0528234315					CAS: 518-82-1
+other	Aspergillus terreus aureus; 9.10-Anthracenedione. 1.3.8-trihydroxy-6-methyl-	C15H10O5	270.0528234315					CAS: 518-82-1
+other	Aspergillus terreus aureus; 9.10-Anthracenedione. 3.8-dihydroxy-1-methoxy-	C15H10O5	270.0528234315					CAS: 89367-83-9
+other	6H-Dibenzo[b.d]pyran-6-one. 3.7(3.9 or 7.9)-dihydroxy-9(7 or 3)-methoxy-1-methy	C15H12O5	272.0684734957					CAS: 26894-49-5
+other	Aspergillus flavipes; 1.4-Pentanediamine. N4-(6-methoxy-4-methyl-8-quinolinyl)-	C16H23N3O	273.1841123760					CAS: 57514-29-1
+other	Aspergillus panamensis; 3(2H)-Furanone. 2-(1E.3E)-1.3-hexadienyl-5-methoxy-2-methyl-4-[(2E)-1-oxo-2-butenyl]-. (-)-	C16H20O4	276.1361591304					CAS: 65794-79-8
+other	Aspergillus sydowi; Benzoic acid. 4-(1.5-dihydroxy-1.5-dimethylhexyl)-3-hydroxy-	C15H22O5	282.1467238167					CAS: 65967-72-8
+other	Aspergillus viride-nutans; 2-Cyclopenten-1-one. 5-acetyl-3.5-dimethoxy-2-methyl-4-[(2R)-2-methyl-1-oxobutyl]-. (4R.5S)-rel-(-)-	C15H22O5	282.1467238167					CAS: 117841-42-6
+other	Aspergillus viride-nutans; 2.4-Cyclohexadien-1-one. 6-hydroxy-3.5-dimethoxy-2.6-dimethyl-4-[(2R)-2-methyl-1-oxobutyl]-. (6S)-rel-(+)-	C15H22O5	282.1467238167					CAS: 287102-35-6
+other	Aspergillus terreus; 9.10-Anthracenedione. 1.6-dihydroxy-8-methoxy-3-methyl-	C16H12O5	284.0684734957					CAS: 3774-64-9
+other	Aspergillus terreus aureus; 9.10-Anthracenedione. 1.6-dihydroxy-8-methoxy-3-methyl-	C16H12O5	284.0684734957					CAS: 3774-64-9
+other	2-Cyclopenten-1-one. 3-[(3aS.8aR)-3a.8a-dihydro-4-hydroxy-6-methoxyfuro[2.3-b]benzofuran-5-yl]-	C16H14O5	286.0841235599					CAS: 52373-83-8
+other	Aspergillus candidus; Phenol. 4.4'-(2.3-diisocyano-1.3-butadiene-1.4-diyl)bis-	C18H12N2O2	288.0898776398					CAS: 580-74-5
+other	Aspergillus flavipes; Pentanoic acid. 4-[(6-methoxy-4-methyl-8-quinolinyl)amino]-	C16H20N2O3	288.1473925187					CAS: 104594-71-0
+other	Aspergillus viride-nutans; 2-Pyrrolidinone. 1-[(2E.4E.6E.8R)-8-hydroxy-6-methyl-1-oxo-2.4.6-dodecatrienyl]-	C17H25NO3	291.1834436740					CAS: 19504-77-9
+other	Aspergillus terreus; 2.5-Piperazinedione. 3.6-bis(phenylmethyl)-. cis	C18H18N2O2	294.1368278324					CAS: 52438-42-3
+other	Aspergillus panamensis; 3(2H)-Furanone. 2-(1.3-hexadienyl)-4-(3-hydroxy-1-oxobutyl)-5-methoxy-2-methyl-	C16H22O5	294.1467238167					CAS: 65831-50-7
+other	Aspergillus niger; 1.2.5-Hexanetrione. 1-(2-hydroxyphenyl)-3-phenyl-	C18H16O4	296.1048590020					CAS: 119465-33-7
+other	Aspergillus niger; 2.5-Hexanedione. 1-hydroxy-1-(2-oxo-3.5-cyclohexadien-1-ylidene)-3-phenyl-. (E)-	C18H16O4	296.1048590020					CAS: 119465-34-8
+other	Aspergillus niger; 2H-Pyran-3(4H)-one. dihydro-6-hydroxy-6-methyl-2-(2-oxo-3.5-cyclohexadien-1-ylidene)-4-phenyl-	C18H16O4	296.1048590020					CAS: 119465-35-9
+other	Aspergillus niger; 2.5-Hexanedione. 1-hydroxy-1-(2-oxo-3.5-cyclohexadien-1-ylidene)-3-phenyl-. (Z)-	C18H16O4	296.1048590020					CAS: 119465-36-0
+other	Aspergillus flavus; Cyclopenta[c]furo[3'.2':4.5]furo[2.3-h][1]benzopyran-1.11-dione. 2.3.6a.9a-tetrahydro-4-hydroxy-. (6aR-cis)	C16H10O6	298.0477380536					CAS: 32215-02-4
+other	Aspergillus chevalieri; Benzaldehyde. 2-(1.3.5-heptatrienyl)-3.6-dihydroxy-5-(3-methyl-2-butenyl)-. (E.E.E)-	C19H22O3	298.1568945725					CAS: 41451-81-4
+other	Aspergillus wenti; 9H-Xanthene-1-carboxylic acid. 3.8-dihydroxy-6-methyl-9-oxo-. methyl ester	C16H12O6	300.0633881178					CAS: 85003-85-6
+other	Aspergillus chevalieri; Benzaldehyde. 2-(3E.5E)-3.5-heptadienyl-3.6-dihydroxy-5-(3-methyl-2-butenyl)-	C19H24O3	300.1725446367					CAS: 74886-31-0
+other	Aspergillus chevalieri; Benzaldehyde. 2-(1E.3E)-1.3-heptadienyl-3.6-dihydroxy-5-(3-methyl-2-butenyl)-	C19H24O3	300.1725446367					CAS: 77102-91-1
+other	Aspergillus ruber; Benzaldehyde. 2-(3E.5E)-3.5-heptadienyl-3.6-dihydroxy-5-(3-methyl-2-butenyl)-	C19H24O3	300.1725446367					CAS: 74886-31-0
+other	2H-Furo[3'.2':4.5]furo[2.3-h]-1-benzopyran-2-one. 7a.10a-dihydro-4-(2-hydroxyethyl)-5-methoxy-	C16H14O6	302.0790381820					CAS: 23315-33-5
+other	Aspergillus chevalieri; Benzaldehyde. 2-(1-heptenyl)-3.6-dihydroxy-5-(3-methyl-2-butenyl)-. (E)-	C19H26O3	302.1881947009					CAS: 40434-07-9
+other	Aspergillus chevalieri; Benzaldehyde. 2-(5E)-5-heptenyl-3.6-dihydroxy-5-(3-methyl-2-butenyl)-	C19H26O3	302.1881947009					CAS: 74886-32-1
+other	Aspergillus ruber; Benzaldehyde. 2-(1-heptenyl)-3.6-dihydroxy-5-(3-methyl-2-butenyl)-. (E)-	C19H26O3	302.1881947009					CAS: 40434-07-9
+other	Aspergillus ruber; Benzaldehyde. 2-(5E)-5-heptenyl-3.6-dihydroxy-5-(3-methyl-2-butenyl)-	C19H26O3	302.1881947009					CAS: 74886-32-1
+other	Aspergillus chevalieri; Benzaldehyde. 2-heptyl-3.6-dihydroxy-5-(3-methyl-2-butenyl)-	C19H28O3	304.2038447651					CAS: 523-73-9
+other	Aspergillus ruber; Benzaldehyde. 2-heptyl-3.6-dihydroxy-5-(3-methyl-2-butenyl)-	C19H28O3	304.2038447651					CAS: 523-73-9
+other	Aspergillus versicolor; 3H-Furo[3.4-f][1]benzopyran-3-one. 1.7.8.9-tetrahydro-1.9-dihydroxy-4-methoxy-5-methyl-8-(1-methylethenyl)-	C16H18O6	306.1103383104					CAS: 85163-39-9
+other	Aspergillus viride-nutans; 2-Pyrrolidinemethanol. 1-[(2E.4E.6E)-8-hydroxy-6-methyl-1-oxo-2.4.6-dodecatrienyl]-. (-)-	C18H29NO3	307.2147438024					CAS: 287102-33-4
+other	Aspergillus panamensis; 3(2H)-Furanone. 2-(1.3-hexadienyl)-5-methoxy-4-(3-methoxy-1-oxobutyl)-2-methyl-	C17H24O5	308.1623738809					CAS: 75916-46-0
+other	Aspergillus viride-nutans; 2.4-Cyclohexadien-1-one. 6-hydroxy-5-[(2-hydroxyethyl)amino]-3-methoxy-2.6-dimethyl-4-(2-methyl-1-oxobutyl)-	C16H25NO5	311.1732729182					CAS: 164415-86-5
+other	Aspergillus flavus; Cyclopenta[c]furo[3'.2':4.5]furo[2.3-h][1]benzopyran-1.11-dione. 2.3.6a.9a-tetrahydro-4-methoxy-. (6aR-cis)-	C17H12O6	312.0633881178					CAS: 1162-65-8
+other	Aspergillus flavus; Cyclopenta[c]furo[3'.2':4.5]furo[2.3-h][1]benzopyran-1.11-dione. 2.3.6a.9a-tetrahydro-4-methoxy-. (6aR.9aS)-	C17H12O6	312.0633881178					CAS: 1162-65-8
+other	Aspergillus parasiticus; Cyclopenta[c]furo[3'.2':4.5]furo[2.3-h][1]benzopyran-1.11-dione. 2.3.6a.9a-tetrahydro-4-methoxy-. (6aR-cis)-	C17H12O6	312.0633881178					CAS: 1162-65-8
+other	Cyclopenta[c]furo[3'.2':4.5]furo[2.3-h][1]benzopyran-1.11-dione. 2.3.6a.9a-tetrahydro-4-methoxy-. (6aR.9aS)-	C17H12O6	312.0633881178					CAS: 1162-65-8
+other	Aspergillus flavus; Cyclopenta[c]furo[3'.2':4.5]furo[2.3-h][1]benzopyran-11(1H)-one. 2.3.6a.9a-tetrahydro-1-hydroxy-4-methoxy-. [1R-(1a.6aa.9aa)]-	C17H14O6	314.0790381820					CAS: 61740-00-9
+other	Aspergillus flavus; Cyclopenta[c]furo[3'.2':4.5]furo[2.3-h][1]benzopyran-1.11-dione. 2.3.6a.8.9.9a-hexahydro-4-methoxy-. (6aR-cis)	C17H14O6	314.0790381820					CAS: 7220-81-7
+other	Aspergillus flavus; Cyclopenta[c]furo[3'.2':4.5]furo[2.3-h][1]benzopyran-1.11-dione. 2.3.6a.8.9.9a-hexahydro-4-methoxy-. (6aR.9aS)-	C17H14O6	314.0790381820					CAS: 7220-81-7
+other	Aspergillus parasiticus; Cyclopenta[c]furo[3'.2':4.5]furo[2.3-h][1]benzopyran-1.11-dione. 2.3.6a.8.9.9a-hexahydro-4-methoxy-. (6aR-cis)-	C17H14O6	314.0790381820					CAS: 7220-81-7
+other	Aspergillus wenti; 9H-Xanthene-1-carboxylic acid. 8-hydroxy-3-methoxy-6-methyl-9-oxo-. methyl ester	C17H14O6	314.0790381820					CAS: 77282-74-7
+other	Cyclopenta[c]furo[3'.2':4.5]furo[2.3-h][1]benzopyran-1.11-dione. 2.3.6a.8.9.9a-hexahydro-4-methoxy-. (6aR.9aS)-	C17H14O6	314.0790381820					CAS: 7220-81-7
+other	Aspergillus wentii; Benzoic acid. 2-(2.6-dihydroxy-4-methylbenzoyl)-3.5-dihydroxy-. methyl ester	C16H14O7	318.0739528041					CAS: 57459-06-0
+other	4-Hexenoic acid. 6-(1.3-dihydro-4-hydroxy-6-methoxy-7-methyl-3-oxo-5-isobenzofuranyl)-4-methyl-. (E)-	C17H20O6	320.1259883746					CAS: 24280-93-1
+other	Aspergillus viride-nutans; 2-Pyrrolidinemethanol. 1-[(2E.4E.6E)-8-methoxy-6-methyl-1-oxo-2.4.6-dodecatrienyl]-. (-)-	C19H31NO3	321.2303938666					CAS: 287102-34-5
+other	Aspergillus versicolor; Anthra[2.3-b]furo[3.2-d]furan-5.10-dione. 3a.12a-dihydro-4.6-dihydroxy-. (3aS-cis)-	C18H10O6	322.0477380536					CAS: 30517-65-8
+other	Aspergillus multicolor; 7H-Furo[3'.2':4.5]furo[2.3-c]xanthen-7-one. 3a.12c-dihydro-8-hydroxy-6-methoxy-. (3aR.12cS)-	C18H12O6	324.0633881178					CAS: 10048-13-2
+other	Aspergillus nidulans; 7H-Furo[3'.2':4.5]furo[2.3-c]xanthen-7-one. 3a.12c-dihydro-8-hydroxy-6-methoxy-. (3aR.12cS)-	C18H12O6	324.0633881178					CAS: 10048-13-2
+other	7H-Furo[3'.2':4.5]furo[2.3-c]xanthen-7-one. 3a.12c-dihydro-8-hydroxy-6-methoxy-. (3aR.12cS)-	C18H12O6	324.0633881178					CAS: 10048-13-2
+other	Aspergillus versicolor; 3H-Furo[3.4-f][1]benzopyran-3-one. 1.7.8.9-tetrahydro-1.9-dihydroxy-8-(1-hydroxy-1-methylethyl)-4-methoxy-5-methyl-	C16H20O7	324.1209029967					CAS: 85163-40-2
+other	Gliotoxin; Aspergillus fumigatus; 10H-3.10a-Epidithiopyrazino[1.2-a]indole-1.4-dione. 2.3.5a.6-tetrahydro-6-hydroxy-3-(hydroxymethyl)-2-methyl-. (3R.5aS.6S.10aR)-	C13H14N2O4S2	326.0394983282					CAS: 67-99-2
+other	7H-Furo[3'.2':4.5]furo[2.3-c]xanthen-7-one. 1.2.3a.12c-tetrahydro-8-hydroxy-6-methoxy-. (3aR-cis)-	C18H14O6	326.0790381820					CAS: 6795-16-0
+other	Aspergillus flavus; 1H.12H-Furo[3'.2':4.5]furo[2.3-h]pyrano[3.4-c][1]benzopyran-1.12-dione. 3.4.7a.10a-tetrahydro-5-methoxy-. (7aR-cis)-	C17H12O7	328.0583027399					CAS: 1165-39-5
+other	Aspergillus flavus; 1H.12H-Furo[3'.2':4.5]furo[2.3-h]pyrano[3.4-c][1]benzopyran-1.12-dione. 3.4.7a.10a-tetrahydro-5-methoxy-. (7aR.10aS)-	C17H12O7	328.0583027399					CAS: 1165-39-5
+other	Aspergillus flavus; Cyclopenta[c]furo[3'.2':4.5]furo[2.3-h][1]benzopyran-1.11-dione. 2.3.6a.9a-tetrahydro-3-hydroxy-4-methoxy-. [3S-(3a.6aa.9aa)]-	C17H12O7	328.0583027399					CAS: 52819-96-2
+other	Aspergillus flavus; Cyclopenta[c]furo[3'.2':4.5]furo[2.3-h][1]benzopyran-1.11-dione. 2.3.6a.9a-tetrahydro-9a-hydroxy-4-methoxy-. (6aR-cis)-	C17H12O7	328.0583027399					CAS: 6795-23-9
+other	Aspergillus parasiticus; 1H.12H-Furo[3'.2':4.5]furo[2.3-h]pyrano[3.4-c][1]benzopyran-1.12-dione. 3.4.7a.10a-tetrahydro-5-methoxy-. (7aR-cis)-	C17H12O7	328.0583027399					CAS: 1165-39-5
+other	1H.12H-Furo[3'.2':4.5]furo[2.3-h]pyrano[3.4-c][1]benzopyran-1.12-dione. 3.4.7a.10a-tetrahydro-5-methoxy-. (7aR.10aS)-	C17H12O7	328.0583027399					CAS: 1165-39-5
+other	Aspergillus flavus; Cyclopenta[c]furo[3'.2':4.5]furo[2.3-h][1]benzopyran-1.11-dione. 2.3.6a.8.9.9a-hexahydro-9a-hydroxy-4-methoxy-	C17H14O7	330.0739528041					CAS: 6885-57-0
+other	Aspergillus flavus; 1H.12H-Furo[3'.2':4.5]furo[2.3-h]pyrano[3.4-c][1]benzopyran-1.12-dione. 3.4.7a.9.10.10a-hexahydro-5-methoxy-. (7aR-cis)-	C17H14O7	330.0739528041					CAS: 7241-98-7
+other	Aspergillus flavus; 1H.12H-Furo[3'.2':4.5]furo[2.3-h]pyrano[3.4-c][1]benzopyran-1.12-dione. 3.4.7a.9.10.10a-hexahydro-5-methoxy-. (7aR.10aS)-	C17H14O7	330.0739528041					CAS: 7241-98-7
+other	Cyclopenta[c]furo[3'.2':4.5]furo[2.3-h][1]benzopyran-1.11-dione. 2.3.6a.8.9.9a-hexahydro-8-hydroxy-4-methoxy-. (6aS.8R.9aS)-	C17H14O7	330.0739528041					CAS: 17878-54-5
+other	1H.12H-Furo[3'.2':4.5]furo[2.3-h]pyrano[3.4-c][1]benzopyran-1.12-dione. 3.4.7a.9.10.10a-hexahydro-5-methoxy-. (7aR.10aS)-	C17H14O7	330.0739528041					CAS: 7241-98-7
+other	Aspergillus terreus; Benzoic acid. 2-(2.6-dihydroxy-4-methylbenzoyl)-5-hydroxy-3-methoxy-. methyl ester	C17H16O7	332.0896028683					CAS: 519-57-3
+other	Aspergillus terreus aureus; Benzoic acid. 2-(2.6-dihydroxy-4-methylbenzoyl)-5-hydroxy-3-methoxy-. methyl ester	C17H16O7	332.0896028683					CAS: 519-57-3
+other	Aspergillus wenti; Benzoic acid. 2-(2.6-dihydroxy-4-methylbenzoyl)-3-hydroxy-5-methoxy-. methyl ester	C17H16O7	332.0896028683					CAS: 77282-68-9
+other	Aspergillus wentii; Benzoic acid. 2-(2.6-dihydroxy-4-methylbenzoyl)-5-hydroxy-3-methoxy-. methyl ester	C17H16O7	332.0896028683					CAS: 519-57-3
+other	Aspergillus wentii; Benzoic acid. 2-(2.6-dihydroxy-4-methylbenzoyl)-3-hydroxy-5-methoxy-. methyl ester	C17H16O7	332.0896028683					CAS: 77282-68-9
+other	Aspergillus versicolor; 4-Isobenzofurancarboxaldehyde. 3-ethoxy-1.3-dihydro-7-methoxy-6-methyl-5-[(3-methyl-2-butenyl)oxy]-1-oxo-	C18H22O6	334.1416384388					CAS: 85163-41-3
+other	Aspergillus flavus; 9H-Pyrrolo[1'.2':2.3]isoindolo[4.5.6-cd]indol-9-one. 10-acetyl-2.6.6a.7.11a.11b-hexahydro-11-hydroxy-7.7-dimethyl-. (6aR.11aS.11bR)-rel-	C20H20N2O3	336.1473925187					CAS: 18172-33-3
+other	Aspergillus versicolor; Anthra[2.3-b]furo[3.2-d]furan-5.10-dione. 3a.12a-dihydro-4.6.8-trihydroxy-. (3aS.12aR)-	C18H10O7	338.0426526757					CAS: 6807-96-1
+other	Aspergillus parasiticus; 7H-Furo[3'.2':4.5]furo[2.3-c]xanthen-7-one. 3a.12c-dihydro-6.8-dimethoxy-. (3aR-cis)-	C19H14O6	338.0790381820					CAS: 17878-69-2
+other	7H-Furo[3'.2':4.5]furo[2.3-c]xanthen-7-one. 3a.12c-dihydro-6.8-dimethoxy-. (3aR.12cS)-	C19H14O6	338.0790381820					CAS: 17878-69-2
+other	Aspergillus candidus; [1.1':4'.1''-Terphenyl]-2'.4.4''-triol. 3'.6'-dimethoxy-	C20H18O5	338.1154236883					CAS: 52452-60-5
+other	Aspergillus multicolor; Anthra[2.3-b]furo[3.2-d]furan-5.10-dione. 2.3.3a.12a-tetrahydro-4.6.8-trihydroxy-. (3aR.12aS)-rel-	C18H12O7	340.0583027399					CAS: 16049-49-3
+other	7H-Furo[3'.2':4.5]furo[2.3-c]xanthen-7-one. 1.2.3a.12c-tetrahydro-6.8-dimethoxy-. (3aR-cis)-	C19H16O6	340.0946882462					CAS: 24945-81-1
+other	1H.12H-Furo[3'.2':4.5]furo[2.3-h]pyrano[3.4-c][1]benzopyran-1.12-dione. 3.4.7a.9.10.10a-hexahydro-9-hydroxy-5-methoxy-	C17H14O8	346.0688674262					CAS: 20421-10-7
+other	Aspergillus wenti; Benzoic acid. 2-(2.6-dihydroxy-4-methylbenzoyl)-3.5-dimethoxy-. methyl ester	C18H18O7	346.1052529325					CAS: 77282-69-0
+other	Aspergillus wentii; Benzoic acid. 2-(2.6-dihydroxy-4-methylbenzoyl)-3.5-dimethoxy-. methyl ester	C18H18O7	346.1052529325					CAS: 77282-69-0
+other	Aspergillus terreus; Benzoic acid. 2-(2-carboxy-3-hydroxy-5-methylphenoxy)-5-hydroxy-3-methoxy-. 1-methyl ester	C17H16O8	348.0845174904					CAS: 577-64-0
+other	Aspergillus terreus ; 6H-Furo[2.3-b]pyran-6-one. 2.3.3a.7a-tetrahydro-4-methoxy-3-methyl-2-[(4-nitrobenzoyl)oxy]-	C16H15NO8	349.0797664635					CAS: 86925-85-1
+other	Aspergillus wentii; 2.5-Furandione. 3-methyl-4-(15-oxohexadecyl)-	C21H34O4	350.2457095798					CAS: 71595-42-1
+other	Aspergillus terreus ; 2-Hexenoic acid. 4.5-bis(1.3-dithiolan-2-yl)-3-methoxy-	C13H20O3S4	352.0295272683					CAS: 86925-87-3
+other	Aspergillus candidus; 2.3-Dibenzofurandiol. 7-(4-hydroxyphenyl)-6.9-dimethoxy-	C20H16O6	352.0946882462					CAS: 81474-59-1
+other	Aspergillus wentii; 2.5-Furandione. 3-(15-hydroxyhexadecyl)-4-methyl-. (S)-	C21H36O4	352.2613596440					CAS: 71595-43-2
+other	Aspergillus wentii; 2.5-Furandione. 3-(15-hydroxyhexadecyl)-4-methyl-. (R)-	C21H36O4	352.2613596440					CAS: 73115-21-6
+other	7H-Furo[3'.2':4.5]furo[2.3-c]xanthen-7-one. 3a.12c-dihydro-8-hydroxy-6.11-dimethoxy-. (3aR.12cR)-	C19H14O7	354.0739528041					CAS: 22897-08-1
+other	Hydroxyterphenyllin; Aspergillus candidus; [1.1':4'.1''-Terphenyl]-2'.3.4.4''-tetrol. 3'.6'-dimethoxy-	C20H18O6	354.1103383104					CAS: 66163-76-6
+other	Aspergillus candidus; [1.1':4'.1''-Terphenyl]-2'.3.4.4''-tetrol. 3'.6'-dimethoxy-	C20H18O6	354.1103383104					CAS: 66163-76-6
+other	Aspergillus terreus; 2.3-Dithia-5.7-diazabicyclo[2.2.2]octane-6.8-dione. 1.4-bis(phenylmethyl)-	C18H16N2O2S2	356.0653191482					CAS: 87869-07-6
+other	Aspergillus parasiticus; 7H-Furo[3'.2':4.5]furo[2.3-c]xanthen-7-one. 1.2.3a.12c-tetrahydro-2-hydroxy-6.8-dimethoxy-	C19H16O7	356.0896028683					CAS: 30099-66-2
+other	Aspergillus terreus; 2-Furancarboxylic acid. 2.5-dihydro-4-hydroxy-3-(4-hydroxyphenyl)-2-[(4-hydroxyphenyl)methyl]-5-oxo-. methyl ester. (2R)-	C19H16O7	356.0896028683					CAS: 87414-44-6
+other	Aspergillus candidus; Phenol. 4-[4-(3.4-dihydro-2.2-dimethyl-2H-1-benzopyran-6-yl)-2.3-diisocyano-1.3-butadienyl]-	C23H20N2O2	356.1524778966					CAS: 61391-08-0
+other	Aspergillus terreus; 2.3-Dithia-5.7-diazabicyclo[2.2.2]octane-6.8-dione-2.3-35S2. 1.4-bis(phenyl-4-t-methyl)-	C18H14N2O2S2T2	360.0817670840					CAS: 87869-08-7
+other	Aspergillus parasiticus; 9.10-Anthracenedione. 1.3.6.8-tetrahydroxy-2-[(1S)-3-hydroxy-1-(hydroxymethyl)propyl]-	C18H16O8	360.0845174904					CAS: 22268-13-9
+other	Yanuthone; Aspergillus niger.; 7-Oxabicyclo[4.1.0]hept-3-en-2-one. 5-hydroxy-4-(hydroxymethyl)-1-[(2E.6E)-3.7.11-trimethyl-2.6.10-dodecatrienyl]-. (1R.5R.6R)-rel-	C22H32O4	360.2300595156					CAS: 307001-93-0
+other	Aspergillus terreus aureus; Benzoic acid. 2-(3-chloro-2.6-dihydroxy-4-methylbenzoyl)-5-hydroxy-3-methoxy-. methyl ester	C17H15ClO7	366.0506308362					CAS: 89367-81-7
+other	dehydroaverufin; Aspergillus versicolor; 2.6-Epoxy-2H-anthra[2.3-b]oxocin-8.13-dione. 3.6-dihydro-7.9.11-trihydroxy-2-methyl-	C20H14O7	366.0739528041					CAS: 61407-06-5
+other	Aspergillus candidus; 2.3-Dibenzofurandiol. 6.9-dimethoxy-7-(4-methoxyphenyl)-	C21H18O6	366.1103383104					CAS: 267007-58-9
+other	Aspergillus candidus; 2.3-Dibenzofurandiol. 7-(3.4-dihydroxyphenyl)-6.9-dimethoxy-	C20H16O7	368.0896028683					CAS: 81474-60-4
+other	Aspergillus multicolor; 2.6-Epoxy-2H-anthra[2.3-b]oxocin-8.13-dione. 3.4.5.6-tetrahydro-7.9.11-trihydroxy-2-methyl-. (2S.6S)-	C20H16O7	368.0896028683					CAS: 14016-29-6
+other	Aspergillus terreus aureus; 9.10-Anthracenedione. 1.6-bis(acetyloxy)-8-methoxy-3-methyl-	C20H16O7	368.0896028683					CAS: 87686-82-6
+other	deoxyaverufinon; Aspergillus versicolor; 2H-Anthra[2.3-b]pyran-6.11-dione. 3.4-dihydro-5.7.9-trihydroxy-2-(2-oxopropyl)-	C20H16O7	368.0896028683					CAS: 61407-05-4
+other	Aspergillus versicolor; Anthra[2.3-b]furan-5.10-dione. 2.3-dihydro-4.6.8-trihydroxy-3-(3-oxobutyl)-	C20H16O7	368.0896028683					CAS: 84062-31-7
+other	Aspergillus versicolor.; 2.6-Epoxy-2H-anthra[2.3-b]oxocin-8.13-dione. 3.4.5.6-tetrahydro-7.9.11-trihydroxy-2-methyl-. (2S.6S)-	C20H16O7	368.0896028683					CAS: 14016-29-6
+other	Aspergillus candidus; Phenol. 4.4'-(2.3-diisocyano-1.3-butadiene-1.4-diyl)bis-. diacetate (ester)	C22H16N2O4	372.1110070124					CAS: 62002-87-3
+other	Aspergillus candidus; 4H-1-Benzopyran-4-one. 2-(3-chloro-2-hydroxyphenyl)-5-hydroxy-3.7.8-trimethoxy-	C18H15ClO7	378.0506308362					CAS: 23363-64-6
+other	Aspergillus terreus; 2.5-Piperazinedione. 1.4-bis(methoxymethyl)-3.6-bis(phenylmethyl)-. cis-	C22H26N2O4	382.1892573334					CAS: 87869-01-0
+other	.6-Dimethoxysterigmatocystin; Aspergillus multicolor; 7H-Furo[3'.2':4.5]furo[2.3-c]xanthen-7-one. 3a.12c-dihydro-8-hydroxy-6.10.11-trimethoxy-. (3aR-cis)-	C20H16O8	384.0845174904					CAS: 65176-75-2
+other	Aspergillus multicolor; 7H-Furo[3'.2':4.5]furo[2.3-c]xanthen-7-one. 3a.12c-dihydro-8-hydroxy-6.10.11-trimethoxy-. (3aR-cis)-	C20H16O8	384.0845174904					CAS: 65176-75-2
+other	Aspergillus terreus; Benzoic acid. 2-(3.5-dichloro-2.6-dihydroxy-4-methylbenzoyl)-5-hydroxy-3-methoxy-	C16H12Cl2O7	385.9960087399					CAS: 11029-16-6
+other	Aspergillus multicolor; 7H-Furo[3'.2':4.5]furo[2.3-c]xanthen-7-one. 1.2.3a.12c-tetrahydro-8-hydroxy-6.10.11-trimethoxy-. (3aR-cis)-	C20H18O8	386.1001675546					CAS: 74494-65-8
+other	Aspergillus terreus; 2.5-Piperazinedione. 3.6-bis(methylthio)-3.6-bis(phenylmethyl)-. (3R.6R)-	C20H22N2O2S2	386.1122693408					CAS: 87869-00-9
+other	Aspergillus wentii; 2.5-Furandione. 3-[15-(acetyloxy)hexadecyl]-4-methyl-. (S)-	C23H38O5	394.2719243303					CAS: 71595-40-9
+other	Aspergillus wentii; 2.5-Furandione. 3-[15-(acetyloxy)hexadecyl]-4-methyl-. (R)-	C23H38O5	394.2719243303					CAS: 73115-22-7
+other	Aspergillus terreus; Spiro[benzofuran-2(3H).1'-[2.5]cyclohexadiene]-2'-carboxylic acid. 5.7-dichloro-4-hydroxy-6'-methoxy-6-methyl-3.4'-dioxo-. methyl ester. (+)-	C17H12Cl2O7	397.9960087399					CAS: 427-63-4
+other	Aspergillus terreus; 2.5-Cyclohexadiene-1.4-dione. 2.5-di-1H-indol-3-yl-3.6-dimethoxy-	C24H18N2O4	398.1266570766					CAS: 78723-19-0
+other	Aspergillus candidus; Phenol. 4-[4-(3.4-dihydro-2.2-dimethyl-2H-1-benzopyran-6-yl)-2.3-diisocyano-1.3-butadienyl]-. acetate (ester)	C25H22N2O3	398.1630425829					CAS: 62002-86-2
+other	aspochalasin B; Aspergillus microcysticus; 1H-Cycloundec[d]isoindole-1.12.15-trione. 2.3.3a.4.6a.9.10.11-octahydro-11-hydroxy-4.5.8-trimethyl-3-(2-methylpropyl)-. (3S.3aR.4S.6aS.7E.11S.13E.15aS)-	C24H33NO4	399.2409585529					CAS: 72363-47-4
+other	aspochalasin C; Aspergillus microcysticus; 1H-Cycloundec[d]isoindole-1.11.12.15(2H)-tetrone. 3.3a.4.6a.9.10.13.14-octahydro-4.5.8-trimethyl-3-(2-methylpropyl)-. (3S.3aR.4S.6aS.7E.15aS)-	C24H33NO4	399.2409585529					CAS: 72363-48-5
+other	Aspergillus terreus aureus; Benzoic acid. 2-(3.5-dichloro-2.6-dihydroxy-4-methylbenzoyl)-5-hydroxy-3-methoxy-. methyl ester	C17H14Cl2O7	400.0116588041					CAS: 2151-16-8
+other	Aspergillus parasiticus; 2-Anthraceneacetaldehyde. a-[2-(acetyloxy)ethyl]-9.10-dihydro-1.3.6.8-tetrahydroxy-9.10-dioxo-. (aS)-	C20H16O9	400.0794321125					CAS: 52021-61-1
+other	Aspergillus parasiticus; Anthra[2.3-b]furan-5.10-dione. 3-[2-(acetyloxy)ethyl]-2.3-dihydro-2.4.6.8-tetrahydroxy-	C20H16O9	400.0794321125					CAS: 62886-00-4
+other	Aspergillus parasiticus; Anthra[1.2-b]furan-6.11-dione. 3-[2-(acetyloxy)ethyl]-2.3-dihydro-2.4.8.10-tetrahydroxy-	C20H16O9	400.0794321125					CAS: 62886-46-8
+other	Aspergillus versicolor; Anthra[2.3-b]furan-5.10-dione. 3-[2-(acetyloxy)ethyl]-2.3-dihydro-2.4.6.8-tetrahydroxy-	C20H16O9	400.0794321125					CAS: 62886-00-4
+other	Yanuthone; Aspergillus niger.; 7-Oxabicyclo[4.1.0]hept-3-ene-2.5-dione. 4-[(acetyloxy)methyl]-1-[(2E.6E)-3.7.11-trimethyl-2.6.10-dodecatrienyl]-	C24H32O5	400.2249741377					CAS: 307304-25-2
+other	aspochalasin A; Aspergillus microcysticus; 1H-Cycloundec[d]isoindole-1.15(2H)-dione. 3.3a.4.6a.9.10.11.12-octahydro-11.12-dihydroxy-4.5.8-trimethyl-3-(2-methylpropyl)-. (3S.3aR.4S.6aS.7E.11S.12S.13E.15aS)-	C24H35NO4	401.2566086171					CAS: 71968-02-0
+other	aspochalasin D; Aspergillus microcysticus; 1H-Cycloundec[d]isoindole-1.15(2H)-dione. 3.3a.4.6a.9.10.11.12-octahydro-11.12-dihydroxy-4.5.8-trimethyl-3-(2-methylpropyl)-. (3S.3aR.4S.6aS.7E.11S.12R.13E.15aS)-	C24H35NO4	401.2566086171					CAS: 72401-79-7
+other	Aspergillus parasiticus; 9.10-Anthracenedione. 2-[(1S)-3-(acetyloxy)-1-(hydroxymethyl)propyl]-1.3.6.8-tetrahydroxy-	C20H18O9	402.0950821767					CAS: 70979-72-5
+other	tryptoquivaline F; Aspergillus fumigatus; Spiro[furan-2(5H).9'-[9H]imidazo[1.2-a]indole]-3'.5(2'H)-dione. 1'.3.4.9'a-tetrahydro-2'-methyl-4-(4-oxo-3(4H)-quinazolinyl)-. (2S.2'S.4S.9'aR)-	C22H18N4O4	402.1328050870					CAS: 61897-89-0
+other	tryptoquivaline J; Aspergillus fumigatus; Spiro[furan-2(5H).9'-[9H]imidazo[1.2-a]indole]-3'.5(2'H)-dione. 1'.3.4.9'a-tetrahydro-2'-methyl-4-(4-oxo-3(4H)-quinazolinyl)-. [2'S-[2'a.9'b(S*).9'aa]]-	C22H18N4O4	402.1328050870					CAS: 66212-51-9
+other	Aspergillus fumigatus; Spiro[furan-2(5H).9'-[9H]imidazo[1.2-a]indole]-3'.5(2'H)-dione. 1'.3.4.9'a-tetrahydro-2'-methyl-4-(4-oxo-3(4H)-quinazolinyl)-. (2S.2'S.4S.9'aR)-	C22H18N4O4	402.1328050870					CAS: 61897-89-0
+other	Aspergillus fumigatus; Spiro[furan-2(5H).9'-[9H]imidazo[1.2-a]indole]-3'.5(2'H)-dione. 1'.3.4.9'a-tetrahydro-2'-methyl-4-(4-oxo-3(4H)-quinazolinyl)-. [2'S-[2'a.9'b(S*).9'aa]]-	C22H18N4O4	402.1328050870					CAS: 66212-51-9
+other	Yanuthone; Aspergillus niger.; 7-Oxabicyclo[4.1.0]hept-3-en-2-one. 4-[(acetyloxy)methyl]-5-hydroxy-1-[(2E.6E)-3.7.11-trimethyl-2.6.10-dodecatrienyl]-. (1R.5R.6R)-rel-	C24H34O5	402.2406242019					CAS: 307304-24-1
+other	Yanuthone; Aspergillus niger.; 7-Oxabicyclo[4.1.0]hept-3-en-2-one. 5-(acetyloxy)-4-(hydroxymethyl)-1-[(2E.6E)-3.7.11-trimethyl-2.6.10-dodecatrienyl]-. (1R.5R.6R)-rel-	C24H34O5	402.2406242019					CAS: 307304-26-3
+other	Aspergillus flavus; 1H-Benzo[d]naphthalen-1-ol. 2.3.4.4a.5.6.7.7a.10.11-decahydro-8-(1H-indol-3-yl)-4.4a.7-trimethyl-9-(1-methylethyl)-. (1R.4S.4aR.7S.7aR.11aR)-rel-	C28H39NO	405.3031648792					CAS: 74328-59-9
+other	Aspergillus terreus; Butanoic acid. 2-methyl-. (1S.3S.4aR.7S.8S.8aS)-1.2.3.4.4a.7.8.8a-octahydro-3.7-dimethyl-8-[2-[(2R.4R)-tetrahydro-4-hydroxy-6-oxo-2H-pyran-2-yl]ethyl]-1-naphthalenyl ester. (2S)-	C24H38O5	406.2719243303					CAS: 77517-29-4
+other	Aspergillus wentii; 2.5-Furandione. 3-[17-(acetyloxy)heptadecyl]-4-methyl-	C24H40O5	408.2875743945					CAS: 71595-41-0
+other	2H-Pyrazino[1'.2':1.5]pyrrolo[2.3-b]indole-1.4(3H.5aH)-dione. 6-acetyl-10b-(1.1-dimethyl-2-propenyl)-6.10b.11.11a-tetrahydro-3-(2-methylpropyl)-. (3S.5aR.10bR.11aS)-	C24H31N3O3	409.2365418770					CAS: 113706-21-1
+other	Orlandin; Aspergillus niger; [8.8'-Bi-2H-1-benzopyran]-2.2'-dione. 7.7'-dihydroxy-4.4'-dimethoxy-5.5'-dimethyl-	C22H18O8	410.1001675546					CAS: 69975-77-5
+other	[8.8'-Bi-2H-1-benzopyran]-2.2'-dione. 7.7'-dihydroxy-4.4'-dimethoxy-5.5'-dimethyl-	C22H18O8	410.1001675546					CAS: 69975-77-5
+other	Anditomin; Aspergillus variecolor; 9.15-Methano-3H.11H.13H-furo[3'.4':3a.4]indeno[1.7a-g][2]benzoxepin-3.11.16-trione. 5.5a.6.7.8.9.10.10a.14.15.15a.15b-dodecahydro-5.5.9.15b-tetramethyl-14-methylene-. (5aR.7aS.9R.10aS.13aS.15R.15aR.15bR)-	C25H30O5	410.2093240735					CAS: 79874-93-4
+other	Aspergillus variecolor; 5.14a-Methano-1H.14aH-furo[3'.4':4b.5]fluoreno[2.1-c]oxepin-3.6.10(5H)-trione. 6a.7.7a.7b.12.12a.13.14-octahydro-5.6a.7b.12.12-pentamethyl-. (5S.6aR.7aS.7bR.12aR.14aS.14bR)-	C25H30O5	410.2093240735					CAS: 72693-37-9
+other	2.13-DH-Fumitremorgin C; A. fumigatus	C22H25N3O5	411.1794209286					
+other	Aspergillus variecolor; 5.14a-Methano-1H.14aH-furo[3'.4':4b.5]fluoreno[2.1-c]oxepin-3.6.10(5H)-trione. 4.5.6a.7.7a.7b.12.12a.13.14-decahydro-5.6a.7b.12.12-pentamethyl-. (3aS.5R.6aR.7aS.7bR.12aR.14aS.14bR)-	C25H32O5	412.2249741377					CAS: 72676-00-7
+other	Aspergillus terreus; 10bH-Benzofuro[2.3-b]indole-2.10b-diol. 5a.6-dihydro-3-(1H-indol-3-yl)-1.4-dimethoxy-	C24H20N2O5	416.1372217629					CAS: 78279-83-1
+other	D-Altritol.;  2.5:3.4-dianhydro-1.6-dideoxy-2-C-[(1E.3E)-4-[(2S.3R)-3-(4-methoxy-3.5-dimethyl-2-oxo-2H-pyran-6-yl)-3-methyloxiranyl]-2-methyl-1.3-pentadienyl]-4-C-methyl-	C24H32O6	416.2198887598					CAS: 88389-71-3
+other	tryptoquivaline E; Aspergillus fumigatus; Spiro[furan-2(5H).9'-[9H]imidazo[1.2-a]indole]-3'.5(2'H)-dione. 1'.3.4.9'a-tetrahydro-1'-hydroxy-2'-methyl-4-(4-oxo-3(4H)-quinazolinyl)-. (2S.2'S.4R.9'aS)-	C22H18N4O5	418.1277197091					CAS: 61897-87-8
+other	tryptoquivaline H; Aspergillus fumigatus; Spiro[furan-2(5H).9'-[9H]imidazo[1.2-a]indole]-3'.5(2'H)-dione. 1'.3.4.9'a-tetrahydro-1'-hydroxy-2'-methyl-4-(4-oxo-3(4H)-quinazolinyl)-. (2S.2'S.4S.9'aS)-	C22H18N4O5	418.1277197091					CAS: 61949-67-5
+other	Aspergillus fumigatus; Spiro[furan-2(5H).9'-[9H]imidazo[1.2-a]indole]-3'.5(2'H)-dione. 1'.3.4.9'a-tetrahydro-1'-hydroxy-2'-methyl-4-(4-oxo-3(4H)-quinazolinyl)-. (2S.2'S.4R.9'aS)-	C22H18N4O5	418.1277197091					CAS: 61897-87-8
+other	Aspergillus fumigatus; Spiro[furan-2(5H).9'-[9H]imidazo[1.2-a]indole]-3'.5(2'H)-dione. 1'.3.4.9'a-tetrahydro-1'-hydroxy-2'-methyl-4-(4-oxo-3(4H)-quinazolinyl)-. (2S.2'S.4S.9'aS)-	C22H18N4O5	418.1277197091					CAS: 61949-67-5
+other	Yanuthone; Aspergillus niger.; 7-Oxabicyclo[4.1.0]hept-3-en-2-one. 4-[(acetyloxy)methyl]-5-hydroxy-1-[(2E.6E.10E)-12-hydroxy-3.7.11-trimethyl-2.6.10-dodecatrienyl]-. (1R.5R.6R)-rel-	C24H34O6	418.2355388240					CAS: 307304-29-6
+other	Yanuthone; Aspergillus niger.; 7-Oxabicyclo[4.1.0]hept-3-en-2-one. 5-(acetyloxy)-4-(hydroxymethyl)-1-[(2E.6E.10E)-12-hydroxy-3.7.11-trimethyl-2.6.10-dodecatrienyl]-. (1R.5R.6R)-rel-	C24H34O6	418.2355388240					CAS: 307304-30-9
+other	silvaticamide; Aspergillus silvaticus; 6H-Dibenz[b.e]azepin-6-one. 5.11-dihydro-1.10.11-trihydroxy-8-methyl-4-(3-methyl-2-butenyl)-7-[(3-methyl-2-butenyl)oxy]-	C25H29NO5	423.2045730466					CAS: 73606-98-1
+other	Aspergillus silvaticus; 6H-Dibenz[b.e]azepin-6-one. 5.11-dihydro-1.10.11-trihydroxy-8-methyl-4-(3-methyl-2-butenyl)-7-[(3-methyl-2-butenyl)oxy]-	C25H29NO5	423.2045730466					CAS: 73606-98-1
+other	Aspergillus terreus; 2-Furancarboxylic acid. 2.5-dihydro-4-hydroxy-2-[[4-hydroxy-3-(3-methyl-2-butenyl)phenyl]methyl]-3-(4-hydroxyphenyl)-5-oxo-. methyl ester. (+)-	C24H24O7	424.1522031251					CAS: 65372-42-1
+other	Aspergillus terreus; 2-Furancarboxylic acid. 2.5-dihydro-4-hydroxy-2-[[4-hydroxy-3-(3-methyl-2-butenyl)phenyl]methyl]-3-(4-hydroxyphenyl)-5-oxo-. methyl ester. (2R)-	C24H24O7	424.1522031251					CAS: 87414-49-1
+other	andibenin; Aspergillus variecolor; Spiro[5.11a-methano-1H.11aH-fluoreno[4.4a-c]furan-9(3H).3'(6'H)-[2H]pyran]-3.6.6'(5H)-trione. 6a.7.7a.8.10.11-hexahydro-8-hydroxy-2'.2'.5.6a.8-pentamethyl-. (3'S.5S.6aR.7aR.8R.11aS.11bR)-	C25H30O6	426.2042386956					CAS: 60451-42-5
+other	Aspergillus variecolor; Spiro[5.11a-methano-1H.11aH-fluoreno[4.4a-c]furan-9(3H).3'(6'H)-[2H]pyran]-3.6.6'(5H)-trione. 6a.7.7a.8.10.11-hexahydro-8-hydroxy-2'.2'.5.6a.8-pentamethyl-. (3'S.5S.6aR.7aR.8R.11aS.11bR)-	C25H30O6	426.2042386956					CAS: 60451-42-5
+other	Aspergillus sclerotiorum.; 1H-Indole. 3.3'-(2.3.5.6-tetramethoxy-1.4-phenylene)bis-	C26H24N2O4	428.1736072692					CAS: 287117-66-2
+other	andibenin C; Aspergillus variecolor; Spiro[5.11a-methano-1H.11aH-fluoreno[4.4a-c]furan-9(3H).3'(4'H)-[2H]pyran]-3.6.6'(3aH)-trione. 4.5.6a.7.7a.8.10.11-octahydro-8-hydroxy-2'.2'.5.6a.8-pentamethyl. (3'S.3aS.5R.6aR.7aR.8R.11aS.11bR)-	C25H32O6	428.2198887598					CAS: 72746-69-1
+other	Aspergillus variecolor; 5.14a-Methano-1H.14aH-furo[3'.4':4b.5]fluoreno[2.1-c]oxepin-3.6.10(3aH)-trione. 4.5.6a.7.7a.7b.12.12a.13.14-decahydro-4-hydroxy-5.6a.7b.12.12-pentamethyl-. (3aR.4R.5S.6aR.7aS.7bR.12aR.14aS.14bR)-	C25H32O6	428.2198887598					CAS: 60451-43-6
+other	Aspergillus terreus; 10bH-Benzofuro[2.3-b]indol-10b-ol. 5a.6-dihydro-3-(1H-indol-3-yl)-1.2.4-trimethoxy-	C25H22N2O5	430.1528718271					CAS: 78279-82-0
+other	Aspergillus terreus; Benzo[1''.2'':4.5; 4''.5'':4'.5']difuro[2.3-b:2'.3'-b']diindole-7b.14b-diol. 5.5a.12.12a-tetrahydro-7.14-dimethoxy-	C24H20N2O6	432.1321363850					CAS: 78279-84-2
+other	tryptoquivaline G; Aspergillus fumigatus; Spiro[furan-2(5H).9'-[9H]imidazo[1.2-a]indole]-3'.5(2'H)-dione. 1'.3.4.9'a-tetrahydro-1'-hydroxy-2'.2'-dimethyl-4-(4-oxo-3(4H)-quinazolinyl)-. (2S.4R.9'aS)-	C23H20N4O5	432.1433697733					CAS: 61897-91-4
+other	Aspergillus fumigatus; Spiro[furan-2(5H).9'-[9H]imidazo[1.2-a]indole]-3'.5(2'H)-dione. 1'.3.4.9'a-tetrahydro-1'-hydroxy-2'.2'-dimethyl-4-(4-oxo-3(4H)-quinazolinyl)-. (2S.4R.9'aS)-	C23H20N4O5	432.1433697733					CAS: 61897-91-4
+other	Aspergillus fumigatus; Spiro[furan-2(5H).9'-[9H]imidazo[1.2-a]indole]-3'.5(2'H)-dione. 1'.3.4.9'a-tetrahydro-1'-hydroxy-2'.2'-dimethyl-4-(4-oxo-3(4H)-quinazolinyl)-. (2S.4S.9'aS)-	C23H20N4O5	432.1433697733					CAS: 69483-20-1
+other	Aspergillus flavus; 4H-3.15a-Epoxy-1-benzoxepino[6'.7':6.7]indeno[1.2-b]indol-4-one. 2.3.5b.6.7.7a.8.13.13b.13c.14.15-dodecahydro-5b-hydroxy-2.2.13b.13c-tetramethyl-. (3R.5bS.7aS.13bS.13cR.15aS)-	C27H31NO4	433.2253084887					CAS: 63722-91-8
+other	Aspergillus flavus; 1H-Benzo[d]naphthalene-1.5-diol. 2.3.4.4a.5.6.7.7a.10.11-decahydro-9-[(1R)-2-hydroxy-1-methylethyl]-8-(1H-indol-3-yl)-4.4a.7-trimethyl-. (1R.4S.4aR.5S.7S.7aR.11aR)-rel-	C28H39NO3	437.2929941234					CAS: 76410-56-5
+other	Aspergillus flavus ; 1H-Benzo[d]naphthalene-1.5-diol. 2.3.4.4a.5.6.7.7a.10.11-decahydro-9-(2-hydroxy-1-methylethyl)-8-(1H-indol-3-yl)-4.4a.7-trimethyl-. [1a.4a.4aa.5b.7a.7ab.9(R*).11aR*]-	C28H39NO3	437.2929941234					CAS: 76410-56-5
+other	Aspergillus terreus; 2-Furancarboxylic acid. 2-[[(2R)-2.3-dihydro-2-(1-hydroxy-1-methylethyl)-5-benzofuranyl]methyl]-2.5-dihydro-4-hydroxy-3-(4-hydroxyphenyl)-5-oxo-. methyl ester. (2R)-	C24H24O8	440.1471177472					CAS: 271587-58-7
+other	Aspergillus terreus; 2-Furancarboxylic acid. 2-[[3-[(3.3-dimethyloxiranyl)methyl]-4-hydroxyphenyl]methyl]-2.5-dihydro-4-hydroxy-3-(4-hydroxyphenyl)-5-oxo-. methyl ester. (2R)-	C24H24O8	440.1471177472					CAS: 87414-45-7
+other	Aspergillus terreus; 2.3-Dithia-5.7-diazabicyclo[2.2.2]octane-6.8-dione. 5.7-bis(methoxymethyl)-1.4-bis(phenylmethyl)-	C22H24N2O4S2	444.1177486492					CAS: 87869-04-3
+other	Aspergillus sclerotiorum.; 2H-Indol-2-one. 1.3-dihydro-3-[4-(1H-indol-3-yl)-2.3.5.6-tetramethoxyphenyl]-. (-)-	C26H24N2O5	444.1685218913					CAS: 287117-65-1
+other	andibenin A; Aspergillus variecolor; Spiro[5.11a-methano-1H.11aH-fluoreno[4.4a-c]furan-9(3H).3'(4'H)-[2H]pyran]-3.6.6'(3aH)-trione. 4.5.6a.7.7a.8.10.11-octahydro-4.8-dihydroxy-2'.2'.5.6a.8-pentamethyl. (3'S.3aR.4R.5S.6aR.7aR.8R.11aS.11bR)-	C25H32O7	444.2148033819					CAS: 72746-68-0
+other	Aspergillus terreus; 2.5-Piperazinedione. 3.6-dimercapto-1.4-bis(methoxymethyl)-3.6-bis(phenylmethyl)-. cis	C22H26N2O4S2	446.1333987134					CAS: 87869-03-2
+other	Aspergillus terreus; 2(5H)-Furanone. 3-(3.4-dihydro-7-hydroxy-2.2-dimethyl-2H-1-benzopyran-6-yl)-4-hydroxy-5-[[4-hydroxy-3-(3-methyl-2-butenyl)phenyl]methylene]-. (5Z)-	C27H28O6	448.1885886314					CAS: 55215-37-7
+other	cryptoechinuline G; Aspergillus ruber; 2.5-Piperazinedione. 3-[[2-(1.1-dimethyl-2-propenyl)-4.5-bis(3-methyl-2-butenyl)-1H-indol-3-yl]methylene]-6-methylene-. (3Z)-	C29H35N3O2	457.2729273833					CAS: 68836-03-3
+other	Aspergillus terreus aureus; Benzoic acid. 5-(acetyloxy)-2-[2.6-bis(acetyloxy)-4-methylbenzoyl]-3-methoxy-. methyl ester	C23H22O10	458.1212969272					CAS: 89367-84-0
+other	Aspergillus niger; Spiro[1H-6.11b-methano-4H-furo[3.4-e][3]benzoxocin-9(10H).3'(6'H)-[2H]pyran]-1.4.6'-trione. 3.3a.6.7.11.11a-hexahydro-3a.7-dihydroxy-2'.2'.3.6.8.11a-hexamethyl-12-methylene-. (3S.3'S.3aS.6R.7R.11aS.11bS)-	C25H30O8	458.1940679398					CAS: 72040-27-8
+other	Aspergillus terreus; 2.5-Cyclohexadiene-1.4-dione. 2-[1-(1.1-dimethyl-2-propenyl)-1H-indol-3-yl]-5-(1H-indol-3-yl)-3.6-dimethoxy-	C29H26N2O4	466.1892573334					CAS: 78708-37-9
+other	Aspergillus terreus; 2.5-Cyclohexadiene-1.4-dione. 2-(1H-indol-3-yl)-3.6-dimethoxy-5-[7-(3-methyl-2-butenyl)-1H-indol-3-yl]-	C29H26N2O4	466.1892573334					CAS: 78708-38-0
+other	Aspergillus terreus; 2.5-Cyclohexadiene-1.4-dione. 2-[2-(1.1-dimethyl-2-propenyl)-1H-indol-3-yl]-5-(1H-indol-3-yl)-3.6-dimethoxy-	C29H26N2O4	466.1892573334					CAS: 78723-18-9
+other	Aspergillus nidulans; Trichothec-9-ene-3.4.8.15-tetrol. 12.13-epoxy-. 4.15-diacetate 8-(3-methylbutanoate). (3a.4b.8a)-	C24H34O9	466.2202826903					CAS: 21259-20-1
+other	Aspergillus terreus; 1.4-Benzenediol. 2-[2-(1.1-dimethyl-2-propenyl)-1H-indol-3-yl]-5-(1H-indol-3-yl)-3.6-dimethoxy-	C29H28N2O4	468.2049073976					CAS: 78279-79-5
+other	astellolide A; Aspergillus variecolor; Naphtho[1.2-c]furan-3(1H)-one. 6.9a-bis[(acetyloxy)methyl]-5-(benzoyloxy)-4.5.5a.6.7.8.9.9a-octahydro-6-methyl-. (5R.5aS.6S.9aR)-	C26H30O8	470.1940679398					CAS: 55778-98-8
+other	Aspergillus fumigatus; Spiro[furan-2(5H).9'-[9H]imidazo[1.2-a]indole]-3'.5(2'H)-dione. 1'.3.4.9'a-tetrahydro-2'-methyl-4-[2-(2-methyl-1-oxopropyl)-4-oxo-3(4H)-quinazolinyl]-. (2S.2'S.4R.9'aR)-	C26H24N4O5	472.1746699017					CAS: 60676-61-1
+other	Aspergillus terreus; 2.5-Piperazinedione. 1.4-bis(methoxymethyl)-3.6-bis(methylthio)-3.6-bis(phenylmethyl)-. cis-	C24H30N2O4S2	474.1646988418					CAS: 87869-05-4
+other	Fumitremorgin B; Aspergillus fumigatus; 5H.14H-Pyrrolo[1''.2'':4'.5']pyrazino[1'.2':1.6]pyrido[3.4-b]indole-5.14-dione. 1.2.3.5a.6.11.12.14a-octahydro-5a.6-dihydroxy-9-methoxy-11-(3-methyl-2-butenyl)-12-(2-methyl-1-propenyl)-. (5aR.6S.12S.14aS)-	C27H33N3O5	479.2420211854					CAS: 12626-17-4
+other	astellolide B; Aspergillus variecolor; Benzoic acid. 4-hydroxy-. (5R.5aS.6S.9aR)-6.9a-bis[(acetyloxy)methyl]-1.3.4.5.5a.6.7.8.9.9a-decahydro-6-methyl-3-oxonaphtho[1.2-c]furan-5-yl ester	C26H30O9	486.1889825619					CAS: 78834-89-6
+other	aspergillus silvaticus; Spiro[4H.8H-[1.4]dioxepino[2.3-g]indole-8.7'(8'H)-[5H.6H-5a.9a](iminomethano)[1H]cyclopent[f]indolizine]-9.10'(10H)-dione. 2'.3'.8'a.9'-tetrahydro-1'-hydroxy-1'.4.4.8'.8'.11'-hexamethyl-. (1'R.5'aS.7'R.8'aS.9'aR)-	C28H35N3O5	493.2576712496					CAS: 77392-58-6
+other	Aspergillus terreus; 1H-Indole. 1-(1.1-dimethyl-2-propenyl)-3-[4-(1H-indol-3-yl)-2.3.5.6-tetramethoxyphenyl]-	C31H32N2O4	496.2362075260					CAS: 78279-80-8
+other	Aspergillus terreus; 1H-Indole. 3-[4-(1H-indol-3-yl)-2.3.5.6-tetramethoxyphenyl]-7-(3-methyl-2-butenyl)-	C31H32N2O4	496.2362075260					CAS: 78279-81-9
+other	Aspergillus niger; Spiro[1H.4H.8H-3a.7a-epoxy-6.11b-methano-3H-furo[3.4-e][3]benzoxocin-9(10H).3'(6'H)-[2H]pyran]-1.4.6'-trione. 7-(acetyloxy)-6.7.11.11a-tetrahydro-2'.2'.3.6.11a-pentamethyl-8.12-bis(methylene)-. (3R.3'R.3aR.6S.7R.7aR.11aR.11bS)-	C27H30O9	498.1889825619					CAS: 82893-35-4
+other	Aspergillus niger; Spiro[1H-6.11b-methano-4H-furo[3.4-e][3]benzoxocin-9(10H).3'(6'H)-[2H]pyran]-1.4.6'-trione. 7-(acetyloxy)-3.3a.6.7.11.11a-hexahydro-3a-hydroxy-2'.2'.3.6.8.11a-hexamethyl-12-methylene-. (3S.3'S.3aS.6R.7R.11aS.11bS)-	C27H32O9	500.2046326261					CAS: 61103-89-7
+other	austin; Aspergillus ustus; Spiro[1H-6.11b-methano-4H-furo[3.4-e][3]benzoxocin-9(10H).3'(6'H)-[2H]pyran]-1.4.6'-trione. 7-(acetyloxy)-3.3a.6.7.11.11a-hexahydro-3a-hydroxy-2'.2'.3.6.8.11a-hexamethyl-12-methylene-. (3S.3'S.3aS.6R.7R.11aS.11bS)-	C27H32O9	500.2046326261					CAS: 61103-89-7
+other	Aspergillus flavus; 4H-3.15a-Epoxy-1-benzoxepino[6'.7':6.7]indeno[1.2-b]indol-4-one. 9-(1.1-dimethyl-2-propenyl)-2.3.5b.6.7.7a.8.13.13b.13c.14.15-dodecahydro-5b-hydroxy-2.2.13b.13c-tetramethyl-. (3R.5bS.7aS.13bS.13cR.15aS)-	C32H39NO4	501.2879087455					CAS: 70553-75-2
+other	tryptoquivaline I; Aspergillus fumigatus; Spiro[furan-2(5H).9'-[9H]imidazo[1.2-a]indole]-3'.5(2'H)-dione. 1'.3.4.9'a-tetrahydro-1'-hydroxy-2'.2'-dimethyl-4-[2-(2-methyl-1-oxopropyl)-4-oxo-3(4H)-quinazolinyl]-. (2S.4R.9'aS)-	C27H26N4O6	502.1852345880					CAS: 66180-23-2
+other	Aspergillus fumigatus; Spiro[furan-2(5H).9'-[9H]imidazo[1.2-a]indole]-3'.5(2'H)-dione. 1'.3.4.9'a-tetrahydro-1'-hydroxy-2'.2'-dimethyl-4-[2-(2-methyl-1-oxopropyl)-4-oxo-3(4H)-quinazolinyl]-. (2S.4R.9'aS)-	C27H26N4O6	502.1852345880					CAS: 66180-23-2
+other	Yanuthone; Aspergillus niger.; Pentanedioic acid. 3-hydroxy-3-methyl-. mono[[(1R.6S)-2.5-dioxo-6-[(2E.6E)-3.7.11-trimethyl-2.6.10-dodecatrienyl]-7-oxabicyclo[4.1.0]hept-3-en-3-yl]methyl] ester. rel	C28H38O8	502.2566681966					CAS: 307304-27-4
+other	Yanuthone; Aspergillus niger.; Pentanedioic acid. 3-hydroxy-3-methyl-. mono[[(1R.2R.6R)-2-hydroxy-5-oxo-6-[(2E.6E)-3.7.11-trimethyl-2.6.10-dodecatrienyl]-7-oxabicyclo[4.1.0]hept-3-en-3-yl]methyl] ester. rel-	C28H40O8	504.2723182608					CAS: 307304-28-5
+other	Aspergillus flavipes; L-Phenylalanine. N-benzoyl-. (2S)-2-(benzoylamino)-3-phenylpropyl ester	C32H30N2O4	506.2205574618					CAS: 63631-36-7
+other	Aspergillus terreus; 2.3.4.5-Tetrathia-7.9-diazabicyclo[4.2.2]decane-8.10-dione. 7.9-bis(methoxymethyl)-1.6-bis(phenylmethyl)-	C22H24N2O4S4	508.0618900292					CAS: 87869-02-1
+other	Aspergillus terreus aureus; Benzoic acid. 5-(acetyloxy)-2-[2.6-bis(acetyloxy)-3.5-dichloro-4-methylbenzoyl]-3-methoxy-. methyl ester	C23H20Cl2O10	526.0433528630					CAS: 89367-82-8
+other	3H-Cyclotridec[d]oxireno[f]isoindole-8.11.12(13H)-trione. 4.7.14.14a.15.15a.16a.16b-octahydro-7-hydroxy-14-(1H-indol-1-ylmethyl)-4.6.15.15a-tetramethyl-. (1E.4S.5E.7R.9E.11aR.14S.14aR.15S.15aR.16aS.16bR)-	C32H36N2O5	528.2624222765					CAS: 50335-03-0
+other	Malformin C; Aspergillus niger; Cyclo(D-cysteinyl-D-cysteinyl-L-valyl-D-leucyl-L-leucyl). cyclic (1�2)-disulfide	C23H39N5O5S2	529.2392607684					CAS: 59926-78-2
+other	Aspergillus fumigatus; Spiro[furan-2(5H).9'-[9H]imidazo[1.2-a]indole]-3'.5(2'H)-dione. 1'-(acetyloxy)-1'.3.4.9'a-tetrahydro-4-[2-[(1S)-1-hydroxy-2-methylpropyl]-4-oxo-3(4H)-quinazolinyl]-2'-methyl-. (2S.2'S.4R.9'aS)-	C28H28N4O7	532.1957992743					CAS: 61897-84-5
+other	Aspergillus fumigatus; Spiro[furan-2(5H).9'-[9H]imidazo[1.2-a]indole]-3'.5(2'H)-dione. 4-[2-[(1S)-1-(acetyloxy)-2-methylpropyl]-4-oxo-3(4H)-quinazolinyl]-1'.3.4.9'a-tetrahydro-1'-hydroxy-2'-methyl-. (2S.2'S.4S.9'aS)-	C28H28N4O7	532.1957992743					CAS: 69575-59-3
+other	Aspergillus terreus; 2.5-Cyclohexadiene-1.4-dione. 2.5-bis[1-(1.1-dimethyl-2-propenyl)-1H-indol-3-yl]-3.6-dimethoxy-	C34H34N2O4	534.2518575902					CAS: 60924-75-6
+other	Aspergillus terreus; 2.5-Cyclohexadiene-1.4-dione. 2-[2-(1.1-dimethyl-2-propenyl)-1H-indol-3-yl]-3.6-dimethoxy-5-[7-(3-methyl-2-butenyl)-1H-indol-3-yl]-	C34H34N2O4	534.2518575902					CAS: 78708-35-7
+other	Aspergillus terreus; 2.5-Cyclohexadiene-1.4-dione. 2-[2-(1.1-dimethyl-2-propenyl)-7-(3-methyl-2-butenyl)-1H-indol-3-yl]-5-(1H-indol-3-yl)-3.6-dimethoxy-	C34H34N2O4	534.2518575902					CAS: 78708-36-8
+other	Aspergillus terreus; 2.5-Cyclohexadiene-1.4-dione. 2-[1-(1.1-dimethyl-2-propenyl)-1H-indol-3-yl]-5-[2-(1.1-dimethyl-2-propenyl)-1H-indol-3-yl]-3.6-dimethoxy-	C34H34N2O4	534.2518575902					CAS: 78723-15-6
+other	Aspergillus terreus; 2.5-Cyclohexadiene-1.4-dione. 2.5-bis[2-(1.1-dimethyl-2-propenyl)-1H-indol-3-yl]-3.6-dimethoxy-	C34H34N2O4	534.2518575902					CAS: 78723-17-8
+other	Aspergillus terreus; 1.4-Benzenediol. 2.5-bis[1-(1.1-dimethyl-2-propenyl)-1H-indol-3-yl]-3.6-dimethoxy-	C34H36N2O4	536.2675076544					CAS: 78279-78-4
+other	Aspergillus terreus; 2-Furancarboxylic acid. 2-[[(2R)-2.3-dihydro-2-(1-hydroxy-1-methylethyl)-5-benzofuranyl]methyl]-2.5-dihydro-4-hydroxy-3-(4-hydroxyphenyl)-5-oxo-. methyl ester. (2R)-. compd. with 1.2-dichloroethane (1:1)	C24H24O8C2H4Cl2	538.1161238756					CAS: 271587-59-8
+other	Aspergillus terreus; 2.3-Dithia-5.7-diazabicyclo[2.2.2]octane-6.8-dione. 5.7-bis(bromomethyl)-1.4-bis(phenylmethyl)-	C20H18Br2N2O2S2	539.9176232124					CAS: 87869-06-5
+other	Aspergillus fumigatus; Spiro[furan-2(5H).9'-[9H]imidazo[1.2-a]indole]-3'.5(2'H)-dione. 1'-(acetyloxy)-1'.3.4.9'a-tetrahydro-4-[2-[(1S)-1-hydroxy-2-methylpropyl]-4-oxo-3(4H)-quinazolinyl]-2'.2'-dimethyl-. (2S.4R.9'aS)-	C29H30N4O7	546.2114493385					CAS: 61897-83-4
+other	Aspergillus terreus; 1H-Indole. 3.3'-(2.3.5.6-tetramethoxy-1.4-phenylene)bis[1-(1.1-dimethyl-2-propenyl)-	C36H40N2O4	564.2988077828					CAS: 78302-49-5
+other	Aspergillus wentii; [9.9'-Bianthracene]-10.10'(9H.9'H)-dione. 4.4'-dihydroxy-5.5'.7.7'-tetramethoxy-2.2'-dimethyl-	C34H30O8	566.1940679398					CAS: 77282-67-8
+other	Fumitremorgin A; Aspergillus fumigatus	C32H41N3O7	579.2944506864					
+other	Aspergillus terreus; 2.5-Cyclohexadiene-1.4-dione. 2-[2-(1.1-dimethyl-2-propenyl)-7-(3-methyl-2-butenyl)-1H-indol-3-yl]-3.6-dimethoxy-5-[7-(3-methyl-2-butenyl)-1H-indol-3-yl]-	C39H42N2O4	602.3144578470					CAS: 78723-14-5
+other	Aspergillus terreus; 2.5-Cyclohexadiene-1.4-dione. 2-[2-(1.1-dimethyl-2-propenyl)-1H-indol-3-yl]-5-[2-(1.1-dimethyl-2-propenyl)-7-(3-methyl-2-butenyl)-1H-indol-3-yl]-3.6-dimethoxy-	C39H42N2O4	602.3144578470					CAS: 78723-16-7
+other	secalonic acids D; Aspergillus aculeatus; [7.7'-Bi-4aH-xanthene]-4a.4'a-dicarboxylic acid. 2.2'.3.3'.4.4'.9.9'-octahydro-1.1'.4.4'.8.8'-hexahydroxy-3.3'-dimethyl-9.9'-dioxo-. dimethyl ester. (3S.3'S.4R.4'R.4aR.4'aR)-	C32H30O14	638.1635556724					CAS: 35287-69-5
+other	secalonic acids F; Aspergillus aculeatus; [7.7'-Bi-4aH-xanthene]-4a.4'a-dicarboxylic acid. 2.2'.3.3'.4.4'.9.9'-octahydro-1.1'.4.4'.8.8'-hexahydroxy-3.3'-dimethyl-9.9'-dioxo-. dimethyl ester. (3S.3'S.4R.4'S.4aR.4'aR)-	C32H30O14	638.1635556724					CAS: 60687-07-2
+other	Aspergillus flavus; [10b.10'b-Bi-10bH-pyrazino[1'.2':1.5]pyrrolo[2.3-b]indole]-1.1'.4.4'-tetrone. 2.2'.3.3'.5a.5'a.6.6'.11.11'.11a.11'a-dodecahydro-2.2'-dimethyl-3.3'-bis(phenylmethyl)-. (3S.3'S.5aS.5'aS.10bS.10'bS.11aS.11'aS)-	C42H40N6O4	692.3111038036					CAS: 64947-43-9
+other	Scleramide; Aspergillus sclerotiorum.; Cyclo(L-glutaminyl-N-methyl-L-phenylalanylglycyl-L-phenylalanyl-N-methyl-L-phenylalanylglycyl)	C38H45N7O7	711.3380468356					CAS: 287181-88-8
+other	astechrome; Aspergillus terreus; Iron. tris[1-(hydroxy-kO)-5-methoxy-6-methyl-3-[[7-(3-methyl-2-butenyl)-1H-indol-3-yl]methyl]-2(1H)-pyrazinonato-kO2]-	C60H66FeN9O9	1112.4332897643					CAS: 75310-10-0
