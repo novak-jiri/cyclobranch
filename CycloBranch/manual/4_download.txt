@@ -13,7 +13,7 @@ Any work based on CycloBranch shall cite any of the following references:
 
 <hr>
 
-<p>The latest development version is available on <a href="http://github.com/novak-jiri/cyclobranch/">GitHub</a>.</p>
+<p>The latest development version is available on <a href="http://github.com/novak-jiri/cyclobranch/releases">GitHub</a>.</p>
 
 <hr>
  
