@@ -17,6 +17,7 @@ void cParameters::clear() {
 	peaklistfilename = "";
 	useprofiledata = false;
 	convertprofiledata = true;
+	profiledatafilename = "";
 	peaklistfileformat = txt;
 	peaklistseries.clear();
 	scannumber = 1;
@@ -1163,6 +1164,8 @@ void cParameters::store(ofstream& os) {
 	os.write((char *)&useprofiledata, sizeof(bool));
 	os.write((char *)&convertprofiledata, sizeof(bool));
 
+	storeString(profiledatafilename, os);
+
 	os.write((char *)&scannumber, sizeof(int));
 	os.write((char *)&precursormass, sizeof(double));
 
@@ -1286,6 +1289,8 @@ void cParameters::load(ifstream& is) {
 
 	is.read((char *)&useprofiledata, sizeof(bool));
 	is.read((char *)&convertprofiledata, sizeof(bool));
+
+	loadString(profiledatafilename, is);
 
 	is.read((char *)&scannumber, sizeof(int));
 	is.read((char *)&precursormass, sizeof(double));

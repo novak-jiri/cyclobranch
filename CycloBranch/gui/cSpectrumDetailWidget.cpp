@@ -21,7 +21,12 @@
 cSpectrumDetailWidget::cSpectrumDetailWidget() {
 	parent = 0;
 	parameters = 0;
+
 	rawdata = 0;
+	imzmlprofilemetadata = 0;
+	profilemz64precision = false;
+	profileintensity64precision = false;
+
 	rowid = 0;
 	preparedToShow = false;
 	theoreticalspectrum = new cTheoreticalSpectrum();
@@ -35,7 +40,11 @@ cSpectrumDetailWidget::cSpectrumDetailWidget(const cSpectrumDetailWidget& sd) {
 
 cSpectrumDetailWidget& cSpectrumDetailWidget::operator=(const cSpectrumDetailWidget& sd) {
 	parameters = sd.parameters;
+
 	rawdata = sd.rawdata;
+	imzmlprofilemetadata = sd.imzmlprofilemetadata;
+	profilemz64precision = sd.profilemz64precision;
+	profileintensity64precision = sd.profileintensity64precision;
 
 	preparedToShow = false;
 	theoreticalspectrum = new cTheoreticalSpectrum();
@@ -45,7 +54,7 @@ cSpectrumDetailWidget& cSpectrumDetailWidget::operator=(const cSpectrumDetailWid
 	}
 
 	if (parameters && sd.preparedToShow) {
-		prepareToShow(rawdata, actionShowIsomers);
+		prepareToShow(actionShowIsomers, rawdata,  imzmlprofilemetadata, profilemz64precision, profileintensity64precision);
 	}
 
 	setWindowTitle(sd.windowTitle());
@@ -642,7 +651,7 @@ void cSpectrumDetailWidget::closeEvent(QCloseEvent *event) {
 }
 
 
-void cSpectrumDetailWidget::prepareToShow(cPeakListSeries* rawdata, QAction* actionShowIsomers) {
+void cSpectrumDetailWidget::prepareToShow(QAction* actionShowIsomers, cPeakListSeries* rawdata, vector<cImzMLItem>* imzmlprofilemetadata, bool profilemz64precision, bool profileintensity64precision) {
 
 	if (!preparedToShow) {
 
@@ -657,6 +666,9 @@ void cSpectrumDetailWidget::prepareToShow(cPeakListSeries* rawdata, QAction* act
 		}
 
 		this->rawdata = rawdata;
+		this->imzmlprofilemetadata = imzmlprofilemetadata;
+		this->profilemz64precision = profilemz64precision;
+		this->profileintensity64precision = profileintensity64precision;
 
 		connect(actionShowIsomers, SIGNAL(triggered()), this, SLOT(showIsomersStateChanged()));
 		this->actionShowIsomers = actionShowIsomers;
@@ -2151,36 +2163,68 @@ void cSpectrumDetailWidget::rawDataStateChanged(bool state) {
 	int targetid;
 	string s;
 
-	if (parameters && theoreticalspectrum && parameters->useprofiledata && (parameters->peaklistfileformat == baf)) {
-							
-		if ((parameters->mode == denovoengine) || (parameters->mode == databasesearch)) {
-			fileid = parameters->scannumber;
-			targetid = 0;
+	if (parameters && theoreticalspectrum && parameters->useprofiledata) {
+
+		if (parameters->peaklistfileformat == baf) {
+
+			if ((parameters->mode == denovoengine) || (parameters->mode == databasesearch)) {
+				fileid = parameters->scannumber;
+				targetid = 0;
+			}
+			else {
+				fileid = rowid;
+				targetid = rowid - 1;
+			}
+
+			if ((targetid >= 0) && (targetid < rawdata->size())) {
+				if (state) {
+					peakliststream.open(parameters->peaklistfilename + ".profile." + to_string(fileid) + ".csv");
+					while (peakliststream.good() && !(strstr(s.c_str(), "M/Z"))) {
+						getline(peakliststream, s);
+					}
+
+					(*rawdata)[targetid].clear();
+					(*rawdata)[targetid].loadFromBAFStream(peakliststream);
+
+					peakliststream.close();
+
+					(*rawdata)[targetid].normalizeIntenzityByValue(theoreticalspectrum->getExperimentalSpectrum().getMaximumAbsoluteIntensity());
+				}
+				else {
+					(*rawdata)[targetid].clear();
+				}
+			}
+
+			emit rawDataStateChangedSignal(state);
+
 		}
-		else {
-			fileid = rowid;
+
+		if ((parameters->peaklistfileformat == imzML) && (parameters->mode == dereplication)) {
 			targetid = rowid - 1;
-		}
-
-		if (state) {				
-			peakliststream.open(parameters->peaklistfilename + ".profile." + to_string(fileid) + ".csv");
-			while (peakliststream.good() && !(strstr(s.c_str(), "M/Z"))) {
-				getline(peakliststream, s);
-			}
-			(*rawdata)[targetid].loadFromBAFStream(peakliststream);
-			peakliststream.close();
 
 			if ((targetid >= 0) && (targetid < rawdata->size())) {
-				(*rawdata)[targetid].normalizeIntenzityByValue(theoreticalspectrum->getExperimentalSpectrum().getMaximumAbsoluteIntensity());
-			}
-		}
-		else {
-			if ((targetid >= 0) && (targetid < rawdata->size())) {
-				(*rawdata)[targetid].clear();
-			}
-		}
+				if (state) {
+					string ibdfilename = parameters->profiledatafilename.substr(0, (int)parameters->profiledatafilename.size() - 5);
+					ibdfilename += "ibd";
+					peakliststream.open(ibdfilename, std::ifstream::binary);
 
-		emit rawDataStateChangedSignal(state);
+					(*rawdata)[targetid].clear();
+					if ((targetid >= 0) && (targetid < imzmlprofilemetadata->size())) {
+						(*rawdata)[targetid].loadFromIBDStream((*imzmlprofilemetadata)[targetid], peakliststream, profilemz64precision, profileintensity64precision);
+					}
+
+					peakliststream.close();
+
+					(*rawdata)[targetid].normalizeIntenzityByValue(theoreticalspectrum->getExperimentalSpectrum().getMaximumAbsoluteIntensity());
+				}
+				else {
+					(*rawdata)[targetid].clear();
+				}
+			}
+
+			emit rawDataStateChangedSignal(state);
+
+		}
 				
 	}
 

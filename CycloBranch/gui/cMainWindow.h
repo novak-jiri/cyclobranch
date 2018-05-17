@@ -131,7 +131,11 @@ private:
 	vector<cSpectrumDetailWidget> spectradetails;
 
 	cParameters parameters;
+
 	cPeakListSeries rawdata;
+	vector<cImzMLItem> imzmlprofilemetadata;
+	bool profilemz64precision;
+	bool profileintensity64precision;
 
 	QTextEdit* logWindow;
 	QSplitter* splitter;

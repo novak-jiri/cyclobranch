@@ -161,10 +161,13 @@ public:
 
 	/**
 		\brief Prepare the widget to show.
-		\param rawdata a pointer to a structure handling raw data
 		\param actionShowIsomers reference to QAction to show isomers of building blocks
-	*/ 
-	void prepareToShow(cPeakListSeries* rawdata, QAction* actionShowIsomers);
+		\param rawdata a pointer to a structure handling raw data
+		\param imzmlprofilemetadata imzml profile metadata
+		\param profilemz64precision true if 64 mz precision is used, false if 32 bit mz precision is used
+		\param profileintensity64precision true if 64 intensity precision is used, false if 32 bit intensity precision is used
+	*/
+	void prepareToShow(QAction* actionShowIsomers, cPeakListSeries* rawdata, vector<cImzMLItem>* imzmlprofilemetadata, bool profilemz64precision, bool profileintensity64precision);
 	
 
 	/**
@@ -292,7 +295,11 @@ private:
 	bool preparedToShow;
 
 	cParameters* parameters;
+
 	cPeakListSeries* rawdata;
+	vector<cImzMLItem>* imzmlprofilemetadata;
+	bool profilemz64precision;
+	bool profileintensity64precision;
 
 	cFindDialog* finddialog;
 	cExportDialog* exportdialog;

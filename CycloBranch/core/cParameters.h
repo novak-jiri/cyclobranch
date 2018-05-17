@@ -92,6 +92,12 @@ public:
 
 
 	/**
+		\brief Profile data file name.
+	*/
+	string profiledatafilename;
+
+
+	/**
 		\brief A file format of peak list.
     */
 	ePeakListFileFormat peaklistfileformat;
