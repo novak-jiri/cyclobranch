@@ -2216,7 +2216,7 @@ void cSpectrumDetailWidget::rawDataStateChanged(bool state) {
 
 		}
 
-		if ((parameters->peaklistfileformat == imzML) && (parameters->mode == dereplication)) {
+		if ((parameters->peaklistfileformat == imzML) && (parameters->mode == dereplication) && (imzmlprofilemetadata->size() > 0)) {
 			targetid = rowid - 1;
 
 			if ((targetid >= 0) && (targetid < rawdata->size())) {

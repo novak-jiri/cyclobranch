@@ -143,10 +143,6 @@ void cPeaksList::loadFromIBDStream(cImzMLItem& imzmlitem, ifstream &ibdstream, b
 		}
 	}
 
-	if (imzmlitem.mzlength != imzmlitem.intensitylength) {
-		return;
-	}
-
 	// intensities
 	if (use_64bit_float_intensity_precision) {
 		start = imzmlitem.intensitystart;
