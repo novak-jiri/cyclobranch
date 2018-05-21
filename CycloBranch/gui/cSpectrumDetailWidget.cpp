@@ -16,6 +16,7 @@
 #include <QList>
 #include <QFileDialog>
 #include <QMessageBox>
+#include <QProgressDialog>
 
 
 cSpectrumDetailWidget::cSpectrumDetailWidget() {
@@ -2163,7 +2164,19 @@ void cSpectrumDetailWidget::rawDataStateChanged(bool state) {
 	int targetid;
 	string s;
 
+	int maximum = 100;
+
+	QProgressDialog progress("Preparing profile data...", /*"Cancel"*/0, 0, maximum, this);
+	progress.setMinimumWidth(250);
+	cEventFilter filter;
+	progress.installEventFilter(&filter);
+	progress.setMinimumDuration(0);
+	progress.setWindowModality(Qt::ApplicationModal);
+	progress.setValue(1);
+
 	if (parameters && theoreticalspectrum && parameters->useprofiledata) {
+
+		progress.setValue(10);
 
 		if (parameters->peaklistfileformat == baf) {
 
@@ -2188,7 +2201,11 @@ void cSpectrumDetailWidget::rawDataStateChanged(bool state) {
 
 					peakliststream.close();
 
+					progress.setValue(33);
+
 					(*rawdata)[targetid].normalizeIntenzityByValue(theoreticalspectrum->getExperimentalSpectrum().getMaximumAbsoluteIntensity());
+
+					progress.setValue(66);
 				}
 				else {
 					(*rawdata)[targetid].clear();
@@ -2215,7 +2232,73 @@ void cSpectrumDetailWidget::rawDataStateChanged(bool state) {
 
 					peakliststream.close();
 
-					(*rawdata)[targetid].normalizeIntenzityByValue(theoreticalspectrum->getExperimentalSpectrum().getMaximumAbsoluteIntensity());
+					progress.setValue(25);
+
+					ofstream mgfofstream;
+					ifstream mgfifstream;
+					string fname;
+
+					char tempstring[1024];
+					string peaksstring;
+					peaksstring.reserve(25000000);
+
+					fname = parameters->profiledatafilename.substr(0, (int)parameters->profiledatafilename.size() - 5);
+					fname += "scan." + to_string(rowid);
+					mgfofstream.open(fname + ".mgf");
+
+					mgfofstream << "BEGIN IONS" << endl;
+					mgfofstream << "TITLE=" << endl;
+					mgfofstream << "SCAN=" << to_string(rowid) << endl;
+					mgfofstream << "PEPMASS=1" << endl;
+					mgfofstream << "RTINSECONDS=1" << endl;
+					mgfofstream << "CHARGE=1+" << endl << endl;
+
+					for (int i = 0; i < (*rawdata)[targetid].size(); i++) {
+						sprintf_s(tempstring, "%f %f\n\0", (*rawdata)[targetid][i].mzratio, (*rawdata)[targetid][i].absoluteintensity);
+						peaksstring.append(tempstring);
+					}
+					mgfofstream << peaksstring;
+					mgfofstream << "END IONS" << endl << endl;
+					mgfofstream.close();
+
+					progress.setValue(50);
+
+					string s;
+					#if OS_TYPE == UNX
+						s = installdir.toStdString() + "External/linux/correctprofile.sh " + fname + "," + to_string(parameters->fwhm);
+					#else
+						#if OS_TYPE == OSX
+							s = installdir.toStdString() + "External/macosx/correctprofile.sh " + fname + "," + to_string(parameters->fwhm);
+						#else		
+							s = "External\\windows\\correctprofile.bat \"" + fname + "\" " + to_string(parameters->fwhm);
+						#endif
+					#endif
+
+					(*rawdata)[targetid].clear();
+
+					progress.setValue(75);
+
+					if (system(s.c_str()) == 0) {
+						cMzML mzml;
+						vector<cPeaksList> peaklists;
+						bool terminatecomputation = false;
+
+						string mzmlname = fname + ".mzML";
+						string mgfname = fname + ".0000000000.mgf";
+
+						int resultcode = mzml.parse(mzmlname, peaklists, singlecomparison /* ok */, 0 /* ok */, terminatecomputation /* ok */);
+						if ((resultcode == 0) && (peaklists.size() == 1)) {
+							QFile::remove(mzmlname.c_str());
+
+							mgfifstream.open(mgfname);
+							(*rawdata)[targetid].loadFromMGFStream(mgfifstream);
+							mgfifstream.close();
+
+							QFile::remove(mgfname.c_str());
+
+							(*rawdata)[targetid].normalizeIntenzityByValue(theoreticalspectrum->getExperimentalSpectrum().getMaximumAbsoluteIntensity());
+						}
+					}
 				}
 				else {
 					(*rawdata)[targetid].clear();
@@ -2228,6 +2311,7 @@ void cSpectrumDetailWidget::rawDataStateChanged(bool state) {
 				
 	}
 
+	progress.setValue(maximum);
 }
 
 
