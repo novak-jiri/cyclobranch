@@ -17,10 +17,10 @@ Any work based on CycloBranch shall cite any of the following references:
 
 <hr>
  
-<p>xx.x.2018</p>
+<p>22.5.2018</p>
   
 <p>
-<b>CycloBranch 1.3.xxx</b>
+<b>CycloBranch 1.3.1</b>
 <ul>
   <li> Changes:
   <ul>
@@ -28,7 +28,7 @@ Any work based on CycloBranch shall cite any of the following references:
     <ul>
         <li> Profile spectra can now be visualized.
         <ul>
-            <li> Bruker's baf files on (Windows only).
+            <li> Bruker's baf files on (Windows only)
             <li> imzML
         </ul>
         <li> Visualization of mass spectra improved.
@@ -44,13 +44,13 @@ Any work based on CycloBranch shall cite any of the following references:
     <li> Settings dialog - layout fixed for macOS.
     <li> FileConverter - collision of filenames between OpenMS and Xcalibur fixed.
   </ul>
-  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.3.xxx_win_64bit.zip" onclick="ga('send', 'event', 'Download', this.href);">Download (Windows, 64 bit - tested on Windows 7/10)</a>
-  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.3.xxx_linux_64bit.tgz" onclick="ga('send', 'event', 'Download', this.href);">Download (Linux, 64 bit - tested on Ubuntu 16.04)</a>
-  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.3.xxx_osx_64bit.dmg" onclick="ga('send', 'event', 'Download', this.href);">Download (macOS, 64 bit - tested on macOS 10.12 Sierra)</a>
+  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.3.1_win_64bit.zip" onclick="ga('send', 'event', 'Download', this.href);">Download (Windows, 64 bit - tested on Windows 7/10)</a>
+  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.3.1_linux_64bit.tgz" onclick="ga('send', 'event', 'Download', this.href);">Download (Linux, 64 bit - tested on Ubuntu 16.04)</a>
+  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.3.1_osx_64bit.dmg" onclick="ga('send', 'event', 'Download', this.href);">Download (macOS, 64 bit - tested on macOS 10.12 Sierra)</a>
   <li> <a href="http://ms.biomed.cas.cz/cyclobranch/docs/refman.pdf" onclick="ga('send', 'event', 'Download', this.href);">PDF manual</a>
-  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.3.xxx_win_sources.zip" onclick="ga('send', 'event', 'Download', this.href);">Download Sources (Windows)</a>
-  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.3.xxx_linux_sources.tgz" onclick="ga('send', 'event', 'Download', this.href);">Download Sources (Linux)</a>
-  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.3.xxx_osx_sources.dmg" onclick="ga('send', 'event', 'Download', this.href);">Download Sources (OS X)</a>
+  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.3.1_win_sources.zip" onclick="ga('send', 'event', 'Download', this.href);">Download Sources (Windows)</a>
+  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.3.1_linux_sources.tgz" onclick="ga('send', 'event', 'Download', this.href);">Download Sources (Linux)</a>
+  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.3.1_osx_sources.dmg" onclick="ga('send', 'event', 'Download', this.href);">Download Sources (OS X)</a>
   <li> Additional databases: <a href="http://ms.biomed.cas.cz/cyclobranch/release/Lipids.zip" onclick="ga('send', 'event', 'Download', this.href);">Lipids</a>  
 </ul>
 </p>
