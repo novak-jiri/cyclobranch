@@ -9,15 +9,15 @@ The window is opened by a double-click on a row in the output report if a branch
 </p>
 
 <p>
-\image html branchcyclicdetail.png "De novo sequencing of pyoverdin E."
-\image latex branchcyclicdetail.png "De novo sequencing of pyoverdin E." width=16cm
+\image html branchcyclicdetail.png "Direct comparison of experimental spectrum of pyoverdin E with the theoretical spectrum."
+\image latex branchcyclicdetail.png "Direct comparison of experimental spectrum of pyoverdin E with the theoretical spectrum." width=16cm
 </p>
 
 <p>
 See details in [Linear Peptide Detail Window](@ref lineardetailwindow), [Cyclic Peptide Detail Window](@ref cyclicdetailwindow) and [Branched Peptide Detail Window](@ref brancheddetailwindow). 
 The differences for branch-cyclic peptides are following:
 <ul>
-<li> The text window on the right at the bottom contains a list of all linearized sequences derived from all possible ring opening sites of a branch-cyclic peptide. 
+<li> The text window on the right at the bottom (data not shown in the image above) contains a list of all linearized sequences derived from all possible ring opening sites of a branch-cyclic peptide. 
 If the ring is opened, a fragment ion corresponds to a branched peptide. Thus for each linearized sequence (derived from the ring opening), another list of linearized sequences is generated 
 (derived from a branched fragment). The nomenclature of linearized sequences of branch-cyclic peptides simply combines nomenclatures of linearized sequences derived 
 from cyclic and branched peptide sequences. For example, 1-4_5 is a linearized sequence no. 5 of a branched fragment ion arising after a ring opening at the position 1-4.

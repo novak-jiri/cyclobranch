@@ -36,7 +36,7 @@ Use F1 to open this help.
 </p>
 <p>Close window.</p>
 
-<p><b>Zoom In (CTRL +; mouse wheel up)</b>
+<p><b>Zoom In (CTRL +)</b>
 \htmlonly
 <img src="83.png">
 \endhtmlonly
@@ -46,7 +46,7 @@ Use F1 to open this help.
 </p>
 <p>Zoom in.</p>
 
-<p><b>Zoom Out (CTRL -; mouse wheel down)</b>
+<p><b>Zoom Out (CTRL -)</b>
 \htmlonly
 <img src="82.png">
 \endhtmlonly
@@ -119,6 +119,8 @@ Use F1 to open this help.
 <li> Left mouse button - press and hold the button to draw a rectangle determining the minimum and maximum values of IDs; release the button to apply the changes.
 <li> Right mouse button - press the button during the drawing of a rectangle to cancel the drawing.
 <li> Middle mouse button - reset the range of IDs.
+<li> Mouse wheel up - zoom the interval in.
+<li> Mouse wheel down - zoom the interval out.
 </ul>
 </p>
 

@@ -104,7 +104,7 @@ a vector of integers is shown, e.g., <code>"B  0 0 1 1 1 1 1 1 1 1 0 0 0 0"</cod
 </p>
 <p>Move the cursor to the next search result when a text was found.</p>
 
-<p><b>Zoom In (CTRL +; mouse wheel up)</b>
+<p><b>Zoom In (CTRL +)</b>
 \htmlonly
 <img src="83.png">
 \endhtmlonly
@@ -114,7 +114,7 @@ a vector of integers is shown, e.g., <code>"B  0 0 1 1 1 1 1 1 1 1 0 0 0 0"</cod
 </p>
 <p>The window with the graphical visualization of an experimental mass spectrum on the left at the top is zoomed in. A zoom factor in the range <1, 32> is increased by 0.2 when the button is pressed.</p>
 
-<p><b>Zoom Out (CTRL -; mouse wheel down)</b>
+<p><b>Zoom Out (CTRL -)</b>
 \htmlonly
 <img src="82.png">
 \endhtmlonly
@@ -143,6 +143,17 @@ a vector of integers is shown, e.g., <code>"B  0 0 1 1 1 1 1 1 1 1 0 0 0 0"</cod
 \endlatexonly
 </p>
 <p>View absolute/relative intensities of peaks.</p>
+
+<p><b>Profile Spectrum (CTRL + P)</b>
+\htmlonly
+<img src="chromatography.png">
+\endhtmlonly
+\latexonly
+\includegraphics{chromatography.png}
+\endlatexonly
+</p>
+<p>View profile spectrum (if applicable). See [the list of supported file formats for visualization of profile data](@ref settings_peaklistfile). Note that the checbox next
+to the file name in the settings dialog must be checked.</p>
 
 <p><b>Hide Matched Peaks (CTRL + M)</b>
 \htmlonly
@@ -189,6 +200,8 @@ and experimental peaks in the peaks table are also hidden if the button is check
 <li> Left mouse button - press and hold the button to draw a rectangle determining the minimum and maximum values of m/z ratios; release the button to apply the changes.
 <li> Right mouse button - press the button during the drawing of a rectangle to cancel the drawing.
 <li> Middle mouse button - reset the range of m/z ratios.
+<li> Mouse wheel up - zoom the interval in.
+<li> Mouse wheel down - zoom the interval out.
 </ul>
 </p>
 

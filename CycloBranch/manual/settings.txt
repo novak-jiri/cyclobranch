@@ -72,68 +72,79 @@ Use F1 to open this help.
 <table width="90%" class="doxtable">
 <tr>
 <th>File format</th>
-<th>Supported data type</th>
+<th>Supported types of spectra (data processing)</th>
+<th>Supported types of spectra (visualization)</th>
 <th>Description</th>
 <th>Notes</th>
 </tr>
 <tr>
 <td>txt</td>
-<td>peaklists</td>
+<td>centroid</td>
+<td>centroid</td>
 <td>plain text file</td>
 <td>Mass-to-charge ratio and intensity on each line separated by tabulator; multiple peaklists must be separated by an empty line.</td>
 </tr>
 <tr>
 <td>mgf</td>
-<td>peaklists</td>
+<td>centroid</td>
+<td>centroid</td>
 <td>Mascot Generic File format</td>
 <td></td>
 </tr>
 <tr>
 <td>mzML</td>
-<td>profile spectra or peaklists</td>
+<td>profile and centroid</td>
+<td>centroid</td>
 <td><a href="http://www.psidev.info/mzml_1_0_0">standard data format</a></td>
 <td>m/z values and intensities must be stored as 64-bit/32-bit floats; no compression. <a href="http://www.openms.de">OpenMS 2.x</a> must be installed.</td>
 </tr>
 <tr>
 <td>mzXML</td>
-<td>peaklists</td>
+<td>centroid</td>
+<td>centroid</td>
 <td>standard data format</td>
 <td><a href="http://www.openms.de">OpenMS 2.x</a> must be installed; the FileConverter tool is used to automatically convert this file format into mgf.</td>
 </tr>
 <tr>
 <td>imzML</td>
-<td>profile spectra or peaklists</td>
+<td>profile and centroid</td>
+<td>profile and centroid</td>
 <td><a href="http://www.imzml.org">standard data format</a></td>
 <td>Processed or continuos data file format; m/z values and intensities must be stored as 64-bit/32-bit floats; no compression. <a href="http://www.openms.de">OpenMS 2.x</a> must be installed.</td>
 </tr>
 <tr>
 <td>baf</td>
-<td>profile spectra</td>
+<td>profile and centroid</td>
+<td>profile and centroid</td>
 <td>Bruker's Analysis File</td>
 <td><a href="http://www.bruker.com/service/support-upgrades/software-downloads/mass-spectrometry.html">CompassXport 3.0</a> must be installed; Windows only.</td>
 </tr>
 <tr>
 <td>raw</td>
-<td>profile spectra or peaklists</td>
+<td>profile and centroid</td>
+<td>centroid</td>
 <td>Thermo raw file</td>
 <td><a href="http://www.openms.de">OpenMS 2.x</a> including ProteoWizard must be installed; Windows only.</td>
 </tr>
 <tr>
 <td>raw</td>
-<td>peaklists</td>
+<td>centroid</td>
+<td>centroid</td>
 <td>Waters raw directory</td>
 <td>Select a *.dat file in the raw directory; Windows only.</td>
 </tr>
 <tr>
 <td>mis (deprecated)</td>
-<td>profile spectra</td>
+<td>profile and centroid</td>
+<td>centroid</td>
 <td>Bruker's flexImaging File (old data format)</td>
 <td><a href="http://www.bruker.com/service/support-upgrades/software-downloads/mass-spectrometry.html">CompassXport 3.0</a> must be installed; Windows only. 
 If the file "[name].mis" is selected, all the "analysis.baf" files in the subfolders of "[name]" directory are searched and processed.</td>
 </tr>
 <tr>
 <td>ser (deprecated)</td>
-<td>profile spectra</td>
+<td>profile and centroid</td>
+<td>centroid</td>
 <td>Apex file format</td>
 <td><a href="http://www.bruker.com/service/support-upgrades/software-downloads/mass-spectrometry.html">CompassXport 3.0</a> must be installed; Windows only. 
 </td>
@@ -141,6 +152,13 @@ If the file "[name].mis" is selected, all the "analysis.baf" files in the subfol
 
 </table>
 </div>
+
+<p>The visualization of profile mass spectra is enabled if the checkbox next to the file name is checked. This feature is currenly available for the following file formats:
+<ul>
+<li>Bruker's baf files (Windows only)
+<li>imzML
+</ul>
+</p>
 
 <p>CycloBranch supports the standard imzML data format for imaging mass spectra (see <a href="http://www.imzml.org">imzml.org</a>). 
 If the file includes profile spectra, they are automatically converted to centroided spectra using the OpenMS pipeline NoiseFilterGaussian &gt;&gt;
