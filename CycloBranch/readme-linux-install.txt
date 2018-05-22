@@ -12,6 +12,7 @@ CycloBranch
 3) If you would like to use mzML, mzXML and imzML file formats, download and install OpenMS 2.3.0 (http://www.openms.de) and type the following commands:
 sudo sudo dpkg -i OpenMS-2.3.0-Linux.deb
 sudo chmod +x /usr/share/cyclobranch/External/linux/any2mgf.sh
+sudo chmod +x /usr/share/cyclobranch/External/linux/correctprofile.sh
 sudo chmod +x /usr/share/cyclobranch/External/linux/raw2peaks.sh
 
 4) If you would like to export images in PDF, type "sudo apt-get install cups-pdf" and configure CUPS PDF print server.
