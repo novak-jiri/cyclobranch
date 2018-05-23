@@ -329,11 +329,13 @@ int cMzML::parse(string& filename, vector<cPeaksList>& peaklists, eModeType mode
 															mgfofstream.open(ss.str());
 														}
 														
-														if ((count + 1) % 100 == 0) {
-															*os << count + 1 << " ";
-														}
-														if ((count + 1) % 2500 == 0) {
-															*os << endl;
+														if (os) {
+															if ((count + 1) % 100 == 0) {
+																*os << count + 1 << " ";
+															}
+															if ((count + 1) % 2500 == 0) {
+																*os << endl;
+															}
 														}
 
 														mgfofstream << "BEGIN IONS" << endl;

@@ -329,7 +329,11 @@ cMainWindow::cMainWindow() {
 	spectradetails.clear();
 
 	parameters.clear();
+	
 	rawdata.clear();
+	imzmlprofilemetadata.clear();
+	profilemz64precision = false;
+	profileintensity64precision = false;
 
 	resultsbasecolumncount = 9;
 	resultsspecificcolumncount = 0;
@@ -736,13 +740,20 @@ void cMainWindow::run() {
 	spectradetails.clear();
 
 	parameters.clear();
+	
 	rawdata.clear();
+	imzmlprofilemetadata.clear();
+	profilemz64precision = false;
+	profileintensity64precision = false;
 
 	cParameters localparameters = parameterswidget->getParameters();
 
 	regex rx;
 	rx = "\\.[iI][mM][zZ][mM][lL]$";
+	localparameters.profiledatafilename = "";
 	if (regex_search(localparameters.peaklistfilename, rx)) {
+		localparameters.profiledatafilename = localparameters.peaklistfilename;
+
 		string convertedimzml = localparameters.peaklistfilename.substr(0, (int)localparameters.peaklistfilename.size() - 6);
 		string convertedibd = convertedimzml;
 		convertedimzml += "_converted_fwhm_";
@@ -1140,13 +1151,39 @@ void cMainWindow::reportSpectra() {
 
 	results->resizeColumnsToContents();
 
-	if (parameters.useprofiledata && (parameters.peaklistfileformat == baf)) {
-		if ((parameters.mode == denovoengine) || (parameters.mode == databasesearch)) {
-			rawdata.resize(1);
+	if (parameters.useprofiledata) {
+
+		if (parameters.peaklistfileformat == baf) {
+			if ((parameters.mode == denovoengine) || (parameters.mode == databasesearch)) {
+				rawdata.resize(1);
+			}
+			else {
+				rawdata.resize(theoreticalspectrumlist.size());
+			}
 		}
-		else {
+
+		if ((parameters.peaklistfileformat == imzML) && (parameters.mode == dereplication)) {
 			rawdata.resize(theoreticalspectrumlist.size());
+			imzmlprofilemetadata.clear();
+			profilemz64precision = false;
+			profileintensity64precision = false;
+			
+			cImzML imzml;
+			int defaultmaxx;
+			int defaultmaxy;
+			int defaultpixelsizex;
+			int defaultpixelsizey;
+			eVendorType vendor;
+
+			if (imzml.parse(parameters.profiledatafilename, defaultmaxx, defaultmaxy, defaultpixelsizex, defaultpixelsizey, vendor) == 0) {
+				if (imzml.hasProfileSpectra()) {
+					imzmlprofilemetadata = imzml.getItems();
+					profilemz64precision = imzml.use64BitMzPrecision();
+					profileintensity64precision = imzml.use64BitIntensityPrecision();
+				}
+			}
 		}
+
 	}
 	
 	QProgressDialog progress("Preparing the report...", /*"Cancel"*/0, 0, theoreticalspectrumlist.size(), this);
@@ -1247,7 +1284,7 @@ void cMainWindow::rowDoubleClicked(const QModelIndex& item) {
 	int row = resultsproxymodel->mapToSource(item).row();
 	int rowid = resultsmodel->item(row, 1)->data(Qt::DisplayRole).toInt() - 1;
 
-	spectradetails[rowid].prepareToShow(&rawdata, actionShowIsomers);
+	spectradetails[rowid].prepareToShow(actionShowIsomers, &rawdata, &imzmlprofilemetadata, profilemz64precision, profileintensity64precision);
 	spectradetails[rowid].show();
 	spectradetails[rowid].activateWindow();
 	if (spectradetails[rowid].isMinimized()) {
@@ -1741,8 +1778,12 @@ void cMainWindow::openResultsFile() {
 			spectradetails.clear();
 
 			parameters.clear();
+
 			rawdata.clear();
-			
+			imzmlprofilemetadata.clear();
+			profilemz64precision = false;
+			profileintensity64precision = false;
+
 			// load graph window
 			graph->load(infile);
 			graph->updateView(actionShowIsomers->isChecked());
@@ -1898,7 +1939,7 @@ void cMainWindow::summaryPeaksTableCancelled() {
 
 
 void cMainWindow::summaryPeaksTableRowDoubleClicked(int rowid, double experimentalmz) {
-	spectradetails[rowid].prepareToShow(&rawdata, actionShowIsomers);
+	spectradetails[rowid].prepareToShow(actionShowIsomers, &rawdata, &imzmlprofilemetadata, profilemz64precision, profileintensity64precision);
 	spectradetails[rowid].show();
 	spectradetails[rowid].activateWindow();
 	if (spectradetails[rowid].isMinimized()) {
