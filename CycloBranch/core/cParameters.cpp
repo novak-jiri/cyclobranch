@@ -82,6 +82,7 @@ void cParameters::clear() {
 		neutrallossesdefinitions.push_back(loss);
 	}
 	neutrallossesfortheoreticalspectra.clear();
+	numberofgeneratedneutrallosses = 0;
 
 	originalneutrallossesdefinitions = neutrallossesdefinitions;
 	originalneutrallossesfortheoreticalspectra = neutrallossesfortheoreticalspectra;
@@ -972,6 +973,7 @@ void cParameters::updateFragmentDefinitions() {
 int cParameters::calculateNeutralLosses(bool& terminatecomputation) {
 	neutrallossesdefinitions.clear();
 	neutrallossesfortheoreticalspectra.clear();
+	numberofgeneratedneutrallosses = 0;
 
 	if (maximumcombinedlosses == 0) {
 		return 0;
@@ -1030,6 +1032,7 @@ int cParameters::calculateNeutralLosses(bool& terminatecomputation) {
 		if (terminatecomputation) {
 			neutrallossesdefinitions.clear();
 			neutrallossesfortheoreticalspectra.clear();
+			numberofgeneratedneutrallosses = 0;
 			return -1;
 		}
 
@@ -1125,13 +1128,14 @@ int cParameters::calculateNeutralLosses(bool& terminatecomputation) {
 		}
 	}
 
+	numberofgeneratedneutrallosses = (int)neutrallossesfortheoreticalspectra.size();
+
 	if (os) {
 		*os << "ok" << endl;
 		*os << "Number of combined losses: " << neutrallossesfortheoreticalspectra.size() << endl << endl;
 	}
 
 	if (neutrallossesfortheoreticalspectra.size() >= compressionlimit) {
-		int size = (int)neutrallossesfortheoreticalspectra.size();
 		for (int i = 0; i < compressionlimit; i++) {
 			tmpformula.clear();
 			tmpformula.addFormula(neutrallossesdefinitions[neutrallossesfortheoreticalspectra[i]].summary);
@@ -1140,6 +1144,7 @@ int cParameters::calculateNeutralLosses(bool& terminatecomputation) {
 			if (terminatecomputation) {
 				neutrallossesdefinitions.clear();
 				neutrallossesfortheoreticalspectra.clear();
+				numberofgeneratedneutrallosses = 0;
 				return -1;
 			}
 		}
@@ -1261,6 +1266,8 @@ void cParameters::store(ofstream& os) {
 	for (int i = 0; i < (int)originalneutrallossesfortheoreticalspectra.size(); i++) {
 		os.write((char *)&originalneutrallossesfortheoreticalspectra[i], sizeof(int));
 	}
+
+	os.write((char *)&numberofgeneratedneutrallosses, sizeof(int));
 
 	storeStringVector(peakidtodesc, os);
 	storeStringVector(isotopeformulaidtodesc, os);
@@ -1387,6 +1394,8 @@ void cParameters::load(ifstream& is) {
 	for (int i = 0; i < (int)originalneutrallossesfortheoreticalspectra.size(); i++) {
 		is.read((char *)&originalneutrallossesfortheoreticalspectra[i], sizeof(int));
 	}
+
+	is.read((char *)&numberofgeneratedneutrallosses, sizeof(int));
 
 	loadStringVector(peakidtodesc, is);
 	loadStringVector(isotopeformulaidtodesc, is);

@@ -218,6 +218,8 @@ void cMainThread::run() {
 			}
 		}
 
+		//parameters.peaklistseries[i].cropMinimumMZRatio(parameters.minimummz, parameters.fragmentmasserrortolerance);
+
 		parameters.peaklistseries[i].cropRelativeIntenzity(parameters.minimumrelativeintensitythreshold);
 
 		//parameters.peaklistseries[i].maxHighestPeaksInWindow(10, 50);

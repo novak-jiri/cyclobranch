@@ -416,6 +416,12 @@ public:
 
 
 	/**
+		\brief A number of generated combinations of neutral losses.
+	*/
+	int numberofgeneratedneutrallosses;
+
+
+	/**
 		\brief A vector of neutral losses generated in theoretical spectra (without combinations).
 	*/
 	vector<int> originalneutrallossesfortheoreticalspectra;
