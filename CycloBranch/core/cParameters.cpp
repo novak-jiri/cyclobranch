@@ -27,7 +27,6 @@ void cParameters::clear() {
 	precursormasserrortolerance = 5;
 	precursorcharge = 1;
 	fragmentmasserrortolerance = 5;
-	//masserrortolerancefordeisotoping = 0;
 	minimumrelativeintensitythreshold = 1;
 	minimumabsoluteintensitythreshold = 0;
 	minimummz = 150;
@@ -835,7 +834,6 @@ string cParameters::printToString() {
 	s += "Charge: " + to_string(precursorcharge) + "\n";
 	s += "Precursor m/z Error Tolerance: " + to_string(precursormasserrortolerance) + "\n";
 	s += "m/z Error Tolerance: " + to_string(fragmentmasserrortolerance) + "\n";
-	//s += "m/z Error Tolerance for Deisotoping: " + to_string(masserrortolerancefordeisotoping) + "\n";
 	s += "Minimum Threshold of Relative Intensity: " + to_string(minimumrelativeintensitythreshold) + "\n";
 	s += "Minimum Threshold of Absolute Intensity: " + to_string(minimumabsoluteintensitythreshold) + "\n";
 	s += "Minimum m/z Ratio: " + to_string(minimummz) + "\n";
@@ -1180,7 +1178,6 @@ void cParameters::store(ofstream& os) {
 	os.write((char *)&precursormasserrortolerance, sizeof(double));
 	os.write((char *)&precursorcharge, sizeof(int));
 	os.write((char *)&fragmentmasserrortolerance, sizeof(double));
-	//os.write((char *)&masserrortolerancefordeisotoping, sizeof(double));
 	os.write((char *)&minimumrelativeintensitythreshold, sizeof(double));
 	os.write((char *)&minimumabsoluteintensitythreshold, sizeof(unsigned));
 	os.write((char *)&minimummz, sizeof(double));
@@ -1308,7 +1305,6 @@ void cParameters::load(ifstream& is) {
 	is.read((char *)&precursormasserrortolerance, sizeof(double));
 	is.read((char *)&precursorcharge, sizeof(int));
 	is.read((char *)&fragmentmasserrortolerance, sizeof(double));
-	//is.read((char *)&masserrortolerancefordeisotoping, sizeof(double));
 	is.read((char *)&minimumrelativeintensitythreshold, sizeof(double));
 	is.read((char *)&minimumabsoluteintensitythreshold, sizeof(unsigned));
 	is.read((char *)&minimummz, sizeof(double));

@@ -346,6 +346,13 @@ public:
 
 
 	/**
+		\brief Get the maximum relative intensity.
+		\retval double maximum relative intensity
+	*/
+	double getMaximumRelativeIntensity();
+
+
+	/**
 		\brief Get the maximum absolute intensity.
 		\retval double maximum absolute intensity
 	*/

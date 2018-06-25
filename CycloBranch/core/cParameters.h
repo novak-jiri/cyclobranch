@@ -152,12 +152,6 @@ public:
 
 
 	/**
-		\brief Mass error tolerance for deisotoping.
-    */
-    //double masserrortolerancefordeisotoping;
-
-
-	/**
 		\brief Minimum relative intensity threshold.
 	*/
 	double minimumrelativeintensitythreshold;

@@ -707,6 +707,17 @@ double cPeaksList::getMaximumAbsoluteIntensityFromMZInterval(double minmz, doubl
 }
 
 
+double cPeaksList::getMaximumRelativeIntensity() {
+	double intensity = 0;
+	for (int i = 0; i < (int)peaks.size(); i++) {
+		if (peaks[i].relativeintensity > intensity) {
+			intensity = peaks[i].relativeintensity;
+		}
+	}
+	return intensity;
+}
+
+
 double cPeaksList::getMaximumAbsoluteIntensity() {
 	double intensity = 0;
 	for (int i = 0; i < (int)peaks.size(); i++) {

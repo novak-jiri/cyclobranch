@@ -2203,8 +2203,14 @@ void cSpectrumDetailWidget::rawDataStateChanged(bool state) {
 
 					progress.setValue(33);
 
-					(*rawdata)[targetid].normalizeIntenzityByValue(theoreticalspectrum->getExperimentalSpectrum().getMaximumAbsoluteIntensity());
+					(*rawdata)[targetid].sortbyMass();
+					(*rawdata)[targetid].normalizeIntenzityByValue(theoreticalspectrum->getExperimentalSpectrum().getMaximumAbsoluteIntensity() * 100.0 / theoreticalspectrum->getExperimentalSpectrum().getMaximumRelativeIntensity());
+					(*rawdata)[targetid].cropMinimumMZRatio(parameters->minimummz, parameters->fragmentmasserrortolerance);
 
+					if ((parameters->mode == denovoengine) || (parameters->mode == singlecomparison) || (parameters->mode == databasesearch)) {
+						(*rawdata)[targetid].cropMaximumMZRatio(charge(uncharge(parameters->precursormass, parameters->precursorcharge), (parameters->precursorcharge > 0) ? 1 : -1), parameters->precursormasserrortolerance);
+					}
+					
 					progress.setValue(66);
 				}
 				else {
@@ -2296,7 +2302,9 @@ void cSpectrumDetailWidget::rawDataStateChanged(bool state) {
 
 							QFile::remove(mgfname.c_str());
 
-							(*rawdata)[targetid].normalizeIntenzityByValue(theoreticalspectrum->getExperimentalSpectrum().getMaximumAbsoluteIntensity());
+							(*rawdata)[targetid].sortbyMass();
+							(*rawdata)[targetid].normalizeIntenzityByValue(theoreticalspectrum->getExperimentalSpectrum().getMaximumAbsoluteIntensity() * 100.0 / theoreticalspectrum->getExperimentalSpectrum().getMaximumRelativeIntensity());
+							(*rawdata)[targetid].cropMinimumMZRatio(parameters->minimummz, parameters->fragmentmasserrortolerance);
 						}
 					}
 				}
