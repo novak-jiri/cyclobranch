@@ -1154,12 +1154,7 @@ void cMainWindow::reportSpectra() {
 	if (parameters.useprofiledata) {
 
 		if (parameters.peaklistfileformat == baf) {
-			if ((parameters.mode == denovoengine) || (parameters.mode == databasesearch)) {
-				rawdata.resize(1);
-			}
-			else {
-				rawdata.resize(theoreticalspectrumlist.size());
-			}
+			rawdata.resize(theoreticalspectrumlist.size());
 		}
 
 		if ((parameters.peaklistfileformat == imzML) && (parameters.mode == dereplication)) {
