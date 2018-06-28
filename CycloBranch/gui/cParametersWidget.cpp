@@ -1257,7 +1257,7 @@ void cParametersWidget::restoreParameters() {
 
 	neutrallosstypes->getList()->clear();
 	for (int i = 0; i < (int)parameters.originalneutrallossesdefinitions.size(); i++) {
-		neutrallosstypes->getList()->addItem(parameters.originalneutrallossesdefinitions[i].summary.c_str());
+		neutrallosstypes->addItem(parameters.originalneutrallossesdefinitions[i].summary.c_str());
 	}
 
 	for (int i = 0; i < (int)parameters.originalneutrallossesfortheoreticalspectra.size(); i++) {
