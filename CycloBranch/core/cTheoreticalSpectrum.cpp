@@ -3184,6 +3184,19 @@ void cTheoreticalSpectrum::generateNTerminalFragmentIons(int maxcharge, int& pea
 			break;
 	}
 
+	string prefixstr;
+	if (writedescription) {
+		if ((peptidetype == cyclic) || (peptidetype == cyclicpolyketide)) {
+			prefixstr = to_string(splittingsites[rotationid].first + 1) + "-" + to_string(splittingsites[rotationid].second + 1) + "_";
+		}
+		if (peptidetype == branched) {
+			prefixstr = to_string(peak.rotationid + 1) + "_";
+		}
+		if (peptidetype == branchcyclic) {
+			prefixstr = to_string(splittingsites[rotationid].first + 1) + "-" + to_string(splittingsites[rotationid].second + 1) + "_" + to_string(trotation->id + 1) + "_";
+		}
+	}
+
 	for (int i = 0; i < (int)intcomposition.size() - 1; i++) {
 		peak.mzratio += bricksdatabase[intcomposition[i] - 1].getMass();
 
@@ -3284,15 +3297,8 @@ void cTheoreticalSpectrum::generateNTerminalFragmentIons(int maxcharge, int& pea
 		if (writedescription) {
 
 			peak.description = "";
-			if ((peptidetype == cyclic) || (peptidetype == cyclicpolyketide)) {
-				peak.description += to_string(splittingsites[rotationid].first + 1) + "-" + to_string(splittingsites[rotationid].second + 1) + "_";
-			}
-			if (peptidetype == branched) {
-				peak.description += to_string(peak.rotationid + 1) + "_";
-			}
-			if (peptidetype == branchcyclic) {
-				peak.description += to_string(splittingsites[rotationid].first + 1) + "-" + to_string(splittingsites[rotationid].second + 1) + "_";
-				peak.description += to_string(trotation->id + 1) + "_";
+			if ((peptidetype == cyclic) || (peptidetype == cyclicpolyketide) || (peptidetype == branched) || (peptidetype == branchcyclic)) {
+				peak.description += prefixstr;
 			}
 			if ((peptidetype == linearpolyketide) || (peptidetype == cyclicpolyketide)) {
 				peak.description += parameters->iondefinitions[fragmentiontype].name.substr(0, 2) + to_string(i + 1);
@@ -3425,30 +3431,45 @@ void cTheoreticalSpectrum::generateCTerminalFragmentIons(int maxcharge, int& pea
 	peak.scrambled = false;
 	peak.isotope = false;
 
-	switch (peptidetype)
-	{
-	case linear:
-		peak.rotationid = rotationid;
-		break;
-	case cyclic:
-		peak.rotationid = rotationid;
-		break;
-	case branched:
-		peak.rotationid = trotation->id;
-		break;
-	case branchcyclic:
-		peak.rotationid = rotationid*6 + trotation->id; // to do - potential bug
-		break;
-	case linearpolyketide:
-		peak.rotationid = rotationid;
-		break;
-	case cyclicpolyketide:
-		peak.rotationid = rotationid;
-		break;
-	case other:
-		break;
-	default:
-		break;
+	switch (peptidetype) {
+		case linear:
+			peak.rotationid = rotationid;
+			break;
+		case cyclic:
+			peak.rotationid = rotationid;
+			break;
+		case branched:
+			peak.rotationid = trotation->id;
+			break;
+		case branchcyclic:
+			peak.rotationid = rotationid*6 + trotation->id; // to do - potential bug
+			break;
+		case linearpolyketide:
+			peak.rotationid = rotationid;
+			break;
+		case cyclicpolyketide:
+			peak.rotationid = rotationid;
+			break;
+		case other:
+			break;
+		default:
+			break;
+	}
+
+	string prefixstr;
+	if (writedescription) {
+		if (peptidetype == cyclicpolyketide) {
+			prefixstr = to_string(splittingsites[rotationid].first + 1) + "-" + to_string(splittingsites[rotationid].second + 1) + "_";
+		}
+		//if (peptidetype == cyclic) {
+		//	prefixstr = to_string(splittingsites[rotationid].first + 1) + "-" + to_string(splittingsites[rotationid].second + 1) + "_";
+		//}
+		if (peptidetype == branched) {
+			prefixstr = to_string(peak.rotationid + 1) + "_";
+		}
+		if (peptidetype == branchcyclic) {
+			prefixstr = to_string(splittingsites[rotationid].first + 1) + "-" + to_string(splittingsites[rotationid].second + 1) + "_" + to_string(trotation->id + 1) + "_";
+		}
 	}
 
 	int order = -1;
@@ -3526,18 +3547,8 @@ void cTheoreticalSpectrum::generateCTerminalFragmentIons(int maxcharge, int& pea
 		if (writedescription) {
 
 			peak.description = "";
-			if (peptidetype == cyclicpolyketide) {
-				peak.description += to_string(splittingsites[rotationid].first + 1) + "-" + to_string(splittingsites[rotationid].second + 1) + "_";
-			}
-			//if (peptidetype == cyclic) {
-			//	peak.description += to_string(splittingsites[rotationid].first + 1) + "-" + to_string(splittingsites[rotationid].second + 1) + "_";
-			//}
-			if (peptidetype == branched) {
-				peak.description += to_string(peak.rotationid + 1) + "_";
-			}
-			if (peptidetype == branchcyclic) {
-				peak.description += to_string(splittingsites[rotationid].first + 1) + "-" + to_string(splittingsites[rotationid].second + 1) + "_";
-				peak.description += to_string(trotation->id + 1) + "_";
+			if ((peptidetype == cyclicpolyketide) /* || (peptidetype == cyclic) */ || (peptidetype == branched) || (peptidetype == branchcyclic)) {
+				peak.description += prefixstr;
 			}
 			if ((peptidetype == linearpolyketide) || (peptidetype == cyclicpolyketide)) {
 				peak.description += parameters->iondefinitions[fragmentiontype].name.substr(0, 2) + to_string((int)intcomposition.size() - i);
