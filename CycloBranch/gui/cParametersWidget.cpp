@@ -188,14 +188,6 @@ cParametersWidget::cParametersWidget(QWidget* parent) {
 	experimentalspectragridlayout->addWidget(fragmentmasserrortolerancelabel, 7, 0);
 	experimentalspectragridlayout->addWidget(fragmentmasserrortolerance, 7, 1);
 
-	//masserrortolerancefordeisotoping = new QDoubleSpinBox();
-	//masserrortolerancefordeisotoping->setToolTip("Enter the m/z error tolerance for deisotoping in MS mode or the fragment m/z error tolerance for deisotoping in MS/MS mode [ppm]\n(the same value like \"m/z Error Tolerance\" is recommended by default; 0 = the deisotoping is disabled).");
-	//masserrortolerancefordeisotoping->setDecimals(3);
-	//masserrortolerancefordeisotoping->setRange(0, 10000);
-	//masserrortolerancefordeisotoping->setSingleStep(1);
-	//masserrortolerancefordeisotoping->setSuffix(" ppm");
-	//experimentalspectraformlayout->addRow(tr("m/z Error Tolerance for Deisotoping: "), masserrortolerancefordeisotoping);
-
 	minimumrelativeintensitythreshold = new QDoubleSpinBox();
 	minimumrelativeintensitythreshold->setToolTip("Enter the minimum threshold of relative intensity in %. Peaks with relative intensities below the threshold are removed from the peaklist.");
 	minimumrelativeintensitythreshold->setDecimals(3);
@@ -628,7 +620,6 @@ cParametersWidget::~cParametersWidget() {
 	delete precursormasserrortolerance;
 	delete fragmentmasserrortolerancelabel;
 	delete fragmentmasserrortolerance;
-	//delete masserrortolerancefordeisotoping;
 	delete minimumrelativeintensitythresholdlabel;
 	delete minimumrelativeintensitythreshold;
 	delete minimumabsoluteintensitythresholdlabel;
@@ -831,7 +822,6 @@ void cParametersWidget::loadSettings() {
 		precursormasserrortolerance->setValue(settings.value("precursormasserrortolerance", 5.0).toDouble());
 		precursorcharge->setValue(settings.value("precursorcharge", 1).toInt());
 		fragmentmasserrortolerance->setValue(settings.value("fragmentmasserrortolerance", 5.0).toDouble());
-		//masserrortolerancefordeisotoping->setValue(settings.value("masserrortolerancefordeisotoping", 0).toDouble());
 		minimumrelativeintensitythreshold->setValue(settings.value("minimumrelativeintensitythreshold", 1).toDouble());
 		minimumabsoluteintensitythreshold->setValue(settings.value("minimumabsoluteintensitythreshold", 0).toUInt());
 		minimummz->setValue(settings.value("minimummz", 150).toDouble());
@@ -916,7 +906,6 @@ void cParametersWidget::saveSettings() {
 	settings.setValue("precursormasserrortolerance", precursormasserrortolerance->value());
 	settings.setValue("precursorcharge", precursorcharge->value());
 	settings.setValue("fragmentmasserrortolerance", fragmentmasserrortolerance->value());
-	//settings.setValue("masserrortolerancefordeisotoping", masserrortolerancefordeisotoping->value());
 	settings.setValue("minimumrelativeintensitythreshold", minimumrelativeintensitythreshold->value());
 	settings.setValue("minimumabsoluteintensitythreshold", minimumabsoluteintensitythreshold->value());
 	settings.setValue("minimummz", minimummz->value());
@@ -1102,7 +1091,6 @@ bool cParametersWidget::updateParameters() {
 	parameters.precursormasserrortolerance = precursormasserrortolerance->value();
 	parameters.precursorcharge = precursorcharge->value();
 	parameters.fragmentmasserrortolerance = fragmentmasserrortolerance->value();
-	//parameters.masserrortolerancefordeisotoping = masserrortolerancefordeisotoping->value();
 	parameters.minimumrelativeintensitythreshold = minimumrelativeintensitythreshold->value();
 	parameters.minimumabsoluteintensitythreshold = minimumabsoluteintensitythreshold->value();
 	parameters.minimummz = minimummz->value();
@@ -1214,7 +1202,6 @@ void cParametersWidget::restoreParameters() {
 	precursormasserrortolerance->setValue(parameters.precursormasserrortolerance);
 	precursorcharge->setValue(parameters.precursorcharge);
 	fragmentmasserrortolerance->setValue(parameters.fragmentmasserrortolerance);
-	//masserrortolerancefordeisotoping->setValue(parameters.masserrortolerancefordeisotoping);
 	minimumrelativeintensitythreshold->setValue(parameters.minimumrelativeintensitythreshold);
 	minimumabsoluteintensitythreshold->setValue(parameters.minimumabsoluteintensitythreshold);
 	minimummz->setValue(parameters.minimummz);
@@ -1270,7 +1257,7 @@ void cParametersWidget::restoreParameters() {
 
 	neutrallosstypes->getList()->clear();
 	for (int i = 0; i < (int)parameters.originalneutrallossesdefinitions.size(); i++) {
-		neutrallosstypes->getList()->addItem(parameters.originalneutrallossesdefinitions[i].summary.c_str());
+		neutrallosstypes->addItem(parameters.originalneutrallossesdefinitions[i].summary.c_str());
 	}
 
 	for (int i = 0; i < (int)parameters.originalneutrallossesfortheoreticalspectra.size(); i++) {
@@ -1393,7 +1380,6 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 		precursoradduct->setDisabled(false);
 		precursorcharge->setDisabled(false);
 		precursormasserrortolerance->setDisabled(false);
-		//masserrortolerancefordeisotoping->setDisabled(false);
 		fwhm->setDisabled(false);
 		brickdatabaseline->setDisabled(false);
 		brickdatabasebutton->setDisabled(false);
@@ -1430,7 +1416,6 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 		precursoradduct->setDisabled(false);
 		precursorcharge->setDisabled(false);
 		precursormasserrortolerance->setDisabled(false);
-		//masserrortolerancefordeisotoping->setDisabled(false);
 		fwhm->setDisabled(false);
 		brickdatabaseline->setDisabled(false);
 		brickdatabasebutton->setDisabled(false);
@@ -1467,7 +1452,6 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 		precursoradduct->setDisabled(false);
 		precursorcharge->setDisabled(false);
 		precursormasserrortolerance->setDisabled(false);
-		//masserrortolerancefordeisotoping->setDisabled(false);
 		fwhm->setDisabled(false);
 		brickdatabaseline->setDisabled(false);
 		brickdatabasebutton->setDisabled(false);
@@ -1504,7 +1488,6 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 		precursoradduct->setDisabled(true);
 		precursorcharge->setDisabled(false);
 		precursormasserrortolerance->setDisabled(true);
-		//masserrortolerancefordeisotoping->setDisabled(true);
 		fwhm->setDisabled(false);
 		brickdatabaseline->setDisabled(true);
 		brickdatabasebutton->setDisabled(true);

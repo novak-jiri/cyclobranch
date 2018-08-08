@@ -209,7 +209,7 @@ void generateCyclicLabelsToRight(bool nterminal, int rotationid, int rotationsta
 	double cumulativeangle;
 	string name;
 	int m;
-	int coverageindex = rotationid * (int)parameters->ionsfortheoreticalspectra.size() * ((int)parameters->neutrallossesfortheoreticalspectra.size() + 1);
+	int coverageindex = rotationid * (int)parameters->ionsfortheoreticalspectra.size() * (parameters->numberofgeneratedneutrallosses + 1);
 	bool skipiontype, skipneutralloss;
 
 	if ((visiblerotationid == -1) || ((parameters->peptidetype == cyclic) && (visiblerotationid == rotationid)) || ((parameters->peptidetype == cyclicpolyketide) && (visiblerotationid == rotationid)) || ((parameters->peptidetype == branchcyclic) && (visiblerotationid == rotationid/6))) {
@@ -294,7 +294,7 @@ void generateCyclicLabelsToLeft(bool nterminal, int rotationid, int rotationstar
 	double cumulativeangle;
 	string name;
 	int m;
-	int coverageindex = rotationid * (int)parameters->ionsfortheoreticalspectra.size() * ((int)parameters->neutrallossesfortheoreticalspectra.size() + 1);
+	int coverageindex = rotationid * (int)parameters->ionsfortheoreticalspectra.size() * (parameters->numberofgeneratedneutrallosses + 1);
 	bool skipiontype, skipneutralloss;
 
 	if ((visiblerotationid == -1) || ((parameters->peptidetype == cyclic) && (visiblerotationid == rotationid)) || ((parameters->peptidetype == cyclicpolyketide) && (visiblerotationid == rotationid)) || ((parameters->peptidetype == branchcyclic) && (visiblerotationid == rotationid/6))) {
@@ -526,7 +526,7 @@ void cCyclicWidget::paint(QPainter& painter) {
 		
 	if (parameters && !hidelabels && (theoreticalspectrum->getVisualCoverage().size() > 0)) {
 	
-		int half = (int)theoreticalspectrum->getVisualCoverage().size() / (int)parameters->ionsfortheoreticalspectra.size() / ((int)parameters->neutrallossesfortheoreticalspectra.size() + 1) / 2;
+		int half = (int)theoreticalspectrum->getVisualCoverage().size() / (int)parameters->ionsfortheoreticalspectra.size() / (parameters->numberofgeneratedneutrallosses + 1) / 2;
 		for (int i = 0; i < half; i++) {
 			generateCyclicLabelsToRight(true, i, i, 0, size - 1, size, labels, parameters, theoreticalspectrum, centerx, centery, radius, angle, linesize, cornerlinesize, visibleionseries, visibleneutralloss, visiblerotationid, -1, -1);
 		}

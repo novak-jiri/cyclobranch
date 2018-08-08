@@ -158,7 +158,6 @@ private:
 	QDoubleSpinBox* precursormasserrortolerance;
 	QLabel* fragmentmasserrortolerancelabel;
 	QDoubleSpinBox* fragmentmasserrortolerance;
-	//QDoubleSpinBox* masserrortolerancefordeisotoping;
 	QLabel* minimumrelativeintensitythresholdlabel;
 	QDoubleSpinBox* minimumrelativeintensitythreshold;
 	QLabel* minimumabsoluteintensitythresholdlabel;

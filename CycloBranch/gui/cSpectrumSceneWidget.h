@@ -205,6 +205,8 @@ private:
 	bool firstshow;
 	bool enablemousemzselection;
 
+	double maxmzoverhead;
+
 
 	double getMZRatioFromXPosition(int x, int w);
 

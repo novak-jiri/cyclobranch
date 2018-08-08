@@ -2164,6 +2164,7 @@ void cSpectrumDetailWidget::rawDataStateChanged(bool state) {
 	int targetid;
 	string s;
 
+	double maxmzoverhead = 5.0;
 	int maximum = 100;
 
 	QProgressDialog progress("Preparing profile data...", /*"Cancel"*/0, 0, maximum, this);
@@ -2182,12 +2183,11 @@ void cSpectrumDetailWidget::rawDataStateChanged(bool state) {
 
 			if ((parameters->mode == denovoengine) || (parameters->mode == databasesearch)) {
 				fileid = parameters->scannumber;
-				targetid = 0;
 			}
 			else {
 				fileid = rowid;
-				targetid = rowid - 1;
 			}
+			targetid = rowid - 1;
 
 			if ((targetid >= 0) && (targetid < rawdata->size())) {
 				if (state) {
@@ -2203,8 +2203,14 @@ void cSpectrumDetailWidget::rawDataStateChanged(bool state) {
 
 					progress.setValue(33);
 
-					(*rawdata)[targetid].normalizeIntenzityByValue(theoreticalspectrum->getExperimentalSpectrum().getMaximumAbsoluteIntensity());
+					(*rawdata)[targetid].sortbyMass();
+					(*rawdata)[targetid].normalizeIntenzityByValue(theoreticalspectrum->getExperimentalSpectrum().getMaximumAbsoluteIntensity() * 100.0 / theoreticalspectrum->getExperimentalSpectrum().getMaximumRelativeIntensity());
+					(*rawdata)[targetid].cropMinimumMZRatio(parameters->minimummz, parameters->fragmentmasserrortolerance);
 
+					if ((parameters->mode == denovoengine) || (parameters->mode == singlecomparison) || (parameters->mode == databasesearch)) {
+						(*rawdata)[targetid].cropMaximumMZRatio(charge(uncharge(parameters->precursormass, parameters->precursorcharge) + maxmzoverhead, (parameters->precursorcharge > 0) ? 1 : -1), parameters->precursormasserrortolerance);
+					}
+					
 					progress.setValue(66);
 				}
 				else {
@@ -2296,7 +2302,9 @@ void cSpectrumDetailWidget::rawDataStateChanged(bool state) {
 
 							QFile::remove(mgfname.c_str());
 
-							(*rawdata)[targetid].normalizeIntenzityByValue(theoreticalspectrum->getExperimentalSpectrum().getMaximumAbsoluteIntensity());
+							(*rawdata)[targetid].sortbyMass();
+							(*rawdata)[targetid].normalizeIntenzityByValue(theoreticalspectrum->getExperimentalSpectrum().getMaximumAbsoluteIntensity() * 100.0 / theoreticalspectrum->getExperimentalSpectrum().getMaximumRelativeIntensity());
+							(*rawdata)[targetid].cropMinimumMZRatio(parameters->minimummz, parameters->fragmentmasserrortolerance);
 						}
 					}
 				}

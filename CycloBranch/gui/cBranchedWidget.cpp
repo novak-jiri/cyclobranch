@@ -218,7 +218,7 @@ void cBranchedWidget::paint(QPainter& painter) {
 				continue;
 			}
 
-			coverageindex = i * (int)parameters->ionsfortheoreticalspectra.size() * ((int)parameters->neutrallossesfortheoreticalspectra.size() + 1);
+			coverageindex = i * (int)parameters->ionsfortheoreticalspectra.size() * (parameters->numberofgeneratedneutrallosses + 1);
 
 			for (int j = 0; j < (int)parameters->ionsfortheoreticalspectra.size(); j++) {
 

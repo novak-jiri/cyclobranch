@@ -12,7 +12,7 @@
 void generateBranchLabelsDown(bool nterminal, int rotationid, unordered_set<cIonLabel, hash_cIonLabel>& labels, cParameters* parameters, cTheoreticalSpectrum* theoreticalspectrum, int centerx, int topmargin, int horizontalstep, int verticalstep, string visibleionseries, string visibleneutralloss, int visiblerotationid, int branchstart) {
 	string name;
 	int k;
-	int coverageindex = rotationid * (int)parameters->ionsfortheoreticalspectra.size() * ((int)parameters->neutrallossesfortheoreticalspectra.size() + 1);
+	int coverageindex = rotationid * (int)parameters->ionsfortheoreticalspectra.size() * (parameters->numberofgeneratedneutrallosses + 1);
 	bool skipiontype, skipneutralloss;
 
 	if ((visiblerotationid == -1) || (visiblerotationid == rotationid/6)) {
@@ -47,7 +47,7 @@ void generateBranchLabelsDown(bool nterminal, int rotationid, unordered_set<cIon
 								if (j >= 0) {
 									name += "-" + parameters->neutrallossesdefinitions[parameters->neutrallossesfortheoreticalspectra[j]].summary;
 								}
-								insertLabel(labels, centerx + 25, topmargin + verticalstep * k + verticalstep / 2 - verticalstep / 8, name, false);
+								insertLabel(labels, centerx + 40, topmargin + verticalstep * k + verticalstep / 2 - verticalstep / 8, name, false);
 							}
 							k++;
 						}
@@ -70,7 +70,7 @@ void generateBranchLabelsUp(bool nterminal, int rotationid, unordered_set<cIonLa
 	string name;
 	int k;
 	int count;
-	int coverageindex = rotationid * (int)parameters->ionsfortheoreticalspectra.size() * ((int)parameters->neutrallossesfortheoreticalspectra.size() + 1);
+	int coverageindex = rotationid * (int)parameters->ionsfortheoreticalspectra.size() * (parameters->numberofgeneratedneutrallosses + 1);
 	bool skipiontype, skipneutralloss;
 
 	if ((visiblerotationid == -1) || (visiblerotationid == rotationid / 6)) {
@@ -106,7 +106,7 @@ void generateBranchLabelsUp(bool nterminal, int rotationid, unordered_set<cIonLa
 								if (j >= 0) {
 									name += "-" + parameters->neutrallossesdefinitions[parameters->neutrallossesfortheoreticalspectra[j]].summary;
 								}
-								insertLabel(labels, centerx - 25, topmargin + verticalstep * (count - k - 1) + verticalstep / 2, name, true);
+								insertLabel(labels, centerx - 40, topmargin + verticalstep * (count - k - 1) + verticalstep / 2, name, true);
 							}
 							k++;
 						}
@@ -335,7 +335,7 @@ void cBranchCyclicWidget::paint(QPainter& painter) {
 		}
 
 		int rotationid;
-		int half = (int)theoreticalspectrum->getVisualCoverage().size() / (int)parameters->ionsfortheoreticalspectra.size() / ((int)parameters->neutrallossesfortheoreticalspectra.size() + 1) / 2;
+		int half = (int)theoreticalspectrum->getVisualCoverage().size() / (int)parameters->ionsfortheoreticalspectra.size() / (parameters->numberofgeneratedneutrallosses + 1) / 2;
 		for (int i = 0; i < half; i++) {
 		
 			if ((visibletrotationid != -1) && (visibletrotationid != i % 6)) {

@@ -54,6 +54,8 @@ cSpectrumSceneWidget::cSpectrumSceneWidget(QWidget* parent) {
 	firstshow = true;
 	enablemousemzselection = true;
 
+	maxmzoverhead = 5.0;
+
 	scene = new QGraphicsScene(this);
 
 	zoomgroup = new QGraphicsItemGroup();
@@ -83,7 +85,7 @@ void cSpectrumSceneWidget::initialize(cParameters* parameters, cTheoreticalSpect
 	}
 
 	minmzratio = 0;
-	maxmzratio = theoreticalspectrum->getExperimentalSpectrum().getMaximumMZRatio();
+	maxmzratio = theoreticalspectrum->getExperimentalSpectrum().getMaximumMZRatio() + maxmzoverhead;
 	emit updateMZInterval(minmzratio, maxmzratio);
 
 	setScene(scene);
@@ -204,7 +206,7 @@ void cSpectrumSceneWidget::wheelEvent(QWheelEvent *event) {
 	else {
 		part = fabs(maxmzratio - minmzratio) / 8.0;
 		newmin = max(minmzratio - part, 0.0);
-		newmax = min(maxmzratio + part, theoreticalspectrum->getExperimentalSpectrum().getMaximumMZRatio());
+		newmax = min(maxmzratio + part, theoreticalspectrum->getExperimentalSpectrum().getMaximumMZRatio() + maxmzoverhead);
 	}
 
 	if (newmin < newmax) {
@@ -959,8 +961,8 @@ void cSpectrumSceneWidget::calculateMinMaxMZ() {
 	}
 	else {
 		if (pressedx > currentx) {
-			minmzratio = min(minmzratio + tmpmaxmzratio - tmpminmzratio, theoreticalspectrum->getExperimentalSpectrum().getMaximumMZRatio());
-			maxmzratio = min(maxmzratio + tmpmaxmzratio - tmpminmzratio, theoreticalspectrum->getExperimentalSpectrum().getMaximumMZRatio());
+			minmzratio = min(minmzratio + tmpmaxmzratio - tmpminmzratio, theoreticalspectrum->getExperimentalSpectrum().getMaximumMZRatio() + maxmzoverhead);
+			maxmzratio = min(maxmzratio + tmpmaxmzratio - tmpminmzratio, theoreticalspectrum->getExperimentalSpectrum().getMaximumMZRatio() + maxmzoverhead);
 		}
 		else {
 			minmzratio = max(0.0, minmzratio - tmpmaxmzratio + tmpminmzratio);
@@ -1017,7 +1019,7 @@ void cSpectrumSceneWidget::setMZInterval(double minmz, double maxmz) {
 	}
 
 	minmzratio = std::max(0.0, minmz);
-	maxmzratio = std::min(maxmz, theoreticalspectrum->getExperimentalSpectrum().getMaximumMZRatio());
+	maxmzratio = std::min(maxmz, theoreticalspectrum->getExperimentalSpectrum().getMaximumMZRatio() + maxmzoverhead);
 	emit updateMZInterval(minmzratio, maxmzratio);
 
 	redrawScene();
@@ -1026,7 +1028,7 @@ void cSpectrumSceneWidget::setMZInterval(double minmz, double maxmz) {
 
 void cSpectrumSceneWidget::resetMZInterval() {
 	minmzratio = 0;
-	maxmzratio = theoreticalspectrum->getExperimentalSpectrum().getMaximumMZRatio();
+	maxmzratio = theoreticalspectrum->getExperimentalSpectrum().getMaximumMZRatio() + maxmzoverhead;
 	emit updateMZInterval(minmzratio, maxmzratio);
 
 	redrawScene();

@@ -23,6 +23,17 @@ cImzML::~cImzML() {
 
 int cImzML::parse(string& filename, int& defaultmaxx, int& defaultmaxy, int& defaultpixelsizex, int& defaultpixelsizey, eVendorType& vendor) {
 
+	ifstream f;
+	bool good;
+
+	f.open(filename.c_str());
+	good = f.good();
+	f.close();
+
+	if (!good) {
+		return 0;
+	}
+
 	parser->parse(filename.c_str());
 	document = parser->getDocument();
 

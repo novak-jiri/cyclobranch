@@ -198,13 +198,6 @@ void cMainThread::run() {
 	int endscanno = ((parameters.mode == dereplication) || (parameters.mode == singlecomparison)) ? parameters.peaklistseries.size() : parameters.scannumber;
 	for (int i = startscanno; i < endscanno; i++) {
 		parameters.peaklistseries[i].sortbyMass();
-		parameters.peaklistseries[i].cropMinimumMZRatio(parameters.minimummz, parameters.fragmentmasserrortolerance);
-
-		if ((parameters.mode == denovoengine) || (parameters.mode == singlecomparison) || (parameters.mode == databasesearch)) {
-			parameters.peaklistseries[i].cropMaximumMZRatio(charge(uncharge(parameters.precursormass, parameters.precursorcharge), (parameters.precursorcharge > 0)?1:-1), parameters.precursormasserrortolerance);
-		}
-
-		parameters.peaklistseries[i].cropAbsoluteIntenzity(parameters.minimumabsoluteintensitythreshold);
 
 		if (parameters.peaklistseries[i].normalizeIntenzity() == -1) {
 			if ((parameters.mode == dereplication) || (parameters.mode == singlecomparison)) {
@@ -218,9 +211,14 @@ void cMainThread::run() {
 			}
 		}
 
-		parameters.peaklistseries[i].cropRelativeIntenzity(parameters.minimumrelativeintensitythreshold);
+		parameters.peaklistseries[i].cropMinimumMZRatio(parameters.minimummz, parameters.fragmentmasserrortolerance);
 
-		//parameters.peaklistseries[i].maxHighestPeaksInWindow(10, 50);
+		if ((parameters.mode == denovoengine) || (parameters.mode == singlecomparison) || (parameters.mode == databasesearch)) {
+			parameters.peaklistseries[i].cropMaximumMZRatio(charge(uncharge(parameters.precursormass, parameters.precursorcharge), (parameters.precursorcharge > 0)?1:-1), parameters.precursormasserrortolerance);
+		}
+
+		parameters.peaklistseries[i].cropAbsoluteIntenzity(parameters.minimumabsoluteintensitythreshold);
+		parameters.peaklistseries[i].cropRelativeIntenzity(parameters.minimumrelativeintensitythreshold);
 
 		if ((parameters.mode == denovoengine) || (parameters.mode == databasesearch) || ((parameters.mode == singlecomparison) && (parameters.peaklistseries.size() == 1))) {
 			*os << "Number of spectra in the file: " << parameters.peaklistseries.size() << endl;
@@ -230,9 +228,6 @@ void cMainThread::run() {
 			}
 			*os << endl;
 			*os << parameters.peaklistseries[i].print();
-			/*if (!parameters.generateisotopepattern && (parameters.masserrortolerancefordeisotoping > 0)) {
-				parameters.peaklistseries[i].removeIsotopes(parameters.precursorcharge, parameters.masserrortolerancefordeisotoping, this);
-			}*/
 		}
 	}
 

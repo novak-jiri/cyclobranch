@@ -152,12 +152,6 @@ public:
 
 
 	/**
-		\brief Mass error tolerance for deisotoping.
-    */
-    //double masserrortolerancefordeisotoping;
-
-
-	/**
 		\brief Minimum relative intensity threshold.
 	*/
 	double minimumrelativeintensitythreshold;
@@ -413,6 +407,12 @@ public:
 		\brief A vector of neutral losses generated in theoretical spectra.
 	*/
 	vector<int> neutrallossesfortheoreticalspectra;
+
+
+	/**
+		\brief A number of generated combinations of neutral losses.
+	*/
+	int numberofgeneratedneutrallosses;
 
 
 	/**

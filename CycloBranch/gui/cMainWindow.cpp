@@ -810,6 +810,7 @@ void cMainWindow::run() {
 				}
 				i--;
 
+				localparameters.convertprofiledata = true;
 				if (i > 0) {
 					QMessageBox::StandardButton reply;
 					string s = "The file '" + localparameters.peaklistfilename.substr(localparameters.peaklistfilename.rfind('/') + 1) + ".profile.1.csv'";
@@ -825,7 +826,6 @@ void cMainWindow::run() {
 
 					reply = QMessageBox::question(this, "Do you want to proceed the existing file(s) ?", s.c_str(), QMessageBox::Yes | QMessageBox::No);
 
-					localparameters.convertprofiledata = true;
 					if (reply == QMessageBox::Yes) {
 						localparameters.convertprofiledata = false;
 					}
@@ -1154,12 +1154,7 @@ void cMainWindow::reportSpectra() {
 	if (parameters.useprofiledata) {
 
 		if (parameters.peaklistfileformat == baf) {
-			if ((parameters.mode == denovoengine) || (parameters.mode == databasesearch)) {
-				rawdata.resize(1);
-			}
-			else {
-				rawdata.resize(theoreticalspectrumlist.size());
-			}
+			rawdata.resize(theoreticalspectrumlist.size());
 		}
 
 		if ((parameters.peaklistfileformat == imzML) && (parameters.mode == dereplication)) {
