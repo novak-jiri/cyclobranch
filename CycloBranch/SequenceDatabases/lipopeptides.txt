@@ -1,0 +1,5 @@
+branch-cyclic	amphomycin	C58H91N13O20	1289.6503324307	[Hpr]-[3Me-Asp]-[Asp]-[Gly]-[Asp]-[Gly]-[Dbu]-[Val]-[Pro]\([Dbu]-[Asp]-[iC13:1(3)]\)				CSID: 34450867
+branch-cyclic	anidulafungin	C58H73N7O17	1139.5062939554	[Thr]-[4OH-Pro]-[DHHT]-[Thr]-[3OH-4Me-Pro]\([C5H10N2O3]-[PTCA]\)				CSID: 145752
+branch-cyclic	caspofungin	C52H88N10O15	1092.6430622083	[Thr]-[4OH-Pro]-[DHHT]-[3OH-Orn]-[3OH-Pro]\([C7H16N4O2]-[C16H30O]\)				CSID: 411774
+branch-cyclic	daptomycin	C72H101N17O26	1619.7103665051	[Gly]-[Orn]-[Asp]-[Ala]-[Asp]-[Gly]-[Ser]-[3Me-Glu]-[Kyn]\([Thr]-[Asp]-[Asn]-[Trp]-[C10:0]\)				CSID: 10482098
+branch-cyclic	micafungin	C56H71N9O23S	1269.4383503242	[Thr]-[4OH-Pro]-[C10H11NO8S]-[OH-Gln]-[3OH-4Me-Pro]\([C5H10N2O3]-[PPOBA]\)				CSID: 419105
