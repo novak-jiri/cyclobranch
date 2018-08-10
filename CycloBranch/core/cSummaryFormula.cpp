@@ -254,22 +254,32 @@ void cSummaryFormula::reduceIsotopeProfile(cPeaksList& isotopeprofile, cPeaksLis
 	// reduce peaks
 	reducedprofile.clear();
 	double relsum;
+	int isize;
 	for (int i = 0; i < clusters.size(); i++) {
-		if (clusters[i].size() == 0) {
+		isize = clusters[i].size();
+
+		if (isize == 0) {
 			continue;
 		}
 		
 		cPeak peak;
 		relsum = 0;
-		for (int j = 0; j < clusters[i].size(); j++) {
-			peak.mzratio += clusters[i][j].mzratio*clusters[i][j].absoluteintensity;
-			relsum += clusters[i][j].absoluteintensity;
 
+		for (int j = 0; j < isize; j++) {
+			relsum += clusters[i][j].absoluteintensity;
+		}
+
+		for (int j = 0; j < isize; j++) {
+			peak.mzratio += clusters[i][j].mzratio*clusters[i][j].absoluteintensity;
 			peak.absoluteintensity += clusters[i][j].absoluteintensity;
 			//peak.relativeintensity += clusters[i][j].relativeintensity;
-
-			peak.description += clusters[i][j].description + ";";
+			peak.description += clusters[i][j].description;
+			if (isize > 1) {
+				peak.description += "[" + QString::number(clusters[i][j].absoluteintensity / relsum * 100.0, 'f', 2).toStdString() + "%]";
+			}
+			peak.description += ";";
 		}
+
 		peak.mzratio /= relsum;
 		reducedprofile.add(peak);
 	}
