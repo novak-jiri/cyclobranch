@@ -17,6 +17,8 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QProgressDialog>
+#include <QClipboard>
+#include <QApplication>
 
 
 cSpectrumDetailWidget::cSpectrumDetailWidget() {
@@ -1357,6 +1359,34 @@ void cSpectrumDetailWidget::keyPressEvent(QKeyEvent *event) {
 	if ((event->key() == Qt::Key_Enter) || (event->key() == Qt::Key_Return)) {
 		setMZInterval();
     }
+
+	if ((event->modifiers() == Qt::ControlModifier) && (event->key() == Qt::Key_C)) {
+		QModelIndexList selectedindexes = peakstable->selectionModel()->selectedIndexes();
+		QStandardItem* item;
+
+		QString selectedtext;
+		string itemtext;
+
+		int selectedcount = selectedindexes.count();
+		for (int i = 0; i < selectedcount; i++) {
+			if (i > 0) {
+				if (proxymodel->mapToSource(selectedindexes[i - 1]).row() != proxymodel->mapToSource(selectedindexes[i]).row()) {
+					selectedtext += "\n";
+				}
+				else {
+					selectedtext += "\t";
+				}
+			}
+
+			item = peakstablemodel->itemFromIndex(proxymodel->mapToSource(selectedindexes[i]));
+			if (item) {
+				itemtext = item->text().toStdString();
+				selectedtext += stripHTML(itemtext).c_str();
+			}
+		}
+		selectedtext += "\n";
+		QApplication::clipboard()->setText(selectedtext);
+	}
 
 	event->accept();
 }
