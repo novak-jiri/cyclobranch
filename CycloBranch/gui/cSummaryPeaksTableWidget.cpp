@@ -18,6 +18,7 @@
 #include <QTextStream>
 #include <QMenuBar>
 #include <QMenu>
+#include <QInputDialog>
 
 
 cSummaryPeaksTableWidget::cSummaryPeaksTableWidget(QWidget* parent) {
@@ -1061,6 +1062,21 @@ void cSummaryPeaksTableWidget::exportStatistics() {
 	QString filename = QFileDialog::getSaveFileName(this, tr("Export Statistics"), lastdirexportstatisticstocsv, tr("Files (*.csv)"));
 
 	if (!filename.isEmpty()) {
+
+		int minconsecutivescans = 1;
+
+		bool okbutton;
+		int inputvalue;
+
+		if (parameters->mode == dereplication) {
+			if (!((parameters->peaklistfileformat == mis) || (parameters->peaklistfileformat == imzML))) {
+				inputvalue = QInputDialog::getInt(this, tr("Export Statistics"), tr("Minimum Number of Consecutive Scans"), 1, 1, 10000, 1, &okbutton);
+				if (okbutton) {
+					minconsecutivescans = inputvalue;
+				}
+			}
+		}
+
 		lastdirexportstatisticstocsv = filename;
 
 		QProgressDialog progress("Exporting statistics to CSV file...", "Cancel", 0, proxymodel->rowCount(), this);
@@ -1320,10 +1336,14 @@ void cSummaryPeaksTableWidget::exportStatistics() {
 		double absintmax, absintavg, absintmed, absintcur;
 		double scoremin, scoreavg, scoremed, scoremax, scorecur;
 		double fdrmin, fdravg, fdrmed, fdrmax, fdrcur;
+		vector<int> idvector;
 		vector<double> relintmedianvector;
 		vector<double> absintmedianvector;
 		vector<double> scoremedianvector;
 		vector<double> fdrmedianvector;
+
+		int consecutiveids;
+		bool printline;
 
 		if (parameters->mode == dereplication) {
 
@@ -1484,6 +1504,8 @@ void cSummaryPeaksTableWidget::exportStatistics() {
 				ymin = INT32_MAX;
 				ymax = 0;
 
+				idvector.clear();
+
 				relintmax = 0;
 				relintavg = 0;
 				relintmedianvector.clear();
@@ -1501,6 +1523,7 @@ void cSummaryPeaksTableWidget::exportStatistics() {
 						if (item->data(Qt::DisplayRole).toInt() > idmax) {
 							idmax = item->data(Qt::DisplayRole).toInt();
 						}
+						idvector.push_back(item->data(Qt::DisplayRole).toInt());
 					}
 
 					if ((parameters->peaklistfileformat == mis) || (parameters->peaklistfileformat == imzML)) {
@@ -1554,19 +1577,44 @@ void cSummaryPeaksTableWidget::exportStatistics() {
 				relintmed = median(relintmedianvector);
 				absintmed = median(absintmedianvector);
 
-				out << "\"" << it->first.name.c_str() << "\",\"" << it->first.iontype.c_str() << "\",\"" << it->second.size() << "\",\"" << it->first.theoreticalmz.c_str() << "\",\"";
+				printline = true;
 
-				stringstream ss;
-				ss << std::fixed << std::setprecision(2) << relintavg << "\",\"" << relintmed << "\",\"" << relintmax << "\",\"";
-				ss << std::fixed << std::setprecision(0) << absintavg << "\",\"" << absintmed << "\",\"" << absintmax << "\",\"";
-				out << ss.str().c_str();
-
-				out << idmin << "\",\"" << idmax << "\",\"";
-				if ((parameters->peaklistfileformat == mis) || (parameters->peaklistfileformat == imzML)) {
-					out << xmin << "\",\"" << xmax << "\",\"" << ymin << "\",\"" << ymax << "\",\"";
+				if (!((parameters->peaklistfileformat == mis) || (parameters->peaklistfileformat == imzML))) {
+					if (minconsecutivescans > 1) {
+						sort(idvector.begin(), idvector.end());
+						consecutiveids = 1;
+						printline = false;
+						for (int i = 1; i < (int)idvector.size(); i++) {
+							if (idvector[i] == idvector[i - 1] + 1) {
+								consecutiveids++;
+							}
+							else {
+								consecutiveids = 1;
+							}
+							if (consecutiveids > minconsecutivescans) {
+								printline = true;
+								break;
+							}
+						}
+					}
 				}
 
-				out << stripHTML(it->first.summaryformula).c_str() << "\"" << endl;
+				if (printline) {
+
+					out << "\"" << it->first.name.c_str() << "\",\"" << it->first.iontype.c_str() << "\",\"" << it->second.size() << "\",\"" << it->first.theoreticalmz.c_str() << "\",\"";
+
+					stringstream ss;
+					ss << std::fixed << std::setprecision(2) << relintavg << "\",\"" << relintmed << "\",\"" << relintmax << "\",\"";
+					ss << std::fixed << std::setprecision(0) << absintavg << "\",\"" << absintmed << "\",\"" << absintmax << "\",\"";
+					out << ss.str().c_str();
+
+					out << idmin << "\",\"" << idmax << "\",\"";
+					if ((parameters->peaklistfileformat == mis) || (parameters->peaklistfileformat == imzML)) {
+						out << xmin << "\",\"" << xmax << "\",\"" << ymin << "\",\"" << ymax << "\",\"";
+					}
+
+					out << stripHTML(it->first.summaryformula).c_str() << "\"" << endl;
+				}
 
 			}
 
