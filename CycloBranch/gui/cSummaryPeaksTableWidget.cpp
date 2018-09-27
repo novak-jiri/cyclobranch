@@ -1063,16 +1063,21 @@ void cSummaryPeaksTableWidget::exportStatistics() {
 
 	if (!filename.isEmpty()) {
 
-		int minconsecutivescans = 1;
+		int minimumfeaturesize = 1;
+		int allionsmustbepresent = 1;
 
 		bool okbutton;
 		int inputvalue;
 
 		if (parameters->mode == dereplication) {
 			if (!((parameters->peaklistfileformat == mis) || (parameters->peaklistfileformat == imzML))) {
-				inputvalue = QInputDialog::getInt(this, tr("Export Statistics"), tr("Minimum Number of Consecutive Scans"), 1, 1, 10000, 1, &okbutton);
+				inputvalue = QInputDialog::getInt(this, tr("Export Statistics"), tr("Minimum feature size"), 1, 1, 10000, 1, &okbutton);
 				if (okbutton) {
-					minconsecutivescans = inputvalue;
+					minimumfeaturesize = inputvalue;
+				}
+				inputvalue = QInputDialog::getInt(this, tr("Export Statistics"), tr("Must all the ions be present ?"), 1, 0, 1, 1, &okbutton);
+				if (okbutton) {
+					allionsmustbepresent = inputvalue;
 				}
 			}
 		}
@@ -1264,7 +1269,7 @@ void cSummaryPeaksTableWidget::exportStatistics() {
 					ionmapms.insert(std::pair< cSummaryTableKeyMS, vector<int> >(keyms, v));
 				}
 
-				if (parameters->generateisotopepattern) {
+				//if (parameters->generateisotopepattern) {
 					obj = envelopemapms.find(keyms);
 					if (obj != envelopemapms.end()) {
 						obj->second.push_back(i);
@@ -1274,7 +1279,7 @@ void cSummaryPeaksTableWidget::exportStatistics() {
 						v.push_back(i);
 						envelopemapms.insert(std::pair< cSummaryTableKeyMS, vector<int> >(keyms, v));
 					}
-				}
+				//}
 
 			}
 			else {
@@ -1580,18 +1585,48 @@ void cSummaryPeaksTableWidget::exportStatistics() {
 				printline = true;
 
 				if (!((parameters->peaklistfileformat == mis) || (parameters->peaklistfileformat == imzML))) {
-					if (minconsecutivescans > 1) {
+					if (minimumfeaturesize > 1) {
 						sort(idvector.begin(), idvector.end());
 						consecutiveids = 1;
 						printline = false;
 						for (int i = 1; i < (int)idvector.size(); i++) {
 							if (idvector[i] == idvector[i - 1] + 1) {
-								consecutiveids++;
+
+								bool increment = true;
+
+								if (allionsmustbepresent) {
+									for (int j = 0; j < (int)parameters->ionsfortheoreticalspectra.size(); j++) {
+										keyms.clear();
+										keyms.id = to_string(idvector[i]);
+										// to do - fix for charge > 1
+										keyms.iontype = parameters->iondefinitions[parameters->ionsfortheoreticalspectra[j]].name.substr(0, parameters->iondefinitions[parameters->ionsfortheoreticalspectra[j]].name.size() - 1) + " 1+";
+										keyms.name = it->first.name;
+										keyms.reference = it->first.reference;
+
+										auto obj = envelopemapms.find(keyms);
+										if (obj != envelopemapms.end()) {
+											keyms.id = to_string(idvector[i - 1]);
+											obj = envelopemapms.find(keyms);
+											if (obj == envelopemapms.end()) {
+												increment = false;
+												break;
+											}
+										}
+										else {
+											increment = false;
+											break;
+										}
+									}
+								}
+
+								if (increment) {
+									consecutiveids++;
+								}
 							}
 							else {
 								consecutiveids = 1;
 							}
-							if (consecutiveids > minconsecutivescans) {
+							if (consecutiveids > minimumfeaturesize) {
 								printline = true;
 								break;
 							}
@@ -1600,7 +1635,6 @@ void cSummaryPeaksTableWidget::exportStatistics() {
 				}
 
 				if (printline) {
-
 					out << "\"" << it->first.name.c_str() << "\",\"" << it->first.iontype.c_str() << "\",\"" << it->second.size() << "\",\"" << it->first.theoreticalmz.c_str() << "\",\"";
 
 					stringstream ss;
@@ -1613,7 +1647,17 @@ void cSummaryPeaksTableWidget::exportStatistics() {
 						out << xmin << "\",\"" << xmax << "\",\"" << ymin << "\",\"" << ymax << "\",\"";
 					}
 
-					out << stripHTML(it->first.summaryformula).c_str() << "\"" << endl;
+					out << stripHTML(it->first.summaryformula).c_str() << "\"";
+
+					if (!((parameters->peaklistfileformat == mis) || (parameters->peaklistfileformat == imzML))) {
+						out << ",\"scans:";
+						for (int i = 0; i < (int)idvector.size(); i++) {
+							out << " " << QVariant(idvector[i]).toString();
+						}
+						out << "\"";
+					}
+					
+					out << endl;
 				}
 
 			}
