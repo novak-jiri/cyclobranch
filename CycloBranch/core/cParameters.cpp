@@ -48,6 +48,8 @@ void cParameters::clear() {
 	reportunmatchedtheoreticalpeaks = false;
 	generateisotopepattern = false;
 	minimumpatternsize = 1;
+	minimumfeaturesize = 1;
+	allionsmustbepresent = false;
 	cyclicnterminus = false;
 	cycliccterminus = false;
 	enablescrambling = false;
@@ -942,6 +944,12 @@ string cParameters::printToString() {
 	
 	s += "Minimum Pattern Size: " + to_string(minimumpatternsize) + "\n";
 
+	s += "Minimum Feature Size: " + to_string(minimumfeaturesize) + "\n";
+
+	s += "All Ions Must be Present: ";
+	s += allionsmustbepresent ? "on" : "off";
+	s += "\n";
+
 	s += "Searched Sequence: " + originalsearchedsequence + "\n";
 	s += "N-terminal Modification: " + searchedsequenceNtermmodif + "\n";
 	s += "C-terminal Modification: " + searchedsequenceCtermmodif + "\n";
@@ -1207,6 +1215,8 @@ void cParameters::store(ofstream& os) {
 	os.write((char *)&reportunmatchedtheoreticalpeaks, sizeof(bool));
 	os.write((char *)&generateisotopepattern, sizeof(bool));
 	os.write((char *)&minimumpatternsize, sizeof(int));
+	os.write((char *)&minimumfeaturesize, sizeof(int));
+	os.write((char *)&allionsmustbepresent, sizeof(bool));
 	os.write((char *)&cyclicnterminus, sizeof(bool));
 	os.write((char *)&cycliccterminus, sizeof(bool));
 	os.write((char *)&enablescrambling, sizeof(bool));
@@ -1334,6 +1344,8 @@ void cParameters::load(ifstream& is) {
 	is.read((char *)&reportunmatchedtheoreticalpeaks, sizeof(bool));
 	is.read((char *)&generateisotopepattern, sizeof(bool));
 	is.read((char *)&minimumpatternsize, sizeof(int));
+	is.read((char *)&minimumfeaturesize, sizeof(int));
+	is.read((char *)&allionsmustbepresent, sizeof(bool));
 	is.read((char *)&cyclicnterminus, sizeof(bool));
 	is.read((char *)&cycliccterminus, sizeof(bool));
 	is.read((char *)&enablescrambling, sizeof(bool));

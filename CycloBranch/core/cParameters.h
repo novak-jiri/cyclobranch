@@ -272,6 +272,18 @@ public:
 
 
 	/**
+		\brief The minimum number of consecutive scans in which a compound must be identified to be reported (LC-MS data only).
+	*/
+	int minimumfeaturesize;
+
+
+	/**
+		\brief If true, all selected ion types must be detected for a compound in a spectrum to be reported.
+	*/
+	bool allionsmustbepresent;
+
+
+	/**
 		\brief True when the N-terminus of a linear peptide is cyclized.
     */
 	bool cyclicnterminus;

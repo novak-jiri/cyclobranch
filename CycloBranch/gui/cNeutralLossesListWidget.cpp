@@ -13,8 +13,8 @@ cNeutralLossesListWidget::cNeutralLossesListWidget(QObject* parent) {
 	hbox = new QHBoxLayout();
 
 	list = new QListWidget();
-	list->setMinimumHeight(240);
-	list->setMaximumHeight(240);
+	list->setMinimumHeight(180);
+	list->setMaximumHeight(180);
 	list->setSelectionMode(QAbstractItemView::MultiSelection);
 
 	selectallbutton = new QPushButton("Select All");
