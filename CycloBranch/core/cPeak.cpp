@@ -38,6 +38,7 @@ cPeak& cPeak::operator=(const cPeak& peak) {
 	rotationid = peak.rotationid;
 	seriesid = peak.seriesid;
 	groupid = peak.groupid;
+	compoundid = peak.compoundid;
 
 	return *this;
 }
@@ -70,6 +71,7 @@ void cPeak::clear() {
 	rotationid = -1;
 	seriesid = -1;
 	groupid = -1;
+	compoundid = -1;
 }
 
 
@@ -100,6 +102,7 @@ void cPeak::store(ofstream& os) {
 	os.write((char *)&rotationid, sizeof(int));
 	os.write((char *)&seriesid, sizeof(int));
 	os.write((char *)&groupid, sizeof(int));
+	os.write((char *)&compoundid, sizeof(int));
 	os.write((char *)&isotope, sizeof(bool));
 	os.write((char *)&removeme, sizeof(bool));
 	os.write((char *)&scrambled, sizeof(bool));
@@ -129,6 +132,7 @@ void cPeak::load(ifstream& is) {
 	is.read((char *)&rotationid, sizeof(int));
 	is.read((char *)&seriesid, sizeof(int));
 	is.read((char *)&groupid, sizeof(int));
+	is.read((char *)&compoundid, sizeof(int));
 	is.read((char *)&isotope, sizeof(bool));
 	is.read((char *)&removeme, sizeof(bool));
 	is.read((char *)&scrambled, sizeof(bool));

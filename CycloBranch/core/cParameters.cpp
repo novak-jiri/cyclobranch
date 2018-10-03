@@ -946,7 +946,7 @@ string cParameters::printToString() {
 
 	s += "Minimum Feature Size: " + to_string(minimumfeaturesize) + "\n";
 
-	s += "All Ions Must be Present: ";
+	s += "All Ions Must be Annotated: ";
 	s += allionsmustbepresent ? "on" : "off";
 	s += "\n";
 

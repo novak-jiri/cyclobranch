@@ -953,6 +953,16 @@ void cTheoreticalSpectrum::removeUnmatchedIsotopePatterns(cPeaksList& theoretica
 }
 
 
+void cTheoreticalSpectrum::removeUnmatchedCompoundsSimpleMode(cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks) {
+	// to do
+}
+
+
+void cTheoreticalSpectrum::removeUnmatchedCompoundsAdvancedMode(cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks) {
+	// to do
+}
+
+
 void cTheoreticalSpectrum::calculateEnvelopeScores(cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks) {
 	
 	// theoreticalpeaks must not be modified here
@@ -2795,6 +2805,7 @@ void cTheoreticalSpectrum::generateMSSpectrum(bool writedescription) {
 	for (int i = 0; i < parameters->sequencedatabase.size(); i++) {
 
 		peak.clear();
+		peak.compoundid = i;
 		peak.isotope = false;
 
 		formula.clear();
@@ -2925,6 +2936,7 @@ void cTheoreticalSpectrum::generateFineMSSpectrum() {
 					for (int p = 0; p < isotopepattern.size(); p++) {
 						isotopepattern[p].description = description + isotopepattern[p].description + "): ";
 						isotopepattern[p].groupid = groupid;
+						isotopepattern[p].compoundid = i;
 						isotopepattern[p].decoy = parameters->sequencedatabase[i].isDecoy();
 						addPeakToList(isotopepattern[p], theoreticalpeaksrealsize);
 					}
@@ -2954,9 +2966,15 @@ void cTheoreticalSpectrum::compareMSSpectrum(cPeaksList& peaklist, cTheoreticalS
 
 	unmatchedpeaksinmatchedpatterns.clear();
 	if (!parameters->generateisotopepattern) {
+		if (parameters->allionsmustbepresent) {
+			removeUnmatchedCompoundsSimpleMode(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks);
+		}
 		removeUnmatchedMetalIsotopes(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks);
 	}
 	else {
+		if (parameters->allionsmustbepresent) {
+			removeUnmatchedCompoundsAdvancedMode(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks);
+		}
 		removeUnmatchedIsotopePatterns(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks, unmatchedpeaksinmatchedpatterns, true);
 		targetscores.clear();
 		decoyscores.clear();

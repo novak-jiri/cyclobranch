@@ -278,7 +278,7 @@ public:
 
 
 	/**
-		\brief If true, all selected ion types must be detected for a compound in a spectrum to be reported.
+		\brief If true, all ions must be annotated in a spectrum for a compound to be reported.
 	*/
 	bool allionsmustbepresent;
 

@@ -472,9 +472,9 @@ cParametersWidget::cParametersWidget(QWidget* parent) {
 	theoreticalspectragridlayout->addWidget(minimumfeaturesize, 10, 1);
 
 	allionsmustbepresent = new QCheckBox();
-	allionsmustbepresent->setToolTip("If enabled, all selected ion types must be present in a spectrum for a compound to be reported.");
+	allionsmustbepresent->setToolTip("If enabled, all ions must be annotated in a spectrum for a compound to be reported.");
 	allionsmustbepresent->setFixedWidth(rightdefaultwidth);
-	allionsmustbepresentlabel = new QLabel("All Ions Must be Present:");
+	allionsmustbepresentlabel = new QLabel("All Ions Must be Annotated:");
 	theoreticalspectragridlayout->addWidget(allionsmustbepresentlabel, 11, 0);
 	theoreticalspectragridlayout->addWidget(allionsmustbepresent, 11, 1);
 
