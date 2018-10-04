@@ -962,7 +962,7 @@ void cTheoreticalSpectrum::removeUnmatchedCompounds(cPeaksList& theoreticalpeaks
 	int stop = 0;
 	int currid = theoreticalpeaks[0].compoundid;
 	bool matched = true;
-	for (int i = 1; i < theoreticalpeaksrealsize; i++) {
+	for (int i = 0; i < theoreticalpeaksrealsize; i++) {
 		if (currid != theoreticalpeaks[i].compoundid) {
 			if (!matched) {
 				for (int j = start; j <= stop; j++) {
@@ -978,16 +978,13 @@ void cTheoreticalSpectrum::removeUnmatchedCompounds(cPeaksList& theoreticalpeaks
 			
 			currid = theoreticalpeaks[i].compoundid;
 			start = i;
-			stop = i;
 			matched = true;
 		}
-		else {
-			if (!theoreticalpeaks[i].isotope && (theoreticalpeaks[i].matched == 0)) {
-				matched = false;
-			}
 
-			stop = i;
+		if (!theoreticalpeaks[i].isotope && (theoreticalpeaks[i].matched == 0)) {
+			matched = false;
 		}
+		stop = i;
 	}
 
 	if (!matched) {
