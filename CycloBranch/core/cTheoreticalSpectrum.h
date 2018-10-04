@@ -167,11 +167,8 @@ class cTheoreticalSpectrum {
 	// remove unmatched isotope patterns
 	void removeUnmatchedIsotopePatterns(cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks, cPeaksList& outputtheoreticalpeaks, bool storeunmatchedpeaks);
 
-	// remove unmatched compounds (simple mode)
-	void removeUnmatchedCompoundsSimpleMode(cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks);
-
-	// remove unmatched compounds (advanced mode)
-	void removeUnmatchedCompoundsAdvancedMode(cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks);
+	// remove unmatched compounds
+	void removeUnmatchedCompounds(cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks);
 
 	// calculate envelope scores
 	void calculateEnvelopeScores(cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks);

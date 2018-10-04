@@ -834,3 +834,58 @@ void cPeaksList::fillOrderIDs() {
 	}
 }
 
+
+void cPeaksList::setIsotopeFlags(bool value) {
+	int size = (int)peaks.size();
+	for (int i = 0; i < size; i++) {
+		peaks[i].isotope = value;
+	}
+}
+
+
+void cPeaksList::markIsotopes() {
+	int size = (int)peaks.size();
+	if (size == 0) {
+		return;
+	}
+
+	int groupid = peaks[0].groupid;
+	int start = 0;
+	int stop = 0;
+	int maximumintensityid = 0;
+
+	for (int i = 1; i < size; i++) {
+		if (groupid != peaks[i].groupid) {
+			for (int j = start; j <= stop; j++) {
+				if (j == maximumintensityid) {
+					peaks[j].isotope = false;
+				}
+				else {
+					peaks[j].isotope = true;
+				}
+			}
+
+			groupid = peaks[i].groupid;
+			start = i;
+			stop = i;
+			maximumintensityid = i;
+		}
+		else {
+			if (peaks[i].relativeintensity > peaks[maximumintensityid].relativeintensity) {
+				maximumintensityid = i;
+			}
+
+			stop = i;
+		}
+	}
+
+	for (int j = start; j <= stop; j++) {
+		if (j == maximumintensityid) {
+			peaks[j].isotope = false;
+		}
+		else {
+			peaks[j].isotope = true;
+		}
+	}
+}
+

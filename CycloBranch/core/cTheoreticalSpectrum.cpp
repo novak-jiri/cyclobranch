@@ -953,7 +953,7 @@ void cTheoreticalSpectrum::removeUnmatchedIsotopePatterns(cPeaksList& theoretica
 }
 
 
-void cTheoreticalSpectrum::removeUnmatchedCompoundsSimpleMode(cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks) {
+void cTheoreticalSpectrum::removeUnmatchedCompounds(cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks) {
 	if (theoreticalpeaksrealsize == 0) {
 		return;
 	}
@@ -1001,11 +1001,6 @@ void cTheoreticalSpectrum::removeUnmatchedCompoundsSimpleMode(cPeaksList& theore
 			}
 		}
 	}
-}
-
-
-void cTheoreticalSpectrum::removeUnmatchedCompoundsAdvancedMode(cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks) {
-	// to do
 }
 
 
@@ -3013,13 +3008,15 @@ void cTheoreticalSpectrum::compareMSSpectrum(cPeaksList& peaklist, cTheoreticalS
 	unmatchedpeaksinmatchedpatterns.clear();
 	if (!parameters->generateisotopepattern) {
 		if (parameters->allionsmustbepresent) {
-			removeUnmatchedCompoundsSimpleMode(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks);
+			removeUnmatchedCompounds(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks);
 		}
 		removeUnmatchedMetalIsotopes(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks);
 	}
 	else {
 		if (parameters->allionsmustbepresent) {
-			removeUnmatchedCompoundsAdvancedMode(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks);
+			tsfullpeaklist->markIsotopes();
+			removeUnmatchedCompounds(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks);
+			tsfullpeaklist->setIsotopeFlags(false);
 		}
 		removeUnmatchedIsotopePatterns(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks, unmatchedpeaksinmatchedpatterns, true);
 		targetscores.clear();
