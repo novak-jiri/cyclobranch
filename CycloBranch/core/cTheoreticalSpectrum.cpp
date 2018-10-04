@@ -954,7 +954,53 @@ void cTheoreticalSpectrum::removeUnmatchedIsotopePatterns(cPeaksList& theoretica
 
 
 void cTheoreticalSpectrum::removeUnmatchedCompoundsSimpleMode(cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks) {
-	// to do
+	if (theoreticalpeaksrealsize == 0) {
+		return;
+	}
+
+	int start = 0;
+	int stop = 0;
+	int currid = theoreticalpeaks[0].compoundid;
+	bool matched = true;
+	for (int i = 1; i < theoreticalpeaksrealsize; i++) {
+		if (currid != theoreticalpeaks[i].compoundid) {
+			if (!matched) {
+				for (int j = start; j <= stop; j++) {
+					if (theoreticalpeaks[j].matched > 0) {
+						experimentalmatches[theoreticalpeaks[j].matchedid].erase(experimentalmatches[theoreticalpeaks[j].matchedid].find(j));
+						experimentalpeaks[theoreticalpeaks[j].matchedid].matched--;
+
+						theoreticalpeaks[j].matched--;
+						theoreticalpeaks[j].matchedid = -1;
+					}
+				}
+			}
+			
+			currid = theoreticalpeaks[i].compoundid;
+			start = i;
+			stop = i;
+			matched = true;
+		}
+		else {
+			if (!theoreticalpeaks[i].isotope && (theoreticalpeaks[i].matched == 0)) {
+				matched = false;
+			}
+
+			stop = i;
+		}
+	}
+
+	if (!matched) {
+		for (int j = start; j <= stop; j++) {
+			if (theoreticalpeaks[j].matched > 0) {
+				experimentalmatches[theoreticalpeaks[j].matchedid].erase(experimentalmatches[theoreticalpeaks[j].matchedid].find(j));
+				experimentalpeaks[theoreticalpeaks[j].matchedid].matched--;
+
+				theoreticalpeaks[j].matched--;
+				theoreticalpeaks[j].matchedid = -1;
+			}
+		}
+	}
 }
 
 
