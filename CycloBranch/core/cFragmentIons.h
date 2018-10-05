@@ -986,6 +986,7 @@ enum eFragmentIonType {
 	ms_3MFe4H,
 	ms_3M2Fe7H,
 	ms_NH4plus,
+	ms_Clminus,
 	ms_plus,
 	ms_minus,
 	ms_liplus,

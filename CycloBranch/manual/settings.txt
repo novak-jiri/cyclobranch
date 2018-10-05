@@ -416,6 +416,7 @@ Buttons:
 <li> [3M+Fe-4H]-
 <li> [3M+2Fe-7H]-
 <li> [M+NH4]+
+<li> [M+Cl]-
 <li> [M]+
 <li> [M]-
 <li> [M+Li]+

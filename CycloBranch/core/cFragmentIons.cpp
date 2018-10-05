@@ -1855,6 +1855,15 @@ void cFragmentIons::recalculateFragments(bool cyclicnterminus, bool cyclicctermi
 	fragmentions[ms_NH4plus].multiplier = 1;
 	fragmentions[ms_NH4plus].summary = "NH4+";
 
+	// initialize ion [M+Cl]-
+	fragmentions[ms_Clminus].nterminal = true;
+	fragmentions[ms_Clminus].cterminal = true;
+	fragmentions[ms_Clminus].name = "[M+Cl]-";
+	fragmentions[ms_Clminus].massdifference = Cl + e;
+	fragmentions[ms_Clminus].positive = false;
+	fragmentions[ms_Clminus].multiplier = 1;
+	fragmentions[ms_Clminus].summary = "Cl+-1";
+
 	// initialize ion [M]+
 	fragmentions[ms_plus].nterminal = true;
 	fragmentions[ms_plus].cterminal = true;
