@@ -185,6 +185,7 @@ Reference ids can be written in the following formats (without quotes):
 <ul>
 <li> "CSID: <number>" (ChemSpider ID; example: "CSID: 13539649")
 <li> "CID: <number>" (PubChem ID; example: "CID: 12439044")
+<li> "DOI: <doi>" (example: "DOI: 10.1016/j.bbapap.2016.12.003")
 <li> "<norine_id>" (Norine ID; example: "NOR00205")
 <li> "<lipidmaps_id>" (LipidMaps ID; example: "LMFA00000001")
 </ul>
