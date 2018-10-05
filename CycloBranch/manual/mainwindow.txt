@@ -177,7 +177,7 @@ https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.23.3/css/theme.green
 </p>
 <p>The "Draw Peptide Tool" is opened. See details [here](@ref drawpeptide).</p>
 
-<p><b>Summary Table of Matched Peaks (CTRL + U)</b>
+<p><b>Summary Table of Matched Peaks (F9)</b>
 \htmlonly
 <img src="43.png">
 \endhtmlonly
@@ -187,7 +187,7 @@ https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.23.3/css/theme.green
 </p>
 <p>Show a summary table of matched peaks reported in all rows which are currently listed in the main window. See details [here](@ref summarypeakstable).</p>
 
-<p><b>Chromatogram (CTRL + H)</b>
+<p><b>Chromatogram (F10)</b>
 \htmlonly
 <img src="chromatography.png">
 \endhtmlonly
@@ -197,7 +197,7 @@ https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.23.3/css/theme.green
 </p>
 <p>Show a chromatogram for LC-MS data. See details [here](@ref chromatogram).</p>
 
-<p><b>CrossVis (CTRL + C)</b>
+<p><b>CrossVis (F11)</b>
 \htmlonly
 <img src="23.png">
 \endhtmlonly
