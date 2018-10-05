@@ -1064,8 +1064,6 @@ void cSummaryPeaksTableWidget::exportStatistics() {
 	if (!filename.isEmpty()) {
 
 		int minimumfeaturesize = 1;
-		int allionsmustbepresent = 1;
-
 		bool okbutton;
 		int inputvalue;
 
@@ -1074,10 +1072,6 @@ void cSummaryPeaksTableWidget::exportStatistics() {
 				inputvalue = QInputDialog::getInt(this, tr("Export Statistics"), tr("Minimum feature size"), 1, 1, 10000, 1, &okbutton);
 				if (okbutton) {
 					minimumfeaturesize = inputvalue;
-				}
-				inputvalue = QInputDialog::getInt(this, tr("Export Statistics"), tr("Must all the ions be present ?"), 1, 0, 1, 1, &okbutton);
-				if (okbutton) {
-					allionsmustbepresent = inputvalue;
 				}
 			}
 		}
@@ -1591,37 +1585,7 @@ void cSummaryPeaksTableWidget::exportStatistics() {
 						printline = false;
 						for (int i = 1; i < (int)idvector.size(); i++) {
 							if (idvector[i] == idvector[i - 1] + 1) {
-
-								bool increment = true;
-
-								if (allionsmustbepresent) {
-									for (int j = 0; j < (int)parameters->ionsfortheoreticalspectra.size(); j++) {
-										keyms.clear();
-										keyms.id = to_string(idvector[i]);
-										// to do - fix for charge > 1
-										keyms.iontype = parameters->iondefinitions[parameters->ionsfortheoreticalspectra[j]].name.substr(0, parameters->iondefinitions[parameters->ionsfortheoreticalspectra[j]].name.size() - 1) + " 1+";
-										keyms.name = it->first.name;
-										keyms.reference = it->first.reference;
-
-										auto obj = envelopemapms.find(keyms);
-										if (obj != envelopemapms.end()) {
-											keyms.id = to_string(idvector[i - 1]);
-											obj = envelopemapms.find(keyms);
-											if (obj == envelopemapms.end()) {
-												increment = false;
-												break;
-											}
-										}
-										else {
-											increment = false;
-											break;
-										}
-									}
-								}
-
-								if (increment) {
-									consecutiveids++;
-								}
+								consecutiveids++;
 							}
 							else {
 								consecutiveids = 1;
