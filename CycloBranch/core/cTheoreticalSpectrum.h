@@ -167,6 +167,9 @@ class cTheoreticalSpectrum {
 	// remove unmatched isotope patterns
 	void removeUnmatchedIsotopePatterns(cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks, cPeaksList& outputtheoreticalpeaks, bool storeunmatchedpeaks);
 
+	// remove unmatched features
+	void removeUnmatchedFeatures(cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks, int id);
+
 	// remove unmatched compounds
 	void removeUnmatchedCompounds(cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks);
 
@@ -344,11 +347,11 @@ public:
 
 	/**
 		\brief Compare theoretical peaks with an experimental spectrum.
-		\param peaklist reference to an experimental peaklist
+		\param id identifier of an experimental spectrum
 		\param tsfull theoretical spectrum with descriptions of peaks
 		\param unmatchedpeaksinmatchedpatterns unmatched peaks in matched isotope patterns
 	*/
-	void compareMSSpectrum(cPeaksList& peaklist, cTheoreticalSpectrum& tsfull, cPeaksList& unmatchedpeaksinmatchedpatterns);
+	void compareMSSpectrum(int id, cTheoreticalSpectrum& tsfull, cPeaksList& unmatchedpeaksinmatchedpatterns);
 
 
 	/**

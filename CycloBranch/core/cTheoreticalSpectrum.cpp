@@ -953,6 +953,61 @@ void cTheoreticalSpectrum::removeUnmatchedIsotopePatterns(cPeaksList& theoretica
 }
 
 
+void cTheoreticalSpectrum::removeUnmatchedFeatures(cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks, int id) {
+	int requestedfeaturesize;
+	bool clearfeature;
+	int k;
+	if (parameters->peaklistseries.size() > 1) {
+		if (!((parameters->peaklistfileformat == mis) || (parameters->peaklistfileformat == imzML))) {
+			if (parameters->minimumfeaturesize > 1) {
+				if (!parameters->generateisotopepattern) {
+					for (int i = 0; i < theoreticalpeaksrealsize; i++) {
+						if (theoreticalpeaks[i].isotope || (theoreticalpeaks[i].matched == 0)) {
+							continue;
+						}
+
+						requestedfeaturesize = parameters->minimumfeaturesize;
+
+						k = id - 1;
+						while ((k >= 0) && (requestedfeaturesize > 1)) {
+							if (!searchHint(theoreticalpeaks[i].mzratio, parameters->peaklistseries[k], parameters->fragmentmasserrortolerance)) {
+								break;
+							}
+							requestedfeaturesize--;
+							k--;
+						}
+						
+						clearfeature = false;
+						if (id + requestedfeaturesize > parameters->peaklistseries.size()) {
+							clearfeature = true;
+						}
+						else {
+							for (int j = id + 1; j < id + requestedfeaturesize; j++) {
+								if (!searchHint(theoreticalpeaks[i].mzratio, parameters->peaklistseries[j], parameters->fragmentmasserrortolerance)) {
+									clearfeature = true;
+									break;
+								}
+							}
+						}
+
+						if (clearfeature) {
+							experimentalmatches[theoreticalpeaks[i].matchedid].erase(experimentalmatches[theoreticalpeaks[i].matchedid].find(i));
+							experimentalpeaks[theoreticalpeaks[i].matchedid].matched--;
+
+							theoreticalpeaks[i].matched--;
+							theoreticalpeaks[i].matchedid = -1;
+						}
+					}
+				}
+				else {
+					// to do
+				}
+			}
+		}
+	}
+}
+
+
 void cTheoreticalSpectrum::removeUnmatchedCompounds(cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks) {
 	if (theoreticalpeaksrealsize == 0) {
 		return;
@@ -2992,30 +3047,40 @@ void cTheoreticalSpectrum::generateFineMSSpectrum() {
 }
 
 
-void cTheoreticalSpectrum::compareMSSpectrum(cPeaksList& peaklist, cTheoreticalSpectrum& tsfull, cPeaksList& unmatchedpeaksinmatchedpatterns) {
-	experimentalpeaks = peaklist;
-	peaklist.clear();
-	experimentalpeaks.sortbyMass();
+void cTheoreticalSpectrum::compareMSSpectrum(int id, cTheoreticalSpectrum& tsfull, cPeaksList& unmatchedpeaksinmatchedpatterns) {
+	experimentalpeaks = parameters->peaklistseries[id];
 
 	cPeaksList* tsfullpeaklist = tsfull.getTheoreticalPeaks();
 
 	experimentalmatches.clear();
 	searchForPeakPairs(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks, parameters->fragmentmasserrortolerance);
 
-	unmatchedpeaksinmatchedpatterns.clear();
-	if (!parameters->generateisotopepattern) {
-		if (parameters->allionsmustbepresent) {
+	// check if all selected ions are present
+	if (parameters->allionsmustbepresent) {
+		if (!parameters->generateisotopepattern) {
 			removeUnmatchedCompounds(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks);
 		}
-		removeUnmatchedMetalIsotopes(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks);
-	}
-	else {
-		if (parameters->allionsmustbepresent) {
+		else {
 			tsfullpeaklist->markIsotopes();
 			removeUnmatchedCompounds(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks);
 			tsfullpeaklist->setIsotopeFlags(false);
 		}
+	}
+
+	// remove unmatched features (LC-MS)
+	removeUnmatchedFeatures(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks, id);
+
+	// clear matched isotopes of unmatched monoisotopic peaks
+	unmatchedpeaksinmatchedpatterns.clear();
+	if (!parameters->generateisotopepattern) {
+		removeUnmatchedMetalIsotopes(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks);
+	}
+	else {
 		removeUnmatchedIsotopePatterns(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks, unmatchedpeaksinmatchedpatterns, true);
+	}
+
+	// calculate scores
+	if (parameters->generateisotopepattern) {
 		targetscores.clear();
 		decoyscores.clear();
 		calculateEnvelopeScores(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks);

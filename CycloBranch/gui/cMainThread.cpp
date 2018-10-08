@@ -506,6 +506,15 @@ void cMainThread::run() {
 		unmatchedpeaks.resize(parameters.peaklistseries.size());
 
 		for (int i = 0; i < parameters.peaklistseries.size(); i++) {
+			if (terminatecomputation) {
+				emitEndSignals();
+				return;
+			}
+
+			parameters.peaklistseries[i].sortbyMass();
+		}
+
+		for (int i = 0; i < parameters.peaklistseries.size(); i++) {
 			if ((i + 1) % 100 == 0) {
 				*os << i + 1 << " ";
 			}
@@ -520,8 +529,22 @@ void cMainThread::run() {
 
 			cTheoreticalSpectrum tstmp;
 			tstmp.setParameters(&parameters);
-			tstmp.compareMSSpectrum(parameters.peaklistseries[i], ts, unmatchedpeaks[i]);
+			tstmp.compareMSSpectrum(i, ts, unmatchedpeaks[i]);
+			if ((parameters.peaklistfileformat == mis) || (parameters.peaklistfileformat == imzML)) {
+				parameters.peaklistseries[i].clear();
+			}
 			theoreticalspectrumlist->add(tstmp);
+		}
+
+		if (!((parameters.peaklistfileformat == mis) || (parameters.peaklistfileformat == imzML))) {
+			for (int i = 0; i < parameters.peaklistseries.size(); i++) {
+				if (terminatecomputation) {
+					emitEndSignals();
+					return;
+				}
+
+				parameters.peaklistseries[i].clear();
+			}
 		}
 
 		*os << " ok" << endl << "Total number of spectra: " << parameters.peaklistseries.size() << endl;
