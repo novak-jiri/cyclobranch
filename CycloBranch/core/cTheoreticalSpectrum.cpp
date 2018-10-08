@@ -154,6 +154,14 @@ bool cTheoreticalSpectrum::searchHint(double mzratio, cPeaksList& experimentalpe
 }
 
 
+bool cTheoreticalSpectrum::featureHint(double mzratio, cPeaksList& experimentalpeaks, double fragmentmasserrortolerance) {
+	if (parameters->allionsmustbepresent) {
+		// to do
+	}
+	return searchHint(mzratio, experimentalpeaks, parameters->fragmentmasserrortolerance);
+}
+
+
 void cTheoreticalSpectrum::computeStatistics(bool writedescription) {
 	experimentalpeaksmatched = 0;
 	scrambledpeaksmatched = 0;
@@ -970,7 +978,7 @@ void cTheoreticalSpectrum::removeUnmatchedFeatures(cPeaksList& theoreticalpeaks,
 
 						k = id - 1;
 						while ((k >= 0) && (requestedfeaturesize > 1)) {
-							if (!searchHint(theoreticalpeaks[i].mzratio, parameters->peaklistseries[k], parameters->fragmentmasserrortolerance)) {
+							if (!featureHint(theoreticalpeaks[i].mzratio, parameters->peaklistseries[k], parameters->fragmentmasserrortolerance)) {
 								break;
 							}
 							requestedfeaturesize--;
@@ -983,7 +991,7 @@ void cTheoreticalSpectrum::removeUnmatchedFeatures(cPeaksList& theoreticalpeaks,
 						}
 						else {
 							for (int j = id + 1; j < id + requestedfeaturesize; j++) {
-								if (!searchHint(theoreticalpeaks[i].mzratio, parameters->peaklistseries[j], parameters->fragmentmasserrortolerance)) {
+								if (!featureHint(theoreticalpeaks[i].mzratio, parameters->peaklistseries[j], parameters->fragmentmasserrortolerance)) {
 									clearfeature = true;
 									break;
 								}

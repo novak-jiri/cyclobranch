@@ -137,6 +137,9 @@ class cTheoreticalSpectrum {
 	// search a m/z ratio in the experimental spectrum to decide whether its description should be generated
 	bool searchHint(double mzratio, cPeaksList& experimentalpeaks, double fragmentmasserrortolerance);
 
+	// search for a feature hint in a spectrum 
+	bool featureHint(double mzratio, cPeaksList& experimentalpeaks, double fragmentmasserrortolerance);
+
 	// compute additional scores
 	void computeStatistics(bool writedescription);
 
