@@ -965,52 +965,42 @@ void cTheoreticalSpectrum::removeUnmatchedFeatures(cPeaksList& theoreticalpeaks,
 	int requestedfeaturesize;
 	bool clearfeature;
 	int k;
-	if (parameters->peaklistseries.size() > 1) {
-		if (!((parameters->peaklistfileformat == mis) || (parameters->peaklistfileformat == imzML))) {
-			if (parameters->minimumfeaturesize > 1) {
-				if (!parameters->generateisotopepattern) {
-					for (int i = 0; i < theoreticalpeaksrealsize; i++) {
-						if (theoreticalpeaks[i].isotope || (theoreticalpeaks[i].matched == 0)) {
-							continue;
-						}
 
-						requestedfeaturesize = parameters->minimumfeaturesize;
+	for (int i = 0; i < theoreticalpeaksrealsize; i++) {
+		if (theoreticalpeaks[i].isotope || (theoreticalpeaks[i].matched == 0)) {
+			continue;
+		}
 
-						k = id - 1;
-						while ((k >= 0) && (requestedfeaturesize > 1)) {
-							if (!featureHint(theoreticalpeaks[i].mzratio, parameters->peaklistseries[k], parameters->fragmentmasserrortolerance)) {
-								break;
-							}
-							requestedfeaturesize--;
-							k--;
-						}
+		requestedfeaturesize = parameters->minimumfeaturesize;
+
+		k = id - 1;
+		while ((k >= 0) && (requestedfeaturesize > 1)) {
+			if (!featureHint(theoreticalpeaks[i].mzratio, parameters->peaklistseries[k], parameters->fragmentmasserrortolerance)) {
+				break;
+			}
+			requestedfeaturesize--;
+			k--;
+		}
 						
-						clearfeature = false;
-						if (id + requestedfeaturesize > parameters->peaklistseries.size()) {
-							clearfeature = true;
-						}
-						else {
-							for (int j = id + 1; j < id + requestedfeaturesize; j++) {
-								if (!featureHint(theoreticalpeaks[i].mzratio, parameters->peaklistseries[j], parameters->fragmentmasserrortolerance)) {
-									clearfeature = true;
-									break;
-								}
-							}
-						}
-
-						if (clearfeature) {
-							experimentalmatches[theoreticalpeaks[i].matchedid].erase(experimentalmatches[theoreticalpeaks[i].matchedid].find(i));
-							experimentalpeaks[theoreticalpeaks[i].matchedid].matched--;
-
-							theoreticalpeaks[i].matched--;
-							theoreticalpeaks[i].matchedid = -1;
-						}
-					}
-				}
-				else {
-					// to do
+		clearfeature = false;
+		if (id + requestedfeaturesize > parameters->peaklistseries.size()) {
+			clearfeature = true;
+		}
+		else {
+			for (int j = id + 1; j < id + requestedfeaturesize; j++) {
+				if (!featureHint(theoreticalpeaks[i].mzratio, parameters->peaklistseries[j], parameters->fragmentmasserrortolerance)) {
+					clearfeature = true;
+					break;
 				}
 			}
+		}
+
+		if (clearfeature) {
+			experimentalmatches[theoreticalpeaks[i].matchedid].erase(experimentalmatches[theoreticalpeaks[i].matchedid].find(i));
+			experimentalpeaks[theoreticalpeaks[i].matchedid].matched--;
+
+			theoreticalpeaks[i].matched--;
+			theoreticalpeaks[i].matchedid = -1;
 		}
 	}
 }
@@ -3063,28 +3053,49 @@ void cTheoreticalSpectrum::compareMSSpectrum(int id, cTheoreticalSpectrum& tsful
 	experimentalmatches.clear();
 	searchForPeakPairs(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks, parameters->fragmentmasserrortolerance);
 
+	// mark isotopes in LC-MS data
+	if (parameters->peaklistseries.size() > 1) {
+		if (!((parameters->peaklistfileformat == mis) || (parameters->peaklistfileformat == imzML))) {
+			if (parameters->generateisotopepattern) {
+				if ((parameters->allionsmustbepresent) || (parameters->minimumfeaturesize > 1)) {
+					tsfullpeaklist->markIsotopes();
+				}
+			}
+		}
+	}
+
 	// check if all selected ions are present
 	if (parameters->allionsmustbepresent) {
-		if (!parameters->generateisotopepattern) {
-			removeUnmatchedCompounds(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks);
-		}
-		else {
-			tsfullpeaklist->markIsotopes();
-			removeUnmatchedCompounds(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks);
-			tsfullpeaklist->setIsotopeFlags(false);
-		}
+		removeUnmatchedCompounds(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks);
 	}
 
 	// remove unmatched features (LC-MS)
-	removeUnmatchedFeatures(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks, id);
+	if (parameters->peaklistseries.size() > 1) {
+		if (!((parameters->peaklistfileformat == mis) || (parameters->peaklistfileformat == imzML))) {
+			if (parameters->minimumfeaturesize > 1) {
+				removeUnmatchedFeatures(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks, id);
+			}
+		}
+	}
+
+	// clear isotopic marks
+	if (parameters->peaklistseries.size() > 1) {
+		if (!((parameters->peaklistfileformat == mis) || (parameters->peaklistfileformat == imzML))) {
+			if (parameters->generateisotopepattern) {
+				if ((parameters->allionsmustbepresent) || (parameters->minimumfeaturesize > 1)) {
+					tsfullpeaklist->setIsotopeFlags(false);
+				}
+			}
+		}
+	}
 
 	// clear matched isotopes of unmatched monoisotopic peaks
 	unmatchedpeaksinmatchedpatterns.clear();
-	if (!parameters->generateisotopepattern) {
-		removeUnmatchedMetalIsotopes(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks);
+	if (parameters->generateisotopepattern) {
+		removeUnmatchedIsotopePatterns(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks, unmatchedpeaksinmatchedpatterns, true);
 	}
 	else {
-		removeUnmatchedIsotopePatterns(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks, unmatchedpeaksinmatchedpatterns, true);
+		removeUnmatchedMetalIsotopes(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks);
 	}
 
 	// calculate scores
