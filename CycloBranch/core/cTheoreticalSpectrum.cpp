@@ -3139,6 +3139,13 @@ void cTheoreticalSpectrum::compareMSSpectrum(int id, cTheoreticalSpectrum& tsful
 	experimentalmatches.clear();
 	searchForPeakPairs(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks, parameters->fragmentmasserrortolerance);
 
+	// pre-cleaning (relative intensity threshold, minimumpatternsize)
+	if (parameters->generateisotopepattern) {
+		if (parameters->allionsmustbepresent || (parameters->minimumfeaturesize > 1)) {
+			removeUnmatchedIsotopePatterns(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks, unmatchedpeaksinmatchedpatterns, false);
+		}
+	}
+
 	// mark isotopes
 	if (parameters->generateisotopepattern) {
 		if ((parameters->allionsmustbepresent) || (parameters->minimumfeaturesize > 1)) {
@@ -3179,6 +3186,7 @@ void cTheoreticalSpectrum::compareMSSpectrum(int id, cTheoreticalSpectrum& tsful
 	// clear matched isotopes of unmatched monoisotopic peaks
 	unmatchedpeaksinmatchedpatterns.clear();
 	if (parameters->generateisotopepattern) {
+		// performs also an additional cleaning of isotopes if removeUnmatchedFeatures is used
 		removeUnmatchedIsotopePatterns(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks, unmatchedpeaksinmatchedpatterns, true);
 	}
 	else {
