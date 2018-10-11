@@ -3139,22 +3139,24 @@ void cTheoreticalSpectrum::compareMSSpectrum(int id, cTheoreticalSpectrum& tsful
 	experimentalmatches.clear();
 	searchForPeakPairs(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks, parameters->fragmentmasserrortolerance);
 
+	bool lcms = (parameters->peaklistseries.size() > 1) && !((parameters->peaklistfileformat == mis) || (parameters->peaklistfileformat == imzML));
+
 	// pre-cleaning (relative intensity threshold, minimumpatternsize)
 	if (parameters->generateisotopepattern) {
-		if (parameters->allionsmustbepresent || (parameters->minimumfeaturesize > 1)) {
+		if (parameters->allionsmustbepresent || (lcms && (parameters->minimumfeaturesize > 1))) {
 			removeUnmatchedIsotopePatterns(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks, unmatchedpeaksinmatchedpatterns, false);
 		}
 	}
 
 	// mark isotopes
 	if (parameters->generateisotopepattern) {
-		if ((parameters->allionsmustbepresent) || (parameters->minimumfeaturesize > 1)) {
+		if ((parameters->allionsmustbepresent) || (lcms && (parameters->minimumfeaturesize > 1))) {
 			tsfullpeaklist->markIsotopes();
 		}
 	}
 
 	// LC-MS data
-	if ((parameters->peaklistseries.size() > 1) && !((parameters->peaklistfileformat == mis) || (parameters->peaklistfileformat == imzML))) {
+	if (lcms) {
 		if (parameters->minimumfeaturesize > 1) {
 			if (parameters->allionsmustbepresent) {
 				removeUnmatchedFeaturesAndCompounds(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks, id);
@@ -3178,7 +3180,7 @@ void cTheoreticalSpectrum::compareMSSpectrum(int id, cTheoreticalSpectrum& tsful
 
 	// clear marks of isotopes
 	if (parameters->generateisotopepattern) {
-		if ((parameters->allionsmustbepresent) || (parameters->minimumfeaturesize > 1)) {
+		if ((parameters->allionsmustbepresent) || (lcms && (parameters->minimumfeaturesize > 1))) {
 			tsfullpeaklist->setIsotopeFlags(false);
 		}
 	}
