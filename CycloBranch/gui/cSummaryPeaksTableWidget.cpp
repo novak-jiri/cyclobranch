@@ -18,7 +18,6 @@
 #include <QTextStream>
 #include <QMenuBar>
 #include <QMenu>
-#include <QInputDialog>
 #include <QClipboard>
 #include <QApplication>
 
@@ -1092,20 +1091,6 @@ void cSummaryPeaksTableWidget::exportStatistics() {
 	QString filename = QFileDialog::getSaveFileName(this, tr("Export Statistics"), lastdirexportstatisticstocsv, tr("Files (*.csv)"));
 
 	if (!filename.isEmpty()) {
-
-		int minimumfeaturesize = 1;
-		bool okbutton;
-		int inputvalue;
-
-		if (parameters->mode == dereplication) {
-			if (!((parameters->peaklistfileformat == mis) || (parameters->peaklistfileformat == imzML))) {
-				inputvalue = QInputDialog::getInt(this, tr("Export Statistics"), tr("Minimum feature size"), 1, 1, 10000, 1, &okbutton);
-				if (okbutton) {
-					minimumfeaturesize = inputvalue;
-				}
-			}
-		}
-
 		lastdirexportstatisticstocsv = filename;
 
 		QProgressDialog progress("Exporting statistics to CSV file...", "Cancel", 0, proxymodel->rowCount(), this);
@@ -1293,7 +1278,7 @@ void cSummaryPeaksTableWidget::exportStatistics() {
 					ionmapms.insert(std::pair< cSummaryTableKeyMS, vector<int> >(keyms, v));
 				}
 
-				//if (parameters->generateisotopepattern) {
+				if (parameters->generateisotopepattern) {
 					obj = envelopemapms.find(keyms);
 					if (obj != envelopemapms.end()) {
 						obj->second.push_back(i);
@@ -1303,7 +1288,7 @@ void cSummaryPeaksTableWidget::exportStatistics() {
 						v.push_back(i);
 						envelopemapms.insert(std::pair< cSummaryTableKeyMS, vector<int> >(keyms, v));
 					}
-				//}
+				}
 
 			}
 			else {
@@ -1365,14 +1350,10 @@ void cSummaryPeaksTableWidget::exportStatistics() {
 		double absintmax, absintavg, absintmed, absintcur;
 		double scoremin, scoreavg, scoremed, scoremax, scorecur;
 		double fdrmin, fdravg, fdrmed, fdrmax, fdrcur;
-		vector<int> idvector;
 		vector<double> relintmedianvector;
 		vector<double> absintmedianvector;
 		vector<double> scoremedianvector;
 		vector<double> fdrmedianvector;
-
-		int consecutiveids;
-		bool printline;
 
 		if (parameters->mode == dereplication) {
 
@@ -1533,8 +1514,6 @@ void cSummaryPeaksTableWidget::exportStatistics() {
 				ymin = INT32_MAX;
 				ymax = 0;
 
-				idvector.clear();
-
 				relintmax = 0;
 				relintavg = 0;
 				relintmedianvector.clear();
@@ -1552,7 +1531,6 @@ void cSummaryPeaksTableWidget::exportStatistics() {
 						if (item->data(Qt::DisplayRole).toInt() > idmax) {
 							idmax = item->data(Qt::DisplayRole).toInt();
 						}
-						idvector.push_back(item->data(Qt::DisplayRole).toInt());
 					}
 
 					if ((parameters->peaklistfileformat == mis) || (parameters->peaklistfileformat == imzML)) {
@@ -1606,53 +1584,19 @@ void cSummaryPeaksTableWidget::exportStatistics() {
 				relintmed = median(relintmedianvector);
 				absintmed = median(absintmedianvector);
 
-				printline = true;
+				out << "\"" << it->first.name.c_str() << "\",\"" << it->first.iontype.c_str() << "\",\"" << it->second.size() << "\",\"" << it->first.theoreticalmz.c_str() << "\",\"";
 
-				if (!((parameters->peaklistfileformat == mis) || (parameters->peaklistfileformat == imzML))) {
-					if (minimumfeaturesize > 1) {
-						sort(idvector.begin(), idvector.end());
-						consecutiveids = 1;
-						printline = false;
-						for (int i = 1; i < (int)idvector.size(); i++) {
-							if (idvector[i] == idvector[i - 1] + 1) {
-								consecutiveids++;
-							}
-							else {
-								consecutiveids = 1;
-							}
-							if (consecutiveids > minimumfeaturesize) {
-								printline = true;
-								break;
-							}
-						}
-					}
+				stringstream ss;
+				ss << std::fixed << std::setprecision(2) << relintavg << "\",\"" << relintmed << "\",\"" << relintmax << "\",\"";
+				ss << std::fixed << std::setprecision(0) << absintavg << "\",\"" << absintmed << "\",\"" << absintmax << "\",\"";
+				out << ss.str().c_str();
+
+				out << idmin << "\",\"" << idmax << "\",\"";
+				if ((parameters->peaklistfileformat == mis) || (parameters->peaklistfileformat == imzML)) {
+					out << xmin << "\",\"" << xmax << "\",\"" << ymin << "\",\"" << ymax << "\",\"";
 				}
 
-				if (printline) {
-					out << "\"" << it->first.name.c_str() << "\",\"" << it->first.iontype.c_str() << "\",\"" << it->second.size() << "\",\"" << it->first.theoreticalmz.c_str() << "\",\"";
-
-					stringstream ss;
-					ss << std::fixed << std::setprecision(2) << relintavg << "\",\"" << relintmed << "\",\"" << relintmax << "\",\"";
-					ss << std::fixed << std::setprecision(0) << absintavg << "\",\"" << absintmed << "\",\"" << absintmax << "\",\"";
-					out << ss.str().c_str();
-
-					out << idmin << "\",\"" << idmax << "\",\"";
-					if ((parameters->peaklistfileformat == mis) || (parameters->peaklistfileformat == imzML)) {
-						out << xmin << "\",\"" << xmax << "\",\"" << ymin << "\",\"" << ymax << "\",\"";
-					}
-
-					out << stripHTML(it->first.summaryformula).c_str() << "\"";
-
-					if (!((parameters->peaklistfileformat == mis) || (parameters->peaklistfileformat == imzML))) {
-						out << ",\"scans:";
-						for (int i = 0; i < (int)idvector.size(); i++) {
-							out << " " << QVariant(idvector[i]).toString();
-						}
-						out << "\"";
-					}
-					
-					out << endl;
-				}
+				out << stripHTML(it->first.summaryformula).c_str() << "\"" << endl;
 
 			}
 
