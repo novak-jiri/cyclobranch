@@ -1003,17 +1003,22 @@ void cTheoreticalSpectrum::removeUnmatchedFeaturesAndCompounds(cPeaksList& theor
 		return;
 	}
 
-	int requestedfeaturesize;
-	bool clearfeature;
-	int k;
-
 	int start = 0;
 	int stop = 0;
 	int currid = theoreticalpeaks[0].compoundid;
 	bool matched = true;
-	int oldfeaturesize = -1;
+	int featurestart = 0;
+	int featureend = parameters->peaklistseries.size() - 1;
+	int k;
+
 	for (int i = 0; i < theoreticalpeaksrealsize; i++) {
 		if (currid != theoreticalpeaks[i].compoundid) {
+			if (matched) {
+				if (featureend - featurestart + 1 < parameters->minimumfeaturesize) {
+					matched = false;
+				}
+			}
+
 			if (!matched) {
 				for (int j = start; j <= stop; j++) {
 					if (theoreticalpeaks[j].matched > 0) {
@@ -1029,7 +1034,8 @@ void cTheoreticalSpectrum::removeUnmatchedFeaturesAndCompounds(cPeaksList& theor
 			currid = theoreticalpeaks[i].compoundid;
 			start = i;
 			matched = true;
-			oldfeaturesize = -1;
+			featurestart = 0;
+			featureend = parameters->peaklistseries.size() - 1;
 		}
 
 		if (!theoreticalpeaks[i].isotope) {
@@ -1037,45 +1043,39 @@ void cTheoreticalSpectrum::removeUnmatchedFeaturesAndCompounds(cPeaksList& theor
 				matched = false;
 			}
 			else {
+
 				if (matched) {
-					requestedfeaturesize = parameters->minimumfeaturesize;
 
 					k = id - 1;
-					while ((k >= 0) && (requestedfeaturesize > 1)) {
+					while (k >= 0) {
 						if (!searchHint(theoreticalpeaks[i].mzratio, parameters->peaklistseries[k], parameters->fragmentmasserrortolerance)) {
 							break;
 						}
-						requestedfeaturesize--;
 						k--;
 					}
+					featurestart = max(featurestart, k + 1);
 
-					if ((oldfeaturesize != -1) && (oldfeaturesize != requestedfeaturesize)) {
-						matched = false;
+					k = id + 1;
+					while (k < parameters->peaklistseries.size()) {
+						if (!searchHint(theoreticalpeaks[i].mzratio, parameters->peaklistseries[k], parameters->fragmentmasserrortolerance)) {
+							break;
+						}
+						k++;
 					}
-					oldfeaturesize = requestedfeaturesize;
+					featureend = min(featureend, k - 1);
 
-					if (matched) {
-						clearfeature = false;
-						if (id + requestedfeaturesize > parameters->peaklistseries.size()) {
-							clearfeature = true;
-						}
-						else {
-							for (int j = id + 1; j < id + requestedfeaturesize; j++) {
-								if (!searchHint(theoreticalpeaks[i].mzratio, parameters->peaklistseries[j], parameters->fragmentmasserrortolerance)) {
-									clearfeature = true;
-									break;
-								}
-							}
-						}
-
-						if (clearfeature) {
-							matched = false;
-						}
-					}
 				}
+
 			}
+
 		}
 		stop = i;
+	}
+
+	if (matched) {
+		if (featureend - featurestart + 1 < parameters->minimumfeaturesize) {
+			matched = false;
+		}
 	}
 
 	if (!matched) {
