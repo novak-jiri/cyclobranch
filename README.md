@@ -53,3 +53,4 @@ http://ms.biomed.cas.cz/cyclobranch/
   * [1] *J. Am. Soc. Mass Spectrom.* (2015), 26(10):1780-1786. DOI: [10.1007/s13361-015-1211-1](http://dx.doi.org/10.1007/s13361-015-1211-1)
   * [2] *BBA - Proteins Proteom.* (2017), 1865(7):768-775. DOI: [10.1016/j.bbapap.2016.12.003](http://dx.doi.org/10.1016/j.bbapap.2016.12.003)
   * [3] *Sci. Rep.* (2017), 7:16523. DOI: [10.1038/s41598-017-16648-z](http://dx.doi.org/10.1038/s41598-017-16648-z)
+  * [4] *J. Mass Spectrom.* (2018), 53(11):1097-1103. DOI: [10.1002/jms.4285](http://dx.doi.org/10.1002/jms.4285)
