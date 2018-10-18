@@ -140,6 +140,9 @@ class cTheoreticalSpectrum {
 	// compute additional scores
 	void computeStatistics(bool writedescription);
 
+	// generate charged forms of fragments
+	void generateChargedFragments(cPeak& peak, map<string, int>& atoms, int& peaklistrealsize, int maxcharge, bool writedescription, bool disablesummary);
+
 	// generate precursor ion and its variants
 	void generatePrecursorIon(vector<int>& intcomposition, cBricksDatabase& bricksdatabasewithcombinations, int& theoreticalpeaksrealsize, bool writedescription);
 

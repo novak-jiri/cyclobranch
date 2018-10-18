@@ -196,6 +196,70 @@ void cTheoreticalSpectrum::computeStatistics(bool writedescription) {
 }
 
 
+void cTheoreticalSpectrum::generateChargedFragments(cPeak& peak, map<string, int>& atoms, int& peaklistrealsize, int maxcharge, bool writedescription, bool disablesummary) {
+	if (peak.mzratio > 0) {
+		double tempratio;
+		string tempdescription;
+		map<string, int> tempmap;
+
+		tempratio = peak.mzratio;
+		if (writedescription) {
+			tempdescription = peak.description;
+		}
+		for (int i = 1; i <= abs(maxcharge); i++) {
+
+			peak.mzratio = charge(uncharge(tempratio, 1), (parameters->precursorcharge > 0) ? i : -i);
+			peak.charge = (parameters->precursorcharge > 0) ? i : -i;
+			if (!disablesummary && (parameters->generateisotopepattern || writedescription)) {
+				tempmap = atoms;
+				rechargeMap(peak.charge, tempmap);
+				peak.formula.setFromMap(tempmap, false);
+			}
+			if (writedescription) {
+				if (parameters->precursorcharge > 0) {
+					peak.description = to_string(i) + "+ " + tempdescription;
+				}
+				else {
+					peak.description = to_string(i) + "- " + tempdescription;
+				}
+			}
+
+			if (writedescription) {
+				if (peak.formula.hasAllElementsPositive()) {
+					if (parameters->reportunmatchedtheoreticalpeaks || searchHint(peak.mzratio, experimentalpeaks, parameters->fragmentmasserrortolerance)) {
+						addPeakToList(peak, peaklistrealsize);
+					}
+					if (!parameters->generateisotopepattern) {
+						addMetalPeaks(peak, parameters->metaladducts, peaklistrealsize, i, writedescription);
+					}
+				}
+			}
+			else {
+				if (parameters->generateisotopepattern) {
+					if (peak.formula.hasAllElementsPositive()) {
+						if (searchHint(peak.mzratio, experimentalpeaks, parameters->fragmentmasserrortolerance)) {
+							addPeakToList(peak, peaklistrealsize);
+						}
+					}
+				}
+				else {
+					if (searchHint(peak.mzratio, experimentalpeaks, parameters->fragmentmasserrortolerance)) {
+						addPeakToList(peak, peaklistrealsize);
+					}
+					addMetalPeaks(peak, parameters->metaladducts, peaklistrealsize, i, writedescription);
+				}
+			}
+
+		}
+		peak.mzratio = tempratio;
+		if (writedescription) {
+			peak.description = tempdescription;
+		}
+
+	}
+}
+
+
 void cTheoreticalSpectrum::generatePrecursorIon(vector<int>& intcomposition, cBricksDatabase& bricksdatabasewithcombinations, int& theoreticalpeaksrealsize, bool writedescription) {
 	cPeak peak;
 	int starttype, endtype;
@@ -3358,10 +3422,7 @@ double cTheoreticalSpectrum::getRatioOfMatchedPeaks() {
 
 void cTheoreticalSpectrum::generateNTerminalFragmentIons(int maxcharge, int& peaklistrealsize, vector<int>& intcomposition, eFragmentIonType fragmentiontype, int neutrallosstype, cBricksDatabase& bricksdatabase, bool writedescription, int rotationid, vector<splitSite>& splittingsites, vector<fragmentDescription>& searchedmodifications, ePeptideType peptidetype, bool regularblocksorder, TRotationInfo* trotation, eResidueLossType leftresiduelosstype, bool hasfirstblockartificial) {
 	cPeak peak;
-	double tempratio;
-	string tempdescription;
-
-	map<string, int> atoms, tempmap;
+	map<string, int> atoms;
 	atoms.clear();
 
 	bool disablesummary = false;
@@ -3565,63 +3626,7 @@ void cTheoreticalSpectrum::generateNTerminalFragmentIons(int maxcharge, int& pea
 
 		}
 
-		if (peak.mzratio > 0) {
-
-			tempratio = peak.mzratio;		
-			if (writedescription) {
-				tempdescription = peak.description;
-			}
-			for (int j = 1; j <= abs(maxcharge); j++) {
-
-				peak.mzratio = charge(uncharge(tempratio, 1), (parameters->precursorcharge > 0)?j:-j);
-				peak.charge = (parameters->precursorcharge > 0)?j:-j;
-				if (!disablesummary && (parameters->generateisotopepattern || writedescription)) {
-					tempmap = atoms;
-					rechargeMap(peak.charge, tempmap);
-					peak.formula.setFromMap(tempmap, false);
-				}
-				if (writedescription) {
-					if (parameters->precursorcharge > 0) {
-						peak.description = to_string(j) + "+ " + tempdescription;
-					}
-					else {
-						peak.description = to_string(j) + "- " + tempdescription;
-					}
-				}
-
-				if (writedescription) {
-					if (peak.formula.hasAllElementsPositive()) {
-						if (parameters->reportunmatchedtheoreticalpeaks || searchHint(peak.mzratio, experimentalpeaks, parameters->fragmentmasserrortolerance)) {
-							addPeakToList(peak, peaklistrealsize);
-						}
-						if (!parameters->generateisotopepattern) {
-							addMetalPeaks(peak, parameters->metaladducts, peaklistrealsize, j, writedescription);
-						}
-					}
-				}
-				else {
-					if (parameters->generateisotopepattern) {
-						if (peak.formula.hasAllElementsPositive()) {
-							if (searchHint(peak.mzratio, experimentalpeaks, parameters->fragmentmasserrortolerance)) {
-								addPeakToList(peak, peaklistrealsize);
-							}
-						}
-					}
-					else {
-						if (searchHint(peak.mzratio, experimentalpeaks, parameters->fragmentmasserrortolerance)) {
-							addPeakToList(peak, peaklistrealsize);
-						}
-						addMetalPeaks(peak, parameters->metaladducts, peaklistrealsize, j, writedescription);
-					}
-				}
-
-			}
-			peak.mzratio = tempratio;
-			if (writedescription) {
-				peak.description = tempdescription;
-			}
-
-		}
+		generateChargedFragments(peak, atoms, peaklistrealsize, maxcharge, writedescription, disablesummary);
 
 	}
 
@@ -3630,10 +3635,7 @@ void cTheoreticalSpectrum::generateNTerminalFragmentIons(int maxcharge, int& pea
 
 void cTheoreticalSpectrum::generateCTerminalFragmentIons(int maxcharge, int& peaklistrealsize, vector<int>& intcomposition, eFragmentIonType fragmentiontype, int neutrallosstype, cBricksDatabase& bricksdatabase, bool writedescription, int rotationid, vector<splitSite>& splittingsites, vector<fragmentDescription>& searchedmodifications, ePeptideType peptidetype, bool regularblocksorder, TRotationInfo* trotation, eResidueLossType rightresiduelosstype, bool haslastblockartificial) {
 	cPeak peak;
-	double tempratio;
-	string tempdescription;
-
-	map<string, int> atoms, tempmap;
+	map<string, int> atoms;
 	atoms.clear();
 
 	bool disablesummary = false;
@@ -3815,63 +3817,7 @@ void cTheoreticalSpectrum::generateCTerminalFragmentIons(int maxcharge, int& pea
 
 		}
 
-		if (peak.mzratio > 0) {
-
-			tempratio = peak.mzratio;
-			if (writedescription) {
-				tempdescription = peak.description;
-			}
-			for (int j = 1; j <= abs(maxcharge); j++) {
-
-				peak.mzratio = charge(uncharge(tempratio, 1), (parameters->precursorcharge > 0)?j:-j);
-				peak.charge = (parameters->precursorcharge > 0)?j:-j;
-				if (!disablesummary && (parameters->generateisotopepattern || writedescription)) {
-					tempmap = atoms;
-					rechargeMap(peak.charge, tempmap);
-					peak.formula.setFromMap(tempmap, false);
-				}
-				if (writedescription) {
-					if (parameters->precursorcharge > 0) {
-						peak.description = to_string(j) + "+ " + tempdescription;
-					}
-					else {
-						peak.description = to_string(j) + "- " + tempdescription;
-					}
-				}
-				
-				if (writedescription) {
-					if (peak.formula.hasAllElementsPositive()) {
-						if (parameters->reportunmatchedtheoreticalpeaks || searchHint(peak.mzratio, experimentalpeaks, parameters->fragmentmasserrortolerance)) {
-							addPeakToList(peak, peaklistrealsize);
-						}
-						if (!parameters->generateisotopepattern) {
-							addMetalPeaks(peak, parameters->metaladducts, peaklistrealsize, j, writedescription);
-						}
-					}
-				}
-				else {
-					if (parameters->generateisotopepattern) {
-						if (peak.formula.hasAllElementsPositive()) {
-							if (searchHint(peak.mzratio, experimentalpeaks, parameters->fragmentmasserrortolerance)) {
-								addPeakToList(peak, peaklistrealsize);
-							}
-						}
-					}
-					else {
-						if (searchHint(peak.mzratio, experimentalpeaks, parameters->fragmentmasserrortolerance)) {
-							addPeakToList(peak, peaklistrealsize);
-						}
-						addMetalPeaks(peak, parameters->metaladducts, peaklistrealsize, j, writedescription);
-					}
-				}
-
-			}
-			peak.mzratio = tempratio;
-			if (writedescription) {
-				peak.description = tempdescription;
-			}
-
-		}
+		generateChargedFragments(peak, atoms, peaklistrealsize, maxcharge, writedescription, disablesummary);
 
 	}
 
