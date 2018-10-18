@@ -3424,6 +3424,11 @@ void cTheoreticalSpectrum::generateNTerminalFragmentIons(int maxcharge, int& pea
 	cPeak peak;
 	map<string, int> atoms;
 	atoms.clear();
+	vector<int> internalcomposition;
+
+	map<string, int> tmpmap;
+	double tmpmz;
+	int tmprotationid;
 
 	bool disablesummary = false;
 	if ((parameters->mode == denovoengine) && (parameters->blindedges == 2) && bricksdatabase[intcomposition[0] - 1].isArtificial()) {
@@ -3497,6 +3502,7 @@ void cTheoreticalSpectrum::generateNTerminalFragmentIons(int maxcharge, int& pea
 		}
 	}
 
+	bool generateinternalfragments = true;
 	for (int i = 0; i < (int)intcomposition.size() - 1; i++) {
 		peak.mzratio += bricksdatabase[intcomposition[i] - 1].getMass();
 
@@ -3519,7 +3525,9 @@ void cTheoreticalSpectrum::generateNTerminalFragmentIons(int maxcharge, int& pea
 			}
 
 			if ((i >= trotation->middlebranchstart) && (i < trotation->middlebranchend)) {
-				continue;
+				if (!(generateinternalfragments && (peptidetype == branchcyclic) && (trotation->id == 0))) {
+					continue;
+				}
 			}
 
 			// redundant short n-term fragments are not generated
@@ -3627,6 +3635,60 @@ void cTheoreticalSpectrum::generateNTerminalFragmentIons(int maxcharge, int& pea
 		}
 
 		generateChargedFragments(peak, atoms, peaklistrealsize, maxcharge, writedescription, disablesummary);
+
+		if (generateinternalfragments && (peptidetype == branchcyclic) && (trotation->id == 0)) {
+			if ((i >= trotation->middlebranchstart) && (i < trotation->middlebranchend)) {
+				internalcomposition.clear();			
+				for (int j = 0; j <= i; j++) {
+					internalcomposition.push_back(intcomposition[j]);
+				}
+
+				tmpmap = atoms;
+				tmpmz = peak.mzratio;
+				tmprotationid = peak.rotationid;
+				
+				peak.rotationid = -1;
+				peak.seriesid = -1;
+
+				for (int j = trotation->middlebranchend + 1; j < (int)intcomposition.size() - 1; j++) {
+					internalcomposition.push_back(intcomposition[j]);
+
+					peak.mzratio += bricksdatabase[intcomposition[j] - 1].getMass();
+					if (!disablesummary && (parameters->generateisotopepattern || writedescription)) {
+						mergeMaps(bricksdatabase[intcomposition[j] - 1].getSummaryMap(), tmpmap);
+					}
+
+					if (writedescription) {
+						peak.description = "internal ";
+
+						peak.description += parameters->iondefinitions[fragmentiontype].name.substr(0, 1) + to_string((int)internalcomposition.size());
+						//if (parameters->iondefinitions[fragmentiontype].name.size() > 1) {
+						//	peak.description += parameters->iondefinitions[fragmentiontype].name.substr(1, parameters->iondefinitions[fragmentiontype].name.length() - 1);
+						//}
+
+						if (peak.neutrallosstype >= 0) {
+							peak.description += "-" + parameters->neutrallossesdefinitions[peak.neutrallosstype].summary;
+						}
+
+						addAdductToDescription(peak.description, parameters->metaladducts);
+						peak.description += ": ";
+
+						for (int k = 0; k < (int)internalcomposition.size(); k++) {
+							peak.description += "[" + bricksdatabase[internalcomposition[k] - 1].getAcronymsAsString() + "]";
+							if (k < (int)internalcomposition.size() - 1) {
+								peak.description += '-';
+							}
+						}
+					}
+
+					generateChargedFragments(peak, tmpmap, peaklistrealsize, maxcharge, writedescription, disablesummary);
+				}
+
+				peak.mzratio = tmpmz;
+				peak.rotationid = tmprotationid;
+
+			}
+		}
 
 	}
 
