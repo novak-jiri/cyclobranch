@@ -1032,6 +1032,19 @@ int cParameters::calculateNeutralLosses(bool& terminatecomputation) {
 		combarray.push_back(0);
 	}
 
+	map<int, int> counts;
+	vector<int> max_counts;
+	bool skipcombination;
+
+	bool bruteforce = false;
+	if (bruteforce) {
+		max_counts.push_back(71);	// H
+		max_counts.push_back(56);	// C
+		max_counts.push_back(9);	// N
+		max_counts.push_back(23);	// O
+		max_counts.push_back(1);	// S
+	}
+
 	i = 0;
 	compressformulas = false;
 	while (neutrallossesbrickdatabase.nextCombination(combarray, numberofbasicbricks, maximumcombinedlosses, 0, uncharge(precursormass, precursorcharge) - minimummz)) {
@@ -1040,6 +1053,34 @@ int cParameters::calculateNeutralLosses(bool& terminatecomputation) {
 			neutrallossesfortheoreticalspectra.clear();
 			numberofgeneratedneutrallosses = 0;
 			return -1;
+		}
+
+		if (bruteforce) {
+			counts.clear();
+			int cnt = 0;
+			for (int j = 0; j < maximumcombinedlosses; j++) {
+				if (combarray[j] == 0) {
+					break;
+				}
+				if (counts.count(combarray[j]) > 0) {
+					counts[combarray[j]]++;
+				}
+				else {
+					counts[combarray[j]] = 1;
+				}
+			}
+
+			skipcombination = false;
+			for (auto& it : counts) {
+				if (it.second > max_counts[it.first - 1]) {
+					skipcombination = true;
+					break;
+				}
+			}
+
+			if (skipcombination) {
+				continue;
+			}
 		}
 
 		getNameOfCompositionFromIntVector(compositionname, combarray);
