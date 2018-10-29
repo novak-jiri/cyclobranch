@@ -196,6 +196,8 @@ private:
 	QCheckBox* cyclicnterminus;
 	QLabel* cycliccterminuslabel;
 	QCheckBox* cycliccterminus;
+	QLabel* internalfragmentslabel;
+	QCheckBox* internalfragments;
 	QLabel* enablescramblinglabel;
 	QCheckBox* enablescrambling;
 	QLabel* similaritysearchlabel;

@@ -3502,7 +3502,6 @@ void cTheoreticalSpectrum::generateNTerminalFragmentIons(int maxcharge, int& pea
 		}
 	}
 
-	bool generateinternalfragments = true;
 	for (int i = 0; i < (int)intcomposition.size() - 1; i++) {
 		peak.mzratio += bricksdatabase[intcomposition[i] - 1].getMass();
 
@@ -3525,7 +3524,7 @@ void cTheoreticalSpectrum::generateNTerminalFragmentIons(int maxcharge, int& pea
 			}
 
 			if ((i >= trotation->middlebranchstart) && (i < trotation->middlebranchend)) {
-				if (!(generateinternalfragments && (peptidetype == branchcyclic) && (trotation->id == 0))) {
+				if (!(parameters->internalfragments && (peptidetype == branchcyclic) && (trotation->id == 0))) {
 					continue;
 				}
 			}
@@ -3636,7 +3635,7 @@ void cTheoreticalSpectrum::generateNTerminalFragmentIons(int maxcharge, int& pea
 
 		generateChargedFragments(peak, atoms, peaklistrealsize, maxcharge, writedescription, disablesummary);
 
-		if (generateinternalfragments && (peptidetype == branchcyclic) && (trotation->id == 0)) {
+		if (parameters->internalfragments && (peptidetype == branchcyclic) && (trotation->id == 0)) {
 			if ((i >= trotation->middlebranchstart) && (i < trotation->middlebranchend)) {
 				internalcomposition.clear();			
 				for (int j = 0; j <= i; j++) {

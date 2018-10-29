@@ -284,31 +284,37 @@ public:
 
 
 	/**
-		\brief True when the N-terminus of a linear peptide is cyclized.
+		\brief True if the N-terminus of a linear peptide is cyclized.
     */
 	bool cyclicnterminus;
 
 
 	/**
-		\brief True when the C-terminus of a linear peptide is cyclized.
+		\brief True if the C-terminus of a linear peptide is cyclized.
     */
 	bool cycliccterminus;
 
 
 	/**
-		\brief True when the detection of scrambled ions is enabled.
+		\brief True if the internal fragments are generated.
+	*/
+	bool internalfragments;
+
+
+	/**
+		\brief True if the detection of scrambled ions is enabled.
     */
     bool enablescrambling;
 
 
 	/**
-		\brief True when the similarity search is enabled.
+		\brief True if the similarity search is enabled.
     */
     bool similaritysearch;
 
 
 	/**
-		\brief True when the order of polyketide blocks is regular.
+		\brief True if the order of polyketide blocks is regularly changed.
     */
     bool regularblocksorder;
 

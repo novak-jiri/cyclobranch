@@ -52,6 +52,7 @@ void cParameters::clear() {
 	allionsmustbepresent = false;
 	cyclicnterminus = false;
 	cycliccterminus = false;
+	internalfragments = false;
 	enablescrambling = false;
 	similaritysearch = false;
 	regularblocksorder = false;
@@ -870,6 +871,10 @@ string cParameters::printToString() {
 	s += cycliccterminus ? "on" : "off";
 	s += "\n";
 
+	s += "Internal Fragments: ";
+	s += internalfragments ? "on" : "off";
+	s += "\n";
+
 	s += "Enable Scrambling: ";
 	s += enablescrambling ? "on" : "off";
 	s += "\n";
@@ -1038,11 +1043,11 @@ int cParameters::calculateNeutralLosses(bool& terminatecomputation) {
 
 	bool bruteforce = false;
 	if (bruteforce) {
-		max_counts.push_back(71);	// H
-		max_counts.push_back(56);	// C
-		max_counts.push_back(9);	// N
-		max_counts.push_back(23);	// O
-		max_counts.push_back(1);	// S
+		max_counts.push_back(88);	// H
+		max_counts.push_back(52);	// C
+		max_counts.push_back(10);	// N
+		max_counts.push_back(15);	// O
+		max_counts.push_back(0);	// S
 	}
 
 	i = 0;
@@ -1260,6 +1265,7 @@ void cParameters::store(ofstream& os) {
 	os.write((char *)&allionsmustbepresent, sizeof(bool));
 	os.write((char *)&cyclicnterminus, sizeof(bool));
 	os.write((char *)&cycliccterminus, sizeof(bool));
+	os.write((char *)&internalfragments, sizeof(bool));
 	os.write((char *)&enablescrambling, sizeof(bool));
 	os.write((char *)&similaritysearch, sizeof(bool));
 	os.write((char *)&regularblocksorder, sizeof(bool));
@@ -1389,6 +1395,7 @@ void cParameters::load(ifstream& is) {
 	is.read((char *)&allionsmustbepresent, sizeof(bool));
 	is.read((char *)&cyclicnterminus, sizeof(bool));
 	is.read((char *)&cycliccterminus, sizeof(bool));
+	is.read((char *)&internalfragments, sizeof(bool));
 	is.read((char *)&enablescrambling, sizeof(bool));
 	is.read((char *)&similaritysearch, sizeof(bool));
 	is.read((char *)&regularblocksorder, sizeof(bool));
