@@ -843,9 +843,6 @@ string cParameters::printToString() {
 	s += "FWHM: " + to_string(fwhm) + "\n";
 	s += "Building Blocks Database File: " + bricksdatabasefilename + "\n";
 	s += "Maximum Number of Combined Blocks (start, middle, end): " + to_string(maximumbricksincombinationbegin) + ", " + to_string(maximumbricksincombinationmiddle) + ", " + to_string(maximumbricksincombinationend) + "\n";
-	s += "Maximum Cumulative Mass of Blocks: " + to_string(maximumcumulativemass) + "\n";
-
-	s += "N-/C-terminal Modifications File: " + modificationsfilename + "\n";
 
 	s += "Incomplete Paths in De Novo Graph: ";
 	switch (blindedges) {
@@ -863,12 +860,11 @@ string cParameters::printToString() {
 	}
 	s += "\n";
 
-	s += "Cyclic N-terminus: ";
-	s += cyclicnterminus ? "on" : "off";
-	s += "\n";
+	s += "Maximum Cumulative Mass of Blocks: " + to_string(maximumcumulativemass) + "\n";
+	s += "N-/C-terminal Modifications File: " + modificationsfilename + "\n";
 
-	s += "Cyclic C-terminus: ";
-	s += cycliccterminus ? "on" : "off";
+	s += "Disable Precursor Mass Filter: ";
+	s += similaritysearch ? "on" : "off";
 	s += "\n";
 
 	s += "Internal Fragments: ";
@@ -879,8 +875,12 @@ string cParameters::printToString() {
 	s += enablescrambling ? "on" : "off";
 	s += "\n";
 
-	s += "Disable Precursor Mass Filter: ";
-	s += similaritysearch ? "on" : "off";
+	s += "Cyclic N-terminus: ";
+	s += cyclicnterminus ? "on" : "off";
+	s += "\n";
+
+	s += "Cyclic C-terminus: ";
+	s += cycliccterminus ? "on" : "off";
 	s += "\n";
 
 	s += "Regular Order of Ketide Blocks: ";
