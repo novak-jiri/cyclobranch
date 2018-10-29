@@ -1,0 +1,16 @@
+TY  - JOUR
+TI  - CycloBranch: An open tool for fine isotope structures in conventional and product ion mass spectra
+T2  - J. Mass Spectrom.
+VL  - 53
+IS  - 11
+SP  - 1097-1103
+PY  - 2018
+AU  - Novak,Jiri
+AU  - Skriba,Anton
+AU  - Zapal,Jakub
+AU  - Kuzma,Marek
+AU  - Havlicek,Vladimir
+N1  - 
+DB  - 
+DO  - 10.1002/jms.4285
+ER  - 

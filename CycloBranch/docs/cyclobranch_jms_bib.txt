@@ -1,0 +1,10 @@
+@ARTICLE{CycloBranch-JMS-2018,
+author={Novak, Jiri and Skriba, Anton and Zapal, Jakub and Kuzma, Marek and Havlicek, Vladimir},
+title={CycloBranch: An open tool for fine isotope structures in conventional and product ion mass spectra},
+journal={J. Mass Spectrom.},
+volume={53},
+number={11},
+year={2018},
+pages={1097--1103},
+doi={10.1002/jms.4285}
+}
