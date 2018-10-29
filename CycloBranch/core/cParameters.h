@@ -502,6 +502,18 @@ public:
 
 
 	/**
+		\brief Check if the names of modifications used in a sequence are correct.
+		\param sequence an input sequence
+		\param startmodifid an output identifier of a start modification
+		\param endmodifid an output identifier of an end modification
+		\param middlemodifid an output identifier of a branch modification
+		\param errormessage an output error message if failed
+		\retval bool true if success
+	*/
+	bool checkModifications(cSequence& sequence, int& startmodifid, int& endmodifid, int& middlemodifid, string& errormessage);
+
+
+	/**
 		\brief Print parameters to a string.
 		\retval string string with parameters
 	*/ 
@@ -524,9 +536,10 @@ public:
 	/**
 		\brief Calculate a list of neutral losses.
 		\param terminatecomputation reference to a variable determining that the computation must be stopped
+		\param errormessage an error message if failed
 		\retval int -1 when an error occurred, 0 otherwise
 	*/
-	int calculateNeutralLosses(bool& terminatecomputation);
+	int calculateNeutralLosses(bool& terminatecomputation, string& errormessage);
 
 
 	/**

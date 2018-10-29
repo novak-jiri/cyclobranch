@@ -45,7 +45,6 @@ private:
 	cTheoreticalSpectrumList* theoreticalspectrumlist;
 	cParameters parameters;
 
-	bool checkModifications(cParameters& parameters, cSequence& sequence, int& startmodifid, int& endmodifid, int& middlemodifid, string& errormessage);
 
 public:
 

@@ -749,10 +749,9 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 
 	// calculate combinations of neutral losses
 	if (!error) {
-		errtype = calculateNeutralLosses(terminatecomputation);
+		errtype = calculateNeutralLosses(terminatecomputation, errormessage);
 		if (errtype == -1) {
 			error = true;
-			errormessage = "Aborted by user.\n";
 		}
 	}
 
@@ -770,6 +769,64 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 
 
 	return 0;
+}
+
+
+bool cParameters::checkModifications(cSequence& sequence, int& startmodifid, int& endmodifid, int& middlemodifid, string& errormessage) {
+	startmodifid = 0;
+	endmodifid = 0;
+	middlemodifid = 0;
+	errormessage = "";
+
+	if ((sequence.getPeptideType() == linear) || (sequence.getPeptideType() == branched) || (sequence.getPeptideType() == branchcyclic) || (sequence.getPeptideType() == linearpolyketide)) {
+
+		if ((sequence.getPeptideType() == linear) || (sequence.getPeptideType() == branched) || (sequence.getPeptideType() == linearpolyketide)) {
+			startmodifid = -1;
+			endmodifid = -1;
+		}
+
+		if ((sequence.getPeptideType() == branched) || (sequence.getPeptideType() == branchcyclic)) {
+			middlemodifid = -1;
+		}
+
+		for (int i = 0; i < (int)searchedmodifications.size(); i++) {
+
+			if ((sequence.getPeptideType() == linear) || (sequence.getPeptideType() == branched) || (sequence.getPeptideType() == linearpolyketide)) {
+				if (searchedmodifications[i].name.compare(sequence.getNTterminalModification()) == 0) {
+					startmodifid = i;
+				}
+
+				if (searchedmodifications[i].name.compare(sequence.getCTterminalModification()) == 0) {
+					endmodifid = i;
+				}
+			}
+
+			if ((sequence.getPeptideType() == branched) || (sequence.getPeptideType() == branchcyclic)) {
+				if (searchedmodifications[i].name.compare(sequence.getBranchModification()) == 0) {
+					middlemodifid = i;
+				}
+			}
+
+		}
+
+		if (startmodifid == -1) {
+			errormessage = "The N-terminal modification in the sequence " + sequence.getSequence() + " is not defined: " + sequence.getNTterminalModification();
+			return false;
+		}
+
+		if (endmodifid == -1) {
+			errormessage = "The C-terminal modification in the sequence " + sequence.getSequence() + " is not defined: " + sequence.getCTterminalModification();
+			return false;
+		}
+
+		if (middlemodifid == -1) {
+			errormessage = "The branch modification in the sequence " + sequence.getSequence() + " is not defined: " + sequence.getBranchModification();
+			return false;
+		}
+
+	}
+
+	return true;
 }
 
 
@@ -981,10 +1038,11 @@ void cParameters::updateFragmentDefinitions() {
 }
 
 
-int cParameters::calculateNeutralLosses(bool& terminatecomputation) {
+int cParameters::calculateNeutralLosses(bool& terminatecomputation, string& errormessage) {
 	neutrallossesdefinitions.clear();
 	neutrallossesfortheoreticalspectra.clear();
 	numberofgeneratedneutrallosses = 0;
+	errormessage = "";
 
 	if (maximumcombinedlosses == 0) {
 		return 0;
@@ -1043,11 +1101,70 @@ int cParameters::calculateNeutralLosses(bool& terminatecomputation) {
 
 	bool bruteforce = false;
 	if (bruteforce) {
+
+		if (mode == singlecomparison) {
+
+			string uppersequence = searchedsequence;
+
+			if (!checkRegex(peptidetype, uppersequence, errormessage)) {
+				return -1;
+			}
+
+			if (!bricksdatabase.replaceAcronymsByIDs(uppersequence, errormessage)) {
+				return -1;
+			}
+
+			cSequence tmpsequence;
+
+			tmpsequence.setNTterminalModification(searchedsequenceNtermmodif);
+			tmpsequence.setCTterminalModification(searchedsequenceCtermmodif);
+			tmpsequence.setBranchModification(searchedsequenceTmodif);
+			tmpsequence.setPeptideType(peptidetype);
+
+			int startmodifid, endmodifid, middlemodifid;
+
+			if (!checkModifications(tmpsequence, startmodifid, endmodifid, middlemodifid, errormessage)) {
+				return -1;
+			}
+
+			map<string, int> uppermap;
+			addStringFormulaToMap(precursoradduct, uppermap);
+
+			switch (peptidetype) {
+				case linear:
+					addStringFormulaToMap(searchedmodifications[startmodifid].summary, uppermap);
+					addStringFormulaToMap(searchedmodifications[endmodifid].summary, uppermap);
+					break;
+				case cyclic:
+					break;
+				case branched:
+					addStringFormulaToMap(searchedmodifications[startmodifid].summary, uppermap);
+					addStringFormulaToMap(searchedmodifications[endmodifid].summary, uppermap);
+					addStringFormulaToMap(searchedmodifications[middlemodifid].summary, uppermap);
+					break;
+				case branchcyclic:
+					addStringFormulaToMap(searchedmodifications[middlemodifid].summary, uppermap);
+					break;
+				case linearpolyketide:
+					addStringFormulaToMap(searchedmodifications[startmodifid].summary, uppermap);
+					addStringFormulaToMap(searchedmodifications[endmodifid].summary, uppermap);
+					break;
+				case cyclicpolyketide:
+					break;
+				case other:
+					break;
+				default:
+					break;
+			}
+
+		}
+		
 		max_counts.push_back(88);	// H
 		max_counts.push_back(52);	// C
 		max_counts.push_back(10);	// N
 		max_counts.push_back(15);	// O
 		max_counts.push_back(0);	// S
+
 	}
 
 	i = 0;
@@ -1057,6 +1174,7 @@ int cParameters::calculateNeutralLosses(bool& terminatecomputation) {
 			neutrallossesdefinitions.clear();
 			neutrallossesfortheoreticalspectra.clear();
 			numberofgeneratedneutrallosses = 0;
+			errormessage = "Aborted by user.";
 			return -1;
 		}
 
@@ -1197,6 +1315,7 @@ int cParameters::calculateNeutralLosses(bool& terminatecomputation) {
 				neutrallossesdefinitions.clear();
 				neutrallossesfortheoreticalspectra.clear();
 				numberofgeneratedneutrallosses = 0;
+				errormessage = "Aborted by user.";
 				return -1;
 			}
 		}
