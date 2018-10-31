@@ -1082,6 +1082,7 @@ int cParameters::calculateNeutralLosses(bool& terminatecomputation, string& erro
 		tmpbrick.setComposition(to_string(numberofbasicbricks + 1), false);
 		tmpbrick.setMass(tmpformula.getMass());
 		tmpbrick.setSummary(originalneutrallossesdefinitions[originalneutrallossesfortheoreticalspectra[i]].summary);
+		tmpbrick.createSummaryMap();
 
 		neutrallossesbrickdatabase.push_back(tmpbrick);
 
@@ -1095,75 +1096,81 @@ int cParameters::calculateNeutralLosses(bool& terminatecomputation, string& erro
 		combarray.push_back(0);
 	}
 
+	map<string, int> atoms;
 	map<int, int> counts;
 	vector<int> max_counts;
 	bool skipcombination;
-
 	bool bruteforce = false;
-	if (bruteforce) {
 
-		if (mode == singlecomparison) {
+	if (mode == singlecomparison) {
 
-			string uppersequence = searchedsequence;
+		bruteforce = true;
+		for (i = 0; i < neutrallossesbrickdatabase.size(); i++) {
+			if (neutrallossesbrickdatabase[i].getSummaryMap().size() == 1) {
+				auto it = neutrallossesbrickdatabase[i].getSummaryMap().begin();
+				if (it->second != 1) {
+					bruteforce = false;
+					break;
+				}
+			}
+			else {
+				bruteforce = false;
+				break;
+			}
+		}
 
-			if (!checkRegex(peptidetype, uppersequence, errormessage)) {
+		// calculate molecular formula of searched sequence
+		if (bruteforce) {
+
+			*os << "Brute force fragmentation enabled. Maximum numbers of elements: " << endl;
+
+			string upperboundsequence = searchedsequence;
+
+			if (!checkRegex(peptidetype, upperboundsequence, errormessage)) {
 				return -1;
 			}
 
-			if (!bricksdatabase.replaceAcronymsByIDs(uppersequence, errormessage)) {
+			if (!bricksdatabase.replaceAcronymsByIDs(upperboundsequence, errormessage)) {
 				return -1;
 			}
 
 			cSequence tmpsequence;
-
 			tmpsequence.setNTterminalModification(searchedsequenceNtermmodif);
 			tmpsequence.setCTterminalModification(searchedsequenceCtermmodif);
 			tmpsequence.setBranchModification(searchedsequenceTmodif);
 			tmpsequence.setPeptideType(peptidetype);
 
 			int startmodifid, endmodifid, middlemodifid;
-
 			if (!checkModifications(tmpsequence, startmodifid, endmodifid, middlemodifid, errormessage)) {
 				return -1;
 			}
 
-			map<string, int> uppermap;
-			addStringFormulaToMap(precursoradduct, uppermap);
+			int branchstart, branchend;
+			vector<string> v;
+			cCandidate c;
+			vector<nodeEdge> netmp;
 
-			switch (peptidetype) {
-				case linear:
-					addStringFormulaToMap(searchedmodifications[startmodifid].summary, uppermap);
-					addStringFormulaToMap(searchedmodifications[endmodifid].summary, uppermap);
-					break;
-				case cyclic:
-					break;
-				case branched:
-					addStringFormulaToMap(searchedmodifications[startmodifid].summary, uppermap);
-					addStringFormulaToMap(searchedmodifications[endmodifid].summary, uppermap);
-					addStringFormulaToMap(searchedmodifications[middlemodifid].summary, uppermap);
-					break;
-				case branchcyclic:
-					addStringFormulaToMap(searchedmodifications[middlemodifid].summary, uppermap);
-					break;
-				case linearpolyketide:
-					addStringFormulaToMap(searchedmodifications[startmodifid].summary, uppermap);
-					addStringFormulaToMap(searchedmodifications[endmodifid].summary, uppermap);
-					break;
-				case cyclicpolyketide:
-					break;
-				case other:
-					break;
-				default:
-					break;
+			parseBranch(peptidetype, upperboundsequence, v, branchstart, branchend);
+			// startmodifid, endmodifid and middlemodifid were filled up by checkModifications
+			c.setCandidate(v, netmp, fragmentIonTypeEnd, startmodifid, endmodifid, middlemodifid, branchstart, branchend);
+			cSummaryFormula formula = c.calculateSummaryFormula(*this, peptidetype, precursormass);
+
+			string formulastr = formula.getSummary();
+			addStringFormulaToMap(formulastr, atoms);
+
+			string tmpstr;
+			for (i = 0; i < neutrallossesbrickdatabase.size(); i++) {
+				tmpstr = neutrallossesbrickdatabase[i].getSummary();
+				if (atoms.count(tmpstr) == 1) {
+					max_counts.push_back(atoms[tmpstr]);
+				}
+				else {
+					max_counts.push_back(0);
+				}
+				*os << tmpstr << ": " << max_counts[i] << endl;
 			}
 
 		}
-		
-		max_counts.push_back(88);	// H
-		max_counts.push_back(52);	// C
-		max_counts.push_back(10);	// N
-		max_counts.push_back(15);	// O
-		max_counts.push_back(0);	// S
 
 	}
 
