@@ -4,22 +4,12 @@
 #include <fstream>
 #include <iomanip> 
 
-#include "include/MassLynxRawDataFile.h"
-#include "include/MassLynxRawReader.h"
-#include "include/MassLynxRawScanReader.h"
-#include "include/MassLynxRawChromatogramReader.h"
-#include "include/MassLynxRawInfo.h"
-#include "include/MassLynxRawScanStatsReader.h"
+#include "include/MassLynxRawInfoReader.hpp"
+#include "include/MassLynxRawScanReader.hpp"
 
-using std::vector;
-using std::string;
-using std::cout;
-using std::endl;
 
 using namespace std;
 using namespace Waters::Lib::MassLynxRaw;
-
-#include <stdio.h>
 
 
 int main(int argc, char* argv[]) {
@@ -31,17 +21,10 @@ int main(int argc, char* argv[]) {
 
 	try {
 
-		// get a raw reader
-		MassLynxRawReader RR(argv[1]);
-
-		// use it to get raw info
-		MassLynxRawInfo RI(RR);
+		MassLynxRawInfo RI(argv[1]);
 		int nFuncs = RI.GetFunctionCount();
 
 		cout << "The data has " << nFuncs << " functions." << endl << endl;
-
-		// now read some raw spectra
-		MassLynxRawScanReader RSR(RR);
 
 		vector<float> masses;
 		vector<float> intensities;
@@ -56,19 +39,14 @@ int main(int argc, char* argv[]) {
 		outputstream << fixed;
 		outputstream << setprecision(10);
 
-		// basic scan stats
-		MassLynxRawScanStatsReader RSSR(RR);
-
-		vector<MSScanStats> stats;
+		MassLynxRawScanReader RSR(RI);
 
 		for (int i = 0; i < nFuncs; i++) {
 
 			cout << "Exporting scan no. " << i << "... ";
 
-			stats.clear();
-			RSSR.readScanStats(i, stats);
-
-			for (int j = 0; j < (int)stats.size(); j++) {
+			int nScans = RI.GetScansInFunction(i);
+			for (int j = 0; j < nScans; j++) {
 				masses.clear();
 				intensities.clear();
 
@@ -77,7 +55,7 @@ int main(int argc, char* argv[]) {
 				outputstream << "scan=" << to_string(j);
 				outputstream << "\nCHARGE=1+\n\n";
 
-				RSR.readSpectrum(i, j, masses, intensities);
+				RSR.ReadScan(i, j, masses, intensities);
 				
 				for (int k = 0; k < (int)masses.size(); k++) {
 					outputstream << masses[k] << " " << intensities[k] << endl;
@@ -93,8 +71,10 @@ int main(int argc, char* argv[]) {
 		outputstream.close();
 
 	}
-	catch (MassLynxRawException &e) {
+	catch (const MassLynxRawException e) {
+
 		cout << "MassLynxRawException: " << e.what() << endl;
+
 	}
 
 	return 0;
