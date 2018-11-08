@@ -200,6 +200,17 @@ string cSequence::getNameWithReferenceAsHTMLString() {
 			}
 		}
 
+		// DOI
+		if (!correctreference) {
+			rx = "^DOI: ";
+			if (regex_search(reference, rx)) {
+				s += "<a href=\"http://dx.doi.org/" + reference.substr(5) + "\">";
+				s += name;
+				s += "</a>";
+				correctreference = true;
+			}
+		}
+
 	}
 	catch (regex_error& /*e*/) {
 		// nothing to do

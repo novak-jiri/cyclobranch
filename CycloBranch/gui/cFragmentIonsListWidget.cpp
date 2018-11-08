@@ -8,7 +8,8 @@
 cFragmentIonsListWidget::cFragmentIonsListWidget(QObject* parent) {
 	this->parent = parent;
 
-	vbox = new QVBoxLayout();
+	vbox1 = new QVBoxLayout();
+	vbox2 = new QVBoxLayout();
 	hbox = new QHBoxLayout();
 
 	list = new QListWidget();
@@ -23,14 +24,17 @@ cFragmentIonsListWidget::cFragmentIonsListWidget(QObject* parent) {
 	resetbutton = new QPushButton("Reset");
 	resetbutton->setToolTip("Reset to the default selection of ions.");
 
-	vbox->addWidget(selectallbutton);
-	vbox->addWidget(clearallbutton);
-	vbox->addWidget(resetbutton);
-	vbox->addStretch(1);
+	vbox1->addWidget(list);
+	vbox1->addStretch(1);
+
+	vbox2->addWidget(selectallbutton);
+	vbox2->addWidget(clearallbutton);
+	vbox2->addWidget(resetbutton);
+	vbox2->addStretch(1);
 
 	hbox->setMargin(0);
-	hbox->addWidget(list);
-	hbox->addLayout(vbox);
+	hbox->addLayout(vbox1);
+	hbox->addLayout(vbox2);
 
 	connect(selectallbutton, SIGNAL(released()), this, SLOT(selectAllItems()));
 	connect(clearallbutton, SIGNAL(released()), this, SLOT(clearAllItems()));
@@ -46,7 +50,8 @@ cFragmentIonsListWidget::~cFragmentIonsListWidget() {
 	delete clearallbutton;
 	delete resetbutton;
 	
-	delete vbox;
+	delete vbox1;
+	delete vbox2;
 	delete hbox;
 }
 

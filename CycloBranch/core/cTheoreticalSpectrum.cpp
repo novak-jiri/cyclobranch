@@ -196,6 +196,70 @@ void cTheoreticalSpectrum::computeStatistics(bool writedescription) {
 }
 
 
+void cTheoreticalSpectrum::generateChargedFragments(cPeak& peak, map<string, int>& atoms, int& peaklistrealsize, int maxcharge, bool writedescription, bool disablesummary) {
+	if (peak.mzratio > 0) {
+		double tempratio;
+		string tempdescription;
+		map<string, int> tempmap;
+
+		tempratio = peak.mzratio;
+		if (writedescription) {
+			tempdescription = peak.description;
+		}
+		for (int i = 1; i <= abs(maxcharge); i++) {
+
+			peak.mzratio = charge(uncharge(tempratio, 1), (parameters->precursorcharge > 0) ? i : -i);
+			peak.charge = (parameters->precursorcharge > 0) ? i : -i;
+			if (!disablesummary && (parameters->generateisotopepattern || writedescription)) {
+				tempmap = atoms;
+				rechargeMap(peak.charge, tempmap);
+				peak.formula.setFromMap(tempmap, false);
+			}
+			if (writedescription) {
+				if (parameters->precursorcharge > 0) {
+					peak.description = to_string(i) + "+ " + tempdescription;
+				}
+				else {
+					peak.description = to_string(i) + "- " + tempdescription;
+				}
+			}
+
+			if (writedescription) {
+				if (peak.formula.hasAllElementsPositive()) {
+					if (parameters->reportunmatchedtheoreticalpeaks || searchHint(peak.mzratio, experimentalpeaks, parameters->fragmentmasserrortolerance)) {
+						addPeakToList(peak, peaklistrealsize);
+					}
+					if (!parameters->generateisotopepattern) {
+						addMetalPeaks(peak, parameters->metaladducts, peaklistrealsize, i, writedescription);
+					}
+				}
+			}
+			else {
+				if (parameters->generateisotopepattern) {
+					if (peak.formula.hasAllElementsPositive()) {
+						if (searchHint(peak.mzratio, experimentalpeaks, parameters->fragmentmasserrortolerance)) {
+							addPeakToList(peak, peaklistrealsize);
+						}
+					}
+				}
+				else {
+					if (searchHint(peak.mzratio, experimentalpeaks, parameters->fragmentmasserrortolerance)) {
+						addPeakToList(peak, peaklistrealsize);
+					}
+					addMetalPeaks(peak, parameters->metaladducts, peaklistrealsize, i, writedescription);
+				}
+			}
+
+		}
+		peak.mzratio = tempratio;
+		if (writedescription) {
+			peak.description = tempdescription;
+		}
+
+	}
+}
+
+
 void cTheoreticalSpectrum::generatePrecursorIon(vector<int>& intcomposition, cBricksDatabase& bricksdatabasewithcombinations, int& theoreticalpeaksrealsize, bool writedescription) {
 	cPeak peak;
 	int starttype, endtype;
@@ -947,6 +1011,193 @@ void cTheoreticalSpectrum::removeUnmatchedIsotopePatterns(cPeaksList& theoretica
 			}
 			if (storeunmatchedpeaks && !theoreticalpeaks[j].decoy && (parameters->mode == dereplication) && parameters->generateisotopepattern && parameters->reportunmatchedtheoreticalpeaks) {
 				outputtheoreticalpeaks.add(theoreticalpeaks[j]);
+			}
+		}
+	}
+}
+
+
+void cTheoreticalSpectrum::removeUnmatchedFeatures(cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks, int id) {
+	int requestedfeaturesize;
+	bool clearfeature;
+	int k;
+
+	for (int i = 0; i < theoreticalpeaksrealsize; i++) {
+		if (theoreticalpeaks[i].isotope || (theoreticalpeaks[i].matched == 0)) {
+			continue;
+		}
+
+		requestedfeaturesize = parameters->minimumfeaturesize;
+
+		k = id - 1;
+		while ((k >= 0) && (requestedfeaturesize > 1)) {
+			if (!searchHint(theoreticalpeaks[i].mzratio, parameters->peaklistseries[k], parameters->fragmentmasserrortolerance)) {
+				break;
+			}
+			requestedfeaturesize--;
+			k--;
+		}
+						
+		clearfeature = false;
+		if (id + requestedfeaturesize > parameters->peaklistseries.size()) {
+			clearfeature = true;
+		}
+		else {
+			for (int j = id + 1; j < id + requestedfeaturesize; j++) {
+				if (!searchHint(theoreticalpeaks[i].mzratio, parameters->peaklistseries[j], parameters->fragmentmasserrortolerance)) {
+					clearfeature = true;
+					break;
+				}
+			}
+		}
+
+		if (clearfeature) {
+			experimentalmatches[theoreticalpeaks[i].matchedid].erase(experimentalmatches[theoreticalpeaks[i].matchedid].find(i));
+			experimentalpeaks[theoreticalpeaks[i].matchedid].matched--;
+
+			theoreticalpeaks[i].matched--;
+			theoreticalpeaks[i].matchedid = -1;
+		}
+	}
+}
+
+
+void cTheoreticalSpectrum::removeUnmatchedFeaturesAndCompounds(cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks, int id) {
+	if (theoreticalpeaksrealsize == 0) {
+		return;
+	}
+
+	int start = 0;
+	int stop = 0;
+	int currid = theoreticalpeaks[0].compoundid;
+	bool matched = true;
+	int featurestart = 0;
+	int featureend = parameters->peaklistseries.size() - 1;
+	int k;
+
+	for (int i = 0; i < theoreticalpeaksrealsize; i++) {
+		if (currid != theoreticalpeaks[i].compoundid) {
+			if (matched) {
+				if (featureend - featurestart + 1 < parameters->minimumfeaturesize) {
+					matched = false;
+				}
+			}
+
+			if (!matched) {
+				for (int j = start; j <= stop; j++) {
+					if (theoreticalpeaks[j].matched > 0) {
+						experimentalmatches[theoreticalpeaks[j].matchedid].erase(experimentalmatches[theoreticalpeaks[j].matchedid].find(j));
+						experimentalpeaks[theoreticalpeaks[j].matchedid].matched--;
+
+						theoreticalpeaks[j].matched--;
+						theoreticalpeaks[j].matchedid = -1;
+					}
+				}
+			}
+
+			currid = theoreticalpeaks[i].compoundid;
+			start = i;
+			matched = true;
+			featurestart = 0;
+			featureend = parameters->peaklistseries.size() - 1;
+		}
+
+		if (!theoreticalpeaks[i].isotope) {
+			if (theoreticalpeaks[i].matched == 0) {
+				matched = false;
+			}
+			else {
+
+				if (matched) {
+
+					k = id - 1;
+					while (k >= 0) {
+						if (!searchHint(theoreticalpeaks[i].mzratio, parameters->peaklistseries[k], parameters->fragmentmasserrortolerance)) {
+							break;
+						}
+						k--;
+					}
+					featurestart = max(featurestart, k + 1);
+
+					k = id + 1;
+					while (k < parameters->peaklistseries.size()) {
+						if (!searchHint(theoreticalpeaks[i].mzratio, parameters->peaklistseries[k], parameters->fragmentmasserrortolerance)) {
+							break;
+						}
+						k++;
+					}
+					featureend = min(featureend, k - 1);
+
+				}
+
+			}
+
+		}
+		stop = i;
+	}
+
+	if (matched) {
+		if (featureend - featurestart + 1 < parameters->minimumfeaturesize) {
+			matched = false;
+		}
+	}
+
+	if (!matched) {
+		for (int j = start; j <= stop; j++) {
+			if (theoreticalpeaks[j].matched > 0) {
+				experimentalmatches[theoreticalpeaks[j].matchedid].erase(experimentalmatches[theoreticalpeaks[j].matchedid].find(j));
+				experimentalpeaks[theoreticalpeaks[j].matchedid].matched--;
+
+				theoreticalpeaks[j].matched--;
+				theoreticalpeaks[j].matchedid = -1;
+			}
+		}
+	}
+}
+
+
+void cTheoreticalSpectrum::removeUnmatchedCompounds(cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks) {
+	if (theoreticalpeaksrealsize == 0) {
+		return;
+	}
+
+	int start = 0;
+	int stop = 0;
+	int currid = theoreticalpeaks[0].compoundid;
+	bool matched = true;
+	for (int i = 0; i < theoreticalpeaksrealsize; i++) {
+		if (currid != theoreticalpeaks[i].compoundid) {
+			if (!matched) {
+				for (int j = start; j <= stop; j++) {
+					if (theoreticalpeaks[j].matched > 0) {
+						experimentalmatches[theoreticalpeaks[j].matchedid].erase(experimentalmatches[theoreticalpeaks[j].matchedid].find(j));
+						experimentalpeaks[theoreticalpeaks[j].matchedid].matched--;
+
+						theoreticalpeaks[j].matched--;
+						theoreticalpeaks[j].matchedid = -1;
+					}
+				}
+			}
+			
+			currid = theoreticalpeaks[i].compoundid;
+			start = i;
+			matched = true;
+		}
+
+		if (!theoreticalpeaks[i].isotope && (theoreticalpeaks[i].matched == 0)) {
+			matched = false;
+		}
+		stop = i;
+	}
+
+	if (!matched) {
+		for (int j = start; j <= stop; j++) {
+			if (theoreticalpeaks[j].matched > 0) {
+				experimentalmatches[theoreticalpeaks[j].matchedid].erase(experimentalmatches[theoreticalpeaks[j].matchedid].find(j));
+				experimentalpeaks[theoreticalpeaks[j].matchedid].matched--;
+
+				theoreticalpeaks[j].matched--;
+				theoreticalpeaks[j].matchedid = -1;
 			}
 		}
 	}
@@ -2795,6 +3046,7 @@ void cTheoreticalSpectrum::generateMSSpectrum(bool writedescription) {
 	for (int i = 0; i < parameters->sequencedatabase.size(); i++) {
 
 		peak.clear();
+		peak.compoundid = i;
 		peak.isotope = false;
 
 		formula.clear();
@@ -2925,6 +3177,7 @@ void cTheoreticalSpectrum::generateFineMSSpectrum() {
 					for (int p = 0; p < isotopepattern.size(); p++) {
 						isotopepattern[p].description = description + isotopepattern[p].description + "): ";
 						isotopepattern[p].groupid = groupid;
+						isotopepattern[p].compoundid = i;
 						isotopepattern[p].decoy = parameters->sequencedatabase[i].isDecoy();
 						addPeakToList(isotopepattern[p], theoreticalpeaksrealsize);
 					}
@@ -2942,22 +3195,72 @@ void cTheoreticalSpectrum::generateFineMSSpectrum() {
 }
 
 
-void cTheoreticalSpectrum::compareMSSpectrum(cPeaksList& peaklist, cTheoreticalSpectrum& tsfull, cPeaksList& unmatchedpeaksinmatchedpatterns) {
-	experimentalpeaks = peaklist;
-	peaklist.clear();
-	experimentalpeaks.sortbyMass();
+void cTheoreticalSpectrum::compareMSSpectrum(int id, cTheoreticalSpectrum& tsfull, cPeaksList& unmatchedpeaksinmatchedpatterns) {
+	experimentalpeaks = parameters->peaklistseries[id];
 
 	cPeaksList* tsfullpeaklist = tsfull.getTheoreticalPeaks();
 
 	experimentalmatches.clear();
 	searchForPeakPairs(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks, parameters->fragmentmasserrortolerance);
 
+	bool lcms = (parameters->peaklistseries.size() > 1) && !((parameters->peaklistfileformat == mis) || (parameters->peaklistfileformat == imzML));
+
+	// pre-cleaning (relative intensity threshold, minimumpatternsize)
+	if (parameters->generateisotopepattern) {
+		if (parameters->allionsmustbepresent || (lcms && (parameters->minimumfeaturesize > 1))) {
+			removeUnmatchedIsotopePatterns(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks, unmatchedpeaksinmatchedpatterns, false);
+		}
+	}
+
+	// mark isotopes
+	if (parameters->generateisotopepattern) {
+		if ((parameters->allionsmustbepresent) || (lcms && (parameters->minimumfeaturesize > 1))) {
+			tsfullpeaklist->markIsotopes();
+		}
+	}
+
+	// LC-MS data
+	if (lcms) {
+		if (parameters->minimumfeaturesize > 1) {
+			if (parameters->allionsmustbepresent) {
+				removeUnmatchedFeaturesAndCompounds(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks, id);
+			}
+			else {
+				removeUnmatchedFeatures(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks, id);
+			}
+		}
+		else {
+			if (parameters->allionsmustbepresent) {
+				removeUnmatchedCompounds(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks);
+			}
+		}
+	}
+	// direct MS or MSI data
+	else {
+		if (parameters->allionsmustbepresent) {
+			removeUnmatchedCompounds(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks);
+		}
+	}
+
+	// clear marks of isotopes
+	if (parameters->generateisotopepattern) {
+		if ((parameters->allionsmustbepresent) || (lcms && (parameters->minimumfeaturesize > 1))) {
+			tsfullpeaklist->setIsotopeFlags(false);
+		}
+	}
+
+	// clear matched isotopes of unmatched monoisotopic peaks
 	unmatchedpeaksinmatchedpatterns.clear();
-	if (!parameters->generateisotopepattern) {
-		removeUnmatchedMetalIsotopes(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks);
+	if (parameters->generateisotopepattern) {
+		// performs also an additional cleaning of isotopes if removeUnmatchedFeatures is used
+		removeUnmatchedIsotopePatterns(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks, unmatchedpeaksinmatchedpatterns, true);
 	}
 	else {
-		removeUnmatchedIsotopePatterns(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks, unmatchedpeaksinmatchedpatterns, true);
+		removeUnmatchedMetalIsotopes(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks);
+	}
+
+	// calculate scores
+	if (parameters->generateisotopepattern) {
 		targetscores.clear();
 		decoyscores.clear();
 		calculateEnvelopeScores(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks);
@@ -3119,11 +3422,13 @@ double cTheoreticalSpectrum::getRatioOfMatchedPeaks() {
 
 void cTheoreticalSpectrum::generateNTerminalFragmentIons(int maxcharge, int& peaklistrealsize, vector<int>& intcomposition, eFragmentIonType fragmentiontype, int neutrallosstype, cBricksDatabase& bricksdatabase, bool writedescription, int rotationid, vector<splitSite>& splittingsites, vector<fragmentDescription>& searchedmodifications, ePeptideType peptidetype, bool regularblocksorder, TRotationInfo* trotation, eResidueLossType leftresiduelosstype, bool hasfirstblockartificial) {
 	cPeak peak;
-	double tempratio;
-	string tempdescription;
-
-	map<string, int> atoms, tempmap;
+	map<string, int> atoms;
 	atoms.clear();
+	vector<int> internalcomposition;
+
+	map<string, int> tmpmap;
+	double tmpmz;
+	int tmprotationid;
 
 	bool disablesummary = false;
 	if ((parameters->mode == denovoengine) && (parameters->blindedges == 2) && bricksdatabase[intcomposition[0] - 1].isArtificial()) {
@@ -3219,7 +3524,9 @@ void cTheoreticalSpectrum::generateNTerminalFragmentIons(int maxcharge, int& pea
 			}
 
 			if ((i >= trotation->middlebranchstart) && (i < trotation->middlebranchend)) {
-				continue;
+				if (!(parameters->internalfragments && (peptidetype == branchcyclic) && (trotation->id == 0))) {
+					continue;
+				}
 			}
 
 			// redundant short n-term fragments are not generated
@@ -3326,62 +3633,60 @@ void cTheoreticalSpectrum::generateNTerminalFragmentIons(int maxcharge, int& pea
 
 		}
 
-		if (peak.mzratio > 0) {
+		generateChargedFragments(peak, atoms, peaklistrealsize, maxcharge, writedescription, disablesummary);
 
-			tempratio = peak.mzratio;		
-			if (writedescription) {
-				tempdescription = peak.description;
-			}
-			for (int j = 1; j <= abs(maxcharge); j++) {
-
-				peak.mzratio = charge(uncharge(tempratio, 1), (parameters->precursorcharge > 0)?j:-j);
-				peak.charge = (parameters->precursorcharge > 0)?j:-j;
-				if (!disablesummary && (parameters->generateisotopepattern || writedescription)) {
-					tempmap = atoms;
-					rechargeMap(peak.charge, tempmap);
-					peak.formula.setFromMap(tempmap, false);
-				}
-				if (writedescription) {
-					if (parameters->precursorcharge > 0) {
-						peak.description = to_string(j) + "+ " + tempdescription;
-					}
-					else {
-						peak.description = to_string(j) + "- " + tempdescription;
-					}
+		if (parameters->internalfragments && (peptidetype == branchcyclic) && (trotation->id == 0)) {
+			if ((i >= trotation->middlebranchstart) && (i < trotation->middlebranchend)) {
+				internalcomposition.clear();			
+				for (int j = 0; j <= i; j++) {
+					internalcomposition.push_back(intcomposition[j]);
 				}
 
-				if (writedescription) {
-					if (peak.formula.hasAllElementsPositive()) {
-						if (parameters->reportunmatchedtheoreticalpeaks || searchHint(peak.mzratio, experimentalpeaks, parameters->fragmentmasserrortolerance)) {
-							addPeakToList(peak, peaklistrealsize);
+				tmpmap = atoms;
+				tmpmz = peak.mzratio;
+				tmprotationid = peak.rotationid;
+				
+				peak.rotationid = -1;
+				peak.seriesid = -1;
+
+				for (int j = trotation->middlebranchend + 1; j < (int)intcomposition.size() - 1; j++) {
+					internalcomposition.push_back(intcomposition[j]);
+
+					peak.mzratio += bricksdatabase[intcomposition[j] - 1].getMass();
+					if (!disablesummary && (parameters->generateisotopepattern || writedescription)) {
+						mergeMaps(bricksdatabase[intcomposition[j] - 1].getSummaryMap(), tmpmap);
+					}
+
+					if (writedescription) {
+						peak.description = "internal ";
+
+						peak.description += parameters->iondefinitions[fragmentiontype].name.substr(0, 1) + to_string((int)internalcomposition.size());
+						//if (parameters->iondefinitions[fragmentiontype].name.size() > 1) {
+						//	peak.description += parameters->iondefinitions[fragmentiontype].name.substr(1, parameters->iondefinitions[fragmentiontype].name.length() - 1);
+						//}
+
+						if (peak.neutrallosstype >= 0) {
+							peak.description += "-" + parameters->neutrallossesdefinitions[peak.neutrallosstype].summary;
 						}
-						if (!parameters->generateisotopepattern) {
-							addMetalPeaks(peak, parameters->metaladducts, peaklistrealsize, j, writedescription);
-						}
-					}
-				}
-				else {
-					if (parameters->generateisotopepattern) {
-						if (peak.formula.hasAllElementsPositive()) {
-							if (searchHint(peak.mzratio, experimentalpeaks, parameters->fragmentmasserrortolerance)) {
-								addPeakToList(peak, peaklistrealsize);
+
+						addAdductToDescription(peak.description, parameters->metaladducts);
+						peak.description += ": ";
+
+						for (int k = 0; k < (int)internalcomposition.size(); k++) {
+							peak.description += "[" + bricksdatabase[internalcomposition[k] - 1].getAcronymsAsString() + "]";
+							if (k < (int)internalcomposition.size() - 1) {
+								peak.description += '-';
 							}
 						}
 					}
-					else {
-						if (searchHint(peak.mzratio, experimentalpeaks, parameters->fragmentmasserrortolerance)) {
-							addPeakToList(peak, peaklistrealsize);
-						}
-						addMetalPeaks(peak, parameters->metaladducts, peaklistrealsize, j, writedescription);
-					}
+
+					generateChargedFragments(peak, tmpmap, peaklistrealsize, maxcharge, writedescription, disablesummary);
 				}
 
-			}
-			peak.mzratio = tempratio;
-			if (writedescription) {
-				peak.description = tempdescription;
-			}
+				peak.mzratio = tmpmz;
+				peak.rotationid = tmprotationid;
 
+			}
 		}
 
 	}
@@ -3391,10 +3696,7 @@ void cTheoreticalSpectrum::generateNTerminalFragmentIons(int maxcharge, int& pea
 
 void cTheoreticalSpectrum::generateCTerminalFragmentIons(int maxcharge, int& peaklistrealsize, vector<int>& intcomposition, eFragmentIonType fragmentiontype, int neutrallosstype, cBricksDatabase& bricksdatabase, bool writedescription, int rotationid, vector<splitSite>& splittingsites, vector<fragmentDescription>& searchedmodifications, ePeptideType peptidetype, bool regularblocksorder, TRotationInfo* trotation, eResidueLossType rightresiduelosstype, bool haslastblockartificial) {
 	cPeak peak;
-	double tempratio;
-	string tempdescription;
-
-	map<string, int> atoms, tempmap;
+	map<string, int> atoms;
 	atoms.clear();
 
 	bool disablesummary = false;
@@ -3576,63 +3878,7 @@ void cTheoreticalSpectrum::generateCTerminalFragmentIons(int maxcharge, int& pea
 
 		}
 
-		if (peak.mzratio > 0) {
-
-			tempratio = peak.mzratio;
-			if (writedescription) {
-				tempdescription = peak.description;
-			}
-			for (int j = 1; j <= abs(maxcharge); j++) {
-
-				peak.mzratio = charge(uncharge(tempratio, 1), (parameters->precursorcharge > 0)?j:-j);
-				peak.charge = (parameters->precursorcharge > 0)?j:-j;
-				if (!disablesummary && (parameters->generateisotopepattern || writedescription)) {
-					tempmap = atoms;
-					rechargeMap(peak.charge, tempmap);
-					peak.formula.setFromMap(tempmap, false);
-				}
-				if (writedescription) {
-					if (parameters->precursorcharge > 0) {
-						peak.description = to_string(j) + "+ " + tempdescription;
-					}
-					else {
-						peak.description = to_string(j) + "- " + tempdescription;
-					}
-				}
-				
-				if (writedescription) {
-					if (peak.formula.hasAllElementsPositive()) {
-						if (parameters->reportunmatchedtheoreticalpeaks || searchHint(peak.mzratio, experimentalpeaks, parameters->fragmentmasserrortolerance)) {
-							addPeakToList(peak, peaklistrealsize);
-						}
-						if (!parameters->generateisotopepattern) {
-							addMetalPeaks(peak, parameters->metaladducts, peaklistrealsize, j, writedescription);
-						}
-					}
-				}
-				else {
-					if (parameters->generateisotopepattern) {
-						if (peak.formula.hasAllElementsPositive()) {
-							if (searchHint(peak.mzratio, experimentalpeaks, parameters->fragmentmasserrortolerance)) {
-								addPeakToList(peak, peaklistrealsize);
-							}
-						}
-					}
-					else {
-						if (searchHint(peak.mzratio, experimentalpeaks, parameters->fragmentmasserrortolerance)) {
-							addPeakToList(peak, peaklistrealsize);
-						}
-						addMetalPeaks(peak, parameters->metaladducts, peaklistrealsize, j, writedescription);
-					}
-				}
-
-			}
-			peak.mzratio = tempratio;
-			if (writedescription) {
-				peak.description = tempdescription;
-			}
-
-		}
+		generateChargedFragments(peak, atoms, peaklistrealsize, maxcharge, writedescription, disablesummary);
 
 	}
 

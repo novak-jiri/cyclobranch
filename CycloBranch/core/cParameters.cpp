@@ -48,8 +48,11 @@ void cParameters::clear() {
 	reportunmatchedtheoreticalpeaks = false;
 	generateisotopepattern = false;
 	minimumpatternsize = 1;
+	minimumfeaturesize = 1;
+	allionsmustbepresent = false;
 	cyclicnterminus = false;
 	cycliccterminus = false;
+	internalfragments = false;
 	enablescrambling = false;
 	similaritysearch = false;
 	regularblocksorder = false;
@@ -746,10 +749,9 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 
 	// calculate combinations of neutral losses
 	if (!error) {
-		errtype = calculateNeutralLosses(terminatecomputation);
+		errtype = calculateNeutralLosses(terminatecomputation, errormessage);
 		if (errtype == -1) {
 			error = true;
-			errormessage = "Aborted by user.\n";
 		}
 	}
 
@@ -767,6 +769,64 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 
 
 	return 0;
+}
+
+
+bool cParameters::checkModifications(cSequence& sequence, int& startmodifid, int& endmodifid, int& middlemodifid, string& errormessage) {
+	startmodifid = 0;
+	endmodifid = 0;
+	middlemodifid = 0;
+	errormessage = "";
+
+	if ((sequence.getPeptideType() == linear) || (sequence.getPeptideType() == branched) || (sequence.getPeptideType() == branchcyclic) || (sequence.getPeptideType() == linearpolyketide)) {
+
+		if ((sequence.getPeptideType() == linear) || (sequence.getPeptideType() == branched) || (sequence.getPeptideType() == linearpolyketide)) {
+			startmodifid = -1;
+			endmodifid = -1;
+		}
+
+		if ((sequence.getPeptideType() == branched) || (sequence.getPeptideType() == branchcyclic)) {
+			middlemodifid = -1;
+		}
+
+		for (int i = 0; i < (int)searchedmodifications.size(); i++) {
+
+			if ((sequence.getPeptideType() == linear) || (sequence.getPeptideType() == branched) || (sequence.getPeptideType() == linearpolyketide)) {
+				if (searchedmodifications[i].name.compare(sequence.getNTterminalModification()) == 0) {
+					startmodifid = i;
+				}
+
+				if (searchedmodifications[i].name.compare(sequence.getCTterminalModification()) == 0) {
+					endmodifid = i;
+				}
+			}
+
+			if ((sequence.getPeptideType() == branched) || (sequence.getPeptideType() == branchcyclic)) {
+				if (searchedmodifications[i].name.compare(sequence.getBranchModification()) == 0) {
+					middlemodifid = i;
+				}
+			}
+
+		}
+
+		if (startmodifid == -1) {
+			errormessage = "The N-terminal modification in the sequence " + sequence.getSequence() + " is not defined: " + sequence.getNTterminalModification();
+			return false;
+		}
+
+		if (endmodifid == -1) {
+			errormessage = "The C-terminal modification in the sequence " + sequence.getSequence() + " is not defined: " + sequence.getCTterminalModification();
+			return false;
+		}
+
+		if (middlemodifid == -1) {
+			errormessage = "The branch modification in the sequence " + sequence.getSequence() + " is not defined: " + sequence.getBranchModification();
+			return false;
+		}
+
+	}
+
+	return true;
 }
 
 
@@ -840,9 +900,6 @@ string cParameters::printToString() {
 	s += "FWHM: " + to_string(fwhm) + "\n";
 	s += "Building Blocks Database File: " + bricksdatabasefilename + "\n";
 	s += "Maximum Number of Combined Blocks (start, middle, end): " + to_string(maximumbricksincombinationbegin) + ", " + to_string(maximumbricksincombinationmiddle) + ", " + to_string(maximumbricksincombinationend) + "\n";
-	s += "Maximum Cumulative Mass of Blocks: " + to_string(maximumcumulativemass) + "\n";
-
-	s += "N-/C-terminal Modifications File: " + modificationsfilename + "\n";
 
 	s += "Incomplete Paths in De Novo Graph: ";
 	switch (blindedges) {
@@ -860,20 +917,27 @@ string cParameters::printToString() {
 	}
 	s += "\n";
 
-	s += "Cyclic N-terminus: ";
-	s += cyclicnterminus ? "on" : "off";
+	s += "Maximum Cumulative Mass of Blocks: " + to_string(maximumcumulativemass) + "\n";
+	s += "N-/C-terminal Modifications File: " + modificationsfilename + "\n";
+
+	s += "Disable Precursor Mass Filter: ";
+	s += similaritysearch ? "on" : "off";
 	s += "\n";
 
-	s += "Cyclic C-terminus: ";
-	s += cycliccterminus ? "on" : "off";
+	s += "Internal Fragments: ";
+	s += internalfragments ? "on" : "off";
 	s += "\n";
 
 	s += "Enable Scrambling: ";
 	s += enablescrambling ? "on" : "off";
 	s += "\n";
 
-	s += "Disable Precursor Mass Filter: ";
-	s += similaritysearch ? "on" : "off";
+	s += "Cyclic N-terminus: ";
+	s += cyclicnterminus ? "on" : "off";
+	s += "\n";
+
+	s += "Cyclic C-terminus: ";
+	s += cycliccterminus ? "on" : "off";
 	s += "\n";
 
 	s += "Regular Order of Ketide Blocks: ";
@@ -942,6 +1006,12 @@ string cParameters::printToString() {
 	
 	s += "Minimum Pattern Size: " + to_string(minimumpatternsize) + "\n";
 
+	s += "Minimum Feature Size: " + to_string(minimumfeaturesize) + "\n";
+
+	s += "All Ions Must be Annotated: ";
+	s += allionsmustbepresent ? "on" : "off";
+	s += "\n";
+
 	s += "Searched Sequence: " + originalsearchedsequence + "\n";
 	s += "N-terminal Modification: " + searchedsequenceNtermmodif + "\n";
 	s += "C-terminal Modification: " + searchedsequenceCtermmodif + "\n";
@@ -968,10 +1038,11 @@ void cParameters::updateFragmentDefinitions() {
 }
 
 
-int cParameters::calculateNeutralLosses(bool& terminatecomputation) {
+int cParameters::calculateNeutralLosses(bool& terminatecomputation, string& errormessage) {
 	neutrallossesdefinitions.clear();
 	neutrallossesfortheoreticalspectra.clear();
 	numberofgeneratedneutrallosses = 0;
+	errormessage = "";
 
 	if (maximumcombinedlosses == 0) {
 		return 0;
@@ -1011,6 +1082,7 @@ int cParameters::calculateNeutralLosses(bool& terminatecomputation) {
 		tmpbrick.setComposition(to_string(numberofbasicbricks + 1), false);
 		tmpbrick.setMass(tmpformula.getMass());
 		tmpbrick.setSummary(originalneutrallossesdefinitions[originalneutrallossesfortheoreticalspectra[i]].summary);
+		tmpbrick.createSummaryMap();
 
 		neutrallossesbrickdatabase.push_back(tmpbrick);
 
@@ -1024,6 +1096,84 @@ int cParameters::calculateNeutralLosses(bool& terminatecomputation) {
 		combarray.push_back(0);
 	}
 
+	map<string, int> atoms;
+	map<int, int> counts;
+	vector<int> max_counts;
+	bool skipcombination;
+	bool bruteforce = false;
+
+	if (mode == singlecomparison) {
+
+		bruteforce = true;
+		for (i = 0; i < neutrallossesbrickdatabase.size(); i++) {
+			if (neutrallossesbrickdatabase[i].getSummaryMap().size() == 1) {
+				auto it = neutrallossesbrickdatabase[i].getSummaryMap().begin();
+				if (it->second != 1) {
+					bruteforce = false;
+					break;
+				}
+			}
+			else {
+				bruteforce = false;
+				break;
+			}
+		}
+
+		// calculate molecular formula of searched sequence
+		if (bruteforce) {
+
+			*os << "Brute force fragmentation enabled. Maximum numbers of elements: " << endl;
+
+			string upperboundsequence = searchedsequence;
+
+			if (!checkRegex(peptidetype, upperboundsequence, errormessage)) {
+				return -1;
+			}
+
+			if (!bricksdatabase.replaceAcronymsByIDs(upperboundsequence, errormessage)) {
+				return -1;
+			}
+
+			cSequence tmpsequence;
+			tmpsequence.setNTterminalModification(searchedsequenceNtermmodif);
+			tmpsequence.setCTterminalModification(searchedsequenceCtermmodif);
+			tmpsequence.setBranchModification(searchedsequenceTmodif);
+			tmpsequence.setPeptideType(peptidetype);
+
+			int startmodifid, endmodifid, middlemodifid;
+			if (!checkModifications(tmpsequence, startmodifid, endmodifid, middlemodifid, errormessage)) {
+				return -1;
+			}
+
+			int branchstart, branchend;
+			vector<string> v;
+			cCandidate c;
+			vector<nodeEdge> netmp;
+
+			parseBranch(peptidetype, upperboundsequence, v, branchstart, branchend);
+			// startmodifid, endmodifid and middlemodifid were filled up by checkModifications
+			c.setCandidate(v, netmp, fragmentIonTypeEnd, startmodifid, endmodifid, middlemodifid, branchstart, branchend);
+			cSummaryFormula formula = c.calculateSummaryFormula(*this, peptidetype, precursormass);
+
+			string formulastr = formula.getSummary();
+			addStringFormulaToMap(formulastr, atoms);
+
+			string tmpstr;
+			for (i = 0; i < neutrallossesbrickdatabase.size(); i++) {
+				tmpstr = neutrallossesbrickdatabase[i].getSummary();
+				if (atoms.count(tmpstr) == 1) {
+					max_counts.push_back(atoms[tmpstr]);
+				}
+				else {
+					max_counts.push_back(0);
+				}
+				*os << tmpstr << ": " << max_counts[i] << endl;
+			}
+
+		}
+
+	}
+
 	i = 0;
 	compressformulas = false;
 	while (neutrallossesbrickdatabase.nextCombination(combarray, numberofbasicbricks, maximumcombinedlosses, 0, uncharge(precursormass, precursorcharge) - minimummz)) {
@@ -1031,7 +1181,36 @@ int cParameters::calculateNeutralLosses(bool& terminatecomputation) {
 			neutrallossesdefinitions.clear();
 			neutrallossesfortheoreticalspectra.clear();
 			numberofgeneratedneutrallosses = 0;
+			errormessage = "Aborted by user.";
 			return -1;
+		}
+
+		if (bruteforce) {
+			counts.clear();
+			int cnt = 0;
+			for (int j = 0; j < maximumcombinedlosses; j++) {
+				if (combarray[j] == 0) {
+					break;
+				}
+				if (counts.count(combarray[j]) > 0) {
+					counts[combarray[j]]++;
+				}
+				else {
+					counts[combarray[j]] = 1;
+				}
+			}
+
+			skipcombination = false;
+			for (auto& it : counts) {
+				if (it.second > max_counts[it.first - 1]) {
+					skipcombination = true;
+					break;
+				}
+			}
+
+			if (skipcombination) {
+				continue;
+			}
 		}
 
 		getNameOfCompositionFromIntVector(compositionname, combarray);
@@ -1143,6 +1322,7 @@ int cParameters::calculateNeutralLosses(bool& terminatecomputation) {
 				neutrallossesdefinitions.clear();
 				neutrallossesfortheoreticalspectra.clear();
 				numberofgeneratedneutrallosses = 0;
+				errormessage = "Aborted by user.";
 				return -1;
 			}
 		}
@@ -1207,8 +1387,11 @@ void cParameters::store(ofstream& os) {
 	os.write((char *)&reportunmatchedtheoreticalpeaks, sizeof(bool));
 	os.write((char *)&generateisotopepattern, sizeof(bool));
 	os.write((char *)&minimumpatternsize, sizeof(int));
+	os.write((char *)&minimumfeaturesize, sizeof(int));
+	os.write((char *)&allionsmustbepresent, sizeof(bool));
 	os.write((char *)&cyclicnterminus, sizeof(bool));
 	os.write((char *)&cycliccterminus, sizeof(bool));
+	os.write((char *)&internalfragments, sizeof(bool));
 	os.write((char *)&enablescrambling, sizeof(bool));
 	os.write((char *)&similaritysearch, sizeof(bool));
 	os.write((char *)&regularblocksorder, sizeof(bool));
@@ -1334,8 +1517,11 @@ void cParameters::load(ifstream& is) {
 	is.read((char *)&reportunmatchedtheoreticalpeaks, sizeof(bool));
 	is.read((char *)&generateisotopepattern, sizeof(bool));
 	is.read((char *)&minimumpatternsize, sizeof(int));
+	is.read((char *)&minimumfeaturesize, sizeof(int));
+	is.read((char *)&allionsmustbepresent, sizeof(bool));
 	is.read((char *)&cyclicnterminus, sizeof(bool));
 	is.read((char *)&cycliccterminus, sizeof(bool));
+	is.read((char *)&internalfragments, sizeof(bool));
 	is.read((char *)&enablescrambling, sizeof(bool));
 	is.read((char *)&similaritysearch, sizeof(bool));
 	is.read((char *)&regularblocksorder, sizeof(bool));

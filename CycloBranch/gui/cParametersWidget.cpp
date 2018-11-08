@@ -31,6 +31,7 @@ cParametersWidget::cParametersWidget(QWidget* parent) {
 	int leftdefaultwidth = 370;
 	int rightdefaultwidth = 370;
 	int searchedsequencedefaultwidth = 510;
+	int checkboxfieldwidth = 80;
 
 	setWindowTitle("Settings...");
 	setWindowIcon(QIcon(":/images/icons/73.png"));
@@ -281,6 +282,17 @@ cParametersWidget::cParametersWidget(QWidget* parent) {
 	brickdatabasegridlayout->addWidget(maximumbricksincombinatiolabel, 1, 0);
 	brickdatabasegridlayout->addWidget(maximumbricksincombinationwidget, 1, 1);
 
+	blindedges = new QComboBox();
+	blindedges->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+	blindedges->setToolTip("The operation to be performed with edges forming incomplete paths:\nkeep (edges are kept - useful if you would like to see the whole de novo graph in 'View -> Graph');\nremove (edges are removed - speeds up the search);\nconnect (edges are connected - useful if you are looking for sequence tags).");
+	blindedges->addItem(tr("keep (you can see a complete de novo graph)"));
+	blindedges->addItem(tr("remove (speed up the search)"));
+	blindedges->addItem(tr("connect (allow detection of sequence tags)"));
+	blindedges->setFixedWidth(leftdefaultwidth);
+	blindedgeslabel = new QLabel("Incomplete Paths in De Novo Graph:");
+	brickdatabasegridlayout->addWidget(blindedgeslabel, 2, 0);
+	brickdatabasegridlayout->addWidget(blindedges, 2, 1);
+
 	maximumcumulativemass = new QDoubleSpinBox();
 	maximumcumulativemass->setToolTip("Enter the maximum cumulative mass of combined blocks (0 = the maximum mass is unlimited). A small value speeds up the search and vice versa.");
 	maximumcumulativemass->setDecimals(3);
@@ -288,8 +300,8 @@ cParametersWidget::cParametersWidget(QWidget* parent) {
 	maximumcumulativemass->setSingleStep(1);
 	maximumcumulativemass->setFixedWidth(leftdefaultwidth);
 	maximumcumulativemasslabel = new QLabel("Maximum Cumulative Mass of Blocks:");
-	brickdatabasegridlayout->addWidget(maximumcumulativemasslabel, 2, 0);
-	brickdatabasegridlayout->addWidget(maximumcumulativemass, 2, 1);
+	brickdatabasegridlayout->addWidget(maximumcumulativemasslabel, 3, 0);
+	brickdatabasegridlayout->addWidget(maximumcumulativemass, 3, 1);
 
 	modificationsline = new QLineEdit();
 	modificationsline->setToolTip("Select the txt file containing a list of modifications.");
@@ -304,8 +316,8 @@ cParametersWidget::cParametersWidget(QWidget* parent) {
 	modificationswidget->setLayout(modificationslayout);
 	modificationswidget->setFixedWidth(leftdefaultwidth);
 	modificationslabel = new QLabel("N-/C-terminal Modifications File:");
-	brickdatabasegridlayout->addWidget(modificationslabel, 3, 0);
-	brickdatabasegridlayout->addWidget(modificationswidget, 3, 1);
+	brickdatabasegridlayout->addWidget(modificationslabel, 4, 0);
+	brickdatabasegridlayout->addWidget(modificationswidget, 4, 1);
 
 	brickdatabasegroupbox = new QGroupBox("Database of Building Blocks");
 	brickdatabasegroupbox->setLayout(brickdatabasegridlayout);
@@ -313,51 +325,47 @@ cParametersWidget::cParametersWidget(QWidget* parent) {
 
 	miscgridlayout = new QGridLayout();
 
-	blindedges = new QComboBox();
-	blindedges->setSizeAdjustPolicy(QComboBox::AdjustToContents);
-	blindedges->setToolTip("The operation to be performed with edges forming incomplete paths:\nkeep (edges are kept - useful if you would like to see the whole de novo graph in 'View -> Graph');\nremove (edges are removed - speeds up the search);\nconnect (edges are connected - useful if you are looking for sequence tags).");
-	blindedges->addItem(tr("keep (you can see a complete de novo graph)"));
-	blindedges->addItem(tr("remove (speed up the search)"));
-	blindedges->addItem(tr("connect (allow detection of sequence tags)"));
-	blindedges->setFixedWidth(leftdefaultwidth);
-	blindedgeslabel = new QLabel("Incomplete Paths in De Novo Graph:");
-	miscgridlayout->addWidget(blindedgeslabel, 0, 0);
-	miscgridlayout->addWidget(blindedges, 0, 1);
+	similaritysearch = new QCheckBox();
+	similaritysearch->setToolTip("Disable the filtering of sequence candidates by precursor mass. This option can be used to determine a peptide family when a modified peptide is included in a sequence database.");
+	similaritysearch->setFixedWidth(checkboxfieldwidth);
+	similaritysearchlabel = new QLabel("Disable Precursor Mass Filter:");
+	miscgridlayout->addWidget(similaritysearchlabel, 0, 0);
+	miscgridlayout->addWidget(similaritysearch, 0, 1);
 
-	cyclicnterminus = new QCheckBox();
-	cyclicnterminus->setToolTip("The water molecule is subtracted from all theoretical N-terminal fragment ions and the theoretical precursor mass.\nThis feature is useful if a linear peptide includes a small cycle close to the N-terminus.\nIf the linear polyketide is selected as the peptide type, the water molecule is subtracted only from the precursor ion.");
-	cyclicnterminus->setFixedWidth(leftdefaultwidth);
-	cyclicnterminuslabel = new QLabel("Cyclic N-terminus:");
-	miscgridlayout->addWidget(cyclicnterminuslabel, 1, 0);
-	miscgridlayout->addWidget(cyclicnterminus, 1, 1);
-
-	cycliccterminus = new QCheckBox();
-	cycliccterminus->setToolTip("The water molecule is subtracted from all theoretical C-terminal fragment ions and the theoretical precursor mass.\nThis feature is useful if a linear peptide includes a small cycle close to the C-terminus.\nIf the linear polyketide is selected as the peptide type, the water molecule is subtracted only from the precursor ion.");
-	cycliccterminus->setFixedWidth(leftdefaultwidth);
-	cycliccterminuslabel = new QLabel("Cyclic C-terminus:");
-	miscgridlayout->addWidget(cycliccterminuslabel, 2, 0);
-	miscgridlayout->addWidget(cycliccterminus, 2, 1);
+	internalfragments = new QCheckBox();
+	internalfragments->setToolTip("Generate internal fragment ions in theoretical spectra.");
+	internalfragments->setFixedWidth(checkboxfieldwidth);
+	internalfragmentslabel = new QLabel("Internal Fragments:");
+	miscgridlayout->addWidget(internalfragmentslabel, 1, 0);
+	miscgridlayout->addWidget(internalfragments, 1, 1);
 
 	enablescrambling = new QCheckBox();
 	enablescrambling->setToolTip("Generate scrambled fragment ions of cyclic peptides in theoretical spectra.");
-	enablescrambling->setFixedWidth(leftdefaultwidth);
+	enablescrambling->setFixedWidth(checkboxfieldwidth);
 	enablescramblinglabel = new QLabel("Enable Scrambling:");
-	miscgridlayout->addWidget(enablescramblinglabel, 3, 0);
-	miscgridlayout->addWidget(enablescrambling, 3, 1);
+	miscgridlayout->addWidget(enablescramblinglabel, 2, 0);
+	miscgridlayout->addWidget(enablescrambling, 2, 1);
 
-	similaritysearch = new QCheckBox();
-	similaritysearch->setToolTip("Disable the filtering of sequence candidates by precursor mass. This option can be used to determine a peptide family when a modified peptide is included in a sequence database.");
-	similaritysearch->setFixedWidth(leftdefaultwidth);
-	similaritysearchlabel = new QLabel("Disable Precursor Mass Filter:");
-	miscgridlayout->addWidget(similaritysearchlabel, 4, 0);
-	miscgridlayout->addWidget(similaritysearch, 4, 1);
+	cyclicnterminus = new QCheckBox();
+	cyclicnterminus->setToolTip("The water molecule is subtracted from all theoretical N-terminal fragment ions and the theoretical precursor mass.\nThis feature is useful if a linear peptide includes a small cycle close to the N-terminus.\nIf the linear polyketide is selected as the peptide type, the water molecule is subtracted only from the precursor ion.");
+	cyclicnterminus->setFixedWidth(checkboxfieldwidth);
+	cyclicnterminuslabel = new QLabel("Cyclic N-terminus:");
+	miscgridlayout->addWidget(cyclicnterminuslabel, 0, 2);
+	miscgridlayout->addWidget(cyclicnterminus, 0, 3);
+
+	cycliccterminus = new QCheckBox();
+	cycliccterminus->setToolTip("The water molecule is subtracted from all theoretical C-terminal fragment ions and the theoretical precursor mass.\nThis feature is useful if a linear peptide includes a small cycle close to the C-terminus.\nIf the linear polyketide is selected as the peptide type, the water molecule is subtracted only from the precursor ion.");
+	cycliccterminus->setFixedWidth(checkboxfieldwidth);
+	cycliccterminuslabel = new QLabel("Cyclic C-terminus:");
+	miscgridlayout->addWidget(cycliccterminuslabel, 1, 2);
+	miscgridlayout->addWidget(cycliccterminus, 1, 3);
 
 	regularblocksorder = new QCheckBox();
 	regularblocksorder->setToolTip("Keep only polyketide sequence candidates whose ketide building blocks are in the regular order [water eliminating block]-[2H eliminating block]-[water eliminating block]-[2H eliminating block], etc.");
-	regularblocksorder->setFixedWidth(leftdefaultwidth);
+	regularblocksorder->setFixedWidth(checkboxfieldwidth);
 	regularblocksorderlabel = new QLabel("Regular Order of Ketide Blocks:");
-	miscgridlayout->addWidget(regularblocksorderlabel, 5, 0);
-	miscgridlayout->addWidget(regularblocksorder, 5, 1);
+	miscgridlayout->addWidget(regularblocksorderlabel, 2, 2);
+	miscgridlayout->addWidget(regularblocksorder, 2, 3);
 
 	miscgroupbox = new QGroupBox("Miscellaneous");
 	miscgroupbox->setLayout(miscgridlayout);
@@ -461,6 +469,22 @@ cParametersWidget::cParametersWidget(QWidget* parent) {
 	minimumpatternsizelabel = new QLabel("Minimum Pattern Size:");
 	theoreticalspectragridlayout->addWidget(minimumpatternsizelabel, 9, 0);
 	theoreticalspectragridlayout->addWidget(minimumpatternsize, 9, 1);
+
+	minimumfeaturesize = new QSpinBox();
+	minimumfeaturesize->setToolTip("The minimum number of consecutive scans in which a compound must be identified to be reported (LC-MS data only).");
+	minimumfeaturesize->setRange(1, 10000);
+	minimumfeaturesize->setSingleStep(1);
+	minimumfeaturesize->setFixedWidth(rightdefaultwidth);
+	minimumfeaturesizelabel = new QLabel("Minimum Feature Size:");
+	theoreticalspectragridlayout->addWidget(minimumfeaturesizelabel, 10, 0);
+	theoreticalspectragridlayout->addWidget(minimumfeaturesize, 10, 1);
+
+	allionsmustbepresent = new QCheckBox();
+	allionsmustbepresent->setToolTip("If enabled, all ions must be annotated in a spectrum for a compound to be reported.");
+	allionsmustbepresent->setFixedWidth(rightdefaultwidth);
+	allionsmustbepresentlabel = new QLabel("All Ions Must be Annotated:");
+	theoreticalspectragridlayout->addWidget(allionsmustbepresentlabel, 11, 0);
+	theoreticalspectragridlayout->addWidget(allionsmustbepresent, 11, 1);
 
 	theoreticalspectragroupbox = new QGroupBox("Theoretical Spectrum/Spectra");
 	theoreticalspectragroupbox->setLayout(theoreticalspectragridlayout);
@@ -642,6 +666,8 @@ cParametersWidget::~cParametersWidget() {
 	delete maximumbricksincombinationend;
 	delete maximumbricksincombinationlayout;
 	delete maximumbricksincombinationwidget;
+	delete blindedgeslabel;
+	delete blindedges;
 	delete maximumcumulativemasslabel;
 	delete maximumcumulativemass;
 	delete modificationslabel;
@@ -652,12 +678,12 @@ cParametersWidget::~cParametersWidget() {
 	delete brickdatabasegridlayout;
 	delete brickdatabasegroupbox;
 	
-	delete blindedgeslabel;
-	delete blindedges;
 	delete cyclicnterminuslabel;
 	delete cyclicnterminus;
 	delete cycliccterminuslabel;
 	delete cycliccterminus;
+	delete internalfragmentslabel;
+	delete internalfragments;
 	delete enablescramblinglabel;
 	delete enablescrambling;
 	delete similaritysearchlabel;
@@ -691,6 +717,10 @@ cParametersWidget::~cParametersWidget() {
 	delete generateisotopepattern;
 	delete minimumpatternsizelabel;
 	delete minimumpatternsize;
+	delete minimumfeaturesizelabel;
+	delete minimumfeaturesize;
+	delete allionsmustbepresentlabel;
+	delete allionsmustbepresent;
 	delete theoreticalspectragridlayout;
 	delete theoreticalspectragroupbox;
 
@@ -837,6 +867,7 @@ void cParametersWidget::loadSettings() {
 		blindedges->setCurrentIndex(settings.value("blindedges", 2).toInt());
 		settings.value("cyclicnterminus", 0).toInt() == 0 ? cyclicnterminus->setChecked(false) : cyclicnterminus->setChecked(true);
 		settings.value("cycliccterminus", 0).toInt() == 0 ? cycliccterminus->setChecked(false) : cycliccterminus->setChecked(true);
+		settings.value("internalfragments", 0).toInt() == 0 ? internalfragments->setChecked(false) : internalfragments->setChecked(true);
 		settings.value("enablescrambling", 0).toInt() == 0 ? enablescrambling->setChecked(false) : enablescrambling->setChecked(true);
 		settings.value("similaritysearch", 0).toInt() == 0 ? similaritysearch->setChecked(false) : similaritysearch->setChecked(true);
 		settings.value("regularblocksorder", 0).toInt() == 0 ? regularblocksorder->setChecked(false) : regularblocksorder->setChecked(true);
@@ -872,6 +903,8 @@ void cParametersWidget::loadSettings() {
 		settings.value("reportunmatchedtheoreticalpeaks", 0).toInt() == 0 ? reportunmatchedtheoreticalpeaks->setChecked(false) : reportunmatchedtheoreticalpeaks->setChecked(true);
 		settings.value("generateisotopepattern", 0).toInt() == 0 ? generateisotopepattern->setChecked(false) : generateisotopepattern->setChecked(true);
 		minimumpatternsize->setValue(settings.value("minimumpatternsize", 1).toInt());
+		minimumfeaturesize->setValue(settings.value("minimumfeaturesize", 1).toInt());
+		settings.value("allionsmustbepresent", 0).toInt() == 0 ? allionsmustbepresent->setChecked(false) : allionsmustbepresent->setChecked(true);
 
 		searchedsequenceline->setText(settings.value("searchedsequence", "").toString());
 		searchedsequenceNtermmodif->setText(settings.value("searchedsequenceNtermmodif", "").toString());
@@ -921,6 +954,7 @@ void cParametersWidget::saveSettings() {
 	settings.setValue("blindedges", blindedges->currentIndex());
 	cyclicnterminus->isChecked() ? settings.setValue("cyclicnterminus", 1) : settings.setValue("cyclicnterminus", 0);
 	cycliccterminus->isChecked() ? settings.setValue("cycliccterminus", 1) : settings.setValue("cycliccterminus", 0);
+	internalfragments->isChecked() ? settings.setValue("internalfragments", 1) : settings.setValue("internalfragments", 0);
 	enablescrambling->isChecked() ? settings.setValue("enablescrambling", 1) : settings.setValue("enablescrambling", 0);
 	similaritysearch->isChecked() ? settings.setValue("similaritysearch", 1) : settings.setValue("similaritysearch", 0);
 	regularblocksorder->isChecked() ? settings.setValue("regularblocksorder", 1) : settings.setValue("regularblocksorder", 0);
@@ -948,6 +982,8 @@ void cParametersWidget::saveSettings() {
 	reportunmatchedtheoreticalpeaks->isChecked() ? settings.setValue("reportunmatchedtheoreticalpeaks", 1) : settings.setValue("reportunmatchedtheoreticalpeaks", 0);
 	generateisotopepattern->isChecked() ? settings.setValue("generateisotopepattern", 1) : settings.setValue("generateisotopepattern", 0);
 	settings.setValue("minimumpatternsize", minimumpatternsize->value());
+	settings.setValue("minimumfeaturesize", minimumfeaturesize->value());
+	allionsmustbepresent->isChecked() ? settings.setValue("allionsmustbepresent", 1) : settings.setValue("allionsmustbepresent", 0);
 
 	settings.setValue("searchedsequence", searchedsequenceline->text());
 	settings.setValue("searchedsequenceNtermmodif", searchedsequenceNtermmodif->text());
@@ -1107,6 +1143,7 @@ bool cParametersWidget::updateParameters() {
 	parameters.blindedges = blindedges->currentIndex();
 	parameters.cyclicnterminus = cyclicnterminus->isChecked();
 	parameters.cycliccterminus = cycliccterminus->isChecked();
+	parameters.internalfragments = internalfragments->isChecked();
 	parameters.enablescrambling = enablescrambling->isChecked();
 	parameters.similaritysearch = similaritysearch->isChecked();
 	parameters.regularblocksorder = regularblocksorder->isChecked();
@@ -1167,6 +1204,8 @@ bool cParametersWidget::updateParameters() {
 	parameters.reportunmatchedtheoreticalpeaks = reportunmatchedtheoreticalpeaks->isChecked();
 	parameters.generateisotopepattern = generateisotopepattern->isChecked();
 	parameters.minimumpatternsize = minimumpatternsize->value();
+	parameters.minimumfeaturesize = minimumfeaturesize->value();
+	parameters.allionsmustbepresent = allionsmustbepresent->isChecked();
 
 	parameters.searchedsequence = searchedsequenceline->text().toStdString();
 	parameters.originalsearchedsequence = parameters.searchedsequence;
@@ -1217,6 +1256,7 @@ void cParametersWidget::restoreParameters() {
 	blindedges->setCurrentIndex(parameters.blindedges);
 	cyclicnterminus->setChecked(parameters.cyclicnterminus);
 	cycliccterminus->setChecked(parameters.cycliccterminus);
+	internalfragments->setChecked(parameters.internalfragments);
 	enablescrambling->setChecked(parameters.enablescrambling);
 	similaritysearch->setChecked(parameters.similaritysearch);
 	regularblocksorder->setChecked(parameters.regularblocksorder);
@@ -1269,7 +1309,9 @@ void cParametersWidget::restoreParameters() {
 	reportunmatchedtheoreticalpeaks->setChecked(parameters.reportunmatchedtheoreticalpeaks);
 	generateisotopepattern->setChecked(parameters.generateisotopepattern);
 	minimumpatternsize->setValue(parameters.minimumpatternsize);
-	
+	minimumfeaturesize->setValue(parameters.minimumfeaturesize);
+	allionsmustbepresent->setChecked(parameters.allionsmustbepresent);
+
 	searchedsequenceline->setText(parameters.searchedsequence.c_str());
 	searchedsequenceNtermmodif->setText(parameters.searchedsequenceNtermmodif.c_str());
 	searchedsequenceCtermmodif->setText(parameters.searchedsequenceCtermmodif.c_str());
@@ -1300,6 +1342,7 @@ void cParametersWidget::updateSettingsWhenPeptideTypeChanged(int index) {
 		modificationsbutton->setDisabled(false);
 		cyclicnterminus->setDisabled(false);
 		cycliccterminus->setDisabled(false);
+		internalfragments->setDisabled(true);
 		enablescrambling->setDisabled(true);
 		regularblocksorder->setDisabled(true);
 		searchedsequenceNtermmodif->setDisabled(false);
@@ -1311,6 +1354,7 @@ void cParametersWidget::updateSettingsWhenPeptideTypeChanged(int index) {
 		modificationsbutton->setDisabled(true);
 		cyclicnterminus->setDisabled(true);
 		cycliccterminus->setDisabled(true);
+		internalfragments->setDisabled(true);
 		enablescrambling->setDisabled(false);
 		regularblocksorder->setDisabled(true);
 		searchedsequenceNtermmodif->setDisabled(true);
@@ -1322,6 +1366,7 @@ void cParametersWidget::updateSettingsWhenPeptideTypeChanged(int index) {
 		modificationsbutton->setDisabled(false);
 		cyclicnterminus->setDisabled(true);
 		cycliccterminus->setDisabled(true);
+		internalfragments->setDisabled(true);
 		enablescrambling->setDisabled(true);
 		regularblocksorder->setDisabled(true);
 		searchedsequenceNtermmodif->setDisabled(false);
@@ -1333,6 +1378,7 @@ void cParametersWidget::updateSettingsWhenPeptideTypeChanged(int index) {
 		modificationsbutton->setDisabled(false);
 		cyclicnterminus->setDisabled(true);
 		cycliccterminus->setDisabled(true);
+		internalfragments->setDisabled(false);
 		enablescrambling->setDisabled(true);
 		regularblocksorder->setDisabled(true);
 		searchedsequenceNtermmodif->setDisabled(true);
@@ -1344,6 +1390,7 @@ void cParametersWidget::updateSettingsWhenPeptideTypeChanged(int index) {
 		modificationsbutton->setDisabled(false);
 		cyclicnterminus->setDisabled(false);
 		cycliccterminus->setDisabled(false);
+		internalfragments->setDisabled(true);
 		enablescrambling->setDisabled(true);
 		regularblocksorder->setDisabled(false);
 		searchedsequenceNtermmodif->setDisabled(false);
@@ -1355,6 +1402,7 @@ void cParametersWidget::updateSettingsWhenPeptideTypeChanged(int index) {
 		modificationsbutton->setDisabled(true);
 		cyclicnterminus->setDisabled(true);
 		cycliccterminus->setDisabled(true);
+		internalfragments->setDisabled(true);
 		enablescrambling->setDisabled(true);
 		regularblocksorder->setDisabled(false);
 		searchedsequenceNtermmodif->setDisabled(true);
@@ -1404,6 +1452,8 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 		reportunmatchedtheoreticalpeaks->setDisabled(false);
 		generateisotopepattern->setDisabled(false);
 		minimumpatternsize->setDisabled(false);
+		minimumfeaturesize->setDisabled(true);
+		allionsmustbepresent->setDisabled(true);
 		searchedsequenceline->setDisabled(false);
 		searchedsequencebutton->setDisabled(false);
 
@@ -1440,6 +1490,8 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 		reportunmatchedtheoreticalpeaks->setDisabled(false);
 		generateisotopepattern->setDisabled(false);
 		minimumpatternsize->setDisabled(false);
+		minimumfeaturesize->setDisabled(true);
+		allionsmustbepresent->setDisabled(true);
 		searchedsequenceline->setDisabled(false);
 		searchedsequencebutton->setDisabled(false);
 
@@ -1476,6 +1528,8 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 		reportunmatchedtheoreticalpeaks->setDisabled(false);
 		generateisotopepattern->setDisabled(false);
 		minimumpatternsize->setDisabled(false);
+		minimumfeaturesize->setDisabled(true);
+		allionsmustbepresent->setDisabled(true);
 		searchedsequenceline->setDisabled(false);
 		searchedsequencebutton->setDisabled(false);
 
@@ -1512,6 +1566,8 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 		reportunmatchedtheoreticalpeaks->setDisabled(false);
 		generateisotopepattern->setDisabled(false);
 		minimumpatternsize->setDisabled(false);
+		minimumfeaturesize->setDisabled(false);
+		allionsmustbepresent->setDisabled(false);
 		searchedsequenceline->setDisabled(true);
 		searchedsequencebutton->setDisabled(true);
 
@@ -1521,6 +1577,7 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 		modificationsbutton->setDisabled(true);
 		cyclicnterminus->setDisabled(true);
 		cycliccterminus->setDisabled(true);
+		internalfragments->setDisabled(true);
 		enablescrambling->setDisabled(true);
 		regularblocksorder->setDisabled(true);
 		searchedsequenceNtermmodif->setDisabled(true);

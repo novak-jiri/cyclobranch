@@ -140,6 +140,9 @@ class cTheoreticalSpectrum {
 	// compute additional scores
 	void computeStatistics(bool writedescription);
 
+	// generate charged forms of fragments
+	void generateChargedFragments(cPeak& peak, map<string, int>& atoms, int& peaklistrealsize, int maxcharge, bool writedescription, bool disablesummary);
+
 	// generate precursor ion and its variants
 	void generatePrecursorIon(vector<int>& intcomposition, cBricksDatabase& bricksdatabasewithcombinations, int& theoreticalpeaksrealsize, bool writedescription);
 
@@ -166,6 +169,15 @@ class cTheoreticalSpectrum {
 
 	// remove unmatched isotope patterns
 	void removeUnmatchedIsotopePatterns(cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks, cPeaksList& outputtheoreticalpeaks, bool storeunmatchedpeaks);
+
+	// remove unmatched features
+	void removeUnmatchedFeatures(cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks, int id);
+
+	// remove unmatched features
+	void removeUnmatchedFeaturesAndCompounds(cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks, int id);
+
+	// remove unmatched compounds
+	void removeUnmatchedCompounds(cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks);
 
 	// calculate envelope scores
 	void calculateEnvelopeScores(cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks);
@@ -341,11 +353,11 @@ public:
 
 	/**
 		\brief Compare theoretical peaks with an experimental spectrum.
-		\param peaklist reference to an experimental peaklist
+		\param id identifier of an experimental spectrum
 		\param tsfull theoretical spectrum with descriptions of peaks
 		\param unmatchedpeaksinmatchedpatterns unmatched peaks in matched isotope patterns
 	*/
-	void compareMSSpectrum(cPeaksList& peaklist, cTheoreticalSpectrum& tsfull, cPeaksList& unmatchedpeaksinmatchedpatterns);
+	void compareMSSpectrum(int id, cTheoreticalSpectrum& tsfull, cPeaksList& unmatchedpeaksinmatchedpatterns);
 
 
 	/**

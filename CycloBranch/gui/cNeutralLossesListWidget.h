@@ -67,7 +67,8 @@ private:
 	QPushButton* defaultbutton;
 	
 	QHBoxLayout* hbox;
-	QVBoxLayout* vbox;
+	QVBoxLayout* vbox1;
+	QVBoxLayout* vbox2;
 
 
 private slots:

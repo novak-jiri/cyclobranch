@@ -4,64 +4,6 @@
 cIsotopePatternCache isotopepatterncache;
 
 
-bool cMainThread::checkModifications(cParameters& parameters, cSequence& sequence, int& startmodifid, int& endmodifid, int& middlemodifid, string& errormessage) {
-	startmodifid = 0;
-	endmodifid = 0;
-	middlemodifid = 0;
-	errormessage = "";
-
-	if ((sequence.getPeptideType() == linear) || (sequence.getPeptideType() == branched) || (sequence.getPeptideType() == branchcyclic) || (sequence.getPeptideType() == linearpolyketide)) {
-
-		if ((sequence.getPeptideType() == linear) || (sequence.getPeptideType() == branched) || (sequence.getPeptideType() == linearpolyketide)) {
-			startmodifid = -1;
-			endmodifid = -1;
-		}
-
-		if ((sequence.getPeptideType() == branched) || (sequence.getPeptideType() == branchcyclic)) {
-			middlemodifid = -1;
-		}
-
-		for (int i = 0; i < (int)parameters.searchedmodifications.size(); i++) {
-
-			if ((sequence.getPeptideType() == linear) || (sequence.getPeptideType() == branched) || (sequence.getPeptideType() == linearpolyketide)) {
-				if (parameters.searchedmodifications[i].name.compare(sequence.getNTterminalModification()) == 0) {
-					startmodifid = i;
-				}
-
-				if (parameters.searchedmodifications[i].name.compare(sequence.getCTterminalModification()) == 0) {
-					endmodifid = i;
-				}
-			}
-
-			if ((sequence.getPeptideType() == branched) || (sequence.getPeptideType() == branchcyclic)) {
-				if (parameters.searchedmodifications[i].name.compare(sequence.getBranchModification()) == 0) {
-					middlemodifid = i;
-				}
-			}
-
-		}
-
-		if (startmodifid == -1) {
-			errormessage = "The N-terminal modification in the sequence " + sequence.getSequence() + " is not defined: " + sequence.getNTterminalModification();
-			return false;
-		}
-
-		if (endmodifid == -1) {
-			errormessage = "The C-terminal modification in the sequence " + sequence.getSequence() + " is not defined: " + sequence.getCTterminalModification();
-			return false;
-		}
-
-		if (middlemodifid == -1) {
-			errormessage = "The branch modification in the sequence " + sequence.getSequence() + " is not defined: " + sequence.getBranchModification();
-			return false;
-		}
-		
-	}
-
-	return true;
-}
-
-
 cMainThread::cMainThread(cParameters& parameters, cTheoreticalSpectrumList& theoreticalspectrumlist, bool enablelogwindow, bool enablestdout) {
 	this->parameters = parameters;
 	this->theoreticalspectrumlist = &theoreticalspectrumlist;
@@ -240,9 +182,9 @@ void cMainThread::run() {
 		sequence.setBranchModification(parameters.searchedsequenceTmodif);
 		sequence.setPeptideType(parameters.peptidetype);
 
-		// check for names of modifications which are used with the searched sequence
+		// check if the names of modifications used in the searched sequence are correct
 		errormessage = "";
-		if (!checkModifications(parameters, sequence, startmodifid, endmodifid, middlemodifid, errormessage)) {
+		if (!parameters.checkModifications(sequence, startmodifid, endmodifid, middlemodifid, errormessage)) {
 			*os << endl << "Error: " << errormessage << endl;
 			emitEndSignals();
 			return;
@@ -386,7 +328,7 @@ void cMainThread::run() {
 			}
 
 			// check whether modification are defined
-			if (!checkModifications(parameters, parameters.sequencedatabase[i], startmodifid, endmodifid, middlemodifid, errormessage)) {
+			if (!parameters.checkModifications(parameters.sequencedatabase[i], startmodifid, endmodifid, middlemodifid, errormessage)) {
 				*os << "Ignored sequence: " << errormessage << endl;
 				continue;
 			}
@@ -506,6 +448,15 @@ void cMainThread::run() {
 		unmatchedpeaks.resize(parameters.peaklistseries.size());
 
 		for (int i = 0; i < parameters.peaklistseries.size(); i++) {
+			if (terminatecomputation) {
+				emitEndSignals();
+				return;
+			}
+
+			parameters.peaklistseries[i].sortbyMass();
+		}
+
+		for (int i = 0; i < parameters.peaklistseries.size(); i++) {
 			if ((i + 1) % 100 == 0) {
 				*os << i + 1 << " ";
 			}
@@ -520,8 +471,22 @@ void cMainThread::run() {
 
 			cTheoreticalSpectrum tstmp;
 			tstmp.setParameters(&parameters);
-			tstmp.compareMSSpectrum(parameters.peaklistseries[i], ts, unmatchedpeaks[i]);
+			tstmp.compareMSSpectrum(i, ts, unmatchedpeaks[i]);
+			if ((parameters.peaklistfileformat == mis) || (parameters.peaklistfileformat == imzML)) {
+				parameters.peaklistseries[i].clear();
+			}
 			theoreticalspectrumlist->add(tstmp);
+		}
+
+		if (!((parameters.peaklistfileformat == mis) || (parameters.peaklistfileformat == imzML))) {
+			for (int i = 0; i < parameters.peaklistseries.size(); i++) {
+				if (terminatecomputation) {
+					emitEndSignals();
+					return;
+				}
+
+				parameters.peaklistseries[i].clear();
+			}
 		}
 
 		*os << " ok" << endl << "Total number of spectra: " << parameters.peaklistseries.size() << endl;

@@ -137,6 +137,12 @@ struct cPeak {
 	*/ 
 	int groupid;
 
+
+	/**
+		\brief Identifier of a compound.
+	*/
+	int compoundid;
+
 		
 	/**
 		\brief True if the peak is an isotope peak.

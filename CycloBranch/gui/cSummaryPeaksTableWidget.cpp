@@ -18,6 +18,8 @@
 #include <QTextStream>
 #include <QMenuBar>
 #include <QMenu>
+#include <QClipboard>
+#include <QApplication>
 
 
 cSummaryPeaksTableWidget::cSummaryPeaksTableWidget(QWidget* parent) {
@@ -772,6 +774,34 @@ void cSummaryPeaksTableWidget::keyPressEvent(QKeyEvent *event) {
 
 	if ((event->modifiers() == Qt::ControlModifier) && (event->key() == Qt::Key_W)) {
 		rowsfilterwholeword->setChecked(!rowsfilterwholeword->isChecked());
+	}
+
+	if ((event->modifiers() == Qt::ControlModifier) && (event->key() == Qt::Key_C)) {
+		QModelIndexList selectedindexes = database->selectionModel()->selectedIndexes();
+		QStandardItem* item;
+
+		QString selectedtext;
+		string itemtext;
+
+		int selectedcount = selectedindexes.count();
+		for (int i = 0; i < selectedcount; i++) {
+			if (i > 0) {
+				if (proxymodel->mapToSource(selectedindexes[i - 1]).row() != proxymodel->mapToSource(selectedindexes[i]).row()) {
+					selectedtext += "\n";
+				}
+				else {
+					selectedtext += "\t";
+				}
+			}
+
+			item = databasemodel->itemFromIndex(proxymodel->mapToSource(selectedindexes[i]));
+			if (item) {
+				itemtext = item->text().toStdString();
+				selectedtext += stripHTML(itemtext).c_str();
+			}
+		}
+		selectedtext += "\n";
+		QApplication::clipboard()->setText(selectedtext);
 	}
 
 	event->accept();

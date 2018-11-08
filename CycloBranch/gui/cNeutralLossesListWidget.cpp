@@ -9,12 +9,13 @@
 cNeutralLossesListWidget::cNeutralLossesListWidget(QObject* parent) {
 	this->parent = parent;
 
-	vbox = new QVBoxLayout();
+	vbox1 = new QVBoxLayout();
+	vbox2 = new QVBoxLayout();
 	hbox = new QHBoxLayout();
 
 	list = new QListWidget();
-	list->setMinimumHeight(240);
-	list->setMaximumHeight(240);
+	list->setMinimumHeight(180);
+	list->setMaximumHeight(180);
 	list->setSelectionMode(QAbstractItemView::MultiSelection);
 
 	selectallbutton = new QPushButton("Select All");
@@ -28,16 +29,19 @@ cNeutralLossesListWidget::cNeutralLossesListWidget(QObject* parent) {
 	defaultbutton = new QPushButton("Default");
 	defaultbutton->setToolTip("Set default items.");
 
-	vbox->addWidget(selectallbutton);
-	vbox->addWidget(clearallbutton);
-	vbox->addWidget(addbutton);
-	vbox->addWidget(removebutton);
-	vbox->addWidget(defaultbutton);
-	vbox->addStretch(1);
+	vbox1->addWidget(list);
+	vbox1->addStretch(1);
+
+	vbox2->addWidget(selectallbutton);
+	vbox2->addWidget(clearallbutton);
+	vbox2->addWidget(addbutton);
+	vbox2->addWidget(removebutton);
+	vbox2->addWidget(defaultbutton);
+	vbox2->addStretch(1);
 
 	hbox->setMargin(0);
-	hbox->addWidget(list);
-	hbox->addLayout(vbox);
+	hbox->addLayout(vbox1);
+	hbox->addLayout(vbox2);
 
 	connect(selectallbutton, SIGNAL(released()), this, SLOT(selectAllItems()));
 	connect(clearallbutton, SIGNAL(released()), this, SLOT(clearAllItems()));
@@ -59,7 +63,8 @@ cNeutralLossesListWidget::~cNeutralLossesListWidget() {
 	delete removebutton;
 	delete defaultbutton;
 	
-	delete vbox;
+	delete vbox1;
+	delete vbox2;
 	delete hbox;
 }
 

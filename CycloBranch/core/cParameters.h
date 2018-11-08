@@ -272,31 +272,49 @@ public:
 
 
 	/**
-		\brief True when the N-terminus of a linear peptide is cyclized.
+		\brief The minimum number of consecutive scans in which a compound must be identified to be reported (LC-MS data only).
+	*/
+	int minimumfeaturesize;
+
+
+	/**
+		\brief If true, all ions must be annotated in a spectrum for a compound to be reported.
+	*/
+	bool allionsmustbepresent;
+
+
+	/**
+		\brief True if the N-terminus of a linear peptide is cyclized.
     */
 	bool cyclicnterminus;
 
 
 	/**
-		\brief True when the C-terminus of a linear peptide is cyclized.
+		\brief True if the C-terminus of a linear peptide is cyclized.
     */
 	bool cycliccterminus;
 
 
 	/**
-		\brief True when the detection of scrambled ions is enabled.
+		\brief True if the internal fragments are generated.
+	*/
+	bool internalfragments;
+
+
+	/**
+		\brief True if the detection of scrambled ions is enabled.
     */
     bool enablescrambling;
 
 
 	/**
-		\brief True when the similarity search is enabled.
+		\brief True if the similarity search is enabled.
     */
     bool similaritysearch;
 
 
 	/**
-		\brief True when the order of polyketide blocks is regular.
+		\brief True if the order of polyketide blocks is regularly changed.
     */
     bool regularblocksorder;
 
@@ -484,6 +502,18 @@ public:
 
 
 	/**
+		\brief Check if the names of modifications used in a sequence are correct.
+		\param sequence an input sequence
+		\param startmodifid an output identifier of a start modification
+		\param endmodifid an output identifier of an end modification
+		\param middlemodifid an output identifier of a branch modification
+		\param errormessage an output error message if failed
+		\retval bool true if success
+	*/
+	bool checkModifications(cSequence& sequence, int& startmodifid, int& endmodifid, int& middlemodifid, string& errormessage);
+
+
+	/**
 		\brief Print parameters to a string.
 		\retval string string with parameters
 	*/ 
@@ -506,9 +536,10 @@ public:
 	/**
 		\brief Calculate a list of neutral losses.
 		\param terminatecomputation reference to a variable determining that the computation must be stopped
+		\param errormessage an error message if failed
 		\retval int -1 when an error occurred, 0 otherwise
 	*/
-	int calculateNeutralLosses(bool& terminatecomputation);
+	int calculateNeutralLosses(bool& terminatecomputation, string& errormessage);
 
 
 	/**

@@ -428,6 +428,19 @@ public:
 	*/
 	void fillOrderIDs();
 
+
+	/**
+		\brief Set isotope flags.
+		\param value flag value
+	*/
+	void setIsotopeFlags(bool value);
+
+
+	/**
+		\brief Mark isotopic peaks in isotopic patterns.
+	*/
+	void markIsotopes();
+
 };
 
 

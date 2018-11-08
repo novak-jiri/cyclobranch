@@ -15,6 +15,8 @@
 #include <QMessageBox>
 #include <QProgressDialog>
 #include <QCloseEvent>
+#include <QClipboard>
+#include <QApplication>
 
 
 cMainWindow::cMainWindow() {
@@ -68,15 +70,15 @@ cMainWindow::cMainWindow() {
 	actionDrawPeptide->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_P));
 
 	actionSummaryTableOfMatchedPeaks = new QAction(QIcon(":/images/icons/43.png"), tr("S&ummary Table of Matched Peaks"), this);
-	actionSummaryTableOfMatchedPeaks->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_U));
-
-	actionImageWindow = new QAction(QIcon(":/images/icons/23.png"), tr("&CrossVis"), this);
-	actionImageWindow->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_C));
-	actionImageWindow->setDisabled(true);
+	actionSummaryTableOfMatchedPeaks->setShortcut(QKeySequence(Qt::Key_F9));
 
 	actionChromatogramWindow = new QAction(QIcon(":/images/icons/chromatography.png"), tr("C&hromatogram"), this);
-	actionChromatogramWindow->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_H));
+	actionChromatogramWindow->setShortcut(QKeySequence(Qt::Key_F10));
 	actionChromatogramWindow->setDisabled(true);
+
+	actionImageWindow = new QAction(QIcon(":/images/icons/23.png"), tr("&CrossVis"), this);
+	actionImageWindow->setShortcut(QKeySequence(Qt::Key_F11));
+	actionImageWindow->setDisabled(true);
 
 	actionNorine = new QAction(QIcon(":/images/icons/25.png"), tr("&Norine"), this);
 	actionNorine->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_1));
@@ -437,6 +439,34 @@ void cMainWindow::keyPressEvent(QKeyEvent *event) {
 
 	if ((event->modifiers() == Qt::ControlModifier) && (event->key() == Qt::Key_W)) {
 		rowsfilterwholeword->setChecked(!rowsfilterwholeword->isChecked());
+	}
+
+	if ((event->modifiers() == Qt::ControlModifier) && (event->key() == Qt::Key_C)) {
+		QModelIndexList selectedindexes = results->selectionModel()->selectedIndexes();
+		QStandardItem* item;
+
+		QString selectedtext;
+		string itemtext;
+
+		int selectedcount = selectedindexes.count();
+		for (int i = 0; i < selectedcount; i++) {
+			if (i > 0) {
+				if (resultsproxymodel->mapToSource(selectedindexes[i - 1]).row() != resultsproxymodel->mapToSource(selectedindexes[i]).row()) {
+					selectedtext += "\n";
+				}
+				else {
+					selectedtext += "\t";
+				}
+			}
+
+			item = resultsmodel->itemFromIndex(resultsproxymodel->mapToSource(selectedindexes[i]));
+			if (item) {
+				itemtext = item->text().toStdString();
+				selectedtext += stripHTML(itemtext).c_str();
+			}
+		}
+		selectedtext += "\n";
+		QApplication::clipboard()->setText(selectedtext);
 	}
 
 	event->accept();

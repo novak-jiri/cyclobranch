@@ -196,6 +196,8 @@ private:
 	QCheckBox* cyclicnterminus;
 	QLabel* cycliccterminuslabel;
 	QCheckBox* cycliccterminus;
+	QLabel* internalfragmentslabel;
+	QCheckBox* internalfragments;
 	QLabel* enablescramblinglabel;
 	QCheckBox* enablescrambling;
 	QLabel* similaritysearchlabel;
@@ -229,6 +231,10 @@ private:
 	QCheckBox* generateisotopepattern;
 	QLabel* minimumpatternsizelabel;
 	QSpinBox* minimumpatternsize;
+	QLabel* minimumfeaturesizelabel;
+	QSpinBox* minimumfeaturesize;
+	QLabel* allionsmustbepresentlabel;
+	QCheckBox* allionsmustbepresent;
 
 	QGroupBox* searchedsequencegroupbox;
 	QGridLayout* searchedsequencegridlayout;
