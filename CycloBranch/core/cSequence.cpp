@@ -204,7 +204,7 @@ string cSequence::getNameWithReferenceAsHTMLString() {
 		if (!correctreference) {
 			rx = "^DOI: ";
 			if (regex_search(reference, rx)) {
-				s += "<a href=\"http://dx.doi.org/" + reference.substr(5) + "\">";
+				s += "<a href=\"https://doi.org/" + reference.substr(5) + "\">";
 				s += name;
 				s += "</a>";
 				correctreference = true;
