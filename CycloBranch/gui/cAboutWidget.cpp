@@ -21,17 +21,17 @@ cAboutWidget::cAboutWidget(QWidget* parent) {
 	QString citations = "Any work based on CycloBranch shall cite any of the following references:<br/><br/>";
 	citations += "Jiri Novak, Karel Lemr, Kevin A. Schug, Vladimir Havlicek:<br/>";
 	citations += "CycloBranch: <i>De Novo</i> Sequencing of Nonribosomal Peptides from Accurate Product Ion Mass Spectra,<br/>";
-	citations += "<i>J. Am. Soc. Mass Spectrom.</i>, vol. 26, no. 10, pp. 1780-1786, 2015. DOI: <a href=\"http://dx.doi.org/10.1007/s13361-015-1211-1\">10.1007/s13361-015-1211-1</a>.<br/>";
+	citations += "<i>J. Am. Soc. Mass Spectrom.</i>, vol. 26, no. 10, pp. 1780-1786, 2015. DOI: <a href=\"https://doi.org/10.1007/s13361-015-1211-1\">10.1007/s13361-015-1211-1</a>.<br/>";
 	citations += "Download citation: [ <a href=\"http://ms.biomed.cas.cz/cyclobranch/docs/cyclobranch_ris.txt\"><b>ris</b></a> ], [ <a href=\"http://ms.biomed.cas.cz/cyclobranch/docs/cyclobranch_bib.txt\"><b>bib</b></a> ]<br/><br/>";
 
 	citations += "Jiri Novak, Lucie Sokolova, Karel Lemr, Tomas Pluhacek, Andrea Palyzova, Vladimir Havlicek:<br/>";
 	citations += "Batch-processing of Imaging or Liquid-chromatography Mass Spectrometry Datasets and <i>De Novo</i> Sequencing of Polyketide Siderophores,<br/>";
-	citations += "<i>BBA - Proteins Proteom.</i>, vol. 1865, no. 7, pp. 768-775, 2017. DOI: <a href=\"http://dx.doi.org/10.1016/j.bbapap.2016.12.003\">10.1016/j.bbapap.2016.12.003</a>.<br/>";
+	citations += "<i>BBA - Proteins Proteom.</i>, vol. 1865, no. 7, pp. 768-775, 2017. DOI: <a href=\"https://doi.org/10.1016/j.bbapap.2016.12.003\">10.1016/j.bbapap.2016.12.003</a>.<br/>";
 	citations += "Download citation: [ <a href=\"http://ms.biomed.cas.cz/cyclobranch/docs/cyclobranch_bba_ris.txt\"><b>ris</b></a> ], [ <a href=\"http://ms.biomed.cas.cz/cyclobranch/docs/cyclobranch_bba_bib.txt\"><b>bib</b></a> ]<br/><br/>";
 
 	citations += "Jiri Novak, Anton Skriba, Jakub Zapal, Marek Kuzma, Vladimir Havlicek:<br/>";
 	citations += "CycloBranch: an Open Tool for Fine Isotope Structures in Conventional and Product Ion Mass Spectra,<br/>";
-	citations += "<i>J. Mass Spectrom.</i>, vol. 53, no. 11, pp. 1097-1103, 2018. DOI: <a href=\"http://dx.doi.org/10.1002/jms.4285\">10.1002/jms.4285</a>.<br/>";
+	citations += "<i>J. Mass Spectrom.</i>, vol. 53, no. 11, pp. 1097-1103, 2018. DOI: <a href=\"https://doi.org/10.1002/jms.4285\">10.1002/jms.4285</a>.<br/>";
 	citations += "Download citation: [ <a href=\"http://ms.biomed.cas.cz/cyclobranch/docs/cyclobranch_jms_ris.txt\"><b>ris</b></a> ], [ <a href=\"http://ms.biomed.cas.cz/cyclobranch/docs/cyclobranch_jms_bib.txt\"><b>bib</b></a> ]<br/><hr/><br/>";
 
 	QString licence = "Licence:<br/><br/> This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.<br/><br/>";
