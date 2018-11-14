@@ -2252,6 +2252,89 @@ void cSpectrumDetailWidget::rawDataStateChanged(bool state) {
 
 		}
 
+		if ((parameters->peaklistfileformat == mzML) || (parameters->peaklistfileformat == raw)) {
+
+			if ((parameters->mode == denovoengine) || (parameters->mode == databasesearch)) {
+				fileid = parameters->scannumber - 1;
+			}
+			else {
+				fileid = rowid - 1;
+			}
+			targetid = rowid - 1;
+
+			if ((targetid >= 0) && (targetid < rawdata->size())) {
+				if (state) {
+					cMzML mzml;
+					vector<cPeaksList> peaklists;
+
+					bool terminatecomputation = false;
+
+					string basename;
+					if (parameters->peaklistfileformat == mzML) {
+						basename = parameters->peaklistfilename.substr(0, (int)parameters->peaklistfilename.size() - 4);
+					}
+					else {
+						basename = parameters->peaklistfilename.substr(0, (int)parameters->peaklistfilename.size() - 3);
+					}
+
+					string mzmlname = basename + "mzML";
+					
+					int resultcode = mzml.parse(mzmlname, peaklists, fileid, parameters->mode, 0 /* ok */, terminatecomputation /* ok */);
+					if ((resultcode == 0) && (peaklists.size() == 1)) {
+
+						progress.setValue(33);
+
+						string fname = basename + "profile." + to_string(fileid);
+
+						string s;
+						#if OS_TYPE == UNX
+							s = installdir.toStdString() + "External/linux/correctprofile.sh " + fname + "," + to_string(parameters->fwhm);
+						#else
+							#if OS_TYPE == OSX
+								s = installdir.toStdString() + "External/macosx/correctprofile.sh " + fname + "," + to_string(parameters->fwhm);
+							#else		
+								s = "External\\windows\\correctprofile.bat \"" + fname + "\" " + to_string(parameters->fwhm);
+							#endif
+						#endif
+
+						progress.setValue(66);
+
+						if (system(s.c_str()) == 0) {
+							mzmlname = fname + ".mzML";
+							string mgfname = fname + ".0000000000.mgf";
+
+							cMzML correctedmzml;
+							peaklists.clear();
+							
+							resultcode = correctedmzml.parse(mzmlname, peaklists, -1, singlecomparison /* ok */, 0 /* ok */, terminatecomputation /* ok */);
+							if ((resultcode == 0) && (peaklists.size() == 1)) {
+								QFile::remove(mzmlname.c_str());
+
+								ifstream mgfifstream;
+								mgfifstream.open(mgfname);
+								(*rawdata)[targetid].clear();
+								(*rawdata)[targetid].loadFromMGFStream(mgfifstream);
+								mgfifstream.close();
+
+								QFile::remove(mgfname.c_str());
+
+								(*rawdata)[targetid].sortbyMass();
+								(*rawdata)[targetid].normalizeIntenzityByValue(theoreticalspectrum->getExperimentalSpectrum().getMaximumAbsoluteIntensity() * 100.0 / theoreticalspectrum->getExperimentalSpectrum().getMaximumRelativeIntensity());
+								(*rawdata)[targetid].cropMinimumMZRatio(parameters->minimummz, parameters->fragmentmasserrortolerance);
+							}
+						}
+
+					}
+				}
+				else {
+					(*rawdata)[targetid].clear();
+				}
+			}
+
+			emit rawDataStateChangedSignal(state);
+
+		}
+
 		if ((parameters->peaklistfileformat == imzML) && (parameters->mode == dereplication) && (imzmlprofilemetadata->size() > 0)) {
 			targetid = rowid - 1;
 
@@ -2322,7 +2405,7 @@ void cSpectrumDetailWidget::rawDataStateChanged(bool state) {
 						string mzmlname = fname + ".mzML";
 						string mgfname = fname + ".0000000000.mgf";
 
-						int resultcode = mzml.parse(mzmlname, peaklists, singlecomparison /* ok */, 0 /* ok */, terminatecomputation /* ok */);
+						int resultcode = mzml.parse(mzmlname, peaklists, -1, singlecomparison /* ok */, 0 /* ok */, terminatecomputation /* ok */);
 						if ((resultcode == 0) && (peaklists.size() == 1)) {
 							QFile::remove(mzmlname.c_str());
 

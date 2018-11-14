@@ -48,7 +48,7 @@ cMzML::~cMzML() {
 }
 
 
-int cMzML::parse(string& filename, vector<cPeaksList>& peaklists, eModeType mode, cMainThread* os, bool& terminatecomputation) {
+int cMzML::parse(string& filename, vector<cPeaksList>& peaklists, int profilespectrumid, eModeType mode, cMainThread* os, bool& terminatecomputation) {
 
 	parser->parse(filename.c_str());
 	document = parser->getDocument();
@@ -325,7 +325,12 @@ int cMzML::parse(string& filename, vector<cPeaksList>& peaklists, eModeType mode
 													if (profilespectra) {
 
 														if (count == 0) {
-															ss << mgfname << setw(10) << setfill('0') << 0 << ".mgf";
+															if (profilespectrumid == -1) {
+																ss << mgfname << setw(10) << setfill('0') << 0 << ".mgf";
+															}
+															else {
+																ss << mgfname << "profile." << to_string(profilespectrumid) << ".mgf";
+															}
 															mgfofstream.open(ss.str());
 														}
 														
@@ -338,32 +343,39 @@ int cMzML::parse(string& filename, vector<cPeaksList>& peaklists, eModeType mode
 															}
 														}
 
-														mgfofstream << "BEGIN IONS" << endl;
-														mgfofstream << "TITLE=" << title << endl;
-														mgfofstream << "SCAN=" << to_string(count + 1) << endl;
-														mgfofstream << "PEPMASS=1" << endl;
-														mgfofstream << "RTINSECONDS=1" << endl;
-														mgfofstream << "CHARGE=1+" << endl << endl;
+														if ((profilespectrumid == -1) || (profilespectrumid == count)) {
+															mgfofstream << "BEGIN IONS" << endl;
+															mgfofstream << "TITLE=" << title << endl;
+															mgfofstream << "SCAN=" << to_string(count + 1) << endl;
+															mgfofstream << "PEPMASS=1" << endl;
+															mgfofstream << "RTINSECONDS=1" << endl;
+															mgfofstream << "CHARGE=1+" << endl << endl;
 
-														peaksstring.clear();
-														for (int ii = 0; ii < peaklist.size(); ii++) {
-															sprintf_s(tempstring, "%f %f\n\0", peaklist[ii].mzratio, peaklist[ii].absoluteintensity);
-															peaksstring.append(tempstring);
-														}
-														mgfofstream << peaksstring;
-														mgfofstream << "END IONS" << endl << endl;
-
-														if (((count + 1) % 100 == 0) && (count > 0)) {
-															mgfofstream.close();
-															stringstream ss;
-															strip = (count + 1) / 100;
-															ss << mgfname << setw(10) << setfill('0') << strip << ".mgf";
-															mgfofstream.open(ss.str());
+															peaksstring.clear();
+															for (int ii = 0; ii < peaklist.size(); ii++) {
+																sprintf_s(tempstring, "%f %f\n\0", peaklist[ii].mzratio, peaklist[ii].absoluteintensity);
+																peaksstring.append(tempstring);
+															}
+															mgfofstream << peaksstring;
+															mgfofstream << "END IONS" << endl << endl;
 														}
 
-														cPeaksList emptypeaklist;
-														emptypeaklist.setTitle(title);
-														peaklists.push_back(emptypeaklist);
+														if (profilespectrumid == -1) {
+															if (((count + 1) % 100 == 0) && (count > 0)) {
+																mgfofstream.close();
+																stringstream ss;
+																strip = (count + 1) / 100;
+																ss << mgfname << setw(10) << setfill('0') << strip << ".mgf";
+																mgfofstream.open(ss.str());
+															}
+														}
+
+														if ((profilespectrumid == -1) || (profilespectrumid == count)) {
+															cPeaksList emptypeaklist;
+															emptypeaklist.setTitle(title);
+															peaklists.push_back(emptypeaklist);
+														}
+
 														count++;
 
 													}

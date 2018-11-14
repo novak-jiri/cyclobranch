@@ -186,7 +186,7 @@ int cPeakListSeries::loadFromMZMLStream(string& mzmlfilename, ifstream &mzmlstre
 	*os << "Loading the mzML file, spectrum no. : ";
 	
 	cMzML mzml;
-	int resultcode = mzml.parse(mzmlfilename, peaklists, mode, os, terminatecomputation);
+	int resultcode = mzml.parse(mzmlfilename, peaklists, -1, mode, os, terminatecomputation);
 	if (resultcode != 0) {
 		peaklists.clear();
 		return resultcode;

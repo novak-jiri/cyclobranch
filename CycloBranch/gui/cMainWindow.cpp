@@ -1187,6 +1187,10 @@ void cMainWindow::reportSpectra() {
 			rawdata.resize(theoreticalspectrumlist.size());
 		}
 
+		if ((parameters.peaklistfileformat == mzML) || (parameters.peaklistfileformat == raw)) {
+			rawdata.resize(theoreticalspectrumlist.size());
+		}
+
 		if ((parameters.peaklistfileformat == imzML) && (parameters.mode == dereplication)) {
 			rawdata.resize(theoreticalspectrumlist.size());
 			imzmlprofilemetadata.clear();

@@ -77,7 +77,7 @@ void cSpectrumSceneWidget::initialize(cParameters* parameters, cTheoreticalSpect
 	this->theoreticalspectrum = theoreticalspectrum;
 
 	if (parameters && parameters->useprofiledata) {
-		if ((parameters->peaklistfileformat == baf) || ((parameters->mode == dereplication) && (parameters->peaklistfileformat == imzML))) {
+		if ((parameters->peaklistfileformat == baf) || (parameters->peaklistfileformat == mzML) || (parameters->peaklistfileformat == raw) || ((parameters->mode == dereplication) && (parameters->peaklistfileformat == imzML))) {
 			if ((rowid > 0) && (rowid <= rawdata->size())) {
 				this->rawdatapeaklist = &((*rawdata)[rowid - 1]);
 			}
@@ -383,7 +383,7 @@ void cSpectrumSceneWidget::redrawScene() {
 	double maxintensity = 0;
 	double rawdatamaxintensity = 0;
 
-	if (parameters->useprofiledata && ((parameters->peaklistfileformat == baf) || ((parameters->mode == dereplication) && (parameters->peaklistfileformat == imzML))) && rawdatastate && (rawdatapeaklist->size() > 0)) {
+	if (parameters->useprofiledata && ((parameters->peaklistfileformat == baf) || (parameters->peaklistfileformat == mzML) || (parameters->peaklistfileformat == raw) || ((parameters->mode == dereplication) && (parameters->peaklistfileformat == imzML))) && rawdatastate && (rawdatapeaklist->size() > 0)) {
 		if (absoluteintensity) {
 			maxintensity = theoreticalspectrum->getExperimentalSpectrum().getMaximumAbsoluteIntensityFromMZInterval(minmzratio, maxmzratio, false, false, other, false);
 		}
@@ -846,7 +846,7 @@ void cSpectrumSceneWidget::redrawScene() {
 
 
 	// raw data (intersections with other objects are not tested)
-	if ((maxintensity > 0) && parameters->useprofiledata && ((parameters->peaklistfileformat == baf) || ((parameters->mode == dereplication) && (parameters->peaklistfileformat == imzML))) && rawdatastate && (rawdatapeaklist->size() > 0)) {
+	if ((maxintensity > 0) && parameters->useprofiledata && ((parameters->peaklistfileformat == baf) || (parameters->peaklistfileformat == mzML) || (parameters->peaklistfileformat == raw) || ((parameters->mode == dereplication) && (parameters->peaklistfileformat == imzML))) && rawdatastate && (rawdatapeaklist->size() > 0)) {
 
 		QPainterPath rpath;
 		int rx, ry, lastrx, lastry;
