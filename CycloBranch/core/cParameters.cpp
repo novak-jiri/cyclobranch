@@ -836,19 +836,19 @@ string cParameters::printToString() {
 	s += "Mode: ";
 	switch ((eModeType)mode) {
 		case denovoengine:
-			s += "De Novo Search Engine";
+			s += "De Novo Search Engine - MS/MS";
 			break;
 		case singlecomparison:
-			s += "Compare Peaklist(s) with Spectrum of Searched Sequence";
+			s += "Compare Peaklist(s) with Spectrum of Searched Sequence - MS/MS";
 			break;
 		case databasesearch:
-			s += "Compare Peaklist with Database - MS/MS data";
+			s += "Compare Peaklist with Database - MS/MS";
 			break;
 		case dereplication:
-			s += "Compare Peaklist(s) with Database - MS or MSI data";
+			s += "Compare Peaklist(s) with Database - MS, LC-MS, MSI";
 			break;
 		case compoundsearch:
-			s += "Compound Search";
+			s += "Compound Search - MS, LC-MS, MSI";
 			break;
 		default:
 			break;
@@ -984,7 +984,7 @@ string cParameters::printToString() {
 	}
 	s += "\n";
 
-	s += "Neutral Losses: ";
+	s += "Neutral Losses / Chemical Elements: ";
 	for (int i = 0; i < (int)originalneutrallossesfortheoreticalspectra.size(); i++) {
 		s += originalneutrallossesdefinitions[originalneutrallossesfortheoreticalspectra[i]].summary;
 		if (i < (int)originalneutrallossesfortheoreticalspectra.size() - 1) {
@@ -993,7 +993,7 @@ string cParameters::printToString() {
 	}
 	s += "\n";
 
-	s += "Maximum Number of Combined Neutral Losses: " + to_string(maximumcombinedlosses) + "\n";
+	s += "Maximum Number of Combined Neutral Losses/Elements: " + to_string(maximumcombinedlosses) + "\n";
 
 	//s += "Remove Hits of Fragments without Hits of Parent Fragments: ";
 	//s += clearhitswithoutparent ? "on" : "off";
