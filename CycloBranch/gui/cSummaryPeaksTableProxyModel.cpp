@@ -36,7 +36,7 @@ bool cSummaryPeaksTableProxyModel::filterAcceptsRow(int sourceRow, const QModelI
 	bool checkrow = false;
 	int x, y;
 
-	if ((mode == dereplication) && ((peaklistfileformat == mis) || (peaklistfileformat == imzML))) {
+	if (((mode == dereplication) || (mode == compoundsearch)) && ((peaklistfileformat == mis) || (peaklistfileformat == imzML))) {
 		x = sourceModel()->data(sourceModel()->index(sourceRow, 1)).toInt();
 		y = sourceModel()->data(sourceModel()->index(sourceRow, 2)).toInt();
 

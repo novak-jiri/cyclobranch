@@ -77,7 +77,7 @@ void cSpectrumSceneWidget::initialize(cParameters* parameters, cTheoreticalSpect
 	this->theoreticalspectrum = theoreticalspectrum;
 
 	if (parameters && parameters->useprofiledata) {
-		if ((parameters->peaklistfileformat == baf) || (parameters->peaklistfileformat == mzML) || (parameters->peaklistfileformat == raw) || ((parameters->mode == dereplication) && (parameters->peaklistfileformat == imzML))) {
+		if ((parameters->peaklistfileformat == baf) || (parameters->peaklistfileformat == mzML) || (parameters->peaklistfileformat == raw) || (((parameters->mode == dereplication) || (parameters->mode == compoundsearch)) && (parameters->peaklistfileformat == imzML))) {
 			if ((rowid > 0) && (rowid <= rawdata->size())) {
 				this->rawdatapeaklist = &((*rawdata)[rowid - 1]);
 			}
@@ -383,7 +383,7 @@ void cSpectrumSceneWidget::redrawScene() {
 	double maxintensity = 0;
 	double rawdatamaxintensity = 0;
 
-	if (parameters->useprofiledata && ((parameters->peaklistfileformat == baf) || (parameters->peaklistfileformat == mzML) || (parameters->peaklistfileformat == raw) || ((parameters->mode == dereplication) && (parameters->peaklistfileformat == imzML))) && rawdatastate && (rawdatapeaklist->size() > 0)) {
+	if (parameters->useprofiledata && ((parameters->peaklistfileformat == baf) || (parameters->peaklistfileformat == mzML) || (parameters->peaklistfileformat == raw) || (((parameters->mode == dereplication) || (parameters->mode == compoundsearch)) && (parameters->peaklistfileformat == imzML))) && rawdatastate && (rawdatapeaklist->size() > 0)) {
 		if (absoluteintensity) {
 			maxintensity = theoreticalspectrum->getExperimentalSpectrum().getMaximumAbsoluteIntensityFromMZInterval(minmzratio, maxmzratio, false, false, other, false);
 		}
@@ -524,7 +524,7 @@ void cSpectrumSceneWidget::redrawScene() {
 		}
 
 		// hide scrambled peaks
-		if ((parameters->mode != dereplication) && (parameters->peptidetype == cyclic) && hidescrambled && theoreticalspectrum->getExperimentalSpectrum()[i].scrambled) {
+		if (((parameters->mode == denovoengine) || (parameters->mode == singlecomparison) || (parameters->mode == databasesearch)) && (parameters->peptidetype == cyclic) && hidescrambled && theoreticalspectrum->getExperimentalSpectrum()[i].scrambled) {
 			continue;
 		}
 
@@ -537,7 +537,7 @@ void cSpectrumSceneWidget::redrawScene() {
 				visiblepeaks[visiblepeakscount].description += "@";
 			}
 
-			if (parameters->mode == dereplication) {
+			if ((parameters->mode == dereplication) || (parameters->mode == compoundsearch)) {
 				visiblepeaks[visiblepeakscount].description += parameters->peakidtodesc[thpeaks[*it].descriptionid].substr(0, parameters->peakidtodesc[thpeaks[*it].descriptionid].rfind(':'));
 			}
 			else {
@@ -599,7 +599,7 @@ void cSpectrumSceneWidget::redrawScene() {
 
 			popit = false;
 
-			if (parameters->mode != dereplication) {
+			if ((parameters->mode == denovoengine) || (parameters->mode == singlecomparison) || (parameters->mode == databasesearch)) {
 
 				if (visibleionseriespart1.compare("") != 0) {
 					tmppos = hits.back().find(visibleionseriespart1);
@@ -694,7 +694,7 @@ void cSpectrumSceneWidget::redrawScene() {
 
 			popit = false;
 
-			if (parameters->mode != dereplication) {
+			if ((parameters->mode == denovoengine) || (parameters->mode == singlecomparison) || (parameters->mode == databasesearch)) {
 
 				if (visibleionseriespart1.compare("") != 0) {
 					tmppos = hits.back().find(visibleionseriespart1);
@@ -797,7 +797,7 @@ void cSpectrumSceneWidget::redrawScene() {
 				text = scene->addText("");
 				text->setDefaultTextColor(QColor(Qt::red));
 				text->setFont(myFont);
-				if (parameters->mode == dereplication) {
+				if ((parameters->mode == dereplication) || (parameters->mode == compoundsearch)) {
 					text->setTextInteractionFlags(Qt::TextBrowserInteraction);
 					text->setOpenExternalLinks(true);
 				}
@@ -846,7 +846,7 @@ void cSpectrumSceneWidget::redrawScene() {
 
 
 	// raw data (intersections with other objects are not tested)
-	if ((maxintensity > 0) && parameters->useprofiledata && ((parameters->peaklistfileformat == baf) || (parameters->peaklistfileformat == mzML) || (parameters->peaklistfileformat == raw) || ((parameters->mode == dereplication) && (parameters->peaklistfileformat == imzML))) && rawdatastate && (rawdatapeaklist->size() > 0)) {
+	if ((maxintensity > 0) && parameters->useprofiledata && ((parameters->peaklistfileformat == baf) || (parameters->peaklistfileformat == mzML) || (parameters->peaklistfileformat == raw) || (((parameters->mode == dereplication) || (parameters->mode == compoundsearch)) && (parameters->peaklistfileformat == imzML))) && rawdatastate && (rawdatapeaklist->size() > 0)) {
 
 		QPainterPath rpath;
 		int rx, ry, lastrx, lastry;

@@ -850,7 +850,7 @@ void cTheoreticalSpectrum::addMetalPeaks(cPeak& peak, vector<string>& metals, in
 					tmppeak.description.replace(tmppeak.description.find(metals[i]), metals[i].size(), isotopename);
 				}
 
-				if ((parameters->mode == dereplication) || (writedescription && parameters->reportunmatchedtheoreticalpeaks) || searchHint(tmppeak.mzratio, experimentalpeaks, parameters->fragmentmasserrortolerance)) {
+				if ((parameters->mode == dereplication) || (parameters->mode == compoundsearch) || (writedescription && parameters->reportunmatchedtheoreticalpeaks) || searchHint(tmppeak.mzratio, experimentalpeaks, parameters->fragmentmasserrortolerance)) {
 					addPeakToList(tmppeak, peaklistrealsize);
 				}
 			}
@@ -938,7 +938,7 @@ void cTheoreticalSpectrum::removeUnmatchedIsotopePatterns(cPeaksList& theoretica
 					// copy unmatched theoretical peaks in matched envelopes into the output
 					if (storeunmatchedpeaks && !theoreticalpeaks[j].decoy && (theoreticalpeaks[j].matched == 0)) {
 						if ((theoreticalpeaks[j].relativeintensity*maximumexperimentalintensity / 100.0 >= parameters->minimumrelativeintensitythreshold) ||
-							((parameters->mode == dereplication) && parameters->generateisotopepattern && parameters->reportunmatchedtheoreticalpeaks)) {
+							(((parameters->mode == dereplication) || (parameters->mode == compoundsearch)) && parameters->generateisotopepattern && parameters->reportunmatchedtheoreticalpeaks)) {
 							outputtheoreticalpeaks.add(theoreticalpeaks[j]);
 						}
 					}
@@ -954,7 +954,7 @@ void cTheoreticalSpectrum::removeUnmatchedIsotopePatterns(cPeaksList& theoretica
 						theoreticalpeaks[j].matched--;
 						theoreticalpeaks[j].matchedid = -1;
 					}
-					if (storeunmatchedpeaks && !theoreticalpeaks[j].decoy && (parameters->mode == dereplication) && parameters->generateisotopepattern && parameters->reportunmatchedtheoreticalpeaks) {
+					if (storeunmatchedpeaks && !theoreticalpeaks[j].decoy && ((parameters->mode == dereplication) || (parameters->mode == compoundsearch)) && parameters->generateisotopepattern && parameters->reportunmatchedtheoreticalpeaks) {
 						outputtheoreticalpeaks.add(theoreticalpeaks[j]);
 					}
 				}
@@ -994,7 +994,7 @@ void cTheoreticalSpectrum::removeUnmatchedIsotopePatterns(cPeaksList& theoretica
 
 			if (storeunmatchedpeaks && !theoreticalpeaks[j].decoy && (theoreticalpeaks[j].matched == 0)) {
 				if ((theoreticalpeaks[j].relativeintensity*maximumexperimentalintensity / 100.0 >= parameters->minimumrelativeintensitythreshold) ||
-					((parameters->mode == dereplication) && parameters->generateisotopepattern && parameters->reportunmatchedtheoreticalpeaks)) {
+					(((parameters->mode == dereplication) || (parameters->mode == compoundsearch)) && parameters->generateisotopepattern && parameters->reportunmatchedtheoreticalpeaks)) {
 					outputtheoreticalpeaks.add(theoreticalpeaks[j]);
 				}
 			}
@@ -1009,7 +1009,7 @@ void cTheoreticalSpectrum::removeUnmatchedIsotopePatterns(cPeaksList& theoretica
 				theoreticalpeaks[j].matched--;
 				theoreticalpeaks[j].matchedid = -1;
 			}
-			if (storeunmatchedpeaks && !theoreticalpeaks[j].decoy && (parameters->mode == dereplication) && parameters->generateisotopepattern && parameters->reportunmatchedtheoreticalpeaks) {
+			if (storeunmatchedpeaks && !theoreticalpeaks[j].decoy && ((parameters->mode == dereplication) || (parameters->mode == compoundsearch)) && parameters->generateisotopepattern && parameters->reportunmatchedtheoreticalpeaks) {
 				outputtheoreticalpeaks.add(theoreticalpeaks[j]);
 			}
 		}

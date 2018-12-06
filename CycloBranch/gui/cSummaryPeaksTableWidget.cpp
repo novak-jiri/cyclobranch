@@ -247,7 +247,7 @@ bool cSummaryPeaksTableWidget::prepareToShow(QStandardItemModel* resultsstandard
 	coordinates.clear();
 
 	// prepare the header
-	if (parameters->mode == dereplication) {
+	if ((parameters->mode == dereplication) || (parameters->mode == compoundsearch)) {
 		if ((parameters->peaklistfileformat == mis) || (parameters->peaklistfileformat == imzML)) {
 			if (parameters->generateisotopepattern) {
 				databasemodel->setColumnCount(15);
@@ -287,7 +287,7 @@ bool cSummaryPeaksTableWidget::prepareToShow(QStandardItemModel* resultsstandard
 	database->setItemDelegateForColumn(0, new QItemDelegate());
 
 	int currentcolumn = 1;
-	if (parameters->mode == dereplication) {
+	if ((parameters->mode == dereplication) || (parameters->mode == compoundsearch)) {
 		if ((parameters->peaklistfileformat == mis) || (parameters->peaklistfileformat == imzML)) {
 			iontypecol = 3;
 
@@ -320,7 +320,7 @@ bool cSummaryPeaksTableWidget::prepareToShow(QStandardItemModel* resultsstandard
 		currentcolumn++;
 	}
 
-	if (parameters->mode != dereplication) {
+	if ((parameters->mode == denovoengine) || (parameters->mode == singlecomparison) || (parameters->mode == databasesearch)) {
 		databasemodel->setHorizontalHeaderItem(currentcolumn, new QStandardItem());
 		databasemodel->horizontalHeaderItem(currentcolumn)->setText("Fragment Type");
 		database->setItemDelegateForColumn(currentcolumn, new QItemDelegate());
@@ -359,7 +359,7 @@ bool cSummaryPeaksTableWidget::prepareToShow(QStandardItemModel* resultsstandard
 	database->setItemDelegateForColumn(currentcolumn, new QItemDelegate());
 	currentcolumn++;
 
-	if (parameters->mode == dereplication) {
+	if ((parameters->mode == dereplication) || (parameters->mode == compoundsearch)) {
 		if (parameters->generateisotopepattern) {
 			databasemodel->setHorizontalHeaderItem(currentcolumn, new QStandardItem());
 			databasemodel->horizontalHeaderItem(currentcolumn)->setText("Score");
@@ -412,7 +412,8 @@ bool cSummaryPeaksTableWidget::prepareToShow(QStandardItemModel* resultsstandard
 	rowsfiltercombobox->clear();
 	for (int i = 0; i < databasemodel->columnCount(); i++) {
 		database->resizeColumnToContents(i);
-		if ((parameters->mode != dereplication) || ((parameters->mode == dereplication) && (i < databasemodel->columnCount() - 1))) {
+		if (((parameters->mode == denovoengine) || (parameters->mode == singlecomparison) || (parameters->mode == databasesearch)) ||
+			(((parameters->mode == dereplication) || (parameters->mode == compoundsearch)) && (i < databasemodel->columnCount() - 1))) {
 			rowsfiltercombobox->addItem(databasemodel->horizontalHeaderItem(i)->text());
 		}
 	}
@@ -447,7 +448,7 @@ bool cSummaryPeaksTableWidget::prepareToShow(QStandardItemModel* resultsstandard
 	for (int i = 0; i < spectracount; i++) {
 
 		if (!resultsproxymodel->mapFromSource(resultsstandardmodel->index(i, 0)).isValid()) {
-			if ((parameters->mode == dereplication) && (parameters->peaklistfileformat != mis) && (parameters->peaklistfileformat != imzML)) {
+			if (((parameters->mode == dereplication) || (parameters->mode == compoundsearch)) && (parameters->peaklistfileformat != mis) && (parameters->peaklistfileformat != imzML)) {
 				cPeak emptypeak;
 				emptypeak.mzratio = (double)(eicchromatogram.size() + 1);
 				emptypeak.absoluteintensity = 0;
@@ -458,7 +459,7 @@ bool cSummaryPeaksTableWidget::prepareToShow(QStandardItemModel* resultsstandard
 
 		spectrumindex = resultsstandardmodel->item(i, 1)->data(Qt::DisplayRole).toInt() - 1;
 
-		if ((parameters->mode == dereplication) && (parameters->peaklistfileformat != mis) && (parameters->peaklistfileformat != imzML)) {
+		if (((parameters->mode == dereplication) || (parameters->mode == compoundsearch)) && (parameters->peaklistfileformat != mis) && (parameters->peaklistfileformat != imzML)) {
 			addEICPeak(eicchromatogram, (*spectralist)[spectrumindex].getExperimentalSpectrum());
 		}
 
@@ -496,7 +497,7 @@ bool cSummaryPeaksTableWidget::prepareToShow(QStandardItemModel* resultsstandard
 			databasemodel->item(currentrow, currentcolumn)->setData(QVariant::fromValue(spectrumindex + 1), Qt::DisplayRole);
 			currentcolumn++;
 
-			if (parameters->mode == dereplication) {
+			if ((parameters->mode == dereplication) || (parameters->mode == compoundsearch)) {
 				if ((parameters->peaklistfileformat == mis) || (parameters->peaklistfileformat == imzML)) {
 					databasemodel->setItem(currentrow, currentcolumn, new QStandardItem());
 					databasemodel->item(currentrow, currentcolumn)->setForeground(brush);
@@ -524,7 +525,7 @@ bool cSummaryPeaksTableWidget::prepareToShow(QStandardItemModel* resultsstandard
 				currentcolumn++;
 			}
 
-			if (parameters->mode != dereplication) {
+			if ((parameters->mode == denovoengine) || (parameters->mode == singlecomparison) || (parameters->mode == databasesearch)) {
 				databasemodel->setItem(currentrow, currentcolumn, new QStandardItem());
 				databasemodel->item(currentrow, currentcolumn)->setForeground(brush);
 				databasemodel->item(currentrow, currentcolumn)->setText(peak->description.substr(0, peak->description.find(':')).c_str());
@@ -563,7 +564,7 @@ bool cSummaryPeaksTableWidget::prepareToShow(QStandardItemModel* resultsstandard
 			databasemodel->item(currentrow, currentcolumn)->setData(QVariant::fromValue(cropPrecisionToSixDecimalsByteArray(peak->matchedppm)), Qt::DisplayRole);
 			currentcolumn++;
 
-			if (parameters->mode == dereplication) {
+			if ((parameters->mode == dereplication) || (parameters->mode == compoundsearch)) {
 				if (parameters->generateisotopepattern) {
 					databasemodel->setItem(currentrow, currentcolumn, new QStandardItem());
 					databasemodel->item(currentrow, currentcolumn)->setForeground(brush);
@@ -674,7 +675,7 @@ bool cSummaryPeaksTableWidget::prepareToShow(QStandardItemModel* resultsstandard
 			database->resizeColumnToContents(i);
 		}
 
-		if (parameters->mode == dereplication) {
+		if ((parameters->mode == dereplication) || (parameters->mode == compoundsearch)) {
 			if ((parameters->peaklistfileformat == mis) || (parameters->peaklistfileformat == imzML)) {
 				emit resetRegion();
 				emit sendFilterOptionsToImageWindow(coordinates, rowsfiltercombobox->currentText().toStdString(), rowsfiltercomparatorcombobox->currentText().toStdString(), rowsfilterline->text().toStdString(), rowsfiltercasesensitive->isChecked(), rowsfilterwholeword->isChecked());
@@ -822,7 +823,7 @@ void cSummaryPeaksTableWidget::filterRows() {
 	cPeaksList eicchromatogram;
 	eicchromatogram.clear();
 
-	if (parameters->mode == dereplication) {
+	if ((parameters->mode == dereplication) || (parameters->mode == compoundsearch)) {
 		if ((parameters->peaklistfileformat == mis) || (parameters->peaklistfileformat == imzML)) {
 			iontypecol = 3;
 			if (parameters->generateisotopepattern) {
@@ -869,7 +870,7 @@ void cSummaryPeaksTableWidget::filterRows() {
 
 	// prepare data for visualization
 	coordinates.clear();
-	if (parameters->mode == dereplication) {
+	if ((parameters->mode == dereplication) || (parameters->mode == compoundsearch)) {
 		if ((parameters->peaklistfileformat == mis) || (parameters->peaklistfileformat == imzML)) {
 			int proxymodelrowcount = proxymodel->rowCount();
 			for (i = 0; i < proxymodelrowcount; i++) {
@@ -918,7 +919,7 @@ void cSummaryPeaksTableWidget::filterRows() {
 		}
 	}
 
-	if ((parameters->mode == dereplication) && !progress.wasCanceled()) {
+	if (((parameters->mode == dereplication) || (parameters->mode == compoundsearch)) && !progress.wasCanceled()) {
 		if ((parameters->peaklistfileformat == mis) || (parameters->peaklistfileformat == imzML)) {
 			emit sendFilterOptionsToImageWindow(coordinates, rowsfiltercombobox->currentText().toStdString(), rowsfiltercomparatorcombobox->currentText().toStdString(), rowsfilterline->text().toStdString(), rowsfiltercasesensitive->isChecked(), rowsfilterwholeword->isChecked());
 		}
@@ -942,7 +943,7 @@ void cSummaryPeaksTableWidget::resetFilter() {
 	cPeaksList eicchromatogram;
 	eicchromatogram.clear();
 
-	if (parameters->mode == dereplication) {
+	if ((parameters->mode == dereplication) || (parameters->mode == compoundsearch)) {
 		if ((parameters->peaklistfileformat == mis) || (parameters->peaklistfileformat == imzML)) {
 			iontypecol = 3;
 			if (parameters->generateisotopepattern) {
@@ -968,7 +969,7 @@ void cSummaryPeaksTableWidget::resetFilter() {
 	progress.setWindowModality(Qt::ApplicationModal);
 
 	coordinates.clear();
-	if (parameters->mode == dereplication) {
+	if ((parameters->mode == dereplication) || (parameters->mode == compoundsearch)) {
 		if ((parameters->peaklistfileformat == mis) || (parameters->peaklistfileformat == imzML)) {
 			for (i = 0; i < rowcount; i++) {
 				x = databasemodel->item(i, 1)->data(Qt::DisplayRole).toInt();
@@ -1124,7 +1125,7 @@ void cSummaryPeaksTableWidget::exportStatistics() {
 
 		int thintcol;
 
-		if (parameters->mode == dereplication) {
+		if ((parameters->mode == dereplication) || (parameters->mode == compoundsearch)) {
 
 			if ((parameters->peaklistfileformat == mis) || (parameters->peaklistfileformat == imzML)) {
 				if (parameters->generateisotopepattern) {
@@ -1229,7 +1230,7 @@ void cSummaryPeaksTableWidget::exportStatistics() {
 		QStandardItem* item;
 		for (int i = 0; i < proxymodel->rowCount(); i++) {
 
-			if (parameters->mode == dereplication) {
+			if ((parameters->mode == dereplication) || (parameters->mode == compoundsearch)) {
 
 				keyms.clear();
 
@@ -1355,7 +1356,7 @@ void cSummaryPeaksTableWidget::exportStatistics() {
 		vector<double> scoremedianvector;
 		vector<double> fdrmedianvector;
 
-		if (parameters->mode == dereplication) {
+		if ((parameters->mode == dereplication) || (parameters->mode == compoundsearch)) {
 
 			auto cmpms = [](pair<cSummaryTableKeyMS, vector<int> > const &a, pair<cSummaryTableKeyMS, vector<int> > const &b) {
 				if (a.first.name < b.first.name) {
@@ -1656,7 +1657,7 @@ void cSummaryPeaksTableWidget::rowDoubleClicked(const QModelIndex& item) {
 	int idcolumn = 0;
 	int experimentalmzcolumn = 0;
 
-	if (parameters->mode == dereplication) {
+	if ((parameters->mode == dereplication) || (parameters->mode == compoundsearch)) {
 		if ((parameters->peaklistfileformat == mis) || (parameters->peaklistfileformat == imzML)) {
 			if (parameters->generateisotopepattern) {
 				size = 14;

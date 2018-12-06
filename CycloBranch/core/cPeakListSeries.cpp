@@ -199,7 +199,7 @@ int cPeakListSeries::loadFromMZMLStream(string& mzmlfilename, ifstream &mzmlstre
 		string mgfname = mzmlfilename.substr(0, (int)mzmlfilename.size() - 4);
 
 		*os << "ok" << endl;
-		if (mode == dereplication) {
+		if ((mode == dereplication) || (mode == compoundsearch)) {
 			*os << "Total number of MS spectra: ";
 		}
 		else {
@@ -253,7 +253,7 @@ int cPeakListSeries::loadFromMZMLStream(string& mzmlfilename, ifstream &mzmlstre
 	else {
 
 		*os << "ok" << endl;
-		if (mode == dereplication) {
+		if ((mode == dereplication) || (mode == compoundsearch)) {
 			*os << "Total number of MS spectra: ";
 		}
 		else {

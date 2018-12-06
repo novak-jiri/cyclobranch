@@ -595,7 +595,7 @@ void cMainWindow::reportSpectrum(int row, cTheoreticalSpectrum& theoreticalspect
 	}
 
 
-	if (parameters.mode == dereplication) {
+	if ((parameters.mode == dereplication) || (parameters.mode == compoundsearch)) {
 		resultsmodel->setItem(row, 2, new QStandardItem());
 		resultsmodel->item(row, 2)->setText(theoreticalspectrum.getExperimentalSpectrum().getTitle().c_str());
 
@@ -926,7 +926,7 @@ void cMainWindow::enableButtonsHandlingResults(bool enable) {
 	actionSummaryTableOfMatchedPeaks->setEnabled(enable);
 	
 	if (enable) {
-		if (parameters.mode == dereplication) {
+		if ((parameters.mode == dereplication) || (parameters.mode == compoundsearch)) {
 			actionShowIsomers->setEnabled(false);
 			if ((parameters.peaklistfileformat == mis) || (parameters.peaklistfileformat == imzML)) {
 				actionImageWindow->setEnabled(true);
@@ -1131,7 +1131,7 @@ void cMainWindow::reportSpectra() {
 	}
 
 
-	if (parameters.mode == dereplication) {
+	if ((parameters.mode == dereplication) || (parameters.mode == compoundsearch)) {
 		if ((parameters.peaklistfileformat == mis) || (parameters.peaklistfileformat == imzML)) {
 			resultsmodel->setColumnCount(8);
 		}
@@ -1191,7 +1191,7 @@ void cMainWindow::reportSpectra() {
 			rawdata.resize(theoreticalspectrumlist.size());
 		}
 
-		if ((parameters.peaklistfileformat == imzML) && (parameters.mode == dereplication)) {
+		if ((parameters.peaklistfileformat == imzML) && ((parameters.mode == dereplication) || (parameters.mode == compoundsearch))) {
 			rawdata.resize(theoreticalspectrumlist.size());
 			imzmlprofilemetadata.clear();
 			profilemz64precision = false;
@@ -1499,7 +1499,7 @@ void cMainWindow::exportToHTML() {
 
 				int columncount;
 				string tdwidth;
-				if (parameters.mode == dereplication) {
+				if ((parameters.mode == dereplication) || (parameters.mode == compoundsearch)) {
 					if ((parameters.peaklistfileformat == mis) || (parameters.peaklistfileformat == imzML)) {
 						if (parameters.generateisotopepattern) {
 							columncount = 15;
@@ -1538,7 +1538,7 @@ void cMainWindow::exportToHTML() {
 
 				out << "<th width=\"" << tdwidth.c_str() << "%\"><b>ID</b></th>";
 
-				if (parameters.mode == dereplication) {
+				if ((parameters.mode == dereplication) || (parameters.mode == compoundsearch)) {
 					if ((parameters.peaklistfileformat == mis) || (parameters.peaklistfileformat == imzML)) {
 						out << "<th width=\"" << tdwidth.c_str() << "%\"><b>Coordinate X</b></th>";
 						out << "<th width=\"" << tdwidth.c_str() << "%\"><b>Coordinate Y</b></th>";
@@ -1555,7 +1555,7 @@ void cMainWindow::exportToHTML() {
 					out << "<th width=\"" << tdwidth.c_str() << "%\"><b>Group ID</b></th>";
 				}
 
-				if (parameters.mode != dereplication) {
+				if ((parameters.mode == denovoengine) || (parameters.mode == singlecomparison) || (parameters.mode == databasesearch)) {
 					out << "<th width=\"" << tdwidth.c_str() << "%\"><b>Fragment Type</b></th>";
 				}
 
@@ -1570,7 +1570,7 @@ void cMainWindow::exportToHTML() {
 				out << "<th width=\"" << tdwidth.c_str() << "%\"><b>Absolute Intensity</b></th>";
 				out << "<th width=\"" << tdwidth.c_str() << "%\"><b>Error [ppm]</b></th>";
 
-				if (parameters.mode == dereplication) {
+				if ((parameters.mode == dereplication) || (parameters.mode == compoundsearch)) {
 					if (parameters.generateisotopepattern) {
 						out << "<th width=\"" << tdwidth.c_str() << "%\"><b>Score</b></th>";
 						out << "<th width=\"" << tdwidth.c_str() << "%\"><b>FDR</b></th>";
@@ -1829,7 +1829,7 @@ void cMainWindow::openResultsFile() {
 			parameters.load(infile);
 			parameterswidget->setAndRestoreParameters(parameters);
 
-			if (parameters.mode == dereplication) {
+			if ((parameters.mode == dereplication) || (parameters.mode == compoundsearch)) {
 				actionShowIsomers->setEnabled(false);
 				if ((parameters.peaklistfileformat == mis) || (parameters.peaklistfileformat == imzML)) {
 					actionImageWindow->setEnabled(true);

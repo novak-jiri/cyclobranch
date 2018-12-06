@@ -159,11 +159,11 @@ int cMzML::parse(string& filename, vector<cPeaksList>& peaklists, int profilespe
 
 															int level = atoi(getAttribute(currentElement4, "value").c_str());
 
-															if ((level == 1) && (mode != dereplication)) {
+															if ((level == 1) && ((mode == denovoengine) || (mode == singlecomparison) || (mode == databasesearch))) {
 																skipspectrum = true;
 															}
 															
-															if ((level > 1) && (mode == dereplication)) {
+															if ((level > 1) && ((mode == dereplication) || (mode == compoundsearch))) {
 																skipspectrum = true;
 															}
 

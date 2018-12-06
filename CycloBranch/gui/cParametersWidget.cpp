@@ -72,6 +72,7 @@ cParametersWidget::cParametersWidget(QWidget* parent) {
 	mode->addItem(tr("Compare Peaklist(s) with Spectrum of Searched Sequence"));
 	mode->addItem(tr("Compare Peaklist with Database - MS/MS data"));
 	mode->addItem(tr("Compare Peaklist(s) with Database - MS or MSI data"));
+	mode->addItem(tr("Compound Search"));
 	mode->setFixedWidth(leftdefaultwidth);
 	modelabel = new QLabel("Mode:");
 	searchgridlayout->addWidget(modelabel, 0, 0);
@@ -774,7 +775,7 @@ void cParametersWidget::closeEvent(QCloseEvent *event) {
 
 
 void cParametersWidget::setSequence(int peptidetypeindex, QString sequence) {
-	if ((eModeType)mode->currentIndex() == dereplication) {
+	if (((eModeType)mode->currentIndex() == dereplication) || ((eModeType)mode->currentIndex() == compoundsearch)) {
 		mode->setCurrentIndex(denovoengine);
 	}
 	peptidetype->setCurrentIndex(peptidetypeindex);
@@ -783,7 +784,7 @@ void cParametersWidget::setSequence(int peptidetypeindex, QString sequence) {
 
 
 void cParametersWidget::setTag(int peptidetypeindex, QString tag) {
-	if ((eModeType)mode->currentIndex() == dereplication) {
+	if (((eModeType)mode->currentIndex() == dereplication) || ((eModeType)mode->currentIndex() == compoundsearch)) {
 		mode->setCurrentIndex(denovoengine);
 	}
 	peptidetype->setCurrentIndex(peptidetypeindex);
@@ -1157,7 +1158,7 @@ bool cParametersWidget::updateParameters() {
 	parameters.ionsfortheoreticalspectra.clear();
 	int start;
 
-	if ((eModeType)mode->currentIndex() == dereplication) {
+	if (((eModeType)mode->currentIndex() == dereplication) || ((eModeType)mode->currentIndex() == compoundsearch)) {
 		start = ms_Hplus;
 	}
 	else {
@@ -1267,7 +1268,7 @@ void cParametersWidget::restoreParameters() {
 	sequencetag->setText(parameters.sequencetag.c_str());
 
 	int start;
-	if (parameters.mode == dereplication) {
+	if ((parameters.mode == dereplication) || (parameters.mode == compoundsearch)) {
 		start = ms_Hplus;
 	}
 	else {
@@ -1331,88 +1332,90 @@ void cParametersWidget::restoreParameters() {
 
 void cParametersWidget::updateSettingsWhenPeptideTypeChanged(int index) {
 
-	if (!(((eModeType)mode->currentIndex() != oldmodetype) && ((eModeType)mode->currentIndex() != dereplication) && (oldmodetype != dereplication))) {
+	if (!(((eModeType)mode->currentIndex() != oldmodetype) 
+		&& (((eModeType)mode->currentIndex() == denovoengine) || ((eModeType)mode->currentIndex() == singlecomparison) || ((eModeType)mode->currentIndex() == databasesearch))
+		&& ((oldmodetype == denovoengine) || (oldmodetype == singlecomparison) || (oldmodetype == databasesearch))
+		)) {
 		resetFragmentIonTypes();
 	}
 
-	switch ((ePeptideType)index)
-	{
-	case linear:
-		modificationsline->setDisabled(false);
-		modificationsbutton->setDisabled(false);
-		cyclicnterminus->setDisabled(false);
-		cycliccterminus->setDisabled(false);
-		internalfragments->setDisabled(true);
-		enablescrambling->setDisabled(true);
-		regularblocksorder->setDisabled(true);
-		searchedsequenceNtermmodif->setDisabled(false);
-		searchedsequenceCtermmodif->setDisabled(false);
-		searchedsequenceTmodif->setDisabled(true);
-		break;
-	case cyclic:
-		modificationsline->setDisabled(true);
-		modificationsbutton->setDisabled(true);
-		cyclicnterminus->setDisabled(true);
-		cycliccterminus->setDisabled(true);
-		internalfragments->setDisabled(true);
-		enablescrambling->setDisabled(false);
-		regularblocksorder->setDisabled(true);
-		searchedsequenceNtermmodif->setDisabled(true);
-		searchedsequenceCtermmodif->setDisabled(true);
-		searchedsequenceTmodif->setDisabled(true);
-		break;
-	case branched:
-		modificationsline->setDisabled(false);
-		modificationsbutton->setDisabled(false);
-		cyclicnterminus->setDisabled(true);
-		cycliccterminus->setDisabled(true);
-		internalfragments->setDisabled(true);
-		enablescrambling->setDisabled(true);
-		regularblocksorder->setDisabled(true);
-		searchedsequenceNtermmodif->setDisabled(false);
-		searchedsequenceCtermmodif->setDisabled(false);
-		searchedsequenceTmodif->setDisabled(false);
-		break;
-	case branchcyclic:
-		modificationsline->setDisabled(false);
-		modificationsbutton->setDisabled(false);
-		cyclicnterminus->setDisabled(true);
-		cycliccterminus->setDisabled(true);
-		internalfragments->setDisabled(false);
-		enablescrambling->setDisabled(true);
-		regularblocksorder->setDisabled(true);
-		searchedsequenceNtermmodif->setDisabled(true);
-		searchedsequenceCtermmodif->setDisabled(true);
-		searchedsequenceTmodif->setDisabled(false);
-		break;
-	case linearpolyketide:
-		modificationsline->setDisabled(false);
-		modificationsbutton->setDisabled(false);
-		cyclicnterminus->setDisabled(false);
-		cycliccterminus->setDisabled(false);
-		internalfragments->setDisabled(true);
-		enablescrambling->setDisabled(true);
-		regularblocksorder->setDisabled(false);
-		searchedsequenceNtermmodif->setDisabled(false);
-		searchedsequenceCtermmodif->setDisabled(false);
-		searchedsequenceTmodif->setDisabled(true);
-		break;
-	case cyclicpolyketide:
-		modificationsline->setDisabled(true);
-		modificationsbutton->setDisabled(true);
-		cyclicnterminus->setDisabled(true);
-		cycliccterminus->setDisabled(true);
-		internalfragments->setDisabled(true);
-		enablescrambling->setDisabled(true);
-		regularblocksorder->setDisabled(false);
-		searchedsequenceNtermmodif->setDisabled(true);
-		searchedsequenceCtermmodif->setDisabled(true);
-		searchedsequenceTmodif->setDisabled(true);
-		break;
-	case other:
-		break;
-	default:
-		break;
+	switch ((ePeptideType)index) {
+		case linear:
+			modificationsline->setDisabled(false);
+			modificationsbutton->setDisabled(false);
+			cyclicnterminus->setDisabled(false);
+			cycliccterminus->setDisabled(false);
+			internalfragments->setDisabled(true);
+			enablescrambling->setDisabled(true);
+			regularblocksorder->setDisabled(true);
+			searchedsequenceNtermmodif->setDisabled(false);
+			searchedsequenceCtermmodif->setDisabled(false);
+			searchedsequenceTmodif->setDisabled(true);
+			break;
+		case cyclic:
+			modificationsline->setDisabled(true);
+			modificationsbutton->setDisabled(true);
+			cyclicnterminus->setDisabled(true);
+			cycliccterminus->setDisabled(true);
+			internalfragments->setDisabled(true);
+			enablescrambling->setDisabled(false);
+			regularblocksorder->setDisabled(true);
+			searchedsequenceNtermmodif->setDisabled(true);
+			searchedsequenceCtermmodif->setDisabled(true);
+			searchedsequenceTmodif->setDisabled(true);
+			break;
+		case branched:
+			modificationsline->setDisabled(false);
+			modificationsbutton->setDisabled(false);
+			cyclicnterminus->setDisabled(true);
+			cycliccterminus->setDisabled(true);
+			internalfragments->setDisabled(true);
+			enablescrambling->setDisabled(true);
+			regularblocksorder->setDisabled(true);
+			searchedsequenceNtermmodif->setDisabled(false);
+			searchedsequenceCtermmodif->setDisabled(false);
+			searchedsequenceTmodif->setDisabled(false);
+			break;
+		case branchcyclic:
+			modificationsline->setDisabled(false);
+			modificationsbutton->setDisabled(false);
+			cyclicnterminus->setDisabled(true);
+			cycliccterminus->setDisabled(true);
+			internalfragments->setDisabled(false);
+			enablescrambling->setDisabled(true);
+			regularblocksorder->setDisabled(true);
+			searchedsequenceNtermmodif->setDisabled(true);
+			searchedsequenceCtermmodif->setDisabled(true);
+			searchedsequenceTmodif->setDisabled(false);
+			break;
+		case linearpolyketide:
+			modificationsline->setDisabled(false);
+			modificationsbutton->setDisabled(false);
+			cyclicnterminus->setDisabled(false);
+			cycliccterminus->setDisabled(false);
+			internalfragments->setDisabled(true);
+			enablescrambling->setDisabled(true);
+			regularblocksorder->setDisabled(false);
+			searchedsequenceNtermmodif->setDisabled(false);
+			searchedsequenceCtermmodif->setDisabled(false);
+			searchedsequenceTmodif->setDisabled(true);
+			break;
+		case cyclicpolyketide:
+			modificationsline->setDisabled(true);
+			modificationsbutton->setDisabled(true);
+			cyclicnterminus->setDisabled(true);
+			cycliccterminus->setDisabled(true);
+			internalfragments->setDisabled(true);
+			enablescrambling->setDisabled(true);
+			regularblocksorder->setDisabled(false);
+			searchedsequenceNtermmodif->setDisabled(true);
+			searchedsequenceCtermmodif->setDisabled(true);
+			searchedsequenceTmodif->setDisabled(true);
+			break;
+		case other:
+			break;
+		default:
+			break;
 	}
 }
 
@@ -1596,37 +1599,37 @@ void cParametersWidget::resetFragmentIonTypes() {
 	iontypes->getList()->clear();
 	eFragmentIonType start, end;
 	
-	if ((eModeType)mode->currentIndex() == dereplication) {
+	if (((eModeType)mode->currentIndex() == dereplication) || ((eModeType)mode->currentIndex() == compoundsearch)) {
 		start = ms_Hplus;
 		end = ms_MGa4H;
 	}
 	else {
 		switch ((ePeptideType)peptidetype->currentIndex()) {
-		case linear:
-		case branched:
-			start = a_ion;
-			end = z_ion;
-			break;
-		case cyclic:
-			start = a_ion;
-			end = c_ion;
-			break;
-		case branchcyclic:
-			start = a_ion;
-			end = z_ion;
-			break;
-		case linearpolyketide:
-			start = l1h_ion;
-			end = r2oh_ion;
-			break;
-		case cyclicpolyketide:
-			start = l1h_ion; // l0h_ion;
-			end = l2h_ion;
-			break;
-		case other:
-			break;
-		default:
-			break;
+			case linear:
+			case branched:
+				start = a_ion;
+				end = z_ion;
+				break;
+			case cyclic:
+				start = a_ion;
+				end = c_ion;
+				break;
+			case branchcyclic:
+				start = a_ion;
+				end = z_ion;
+				break;
+			case linearpolyketide:
+				start = l1h_ion;
+				end = r2oh_ion;
+				break;
+			case cyclicpolyketide:
+				start = l1h_ion; // l0h_ion;
+				end = l2h_ion;
+				break;
+			case other:
+				break;
+			default:
+				break;
 		}
 	}
 
@@ -1634,45 +1637,45 @@ void cParametersWidget::resetFragmentIonTypes() {
 
 		iontypes->getList()->addItem(tr(parameters.iondefinitions[(eFragmentIonType)i].name.c_str()));
 
-		if ((eModeType)mode->currentIndex() == dereplication) {
+		if (((eModeType)mode->currentIndex() == dereplication) || ((eModeType)mode->currentIndex() == compoundsearch)) {
 			if ((eFragmentIonType)i == ms_Hplus) {
 				iontypes->getList()->item(i-start)->setSelected(true);
 			}
 		}
 		else {
 			switch ((ePeptideType)peptidetype->currentIndex()) {
-			case linear:
-			case branched:
-				if (((eFragmentIonType)i == b_ion) || ((eFragmentIonType)i == y_ion)) {
-					iontypes->getList()->item(i-start)->setSelected(true);
-				}
-				break;
-			case cyclic:
-				if ((eFragmentIonType)i == b_ion) {
-					iontypes->getList()->item(i-start)->setSelected(true);
-				}
-				break;
-			case branchcyclic:
-				if (((eFragmentIonType)i == b_ion) || ((eFragmentIonType)i == y_ion)) {
-					iontypes->getList()->item(i-start)->setSelected(true);
-				}
-				break;
-			case linearpolyketide:
-				if (((eFragmentIonType)i == l1h_ion) || ((eFragmentIonType)i == l2h_ion) || ((eFragmentIonType)i == r1h_ion) || ((eFragmentIonType)i == r2h_ion) ||
-					((eFragmentIonType)i == l1oh_ion) || ((eFragmentIonType)i == l2oh_ion) || ((eFragmentIonType)i == r1oh_ion) || ((eFragmentIonType)i == r2oh_ion)
-					) {
-					iontypes->getList()->item(i-start)->setSelected(true);
-				}
-				break;
-			case cyclicpolyketide:
-				if (/*((eFragmentIonType)i == l0h_ion) ||*/ ((eFragmentIonType)i == l1h_ion) || ((eFragmentIonType)i == l2h_ion)) {
-					iontypes->getList()->item(i-start)->setSelected(true);
-				}
-				break;
-			case other:
-				break;
-			default:
-				break;
+				case linear:
+				case branched:
+					if (((eFragmentIonType)i == b_ion) || ((eFragmentIonType)i == y_ion)) {
+						iontypes->getList()->item(i-start)->setSelected(true);
+					}
+					break;
+				case cyclic:
+					if ((eFragmentIonType)i == b_ion) {
+						iontypes->getList()->item(i-start)->setSelected(true);
+					}
+					break;
+				case branchcyclic:
+					if (((eFragmentIonType)i == b_ion) || ((eFragmentIonType)i == y_ion)) {
+						iontypes->getList()->item(i-start)->setSelected(true);
+					}
+					break;
+				case linearpolyketide:
+					if (((eFragmentIonType)i == l1h_ion) || ((eFragmentIonType)i == l2h_ion) || ((eFragmentIonType)i == r1h_ion) || ((eFragmentIonType)i == r2h_ion) ||
+						((eFragmentIonType)i == l1oh_ion) || ((eFragmentIonType)i == l2oh_ion) || ((eFragmentIonType)i == r1oh_ion) || ((eFragmentIonType)i == r2oh_ion)
+						) {
+						iontypes->getList()->item(i-start)->setSelected(true);
+					}
+					break;
+				case cyclicpolyketide:
+					if (/*((eFragmentIonType)i == l0h_ion) ||*/ ((eFragmentIonType)i == l1h_ion) || ((eFragmentIonType)i == l2h_ion)) {
+						iontypes->getList()->item(i-start)->setSelected(true);
+					}
+					break;
+				case other:
+					break;
+				default:
+					break;
 			}
 		}
 

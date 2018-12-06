@@ -734,7 +734,7 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 
 
 	// check theoretical fragments in positive/negative mode
-	if (!error && (mode == dereplication)) {
+	if (!error && ((mode == dereplication) || (mode == compoundsearch))) {
 		i = 0;
 		while (i < (int)ionsfortheoreticalspectra.size()) {
 			if (iondefinitions[ionsfortheoreticalspectra[i]].positive != (precursorcharge > 0)) {
@@ -835,20 +835,23 @@ string cParameters::printToString() {
 
 	s += "Mode: ";
 	switch ((eModeType)mode) {
-	case denovoengine:
-		s += "De Novo Search Engine";
-		break;
-	case singlecomparison:
-		s += "Compare Peaklist(s) with Spectrum of Searched Sequence";
-		break;
-	case databasesearch:
-		s += "Compare Peaklist with Database - MS/MS data";
-		break;
-	case dereplication:
-		s += "Compare Peaklist(s) with Database - MS or MSI data";
-		break;
-	default:
-		break;
+		case denovoengine:
+			s += "De Novo Search Engine";
+			break;
+		case singlecomparison:
+			s += "Compare Peaklist(s) with Spectrum of Searched Sequence";
+			break;
+		case databasesearch:
+			s += "Compare Peaklist with Database - MS/MS data";
+			break;
+		case dereplication:
+			s += "Compare Peaklist(s) with Database - MS or MSI data";
+			break;
+		case compoundsearch:
+			s += "Compound Search";
+			break;
+		default:
+			break;
 	}
 	s += "\n";
 

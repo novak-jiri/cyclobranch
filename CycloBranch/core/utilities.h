@@ -75,7 +75,8 @@ enum eModeType {
 	denovoengine = 0,
 	singlecomparison = 1,
 	databasesearch = 2,
-	dereplication = 3
+	dereplication = 3,
+	compoundsearch = 4
 };
 
 

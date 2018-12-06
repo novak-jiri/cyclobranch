@@ -136,13 +136,13 @@ void cMainThread::run() {
 		return;
 	}
 
-	int startscanno = ((parameters.mode == dereplication) || (parameters.mode == singlecomparison)) ? 0 : parameters.scannumber - 1;
-	int endscanno = ((parameters.mode == dereplication) || (parameters.mode == singlecomparison)) ? parameters.peaklistseries.size() : parameters.scannumber;
+	int startscanno = ((parameters.mode == dereplication) || (parameters.mode == compoundsearch) || (parameters.mode == singlecomparison)) ? 0 : parameters.scannumber - 1;
+	int endscanno = ((parameters.mode == dereplication) || (parameters.mode == compoundsearch) || (parameters.mode == singlecomparison)) ? parameters.peaklistseries.size() : parameters.scannumber;
 	for (int i = startscanno; i < endscanno; i++) {
 		parameters.peaklistseries[i].sortbyMass();
 
 		if (parameters.peaklistseries[i].normalizeIntenzity() == -1) {
-			if ((parameters.mode == dereplication) || (parameters.mode == singlecomparison)) {
+			if ((parameters.mode == dereplication) || (parameters.mode == compoundsearch) || (parameters.mode == singlecomparison)) {
 				*os << "Warning: the spectrum no. " << i + 1 << " is empty or the format of peaklist is incorrect." << endl;
 			}
 			else {
@@ -412,7 +412,7 @@ void cMainThread::run() {
 
 
 	// database search - MS mode
-	if (parameters.mode == dereplication) {
+	if ((parameters.mode == dereplication) || (parameters.mode == compoundsearch)) {
 		*os << "Generating theoretical peaks... ";
 
 		theoreticalspectrumlist->initialize(*os, parameters, &graph);
@@ -612,7 +612,7 @@ void cMainThread::run() {
 void cMainThread::emitEndSignals() {
 	emit setGraph(graph.printGraph());
 
-	if ((parameters.mode == dereplication) || (parameters.neutrallossesfortheoreticalspectra.size() > 10000)) {
+	if ((parameters.mode == dereplication) || (parameters.mode == compoundsearch) || (parameters.neutrallossesfortheoreticalspectra.size() > 10000)) {
 		parameters.neutrallossesdefinitions.clear();
 		parameters.neutrallossesfortheoreticalspectra.clear();
 	}

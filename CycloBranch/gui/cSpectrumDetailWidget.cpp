@@ -181,7 +181,7 @@ string cSpectrumDetailWidget::getPeaksTableAsHTMLString(bool unmatchedtheoretica
 
 		s += "<table class=\"tablesorter\" cellpadding=\"0\" cellspacing=\"0\" border=\"1\" width=\"100%\"><thead><tr>";
 
-		if (parameters->mode == dereplication) {
+		if ((parameters->mode == dereplication) || (parameters->mode == compoundsearch)) {
 			if (parameters->generateisotopepattern) {
 				columncount = 12;
 			}
@@ -200,7 +200,7 @@ string cSpectrumDetailWidget::getPeaksTableAsHTMLString(bool unmatchedtheoretica
 
 		tdwidth = to_string(100/columncount);
 
-		if (parameters->mode == dereplication) {
+		if ((parameters->mode == dereplication) || (parameters->mode == compoundsearch)) {
 			if (parameters->generateisotopepattern) {
 				s += "<th width=\"" + tdwidth + "%\"><b>Pattern Type</b></th>";
 			}
@@ -223,7 +223,7 @@ string cSpectrumDetailWidget::getPeaksTableAsHTMLString(bool unmatchedtheoretica
 		s += "<th width=\"" + tdwidth + "%\"><b>Absolute Intensity</b></th>";
 		s += "<th width=\"" + tdwidth + "%\"><b>Error [ppm]</b></th>";
 
-		if (parameters->mode == dereplication) {
+		if ((parameters->mode == dereplication) || (parameters->mode == compoundsearch)) {
 			if (parameters->generateisotopepattern) {
 				s += "<th width=\"" + tdwidth + "%\"><b>Score</b></th>";
 				s += "<th width=\"" + tdwidth + "%\"><b>FDR</b></th>";
@@ -269,7 +269,7 @@ string cSpectrumDetailWidget::getPeaksTableAsHTMLString(bool unmatchedtheoretica
 
 			s += "<tr>";
 		
-			if (parameters->mode == dereplication) {
+			if ((parameters->mode == dereplication) || (parameters->mode == compoundsearch)) {
 				secondspace = (int)peak->description.find(' ', peak->description.find(' ') + 1);
 				s += printHTMLTableCell(peak->description.substr(0, secondspace), isred);
 			}
@@ -293,7 +293,7 @@ string cSpectrumDetailWidget::getPeaksTableAsHTMLString(bool unmatchedtheoretica
 				s += printHTMLTableCell(to_string(cropPrecisionToSixDecimals(peak->matchedrelativeintensity)), isred);
 				s += printHTMLTableCell(QVariant(cropDecimalsByteArray(peak->matchedabsoluteintensity)).toString().toStdString(), isred);
 				s += printHTMLTableCell(to_string(cropPrecisionToSixDecimals(peak->matchedppm)), isred);
-				if (parameters->mode == dereplication) {
+				if ((parameters->mode == dereplication) || (parameters->mode == compoundsearch)) {
 					if (parameters->generateisotopepattern) {
 						s += printHTMLTableCell(to_string(cropPrecisionToSixDecimals(theoreticalspectrum->getTargetPatternScore(peak->groupid))), isred);
 						s += printHTMLTableCell(to_string(cropPrecisionToSixDecimals(theoreticalspectrum->getTargetPatternFDR(peak->groupid))), isred);
@@ -302,14 +302,14 @@ string cSpectrumDetailWidget::getPeaksTableAsHTMLString(bool unmatchedtheoretica
 			}
 			else {
 				s += "<td></td><td></td><td></td><td></td>";
-				if (parameters->mode == dereplication) {
+				if ((parameters->mode == dereplication) || (parameters->mode == compoundsearch)) {
 					if (parameters->generateisotopepattern) {
 						s += "<td></td><td></td>";
 					}
 				}
 			}
 
-			if (parameters->mode == dereplication) {
+			if ((parameters->mode == dereplication) || (parameters->mode == compoundsearch)) {
 				s += printHTMLTableCell(peak->description.substr(peak->description.rfind('(') + 1, peak->description.rfind(')') - peak->description.rfind('(') - 1), isred);
 
 				langle = (int)peak->description.rfind("</a>");
@@ -368,7 +368,7 @@ string cSpectrumDetailWidget::getPeaksTableAsHTMLString(bool unmatchedtheoretica
 				s += printHTMLTableCell(to_string(cropPrecisionToSixDecimals(peak->relativeintensity)), false);
 				s += printHTMLTableCell(QVariant(cropDecimalsByteArray(peak->absoluteintensity)).toString().toStdString(), false);
 				s += "<td></td><td></td><td></td>";
-				if (parameters->mode == dereplication) {
+				if ((parameters->mode == dereplication) || (parameters->mode == compoundsearch)) {
 					s += "<td></td>";
 					if (parameters->generateisotopepattern) {
 						s += "<td></td><td></td>";
@@ -398,7 +398,7 @@ string cSpectrumDetailWidget::getPartialPeaksTableAsHTMLString(int id, bool expo
 
 	if (theoreticalspectrum && parameters) {
 
-		if (parameters->mode == dereplication) {
+		if ((parameters->mode == dereplication) || (parameters->mode == compoundsearch)) {
 			thpeaks = new cPeaksList();
 			for (int i = 0; i < (int)theoreticalspectrum->getTheoreticalPeaks()->size(); i++) {
 				peak = &((*(theoreticalspectrum->getTheoreticalPeaks()))[i]);
@@ -439,7 +439,7 @@ string cSpectrumDetailWidget::getPartialPeaksTableAsHTMLString(int id, bool expo
 			s += "<tr>";
 			s += printHTMLTableCell(to_string(id + 1), isred);
 		
-			if (parameters->mode == dereplication) {
+			if ((parameters->mode == dereplication) || (parameters->mode == compoundsearch)) {
 				if ((parameters->peaklistfileformat == mis) || (parameters->peaklistfileformat == imzML)) {
 					s += printHTMLTableCell(to_string(theoreticalspectrum->getExperimentalSpectrum().getCoordinateX()), isred);
 					s += printHTMLTableCell(to_string(theoreticalspectrum->getExperimentalSpectrum().getCoordinateY()), isred);
@@ -452,7 +452,7 @@ string cSpectrumDetailWidget::getPartialPeaksTableAsHTMLString(int id, bool expo
 				s += printHTMLTableCell(to_string(theoreticalspectrum->getPathId() + 1), isred);
 			}
 
-			if (parameters->mode != dereplication) {
+			if ((parameters->mode == denovoengine) || (parameters->mode == singlecomparison) || (parameters->mode == databasesearch)) {
 				s += printHTMLTableCell(peak->description.substr(0, peak->description.find(':')), isred);
 			}
 		
@@ -467,7 +467,7 @@ string cSpectrumDetailWidget::getPartialPeaksTableAsHTMLString(int id, bool expo
 				s += printHTMLTableCell(to_string(cropPrecisionToSixDecimals(peak->matchedrelativeintensity)), isred);
 				s += printHTMLTableCell(QVariant(cropDecimalsByteArray(peak->matchedabsoluteintensity)).toString().toStdString(), isred);
 				s += printHTMLTableCell(to_string(cropPrecisionToSixDecimals(peak->matchedppm)), isred);
-				if (parameters->mode == dereplication) {
+				if ((parameters->mode == dereplication) || (parameters->mode == compoundsearch)) {
 					if (parameters->generateisotopepattern) {
 						s += printHTMLTableCell(to_string(cropPrecisionToSixDecimals(theoreticalspectrum->getTargetPatternScore(peak->groupid))), isred);
 						s += printHTMLTableCell(to_string(cropPrecisionToSixDecimals(theoreticalspectrum->getTargetPatternFDR(peak->groupid))), isred);
@@ -476,14 +476,14 @@ string cSpectrumDetailWidget::getPartialPeaksTableAsHTMLString(int id, bool expo
 			}
 			else {
 				s += "<td></td><td></td><td></td><td></td>";
-				if (parameters->mode == dereplication) {
+				if ((parameters->mode == dereplication) || (parameters->mode == compoundsearch)) {
 					if (parameters->generateisotopepattern) {
 						s += "<td></td><td></td>";
 					}
 				}
 			}
 
-			if (parameters->mode == dereplication) {
+			if ((parameters->mode == dereplication) || (parameters->mode == compoundsearch)) {
 				s += printHTMLTableCell(peak->description.substr(peak->description.rfind('(') + 1, peak->description.rfind(')') - peak->description.rfind('(') - 1), isred);
 
 				langle = (int)peak->description.rfind("</a>");
@@ -525,7 +525,7 @@ string cSpectrumDetailWidget::getPartialPeaksTableAsHTMLString(int id, bool expo
 			s += "</tr>";
 		}
 
-		if (parameters->mode == dereplication) {
+		if ((parameters->mode == dereplication) || (parameters->mode == compoundsearch)) {
 			delete thpeaks;
 		}
 
@@ -659,7 +659,7 @@ void cSpectrumDetailWidget::prepareToShow(QAction* actionShowIsomers, cPeakListS
 	if (!preparedToShow) {
 
 		if (parameters) {
-			if ((parameters->mode == dereplication) || (parameters->mode == singlecomparison)) {
+			if ((parameters->mode == dereplication) || (parameters->mode == compoundsearch) || (parameters->mode == singlecomparison)) {
 				setWindowTitle(("Experimental Spectrum No. " + to_string(rowid)).c_str());
 			}
 			else {
@@ -1268,7 +1268,7 @@ void cSpectrumDetailWidget::findAll(const QString& str, QTextDocument::FindFlags
 	QStandardItem* item;
 	for (int i = 0; i < proxymodel->rowCount(); i++) {
 
-		for (int j = 0; j < ((parameters->mode == dereplication)?peakstablemodel->columnCount() - 1:peakstablemodel->columnCount()); j++) {
+		for (int j = 0; j < (((parameters->mode == dereplication) || (parameters->mode == compoundsearch)) ? peakstablemodel->columnCount() - 1 : peakstablemodel->columnCount()); j++) {
 			item = peakstablemodel->itemFromIndex(proxymodel->mapToSource(proxymodel->index(i, j)));
 
 			if (!item) {
@@ -1399,7 +1399,7 @@ void cSpectrumDetailWidget::preparePeaksTable() {
 	peakstable->horizontalHeader()->setSectionsMovable(true);
 	//peakstable->verticalHeader()->setDefaultSectionSize(30);
 
-	if (parameters->mode == dereplication) {
+	if ((parameters->mode == dereplication) || (parameters->mode == compoundsearch)) {
 		if (parameters->generateisotopepattern) {
 			peakstablemodel->setColumnCount(12);
 		}
@@ -1421,7 +1421,7 @@ void cSpectrumDetailWidget::preparePeaksTable() {
 	}
 
 	int currentcolumn = 0;
-	if (parameters->mode == dereplication) {
+	if ((parameters->mode == dereplication) || (parameters->mode == compoundsearch)) {
 		if (parameters->generateisotopepattern) {
 			peakstablemodel->horizontalHeaderItem(currentcolumn)->setText("Pattern Type");
 		}
@@ -1454,7 +1454,7 @@ void cSpectrumDetailWidget::preparePeaksTable() {
 	peakstablemodel->horizontalHeaderItem(currentcolumn)->setText("Error [ppm]");
 	currentcolumn++;
 
-	if (parameters->mode == dereplication) {
+	if ((parameters->mode == dereplication) || (parameters->mode == compoundsearch)) {
 
 		if (parameters->generateisotopepattern) {
 			peakstablemodel->horizontalHeaderItem(currentcolumn)->setText("Score");
@@ -1534,7 +1534,7 @@ void cSpectrumDetailWidget::preparePeaksTable() {
 		}
 		
 		currentcolumn = 0;
-		if (parameters->mode == dereplication) {
+		if ((parameters->mode == dereplication) || (parameters->mode == compoundsearch)) {
 			secondspace = (int)peak->description.find(' ', peak->description.find(' ') + 1);
 
 			peakstablemodel->setItem(i, currentcolumn, new QStandardItem());
@@ -1583,7 +1583,7 @@ void cSpectrumDetailWidget::preparePeaksTable() {
 			peakstablemodel->item(i, currentcolumn)->setData(QVariant::fromValue(cropPrecisionToSixDecimalsByteArray(peak->matchedppm)), Qt::DisplayRole);
 			currentcolumn++;
 
-			if (parameters->mode == dereplication) {
+			if ((parameters->mode == dereplication) || (parameters->mode == compoundsearch)) {
 				if (parameters->generateisotopepattern) {
 					peakstablemodel->setItem(i, currentcolumn, new QStandardItem());
 					peakstablemodel->item(i, currentcolumn)->setForeground(brush);
@@ -1599,14 +1599,14 @@ void cSpectrumDetailWidget::preparePeaksTable() {
 		}
 		else {
 			currentcolumn += 4;
-			if (parameters->mode == dereplication) {
+			if ((parameters->mode == dereplication) || (parameters->mode == compoundsearch)) {
 				if (parameters->generateisotopepattern) {
 					currentcolumn += 2;
 				}
 			}
 		}
 
-		if (parameters->mode == dereplication) {
+		if ((parameters->mode == dereplication) || (parameters->mode == compoundsearch)) {
 			peakstablemodel->setItem(i, currentcolumn, new QStandardItem());
 			peakstablemodel->item(i, currentcolumn)->setForeground(brush);
 			QString summary;
@@ -1726,7 +1726,7 @@ void cSpectrumDetailWidget::preparePeaksTable() {
 		peakstable->resizeColumnToContents(i);
 	}
 
-	if (parameters->mode == dereplication) {
+	if ((parameters->mode == dereplication) || (parameters->mode == compoundsearch)) {
 		if (parameters->generateisotopepattern) {
 			peakstable->setColumnWidth(9, min(400, peakstable->columnWidth(9)));
 		}
@@ -2335,7 +2335,7 @@ void cSpectrumDetailWidget::rawDataStateChanged(bool state) {
 
 		}
 
-		if ((parameters->peaklistfileformat == imzML) && (parameters->mode == dereplication) && (imzmlprofilemetadata->size() > 0)) {
+		if ((parameters->peaklistfileformat == imzML) && ((parameters->mode == dereplication) || (parameters->mode == compoundsearch)) && (imzmlprofilemetadata->size() > 0)) {
 			targetid = rowid - 1;
 
 			if ((targetid >= 0) && (targetid < rawdata->size())) {
@@ -2461,7 +2461,7 @@ void cSpectrumDetailWidget::hidePeakLabels(bool hide) {
 
 	spectrumscene->hidePeakLabels(hide);
 
-	if (parameters && (parameters->mode != dereplication)) {
+	if (parameters && ((parameters->mode == denovoengine) || (parameters->mode == singlecomparison) || (parameters->mode == databasesearch))) {
 		switch (parameters->peptidetype) {
 			case linear:
 				linearwidget->hidePeakLabels(hide);
@@ -2512,7 +2512,7 @@ void cSpectrumDetailWidget::filterTableAfterTRotationChanged(int index) {
 
 void cSpectrumDetailWidget::showIsomersStateChanged() {
 
-	if (parameters->mode != dereplication) {
+	if ((parameters->mode == denovoengine) || (parameters->mode == singlecomparison) || (parameters->mode == databasesearch)) {
 
 		reportisomers = actionShowIsomers->isChecked();
 
@@ -2595,60 +2595,66 @@ void cSpectrumDetailWidget::showHTMLDocumentation() {
 		if (parameters->mode == dereplication) {
 			QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo("docs/html/dereplication.html").absoluteFilePath()));
 		}
+		else if (parameters->mode == compoundsearch) {
+			// to do
+		} 
 		else {
 			switch (parameters->peptidetype) {
-			case linear:
-				QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo("docs/html/lineardetail.html").absoluteFilePath()));
-				break;
-			case cyclic:
-				QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo("docs/html/cyclicdetail.html").absoluteFilePath()));
-				break;
-			case branched:
-				QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo("docs/html/brancheddetail.html").absoluteFilePath()));
-				break;
-			case branchcyclic:
-				QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo("docs/html/branchcyclicdetail.html").absoluteFilePath()));
-				break;
-			case linearpolyketide:
-				QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo("docs/html/linearketidedetail.html").absoluteFilePath()));
-				break;
-			case cyclicpolyketide:
-				QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo("docs/html/cyclicketidedetail.html").absoluteFilePath()));
-				break;
-			case other:
-				break;
-			default:
-				break;
+				case linear:
+					QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo("docs/html/lineardetail.html").absoluteFilePath()));
+					break;
+				case cyclic:
+					QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo("docs/html/cyclicdetail.html").absoluteFilePath()));
+					break;
+				case branched:
+					QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo("docs/html/brancheddetail.html").absoluteFilePath()));
+					break;
+				case branchcyclic:
+					QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo("docs/html/branchcyclicdetail.html").absoluteFilePath()));
+					break;
+				case linearpolyketide:
+					QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo("docs/html/linearketidedetail.html").absoluteFilePath()));
+					break;
+				case cyclicpolyketide:
+					QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo("docs/html/cyclicketidedetail.html").absoluteFilePath()));
+					break;
+				case other:
+					break;
+				default:
+					break;
 			}
 		}
 	#else
 		if (parameters->mode == dereplication) {
 			QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo(installdir + "docs/html/dereplication.html").absoluteFilePath()));
 		}
+		else if (parameters->mode == compoundsearch) {
+			// to do
+		}
 		else {
 			switch (parameters->peptidetype) {
-			case linear:
-				QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo(installdir + "docs/html/lineardetail.html").absoluteFilePath()));
-				break;
-			case cyclic:
-				QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo(installdir + "docs/html/cyclicdetail.html").absoluteFilePath()));
-				break;
-			case branched:
-				QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo(installdir + "docs/html/brancheddetail.html").absoluteFilePath()));
-				break;
-			case branchcyclic:
-				QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo(installdir + "docs/html/branchcyclicdetail.html").absoluteFilePath()));
-				break;
-			case linearpolyketide:
-				QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo(installdir + "docs/html/linearketidedetail.html").absoluteFilePath()));
-				break;
-			case cyclicpolyketide:
-				QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo(installdir + "docs/html/cyclicketidedetail.html").absoluteFilePath()));
-				break;
-			case other:
-				break;
-			default:
-				break;
+				case linear:
+					QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo(installdir + "docs/html/lineardetail.html").absoluteFilePath()));
+					break;
+				case cyclic:
+					QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo(installdir + "docs/html/cyclicdetail.html").absoluteFilePath()));
+					break;
+				case branched:
+					QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo(installdir + "docs/html/brancheddetail.html").absoluteFilePath()));
+					break;
+				case branchcyclic:
+					QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo(installdir + "docs/html/branchcyclicdetail.html").absoluteFilePath()));
+					break;
+				case linearpolyketide:
+					QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo(installdir + "docs/html/linearketidedetail.html").absoluteFilePath()));
+					break;
+				case cyclicpolyketide:
+					QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo(installdir + "docs/html/cyclicketidedetail.html").absoluteFilePath()));
+					break;
+				case other:
+					break;
+				default:
+					break;
 			}
 		}
 	#endif
