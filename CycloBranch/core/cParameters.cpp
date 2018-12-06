@@ -748,7 +748,10 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 
 
 	// calculate combinations of neutral losses
-	if (!error) {
+	neutrallossesdefinitions.clear();
+	neutrallossesfortheoreticalspectra.clear();
+	numberofgeneratedneutrallosses = 0;
+	if (!error && ((mode == denovoengine) || (mode == singlecomparison) || (mode == databasesearch) || (mode == dereplication))) {
 		errtype = calculateNeutralLosses(terminatecomputation, errormessage);
 		if (errtype == -1) {
 			error = true;
