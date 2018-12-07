@@ -216,14 +216,29 @@ cParametersWidget::cParametersWidget(QWidget* parent) {
 	experimentalspectragridlayout->addWidget(minimumabsoluteintensitythreshold, 9, 1);
 
 	minimummz = new QDoubleSpinBox();
-	minimummz->setToolTip("Enter the minimum m/z ratio. Peaks with m/z ratios below the threshold are removed from the peaklist.");
+	minimummz->setToolTip("Enter the minimum m/z ratio. Peaks with m/z ratios below the threshold will be removed from the peaklist.");
 	minimummz->setDecimals(3);
-	minimummz->setRange(0, 10000);
+	minimummz->setRange(0, 100000);
 	minimummz->setSingleStep(1);
-	minimummz->setFixedWidth(leftdefaultwidth);
-	minimummzlabel = new QLabel("Minimum m/z Ratio:");
-	experimentalspectragridlayout->addWidget(minimummzlabel, 10, 0);
-	experimentalspectragridlayout->addWidget(minimummz, 10, 1);
+	minimummz->setPrefix("minimum: ");
+
+	maximummz = new QDoubleSpinBox();
+	maximummz->setToolTip("Enter the maximum m/z ratio. Peaks with m/z ratios above the threshold will be removed from the peaklist\n(0.0 = the feature is disabled).");
+	maximummz->setDecimals(3);
+	maximummz->setRange(0, 100000);
+	maximummz->setSingleStep(1);
+	maximummz->setPrefix("maximum: ");
+
+	mzratiolayout = new QHBoxLayout();
+	mzratiolayout->addWidget(minimummz);
+	mzratiolayout->addWidget(maximummz);
+	mzratiolayout->setMargin(0);
+	mzratiowidget = new QWidget();
+	mzratiowidget->setLayout(mzratiolayout);
+	mzratiowidget->setFixedWidth(leftdefaultwidth);
+	mzratiolabel = new QLabel("m/z Ratio:");
+	experimentalspectragridlayout->addWidget(mzratiolabel, 10, 0);
+	experimentalspectragridlayout->addWidget(mzratiowidget, 10, 1);
 
 	fwhm = new QDoubleSpinBox();
 	fwhm->setToolTip("Full width at half maximum. The value is used if the profile spectra are converted into peaklists (mzML and imzML) and if the full isotope patterns of compounds are generated.");
@@ -654,8 +669,11 @@ cParametersWidget::~cParametersWidget() {
 	delete minimumrelativeintensitythreshold;
 	delete minimumabsoluteintensitythresholdlabel;
 	delete minimumabsoluteintensitythreshold;
-	delete minimummzlabel;
+	delete mzratiolabel;
 	delete minimummz;
+	delete maximummz;
+	delete mzratiolayout;
+	delete mzratiowidget;
 	delete fwhmlabel;
 	delete fwhm;
 	delete experimentalspectragridlayout;
@@ -861,6 +879,7 @@ void cParametersWidget::loadSettings() {
 		minimumrelativeintensitythreshold->setValue(settings.value("minimumrelativeintensitythreshold", 1).toDouble());
 		minimumabsoluteintensitythreshold->setValue(settings.value("minimumabsoluteintensitythreshold", 0).toUInt());
 		minimummz->setValue(settings.value("minimummz", 150).toDouble());
+		maximummz->setValue(settings.value("maximummz", 0).toDouble());
 		fwhm->setValue(settings.value("fwhm", 0.05).toDouble());
 
 		brickdatabaseline->setText(settings.value("brickdatabase", "").toString());
@@ -948,6 +967,7 @@ void cParametersWidget::saveSettings() {
 	settings.setValue("minimumrelativeintensitythreshold", minimumrelativeintensitythreshold->value());
 	settings.setValue("minimumabsoluteintensitythreshold", minimumabsoluteintensitythreshold->value());
 	settings.setValue("minimummz", minimummz->value());
+	settings.setValue("maximummz", maximummz->value());
 	settings.setValue("fwhm", fwhm->value());
 
 	settings.setValue("brickdatabase", brickdatabaseline->text());
@@ -1099,6 +1119,13 @@ bool cParametersWidget::updateParameters() {
 		return false;
 	}
 
+	if (((eModeType)mode->currentIndex() == compoundsearch) && (maximummz->value() <= minimummz->value())) {
+		errstr = "The maximum m/z ratio must be bigger than the minimum m/z ratio!";
+		msgBox.setText(errstr);
+		msgBox.exec();
+		return false;
+	}
+
 	/*
 	if ((maximumbricksincombinationmiddle->value() < 2) && ((eModeType)mode->currentIndex() == denovoengine) && (((ePeptideType)peptidetype->currentIndex() == branched) || ((ePeptideType)peptidetype->currentIndex() == branchcyclic))) {
 		errstr = "'Maximum Number of Combined Blocks (middle)' must be at least 2 when a branched or a branch-cyclic peptide is searched! (One block represents a branched residue, the other block(s) corresponds to a branch.)";
@@ -1136,6 +1163,7 @@ bool cParametersWidget::updateParameters() {
 	parameters.minimumrelativeintensitythreshold = minimumrelativeintensitythreshold->value();
 	parameters.minimumabsoluteintensitythreshold = minimumabsoluteintensitythreshold->value();
 	parameters.minimummz = minimummz->value();
+	parameters.maximummz = maximummz->value();
 	parameters.fwhm = fwhm->value();
 
 	parameters.bricksdatabasefilename = brickdatabaseline->text().toStdString();
@@ -1250,6 +1278,7 @@ void cParametersWidget::restoreParameters() {
 	minimumrelativeintensitythreshold->setValue(parameters.minimumrelativeintensitythreshold);
 	minimumabsoluteintensitythreshold->setValue(parameters.minimumabsoluteintensitythreshold);
 	minimummz->setValue(parameters.minimummz);
+	maximummz->setValue(parameters.maximummz);
 	fwhm->setValue(parameters.fwhm);
 
 	brickdatabaseline->setText(parameters.bricksdatabasefilename.c_str());
@@ -1435,6 +1464,7 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 			precursoradduct->setDisabled(false);
 			precursorcharge->setDisabled(false);
 			precursormasserrortolerance->setDisabled(false);
+			maximummz->setDisabled(true);
 			fwhm->setDisabled(false);
 			brickdatabaseline->setDisabled(false);
 			brickdatabasebutton->setDisabled(false);
@@ -1473,6 +1503,7 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 			precursoradduct->setDisabled(false);
 			precursorcharge->setDisabled(false);
 			precursormasserrortolerance->setDisabled(false);
+			maximummz->setDisabled(true);
 			fwhm->setDisabled(false);
 			brickdatabaseline->setDisabled(false);
 			brickdatabasebutton->setDisabled(false);
@@ -1511,6 +1542,7 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 			precursoradduct->setDisabled(false);
 			precursorcharge->setDisabled(false);
 			precursormasserrortolerance->setDisabled(false);
+			maximummz->setDisabled(true);
 			fwhm->setDisabled(false);
 			brickdatabaseline->setDisabled(false);
 			brickdatabasebutton->setDisabled(false);
@@ -1549,6 +1581,7 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 			precursoradduct->setDisabled(true);
 			precursorcharge->setDisabled(false);
 			precursormasserrortolerance->setDisabled(true);
+			maximummz->setDisabled(true);
 			fwhm->setDisabled(false);
 			brickdatabaseline->setDisabled(true);
 			brickdatabasebutton->setDisabled(true);
@@ -1600,6 +1633,7 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 			precursoradduct->setDisabled(true);
 			precursorcharge->setDisabled(false);
 			precursormasserrortolerance->setDisabled(true);
+			maximummz->setDisabled(false);
 			fwhm->setDisabled(false);
 			brickdatabaseline->setDisabled(true);
 			brickdatabasebutton->setDisabled(true);

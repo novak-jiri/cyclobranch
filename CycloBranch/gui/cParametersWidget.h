@@ -162,8 +162,11 @@ private:
 	QDoubleSpinBox* minimumrelativeintensitythreshold;
 	QLabel* minimumabsoluteintensitythresholdlabel;
 	QSpinBox* minimumabsoluteintensitythreshold;
-	QLabel* minimummzlabel;
+	QLabel* mzratiolabel;
 	QDoubleSpinBox* minimummz;
+	QDoubleSpinBox* maximummz;
+	QHBoxLayout* mzratiolayout;
+	QWidget* mzratiowidget;
 	QLabel* fwhmlabel;
 	QDoubleSpinBox* fwhm;
 

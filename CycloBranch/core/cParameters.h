@@ -164,9 +164,15 @@ public:
 
 
 	/**
-		\brief Minimum mz.
+		\brief Minimum m/z ratio.
     */
     double minimummz;
+
+
+	/**
+		\brief Maximum m/z ratio.
+	*/
+	double maximummz;
 
 
 	/**
@@ -540,6 +546,15 @@ public:
 		\retval int -1 when an error occurred, 0 otherwise
 	*/
 	int calculateNeutralLosses(bool& terminatecomputation, string& errormessage);
+
+
+	/**
+		\brief Generate compounds.
+		\param terminatecomputation reference to a variable determining that the computation must be stopped
+		\param errormessage an error message if failed
+		\retval int -1 when an error occurred, 0 otherwise
+	*/
+	int generateCompounds(bool& terminatecomputation, string& errormessage);
 
 
 	/**

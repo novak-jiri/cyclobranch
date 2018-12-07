@@ -30,6 +30,7 @@ void cParameters::clear() {
 	minimumrelativeintensitythreshold = 1;
 	minimumabsoluteintensitythreshold = 0;
 	minimummz = 150;
+	maximummz = 0;
 	fwhm = 0.05;
 	bricksdatabasefilename = "";
 	bricksdatabase.clear();
@@ -747,14 +748,22 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 	}
 
 
-	// calculate combinations of neutral losses
+	// calculate combinations of neutral losses or generate compounds
 	neutrallossesdefinitions.clear();
 	neutrallossesfortheoreticalspectra.clear();
 	numberofgeneratedneutrallosses = 0;
-	if (!error && ((mode == denovoengine) || (mode == singlecomparison) || (mode == databasesearch) || (mode == dereplication))) {
-		errtype = calculateNeutralLosses(terminatecomputation, errormessage);
-		if (errtype == -1) {
-			error = true;
+	if (!error) {
+		if ((mode == denovoengine) || (mode == singlecomparison) || (mode == databasesearch) || (mode == dereplication)) {
+			errtype = calculateNeutralLosses(terminatecomputation, errormessage);
+			if (errtype == -1) {
+				error = true;
+			}
+		}
+		else if (mode == compoundsearch) {
+			errtype = generateCompounds(terminatecomputation, errormessage);
+			if (errtype == -1) {
+				error = true;
+			}
 		}
 	}
 
@@ -903,6 +912,7 @@ string cParameters::printToString() {
 	s += "Minimum Threshold of Relative Intensity: " + to_string(minimumrelativeintensitythreshold) + "\n";
 	s += "Minimum Threshold of Absolute Intensity: " + to_string(minimumabsoluteintensitythreshold) + "\n";
 	s += "Minimum m/z Ratio: " + to_string(minimummz) + "\n";
+	s += "Maximum m/z Ratio: " + to_string(maximummz) + "\n";
 	s += "FWHM: " + to_string(fwhm) + "\n";
 	s += "Building Blocks Database File: " + bricksdatabasefilename + "\n";
 	s += "Maximum Number of Combined Blocks (start, middle, end): " + to_string(maximumbricksincombinationbegin) + ", " + to_string(maximumbricksincombinationmiddle) + ", " + to_string(maximumbricksincombinationend) + "\n";
@@ -1338,6 +1348,166 @@ int cParameters::calculateNeutralLosses(bool& terminatecomputation, string& erro
 }
 
 
+int cParameters::generateCompounds(bool& terminatecomputation, string& errormessage) {
+	errormessage = "";
+
+	if (maximumcombinedlosses == 0) {
+		return 0;
+	}
+
+	cSequence seq;
+	cSummaryFormula tmpformula;
+	string tmpstring;
+	neutralLoss loss;
+	int i;
+
+	cBricksDatabase elementsbrickdatabase;
+	cBrick tmpbrick;
+	int numberofbasicbricks = 0;
+	string compositionname;
+	vector<int> intcomposition;
+
+	bool undefinedelement;
+	int valence;
+	int atomscount;
+
+	//int stringsizeest = 0;
+	//int mapsizeest = 0;
+	//int doublesizeest = 0;
+	//int pruned = 0;
+
+	if (os) {
+		*os << "Generating compounds... " << endl;
+	}
+
+	for (i = 0; i < (int)originalneutrallossesfortheoreticalspectra.size(); i++) {
+		tmpformula.setFormula(originalneutrallossesdefinitions[originalneutrallossesfortheoreticalspectra[i]].summary, false);
+
+		tmpbrick.clear();
+		tmpbrick.setComposition(to_string(numberofbasicbricks + 1), false);
+		tmpbrick.setMass(tmpformula.getMass());
+		tmpbrick.setSummary(originalneutrallossesdefinitions[originalneutrallossesfortheoreticalspectra[i]].summary);
+		tmpbrick.createSummaryMap();
+
+		elementsbrickdatabase.push_back(tmpbrick);
+
+		numberofbasicbricks++;
+	}
+
+	elementsbrickdatabase.sortbyMass();
+
+	vector<int> combarray;
+	for (i = 0; i < maximumcombinedlosses; i++) {
+		combarray.push_back(0);
+	}
+
+	i = 0;
+	while (elementsbrickdatabase.nextCombination(combarray, numberofbasicbricks, maximumcombinedlosses, 0, maximummz)) {
+		if (terminatecomputation) {
+			errormessage = "Aborted by user.";
+			return -1;
+		}
+
+		getNameOfCompositionFromIntVector(compositionname, combarray);
+
+		tmpbrick.clear();
+		tmpbrick.setComposition(compositionname, true);
+		tmpbrick.setMass(elementsbrickdatabase.getMassOfComposition(combarray, numberofbasicbricks));
+
+		loss.clear();
+		loss.massdifference = tmpbrick.getMass();
+
+		// to do - charge and adducts are not considered here !!!
+		if ((loss.massdifference < minimummz) || (loss.massdifference > maximummz)) {
+			continue;
+		}
+
+		intcomposition.clear();
+		tmpbrick.explodeToIntComposition(intcomposition);
+		for (int j = 0; j < (int)intcomposition.size(); j++) {
+			loss.summary += elementsbrickdatabase[intcomposition[j] - 1].getSummary();
+		}
+
+		tmpformula.clear();
+		tmpformula.addFormula(loss.summary, true);
+		tmpstring = tmpformula.getSummary();
+		addStringFormulaToMap(tmpstring, loss.summarymap);
+
+		undefinedelement = false;
+		for (auto it = loss.summarymap.begin(); it != loss.summarymap.end(); ++it) {
+			if ((it->first.compare("H") != 0) && (it->first.compare("C") != 0) && (it->first.compare("O") != 0) && (it->first.compare("N") != 0) && (it->first.compare("S") != 0)) {
+				undefinedelement = true;
+				break;
+			}
+		}
+
+		valence = 0;
+		atomscount = 0;
+		if (loss.summarymap.count("H") > 0) {
+			valence += -loss.summarymap["H"];
+			atomscount += -loss.summarymap["H"];
+		}
+		if (loss.summarymap.count("C") > 0) {
+			valence += -loss.summarymap["C"] * 4;
+			atomscount += -loss.summarymap["C"];
+		}
+		if (loss.summarymap.count("O") > 0) {
+			valence += -loss.summarymap["O"] * 2;
+			atomscount += -loss.summarymap["O"];
+		}
+		if (loss.summarymap.count("N") > 0) {
+			valence += -loss.summarymap["N"] * 3;
+			atomscount += -loss.summarymap["N"];
+		}
+		if (loss.summarymap.count("S") > 0) {
+			valence += -loss.summarymap["S"] * 6; /* the maximum valence state is used */
+			atomscount += -loss.summarymap["S"];
+		}
+
+		// SENIOR rule 1 - the sum of valences must be even
+		// SENIOR rule 3 - the sum of valences >= 2 * (atomscount - maximum number of allowed components in the graph); edges - nodes + components >= 0
+		if (!undefinedelement && ((valence % 2 == 1) || (valence < 2 * (atomscount - 1)))) {
+			//pruned++;
+			continue;
+		}
+
+		tmpformula.clear();
+		tmpformula.addFormula(loss.summary);
+		loss.summary = tmpformula.getSummary();
+
+		//stringsizeest += sizeof(string) + loss.summary.size();
+		//mapsizeest += sizeof(loss.summarymap) + loss.summarymap.size() * (sizeof(string) /* the length of string is 1 for HCONS */ + sizeof(int));
+		//doublesizeest += sizeof(double);
+
+		seq.setSummaryFormula(loss.summary);
+		sequencedatabase.push_back(seq);
+
+		i++;
+
+		if (i % 100000 == 0) {
+			if (os) {
+				*os << i << " ";
+			}
+
+			//cout << i << " " << pruned << " - " << stringsizeest << " " << mapsizeest << " " << doublesizeest << " " << stringsizeest + mapsizeest + doublesizeest << endl;
+		}
+
+		if (i % 1000000 == 0) {
+			if (os) {
+				*os << endl;
+			}
+		}
+	}
+
+	if (os) {
+		*os << "ok" << endl;
+		*os << "Number of generated compounds: " << sequencedatabase.size() << endl << endl;
+	}
+
+	return 0;
+}
+
+
 void cParameters::store(ofstream& os) {
 	int size;
 	string s;
@@ -1367,6 +1537,7 @@ void cParameters::store(ofstream& os) {
 	os.write((char *)&minimumrelativeintensitythreshold, sizeof(double));
 	os.write((char *)&minimumabsoluteintensitythreshold, sizeof(unsigned));
 	os.write((char *)&minimummz, sizeof(double));
+	os.write((char *)&maximummz, sizeof(double));
 	os.write((char *)&fwhm, sizeof(double));
 
 	storeString(bricksdatabasefilename, os);
@@ -1497,6 +1668,7 @@ void cParameters::load(ifstream& is) {
 	is.read((char *)&minimumrelativeintensitythreshold, sizeof(double));
 	is.read((char *)&minimumabsoluteintensitythreshold, sizeof(unsigned));
 	is.read((char *)&minimummz, sizeof(double));
+	is.read((char *)&maximummz, sizeof(double));
 	is.read((char *)&fwhm, sizeof(double));
 
 	loadString(bricksdatabasefilename, is);
