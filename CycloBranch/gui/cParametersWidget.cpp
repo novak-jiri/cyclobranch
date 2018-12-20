@@ -507,6 +507,13 @@ cParametersWidget::cParametersWidget(QWidget* parent) {
 	theoreticalspectragridlayout->addWidget(allionsmustbepresentlabel, 11, 0);
 	theoreticalspectragridlayout->addWidget(allionsmustbepresent, 11, 1);
 
+	advancedformulacheck = new QCheckBox();
+	advancedformulacheck->setToolTip("Apply advanced filtering rules if molecular formulas of compounds are generated.");
+	advancedformulacheck->setFixedWidth(rightdefaultwidth);
+	advancedformulachecklabel = new QLabel("Advanced Formula Check:");
+	theoreticalspectragridlayout->addWidget(advancedformulachecklabel, 12, 0);
+	theoreticalspectragridlayout->addWidget(advancedformulacheck, 12, 1);
+
 	theoreticalspectragroupbox = new QGroupBox("Theoretical Spectrum/Spectra");
 	theoreticalspectragroupbox->setLayout(theoreticalspectragridlayout);
 
@@ -631,7 +638,6 @@ cParametersWidget::cParametersWidget(QWidget* parent) {
 
 
 cParametersWidget::~cParametersWidget() {
-
 	delete stdbuttons;
 	delete load;
 	delete save;
@@ -745,6 +751,8 @@ cParametersWidget::~cParametersWidget() {
 	delete minimumfeaturesize;
 	delete allionsmustbepresentlabel;
 	delete allionsmustbepresent;
+	delete advancedformulachecklabel;
+	delete advancedformulacheck;
 	delete theoreticalspectragridlayout;
 	delete theoreticalspectragroupbox;
 
@@ -930,6 +938,7 @@ void cParametersWidget::loadSettings() {
 		minimumpatternsize->setValue(settings.value("minimumpatternsize", 1).toInt());
 		minimumfeaturesize->setValue(settings.value("minimumfeaturesize", 1).toInt());
 		settings.value("allionsmustbepresent", 0).toInt() == 0 ? allionsmustbepresent->setChecked(false) : allionsmustbepresent->setChecked(true);
+		settings.value("advancedformulacheck", 1).toInt() == 0 ? advancedformulacheck->setChecked(false) : advancedformulacheck->setChecked(true);
 
 		searchedsequenceline->setText(settings.value("searchedsequence", "").toString());
 		searchedsequenceNtermmodif->setText(settings.value("searchedsequenceNtermmodif", "").toString());
@@ -1010,6 +1019,7 @@ void cParametersWidget::saveSettings() {
 	settings.setValue("minimumpatternsize", minimumpatternsize->value());
 	settings.setValue("minimumfeaturesize", minimumfeaturesize->value());
 	allionsmustbepresent->isChecked() ? settings.setValue("allionsmustbepresent", 1) : settings.setValue("allionsmustbepresent", 0);
+	advancedformulacheck->isChecked() ? settings.setValue("advancedformulacheck", 1) : settings.setValue("advancedformulacheck", 0);
 
 	settings.setValue("searchedsequence", searchedsequenceline->text());
 	settings.setValue("searchedsequenceNtermmodif", searchedsequenceNtermmodif->text());
@@ -1240,6 +1250,7 @@ bool cParametersWidget::updateParameters() {
 	parameters.minimumpatternsize = minimumpatternsize->value();
 	parameters.minimumfeaturesize = minimumfeaturesize->value();
 	parameters.allionsmustbepresent = allionsmustbepresent->isChecked();
+	parameters.advancedformulacheck = advancedformulacheck->isChecked();
 
 	parameters.searchedsequence = searchedsequenceline->text().toStdString();
 	parameters.originalsearchedsequence = parameters.searchedsequence;
@@ -1346,6 +1357,7 @@ void cParametersWidget::restoreParameters() {
 	minimumpatternsize->setValue(parameters.minimumpatternsize);
 	minimumfeaturesize->setValue(parameters.minimumfeaturesize);
 	allionsmustbepresent->setChecked(parameters.allionsmustbepresent);
+	advancedformulacheck->setChecked(parameters.advancedformulacheck);
 
 	searchedsequenceline->setText(parameters.searchedsequence.c_str());
 	searchedsequenceNtermmodif->setText(parameters.searchedsequenceNtermmodif.c_str());
@@ -1486,6 +1498,7 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 			neutrallosstypes->setDisabled(false);
 			maximumcombinedlosses->setDisabled(false);
 			//clearhitswithoutparent->setDisabled(false);
+			advancedformulacheck->setDisabled(true);
 			reportunmatchedtheoreticalpeaks->setDisabled(false);
 			generateisotopepattern->setDisabled(false);
 			minimumpatternsize->setDisabled(false);
@@ -1525,6 +1538,7 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 			neutrallosstypes->setDisabled(false);
 			maximumcombinedlosses->setDisabled(false);
 			//clearhitswithoutparent->setDisabled(false);
+			advancedformulacheck->setDisabled(true);
 			reportunmatchedtheoreticalpeaks->setDisabled(false);
 			generateisotopepattern->setDisabled(false);
 			minimumpatternsize->setDisabled(false);
@@ -1564,6 +1578,7 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 			neutrallosstypes->setDisabled(false);
 			maximumcombinedlosses->setDisabled(false);
 			//clearhitswithoutparent->setDisabled(false);
+			advancedformulacheck->setDisabled(true);
 			reportunmatchedtheoreticalpeaks->setDisabled(false);
 			generateisotopepattern->setDisabled(false);
 			minimumpatternsize->setDisabled(false);
@@ -1603,6 +1618,7 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 			neutrallosstypes->setDisabled(false);
 			maximumcombinedlosses->setDisabled(false);
 			//clearhitswithoutparent->setDisabled(true);
+			advancedformulacheck->setDisabled(true);
 			reportunmatchedtheoreticalpeaks->setDisabled(false);
 			generateisotopepattern->setDisabled(false);
 			minimumpatternsize->setDisabled(false);
@@ -1655,6 +1671,7 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 			neutrallosstypes->setDisabled(false);
 			maximumcombinedlosses->setDisabled(false);
 			//clearhitswithoutparent->setDisabled(true);
+			advancedformulacheck->setDisabled(false);
 			reportunmatchedtheoreticalpeaks->setDisabled(false);
 			generateisotopepattern->setDisabled(false);
 			minimumpatternsize->setDisabled(false);

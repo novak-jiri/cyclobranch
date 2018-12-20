@@ -46,6 +46,7 @@ void cParameters::clear() {
 	scoretype = number_of_matched_peaks;
 	maximumcombinedlosses = 2;
 	//clearhitswithoutparent = false;
+	advancedformulacheck = true;
 	reportunmatchedtheoreticalpeaks = false;
 	generateisotopepattern = false;
 	minimumpatternsize = 1;
@@ -1028,6 +1029,10 @@ string cParameters::printToString() {
 	s += allionsmustbepresent ? "on" : "off";
 	s += "\n";
 
+	s += "Advanced Formula Check: ";
+	s += advancedformulacheck ? "on" : "off";
+	s += "\n";
+
 	s += "Searched Sequence: " + originalsearchedsequence + "\n";
 	s += "N-terminal Modification: " + searchedsequenceNtermmodif + "\n";
 	s += "C-terminal Modification: " + searchedsequenceCtermmodif + "\n";
@@ -1470,7 +1475,6 @@ int cParameters::generateCompounds(bool& terminatecomputation, string& errormess
 			continue;
 		}
 
-		bool advancedformulacheck = false;
 		if (advancedformulacheck) {
 
 			if (loss.massdifference < 500.0) {
@@ -1803,6 +1807,7 @@ void cParameters::store(ofstream& os) {
 	os.write((char *)&minimumpatternsize, sizeof(int));
 	os.write((char *)&minimumfeaturesize, sizeof(int));
 	os.write((char *)&allionsmustbepresent, sizeof(bool));
+	os.write((char *)&advancedformulacheck, sizeof(bool));
 	os.write((char *)&cyclicnterminus, sizeof(bool));
 	os.write((char *)&cycliccterminus, sizeof(bool));
 	os.write((char *)&internalfragments, sizeof(bool));
@@ -1934,6 +1939,7 @@ void cParameters::load(ifstream& is) {
 	is.read((char *)&minimumpatternsize, sizeof(int));
 	is.read((char *)&minimumfeaturesize, sizeof(int));
 	is.read((char *)&allionsmustbepresent, sizeof(bool));
+	is.read((char *)&advancedformulacheck, sizeof(bool));
 	is.read((char *)&cyclicnterminus, sizeof(bool));
 	is.read((char *)&cycliccterminus, sizeof(bool));
 	is.read((char *)&internalfragments, sizeof(bool));

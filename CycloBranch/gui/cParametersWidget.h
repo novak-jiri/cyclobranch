@@ -238,6 +238,8 @@ private:
 	QSpinBox* minimumfeaturesize;
 	QLabel* allionsmustbepresentlabel;
 	QCheckBox* allionsmustbepresent;
+	QLabel* advancedformulachecklabel;
+	QCheckBox* advancedformulacheck;
 
 	QGroupBox* searchedsequencegroupbox;
 	QGridLayout* searchedsequencegridlayout;

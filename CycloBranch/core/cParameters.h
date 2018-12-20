@@ -290,6 +290,12 @@ public:
 
 
 	/**
+		\brief Advanced filtering rules are aplied if compounds are generated in MS mode.
+	*/
+	bool advancedformulacheck;
+
+
+	/**
 		\brief True if the N-terminus of a linear peptide is cyclized.
     */
 	bool cyclicnterminus;
