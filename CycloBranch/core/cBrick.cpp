@@ -33,6 +33,8 @@ void cBrick::clear() {
 	composition = "";
 	artificial = false;
 	residuelosstype = h2o_loss;
+	losses.clear();
+	lossmaps.clear();
 }
 
 
@@ -64,6 +66,11 @@ map<string, int>& cBrick::getSummaryMap() {
 
 vector<string>& cBrick::getAcronyms() {
 	return acronyms;
+}
+
+
+string& cBrick::getLosses() {
+	return losses;
 }
 
 
@@ -139,6 +146,16 @@ void cBrick::setAcronyms(const string& acronyms) {
 	if (s.compare("") != 0) {
 		this->acronyms.push_back(s);
 	}
+}
+
+
+void cBrick::setLosses(const string& str) {
+	losses = str;
+}
+
+
+void cBrick::createLossMaps() {
+	// to do
 }
 
 
@@ -379,6 +396,7 @@ void cBrick::store(ofstream& os) {
 	storeString(composition, os);
 	os.write((char *)&artificial, sizeof(bool));
 	os.write((char *)&residuelosstype, sizeof(eResidueLossType));
+	storeString(losses, os);
 }
 
 
@@ -392,5 +410,6 @@ void cBrick::load(ifstream& is) {
 	loadString(composition, is);
 	is.read((char *)&artificial, sizeof(bool));
 	is.read((char *)&residuelosstype, sizeof(eResidueLossType));
+	loadString(losses, is);
 }
 

@@ -290,7 +290,7 @@ void cBricksDatabaseWidget::deleteTable() {
 
 
 void cBricksDatabaseWidget::resetHeader() {
-	databasemodel->setColumnCount(7);
+	databasemodel->setColumnCount(8);
 
 	databasemodel->setHorizontalHeaderItem(0, new QStandardItem());
 	database->setItemDelegateForColumn(0, new cCheckBoxDelegate());
@@ -298,9 +298,10 @@ void cBricksDatabaseWidget::resetHeader() {
 	databasemodel->setHorizontalHeaderItem(2, new QStandardItem("Acronym(s)"));
 	databasemodel->setHorizontalHeaderItem(3, new QStandardItem("Residue Summary"));
 	databasemodel->setHorizontalHeaderItem(4, new QStandardItem("Monoisotopic Residue Mass"));
-	databasemodel->setHorizontalHeaderItem(5, new QStandardItem("Reference(s)"));
-	databasemodel->setHorizontalHeaderItem(6, new QStandardItem("Preview"));
-	database->setItemDelegateForColumn(6, new cMultipleButtonDelegate());
+	databasemodel->setHorizontalHeaderItem(5, new QStandardItem("Neutral Loss(es)"));
+	databasemodel->setHorizontalHeaderItem(6, new QStandardItem("Reference(s)"));
+	databasemodel->setHorizontalHeaderItem(7, new QStandardItem("Preview"));
+	database->setItemDelegateForColumn(7, new cMultipleButtonDelegate());
 
 	rowsfiltercombobox->clear();
 	for (int i = 1; i < databasemodel->columnCount() - 1; i++) {
@@ -313,7 +314,7 @@ void cBricksDatabaseWidget::resetHeader() {
 	}
 	database->setColumnWidth(1, 400);
 	database->setColumnWidth(2, 400);
-	database->setColumnWidth(5, 400);
+	database->setColumnWidth(6, 400);
 }
 
 
@@ -322,11 +323,11 @@ bool cBricksDatabaseWidget::checkTable() {
 	int checkslash;
 	for (int i = 0; i < databasemodel->rowCount(); i++) {
 		checkslash = numberOfOccurrences(databasemodel->item(i, 1)->text().toStdString(),'/');
-		if ((checkslash != numberOfOccurrences(databasemodel->item(i, 2)->text().toStdString(),'/')) || (checkslash != numberOfOccurrences(databasemodel->item(i, 5)->text().toStdString(),'/'))) {
+		if ((checkslash != numberOfOccurrences(databasemodel->item(i, 2)->text().toStdString(),'/')) || (checkslash != numberOfOccurrences(databasemodel->item(i, 5)->text().toStdString(),'/')) || (checkslash != numberOfOccurrences(databasemodel->item(i, 6)->text().toStdString(), '/'))) {
 			QMessageBox msgBox;
 			QString errstr = "Syntax error in the row no. ";
 			errstr += to_string(i + 1).c_str();
-			errstr += ":\nThe number of '/' must be equal in the fields Name(s), Acronym(s) and Reference(s) !\n\nNote: The symbol '/' separates izomers of a building block.";
+			errstr += ":\nThe number of '/' must be equal in the fields Name(s), Acronym(s), Neutral Loss(es), and Reference(s) !\n\nNote: The symbol '/' separates izomers of a building block.";
 			msgBox.setText(errstr);
 			msgBox.exec();
 			return false;
@@ -478,10 +479,13 @@ void cBricksDatabaseWidget::openDatabase() {
 				databasemodel->item(i, 4)->setData(QVariant::fromValue(cropPrecisionToSixDecimalsByteArray(bricks[i].getMass())), Qt::DisplayRole);
 				
 				databasemodel->setItem(i, 5, new QStandardItem());
-				databasemodel->item(i, 5)->setText(bricks[i].getReferencesAsString().c_str());
+				databasemodel->item(i, 5)->setText(bricks[i].getLosses().c_str());
+
+				databasemodel->setItem(i, 6, new QStandardItem());
+				databasemodel->item(i, 6)->setText(bricks[i].getReferencesAsString().c_str());
 				
-                databasemodel->setItem(i, 6, new QStandardItem());
-				databasemodel->item(i, 6)->setText(bricks[i].getAcronymsWithReferencesAsHTMLString().c_str());
+                databasemodel->setItem(i, 7, new QStandardItem());
+				databasemodel->item(i, 7)->setText(bricks[i].getAcronymsWithReferencesAsHTMLString().c_str());
 
 				progress.setValue(i);
 				if (progress.wasCanceled()) {
@@ -505,7 +509,7 @@ void cBricksDatabaseWidget::openDatabase() {
 			}
 			database->setColumnWidth(1, 400);
 			database->setColumnWidth(2, 400);
-			database->setColumnWidth(5, 400);
+			database->setColumnWidth(6, 400);
 
 			progress.setValue(bricks.size());
 
@@ -575,6 +579,10 @@ bool cBricksDatabaseWidget::saveDatabase() {
 					break;
 				case 5:
 					s = proxymodel->index(i, j).data(Qt::DisplayRole).toString().toStdString();
+					b.setLosses(removeWhiteSpacesExceptSpaces(s));
+					break;
+				case 6:
+					s = proxymodel->index(i, j).data(Qt::DisplayRole).toString().toStdString();
 					b.setReferences(removeWhiteSpacesExceptSpaces(s));
 					break;
 				default:
@@ -635,6 +643,7 @@ void cBricksDatabaseWidget::addRow() {
 	databasemodel->setItem(row, 4, new QStandardItem());
 	databasemodel->setItem(row, 5, new QStandardItem());
 	databasemodel->setItem(row, 6, new QStandardItem());
+	databasemodel->setItem(row, 7, new QStandardItem());
 
 	database->scrollToBottom();
 }
@@ -665,13 +674,13 @@ void cBricksDatabaseWidget::itemChanged(QStandardItem* item) {
 	}
 
 	// update references preview
-	if (((item->column() == 2) || (item->column() == 5)) && databasemodel->item(item->row(), 6)) {
+	if (((item->column() == 2) || (item->column() == 6)) && databasemodel->item(item->row(), 7)) {
 		cBrick b;
 
 		b.setAcronyms(databasemodel->item(item->row(), 2)->text().toStdString());
-		b.setReferences(databasemodel->item(item->row(), 5)->text().toStdString());
+		b.setReferences(databasemodel->item(item->row(), 6)->text().toStdString());
 
-		databasemodel->item(item->row(), 6)->setText(b.getAcronymsWithReferencesAsHTMLString().c_str());
+		databasemodel->item(item->row(), 7)->setText(b.getAcronymsWithReferencesAsHTMLString().c_str());
 	}
 
 	if (item->column() > 0) {
@@ -779,10 +788,13 @@ void cBricksDatabaseWidget::importDatabase() {
 				databasemodel->item(i + originalrowcount, 4)->setData(QVariant::fromValue(cropPrecisionToSixDecimalsByteArray(importedbricks[i].getMass())), Qt::DisplayRole);
 				
 				databasemodel->setItem(i + originalrowcount, 5, new QStandardItem());
-				databasemodel->item(i + originalrowcount, 5)->setText(importedbricks[i].getReferencesAsString().c_str());
+				databasemodel->item(i + originalrowcount, 5)->setText(importedbricks[i].getLosses().c_str());
+
+				databasemodel->setItem(i + originalrowcount, 6, new QStandardItem());
+				databasemodel->item(i + originalrowcount, 6)->setText(importedbricks[i].getReferencesAsString().c_str());
 				
-                databasemodel->setItem(i + originalrowcount, 6, new QStandardItem());
-				databasemodel->item(i + originalrowcount, 6)->setText(importedbricks[i].getAcronymsWithReferencesAsHTMLString().c_str());
+                databasemodel->setItem(i + originalrowcount, 7, new QStandardItem());
+				databasemodel->item(i + originalrowcount, 7)->setText(importedbricks[i].getAcronymsWithReferencesAsHTMLString().c_str());
 
 				bricks.push_back(importedbricks[i]);
 
@@ -808,7 +820,7 @@ void cBricksDatabaseWidget::importDatabase() {
 			}
 			database->setColumnWidth(1, 400);
 			database->setColumnWidth(2, 400);
-			database->setColumnWidth(5, 400);
+			database->setColumnWidth(6, 400);
 
 			if (progress.wasCanceled()) {
 				setDataModified(false);

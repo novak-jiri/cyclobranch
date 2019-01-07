@@ -200,6 +200,17 @@ int cBricksDatabase::loadFromPlainTextStream(ifstream &stream, string& errormess
 			break;
 		}
 
+		// load the list of losses
+		pos = s.find('\t');
+		if (pos != string::npos) {
+			b.setLosses(s.substr(0, pos));
+			//b.createLossMaps();
+			s = s.substr(pos + 1);
+		}
+		else {
+			// nothing to do - compatibility with the old format of database
+		}
+
 		// load references
 		#if OS_TYPE != WIN
 			if ((s.size() > 0) && (s.back() == '\r')) {
@@ -248,6 +259,7 @@ void cBricksDatabase::storeToPlainTextStream(ofstream &stream) {
 		stream << bricks[i].getAcronymsAsString() << "\t";
 		stream << bricks[i].getSummary() << "\t";
 		stream << std::fixed << std::setprecision(10) << bricks[i].getMass() << "\t";
+		stream << bricks[i].getLosses() << "\t";
 		stream << bricks[i].getReferencesAsString() << endl;
 	}
 }

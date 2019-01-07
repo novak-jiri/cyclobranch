@@ -132,7 +132,7 @@ bool cBricksDatabaseProxyModel::filterAcceptsRow(int sourceRow, const QModelInde
 
 
 bool cBricksDatabaseProxyModel::lessThan(const QModelIndex &left, const QModelIndex &right) const {
-	if (left.column() == 6) {
+	if (left.column() == 7) {
 		return false;
 	}
 

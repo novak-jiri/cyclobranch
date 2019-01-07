@@ -48,6 +48,8 @@ class cBrick {
 	string composition;
 	bool artificial;
 	eResidueLossType residuelosstype;
+	string losses;
+	vector < vector< map<string, int> > > lossmaps;
 
 public:
 
@@ -85,14 +87,14 @@ public:
 
 	
 	/**
-		\brief Access to a string variable which stores a summary molecular formula of the brick.
+		\brief Access to a string variable which stores a molecular formula of the brick.
 		\retval reference to a string
 	*/ 
 	string& getSummary();
 
 
 	/**
-		\brief Access to a map which stores a summary molecular formula of the brick.
+		\brief Access to a map which stores a molecular formula of the brick.
 		\retval map<string, int> reference to a map
 	*/
 	map<string, int>& getSummaryMap();
@@ -103,6 +105,13 @@ public:
 		\retval reference to a vector of strings
 	*/ 
 	vector<string>& getAcronyms();
+
+
+	/**
+		\brief Access to a string variable which stores a list of neutral losses.
+		\retval reference to a string
+	*/
+	string& getLosses();
 
 
 	/**
@@ -156,7 +165,7 @@ public:
 
 
 	/**
-		\brief Create an internal map of atoms from the summary formula.
+		\brief Create a map of atoms from the molecular formula.
 	*/
 	void createSummaryMap();
 
@@ -166,6 +175,19 @@ public:
 		\param acronyms reference to a string where the acronyms are separated by '/'
 	*/ 
 	void setAcronyms(const string& acronyms);
+
+
+	/**
+		\brief Set the list of losses.
+		\param str reference to a string
+	*/
+	void setLosses(const string& str);
+
+
+	/**
+		\brief Create maps of atoms for the neutral losses.
+	*/
+	void createLossMaps();
 
 
 	/**
