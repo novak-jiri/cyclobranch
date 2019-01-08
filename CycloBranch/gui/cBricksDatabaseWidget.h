@@ -133,7 +133,7 @@ private:
 
 	bool checkTable();
 
-	bool checkFormula(int row, const string& summary);
+	bool checkFormula(int row, cSummaryFormula& formula);
 
 	void setDataModified(bool datamodified);
 

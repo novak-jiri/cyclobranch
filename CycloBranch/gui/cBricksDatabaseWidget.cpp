@@ -334,9 +334,41 @@ bool cBricksDatabaseWidget::checkTable() {
 		}
 	}
 
-	// check summary formulas
+	cSummaryFormula formula;
+	string tmpstr;
+
+	// check molecular formulas
 	for (int i = 0; i < databasemodel->rowCount(); i++) {
-		if (!checkFormula(i, databasemodel->item(i, 3)->text().toStdString())) {
+		tmpstr = databasemodel->item(i, 3)->text().toStdString();
+		formula.setFormula(tmpstr);
+		if (!checkFormula(i, formula)) {
+			return false;
+		}
+		else {
+			if (databasemodel->item(i, 4)) {
+				databasemodel->item(i, 4)->setData(QVariant::fromValue(cropPrecisionToSixDecimalsByteArray(formula.getMass())), Qt::DisplayRole);
+			}
+		}
+	}
+
+	// check neutral losses
+	string lossstr;
+	size_t last, next;
+	for (int i = 0; i < databasemodel->rowCount(); i++) {
+		lossstr = databasemodel->item(i, 5)->text().toStdString();
+		last = 0;
+		next = 0;
+		while ((next = lossstr.find_first_of(";/", last)) != string::npos) {
+			tmpstr = lossstr.substr(last, next - last);
+			formula.setFormula(tmpstr);
+			if (!checkFormula(i, formula)) {
+				return false;
+			}
+			last = next + 1;
+		}
+		tmpstr = lossstr.substr(last);
+		formula.setFormula(tmpstr);
+		if (!checkFormula(i, formula)) {
 			return false;
 		}
 	}
@@ -345,10 +377,8 @@ bool cBricksDatabaseWidget::checkTable() {
 }
 
 
-bool cBricksDatabaseWidget::checkFormula(int row, const string& summary) {
-	cSummaryFormula formula;
+bool cBricksDatabaseWidget::checkFormula(int row, cSummaryFormula& formula) {
 	string errmsg;
-	formula.setFormula(summary);
 	if (!formula.isValid(errmsg)) {
 		QMessageBox msgBox;
 		QString errstr = "Syntax error in the row no. ";
@@ -358,9 +388,6 @@ bool cBricksDatabaseWidget::checkFormula(int row, const string& summary) {
 		msgBox.setText(errstr);
 		msgBox.exec();
 		return false;
-	}
-	if (databasemodel->item(row, 4)) {
-		databasemodel->item(row, 4)->setData(QVariant::fromValue(cropPrecisionToSixDecimalsByteArray(formula.getMass())), Qt::DisplayRole);
 	}
 	return true;
 }
@@ -670,7 +697,14 @@ void cBricksDatabaseWidget::itemChanged(QStandardItem* item) {
 
 	// recalculate mass when formula is changed
 	if (item->column() == 3) {
-		checkFormula(item->row(), item->text().toStdString());
+		string tmpstr = item->text().toStdString();
+		cSummaryFormula formula;
+		formula.setFormula(tmpstr);
+		if (checkFormula(item->row(), formula)) {
+			if (databasemodel->item(item->row(), 4)) {
+				databasemodel->item(item->row(), 4)->setData(QVariant::fromValue(cropPrecisionToSixDecimalsByteArray(formula.getMass())), Qt::DisplayRole);
+			}
+		}
 	}
 
 	// update references preview

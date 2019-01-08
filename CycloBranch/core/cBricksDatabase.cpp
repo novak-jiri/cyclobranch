@@ -204,7 +204,7 @@ int cBricksDatabase::loadFromPlainTextStream(ifstream &stream, string& errormess
 		pos = s.find('\t');
 		if (pos != string::npos) {
 			b.setLosses(s.substr(0, pos));
-			//b.createLossMaps();
+			b.createLossMaps();
 			s = s.substr(pos + 1);
 		}
 		else {

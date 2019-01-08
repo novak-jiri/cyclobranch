@@ -155,7 +155,48 @@ void cBrick::setLosses(const string& str) {
 
 
 void cBrick::createLossMaps() {
-	// to do
+	vector<string> lossesofisomers;
+	vector< map<string, int> > tmpmapvector;
+	map<string, int> tmpmap;
+	string tmpstring;
+
+	size_t last = 0;
+	size_t next = 0; 
+	while ((next = losses.find("/", last)) != string::npos) {
+		lossesofisomers.push_back(losses.substr(last, next - last));
+		last = next + 1;
+	} 
+	lossesofisomers.push_back(losses.substr(last));
+
+	lossmaps.clear();
+	for (int i = 0; i < (int)lossesofisomers.size(); i++) {
+		last = 0;
+		next = 0;
+		tmpmapvector.clear();
+		while ((next = lossesofisomers[i].find(";", last)) != string::npos) {
+			tmpstring = lossesofisomers[i].substr(last, next - last);
+			tmpmap.clear();
+			addStringFormulaToMap(tmpstring, tmpmap);
+			tmpmapvector.push_back(tmpmap);
+			last = next + 1;
+		}
+		tmpstring = lossesofisomers[i].substr(last);
+		tmpmap.clear();
+		addStringFormulaToMap(tmpstring, tmpmap);
+		tmpmapvector.push_back(tmpmap);
+
+		lossmaps.push_back(tmpmapvector);
+	}
+	
+	/*for (int i = 0; i < (int)lossmaps.size(); i++) {
+		for (int j = 0; j < (int)lossmaps[i].size(); j++) {
+			for (auto& it : lossmaps[i][j]) {
+				cout << it.first << " " << it.second << endl;
+			}
+			cout << endl;
+		}
+		cout << "---" << endl;
+	}*/
 }
 
 
@@ -387,6 +428,8 @@ eResidueLossType cBrick::getResidueLossType() {
 
 
 void cBrick::store(ofstream& os) {
+	int size1, size2;
+
 	storeString(name, os);
 	storeStringVector(acronyms, os);
 	storeStringVector(references, os);
@@ -397,10 +440,22 @@ void cBrick::store(ofstream& os) {
 	os.write((char *)&artificial, sizeof(bool));
 	os.write((char *)&residuelosstype, sizeof(eResidueLossType));
 	storeString(losses, os);
+
+	size1 = (int)lossmaps.size();
+	os.write((char *)&size1, sizeof(int));
+	for (int i = 0; i < size1; i++) {
+		size2 = (int)lossmaps[i].size();
+		os.write((char *)&size2, sizeof(int));
+		for (int j = 0; j < size2; j++) {
+			storeStringIntMap(lossmaps[i][j], os);
+		}
+	}
 }
 
 
 void cBrick::load(ifstream& is) {
+	int size1, size2;
+
 	loadString(name, is);
 	loadStringVector(acronyms, is);
 	loadStringVector(references, is);
@@ -411,5 +466,15 @@ void cBrick::load(ifstream& is) {
 	is.read((char *)&artificial, sizeof(bool));
 	is.read((char *)&residuelosstype, sizeof(eResidueLossType));
 	loadString(losses, is);
+
+	is.read((char *)&size1, sizeof(int));
+	lossmaps.resize(size1);
+	for (int i = 0; i < size1; i++) {
+		is.read((char *)&size2, sizeof(int));
+		lossmaps[i].resize(size2);
+		for (int j = 0; j < size2; j++) {
+			loadStringIntMap(lossmaps[i][j], is);
+		}
+	}
 }
 
