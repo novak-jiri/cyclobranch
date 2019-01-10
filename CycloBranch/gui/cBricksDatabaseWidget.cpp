@@ -323,7 +323,7 @@ bool cBricksDatabaseWidget::checkTable() {
 	int checkslash;
 	for (int i = 0; i < databasemodel->rowCount(); i++) {
 		checkslash = numberOfOccurrences(databasemodel->item(i, 1)->text().toStdString(),'/');
-		if ((checkslash != numberOfOccurrences(databasemodel->item(i, 2)->text().toStdString(),'/')) || (checkslash != numberOfOccurrences(databasemodel->item(i, 5)->text().toStdString(),'/')) || (checkslash != numberOfOccurrences(databasemodel->item(i, 6)->text().toStdString(), '/'))) {
+		if ((checkslash != numberOfOccurrences(databasemodel->item(i, 2)->text().toStdString(),'/')) || (checkslash != numberOfOccurrences(databasemodel->item(i, 6)->text().toStdString(), '/'))) {
 			QMessageBox msgBox;
 			QString errstr = "Syntax error in the row no. ";
 			errstr += to_string(i + 1).c_str();
@@ -358,7 +358,7 @@ bool cBricksDatabaseWidget::checkTable() {
 		lossstr = databasemodel->item(i, 5)->text().toStdString();
 		last = 0;
 		next = 0;
-		while ((next = lossstr.find_first_of(";/", last)) != string::npos) {
+		while ((next = lossstr.find(";", last)) != string::npos) {
 			tmpstr = lossstr.substr(last, next - last);
 			formula.setFormula(tmpstr);
 			if (!checkFormula(i, formula)) {

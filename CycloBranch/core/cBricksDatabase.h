@@ -67,6 +67,13 @@ class cBricksDatabase {
 
 	vector<cBrick> bricks;
 
+	map<string, int> lossmap;
+	vector< map<string, int> > lossmapvector;
+
+	
+	void addLossToMap(string& lossstr, vector<int>& lossids);
+
+
 public:
 
 	/**

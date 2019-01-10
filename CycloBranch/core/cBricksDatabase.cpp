@@ -56,6 +56,53 @@ void generateBricksPermutations(vector<string>& bricks, vector<string>& currentp
 }
 
 
+void cBricksDatabase::addLossToMap(string& lossstr, vector<int>& lossids) {
+	size_t last = 0;
+	size_t next = 0;
+
+	string tmpstring;
+	int tmpsize;
+
+	map<string, int> tmpmap;
+
+	lossids.clear();
+	while ((next = lossstr.find(";", last)) != string::npos) {
+		tmpstring = lossstr.substr(last, next - last);
+
+		if (lossmap.count(tmpstring) > 0) {
+			lossids.push_back(lossmap[tmpstring]);
+		}
+		else {
+			tmpsize = (int)lossmap.size();
+			lossmap[tmpstring] = tmpsize;
+			lossids.push_back(tmpsize);
+
+			tmpmap.clear();
+			addStringFormulaToMap(tmpstring, tmpmap);
+			lossmapvector.push_back(tmpmap);
+		}
+
+		last = next + 1;
+	}
+
+	tmpstring = lossstr.substr(last);
+
+	if (lossmap.count(tmpstring) > 0) {
+		lossids.push_back(lossmap[tmpstring]);
+	}
+	else {
+		tmpsize = (int)lossmap.size();
+		lossmap[tmpstring] = tmpsize;
+		lossids.push_back(tmpsize);
+
+		tmpmap.clear();
+		addStringFormulaToMap(tmpstring, tmpmap);
+		lossmapvector.push_back(tmpmap);
+	}
+
+}
+
+
 bool cBricksDatabase::nextCombination(vector<int>& combarray, int numberofbasicbricks, int maximumbricksincombination, double maximumcumulativemass, double neutralprecursormass) {
 	int pointer = 0;
 	int cyFlag = 0;
@@ -122,7 +169,7 @@ cBricksDatabase::cBricksDatabase() {
 
 
 int cBricksDatabase::loadFromPlainTextStream(ifstream &stream, string& errormessage, bool ignoreerrors, bool skiph2blocks) {
-	string s;
+	string s, tmps;
 	cBrick b;
 	size_t pos;
 	double mass;
@@ -133,6 +180,7 @@ int cBricksDatabase::loadFromPlainTextStream(ifstream &stream, string& errormess
 	bool error = false;
 	errormessage = "";
 	cSummaryFormula formula;
+	vector<int> lossids;
 	
 	bricks.clear();
 	while (stream.good()) {
@@ -203,8 +251,10 @@ int cBricksDatabase::loadFromPlainTextStream(ifstream &stream, string& errormess
 		// load the list of losses
 		pos = s.find('\t');
 		if (pos != string::npos) {
-			b.setLosses(s.substr(0, pos));
-			b.createLossMaps();
+			tmps = s.substr(0, pos);
+			b.setLosses(tmps);
+			addLossToMap(tmps, lossids);
+			b.setLossIDs(lossids);
 			s = s.substr(pos + 1);
 		}
 		else {
@@ -460,6 +510,8 @@ string cBricksDatabase::getTagNameOfTPeptide(string& tcomposition) {
 
 void cBricksDatabase::clear() {
 	bricks.clear();
+	lossmap.clear();
+	lossmapvector.clear();
 }
 
 
@@ -555,6 +607,9 @@ void cBricksDatabase::store(ofstream& os) {
 	for (int i = 0; i < (int)bricks.size(); i++) {
 		bricks[i].store(os);
 	}
+
+	storeStringIntMap(lossmap, os);
+	storeStringIntMapVector(lossmapvector, os);
 }
 
 
@@ -567,6 +622,9 @@ void cBricksDatabase::load(ifstream& is) {
 	for (int i = 0; i < (int)bricks.size(); i++) {
 		bricks[i].load(is);
 	}
+
+	loadStringIntMap(lossmap, is);
+	loadStringIntMapVector(lossmapvector, is);
 }
 
 

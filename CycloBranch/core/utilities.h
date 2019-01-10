@@ -113,6 +113,22 @@ extern QString installdir;
 
 
 /**
+	\brief Store a vector of integers into an output stream.
+	\param v reference to a vector of integers
+	\param os reference to an output stream
+*/
+void storeIntVector(vector<int>& v, ofstream& os);
+
+
+/**
+	\brief Load a vector of integers from an input stream.
+	\param v reference to a vector of integers
+	\param is reference to an input stream
+*/
+void loadIntVector(vector<int>& v, ifstream& is);
+
+
+/**
 	\brief Store a string into an output stream.
 	\param s reference to a string
 	\param os reference to an output stream
@@ -158,6 +174,22 @@ void storeStringIntMap(map<string, int>& map, ofstream& os);
 	\param is reference to an input stream
 */
 void loadStringIntMap(map<string, int>& map, ifstream& is);
+
+
+/**
+	\brief Store a vector of map<string, int> into an output stream.
+	\param vector reference to a vector
+	\param os reference to an output stream
+*/
+void storeStringIntMapVector(vector< map<string, int> >& vector, ofstream& os);
+
+
+/**
+	\brief Load a vector of map<string, int> from an input stream.
+	\param vector reference to a vector
+	\param is reference to an input stream
+*/
+void loadStringIntMapVector(vector< map<string, int> >& vector, ifstream& is);
 
 
 /**

@@ -49,7 +49,7 @@ class cBrick {
 	bool artificial;
 	eResidueLossType residuelosstype;
 	string losses;
-	vector < vector< map<string, int> > > lossmaps;
+	vector<int> lossids;
 
 public:
 
@@ -112,6 +112,13 @@ public:
 		\retval reference to a string
 	*/
 	string& getLosses();
+
+
+	/**
+		\brief Access to a vector of identifiers of neutral losses
+		\retval reference to a vector of identifiers of neutral losses
+	*/
+	vector<int>& getLossIDs();
 
 
 	/**
@@ -185,9 +192,10 @@ public:
 
 
 	/**
-		\brief Create maps of atoms for the neutral losses.
+		\brief Set a vector of identifiers of neutral losses.
+		\param lossids a vector of identifiers of neutral losses
 	*/
-	void createLossMaps();
+	void setLossIDs(vector<int>& lossids);
 
 
 	/**

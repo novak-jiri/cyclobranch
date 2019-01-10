@@ -16,6 +16,25 @@ QString appversion = "v. 1.3.10 (64-bit)";
 #endif
 
 
+void storeIntVector(vector<int>& v, ofstream& os) {
+	int size = (int)v.size();
+	os.write((char *)&size, sizeof(int));
+	for (int i = 0; i < (int)v.size(); i++) {
+		os.write((char *)&(v[i]), sizeof(int));
+	}
+}
+
+
+void loadIntVector(vector<int>& v, ifstream& is) {
+	int size;
+	is.read((char *)&size, sizeof(int));
+	v.resize(size);
+	for (int i = 0; i < (int)v.size(); i++) {
+		is.read((char *)&(v[i]), sizeof(int));
+	}
+}
+
+
 void storeString(string& s, ofstream& os) {
 	int size = (int)s.size();
 	os.write((char *)&size, sizeof(int));
@@ -74,6 +93,25 @@ void loadStringIntMap(map<string, int>& map, ifstream& is) {
 		loadString(s, is);
 		is.read((char *)&value, sizeof(int));
 		map[s] = value;
+	}
+}
+
+
+void storeStringIntMapVector(vector< map<string, int> >& vector, ofstream& os) {
+	int size = (int)vector.size();
+	os.write((char *)&size, sizeof(int));
+	for (int i = 0; i < (int)vector.size(); i++) {
+		storeStringIntMap(vector[i], os);
+	}
+}
+
+
+void loadStringIntMapVector(vector< map<string, int> >& vector, ifstream& is) {
+	int size;
+	is.read((char *)&size, sizeof(int));
+	vector.resize(size);
+	for (int i = 0; i < (int)vector.size(); i++) {
+		loadStringIntMap(vector[i], is);
 	}
 }
 
