@@ -57,29 +57,41 @@ void generateBricksPermutations(vector<string>& bricks, vector<string>& currentp
 
 
 void cBricksDatabase::addLossToMap(string& lossstr, vector<int>& lossids) {
-	size_t last = 0;
-	size_t next = 0;
+	lossids.clear();
 
+	if (lossstr.size() == 0) {
+		return;
+	}
+
+	map<string, int> tmpmap;
 	string tmpstring;
 	int tmpsize;
 
-	map<string, int> tmpmap;
+	cSummaryFormula formula;
+	double tmpmass;
 
-	lossids.clear();
+	size_t last = 0;
+	size_t next = 0;
 	while ((next = lossstr.find(";", last)) != string::npos) {
 		tmpstring = lossstr.substr(last, next - last);
 
-		if (lossmap.count(tmpstring) > 0) {
-			lossids.push_back(lossmap[tmpstring]);
+		if (lossorders.count(tmpstring) > 0) {
+			lossids.push_back(lossorders[tmpstring]);
 		}
 		else {
-			tmpsize = (int)lossmap.size();
-			lossmap[tmpstring] = tmpsize;
+			tmpsize = (int)lossorders.size();
+			lossorders[tmpstring] = tmpsize;
 			lossids.push_back(tmpsize);
+
+			losssummaries.push_back(tmpstring);
+
+			formula.setFormula(tmpstring);
+			tmpmass = -formula.getMass();
+			lossmasses.push_back(tmpmass);
 
 			tmpmap.clear();
 			addStringFormulaToMap(tmpstring, tmpmap);
-			lossmapvector.push_back(tmpmap);
+			lossmaps.push_back(tmpmap);
 		}
 
 		last = next + 1;
@@ -87,19 +99,24 @@ void cBricksDatabase::addLossToMap(string& lossstr, vector<int>& lossids) {
 
 	tmpstring = lossstr.substr(last);
 
-	if (lossmap.count(tmpstring) > 0) {
-		lossids.push_back(lossmap[tmpstring]);
+	if (lossorders.count(tmpstring) > 0) {
+		lossids.push_back(lossorders[tmpstring]);
 	}
 	else {
-		tmpsize = (int)lossmap.size();
-		lossmap[tmpstring] = tmpsize;
+		tmpsize = (int)lossorders.size();
+		lossorders[tmpstring] = tmpsize;
 		lossids.push_back(tmpsize);
+
+		losssummaries.push_back(tmpstring);
+
+		formula.setFormula(tmpstring);
+		tmpmass = -formula.getMass();
+		lossmasses.push_back(tmpmass);
 
 		tmpmap.clear();
 		addStringFormulaToMap(tmpstring, tmpmap);
-		lossmapvector.push_back(tmpmap);
+		lossmaps.push_back(tmpmap);
 	}
-
 }
 
 
@@ -510,8 +527,10 @@ string cBricksDatabase::getTagNameOfTPeptide(string& tcomposition) {
 
 void cBricksDatabase::clear() {
 	bricks.clear();
-	lossmap.clear();
-	lossmapvector.clear();
+	lossorders.clear();
+	lossmasses.clear();
+	losssummaries.clear();
+	lossmaps.clear();
 }
 
 
@@ -608,8 +627,10 @@ void cBricksDatabase::store(ofstream& os) {
 		bricks[i].store(os);
 	}
 
-	storeStringIntMap(lossmap, os);
-	storeStringIntMapVector(lossmapvector, os);
+	storeStringIntMap(lossorders, os);
+	storeDoubleVector(lossmasses, os);
+	storeStringVector(losssummaries, os);
+	storeStringIntMapVector(lossmaps, os);
 }
 
 
@@ -623,8 +644,10 @@ void cBricksDatabase::load(ifstream& is) {
 		bricks[i].load(is);
 	}
 
-	loadStringIntMap(lossmap, is);
-	loadStringIntMapVector(lossmapvector, is);
+	loadStringIntMap(lossorders, is);
+	loadDoubleVector(lossmasses, is);
+	loadStringVector(losssummaries, is);
+	loadStringIntMapVector(lossmaps, is);
 }
 
 
@@ -662,5 +685,40 @@ bool cBricksDatabase::checkKetideBlocks(cBrick& brickseries, bool regularblockso
 	*/
 
 	return false;
+}
+
+
+double cBricksDatabase::getMassOfNeutralLosses(vector<int>& lossids) {
+	int size = (int)lossmasses.size();
+	double mass = 0;
+	for (auto& it : lossids) {
+		if (it < size) {
+			mass += lossmasses[it];
+		}
+	}
+	return mass;
+}
+
+
+string cBricksDatabase::getSummaryFormulaOfNeutralLosses(vector<int>& lossids) {
+	int size = (int)losssummaries.size();
+	string summary = "";
+	for (auto& it : lossids) {
+		if (it < size) {
+			summary += losssummaries[it];
+		}
+	}
+	return summary;
+}
+
+
+void cBricksDatabase::getMapOfNeutralLosses(vector<int>& lossids, map<string, int>& summarymap) {
+	int size = (int)lossmaps.size();
+	summarymap.clear();
+	for (auto& it : lossids) {
+		if (it < size) {
+			mergeMaps(lossmaps[it], summarymap);
+		}
+	}
 }
 

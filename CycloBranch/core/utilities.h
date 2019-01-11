@@ -129,6 +129,22 @@ void loadIntVector(vector<int>& v, ifstream& is);
 
 
 /**
+	\brief Store a vector of doubles into an output stream.
+	\param v reference to a vector of doubles
+	\param os reference to an output stream
+*/
+void storeDoubleVector(vector<double>& v, ofstream& os);
+
+
+/**
+	\brief Load a vector of doubles from an input stream.
+	\param v reference to a vector of doubles
+	\param is reference to an input stream
+*/
+void loadDoubleVector(vector<double>& v, ifstream& is);
+
+
+/**
 	\brief Store a string into an output stream.
 	\param s reference to a string
 	\param os reference to an output stream

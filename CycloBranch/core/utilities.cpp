@@ -35,6 +35,25 @@ void loadIntVector(vector<int>& v, ifstream& is) {
 }
 
 
+void storeDoubleVector(vector<double>& v, ofstream& os) {
+	int size = (int)v.size();
+	os.write((char *)&size, sizeof(int));
+	for (int i = 0; i < (int)v.size(); i++) {
+		os.write((char *)&(v[i]), sizeof(double));
+	}
+}
+
+
+void loadDoubleVector(vector<double>& v, ifstream& is) {
+	int size;
+	is.read((char *)&size, sizeof(int));
+	v.resize(size);
+	for (int i = 0; i < (int)v.size(); i++) {
+		is.read((char *)&(v[i]), sizeof(double));
+	}
+}
+
+
 void storeString(string& s, ofstream& os) {
 	int size = (int)s.size();
 	os.write((char *)&size, sizeof(int));

@@ -3426,6 +3426,21 @@ void cTheoreticalSpectrum::generateNTerminalFragmentIons(int maxcharge, int& pea
 	atoms.clear();
 	vector<int> internalcomposition;
 
+	const unsigned max_losses = 24; 
+	vector<int> currentlosses;
+
+	vector<int> tmplossvector;
+	tmplossvector.reserve(max_losses);
+
+	unsigned binary, binarypos, currsize, loopend;
+
+	set< vector<int> > fragmentlossset;
+	vector<double> fragmentlossmass;
+	vector<string> fragmentlosssummary;
+	vector< map<string, int> > fragmentlossmap;
+
+	map<string, int> fmap;
+
 	map<string, int> tmpmap;
 	double tmpmz;
 	int tmprotationid;
@@ -3502,8 +3517,59 @@ void cTheoreticalSpectrum::generateNTerminalFragmentIons(int maxcharge, int& pea
 		}
 	}
 
+	currentlosses.clear();
 	for (int i = 0; i < (int)intcomposition.size() - 1; i++) {
 		peak.mzratio += bricksdatabase[intcomposition[i] - 1].getMass();
+
+		if ((currentlosses.size() > 0) || (bricksdatabase[intcomposition[i] - 1].getLossIDs().size() > 0)) {
+			currentlosses.reserve(currentlosses.size() + bricksdatabase[intcomposition[i] - 1].getLossIDs().size());
+			currentlosses.insert(currentlosses.end(), bricksdatabase[intcomposition[i] - 1].getLossIDs().begin(), bricksdatabase[intcomposition[i] - 1].getLossIDs().end());
+			sort(currentlosses.begin(), currentlosses.end());
+
+			currsize = (unsigned)currentlosses.size();
+			if (currsize <= max_losses) {
+				loopend = 1 << currsize;
+				for (unsigned j = 1; j < loopend; j++) {
+					binary = j;
+					binarypos = 0;
+					tmplossvector.clear();
+					while ((binary > 0) && (binarypos < currsize)) {
+						if ((binary & 1) == 1) {
+							tmplossvector.push_back(currentlosses[binarypos]);
+						}
+						binary = binary >> 1;
+						binarypos++;
+					}
+					fragmentlossset.insert(tmplossvector);
+				}
+
+				fragmentlossmass.clear();
+				fragmentlosssummary.clear();
+				fragmentlossmap.clear();
+
+				fragmentlossmass.reserve(fragmentlossset.size());
+				fragmentlosssummary.reserve(fragmentlossset.size());
+				fragmentlossmap.reserve(fragmentlossset.size());
+		
+				for (auto& it : fragmentlossset) {
+					/*for (auto& it2 : it) {
+						cout << it2 << " ";
+					}*/
+					fragmentlossmass.push_back(bricksdatabase.getMassOfNeutralLosses((vector<int>&)it));
+					fragmentlosssummary.push_back(bricksdatabase.getSummaryFormulaOfNeutralLosses((vector<int>&)it));
+					bricksdatabase.getMapOfNeutralLosses((vector<int>&)it, fmap);
+					fragmentlossmap.push_back(fmap);
+					//cout << " " << fragmentlossmass.back() << " " << fragmentlosssummary.back() << endl;
+				}
+			}
+		}
+
+		/*cout << peak.mzratio << " " << bricksdatabase[intcomposition[i] - 1].getLossIDs().size() << " - ";
+		for (size_t j = 0; j < currentlosses.size(); j++)
+		{
+			cout << currentlosses[j] << " ";
+		}
+		cout << endl << endl;*/
 
 		if ((parameters->mode == denovoengine) && (parameters->blindedges == 2) && bricksdatabase[intcomposition[i] - 1].isArtificial()) {
 			peak.formula.clear();

@@ -67,9 +67,11 @@ class cBricksDatabase {
 
 	vector<cBrick> bricks;
 
-	map<string, int> lossmap;
-	vector< map<string, int> > lossmapvector;
+	map<string, int> lossorders;
 
+	vector<double> lossmasses;
+	vector<string> losssummaries;
+	vector< map<string, int> > lossmaps;
 	
 	void addLossToMap(string& lossstr, vector<int>& lossids);
 
@@ -248,6 +250,29 @@ public:
 	*/ 
 	bool checkKetideBlocks(cBrick& brickseries, bool regularblocksorder);
 
+
+	/**
+		\brief Get the summary mass of neutral losses.
+		\param lossids a vector of ids of neutral losses
+		\retval double mass
+	*/
+	double getMassOfNeutralLosses(vector<int>& lossids);
+
+
+	/**
+		\brief Get the summary formula of neutral losses.
+		\param lossids a vector of ids of neutral losses
+		\retval string formula
+	*/
+	string getSummaryFormulaOfNeutralLosses(vector<int>& lossids);
+
+
+	/**
+		\brief Get the summary map of neutral losses.
+		\param lossids an input vector of ids of neutral losses
+		\param summarymap an output map of atoms
+	*/
+	void getMapOfNeutralLosses(vector<int>& lossids, map<string, int>& summarymap);
 
 };
 
