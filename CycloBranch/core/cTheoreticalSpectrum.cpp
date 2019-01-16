@@ -735,6 +735,184 @@ void cTheoreticalSpectrum::generateScrambledIons(cBricksDatabase& bricksdatabase
 }
 
 
+void cTheoreticalSpectrum::updateListOfNeutralLosses(cBricksDatabase& bricksdatabase, cBrick& block, vector<int>& currentlosses, vector<double>& fragmentlossmass, vector<string>& fragmentlosssummary, vector< map<string, int> >& fragmentlossmap, bool writedescription, bool disablesummary) {
+	set< vector<int> > fragmentlossset;
+	map<string, int> fmap;
+
+	const unsigned max_losses = 25;
+
+	vector<int> tmplossvector;
+	tmplossvector.reserve(max_losses);
+
+	unsigned binary, binarypos, currsize, loopend;
+
+	// the data are updated only if the block contains a list of losses
+	if (block.getLossIDs().size() > 0) {
+		currentlosses.reserve(currentlosses.size() + block.getLossIDs().size());
+		currentlosses.insert(currentlosses.end(), block.getLossIDs().begin(), block.getLossIDs().end());
+		sort(currentlosses.begin(), currentlosses.end());
+
+		fragmentlossset.clear();
+
+		fragmentlossmass.clear();
+		if (writedescription) {
+			fragmentlosssummary.clear();
+		}
+		if (!disablesummary && (parameters->generateisotopepattern || writedescription)) {
+			fragmentlossmap.clear();
+		}
+
+		currsize = (unsigned)currentlosses.size();
+		if (currsize < max_losses) {
+			loopend = 1 << currsize;
+			for (unsigned j = 1; j < loopend; j++) {
+				binary = j;
+				binarypos = 0;
+				tmplossvector.clear();
+				while ((binary > 0) && (binarypos < currsize)) {
+					if ((binary & 1) == 1) {
+						tmplossvector.push_back(currentlosses[binarypos]);
+					}
+					binary = binary >> 1;
+					binarypos++;
+				}
+				fragmentlossset.insert(tmplossvector);
+			}
+
+			fragmentlossmass.reserve(fragmentlossset.size());
+			if (writedescription) {
+				fragmentlosssummary.reserve(fragmentlossset.size());
+			}
+			if (!disablesummary && (parameters->generateisotopepattern || writedescription)) {
+				fragmentlossmap.reserve(fragmentlossset.size());
+			}
+
+			for (auto& it : fragmentlossset) {
+				fragmentlossmass.push_back(bricksdatabase.getMassOfNeutralLosses((vector<int>&)it));
+				if (writedescription) {
+					fragmentlosssummary.push_back(bricksdatabase.getSummaryFormulaOfNeutralLosses((vector<int>&)it));
+				}
+				if (!disablesummary && (parameters->generateisotopepattern || writedescription)) {
+					bricksdatabase.getMapOfNeutralLosses((vector<int>&)it, fmap);
+					fragmentlossmap.push_back(fmap);
+				}
+			}
+		}
+	}
+
+}
+
+
+void cTheoreticalSpectrum::generateInternalFragments(cBricksDatabase& bricksdatabase, cPeak& peak, int maxcharge, int& peaklistrealsize, vector<int>& intcomposition, int pos, map<string, int>& atoms, vector<int>& currentlosses, eFragmentIonType fragmentiontype, ePeptideType peptidetype, TRotationInfo* trotation, bool writedescription, bool disablesummary) {
+
+	vector<int> internalcurrentlosses = currentlosses;
+
+	vector<double> fragmentlossmass;
+	vector<string> fragmentlosssummary;
+	vector< map<string, int> > fragmentlossmap;
+
+	vector<int> internalcomposition;
+	
+	double tmpmz1;
+	map<string, int> tmpmap1;
+
+	double tmpmz2;
+	map<string, int> tmpmap2;
+
+	int tmprotationid;
+	int tmpseriesid;
+
+	if ((peptidetype == branchcyclic) && (trotation->id == 0)) {
+
+		if ((pos >= trotation->middlebranchstart) && (pos < trotation->middlebranchend)) {
+
+			internalcomposition.clear();
+			for (int i = 0; i <= pos; i++) {
+				internalcomposition.push_back(intcomposition[i]);
+			}
+
+			tmpmz1 = peak.mzratio;
+			tmpmap1 = atoms;
+
+			tmprotationid = peak.rotationid;
+			tmpseriesid = peak.seriesid;
+
+			peak.rotationid = -1;
+			peak.seriesid = -1;
+
+			for (int i = trotation->middlebranchend + 1; i < (int)intcomposition.size() - 1; i++) {
+				internalcomposition.push_back(intcomposition[i]);
+
+				peak.mzratio += bricksdatabase[intcomposition[i] - 1].getMass();
+				if (!disablesummary && (parameters->generateisotopepattern || writedescription)) {
+					mergeMaps(bricksdatabase[intcomposition[i] - 1].getSummaryMap(), tmpmap1);
+				}
+
+				updateListOfNeutralLosses(bricksdatabase, bricksdatabase[intcomposition[pos] - 1], internalcurrentlosses, fragmentlossmass, fragmentlosssummary, fragmentlossmap, writedescription, disablesummary);
+
+				tmpmz2 = peak.mzratio;
+				tmpmap2 = tmpmap1;
+				
+				for (int j = -1; j < (int)fragmentlossmass.size(); j++) {
+
+					if (writedescription) {
+						peak.description = "internal ";
+
+						peak.description += parameters->iondefinitions[fragmentiontype].name.substr(0, 1) + to_string((int)internalcomposition.size());
+						//	to do - polyketides
+						//	if (parameters->iondefinitions[fragmentiontype].name.size() > 1) {
+						//		peak.description += parameters->iondefinitions[fragmentiontype].name.substr(1, parameters->iondefinitions[fragmentiontype].name.length() - 1);
+						//	}
+
+						if ((peak.neutrallosstype >= 0) || (j >= 0)) {
+							peak.description += "-";
+							if (j >= 0) {
+								peak.description += fragmentlosssummary[j];
+							}
+							if (peak.neutrallosstype >= 0) {
+								peak.description += parameters->neutrallossesdefinitions[peak.neutrallosstype].summary;
+							}
+						}
+
+						addAdductToDescription(peak.description, parameters->metaladducts);
+						peak.description += ": ";
+
+						for (int k = 0; k < (int)internalcomposition.size(); k++) {
+							peak.description += "[" + bricksdatabase[internalcomposition[k] - 1].getAcronymsAsString() + "]";
+							if (k < (int)internalcomposition.size() - 1) {
+								peak.description += '-';
+							}
+						}
+					}
+
+					if (j >= 0) {
+						peak.mzratio += fragmentlossmass[j];
+						if (!disablesummary && (parameters->generateisotopepattern || writedescription)) {
+							mergeMaps(fragmentlossmap[j], tmpmap2);
+						}
+					}
+
+					generateChargedFragments(peak, tmpmap2, peaklistrealsize, maxcharge, writedescription, disablesummary);
+
+					peak.mzratio = tmpmz2;
+					tmpmap2 = tmpmap1;
+
+				}
+
+			}
+
+			peak.mzratio = tmpmz1;
+
+			peak.rotationid = tmprotationid;
+			peak.seriesid = tmpseriesid;
+
+		}
+
+	}
+
+}
+
+
 void cTheoreticalSpectrum::selectAndNormalizeScrambledSequences(unordered_set<string>& scrambledsequences) {
 	unordered_set<string> temp = scrambledsequences;
 	scrambledsequences.clear();
@@ -3423,27 +3601,17 @@ double cTheoreticalSpectrum::getRatioOfMatchedPeaks() {
 void cTheoreticalSpectrum::generateNTerminalFragmentIons(int maxcharge, int& peaklistrealsize, vector<int>& intcomposition, eFragmentIonType fragmentiontype, int neutrallosstype, cBricksDatabase& bricksdatabase, bool writedescription, int rotationid, vector<splitSite>& splittingsites, vector<fragmentDescription>& searchedmodifications, ePeptideType peptidetype, bool regularblocksorder, TRotationInfo* trotation, eResidueLossType leftresiduelosstype, bool hasfirstblockartificial) {
 	cPeak peak;
 	map<string, int> atoms;
-	atoms.clear();
-	vector<int> internalcomposition;
 
-	const unsigned max_losses = 24; 
 	vector<int> currentlosses;
-
-	vector<int> tmplossvector;
-	tmplossvector.reserve(max_losses);
-
-	unsigned binary, binarypos, currsize, loopend;
-
-	set< vector<int> > fragmentlossset;
 	vector<double> fragmentlossmass;
 	vector<string> fragmentlosssummary;
 	vector< map<string, int> > fragmentlossmap;
 
-	map<string, int> fmap;
-
-	map<string, int> tmpmap;
 	double tmpmz;
+	map<string, int> tmpmap;
+
 	int tmprotationid;
+	int tmpseriesid;
 
 	bool disablesummary = false;
 	if ((parameters->mode == denovoengine) && (parameters->blindedges == 2) && bricksdatabase[intcomposition[0] - 1].isArtificial()) {
@@ -3517,59 +3685,8 @@ void cTheoreticalSpectrum::generateNTerminalFragmentIons(int maxcharge, int& pea
 		}
 	}
 
-	currentlosses.clear();
 	for (int i = 0; i < (int)intcomposition.size() - 1; i++) {
 		peak.mzratio += bricksdatabase[intcomposition[i] - 1].getMass();
-
-		if ((currentlosses.size() > 0) || (bricksdatabase[intcomposition[i] - 1].getLossIDs().size() > 0)) {
-			currentlosses.reserve(currentlosses.size() + bricksdatabase[intcomposition[i] - 1].getLossIDs().size());
-			currentlosses.insert(currentlosses.end(), bricksdatabase[intcomposition[i] - 1].getLossIDs().begin(), bricksdatabase[intcomposition[i] - 1].getLossIDs().end());
-			sort(currentlosses.begin(), currentlosses.end());
-
-			currsize = (unsigned)currentlosses.size();
-			if (currsize <= max_losses) {
-				loopend = 1 << currsize;
-				for (unsigned j = 1; j < loopend; j++) {
-					binary = j;
-					binarypos = 0;
-					tmplossvector.clear();
-					while ((binary > 0) && (binarypos < currsize)) {
-						if ((binary & 1) == 1) {
-							tmplossvector.push_back(currentlosses[binarypos]);
-						}
-						binary = binary >> 1;
-						binarypos++;
-					}
-					fragmentlossset.insert(tmplossvector);
-				}
-
-				fragmentlossmass.clear();
-				fragmentlosssummary.clear();
-				fragmentlossmap.clear();
-
-				fragmentlossmass.reserve(fragmentlossset.size());
-				fragmentlosssummary.reserve(fragmentlossset.size());
-				fragmentlossmap.reserve(fragmentlossset.size());
-		
-				for (auto& it : fragmentlossset) {
-					/*for (auto& it2 : it) {
-						cout << it2 << " ";
-					}*/
-					fragmentlossmass.push_back(bricksdatabase.getMassOfNeutralLosses((vector<int>&)it));
-					fragmentlosssummary.push_back(bricksdatabase.getSummaryFormulaOfNeutralLosses((vector<int>&)it));
-					bricksdatabase.getMapOfNeutralLosses((vector<int>&)it, fmap);
-					fragmentlossmap.push_back(fmap);
-					//cout << " " << fragmentlossmass.back() << " " << fragmentlosssummary.back() << endl;
-				}
-			}
-		}
-
-		/*cout << peak.mzratio << " " << bricksdatabase[intcomposition[i] - 1].getLossIDs().size() << " - ";
-		for (size_t j = 0; j < currentlosses.size(); j++)
-		{
-			cout << currentlosses[j] << " ";
-		}
-		cout << endl << endl;*/
 
 		if ((parameters->mode == denovoengine) && (parameters->blindedges == 2) && bricksdatabase[intcomposition[i] - 1].isArtificial()) {
 			peak.formula.clear();
@@ -3667,92 +3784,67 @@ void cTheoreticalSpectrum::generateNTerminalFragmentIons(int maxcharge, int& pea
 
 		peak.seriesid = i;
 
-		if (writedescription) {
+		updateListOfNeutralLosses(bricksdatabase, bricksdatabase[intcomposition[i] - 1], currentlosses, fragmentlossmass, fragmentlosssummary, fragmentlossmap, writedescription, disablesummary);
 
-			peak.description = "";
-			if ((peptidetype == cyclic) || (peptidetype == cyclicpolyketide) || (peptidetype == branched) || (peptidetype == branchcyclic)) {
-				peak.description += prefixstr;
+		tmpmz = peak.mzratio;
+		tmpmap = atoms;
+
+		for (int j = -1; j < (int)fragmentlossmass.size(); j++) {
+
+			if (writedescription) {
+
+				peak.description = "";
+				if ((peptidetype == cyclic) || (peptidetype == cyclicpolyketide) || (peptidetype == branched) || (peptidetype == branchcyclic)) {
+					peak.description += prefixstr;
+				}
+				if ((peptidetype == linearpolyketide) || (peptidetype == cyclicpolyketide)) {
+					peak.description += parameters->iondefinitions[fragmentiontype].name.substr(0, 2) + to_string(i + 1);
+					if (parameters->iondefinitions[fragmentiontype].name.size() > 2) {
+						peak.description += parameters->iondefinitions[fragmentiontype].name.substr(2, parameters->iondefinitions[fragmentiontype].name.length() - 2);
+					}
+				}
+				else {
+					peak.description += parameters->iondefinitions[fragmentiontype].name.substr(0, 1) + to_string(i + 1);
+					if (parameters->iondefinitions[fragmentiontype].name.size() > 1) {
+						peak.description += parameters->iondefinitions[fragmentiontype].name.substr(1, parameters->iondefinitions[fragmentiontype].name.length() - 1);
+					}
+				}
+				if ((peak.neutrallosstype >= 0) || (j >= 0)) {
+					peak.description += "-";
+					if (j >= 0) {
+						peak.description += fragmentlosssummary[j];
+					}
+					if (peak.neutrallosstype >= 0) {
+						peak.description += parameters->neutrallossesdefinitions[peak.neutrallosstype].summary;
+					}
+				}
+				addAdductToDescription(peak.description, parameters->metaladducts);
+				peak.description += ": ";
+				for (int k = 0; k <= i; k++) {
+					peak.description += "[" + bricksdatabase[intcomposition[k] - 1].getAcronymsAsString() + "]";
+					if (k < i) {
+						peak.description += '-';
+					}
+				}
+
 			}
-			if ((peptidetype == linearpolyketide) || (peptidetype == cyclicpolyketide)) {
-				peak.description += parameters->iondefinitions[fragmentiontype].name.substr(0, 2) + to_string(i + 1);
-				if (parameters->iondefinitions[fragmentiontype].name.size() > 2) {
-					peak.description += parameters->iondefinitions[fragmentiontype].name.substr(2, parameters->iondefinitions[fragmentiontype].name.length() - 2);
+
+			if (j >= 0) {
+				peak.mzratio += fragmentlossmass[j];
+				if (!disablesummary && (parameters->generateisotopepattern || writedescription)) {
+					mergeMaps(fragmentlossmap[j], tmpmap);
 				}
 			}
-			else {
-				peak.description += parameters->iondefinitions[fragmentiontype].name.substr(0, 1) + to_string(i + 1);
-				if (parameters->iondefinitions[fragmentiontype].name.size() > 1) {
-					peak.description += parameters->iondefinitions[fragmentiontype].name.substr(1, parameters->iondefinitions[fragmentiontype].name.length() - 1);
-				}
-			}
-			if (peak.neutrallosstype >= 0) {
-				peak.description += "-" + parameters->neutrallossesdefinitions[peak.neutrallosstype].summary;
-			}
-			addAdductToDescription(peak.description, parameters->metaladducts);
-			peak.description += ": ";
-			for (int j = 0; j <= i; j++) {
-				peak.description += "[" + bricksdatabase[intcomposition[j] - 1].getAcronymsAsString() + "]";
-				if (j < i) {
-					peak.description += '-';
-				}
-			}
+
+			generateChargedFragments(peak, tmpmap, peaklistrealsize, maxcharge, writedescription, disablesummary);
+
+			peak.mzratio = tmpmz;
+			tmpmap = atoms;
 
 		}
 
-		generateChargedFragments(peak, atoms, peaklistrealsize, maxcharge, writedescription, disablesummary);
-
-		if (parameters->internalfragments && (peptidetype == branchcyclic) && (trotation->id == 0)) {
-			if ((i >= trotation->middlebranchstart) && (i < trotation->middlebranchend)) {
-				internalcomposition.clear();			
-				for (int j = 0; j <= i; j++) {
-					internalcomposition.push_back(intcomposition[j]);
-				}
-
-				tmpmap = atoms;
-				tmpmz = peak.mzratio;
-				tmprotationid = peak.rotationid;
-				
-				peak.rotationid = -1;
-				peak.seriesid = -1;
-
-				for (int j = trotation->middlebranchend + 1; j < (int)intcomposition.size() - 1; j++) {
-					internalcomposition.push_back(intcomposition[j]);
-
-					peak.mzratio += bricksdatabase[intcomposition[j] - 1].getMass();
-					if (!disablesummary && (parameters->generateisotopepattern || writedescription)) {
-						mergeMaps(bricksdatabase[intcomposition[j] - 1].getSummaryMap(), tmpmap);
-					}
-
-					if (writedescription) {
-						peak.description = "internal ";
-
-						peak.description += parameters->iondefinitions[fragmentiontype].name.substr(0, 1) + to_string((int)internalcomposition.size());
-						//if (parameters->iondefinitions[fragmentiontype].name.size() > 1) {
-						//	peak.description += parameters->iondefinitions[fragmentiontype].name.substr(1, parameters->iondefinitions[fragmentiontype].name.length() - 1);
-						//}
-
-						if (peak.neutrallosstype >= 0) {
-							peak.description += "-" + parameters->neutrallossesdefinitions[peak.neutrallosstype].summary;
-						}
-
-						addAdductToDescription(peak.description, parameters->metaladducts);
-						peak.description += ": ";
-
-						for (int k = 0; k < (int)internalcomposition.size(); k++) {
-							peak.description += "[" + bricksdatabase[internalcomposition[k] - 1].getAcronymsAsString() + "]";
-							if (k < (int)internalcomposition.size() - 1) {
-								peak.description += '-';
-							}
-						}
-					}
-
-					generateChargedFragments(peak, tmpmap, peaklistrealsize, maxcharge, writedescription, disablesummary);
-				}
-
-				peak.mzratio = tmpmz;
-				peak.rotationid = tmprotationid;
-
-			}
+		if (parameters->internalfragments) {
+			generateInternalFragments(bricksdatabase, peak, maxcharge, peaklistrealsize, intcomposition, i, atoms, currentlosses, fragmentiontype, peptidetype, trotation, writedescription, disablesummary);
 		}
 
 	}

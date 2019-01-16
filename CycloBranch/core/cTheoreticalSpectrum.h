@@ -149,6 +149,12 @@ class cTheoreticalSpectrum {
 	// generate scrambled sequences
 	void generateScrambledIons(cBricksDatabase& bricksdatabase, bool writedescription, int& theoreticalpeaksrealsize);
 
+	// update the list of losses
+	void updateListOfNeutralLosses(cBricksDatabase& bricksdatabase, cBrick& block, vector<int>& currentlosses, vector<double>& fragmentlossmass, vector<string>& fragmentlosssummary, vector< map<string, int> >& fragmentlossmap, bool writedescription, bool disablesummary);
+
+	// generate internal fragments
+	void generateInternalFragments(cBricksDatabase& bricksdatabase, cPeak& peak, int maxcharge, int& peaklistrealsize, vector<int>& intcomposition, int pos, map<string, int>& atoms, vector<int>& currentlosses, eFragmentIonType fragmentiontype, ePeptideType peptidetype, TRotationInfo* trotation, bool writedescription, bool disablesummary);
+
 	// select and normalize scrambled sequences
 	void selectAndNormalizeScrambledSequences(unordered_set<string>& scrambledsequences);
 

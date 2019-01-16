@@ -85,11 +85,13 @@ void cBricksDatabase::addLossToMap(string& lossstr, vector<int>& lossids) {
 
 			losssummaries.push_back(tmpstring);
 
-			formula.setFormula(tmpstring);
-			tmpmass = -formula.getMass();
+			formula.clear();
+			formula.addFormula(tmpstring, true);
+			tmpmass = formula.getMass();
 			lossmasses.push_back(tmpmass);
 
 			tmpmap.clear();
+			tmpstring = formula.getSummary();
 			addStringFormulaToMap(tmpstring, tmpmap);
 			lossmaps.push_back(tmpmap);
 		}
@@ -109,11 +111,13 @@ void cBricksDatabase::addLossToMap(string& lossstr, vector<int>& lossids) {
 
 		losssummaries.push_back(tmpstring);
 
-		formula.setFormula(tmpstring);
-		tmpmass = -formula.getMass();
+		formula.clear();
+		formula.addFormula(tmpstring, true);
+		tmpmass = formula.getMass();
 		lossmasses.push_back(tmpmass);
 
 		tmpmap.clear();
+		tmpstring = formula.getSummary();
 		addStringFormulaToMap(tmpstring, tmpmap);
 		lossmaps.push_back(tmpmap);
 	}
