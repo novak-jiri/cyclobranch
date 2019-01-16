@@ -3788,6 +3788,9 @@ void cTheoreticalSpectrum::generateNTerminalFragmentIons(int maxcharge, int& pea
 
 		tmpmz = peak.mzratio;
 		tmpmap = atoms;
+		
+		tmprotationid = peak.rotationid;
+		tmpseriesid = peak.seriesid;
 
 		for (int j = -1; j < (int)fragmentlossmass.size(); j++) {
 
@@ -3834,6 +3837,13 @@ void cTheoreticalSpectrum::generateNTerminalFragmentIons(int maxcharge, int& pea
 				if (!disablesummary && (parameters->generateisotopepattern || writedescription)) {
 					mergeMaps(fragmentlossmap[j], tmpmap);
 				}
+
+				peak.rotationid = -1;
+				peak.seriesid = -1;
+			}
+			else {
+				peak.rotationid = tmprotationid;
+				peak.seriesid = tmpseriesid;
 			}
 
 			generateChargedFragments(peak, tmpmap, peaklistrealsize, maxcharge, writedescription, disablesummary);
@@ -3842,6 +3852,9 @@ void cTheoreticalSpectrum::generateNTerminalFragmentIons(int maxcharge, int& pea
 			tmpmap = atoms;
 
 		}
+
+		peak.rotationid = tmprotationid;
+		peak.seriesid = tmpseriesid;
 
 		if (parameters->internalfragments) {
 			generateInternalFragments(bricksdatabase, peak, maxcharge, peaklistrealsize, intcomposition, i, atoms, currentlosses, fragmentiontype, peptidetype, trotation, writedescription, disablesummary);
