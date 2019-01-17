@@ -2106,7 +2106,7 @@ int cTheoreticalSpectrum::compareBranched(cPeaksList& sortedpeaklist, cBricksDat
 	}
 	
 	for (int i = 0; i < theoreticalpeaksrealsize; i++) {
-		if (!theoreticalpeaks[i].isotope && (theoreticalpeaks[i].matched > 0) && (theoreticalpeaks[i].rotationid >= 0) 
+		if (!theoreticalpeaks[i].isotope && (theoreticalpeaks[i].matched > 0) && (theoreticalpeaks[i].rotationid >= 0) && (theoreticalpeaks[i].seriesid >= 0)
 			&& (series[theoreticalpeaks[i].rotationid].count(theoreticalpeaks[i].iontype) == 1)
 			&& (series[theoreticalpeaks[i].rotationid][theoreticalpeaks[i].iontype].count(theoreticalpeaks[i].neutrallosstype) == 1)) {
 			series[theoreticalpeaks[i].rotationid][theoreticalpeaks[i].iontype][theoreticalpeaks[i].neutrallosstype][theoreticalpeaks[i].seriesid]++;
@@ -2299,7 +2299,7 @@ int cTheoreticalSpectrum::compareLinear(cPeaksList& sortedpeaklist, cBricksDatab
 	}
 
 	for (int i = 0; i < theoreticalpeaksrealsize; i++) {
-		if (!theoreticalpeaks[i].isotope && (theoreticalpeaks[i].matched > 0) 
+		if (!theoreticalpeaks[i].isotope && (theoreticalpeaks[i].matched > 0) && (theoreticalpeaks[i].seriesid >= 0)
 			&& (series.count(theoreticalpeaks[i].iontype) == 1) 
 			&& (series[theoreticalpeaks[i].iontype].count(theoreticalpeaks[i].neutrallosstype) == 1)) {
 			series[theoreticalpeaks[i].iontype][theoreticalpeaks[i].neutrallosstype][theoreticalpeaks[i].seriesid]++;
@@ -2543,7 +2543,7 @@ int cTheoreticalSpectrum::compareCyclic(cPeaksList& sortedpeaklist, cBricksDatab
 	}
 
 	for (int i = 0; i < theoreticalpeaksrealsize; i++) {
-		if (!theoreticalpeaks[i].isotope && (theoreticalpeaks[i].matched > 0) && (theoreticalpeaks[i].rotationid >= 0) 
+		if (!theoreticalpeaks[i].isotope && (theoreticalpeaks[i].matched > 0) && (theoreticalpeaks[i].rotationid >= 0) && (theoreticalpeaks[i].seriesid >= 0)
 			&& (series[theoreticalpeaks[i].rotationid].count(theoreticalpeaks[i].iontype) == 1)
 			&& (series[theoreticalpeaks[i].rotationid][theoreticalpeaks[i].iontype].count(theoreticalpeaks[i].neutrallosstype) == 1)) {
 			series[theoreticalpeaks[i].rotationid][theoreticalpeaks[i].iontype][theoreticalpeaks[i].neutrallosstype][theoreticalpeaks[i].seriesid]++;
@@ -2890,7 +2890,7 @@ int cTheoreticalSpectrum::compareBranchCyclic(cPeaksList& sortedpeaklist, cBrick
 		}
 	
 		for (int j = 0; j < theoreticalpeaksrealsize; j++) {
-			if (!theoreticalpeaks[j].isotope && (theoreticalpeaks[j].matched > 0) && (theoreticalpeaks[j].rotationid >= 0) 
+			if (!theoreticalpeaks[j].isotope && (theoreticalpeaks[j].matched > 0) && (theoreticalpeaks[j].rotationid >= 0) && (theoreticalpeaks[j].seriesid >= 0)
 				&& (series[i][theoreticalpeaks[j].rotationid % 6].count(theoreticalpeaks[j].iontype) == 1)
 				&& (series[i][theoreticalpeaks[j].rotationid % 6][theoreticalpeaks[j].iontype].count(theoreticalpeaks[j].neutrallosstype) == 1)) {
 				if (i == theoreticalpeaks[j].rotationid / 6) {
@@ -3126,7 +3126,7 @@ int cTheoreticalSpectrum::compareLinearPolyketide(cPeaksList& sortedpeaklist, cB
 	}
 
 	for (int i = 0; i < theoreticalpeaksrealsize; i++) {
-		if (!theoreticalpeaks[i].isotope && (theoreticalpeaks[i].matched > 0)
+		if (!theoreticalpeaks[i].isotope && (theoreticalpeaks[i].matched > 0) && (theoreticalpeaks[i].seriesid >= 0)
 			&& (series.count(theoreticalpeaks[i].iontype) == 1)
 			&& (series[theoreticalpeaks[i].iontype].count(theoreticalpeaks[i].neutrallosstype) == 1)) {
 			series[theoreticalpeaks[i].iontype][theoreticalpeaks[i].neutrallosstype][theoreticalpeaks[i].seriesid]++;
@@ -3901,7 +3901,17 @@ void cTheoreticalSpectrum::generateNTerminalFragmentIons(int maxcharge, int& pea
 void cTheoreticalSpectrum::generateCTerminalFragmentIons(int maxcharge, int& peaklistrealsize, vector<int>& intcomposition, eFragmentIonType fragmentiontype, int neutrallosstype, cBricksDatabase& bricksdatabase, bool writedescription, int rotationid, vector<splitSite>& splittingsites, vector<fragmentDescription>& searchedmodifications, ePeptideType peptidetype, bool regularblocksorder, TRotationInfo* trotation, eResidueLossType rightresiduelosstype, bool haslastblockartificial) {
 	cPeak peak;
 	map<string, int> atoms;
-	atoms.clear();
+
+	vector<int> currentlosses;
+	vector<double> fragmentlossmass;
+	vector<string> fragmentlosssummary;
+	vector< map<string, int> > fragmentlossmap;
+
+	double tmpmz;
+	map<string, int> tmpmap;
+
+	int tmprotationid;
+	int tmpseriesid;
 
 	bool disablesummary = false;
 	if ((parameters->mode == denovoengine) && (parameters->blindedges == 2) && bricksdatabase[intcomposition[intcomposition.size() - 1] - 1].isArtificial()) {
@@ -4050,39 +4060,81 @@ void cTheoreticalSpectrum::generateCTerminalFragmentIons(int maxcharge, int& pea
 
 		peak.seriesid = (int)intcomposition.size() - i - 1;
 
-		if (writedescription) {
+		updateListOfNeutralLosses(bricksdatabase, bricksdatabase[intcomposition[i] - 1], currentlosses, fragmentlossmass, fragmentlosssummary, fragmentlossmap, writedescription, disablesummary);
 
-			peak.description = "";
-			if ((peptidetype == cyclicpolyketide) /* || (peptidetype == cyclic) */ || (peptidetype == branched) || (peptidetype == branchcyclic)) {
-				peak.description += prefixstr;
-			}
-			if ((peptidetype == linearpolyketide) || (peptidetype == cyclicpolyketide)) {
-				peak.description += parameters->iondefinitions[fragmentiontype].name.substr(0, 2) + to_string((int)intcomposition.size() - i);
-				if (parameters->iondefinitions[fragmentiontype].name.size() > 2) {
-					peak.description += parameters->iondefinitions[fragmentiontype].name.substr(2, parameters->iondefinitions[fragmentiontype].name.length() - 2);
+		tmpmz = peak.mzratio;
+		tmpmap = atoms;
+
+		tmprotationid = peak.rotationid;
+		tmpseriesid = peak.seriesid;
+
+		for (int j = -1; j < (int)fragmentlossmass.size(); j++) {
+
+			if (writedescription) {
+
+				peak.description = "";
+				if ((peptidetype == cyclicpolyketide) /* || (peptidetype == cyclic) */ || (peptidetype == branched) || (peptidetype == branchcyclic)) {
+					peak.description += prefixstr;
 				}
+				if ((peptidetype == linearpolyketide) || (peptidetype == cyclicpolyketide)) {
+					peak.description += parameters->iondefinitions[fragmentiontype].name.substr(0, 2) + to_string((int)intcomposition.size() - i);
+					if (parameters->iondefinitions[fragmentiontype].name.size() > 2) {
+						peak.description += parameters->iondefinitions[fragmentiontype].name.substr(2, parameters->iondefinitions[fragmentiontype].name.length() - 2);
+					}
+				}
+				else {
+					peak.description += parameters->iondefinitions[fragmentiontype].name.substr(0, 1) + to_string((int)intcomposition.size() - i);
+					if (parameters->iondefinitions[fragmentiontype].name.size() > 1) {
+						peak.description += parameters->iondefinitions[fragmentiontype].name.substr(1, parameters->iondefinitions[fragmentiontype].name.length() - 1);
+					}
+				}
+				if ((peak.neutrallosstype >= 0) || (j >= 0)) {
+					peak.description += "-";
+					if (j >= 0) {
+						peak.description += fragmentlosssummary[j];
+					}
+					if (peak.neutrallosstype >= 0) {
+						peak.description += parameters->neutrallossesdefinitions[peak.neutrallosstype].summary;
+					}
+				}
+				addAdductToDescription(peak.description, parameters->metaladducts);
+				peak.description += ": ";
+				for (int k = (int)intcomposition.size() - 1; k >= i; k--) {
+					peak.description += "[" + bricksdatabase[intcomposition[k] - 1].getAcronymsAsString() + "]";
+					if (k > i) {
+						peak.description += '-';
+					}
+				}
+
+			}
+
+			if (j >= 0) {
+				peak.mzratio += fragmentlossmass[j];
+				if (!disablesummary && (parameters->generateisotopepattern || writedescription)) {
+					mergeMaps(fragmentlossmap[j], tmpmap);
+				}
+
+				peak.rotationid = -1;
+				peak.seriesid = -1;
 			}
 			else {
-				peak.description += parameters->iondefinitions[fragmentiontype].name.substr(0, 1) + to_string((int)intcomposition.size() - i);
-				if (parameters->iondefinitions[fragmentiontype].name.size() > 1) {
-					peak.description += parameters->iondefinitions[fragmentiontype].name.substr(1, parameters->iondefinitions[fragmentiontype].name.length() - 1);
-				}
+				peak.rotationid = tmprotationid;
+				peak.seriesid = tmpseriesid;
 			}
-			if (peak.neutrallosstype >= 0) {
-				peak.description += "-" + parameters->neutrallossesdefinitions[peak.neutrallosstype].summary;
-			}
-			addAdductToDescription(peak.description, parameters->metaladducts);
-			peak.description += ": ";
-			for (int j = (int)intcomposition.size() - 1; j >= i; j--) {
-				peak.description += "[" + bricksdatabase[intcomposition[j] - 1].getAcronymsAsString() + "]";
-				if (j > i) {
-					peak.description += '-';
-				}
-			}
+
+			generateChargedFragments(peak, tmpmap, peaklistrealsize, maxcharge, writedescription, disablesummary);
+
+			peak.mzratio = tmpmz;
+			tmpmap = atoms;
 
 		}
 
-		generateChargedFragments(peak, atoms, peaklistrealsize, maxcharge, writedescription, disablesummary);
+		peak.rotationid = tmprotationid;
+		peak.seriesid = tmpseriesid;
+
+		if (parameters->internalfragments) {
+			// to do where applicable
+		}
 
 	}
 
