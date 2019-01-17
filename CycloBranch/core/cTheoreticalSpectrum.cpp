@@ -263,11 +263,16 @@ void cTheoreticalSpectrum::generateChargedFragments(cPeak& peak, map<string, int
 void cTheoreticalSpectrum::generatePrecursorIon(vector<int>& intcomposition, cBricksDatabase& bricksdatabasewithcombinations, int& theoreticalpeaksrealsize, bool writedescription) {
 	cPeak peak;
 	int starttype, endtype;
+
 	set<int> usedmodifications;
 	usedmodifications.insert(0);
 
 	map<string, int> atoms, tempmap;
-	atoms.clear();
+
+	vector<int> currentlosses;
+	vector<double> fragmentlossmass;
+	vector<string> fragmentlosssummary;
+	vector< map<string, int> > fragmentlossmap;
 
 	bool disablesummary = false;
 	if ((parameters->mode == denovoengine) && (parameters->blindedges == 2)) {
@@ -352,6 +357,9 @@ void cTheoreticalSpectrum::generatePrecursorIon(vector<int>& intcomposition, cBr
 		if (!disablesummary && (parameters->generateisotopepattern || writedescription)) {
 			mergeMaps(bricksdatabasewithcombinations[intcomposition[i] - 1].getSummaryMap(), atoms);
 		}
+
+		// to do - performance optimization - no need to recalculate everything in every iteration
+		updateListOfNeutralLosses(bricksdatabasewithcombinations, bricksdatabasewithcombinations[intcomposition[i] - 1], currentlosses, fragmentlossmass, fragmentlosssummary, fragmentlossmap, writedescription, disablesummary);
 	}
 
 	if (parameters->peptidetype == linearpolyketide) {
@@ -390,132 +398,157 @@ void cTheoreticalSpectrum::generatePrecursorIon(vector<int>& intcomposition, cBr
 			endtype = (int)linear_polyketide_precursor_ion_h_h;
 		}
 	}
-	
+
 	double tempratio = peak.mzratio;
+
 	for (int i = starttype; i <= endtype; i++) {
+
 		for (int j = -1; j < (int)parameters->neutrallossesfortheoreticalspectra.size(); j++) {
-			for (set<int>::iterator it = usedmodifications.begin(); it != usedmodifications.end(); ++it) {
-				for (int k = 1; k <= abs(parameters->precursorcharge); k++) {
-					peak.iontype = (eFragmentIonType)i;
-					peak.neutrallosstype = (j == -1) ? -1 : parameters->neutrallossesfortheoreticalspectra[j];
-					peak.mzratio = tempratio + parameters->iondefinitions[(eFragmentIonType)i].massdifference - parameters->searchedmodifications[*it].massdifference;
-					if (j >= 0) {
-						peak.mzratio += parameters->neutrallossesdefinitions[peak.neutrallosstype].massdifference;
-					}
-					peak.mzratio = charge(uncharge(peak.mzratio, 1), (parameters->precursorcharge > 0) ? k : -k);
-					peak.charge = (parameters->precursorcharge > 0) ? k : -k;
 
-					if (!disablesummary && (parameters->generateisotopepattern || writedescription)) {
-						tempmap = atoms;
-						mergeMaps(parameters->iondefinitions[(eFragmentIonType)i].summarymap, tempmap);
+			for (auto it = usedmodifications.begin(); it != usedmodifications.end(); ++it) {
+
+				for (int k = -1; k < (int)fragmentlossmass.size(); k++) {
+
+					for (int m = 1; m <= abs(parameters->precursorcharge); m++) {
+
+						peak.iontype = (eFragmentIonType)i;
+						peak.neutrallosstype = (j == -1) ? -1 : parameters->neutrallossesfortheoreticalspectra[j];
+						peak.mzratio = tempratio + parameters->iondefinitions[(eFragmentIonType)i].massdifference - parameters->searchedmodifications[*it].massdifference;
 						if (j >= 0) {
-							mergeMaps(parameters->neutrallossesdefinitions[peak.neutrallosstype].summarymap, tempmap);
+							peak.mzratio += parameters->neutrallossesdefinitions[peak.neutrallosstype].massdifference;
 						}
-						rechargeMap(peak.charge, tempmap);
-						peak.formula.setFromMap(tempmap, false);
-						peak.formula.addFormula(parameters->searchedmodifications[*it].summary, true);
-					}
-
-					if (writedescription) {
-						string str;
-
-						peak.description = parameters->iondefinitions[(eFragmentIonType)i].name;
-						if (j >= 0) {
-							peak.description += "-" + parameters->neutrallossesdefinitions[peak.neutrallosstype].summary;
+						if (k >= 0) {
+							peak.mzratio += fragmentlossmass[k];
 						}
-						if (*it > 0) {
-							peak.description += " (" + parameters->searchedmodifications[*it].name + " loss)";
-						}
-						peak.description += ":";
+						peak.mzratio = charge(uncharge(peak.mzratio, 1), (parameters->precursorcharge > 0) ? m : -m);
+						peak.charge = (parameters->precursorcharge > 0) ? m : -m;
 
-						if (parameters->precursorcharge > 0) {
-							if (!parameters->precursoradduct.empty()) {
-								str = "+" + parameters->precursoradduct;
-								if (k > 1) {
-									str += "+";
-									if (k > 2) {
-										str += to_string(k - 1);
+						if (!disablesummary && (parameters->generateisotopepattern || writedescription)) {
+							tempmap = atoms;
+							mergeMaps(parameters->iondefinitions[(eFragmentIonType)i].summarymap, tempmap);
+							if (j >= 0) {
+								mergeMaps(parameters->neutrallossesdefinitions[peak.neutrallosstype].summarymap, tempmap);
+							}
+							if (k >= 0) {
+								mergeMaps(fragmentlossmap[k], tempmap);
+							}
+							rechargeMap(peak.charge, tempmap);
+							peak.formula.setFromMap(tempmap, false);
+							peak.formula.addFormula(parameters->searchedmodifications[*it].summary, true);
+						}
+
+						if (writedescription) {
+							string str;
+
+							peak.description = parameters->iondefinitions[(eFragmentIonType)i].name;
+							if ((k >= 0) || (j >= 0)) {
+								peak.description += "-";
+								if (k >= 0) {
+									peak.description += fragmentlosssummary[k];
+								}
+								if (j >= 0) {
+									peak.description += parameters->neutrallossesdefinitions[peak.neutrallosstype].summary;
+								}
+							}
+							if (*it > 0) {
+								peak.description += " (" + parameters->searchedmodifications[*it].name + " loss)";
+							}
+							peak.description += ":";
+
+							if (parameters->precursorcharge > 0) {
+								if (!parameters->precursoradduct.empty()) {
+									str = "+" + parameters->precursoradduct;
+									if (m > 1) {
+										str += "+";
+										if (m > 2) {
+											str += to_string(m - 1);
+										}
+										str += "H";
+									}
+									peak.description.replace(peak.description.find("+zH"), 3, str);
+								}
+								else {
+									str = "+";
+									if (m > 1) {
+										str += to_string(m);
 									}
 									str += "H";
+									peak.description.replace(peak.description.find("+zH"), 3, str);
 								}
-								peak.description.replace(peak.description.find("+zH"), 3, str);
+
+								str = "]";
+								if (m > 1) {
+									str += to_string(m);
+								}
+								str += "+";
+								peak.description.replace(peak.description.find("]+"), 2, str);
 							}
 							else {
-								str = "+";
-								if (k > 1) {
-									str += to_string(k);
+								if (!parameters->precursoradduct.empty()) {
+									str = "-" + parameters->precursoradduct;
+									if (m > 1) {
+										str += "-";
+										if (m > 2) {
+											str += to_string(m - 1);
+										}
+										str += "H";
+									}
+									peak.description.replace(peak.description.find("+zH"), 3, str);
 								}
-								str += "H";
-								peak.description.replace(peak.description.find("+zH"), 3, str);
-							}
+								else {
+									str = "-";
+									if (m > 1) {
+										str += to_string(m);
+									}
+									str += "H";
+									peak.description.replace(peak.description.find("+zH"), 3, str);
+								}
 
-							str = "]";
-							if (k > 1) {
-								str += to_string(k);
+								str = "]";
+								if (m > 1) {
+									str += to_string(m);
+								}
+								str += "-";
+								peak.description.replace(peak.description.find("]+"), 2, str);
 							}
-							str += "+";
-							peak.description.replace(peak.description.find("]+"), 2, str);
+						}
+
+						if (writedescription) {
+							if (peak.formula.hasAllElementsPositive()) {
+								if (parameters->reportunmatchedtheoreticalpeaks || searchHint(peak.mzratio, experimentalpeaks, parameters->fragmentmasserrortolerance)) {
+									addPeakToList(peak, theoreticalpeaksrealsize);
+								}
+								if (!parameters->generateisotopepattern) {
+									addMetalPeaks(peak, parameters->metaladducts, theoreticalpeaksrealsize, m, writedescription);
+								}
+							}
 						}
 						else {
-							if (!parameters->precursoradduct.empty()) {
-								str = "-" + parameters->precursoradduct;
-								if (k > 1) {
-									str += "-";
-									if (k > 2) {
-										str += to_string(k - 1);
+							if (parameters->generateisotopepattern) {
+								if (peak.formula.hasAllElementsPositive()) {
+									if (searchHint(peak.mzratio, experimentalpeaks, parameters->fragmentmasserrortolerance)) {
+										addPeakToList(peak, theoreticalpeaksrealsize);
 									}
-									str += "H";
 								}
-								peak.description.replace(peak.description.find("+zH"), 3, str);
 							}
 							else {
-								str = "-";
-								if (k > 1) {
-									str += to_string(k);
-								}
-								str += "H";
-								peak.description.replace(peak.description.find("+zH"), 3, str);
-							}
-
-							str = "]";
-							if (k > 1) {
-								str += to_string(k);
-							}
-							str += "-";
-							peak.description.replace(peak.description.find("]+"), 2, str);
-						}
-					}
-
-					if (writedescription) {
-						if (peak.formula.hasAllElementsPositive()) {
-							if (parameters->reportunmatchedtheoreticalpeaks || searchHint(peak.mzratio, experimentalpeaks, parameters->fragmentmasserrortolerance)) {
-								addPeakToList(peak, theoreticalpeaksrealsize);
-							}
-							if (!parameters->generateisotopepattern) {
-								addMetalPeaks(peak, parameters->metaladducts, theoreticalpeaksrealsize, k, writedescription);
-							}
-						}
-					}
-					else {
-						if (parameters->generateisotopepattern) {
-							if (peak.formula.hasAllElementsPositive()) {
 								if (searchHint(peak.mzratio, experimentalpeaks, parameters->fragmentmasserrortolerance)) {
 									addPeakToList(peak, theoreticalpeaksrealsize);
 								}
+								addMetalPeaks(peak, parameters->metaladducts, theoreticalpeaksrealsize, m, writedescription);
 							}
 						}
-						else {
-							if (searchHint(peak.mzratio, experimentalpeaks, parameters->fragmentmasserrortolerance)) {
-								addPeakToList(peak, theoreticalpeaksrealsize);
-							}
-							addMetalPeaks(peak, parameters->metaladducts, theoreticalpeaksrealsize, k, writedescription);
-						}
+
 					}
 
 				}
+
 			}
+
 		}
+
 	}
+
 }
 
 
