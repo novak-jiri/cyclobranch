@@ -865,7 +865,9 @@ void cTheoreticalSpectrum::generateInternalFragments(cBricksDatabase& bricksdata
 			}
 
 			tmpmz1 = peak.mzratio;
-			tmpmap1 = atoms;
+			if (!disablesummary && (parameters->generateisotopepattern || writedescription)) {
+				tmpmap1 = atoms;
+			}
 
 			tmprotationid = peak.rotationid;
 			tmpseriesid = peak.seriesid;
@@ -884,7 +886,9 @@ void cTheoreticalSpectrum::generateInternalFragments(cBricksDatabase& bricksdata
 				updateListOfNeutralLosses(bricksdatabase, bricksdatabase[intcomposition[pos] - 1], internalcurrentlosses, fragmentlossmass, fragmentlosssummary, fragmentlossmap, writedescription, disablesummary);
 
 				tmpmz2 = peak.mzratio;
-				tmpmap2 = tmpmap1;
+				if (!disablesummary && (parameters->generateisotopepattern || writedescription)) {
+					tmpmap2 = tmpmap1;
+				}
 				
 				for (int j = -1; j < (int)fragmentlossmass.size(); j++) {
 
@@ -928,7 +932,9 @@ void cTheoreticalSpectrum::generateInternalFragments(cBricksDatabase& bricksdata
 					generateChargedFragments(peak, tmpmap2, peaklistrealsize, maxcharge, writedescription, disablesummary);
 
 					peak.mzratio = tmpmz2;
-					tmpmap2 = tmpmap1;
+					if (!disablesummary && (parameters->generateisotopepattern || writedescription)) {
+						tmpmap2 = tmpmap1;
+					}
 
 				}
 
@@ -3820,7 +3826,9 @@ void cTheoreticalSpectrum::generateNTerminalFragmentIons(int maxcharge, int& pea
 		updateListOfNeutralLosses(bricksdatabase, bricksdatabase[intcomposition[i] - 1], currentlosses, fragmentlossmass, fragmentlosssummary, fragmentlossmap, writedescription, disablesummary);
 
 		tmpmz = peak.mzratio;
-		tmpmap = atoms;
+		if (!disablesummary && (parameters->generateisotopepattern || writedescription)) {
+			tmpmap = atoms;
+		}
 		
 		tmprotationid = peak.rotationid;
 		tmpseriesid = peak.seriesid;
@@ -3882,7 +3890,9 @@ void cTheoreticalSpectrum::generateNTerminalFragmentIons(int maxcharge, int& pea
 			generateChargedFragments(peak, tmpmap, peaklistrealsize, maxcharge, writedescription, disablesummary);
 
 			peak.mzratio = tmpmz;
-			tmpmap = atoms;
+			if (!disablesummary && (parameters->generateisotopepattern || writedescription)) {
+				tmpmap = atoms;
+			}
 
 		}
 
@@ -4063,7 +4073,9 @@ void cTheoreticalSpectrum::generateCTerminalFragmentIons(int maxcharge, int& pea
 		updateListOfNeutralLosses(bricksdatabase, bricksdatabase[intcomposition[i] - 1], currentlosses, fragmentlossmass, fragmentlosssummary, fragmentlossmap, writedescription, disablesummary);
 
 		tmpmz = peak.mzratio;
-		tmpmap = atoms;
+		if (!disablesummary && (parameters->generateisotopepattern || writedescription)) {
+			tmpmap = atoms;
+		}
 
 		tmprotationid = peak.rotationid;
 		tmpseriesid = peak.seriesid;
@@ -4125,7 +4137,9 @@ void cTheoreticalSpectrum::generateCTerminalFragmentIons(int maxcharge, int& pea
 			generateChargedFragments(peak, tmpmap, peaklistrealsize, maxcharge, writedescription, disablesummary);
 
 			peak.mzratio = tmpmz;
-			tmpmap = atoms;
+			if (!disablesummary && (parameters->generateisotopepattern || writedescription)) {
+				tmpmap = atoms;
+			}
 
 		}
 
