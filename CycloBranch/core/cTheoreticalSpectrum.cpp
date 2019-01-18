@@ -855,7 +855,7 @@ void cTheoreticalSpectrum::generateInternalFragments(cBricksDatabase& bricksdata
 	int tmprotationid;
 	int tmpseriesid;
 
-	if ((peptidetype == branchcyclic) && (trotation->id == 0)) {
+	if ((peptidetype == branchcyclic) && trotation && (trotation->id == 0)) {
 
 		if ((pos >= trotation->middlebranchstart) && (pos < trotation->middlebranchend)) {
 
@@ -3652,6 +3652,8 @@ void cTheoreticalSpectrum::generateNTerminalFragmentIons(int maxcharge, int& pea
 	int tmprotationid;
 	int tmpseriesid;
 
+	bool skipcommonfragments;
+
 	bool disablesummary = false;
 	if ((parameters->mode == denovoengine) && (parameters->blindedges == 2) && bricksdatabase[intcomposition[0] - 1].isArtificial()) {
 		disablesummary = true;
@@ -3733,6 +3735,8 @@ void cTheoreticalSpectrum::generateNTerminalFragmentIons(int maxcharge, int& pea
 			disablesummary = true;
 		}
 
+		updateListOfNeutralLosses(bricksdatabase, bricksdatabase[intcomposition[i] - 1], currentlosses, fragmentlossmass, fragmentlosssummary, fragmentlossmap, writedescription, disablesummary);
+
 		if (!disablesummary && (parameters->generateisotopepattern || writedescription)) {
 			mergeMaps(bricksdatabase[intcomposition[i] - 1].getSummaryMap(), atoms);
 		}
@@ -3746,7 +3750,12 @@ void cTheoreticalSpectrum::generateNTerminalFragmentIons(int maxcharge, int& pea
 			}
 
 			if ((i >= trotation->middlebranchstart) && (i < trotation->middlebranchend)) {
-				if (!(parameters->internalfragments && (peptidetype == branchcyclic) && (trotation->id == 0))) {
+				if (parameters->internalfragments) {
+					if (!((peptidetype == branchcyclic) && (trotation->id == 0))) {
+						continue;
+					}
+				}
+				else {
 					continue;
 				}
 			}
@@ -3823,81 +3832,85 @@ void cTheoreticalSpectrum::generateNTerminalFragmentIons(int maxcharge, int& pea
 
 		peak.seriesid = i;
 
-		updateListOfNeutralLosses(bricksdatabase, bricksdatabase[intcomposition[i] - 1], currentlosses, fragmentlossmass, fragmentlosssummary, fragmentlossmap, writedescription, disablesummary);
+		skipcommonfragments = (trotation && (i >= trotation->middlebranchstart) && (i < trotation->middlebranchend) && (peptidetype == branchcyclic) && (trotation->id == 0));
 
-		tmpmz = peak.mzratio;
-		if (!disablesummary && (parameters->generateisotopepattern || writedescription)) {
-			tmpmap = atoms;
-		}
-		
-		tmprotationid = peak.rotationid;
-		tmpseriesid = peak.seriesid;
+		if (!skipcommonfragments) {
 
-		for (int j = -1; j < (int)fragmentlossmass.size(); j++) {
-
-			if (writedescription) {
-
-				peak.description = "";
-				if ((peptidetype == cyclic) || (peptidetype == cyclicpolyketide) || (peptidetype == branched) || (peptidetype == branchcyclic)) {
-					peak.description += prefixstr;
-				}
-				if ((peptidetype == linearpolyketide) || (peptidetype == cyclicpolyketide)) {
-					peak.description += parameters->iondefinitions[fragmentiontype].name.substr(0, 2) + to_string(i + 1);
-					if (parameters->iondefinitions[fragmentiontype].name.size() > 2) {
-						peak.description += parameters->iondefinitions[fragmentiontype].name.substr(2, parameters->iondefinitions[fragmentiontype].name.length() - 2);
-					}
-				}
-				else {
-					peak.description += parameters->iondefinitions[fragmentiontype].name.substr(0, 1) + to_string(i + 1);
-					if (parameters->iondefinitions[fragmentiontype].name.size() > 1) {
-						peak.description += parameters->iondefinitions[fragmentiontype].name.substr(1, parameters->iondefinitions[fragmentiontype].name.length() - 1);
-					}
-				}
-				if ((peak.neutrallosstype >= 0) || (j >= 0)) {
-					peak.description += "-";
-					if (j >= 0) {
-						peak.description += fragmentlosssummary[j];
-					}
-					if (peak.neutrallosstype >= 0) {
-						peak.description += parameters->neutrallossesdefinitions[peak.neutrallosstype].summary;
-					}
-				}
-				addAdductToDescription(peak.description, parameters->metaladducts);
-				peak.description += ": ";
-				for (int k = 0; k <= i; k++) {
-					peak.description += "[" + bricksdatabase[intcomposition[k] - 1].getAcronymsAsString() + "]";
-					if (k < i) {
-						peak.description += '-';
-					}
-				}
-
-			}
-
-			if (j >= 0) {
-				peak.mzratio += fragmentlossmass[j];
-				if (!disablesummary && (parameters->generateisotopepattern || writedescription)) {
-					mergeMaps(fragmentlossmap[j], tmpmap);
-				}
-
-				peak.rotationid = -1;
-				peak.seriesid = -1;
-			}
-			else {
-				peak.rotationid = tmprotationid;
-				peak.seriesid = tmpseriesid;
-			}
-
-			generateChargedFragments(peak, tmpmap, peaklistrealsize, maxcharge, writedescription, disablesummary);
-
-			peak.mzratio = tmpmz;
+			tmpmz = peak.mzratio;
 			if (!disablesummary && (parameters->generateisotopepattern || writedescription)) {
 				tmpmap = atoms;
 			}
 
-		}
+			tmprotationid = peak.rotationid;
+			tmpseriesid = peak.seriesid;
 
-		peak.rotationid = tmprotationid;
-		peak.seriesid = tmpseriesid;
+			for (int j = -1; j < (int)fragmentlossmass.size(); j++) {
+
+				if (writedescription) {
+
+					peak.description = "";
+					if ((peptidetype == cyclic) || (peptidetype == cyclicpolyketide) || (peptidetype == branched) || (peptidetype == branchcyclic)) {
+						peak.description += prefixstr;
+					}
+					if ((peptidetype == linearpolyketide) || (peptidetype == cyclicpolyketide)) {
+						peak.description += parameters->iondefinitions[fragmentiontype].name.substr(0, 2) + to_string(i + 1);
+						if (parameters->iondefinitions[fragmentiontype].name.size() > 2) {
+							peak.description += parameters->iondefinitions[fragmentiontype].name.substr(2, parameters->iondefinitions[fragmentiontype].name.length() - 2);
+						}
+					}
+					else {
+						peak.description += parameters->iondefinitions[fragmentiontype].name.substr(0, 1) + to_string(i + 1);
+						if (parameters->iondefinitions[fragmentiontype].name.size() > 1) {
+							peak.description += parameters->iondefinitions[fragmentiontype].name.substr(1, parameters->iondefinitions[fragmentiontype].name.length() - 1);
+						}
+					}
+					if ((peak.neutrallosstype >= 0) || (j >= 0)) {
+						peak.description += "-";
+						if (j >= 0) {
+							peak.description += fragmentlosssummary[j];
+						}
+						if (peak.neutrallosstype >= 0) {
+							peak.description += parameters->neutrallossesdefinitions[peak.neutrallosstype].summary;
+						}
+					}
+					addAdductToDescription(peak.description, parameters->metaladducts);
+					peak.description += ": ";
+					for (int k = 0; k <= i; k++) {
+						peak.description += "[" + bricksdatabase[intcomposition[k] - 1].getAcronymsAsString() + "]";
+						if (k < i) {
+							peak.description += '-';
+						}
+					}
+
+				}
+
+				if (j >= 0) {
+					peak.mzratio += fragmentlossmass[j];
+					if (!disablesummary && (parameters->generateisotopepattern || writedescription)) {
+						mergeMaps(fragmentlossmap[j], tmpmap);
+					}
+
+					peak.rotationid = -1;
+					peak.seriesid = -1;
+				}
+				else {
+					peak.rotationid = tmprotationid;
+					peak.seriesid = tmpseriesid;
+				}
+
+				generateChargedFragments(peak, tmpmap, peaklistrealsize, maxcharge, writedescription, disablesummary);
+
+				peak.mzratio = tmpmz;
+				if (!disablesummary && (parameters->generateisotopepattern || writedescription)) {
+					tmpmap = atoms;
+				}
+
+			}
+
+			peak.rotationid = tmprotationid;
+			peak.seriesid = tmpseriesid;
+
+		}
 
 		if (parameters->internalfragments) {
 			generateInternalFragments(bricksdatabase, peak, maxcharge, peaklistrealsize, intcomposition, i, atoms, currentlosses, fragmentiontype, peptidetype, trotation, writedescription, disablesummary);
@@ -3922,6 +3935,8 @@ void cTheoreticalSpectrum::generateCTerminalFragmentIons(int maxcharge, int& pea
 
 	int tmprotationid;
 	int tmpseriesid;
+
+	bool skipcommonfragments;
 
 	bool disablesummary = false;
 	if ((parameters->mode == denovoengine) && (parameters->blindedges == 2) && bricksdatabase[intcomposition[intcomposition.size() - 1] - 1].isArtificial()) {
@@ -4008,6 +4023,8 @@ void cTheoreticalSpectrum::generateCTerminalFragmentIons(int maxcharge, int& pea
 			disablesummary = true;
 		}
 
+		updateListOfNeutralLosses(bricksdatabase, bricksdatabase[intcomposition[i] - 1], currentlosses, fragmentlossmass, fragmentlosssummary, fragmentlossmap, writedescription, disablesummary);
+
 		if (!disablesummary && (parameters->generateisotopepattern || writedescription)) {
 			mergeMaps(bricksdatabase[intcomposition[i] - 1].getSummaryMap(), atoms);
 		}
@@ -4022,7 +4039,13 @@ void cTheoreticalSpectrum::generateCTerminalFragmentIons(int maxcharge, int& pea
 			}
 
 			if ((i > trotation->middlebranchstart) && (i <= trotation->middlebranchend)) {
-				continue;
+				if (parameters->internalfragments) {
+					// to do where applicable
+					continue;
+				}
+				else {
+					continue;
+				}
 			}
 
 			// redundant short c-term fragments are not generated
@@ -4070,81 +4093,86 @@ void cTheoreticalSpectrum::generateCTerminalFragmentIons(int maxcharge, int& pea
 
 		peak.seriesid = (int)intcomposition.size() - i - 1;
 
-		updateListOfNeutralLosses(bricksdatabase, bricksdatabase[intcomposition[i] - 1], currentlosses, fragmentlossmass, fragmentlosssummary, fragmentlossmap, writedescription, disablesummary);
+		// to do where applicable
+		skipcommonfragments = false;
 
-		tmpmz = peak.mzratio;
-		if (!disablesummary && (parameters->generateisotopepattern || writedescription)) {
-			tmpmap = atoms;
-		}
+		if (!skipcommonfragments) {
 
-		tmprotationid = peak.rotationid;
-		tmpseriesid = peak.seriesid;
-
-		for (int j = -1; j < (int)fragmentlossmass.size(); j++) {
-
-			if (writedescription) {
-
-				peak.description = "";
-				if ((peptidetype == cyclicpolyketide) /* || (peptidetype == cyclic) */ || (peptidetype == branched) || (peptidetype == branchcyclic)) {
-					peak.description += prefixstr;
-				}
-				if ((peptidetype == linearpolyketide) || (peptidetype == cyclicpolyketide)) {
-					peak.description += parameters->iondefinitions[fragmentiontype].name.substr(0, 2) + to_string((int)intcomposition.size() - i);
-					if (parameters->iondefinitions[fragmentiontype].name.size() > 2) {
-						peak.description += parameters->iondefinitions[fragmentiontype].name.substr(2, parameters->iondefinitions[fragmentiontype].name.length() - 2);
-					}
-				}
-				else {
-					peak.description += parameters->iondefinitions[fragmentiontype].name.substr(0, 1) + to_string((int)intcomposition.size() - i);
-					if (parameters->iondefinitions[fragmentiontype].name.size() > 1) {
-						peak.description += parameters->iondefinitions[fragmentiontype].name.substr(1, parameters->iondefinitions[fragmentiontype].name.length() - 1);
-					}
-				}
-				if ((peak.neutrallosstype >= 0) || (j >= 0)) {
-					peak.description += "-";
-					if (j >= 0) {
-						peak.description += fragmentlosssummary[j];
-					}
-					if (peak.neutrallosstype >= 0) {
-						peak.description += parameters->neutrallossesdefinitions[peak.neutrallosstype].summary;
-					}
-				}
-				addAdductToDescription(peak.description, parameters->metaladducts);
-				peak.description += ": ";
-				for (int k = (int)intcomposition.size() - 1; k >= i; k--) {
-					peak.description += "[" + bricksdatabase[intcomposition[k] - 1].getAcronymsAsString() + "]";
-					if (k > i) {
-						peak.description += '-';
-					}
-				}
-
-			}
-
-			if (j >= 0) {
-				peak.mzratio += fragmentlossmass[j];
-				if (!disablesummary && (parameters->generateisotopepattern || writedescription)) {
-					mergeMaps(fragmentlossmap[j], tmpmap);
-				}
-
-				peak.rotationid = -1;
-				peak.seriesid = -1;
-			}
-			else {
-				peak.rotationid = tmprotationid;
-				peak.seriesid = tmpseriesid;
-			}
-
-			generateChargedFragments(peak, tmpmap, peaklistrealsize, maxcharge, writedescription, disablesummary);
-
-			peak.mzratio = tmpmz;
+			tmpmz = peak.mzratio;
 			if (!disablesummary && (parameters->generateisotopepattern || writedescription)) {
 				tmpmap = atoms;
 			}
 
-		}
+			tmprotationid = peak.rotationid;
+			tmpseriesid = peak.seriesid;
 
-		peak.rotationid = tmprotationid;
-		peak.seriesid = tmpseriesid;
+			for (int j = -1; j < (int)fragmentlossmass.size(); j++) {
+
+				if (writedescription) {
+
+					peak.description = "";
+					if ((peptidetype == cyclicpolyketide) /* || (peptidetype == cyclic) */ || (peptidetype == branched) || (peptidetype == branchcyclic)) {
+						peak.description += prefixstr;
+					}
+					if ((peptidetype == linearpolyketide) || (peptidetype == cyclicpolyketide)) {
+						peak.description += parameters->iondefinitions[fragmentiontype].name.substr(0, 2) + to_string((int)intcomposition.size() - i);
+						if (parameters->iondefinitions[fragmentiontype].name.size() > 2) {
+							peak.description += parameters->iondefinitions[fragmentiontype].name.substr(2, parameters->iondefinitions[fragmentiontype].name.length() - 2);
+						}
+					}
+					else {
+						peak.description += parameters->iondefinitions[fragmentiontype].name.substr(0, 1) + to_string((int)intcomposition.size() - i);
+						if (parameters->iondefinitions[fragmentiontype].name.size() > 1) {
+							peak.description += parameters->iondefinitions[fragmentiontype].name.substr(1, parameters->iondefinitions[fragmentiontype].name.length() - 1);
+						}
+					}
+					if ((peak.neutrallosstype >= 0) || (j >= 0)) {
+						peak.description += "-";
+						if (j >= 0) {
+							peak.description += fragmentlosssummary[j];
+						}
+						if (peak.neutrallosstype >= 0) {
+							peak.description += parameters->neutrallossesdefinitions[peak.neutrallosstype].summary;
+						}
+					}
+					addAdductToDescription(peak.description, parameters->metaladducts);
+					peak.description += ": ";
+					for (int k = (int)intcomposition.size() - 1; k >= i; k--) {
+						peak.description += "[" + bricksdatabase[intcomposition[k] - 1].getAcronymsAsString() + "]";
+						if (k > i) {
+							peak.description += '-';
+						}
+					}
+
+				}
+
+				if (j >= 0) {
+					peak.mzratio += fragmentlossmass[j];
+					if (!disablesummary && (parameters->generateisotopepattern || writedescription)) {
+						mergeMaps(fragmentlossmap[j], tmpmap);
+					}
+
+					peak.rotationid = -1;
+					peak.seriesid = -1;
+				}
+				else {
+					peak.rotationid = tmprotationid;
+					peak.seriesid = tmpseriesid;
+				}
+
+				generateChargedFragments(peak, tmpmap, peaklistrealsize, maxcharge, writedescription, disablesummary);
+
+				peak.mzratio = tmpmz;
+				if (!disablesummary && (parameters->generateisotopepattern || writedescription)) {
+					tmpmap = atoms;
+				}
+
+			}
+
+			peak.rotationid = tmprotationid;
+			peak.seriesid = tmpseriesid;
+
+		}
 
 		if (parameters->internalfragments) {
 			// to do where applicable
