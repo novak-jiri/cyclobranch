@@ -442,7 +442,7 @@ void cTheoreticalSpectrum::generatePrecursorIon(vector<int>& intcomposition, cBr
 
 							peak.description = parameters->iondefinitions[(eFragmentIonType)i].name;
 							if ((k >= 0) || (j >= 0)) {
-								peak.description += "-";
+								peak.description += " -";
 								if (k >= 0) {
 									peak.description += fragmentlosssummary[k];
 								}
@@ -706,7 +706,7 @@ void cTheoreticalSpectrum::generateScrambledIons(cBricksDatabase& bricksdatabase
 						peak.description += parameters->iondefinitions[peak.iontype].name.substr(1, parameters->iondefinitions[peak.iontype].name.length() - 1);
 					}
 					if (peak.neutrallosstype >= 0) {
-						peak.description += "-" + parameters->neutrallossesdefinitions[peak.neutrallosstype].summary;
+						peak.description += " -" + parameters->neutrallossesdefinitions[peak.neutrallosstype].summary;
 					}
 
 					addAdductToDescription(peak.description, parameters->metaladducts);
@@ -902,7 +902,7 @@ void cTheoreticalSpectrum::generateInternalFragments(cBricksDatabase& bricksdata
 						//	}
 
 						if ((peak.neutrallosstype >= 0) || (j >= 0)) {
-							peak.description += "-";
+							peak.description += " -";
 							if (j >= 0) {
 								peak.description += fragmentlosssummary[j];
 							}
@@ -3865,7 +3865,7 @@ void cTheoreticalSpectrum::generateNTerminalFragmentIons(int maxcharge, int& pea
 						}
 					}
 					if ((peak.neutrallosstype >= 0) || (j >= 0)) {
-						peak.description += "-";
+						peak.description += " -";
 						if (j >= 0) {
 							peak.description += fragmentlosssummary[j];
 						}
@@ -4127,7 +4127,7 @@ void cTheoreticalSpectrum::generateCTerminalFragmentIons(int maxcharge, int& pea
 						}
 					}
 					if ((peak.neutrallosstype >= 0) || (j >= 0)) {
-						peak.description += "-";
+						peak.description += " -";
 						if (j >= 0) {
 							peak.description += fragmentlosssummary[j];
 						}

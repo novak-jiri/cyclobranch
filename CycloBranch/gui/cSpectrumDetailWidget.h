@@ -193,6 +193,13 @@ public:
 	void zoomToPeak(double value);
 
 
+	/**
+		\brief Get a set of local neutral losses.
+		\retval set<int> get a set of local neutral losses
+	*/
+	set<string>& getLocalNeutralLosses();
+
+
 protected:
 
 
@@ -293,6 +300,8 @@ private:
 	
 	int rowid;
 	bool preparedToShow;
+
+	set<string> localneutralosses;
 
 	cParameters* parameters;
 

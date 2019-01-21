@@ -32,6 +32,7 @@ cSpectrumDetailWidget::cSpectrumDetailWidget() {
 
 	rowid = 0;
 	preparedToShow = false;
+	localneutralosses.clear();
 	theoreticalspectrum = new cTheoreticalSpectrum();
 }
 
@@ -50,6 +51,7 @@ cSpectrumDetailWidget& cSpectrumDetailWidget::operator=(const cSpectrumDetailWid
 	profileintensity64precision = sd.profileintensity64precision;
 
 	preparedToShow = false;
+	localneutralosses = sd.localneutralosses;
 	theoreticalspectrum = new cTheoreticalSpectrum();
 
 	if (parameters && sd.theoreticalspectrum) {
@@ -987,12 +989,6 @@ void cSpectrumDetailWidget::prepareToShow(QAction* actionShowIsomers, cPeakListS
 			toolbarNeutralLoss->addWidget(neutrallosswidget);
 
 			neutrallosscombobox->addItem(tr("all"));
-			if (parameters->neutrallossesfortheoreticalspectra.size() > 0) {
-				neutrallosscombobox->addItem(tr("none"));
-				for (int i = 0; i < (int)parameters->neutrallossesfortheoreticalspectra.size(); i++) {
-					neutrallosscombobox->addItem(tr(parameters->neutrallossesdefinitions[parameters->neutrallossesfortheoreticalspectra[i]].summary.c_str()));
-				}
-			}
 			
 			connect(neutrallosscombobox, SIGNAL(currentIndexChanged(QString)), spectrumscene, SLOT(neutralLossChanged(QString)));
 			connect(neutrallosscombobox, SIGNAL(currentIndexChanged(int)), this, SLOT(filterTableAfterNeutralLossChanged(int)));
@@ -1231,6 +1227,15 @@ void cSpectrumDetailWidget::prepareToShow(QAction* actionShowIsomers, cPeakListS
 			
 			preparePeaksTable();
 
+			if ((parameters->mode == denovoengine) || (parameters->mode == singlecomparison) || (parameters->mode == databasesearch)) {
+				if (localneutralosses.size() > 0) {
+					neutrallosscombobox->addItem(tr("none"));
+					for (auto& it : localneutralosses) {
+						neutrallosscombobox->addItem(tr(it.c_str()));
+					}
+				}
+			}
+
 		}
 
 		preparedToShow = true;
@@ -1352,6 +1357,11 @@ void cSpectrumDetailWidget::zoomToPeak(double value) {
 	if (value > 0) {
 		emit emitMZInterval(value - 5.0, value + 5.0);
 	}
+}
+
+
+set<string>& cSpectrumDetailWidget::getLocalNeutralLosses() {
+	return localneutralosses;
 }
 
 
@@ -1494,7 +1504,7 @@ void cSpectrumDetailWidget::preparePeaksTable() {
 	int thpeakscount;
 	cPeak* peak;
 	int secondspace, langle, rangle, tmp;
-	string stmp, desc;
+	string stmp, desc, fragname;
 	size_t pos;
 	QBrush brush;
 
@@ -1544,7 +1554,18 @@ void cSpectrumDetailWidget::preparePeaksTable() {
 		else {
 			peakstablemodel->setItem(i, currentcolumn, new QStandardItem());
 			peakstablemodel->item(i, currentcolumn)->setForeground(brush);
-			peakstablemodel->item(i, currentcolumn)->setText(peak->description.substr(0, peak->description.find(':')).c_str());
+			fragname = peak->description.substr(0, peak->description.find(':'));
+			peakstablemodel->item(i, currentcolumn)->setText(fragname.c_str());
+			if (fragname.rfind(" -") != string::npos) {
+				fragname = fragname.substr(fragname.rfind(" -") + 2);
+				if (fragname.find('_') != string::npos) {
+					fragname = fragname.substr(0, fragname.find('_'));
+				}
+				if (fragname.find(' ') != string::npos) {
+					fragname = fragname.substr(0, fragname.find(' '));
+				}
+				localneutralosses.insert(fragname);
+			}
 		}
 		currentcolumn++;
 		
@@ -2162,13 +2183,14 @@ void cSpectrumDetailWidget::filterPeaksTable() {
 					pattern = "^";
 				}
 				pattern += "((?!";
-				for (int i = 0; i < (int)parameters->neutrallossesfortheoreticalspectra.size(); i++) {
+				for (auto& it : localneutralosses) {
 					pattern += "-";
-					pattern += parameters->neutrallossesdefinitions[parameters->neutrallossesfortheoreticalspectra[i]].summary.c_str();
+					pattern += it.c_str();
 					pattern += "(?:$|_| )";
-					if (i < (int)parameters->neutrallossesfortheoreticalspectra.size() - 1) {
-						pattern += "|";
-					}
+					pattern += "|";
+				}
+				if (localneutralosses.size() > 0) {
+					pattern = pattern.left(pattern.size() - 1);
 				}
 				pattern += ").)*$";
 			}

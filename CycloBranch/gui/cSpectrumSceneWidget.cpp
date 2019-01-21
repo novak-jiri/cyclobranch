@@ -1,4 +1,5 @@
 #include "gui/cSpectrumSceneWidget.h"
+#include "gui/cSpectrumDetailWidget.h"
 
 #include <QTextEdit>
 #include <QVBoxLayout>
@@ -583,6 +584,7 @@ void cSpectrumSceneWidget::redrawScene() {
 	bool popit;
 	string tmpvisibleneutralloss;
 	size_t tmpposition;
+	set<string> localneutrallosses = ((cSpectrumDetailWidget *)parent)->getLocalNeutralLosses();
 	for (int i = 0; i < (int)visiblepeaks.size(); i++) {
 
 		x = getXPositionFromMZRatio(visiblepeaks[i].mzratio, w);
@@ -639,8 +641,8 @@ void cSpectrumSceneWidget::redrawScene() {
 
 				if (visibleneutralloss.compare("all") != 0) {
 					if (visibleneutralloss.compare("none") == 0) {
-						for (int j = 0; j < (int)parameters->neutrallossesfortheoreticalspectra.size(); j++) {
-							tmpvisibleneutralloss = "-" + parameters->neutrallossesdefinitions[parameters->neutrallossesfortheoreticalspectra[j]].summary;
+						for (auto& it : localneutrallosses) {
+							tmpvisibleneutralloss = "-" + it;
 							tmpposition = hits.back().find(tmpvisibleneutralloss);
 							if (tmpposition != string::npos) {
 								tmpstr = hits.back().substr(tmpposition + tmpvisibleneutralloss.size());
@@ -734,8 +736,8 @@ void cSpectrumSceneWidget::redrawScene() {
 
 				if (visibleneutralloss.compare("all") != 0) {
 					if (visibleneutralloss.compare("none") == 0) {
-						for (int j = 0; j < (int)parameters->neutrallossesfortheoreticalspectra.size(); j++) {
-							tmpvisibleneutralloss = "-" + parameters->neutrallossesdefinitions[parameters->neutrallossesfortheoreticalspectra[j]].summary;
+						for (auto& it : localneutrallosses) {
+							tmpvisibleneutralloss = "-" + it;
 							tmpposition = hits.back().find(tmpvisibleneutralloss);
 							if (tmpposition != string::npos) {
 								tmpstr = hits.back().substr(tmpposition + tmpvisibleneutralloss.size());
