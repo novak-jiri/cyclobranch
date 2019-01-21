@@ -25,6 +25,9 @@ cSpectrumSceneWidget::cSpectrumSceneWidget(QWidget* parent) {
 	rawdatapeaklist = 0;
 	origwidth = 0;
 	origheight = 0;
+	calledbyresizeevent = false;
+	oldwidth.clear();
+	oldheight.clear();
 	currentscale = 1;
 	absoluteintensity = false;
 	rawdatastate = false;
@@ -198,6 +201,7 @@ void cSpectrumSceneWidget::hidePeakLabels(bool state) {
 
 void cSpectrumSceneWidget::wheelEvent(QWheelEvent *event) {
 	double part, newmin, newmax;
+
 	if (event->delta() > 0) {
 		part = fabs(maxmzratio - minmzratio) / 10.0;
 		newmin = minmzratio + part;
@@ -214,8 +218,9 @@ void cSpectrumSceneWidget::wheelEvent(QWheelEvent *event) {
 		maxmzratio = newmax;
 		emit updateMZInterval(minmzratio, maxmzratio);
 		redrawScene();
+		viewport()->update();
 	}
-
+	
 	event->accept();
 }
 
@@ -329,6 +334,8 @@ void cSpectrumSceneWidget::resizeEvent(QResizeEvent *event) {
 	// a visualization fix
 	origwidth = (origwidth / 10) * 10;
 	origheight = (origheight / 10) * 10;
+
+	calledbyresizeevent = true;
 
 	redrawScene();	
 }
@@ -888,9 +895,46 @@ void cSpectrumSceneWidget::redrawScene() {
 
 
 	scene->removeItem(zoomgroup);
+
+	if (calledbyresizeevent) {
+		oldwidth.push_back(origwidth);
+		oldheight.push_back(origheight);
+	}
+	else {
+		oldwidth.clear();
+		oldheight.clear();
+	}
+
+	bool blocksignal = false;
+	// detection of cyclic calls redrawScene<->resizeEvent
+	if ((oldwidth.size() == 4) && (oldheight.size() == 4)) {
+		if ((oldwidth[3] == oldwidth[1]) && (oldheight[3] == oldheight[1]) && (oldwidth[2] == oldwidth[0]) && (oldheight[2] == oldheight[0])) {
+			blocksignal = true;
+		}
+	}
+	
+	if (blocksignal) {
+		scene->blockSignals(true);
+	}
+	
 	scene->setSceneRect(scene->itemsBoundingRect());
+	
+	if (blocksignal) {
+		scene->blockSignals(false);
+	}
+
 	zoomgroup->setVisible(false);
 	scene->addItem(zoomgroup);
+
+	while (oldwidth.size() > 3) {
+		oldwidth.pop_front();
+	}
+
+	while (oldheight.size() > 3) {
+		oldheight.pop_front();
+	}
+
+	calledbyresizeevent = false;
 
 }
 
@@ -1023,6 +1067,7 @@ void cSpectrumSceneWidget::setMZInterval(double minmz, double maxmz) {
 	emit updateMZInterval(minmzratio, maxmzratio);
 
 	redrawScene();
+	viewport()->update();
 }
 
 

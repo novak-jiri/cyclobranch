@@ -174,6 +174,10 @@ private:
 	int origwidth;
 	int origheight;
 
+	bool calledbyresizeevent;
+	deque<int> oldwidth;
+	deque<int> oldheight;
+
 	string visibleionseriespart1;
 	string visibleionseriespart2;
 	string visibleneutralloss;
