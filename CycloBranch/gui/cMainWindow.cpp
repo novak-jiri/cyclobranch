@@ -250,6 +250,8 @@ cMainWindow::cMainWindow() {
 	connect(summarytableofmatchedpeaks, SIGNAL(sendFilterOptionsToChromatogram(cPeaksList)), chromatogramwindow, SLOT(setFilterOptionsSlot(cPeaksList)));
 	connect(summarytableofmatchedpeaks, SIGNAL(resetRegion()), imagewindow, SLOT(clearSelection()));
 
+	connect(chromatogramwindow, SIGNAL(doubleClickedScanIDSignal(int)), this, SLOT(chromatogramDoubleClicked(int)));
+
 	menuFile->addAction(actionOpenResults);
 	menuFile->addAction(actionSaveResults);
 	menuFile->addSeparator();
@@ -1980,6 +1982,18 @@ void cMainWindow::summaryPeaksTableRowDoubleClicked(int rowid, double experiment
 
 void cMainWindow::updateSummaryPeaksTableFilterSlot(int xmin, int xmax, int ymin, int ymax) {
 	summarytableofmatchedpeaks->updateFilterBySelectedRegion(xmin, xmax, ymin, ymax);
+}
+
+
+void cMainWindow::chromatogramDoubleClicked(int scanid) {
+	if ((scanid >= 0) && (scanid < spectradetails.size())) {
+		spectradetails[scanid].prepareToShow(actionShowIsomers, &rawdata, &imzmlprofilemetadata, profilemz64precision, profileintensity64precision);
+		spectradetails[scanid].show();
+		spectradetails[scanid].activateWindow();
+		if (spectradetails[scanid].isMinimized()) {
+			spectradetails[scanid].showNormal();
+		}
+	}
 }
 
 

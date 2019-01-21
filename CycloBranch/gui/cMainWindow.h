@@ -258,6 +258,8 @@ private slots:
 
 	void updateSummaryPeaksTableFilterSlot(int xmin, int xmax, int ymin, int ymax);
 
+	void chromatogramDoubleClicked(int scanid);
+
 	//void showContextMenu(const QPoint &pt);
 
 signals:

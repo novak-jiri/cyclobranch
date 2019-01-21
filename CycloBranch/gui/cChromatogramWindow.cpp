@@ -16,6 +16,7 @@ cChromatogramWindow::cChromatogramWindow(cTheoreticalSpectrumList& theoreticalsp
 	menuHelp = new QMenu(tr("&Help"), this);
 
 	chromatogramwindowwidget = new cChromatogramWindowWidget(theoreticalspectrumlist, this);
+	connect(chromatogramwindowwidget, SIGNAL(chromatogramWidgetDoubleClicked(int)), this, SLOT(chromatogramDoubleClickedSlot(int)));
 
 
 	toolbarFile = addToolBar(tr("File"));
@@ -286,5 +287,10 @@ void cChromatogramWindow::showHTMLDocumentation() {
 	#else
 		QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo(installdir + "docs/html/chromatogram.html").absoluteFilePath()));
 	#endif
+}
+
+
+void cChromatogramWindow::chromatogramDoubleClickedSlot(int scanid) {
+	emit doubleClickedScanIDSignal(scanid);
 }
 

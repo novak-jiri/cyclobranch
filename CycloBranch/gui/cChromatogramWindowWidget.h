@@ -115,6 +115,13 @@ protected:
 
 
 	/**
+		\brief Handle the mouse double click event.
+		\param event pointer to QMouseEvent
+	*/
+	void mouseDoubleClickEvent(QMouseEvent *event);
+
+
+	/**
 		\brief Handle the widget show event.
 		\param event pointer to QShowEvent
 	*/
@@ -195,6 +202,12 @@ signals:
 	*/
 	void updateScanIDInterval(int minid, int maxid);
 
+
+	/**
+		\brief A chromatographic peak was double clicked.
+		\param scanid id of a scan
+	*/
+	void chromatogramWidgetDoubleClicked(int scanid);
 
 
 private slots:

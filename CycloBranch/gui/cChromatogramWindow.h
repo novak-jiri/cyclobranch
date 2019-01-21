@@ -114,6 +114,13 @@ signals:
 	void emitScanIDInterval(int minid, int maxid);
 
 
+	/**
+		\brief The signal is emitted a chromatographic peak was double clicked.
+		\param scanid scan id
+	*/
+	void doubleClickedScanIDSignal(int scanid);
+
+
 private slots:
 
 
@@ -134,6 +141,8 @@ private slots:
 
 	void showHTMLDocumentation();
 
+
+	void chromatogramDoubleClickedSlot(int scanid);
 
 };
 
