@@ -260,6 +260,8 @@ private slots:
 
 	void chromatogramDoubleClicked(int scanid);
 
+	void imageWindowDoubleClicked(int spectrumid);
+
 	//void showContextMenu(const QPoint &pt);
 
 signals:

@@ -414,6 +414,9 @@ private slots:
 	void updateRulerSlot(double value);
 
 
+	void imageDoubleClickedSlot(int spectrumid);
+
+
 signals:
 
 
@@ -442,6 +445,13 @@ signals:
 		\param layerid id of the layer
 	*/
 	void activeLayerChanged(int layerid);
+
+
+	/**
+		\brief The signal is emitted the image is double clicked.
+		\param spectrumid id of a spectrum
+	*/
+	void doubleClickedSpectrumIDSignal(int spectrumid);
 
 
 };

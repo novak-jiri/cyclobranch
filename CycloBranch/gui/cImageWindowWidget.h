@@ -359,6 +359,13 @@ protected:
 
 
 	/**
+		\brief Handle the mouse double click event.
+		\param event pointer to QMouseEvent
+	*/
+	void mouseDoubleClickEvent(QMouseEvent *event);
+
+
+	/**
 		\brief Handle the resize event.
 		\param event pointer to QResizeEvent
 	*/
@@ -415,6 +422,13 @@ signals:
 		\param size ruler size
 	*/
 	void updateRuler(double size);
+
+
+	/**
+		\brief The image was double clicked.
+		\param spectrumid id of a spectrum
+	*/
+	void imageWidgetDoubleClicked(int spectrumid);
 
 
 private:

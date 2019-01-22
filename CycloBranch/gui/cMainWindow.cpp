@@ -251,6 +251,7 @@ cMainWindow::cMainWindow() {
 	connect(summarytableofmatchedpeaks, SIGNAL(resetRegion()), imagewindow, SLOT(clearSelection()));
 
 	connect(chromatogramwindow, SIGNAL(doubleClickedScanIDSignal(int)), this, SLOT(chromatogramDoubleClicked(int)));
+	connect(imagewindow, SIGNAL(doubleClickedSpectrumIDSignal(int)), this, SLOT(imageWindowDoubleClicked(int)));
 
 	menuFile->addAction(actionOpenResults);
 	menuFile->addAction(actionSaveResults);
@@ -1992,6 +1993,18 @@ void cMainWindow::chromatogramDoubleClicked(int scanid) {
 		spectradetails[scanid].activateWindow();
 		if (spectradetails[scanid].isMinimized()) {
 			spectradetails[scanid].showNormal();
+		}
+	}
+}
+
+
+void cMainWindow::imageWindowDoubleClicked(int spectrumid) {
+	if ((spectrumid >= 0) && (spectrumid < spectradetails.size())) {
+		spectradetails[spectrumid].prepareToShow(actionShowIsomers, &rawdata, &imzmlprofilemetadata, profilemz64precision, profileintensity64precision);
+		spectradetails[spectrumid].show();
+		spectradetails[spectrumid].activateWindow();
+		if (spectradetails[spectrumid].isMinimized()) {
+			spectradetails[spectrumid].showNormal();
 		}
 	}
 }

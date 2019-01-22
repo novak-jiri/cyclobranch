@@ -295,8 +295,10 @@ cImageWindow::cImageWindow(QWidget* parent) {
 
 	layerslayout = new QGridLayout();
 	layerslayout->setAlignment(Qt::AlignTop);
+
 	connect(this, SIGNAL(layerChanged(int, bool, int, int)), imagewindowwidget, SLOT(changeLayer(int, bool, int, int)));
 	connect(this, SIGNAL(activeLayerChanged(int)), imagewindowwidget, SLOT(changeActiveLayer(int)));
+	connect(imagewindowwidget, SIGNAL(imageWidgetDoubleClicked(int)), this, SLOT(imageDoubleClickedSlot(int)));
 
 	layerscount = 0;
 	activelayer = 0;
@@ -1379,5 +1381,10 @@ void cImageWindow::updateMicroscopySlot(double x, double y, double width, double
 
 void cImageWindow::updateRulerSlot(double value) {
 	rulerValue->setValue(value);
+}
+
+
+void cImageWindow::imageDoubleClickedSlot(int spectrumid) {
+	emit doubleClickedSpectrumIDSignal(spectrumid);
 }
 

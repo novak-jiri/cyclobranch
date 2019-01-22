@@ -561,6 +561,53 @@ void cImageWindowWidget::mouseReleaseEvent(QMouseEvent *event) {
 }
 
 
+void cImageWindowWidget::mouseDoubleClickEvent(QMouseEvent *event) {
+	QGraphicsView::mouseDoubleClickEvent(event);
+	int x, y, spectrumid;
+
+	if (event->button() == Qt::LeftButton) {
+
+		if ((pressedx == currentx) && (pressedy == currenty)) {
+
+			if (vendor == bruker) {
+				x = currentx * (maxx + 1) / max(1, currentwidth) - leftshift;
+				y = currenty * (maxy + 1) / max(1, currentheight) - topshift;
+			}
+			else {
+				x = currentx * maxx / max(1, currentwidth) - leftshift + 1;
+				y = currenty * maxy / max(1, currentheight) - topshift + 1;
+			}
+
+			if ((currentx > 0) && (currenty > 0) && (currentx < currentwidth) && (currenty < currentheight)) {
+				
+				spectrumid = -1;
+				for (auto& it : coordinates) {
+					if ((it.x == x) && (it.y == y)) {
+						spectrumid = it.id;
+						break;
+					}
+				}
+
+				if (spectrumid != -1) {
+					emit imageWidgetDoubleClicked(spectrumid - 1);
+				}
+			}
+
+			pressedx = -1;
+			pressedy = -1;
+
+			setCursor(Qt::ArrowCursor);
+			cursoractivity = cursoractivity_none;
+
+			redrawScene();
+		}
+
+	}
+
+	event->accept();
+}
+
+
 void cImageWindowWidget::resizeEvent(QResizeEvent *event) {
 	QGraphicsView::resizeEvent(event);
 	redrawScene();
