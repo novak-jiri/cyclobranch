@@ -610,6 +610,11 @@ void cTheoreticalSpectrum::generateScrambledIons(cBricksDatabase& bricksdatabase
 	double tempmzratio;
 	map<string, int> tempmap;
 	bool tempmapready, disablesummary;
+
+	vector<int> currentlosses;
+	vector<double> fragmentlossmass;
+	vector<string> fragmentlosssummary;
+	vector< map<string, int> > fragmentlossmap;
 	
 	// generate scrambled peaks from sequences
 	for (auto it = scrambledsequences.begin(); it != scrambledsequences.end(); ++it) {
@@ -617,11 +622,6 @@ void cTheoreticalSpectrum::generateScrambledIons(cBricksDatabase& bricksdatabase
 		b.setComposition((string &)*it, false);
 		intcomposition.clear();
 		b.explodeToIntComposition(intcomposition);
-
-		tempmzratio = 0;
-		for (int i = 0; i < (int)intcomposition.size(); i++) {
-			tempmzratio += bricksdatabase[intcomposition[i] - 1].getMass();
-		}
 
 		disablesummary = false;
 		if ((parameters->mode == denovoengine) && (parameters->blindedges == 2)) {
@@ -633,100 +633,125 @@ void cTheoreticalSpectrum::generateScrambledIons(cBricksDatabase& bricksdatabase
 			}
 		}
 
+		tempmzratio = 0;
+		currentlosses.clear();
+		for (int i = 0; i < (int)intcomposition.size(); i++) {
+			tempmzratio += bricksdatabase[intcomposition[i] - 1].getMass();
+
+			// to do - possible performance optimization
+			updateListOfNeutralLosses(bricksdatabase, bricksdatabase[intcomposition[i] - 1], currentlosses, fragmentlossmass, fragmentlosssummary, fragmentlossmap, writedescription, disablesummary);
+		}
+
 		tempmapready = false;
 			
 		for (int i = 0; i < (int)parameters->ionsfortheoreticalspectra.size(); i++) {
 
 			for (int j = -1; j < (int)parameters->neutrallossesfortheoreticalspectra.size(); j++) {
 
-				peak.clear();
-				peak.iontype = (eFragmentIonType)parameters->ionsfortheoreticalspectra[i];
-				if (j >= 0) {
-					peak.neutrallosstype = parameters->neutrallossesfortheoreticalspectra[j];
-				}
-				else {
-					peak.neutrallosstype = -1;
-				}
-				peak.mzratio = parameters->iondefinitions[peak.iontype].massdifference;
-				if (peak.neutrallosstype >= 0) {
-					peak.mzratio += parameters->neutrallossesdefinitions[peak.neutrallosstype].massdifference;
-				}
-				peak.mzratio += tempmzratio;
+				for (int k = -1; k < (int)fragmentlossmass.size(); k++) {
 
-				peak.charge = 1;
-				if (parameters->precursorcharge < 0) {
-					peak.mzratio = charge(uncharge(peak.mzratio, 1), -1);
-					peak.charge = -1;
-				}
-
-				// skip scrambled peaks whose m/z ratios collide with common fragment ions
-				if (theoreticalmzratios.find((unsigned long long)(peak.mzratio*(double)1000000)) != theoreticalmzratios.end()) {
-					continue;
-				}
-
-				if (!disablesummary && (parameters->generateisotopepattern || writedescription)) {
-
-					if (!tempmapready) {
-						tempmap.clear();
-
-						for (int k = 0; k < (int)intcomposition.size(); k++) {
-							mergeMaps(bricksdatabase[intcomposition[k] - 1].getSummaryMap(), tempmap);
-						}
-
-						tempmapready = true;
-					}
-
-					atoms = tempmap;
-					mergeMaps(parameters->iondefinitions[peak.iontype].summarymap, atoms);
-					if (peak.neutrallosstype >= 0) {
-						mergeMaps(parameters->neutrallossesdefinitions[peak.neutrallosstype].summarymap, atoms);
-					}
-
-					if (peak.charge == -1) {
-						rechargeMap(-1, atoms);
-					}
-
-					peak.formula.setFromMap(atoms, false);
-				}
-
-				peak.scrambled = true;
-
-				if (writedescription) {
-
-					if (parameters->precursorcharge < 0) {
-						peak.description = "1- ";
+					peak.clear();
+					peak.iontype = (eFragmentIonType)parameters->ionsfortheoreticalspectra[i];
+					if (j >= 0) {
+						peak.neutrallosstype = parameters->neutrallossesfortheoreticalspectra[j];
 					}
 					else {
-						peak.description = "1+ ";
+						peak.neutrallosstype = -1;
 					}
-
-					peak.description += "scrambled ";
-					peak.description += parameters->iondefinitions[peak.iontype].name.substr(0, 1) + to_string((int)intcomposition.size());
-					if (parameters->iondefinitions[peak.iontype].name.size() > 1) {
-						peak.description += parameters->iondefinitions[peak.iontype].name.substr(1, parameters->iondefinitions[peak.iontype].name.length() - 1);
-					}
+					peak.mzratio = parameters->iondefinitions[peak.iontype].massdifference;
 					if (peak.neutrallosstype >= 0) {
-						peak.description += " -" + parameters->neutrallossesdefinitions[peak.neutrallosstype].summary;
+						peak.mzratio += parameters->neutrallossesdefinitions[peak.neutrallosstype].massdifference;
+					}
+					if (k >= 0) {
+						peak.mzratio += fragmentlossmass[k];
+					}
+					peak.mzratio += tempmzratio;
+
+					peak.charge = 1;
+					if (parameters->precursorcharge < 0) {
+						peak.mzratio = charge(uncharge(peak.mzratio, 1), -1);
+						peak.charge = -1;
 					}
 
-					addAdductToDescription(peak.description, parameters->metaladducts);
-					peak.description += ": ";
-					for (int k = 0; k < (int)intcomposition.size(); k++) {
-						peak.description += "[" + bricksdatabase[intcomposition[k] - 1].getAcronymsAsString() + "]";
-						if (k < (int)intcomposition.size() - 1) {
-							peak.description += '-';
+					// skip scrambled peaks whose m/z ratios collide with common fragment ions
+					if (theoreticalmzratios.find((unsigned long long)(peak.mzratio*(double)1000000)) != theoreticalmzratios.end()) {
+						continue;
+					}
+
+					if (!disablesummary && (parameters->generateisotopepattern || writedescription)) {
+
+						if (!tempmapready) {
+							tempmap.clear();
+
+							for (int m = 0; m < (int)intcomposition.size(); m++) {
+								mergeMaps(bricksdatabase[intcomposition[m] - 1].getSummaryMap(), tempmap);
+							}
+
+							tempmapready = true;
 						}
+
+						atoms = tempmap;
+						mergeMaps(parameters->iondefinitions[peak.iontype].summarymap, atoms);
+						if (peak.neutrallosstype >= 0) {
+							mergeMaps(parameters->neutrallossesdefinitions[peak.neutrallosstype].summarymap, atoms);
+						}
+						if (k >= 0) {
+							mergeMaps(fragmentlossmap[k], atoms);
+						}
+
+						if (peak.charge == -1) {
+							rechargeMap(-1, atoms);
+						}
+
+						peak.formula.setFromMap(atoms, false);
 					}
 
-				}
+					peak.scrambled = true;
 
-				if (scrambledpeaks.size() > scrambledspeaksrealsize) {
-					scrambledpeaks[scrambledspeaksrealsize] = peak;
+					if (writedescription) {
+
+						if (parameters->precursorcharge < 0) {
+							peak.description = "1- ";
+						}
+						else {
+							peak.description = "1+ ";
+						}
+
+						peak.description += "scrambled ";
+						peak.description += parameters->iondefinitions[peak.iontype].name.substr(0, 1) + to_string((int)intcomposition.size());
+						if (parameters->iondefinitions[peak.iontype].name.size() > 1) {
+							peak.description += parameters->iondefinitions[peak.iontype].name.substr(1, parameters->iondefinitions[peak.iontype].name.length() - 1);
+						}
+						if ((k >= 0) || (peak.neutrallosstype >= 0)) {
+							peak.description += " -";
+							if (k >= 0) {
+								peak.description += fragmentlosssummary[k];
+							}
+							if (peak.neutrallosstype >= 0) {
+								peak.description += parameters->neutrallossesdefinitions[peak.neutrallosstype].summary;
+							}
+						}
+
+						addAdductToDescription(peak.description, parameters->metaladducts);
+						peak.description += ": ";
+						for (int m = 0; m < (int)intcomposition.size(); m++) {
+							peak.description += "[" + bricksdatabase[intcomposition[m] - 1].getAcronymsAsString() + "]";
+							if (m < (int)intcomposition.size() - 1) {
+								peak.description += '-';
+							}
+						}
+
+					}
+
+					if (scrambledpeaks.size() > scrambledspeaksrealsize) {
+						scrambledpeaks[scrambledspeaksrealsize] = peak;
+					}
+					else {
+						scrambledpeaks.add(peak);
+					}
+					scrambledspeaksrealsize++;
+
 				}
-				else {
-					scrambledpeaks.add(peak);
-				}
-				scrambledspeaksrealsize++;
 
 			}
 		
