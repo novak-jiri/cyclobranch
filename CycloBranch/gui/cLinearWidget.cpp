@@ -208,7 +208,7 @@ void cLinearWidget::paint(QPainter& painter) {
 		for (int i = 0; i < thpeaks->size(); i++) {
 			if ((*thpeaks)[i].matched > 0) {
 				description = (*thpeaks)[i].description;
-				description = description.substr(0, description.rfind(':'));
+				description = description.substr(0, description.find(':'));
 				if (description.find('[') == string::npos) {
 					if (parameters->precursorcharge > 0) {
 						pos = description.find("+ ");
