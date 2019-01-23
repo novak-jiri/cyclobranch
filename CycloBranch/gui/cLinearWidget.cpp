@@ -182,7 +182,7 @@ void cLinearWidget::paint(QPainter& painter) {
 			painter.setPen(QPen(Qt::black, 2, Qt::SolidLine));
 			painter.drawLine(leftmargin + horizontalstep/4 + horizontalstep*i + horizontalstep/2, topmargin + 11, leftmargin + horizontalstep/4 + horizontalstep*(i + 1), topmargin + 11);
 
-			if (theoreticalspectrum->getVisualCoverage().size() > 0) {
+			if (theoreticalspectrum->getTheoreticalPeaks()->size() > 0) {
 				painter.setPen(QPen(Qt::black, 2, Qt::DashLine));
 				painter.drawLine(leftmargin + horizontalstep*(i + 1), topmargin - 10, leftmargin + horizontalstep*(i + 1), topmargin + 30);	
 				painter.drawLine(leftmargin + horizontalstep/4 + horizontalstep/8 + horizontalstep*i + horizontalstep/2, topmargin - 10, leftmargin + horizontalstep*(i + 1), topmargin + - 10);

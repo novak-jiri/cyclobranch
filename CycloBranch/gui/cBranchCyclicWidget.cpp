@@ -284,7 +284,7 @@ void cBranchCyclicWidget::paint(QPainter& painter) {
 	int linesize = 20;
 	int cornerlinesize = horizontalstep/8;
 
-	paintCircle(painter, backboneacronyms, centerx, centery, radius, angle, horizontalstep, linesize, cornerlinesize, theoreticalspectrum->getVisualCoverage().size() > 0, visiblerotationid, labels);
+	paintCircle(painter, backboneacronyms, centerx, centery, radius, angle, horizontalstep, linesize, cornerlinesize, theoreticalspectrum->getTheoreticalPeaks()->size() > 0, visiblerotationid, labels);
 
 
 	// paint the branch
@@ -297,7 +297,7 @@ void cBranchCyclicWidget::paint(QPainter& painter) {
 			painter.drawText(centerx - horizontalstep/3, topmargin + verticalstep*i, horizontalstep*2/3, 20, Qt::AlignCenter, branchacronyms[branchsize - i - 1].c_str());
 		}	
 
-		if (theoreticalspectrum->getVisualCoverage().size() > 0) {
+		if (theoreticalspectrum->getTheoreticalPeaks()->size() > 0) {
 			painter.drawText(centerx - horizontalstep/3, topmargin + verticalstep*i - 20, horizontalstep*2/3, 20, Qt::AlignLeft, to_string(backbonesize + branchsize - i).c_str());
 		}
 
@@ -307,7 +307,7 @@ void cBranchCyclicWidget::paint(QPainter& painter) {
 		painter.setPen(QPen(Qt::black, 2, Qt::SolidLine));
 		painter.drawLine(centerx, topmargin + verticalstep*i + 20, centerx, topmargin + verticalstep*i + verticalstep);
 
-		if (theoreticalspectrum->getVisualCoverage().size() > 0) {
+		if (theoreticalspectrum->getTheoreticalPeaks()->size() > 0) {
 			painter.setPen(QPen(Qt::black, 2, Qt::DashLine));
 			painter.drawLine(centerx - 20, topmargin + verticalstep*i + (verticalstep + 10)/2, centerx + 20, topmargin + verticalstep*i + (verticalstep + 10)/2);	
 			painter.drawLine(centerx - 20, topmargin + verticalstep*i + (verticalstep + 10)/2, centerx - 20, topmargin + verticalstep*i + (verticalstep + 10)/2 + verticalstep/8);

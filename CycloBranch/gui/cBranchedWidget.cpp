@@ -170,7 +170,7 @@ void cBranchedWidget::paint(QPainter& painter) {
 		if (i < backbonesize - 1) {
 			painter.setPen(QPen(Qt::black, 2, Qt::SolidLine));
 			painter.drawLine(leftmargin + horizontalstep/4 + horizontalstep*i + horizontalstep/2, topmargin + verticalstep*branchsize + 11, leftmargin + horizontalstep/4 + horizontalstep*(i + 1), topmargin + verticalstep*branchsize + 11);
-			if (theoreticalspectrum->getVisualCoverage().size() > 0) {
+			if (theoreticalspectrum->getTheoreticalPeaks()->size() > 0) {
 				painter.setPen(QPen(Qt::black, 2, Qt::DashLine));
 				painter.drawLine(leftmargin + horizontalstep*(i + 1), topmargin + verticalstep*branchsize - 10, leftmargin + horizontalstep*(i + 1), topmargin + verticalstep*branchsize + 30);	
 				painter.drawLine(leftmargin + horizontalstep/4 + horizontalstep/8 + horizontalstep*i + horizontalstep/2, topmargin + verticalstep*branchsize - 10, leftmargin + horizontalstep*(i + 1), topmargin + verticalstep*branchsize - 10);
@@ -193,7 +193,7 @@ void cBranchedWidget::paint(QPainter& painter) {
 
 		painter.setPen(QPen(Qt::black, 2, Qt::SolidLine));
 		painter.drawLine(leftmargin + horizontalstep/2 + horizontalstep*tpermutations[0].middlebranchstart, topmargin + verticalstep*i + 20, leftmargin + horizontalstep/2 + horizontalstep*tpermutations[0].middlebranchstart, topmargin + verticalstep*i + verticalstep);
-		if (theoreticalspectrum->getVisualCoverage().size() > 0) {
+		if (theoreticalspectrum->getTheoreticalPeaks()->size() > 0) {
 			painter.setPen(QPen(Qt::black, 2, Qt::DashLine));
 			painter.drawLine(leftmargin + horizontalstep/2 + horizontalstep*tpermutations[0].middlebranchstart - 20, topmargin + verticalstep*i + (verticalstep + 10)/2, leftmargin + horizontalstep/2 + horizontalstep*tpermutations[0].middlebranchstart + 20, topmargin + verticalstep*i + (verticalstep + 10)/2);	
 			painter.drawLine(leftmargin + horizontalstep/2 + horizontalstep*tpermutations[0].middlebranchstart - 20, topmargin + verticalstep*i + (verticalstep + 10)/2, leftmargin + horizontalstep/2 + horizontalstep*tpermutations[0].middlebranchstart - 20, topmargin + verticalstep*i + (verticalstep + 10)/2 + verticalstep/8);

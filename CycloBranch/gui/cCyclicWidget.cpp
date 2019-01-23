@@ -522,7 +522,7 @@ void cCyclicWidget::paint(QPainter& painter) {
 	int linesize = 20;
 	int cornerlinesize = horizontalstep/8;
 
-	paintCircle(painter, acronyms, centerx, centery, radius, angle, horizontalstep, linesize, cornerlinesize, theoreticalspectrum->getVisualCoverage().size() > 0, visiblerotationid, labels);
+	paintCircle(painter, acronyms, centerx, centery, radius, angle, horizontalstep, linesize, cornerlinesize, theoreticalspectrum->getTheoreticalPeaks()->size() > 0, visiblerotationid, labels);
 		
 	if (parameters && !hidelabels && (theoreticalspectrum->getVisualCoverage().size() > 0)) {
 	
