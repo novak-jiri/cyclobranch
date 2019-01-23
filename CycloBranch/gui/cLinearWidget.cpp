@@ -191,7 +191,7 @@ void cLinearWidget::paint(QPainter& painter) {
 		}
 	}
 	
-	if (parameters && !hidelabels && (theoreticalspectrum->getVisualCoverage().size() > 0)) {
+	if (parameters && !hidelabels && theoreticalspectrum->getTheoreticalPeaks() && (theoreticalspectrum->getVisualCoverage().size() > 0)) {
 
 		unordered_set<cIonLabel, hash_cIonLabel> labels;
 		labels.clear();
@@ -200,6 +200,47 @@ void cLinearWidget::paint(QPainter& painter) {
 		int len = (int)theoreticalspectrum->getVisualCoverage()[0].series.size();
 		int coverageindex = 0;
 		bool skipiontype, skipneutralloss;
+
+		set<string> toprint;
+		cPeaksList* thpeaks = theoreticalspectrum->getTheoreticalPeaks();
+		string description;
+		size_t pos;
+		for (int i = 0; i < thpeaks->size(); i++) {
+			if ((*thpeaks)[i].matched > 0) {
+				description = (*thpeaks)[i].description;
+				description = description.substr(0, description.rfind(':'));
+				if (description.find('[') == string::npos) {
+					if (parameters->precursorcharge > 0) {
+						pos = description.find("+ ");
+						if (pos != string::npos) {
+							description = description.substr(pos + 2);
+						}
+						else {
+							continue;
+						}
+					}
+					else {
+						pos = description.find("- ");
+						if (pos != string::npos) {
+							description = description.substr(pos + 2);
+						}
+						else {
+							continue;
+						}
+					}
+					toprint.insert(description);
+				}
+			}
+		}
+
+		// to do - regex
+		// to do - positioning
+		// to do - lin pk
+
+		//for (auto& it : toprint) {
+		//	cout << it << endl;
+		//}
+		//cout << endl;
 
 		for (int i = 0; i < (int)parameters->ionsfortheoreticalspectra.size(); i++) {
 
