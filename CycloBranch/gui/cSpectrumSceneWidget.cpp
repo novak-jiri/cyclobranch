@@ -642,7 +642,7 @@ void cSpectrumSceneWidget::redrawScene() {
 				if (visibleneutralloss.compare("all") != 0) {
 					if (visibleneutralloss.compare("none") == 0) {
 						for (auto& it : localneutrallosses) {
-							tmpvisibleneutralloss = "-" + it;
+							tmpvisibleneutralloss = " -" + it;
 							tmpposition = hits.back().find(tmpvisibleneutralloss);
 							if (tmpposition != string::npos) {
 								tmpstr = hits.back().substr(tmpposition + tmpvisibleneutralloss.size());
@@ -654,7 +654,7 @@ void cSpectrumSceneWidget::redrawScene() {
 						}
 					}
 					else {
-						tmpvisibleneutralloss = "-" + visibleneutralloss;
+						tmpvisibleneutralloss = " -" + visibleneutralloss;
 						tmpposition = hits.back().find(tmpvisibleneutralloss);
 						if (tmpposition == string::npos) {
 							popit = true;
@@ -737,7 +737,7 @@ void cSpectrumSceneWidget::redrawScene() {
 				if (visibleneutralloss.compare("all") != 0) {
 					if (visibleneutralloss.compare("none") == 0) {
 						for (auto& it : localneutrallosses) {
-							tmpvisibleneutralloss = "-" + it;
+							tmpvisibleneutralloss = " -" + it;
 							tmpposition = hits.back().find(tmpvisibleneutralloss);
 							if (tmpposition != string::npos) {
 								tmpstr = hits.back().substr(tmpposition + tmpvisibleneutralloss.size());
@@ -749,7 +749,7 @@ void cSpectrumSceneWidget::redrawScene() {
 						}
 					}
 					else {
-						tmpvisibleneutralloss = "-" + visibleneutralloss;
+						tmpvisibleneutralloss = " -" + visibleneutralloss;
 						tmpposition = hits.back().find(tmpvisibleneutralloss);
 						if (tmpposition == string::npos) {
 							popit = true;

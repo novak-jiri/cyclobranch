@@ -2184,7 +2184,7 @@ void cSpectrumDetailWidget::filterPeaksTable() {
 				}
 				pattern += "((?!";
 				for (auto& it : localneutralosses) {
-					pattern += "-";
+					pattern += " -";
 					pattern += it.c_str();
 					pattern += "(?:$|_| )";
 					pattern += "|";
@@ -2195,7 +2195,7 @@ void cSpectrumDetailWidget::filterPeaksTable() {
 				pattern += ").)*$";
 			}
 			else {
-				pattern += "-";
+				pattern += " -";
 				pattern += neutrallosscombobox->currentText();
 				pattern += "(?:$|_| )";
 			}
