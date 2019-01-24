@@ -534,15 +534,7 @@ void cCyclicWidget::paint(QPainter& painter) {
 			generateCyclicLabelsToLeft(true, i, i, 0, size - 1, size, labels, parameters, theoreticalspectrum, centerx, centery, radius, angle, linesize, cornerlinesize, visibleionseries, visibleneutralloss, visiblerotationid, -1, -1);
 		}
 
-		painter.setPen(QPen(Qt::red, 2, Qt::SolidLine));
-		for (auto it = labels.begin(); it != labels.end(); ++it) {
-			if (it->alignright) {
-				painter.drawText(it->x - fm.width(it->label.c_str()), it->y, fm.width(it->label.c_str()), 20, Qt::AlignLeft, it->label.c_str());
-			}
-			else {
-				painter.drawText(it->x, it->y, width(), 20, Qt::AlignLeft, it->label.c_str());
-			}
-		}
+		drawLabels(painter, labels, width());
 
 	}
 	

@@ -3675,7 +3675,7 @@ void cTheoreticalSpectrum::generateNTerminalFragmentIons(int maxcharge, int& pea
 	map<string, int> tmpmap;
 
 	int tmprotationid;
-	int tmpseriesid;
+	//int tmpseriesid;
 
 	bool skipcommonfragments;
 
@@ -3867,7 +3867,7 @@ void cTheoreticalSpectrum::generateNTerminalFragmentIons(int maxcharge, int& pea
 			}
 
 			tmprotationid = peak.rotationid;
-			tmpseriesid = peak.seriesid;
+			//tmpseriesid = peak.seriesid;
 
 			for (int j = -1; j < (int)fragmentlossmass.size(); j++) {
 
@@ -3916,11 +3916,11 @@ void cTheoreticalSpectrum::generateNTerminalFragmentIons(int maxcharge, int& pea
 					}
 
 					peak.rotationid = -1;
-					peak.seriesid = -1;
+					//peak.seriesid = -1;
 				}
 				else {
 					peak.rotationid = tmprotationid;
-					peak.seriesid = tmpseriesid;
+					//peak.seriesid = tmpseriesid;
 				}
 
 				generateChargedFragments(peak, tmpmap, peaklistrealsize, maxcharge, writedescription, disablesummary);
@@ -3933,7 +3933,7 @@ void cTheoreticalSpectrum::generateNTerminalFragmentIons(int maxcharge, int& pea
 			}
 
 			peak.rotationid = tmprotationid;
-			peak.seriesid = tmpseriesid;
+			//peak.seriesid = tmpseriesid;
 
 		}
 
@@ -3959,7 +3959,7 @@ void cTheoreticalSpectrum::generateCTerminalFragmentIons(int maxcharge, int& pea
 	map<string, int> tmpmap;
 
 	int tmprotationid;
-	int tmpseriesid;
+	//int tmpseriesid;
 
 	bool skipcommonfragments;
 
@@ -4129,7 +4129,7 @@ void cTheoreticalSpectrum::generateCTerminalFragmentIons(int maxcharge, int& pea
 			}
 
 			tmprotationid = peak.rotationid;
-			tmpseriesid = peak.seriesid;
+			//tmpseriesid = peak.seriesid;
 
 			for (int j = -1; j < (int)fragmentlossmass.size(); j++) {
 
@@ -4178,11 +4178,11 @@ void cTheoreticalSpectrum::generateCTerminalFragmentIons(int maxcharge, int& pea
 					}
 
 					peak.rotationid = -1;
-					peak.seriesid = -1;
+					//peak.seriesid = -1;
 				}
 				else {
 					peak.rotationid = tmprotationid;
-					peak.seriesid = tmpseriesid;
+					//peak.seriesid = tmpseriesid;
 				}
 
 				generateChargedFragments(peak, tmpmap, peaklistrealsize, maxcharge, writedescription, disablesummary);
@@ -4195,7 +4195,7 @@ void cTheoreticalSpectrum::generateCTerminalFragmentIons(int maxcharge, int& pea
 			}
 
 			peak.rotationid = tmprotationid;
-			peak.seriesid = tmpseriesid;
+			//peak.seriesid = tmpseriesid;
 
 		}
 

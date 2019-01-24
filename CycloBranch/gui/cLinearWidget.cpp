@@ -15,19 +15,45 @@ bool operator == (cIonLabel const& a, cIonLabel const& b) {
 
 
 void insertLabel(unordered_set<cIonLabel, hash_cIonLabel>& labels, int x, int y, string& description, bool alignright) {
-	cIonLabel label;
-	label.x = x;
-	label.y = y;
-	label.label = description;
-	label.alignright = alignright;
+	cIonLabel newlabel;
+	newlabel.x = x;
+	newlabel.y = y;
+	newlabel.labelset.insert(description);
+	newlabel.alignright = alignright;
 
-	if (labels.count(label) == 1) {
-		auto it = labels.find(label);
-		label.label = it->label + "," + label.label;
+	if (labels.count(newlabel) == 1) {
+		auto it = labels.find(newlabel);
+		newlabel.labelset = it->labelset;
+		newlabel.labelset.insert(description);
 		labels.erase(it);
 	}
 
-	labels.insert(label);
+	labels.insert(newlabel);
+}
+
+
+void drawLabels(QPainter& painter, unordered_set<cIonLabel, hash_cIonLabel>& labels, int width) {
+	QFont myFont("Courier", 9);
+	QFontMetrics fm(myFont);
+	string labeldesc;
+
+	painter.setPen(QPen(Qt::red, 2, Qt::SolidLine));
+	for (auto& it : labels) {
+		labeldesc = "";
+		for (auto& it2 : it.labelset) {
+			labeldesc += it2 + ",";
+		}
+		if (labeldesc.size() > 0) {
+			labeldesc = labeldesc.substr(0, labeldesc.size() - 1);
+		}
+		labeldesc.erase(remove_if(labeldesc.begin(), labeldesc.end(), isspace), labeldesc.end());
+		if (it.alignright) {
+			painter.drawText(it.x - fm.width(labeldesc.c_str()), it.y, fm.width(labeldesc.c_str()), 20, Qt::AlignLeft, labeldesc.c_str());
+		}
+		else {
+			painter.drawText(it.x, it.y, width, 20, Qt::AlignLeft, labeldesc.c_str());
+		}
+	}
 }
 
 
@@ -191,24 +217,21 @@ void cLinearWidget::paint(QPainter& painter) {
 		}
 	}
 	
-	if (parameters && !hidelabels && theoreticalspectrum->getTheoreticalPeaks() && (theoreticalspectrum->getVisualCoverage().size() > 0)) {
+	if (parameters && !hidelabels && theoreticalspectrum->getTheoreticalPeaks()) {
 
 		unordered_set<cIonLabel, hash_cIonLabel> labels;
 		labels.clear();
 
-		string name;
-		int len = (int)theoreticalspectrum->getVisualCoverage()[0].series.size();
-		int coverageindex = 0;
-		bool skipiontype, skipneutralloss;
-
-		set<string> toprint;
 		cPeaksList* thpeaks = theoreticalspectrum->getTheoreticalPeaks();
 		string description;
 		size_t pos;
 		for (int i = 0; i < thpeaks->size(); i++) {
+
 			if ((*thpeaks)[i].matched > 0) {
+
 				description = (*thpeaks)[i].description;
 				description = description.substr(0, description.find(':'));
+
 				if (description.find('[') == string::npos) {
 					if (parameters->precursorcharge > 0) {
 						pos = description.find("+ ");
@@ -228,89 +251,40 @@ void cLinearWidget::paint(QPainter& painter) {
 							continue;
 						}
 					}
-					toprint.insert(description);
-				}
-			}
-		}
 
-		// to do - regex
-		// to do - positioning
-		// to do - lin pk
+					if (visibleionseries.empty() || (!visibleionseries.empty() && (parameters->iondefinitions[(*thpeaks)[i].iontype].name.compare(visibleionseries) == 0))) {
 
-		//for (auto& it : toprint) {
-		//	cout << it << endl;
-		//}
-		//cout << endl;
+						if (visibleneutralloss.compare("all") == 0) { // to do
 
-		for (int i = 0; i < (int)parameters->ionsfortheoreticalspectra.size(); i++) {
+							if (((parameters->peptidetype == linear) && (parameters->iondefinitions[(*thpeaks)[i].iontype].nterminal))
+								|| ((parameters->peptidetype == linearpolyketide) && (((*thpeaks)[i].iontype == l1h_ion) || ((*thpeaks)[i].iontype == l2h_ion) || ((*thpeaks)[i].iontype == l1oh_ion) || ((*thpeaks)[i].iontype == l2oh_ion)))) {
 
-			skipiontype = false;
-			if ((visibleionseries.compare("") != 0) && (parameters->iondefinitions[parameters->ionsfortheoreticalspectra[i]].name.compare(visibleionseries) != 0)) {
-				skipiontype = true;
-			}
-
-			for (int j = -1; j < (int)parameters->neutrallossesfortheoreticalspectra.size(); j++) {
-
-				skipneutralloss = false;
-				if (visibleneutralloss.compare("all") != 0) {
-					if ((j == -1) && (visibleneutralloss.compare("none") != 0)) {
-						skipneutralloss = true;
-					}
-					if ((j >= 0) && (parameters->neutrallossesdefinitions[parameters->neutrallossesfortheoreticalspectra[j]].summary.compare(visibleneutralloss) != 0)) {
-						skipneutralloss = true;
-					}
-				}
-
-				if (!skipiontype && !skipneutralloss) {
-
-					if (((parameters->peptidetype == linear) && (parameters->iondefinitions[parameters->ionsfortheoreticalspectra[i]].nterminal))
-						|| ((parameters->peptidetype == linearpolyketide) && ((parameters->ionsfortheoreticalspectra[i] == l1h_ion) || (parameters->ionsfortheoreticalspectra[i] == l2h_ion) || (parameters->ionsfortheoreticalspectra[i] == l1oh_ion) || (parameters->ionsfortheoreticalspectra[i] == l2oh_ion)))) {
-						for (int k = 0; k < len; k++) {
-							if (theoreticalspectrum->getVisualCoverage()[coverageindex].series[k] > 0) {
-								if (parameters->peptidetype == linearpolyketide) {
-									name = parameters->iondefinitions[parameters->ionsfortheoreticalspectra[i]].name.substr(0, 2) + to_string(k + 1) + parameters->iondefinitions[parameters->ionsfortheoreticalspectra[i]].name.substr(2);
+								if ((*thpeaks)[i].seriesid >= 0) {
+									insertLabel(labels, leftmargin + horizontalstep / 4 + horizontalstep / 8 + horizontalstep * (*thpeaks)[i].seriesid + horizontalstep / 2, topmargin - 35, description, false);
 								}
-								else {
-									name = parameters->iondefinitions[parameters->ionsfortheoreticalspectra[i]].name[0] + to_string(k + 1) + parameters->iondefinitions[parameters->ionsfortheoreticalspectra[i]].name.substr(1);
-								}
-								if (j >= 0) {
-									name += "-" + parameters->neutrallossesdefinitions[parameters->neutrallossesfortheoreticalspectra[j]].summary;
-								}
-								insertLabel(labels, leftmargin + horizontalstep / 4 + horizontalstep / 8 + horizontalstep * k + horizontalstep / 2, topmargin - 35, name, false);
+
 							}
-						}
-					}
 
-					if (((parameters->peptidetype == linear) && (parameters->iondefinitions[parameters->ionsfortheoreticalspectra[i]].cterminal)) ||
-						((parameters->peptidetype == linearpolyketide) && ((parameters->ionsfortheoreticalspectra[i] == r1h_ion) || (parameters->ionsfortheoreticalspectra[i] == r2h_ion) || (parameters->ionsfortheoreticalspectra[i] == r1oh_ion) || (parameters->ionsfortheoreticalspectra[i] == r2oh_ion)))) {
-						for (int k = len - 1; k >= 0; k--) {
-							if (theoreticalspectrum->getVisualCoverage()[coverageindex].series[len - k - 1] > 0) {
-								if (parameters->peptidetype == linearpolyketide) {
-									name = parameters->iondefinitions[parameters->ionsfortheoreticalspectra[i]].name.substr(0, 2) + to_string(len - k) + parameters->iondefinitions[parameters->ionsfortheoreticalspectra[i]].name.substr(2);
+							if (((parameters->peptidetype == linear) && (parameters->iondefinitions[(*thpeaks)[i].iontype].cterminal)) ||
+								((parameters->peptidetype == linearpolyketide) && (((*thpeaks)[i].iontype == r1h_ion) || ((*thpeaks)[i].iontype == r2h_ion) || ((*thpeaks)[i].iontype == r1oh_ion) || ((*thpeaks)[i].iontype == r2oh_ion)))) {
+
+								if ((*thpeaks)[i].seriesid >= 0) {
+									insertLabel(labels, leftmargin + horizontalstep * ((*thpeaks)[i].seriesid + 1), topmargin + 35, description, false);
 								}
-								else {
-									name = parameters->iondefinitions[parameters->ionsfortheoreticalspectra[i]].name[0] + to_string(len - k) + parameters->iondefinitions[parameters->ionsfortheoreticalspectra[i]].name.substr(1);
-								}
-								if (j >= 0) {
-									name += "-" + parameters->neutrallossesdefinitions[parameters->neutrallossesfortheoreticalspectra[j]].summary;
-								}
-								insertLabel(labels, leftmargin + horizontalstep * (k + 1), topmargin + 35, name, false);
+
 							}
+
 						}
+
 					}
 
 				}
-
-				coverageindex++;
 
 			}
 
 		}
 
-		painter.setPen(QPen(Qt::red, 2, Qt::SolidLine));
-		for (auto it = labels.begin(); it != labels.end(); ++it) {
-			painter.drawText(it->x, it->y, width(), 20, Qt::AlignLeft, it->label.c_str());
-		}
+		drawLabels(painter, labels, width());
 	
 	}
 	
