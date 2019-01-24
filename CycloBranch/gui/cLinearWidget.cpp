@@ -254,7 +254,9 @@ void cLinearWidget::paint(QPainter& painter) {
 
 					if (visibleionseries.empty() || (!visibleionseries.empty() && (parameters->iondefinitions[(*thpeaks)[i].iontype].name.compare(visibleionseries) == 0))) {
 
-						if (visibleneutralloss.compare("all") == 0) { // to do
+						if ((visibleneutralloss.compare("all") == 0) 
+							|| ((visibleneutralloss.compare("none") == 0) && (description.find(" -") == string::npos))
+							|| ((visibleneutralloss.compare("all") != 0) && (visibleneutralloss.compare("none") != 0) && (description.substr(description.find(" -") + 2).compare(visibleneutralloss) == 0))) {
 
 							if (((parameters->peptidetype == linear) && (parameters->iondefinitions[(*thpeaks)[i].iontype].nterminal))
 								|| ((parameters->peptidetype == linearpolyketide) && (((*thpeaks)[i].iontype == l1h_ion) || ((*thpeaks)[i].iontype == l2h_ion) || ((*thpeaks)[i].iontype == l1oh_ion) || ((*thpeaks)[i].iontype == l2oh_ion)))) {
@@ -269,7 +271,7 @@ void cLinearWidget::paint(QPainter& painter) {
 								((parameters->peptidetype == linearpolyketide) && (((*thpeaks)[i].iontype == r1h_ion) || ((*thpeaks)[i].iontype == r2h_ion) || ((*thpeaks)[i].iontype == r1oh_ion) || ((*thpeaks)[i].iontype == r2oh_ion)))) {
 
 								if ((*thpeaks)[i].seriesid >= 0) {
-									insertLabel(labels, leftmargin + horizontalstep * ((*thpeaks)[i].seriesid + 1), topmargin + 35, description, false);
+									insertLabel(labels, leftmargin + horizontalstep * (size - (*thpeaks)[i].seriesid - 1), topmargin + 35, description, false);
 								}
 
 							}
