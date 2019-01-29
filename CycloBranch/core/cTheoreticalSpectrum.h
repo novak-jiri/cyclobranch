@@ -59,9 +59,9 @@ struct splitSite {
 
 
 /**
-	\brief An auxiliary structure for visualisation of matched series of a cyclic peptide.
+	\brief An auxiliary structure for visualisation of matched series of fragment ions.
 */
-struct visualSeries {
+struct matchedSeries {
 
 	/**
 		\brief A vector of matched peaks in a series.
@@ -78,7 +78,7 @@ struct visualSeries {
 	/**
 		\brief The constructor.
 	*/
-	visualSeries() {
+	matchedSeries() {
 		series.clear();
 		name = "";
 	}

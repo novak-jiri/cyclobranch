@@ -34,7 +34,7 @@ int getNumberOfScoreHits(vector<double>& scores, double value) {
 }
 
 
-void visualSeries::store(ofstream& os) {
+void matchedSeries::store(ofstream& os) {
 	int size;
 
 	size = (int)series.size();
@@ -47,7 +47,7 @@ void visualSeries::store(ofstream& os) {
 }
 
 
-void visualSeries::load(ifstream& is) {
+void matchedSeries::load(ifstream& is) {
 	int size;
 
 	is.read((char *)&size, sizeof(int));
@@ -2115,7 +2115,7 @@ int cTheoreticalSpectrum::compareBranched(cPeaksList& sortedpeaklist, cBricksDat
 
 
 	// coverage of series
-	vector<map<eFragmentIonType, map<int, vector<int> > > > series;
+	/*vector<map<eFragmentIonType, map<int, vector<int> > > > series;
 	series.resize(trotations.size());
 	for (int i = 0; i < (int)series.size(); i++) {
 
@@ -2142,7 +2142,7 @@ int cTheoreticalSpectrum::compareBranched(cPeaksList& sortedpeaklist, cBricksDat
 			&& (series[theoreticalpeaks[i].rotationid][theoreticalpeaks[i].iontype].count(theoreticalpeaks[i].neutrallosstype) == 1)) {
 			series[theoreticalpeaks[i].rotationid][theoreticalpeaks[i].iontype][theoreticalpeaks[i].neutrallosstype][theoreticalpeaks[i].seriesid]++;
 		}
-	}
+	}*/
 	
 
 	// peak hits without parents are removed
@@ -2183,14 +2183,14 @@ int cTheoreticalSpectrum::compareBranched(cPeaksList& sortedpeaklist, cBricksDat
 			normalizeTheoreticalIntensities(theoreticalpeaks, theoreticalpeaksrealsize);
 		}
 
-		visualSeries tempseries;
-		bool reportrow;
-
 		coveragebyseries = "Linearized sequences:<br/>";
 		for (int i = 0; i < (int)trotations.size(); i++) {
 			coveragebyseries += to_string(i + 1) + " ~ " + bricksdatabasewithcombinations.getAcronymNameOfTPeptide(trotations[i].tcomposition, false) + "<br/>";
 		}
 		coveragebyseries += "<br/>";
+
+		/*matchedSeries tempseries;
+		bool reportrow;
 
 		if (parameters->ionsfortheoreticalspectra.size() > 0) {
 			coveragebyseries += "Series of matched peaks:";
@@ -2233,7 +2233,7 @@ int cTheoreticalSpectrum::compareBranched(cPeaksList& sortedpeaklist, cBricksDat
 				coveragebyseries += "<tr><td colspan=\"" + to_string((int)series[0][parameters->ionsfortheoreticalspectra[0]][-1].size()) + "\">&nbsp;</td></tr>";
 			}
 			coveragebyseries += "</table>";
-		}
+		}*/
 
 	}
 
@@ -2311,7 +2311,7 @@ int cTheoreticalSpectrum::compareLinear(cPeaksList& sortedpeaklist, cBricksDatab
 
 
 	// coverage of series
-	map<eFragmentIonType, map<int, vector<int> > > series;
+	/*map<eFragmentIonType, map<int, vector<int> > > series;
 	for (int i = 0; i < (int)parameters->ionsfortheoreticalspectra.size(); i++) {
 
 		for (int j = -1; j < (int)parameters->neutrallossesfortheoreticalspectra.size(); j++) {
@@ -2333,7 +2333,7 @@ int cTheoreticalSpectrum::compareLinear(cPeaksList& sortedpeaklist, cBricksDatab
 			&& (series[theoreticalpeaks[i].iontype].count(theoreticalpeaks[i].neutrallosstype) == 1)) {
 			series[theoreticalpeaks[i].iontype][theoreticalpeaks[i].neutrallosstype][theoreticalpeaks[i].seriesid]++;
 		}
-	}
+	}*/
 	
 
 	// peak hits without parents are removed
@@ -2372,7 +2372,7 @@ int cTheoreticalSpectrum::compareLinear(cPeaksList& sortedpeaklist, cBricksDatab
 			normalizeTheoreticalIntensities(theoreticalpeaks, theoreticalpeaksrealsize);
 		}
 
-		visualSeries tempseries;
+		/*matchedSeries tempseries;
 		bool reportrow;
 
 		if (parameters->ionsfortheoreticalspectra.size() > 0) {
@@ -2412,7 +2412,7 @@ int cTheoreticalSpectrum::compareLinear(cPeaksList& sortedpeaklist, cBricksDatab
 				}
 			}
 			coveragebyseries += "</table>";
-		}
+		}*/
 
 	}
 
@@ -2548,7 +2548,7 @@ int cTheoreticalSpectrum::compareCyclic(cPeaksList& sortedpeaklist, cBricksDatab
 
 
 	// coverage of series
-	vector<map<eFragmentIonType, map<int, vector<int> > > > series;
+	/*vector<map<eFragmentIonType, map<int, vector<int> > > > series;
 	series.resize(rotations.size());
 	for (int i = 0; i < (int)series.size(); i++) {
 
@@ -2575,7 +2575,7 @@ int cTheoreticalSpectrum::compareCyclic(cPeaksList& sortedpeaklist, cBricksDatab
 			&& (series[theoreticalpeaks[i].rotationid][theoreticalpeaks[i].iontype].count(theoreticalpeaks[i].neutrallosstype) == 1)) {
 			series[theoreticalpeaks[i].rotationid][theoreticalpeaks[i].iontype][theoreticalpeaks[i].neutrallosstype][theoreticalpeaks[i].seriesid]++;
 		}
-	}
+	}*/
 
 
 	// peak hits without parents are removed
@@ -2671,9 +2671,6 @@ int cTheoreticalSpectrum::compareCyclic(cPeaksList& sortedpeaklist, cBricksDatab
 			normalizeTheoreticalIntensities(theoreticalpeaks, theoreticalpeaksrealsize);
 		}
 
-		visualSeries tempseries;
-		bool reportrow;
-
 		string rotationlabel;
 		rotationslabels.clear();
 
@@ -2687,6 +2684,9 @@ int cTheoreticalSpectrum::compareCyclic(cPeaksList& sortedpeaklist, cBricksDatab
 			coveragebyseries += rotationlabel + " " + bricksdatabasewithcombinations.getAcronymName(rotations[i], false) + "<br/>";
 		}
 		coveragebyseries += "<br/>";
+
+		/*matchedSeries tempseries;
+		bool reportrow;
 
 		if (parameters->ionsfortheoreticalspectra.size() > 0) {
 			coveragebyseries += "Series of matched peaks:";
@@ -2729,7 +2729,7 @@ int cTheoreticalSpectrum::compareCyclic(cPeaksList& sortedpeaklist, cBricksDatab
 				coveragebyseries += "<tr><td colspan=\"" + to_string((int)series[0][parameters->ionsfortheoreticalspectra[0]][-1].size()) + "\">&nbsp;</td></tr>";
 			}
 			coveragebyseries += "</table>";
-		}
+		}*/
 
 	}
 		
@@ -2894,7 +2894,7 @@ int cTheoreticalSpectrum::compareBranchCyclic(cPeaksList& sortedpeaklist, cBrick
 
 
 	// coverage of series
-	vector<vector<map<eFragmentIonType, map<int, vector<int> > > > > series;
+	/*vector<vector<map<eFragmentIonType, map<int, vector<int> > > > > series;
 	series.resize(branchcyclicrotations.size());
 	for (int i = 0; i < (int)branchcyclicrotations.size(); i++) {
 		series[i].resize(6);
@@ -2928,7 +2928,7 @@ int cTheoreticalSpectrum::compareBranchCyclic(cPeaksList& sortedpeaklist, cBrick
 				}
 			}
 		}
-	}
+	}*/
 
 
 	// peak hits without parents are removed
@@ -2971,9 +2971,6 @@ int cTheoreticalSpectrum::compareBranchCyclic(cPeaksList& sortedpeaklist, cBrick
 			normalizeTheoreticalIntensities(theoreticalpeaks, theoreticalpeaksrealsize);
 		}
 
-		visualSeries tempseries;
-		bool reportrow;
-
 		string rotationlabel;
 		rotationslabels.clear();
 
@@ -2989,6 +2986,9 @@ int cTheoreticalSpectrum::compareBranchCyclic(cPeaksList& sortedpeaklist, cBrick
 			}
 			coveragebyseries += "<br/>";
 		}
+
+		/*matchedSeries tempseries;
+		bool reportrow;
 
 		if (parameters->ionsfortheoreticalspectra.size() > 0) {
 			coveragebyseries += "Series of matched peaks:";
@@ -3034,7 +3034,7 @@ int cTheoreticalSpectrum::compareBranchCyclic(cPeaksList& sortedpeaklist, cBrick
 				}
 			}
 			coveragebyseries += "</table>";
-		}
+		}*/
 
 	}
 
@@ -3142,7 +3142,7 @@ int cTheoreticalSpectrum::compareLinearPolyketide(cPeaksList& sortedpeaklist, cB
 
 
 	// coverage of series
-	map<eFragmentIonType, map<int, vector<int> > > series;
+	/*map<eFragmentIonType, map<int, vector<int> > > series;
 	for (int i = 0; i < (int)parameters->ionsfortheoreticalspectra.size(); i++) {
 
 		for (int j = -1; j < (int)parameters->neutrallossesfortheoreticalspectra.size(); j++) {
@@ -3164,7 +3164,7 @@ int cTheoreticalSpectrum::compareLinearPolyketide(cPeaksList& sortedpeaklist, cB
 			&& (series[theoreticalpeaks[i].iontype].count(theoreticalpeaks[i].neutrallosstype) == 1)) {
 			series[theoreticalpeaks[i].iontype][theoreticalpeaks[i].neutrallosstype][theoreticalpeaks[i].seriesid]++;
 		}
-	}
+	}*/
 	
 	
 	// peak hits without parents are removed
@@ -3203,7 +3203,7 @@ int cTheoreticalSpectrum::compareLinearPolyketide(cPeaksList& sortedpeaklist, cB
 			normalizeTheoreticalIntensities(theoreticalpeaks, theoreticalpeaksrealsize);
 		}
 
-		visualSeries tempseries;
+		/*matchedSeries tempseries;
 		bool reportrow;
 
 		if (parameters->ionsfortheoreticalspectra.size() > 0) {
@@ -3243,7 +3243,7 @@ int cTheoreticalSpectrum::compareLinearPolyketide(cPeaksList& sortedpeaklist, cB
 				}
 			}
 			coveragebyseries += "</table>";
-		}
+		}*/
 
 	}
 
