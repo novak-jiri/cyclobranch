@@ -1048,12 +1048,12 @@ void cSpectrumDetailWidget::prepareToShow(QAction* actionShowIsomers, cPeakListS
 			// branched
 			if (parameters->peptidetype == branched) {
 				trotationcombobox->addItem(tr("all"));
-				trotationcombobox->addItem(tr("1 (left-to-right)"));
-				trotationcombobox->addItem(tr("2 (top-to-right)"));
-				trotationcombobox->addItem(tr("3 (right-to-left)"));
-				trotationcombobox->addItem(tr("4 (left-to-top)"));
-				trotationcombobox->addItem(tr("5 (top-to-left)"));
-				trotationcombobox->addItem(tr("6 (right-to-top)"));
+				trotationcombobox->addItem(tr("1 (N-term to C-term)"));
+				trotationcombobox->addItem(tr("2 (Branch to C-term)"));
+				trotationcombobox->addItem(tr("3 (C-term to N-term)"));
+				trotationcombobox->addItem(tr("4 (N-term to Branch)"));
+				trotationcombobox->addItem(tr("5 (Branch to N-term)"));
+				trotationcombobox->addItem(tr("6 (C-term to Branch)"));
 
 				connect(trotationcombobox, SIGNAL(currentIndexChanged(int)), spectrumscene, SLOT(trotationChanged(int)));
 				connect(trotationcombobox, SIGNAL(currentIndexChanged(int)), branchedwidget, SLOT(trotationChanged(int)));
@@ -1088,12 +1088,12 @@ void cSpectrumDetailWidget::prepareToShow(QAction* actionShowIsomers, cPeakListS
 				toolbarRotation->addWidget(rotationwidget);
 
 				trotationcombobox->addItem(tr("all"));
-				trotationcombobox->addItem(tr("1 (left-to-right)"));
-				trotationcombobox->addItem(tr("2 (top-to-right)"));
-				trotationcombobox->addItem(tr("3 (right-to-left)"));
-				trotationcombobox->addItem(tr("4 (left-to-top)"));
-				trotationcombobox->addItem(tr("5 (top-to-left)"));
-				trotationcombobox->addItem(tr("6 (right-to-top)"));
+				trotationcombobox->addItem(tr("1 (N-term to C-term)"));
+				trotationcombobox->addItem(tr("2 (Branch to C-term)"));
+				trotationcombobox->addItem(tr("3 (C-term to N-term)"));
+				trotationcombobox->addItem(tr("4 (N-term to Branch)"));
+				trotationcombobox->addItem(tr("5 (Branch to N-term)"));
+				trotationcombobox->addItem(tr("6 (C-term to Branch)"));
 
 				connect(trotationcombobox, SIGNAL(currentIndexChanged(int)), spectrumscene, SLOT(trotationChanged(int)));
 				connect(trotationcombobox, SIGNAL(currentIndexChanged(int)), branchcyclicwidget, SLOT(trotationChanged(int)));
