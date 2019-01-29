@@ -2012,7 +2012,7 @@ void cTheoreticalSpectrum::clear(bool clearpeaklist) {
 	coveragebyseries = "";
 	valid = false;
 	sumofrelativeintensities = 0;
-	visualcoverage.clear();
+	rotationslabels.clear();
 	validposition = -1;
 	reversevalidposition = -1;
 	
@@ -2183,7 +2183,6 @@ int cTheoreticalSpectrum::compareBranched(cPeaksList& sortedpeaklist, cBricksDat
 			normalizeTheoreticalIntensities(theoreticalpeaks, theoreticalpeaksrealsize);
 		}
 
-		visualcoverage.clear();
 		visualSeries tempseries;
 		bool reportrow;
 
@@ -2229,7 +2228,6 @@ int cTheoreticalSpectrum::compareBranched(cPeaksList& sortedpeaklist, cBricksDat
 						if (reportrow) {
 							coveragebyseries += "</tr>";
 						}
-						visualcoverage.push_back(tempseries);
 					}
 				}
 				coveragebyseries += "<tr><td colspan=\"" + to_string((int)series[0][parameters->ionsfortheoreticalspectra[0]][-1].size()) + "\">&nbsp;</td></tr>";
@@ -2374,7 +2372,6 @@ int cTheoreticalSpectrum::compareLinear(cPeaksList& sortedpeaklist, cBricksDatab
 			normalizeTheoreticalIntensities(theoreticalpeaks, theoreticalpeaksrealsize);
 		}
 
-		visualcoverage.clear();
 		visualSeries tempseries;
 		bool reportrow;
 
@@ -2412,7 +2409,6 @@ int cTheoreticalSpectrum::compareLinear(cPeaksList& sortedpeaklist, cBricksDatab
 					if (reportrow) {
 						coveragebyseries += "</tr>";
 					}
-					visualcoverage.push_back(tempseries);
 				}
 			}
 			coveragebyseries += "</table>";
@@ -2675,16 +2671,20 @@ int cTheoreticalSpectrum::compareCyclic(cPeaksList& sortedpeaklist, cBricksDatab
 			normalizeTheoreticalIntensities(theoreticalpeaks, theoreticalpeaksrealsize);
 		}
 
-		visualcoverage.clear();
 		visualSeries tempseries;
 		bool reportrow;
+
+		string rotationlabel;
+		rotationslabels.clear();
 
 		coveragebyseries = "Linearized sequences from all ring break up points:<br/>";
 		for (int i = 0; i < (int)rotations.size(); i++) {
 			if (i == r) {
 				coveragebyseries += "<br/>";
 			}
-			coveragebyseries += to_string(splittingsites[i].first + 1) + "-" + to_string(splittingsites[i].second + 1) + " " + bricksdatabasewithcombinations.getAcronymName(rotations[i], false) + "<br/>";
+			rotationlabel = to_string(splittingsites[i].first + 1) + "-" + to_string(splittingsites[i].second + 1);
+			rotationslabels.push_back(rotationlabel);
+			coveragebyseries += rotationlabel + " " + bricksdatabasewithcombinations.getAcronymName(rotations[i], false) + "<br/>";
 		}
 		coveragebyseries += "<br/>";
 
@@ -2724,7 +2724,6 @@ int cTheoreticalSpectrum::compareCyclic(cPeaksList& sortedpeaklist, cBricksDatab
 						if (reportrow) {
 							coveragebyseries += "</tr>";
 						}
-						visualcoverage.push_back(tempseries);
 					}
 				}
 				coveragebyseries += "<tr><td colspan=\"" + to_string((int)series[0][parameters->ionsfortheoreticalspectra[0]][-1].size()) + "\">&nbsp;</td></tr>";
@@ -2972,14 +2971,18 @@ int cTheoreticalSpectrum::compareBranchCyclic(cPeaksList& sortedpeaklist, cBrick
 			normalizeTheoreticalIntensities(theoreticalpeaks, theoreticalpeaksrealsize);
 		}
 
-		visualcoverage.clear();
 		visualSeries tempseries;
 		bool reportrow;
 
+		string rotationlabel;
+		rotationslabels.clear();
+
 		coveragebyseries = "Linearized sequences from all ring break up points:<br/>";
 		for (int i = 0; i < (int)branchcyclicrotations.size(); i++) {
+			rotationlabel = to_string(splittingsites[i].first + 1) + "-" + to_string(splittingsites[i].second + 1);
+			rotationslabels.push_back(rotationlabel);
 			for (int j = 0; j < (int)trotationsofbranchcyclicrotations[i].size(); j++) {
-				coveragebyseries += to_string(splittingsites[i].first + 1) + "-" + to_string(splittingsites[i].second + 1) + "_";
+				coveragebyseries += rotationlabel  + "_";
 				coveragebyseries += to_string(j + 1) + " ~ ";
 				coveragebyseries += bricksdatabasewithcombinations.getAcronymNameOfTPeptide(trotationsofbranchcyclicrotations[i][j].tcomposition, false);
 				coveragebyseries += "<br/>";
@@ -3025,7 +3028,6 @@ int cTheoreticalSpectrum::compareBranchCyclic(cPeaksList& sortedpeaklist, cBrick
 							if (reportrow) {
 								coveragebyseries += "</tr>";
 							}
-							visualcoverage.push_back(tempseries);
 						}
 					}
 					coveragebyseries += "<tr><td colspan=\"" + to_string((int)series[0][0][parameters->ionsfortheoreticalspectra[0]][-1].size()) + "\">&nbsp;</td></tr>";
@@ -3201,7 +3203,6 @@ int cTheoreticalSpectrum::compareLinearPolyketide(cPeaksList& sortedpeaklist, cB
 			normalizeTheoreticalIntensities(theoreticalpeaks, theoreticalpeaksrealsize);
 		}
 
-		visualcoverage.clear();
 		visualSeries tempseries;
 		bool reportrow;
 
@@ -3239,7 +3240,6 @@ int cTheoreticalSpectrum::compareLinearPolyketide(cPeaksList& sortedpeaklist, cB
 					if (reportrow) {
 						coveragebyseries += "</tr>";
 					}
-					visualcoverage.push_back(tempseries);
 				}
 			}
 			coveragebyseries += "</table>";
@@ -4403,8 +4403,8 @@ void cTheoreticalSpectrum::setValidSequence(regex& searchedsequence) {
 }
 
 
-vector<visualSeries>& cTheoreticalSpectrum::getVisualCoverage() {
-	return visualcoverage;
+vector<string>& cTheoreticalSpectrum::getLabelsOfRotations() {
+	return rotationslabels;
 }
 
 
@@ -4545,11 +4545,7 @@ void cTheoreticalSpectrum::store(ofstream& os) {
 	os.write((char *)&valid, sizeof(bool));
 	os.write((char *)&sumofrelativeintensities, sizeof(double));
 
-	size = (int)visualcoverage.size();
-	os.write((char *)&size, sizeof(int));
-	for (int i = 0; i < (int)visualcoverage.size(); i++) {
-		visualcoverage[i].store(os);
-	}
+	storeStringVector(rotationslabels, os);
 
 	os.write((char *)&validposition, sizeof(int));
 	os.write((char *)&reversevalidposition, sizeof(int));
@@ -4631,11 +4627,7 @@ void cTheoreticalSpectrum::load(ifstream& is) {
 	is.read((char *)&valid, sizeof(bool));
 	is.read((char *)&sumofrelativeintensities, sizeof(double));
 
-	is.read((char *)&size, sizeof(int));
-	visualcoverage.resize(size);
-	for (int i = 0; i < (int)visualcoverage.size(); i++) {
-		visualcoverage[i].load(is);
-	}
+	loadStringVector(rotationslabels, is);
 
 	is.read((char *)&validposition, sizeof(int));
 	is.read((char *)&reversevalidposition, sizeof(int));

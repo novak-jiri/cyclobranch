@@ -1021,18 +1021,11 @@ void cSpectrumDetailWidget::prepareToShow(QAction* actionShowIsomers, cPeakListS
 
 
 			// cyclic
-			if (theoreticalspectrum && ((parameters->peptidetype == cyclic) || (parameters->peptidetype == cyclicpolyketide))) {
-				int r = (int)theoreticalspectrum->getCandidate().getAcronyms().size();
-				int hint = (int)theoreticalspectrum->getVisualCoverage().size()/(2*r);
-				
+			if (theoreticalspectrum && ((parameters->peptidetype == cyclic) || (parameters->peptidetype == cyclicpolyketide))) {			
+				vector<string> rotationslabels = theoreticalspectrum->getLabelsOfRotations();
 				rotationcombobox->addItem(tr("all"));
-
-				string s;
-				if (theoreticalspectrum->getVisualCoverage().size() > 0) {
-					for (int i = 0; i < 2*r; i++) {
-						s = theoreticalspectrum->getVisualCoverage()[i*hint].name.substr(0, theoreticalspectrum->getVisualCoverage()[i*hint].name.rfind('_'));
-						rotationcombobox->addItem(tr(s.c_str()));
-					}
+				for (auto& it : rotationslabels) {
+					rotationcombobox->addItem(tr(it.c_str()));
 				}
 
 				connect(rotationcombobox, SIGNAL(currentIndexChanged(int)), spectrumscene, SLOT(rotationChanged(int)));
@@ -1066,17 +1059,10 @@ void cSpectrumDetailWidget::prepareToShow(QAction* actionShowIsomers, cPeakListS
 
 			// branch-cyclic
 			if (parameters && theoreticalspectrum && (parameters->peptidetype == branchcyclic)) {
-				int r = (int)theoreticalspectrum->getCandidate().getAcronyms().size() - (int)theoreticalspectrum->getCandidate().getBranchSize();
-				int hint = (int)theoreticalspectrum->getVisualCoverage().size()/(2*r);
-
+				vector<string> rotationslabels = theoreticalspectrum->getLabelsOfRotations();
 				rotationcombobox->addItem(tr("all"));
-
-				string s;
-				if (theoreticalspectrum->getVisualCoverage().size() > 0) {
-					for (int i = 0; i < 2*r; i++) {
-						s = theoreticalspectrum->getVisualCoverage()[i*hint].name.substr(0, theoreticalspectrum->getVisualCoverage()[i*hint].name.find('_'));
-						rotationcombobox->addItem(tr(s.c_str()));
-					}
+				for (auto& it : rotationslabels) {
+					rotationcombobox->addItem(tr(it.c_str()));
 				}
 
 				connect(rotationcombobox, SIGNAL(currentIndexChanged(int)), spectrumscene, SLOT(rotationChanged(int)));

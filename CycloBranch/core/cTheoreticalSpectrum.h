@@ -119,7 +119,7 @@ class cTheoreticalSpectrum {
 	string coveragebyseries;
 	bool valid;
 	double sumofrelativeintensities;
-	vector<visualSeries> visualcoverage;
+	vector<string> rotationslabels;
 	int validposition;
 	int reversevalidposition;
 	int seriescompleted;
@@ -560,10 +560,10 @@ public:
 
 
 	/**
-		\brief Get a vector of fragment ion series for visualization.
-		\retval vector<visualSeries> vector of fragment ion series for visualisation
-	*/ 
-	vector<visualSeries>& getVisualCoverage();
+		\brief Get the labels of cyclic rotations.
+		\retval vector<string> a vector of labels
+	*/
+	vector<string>& getLabelsOfRotations();
 
 
 	/**
