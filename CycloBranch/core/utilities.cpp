@@ -4,7 +4,7 @@
 
 
 QString appname = "CycloBranch";
-QString appversion = "v. 1.3.11 (64-bit)";
+QString appversion = "v. 1.3.12 (64-bit)";
 
 
 #if OS_TYPE == UNX
@@ -167,6 +167,11 @@ void convertStringIntUnorderedMapToStringVector(unordered_map<string, int>& map,
 		vector[it->second] = it->first;
 		map.erase(it);
 	}
+}
+
+
+bool isWhiteSpace(char c) {
+	return isspace(c);
 }
 
 

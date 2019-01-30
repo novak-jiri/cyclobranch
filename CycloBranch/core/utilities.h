@@ -234,6 +234,14 @@ void convertStringIntUnorderedMapToStringVector(unordered_map<string, int>& map,
 
 
 /**
+	\brief Check if \a c is a white space.
+	\param c char
+	\retval bool true if \a c is a white space; false otherwise.
+*/
+bool isWhiteSpace(char c);
+
+
+/**
 	\brief Check if \a c is a white space (except normal space).
 	\param c char
 	\retval bool true if \a c is a white space (except normal space); false otherwise.

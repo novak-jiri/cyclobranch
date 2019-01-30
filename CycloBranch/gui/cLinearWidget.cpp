@@ -46,7 +46,7 @@ void drawLabels(QPainter& painter, unordered_set<cIonLabel, hash_cIonLabel>& lab
 		if (labeldesc.size() > 0) {
 			labeldesc = labeldesc.substr(0, labeldesc.size() - 1);
 		}
-		labeldesc.erase(remove_if(labeldesc.begin(), labeldesc.end(), isspace), labeldesc.end());
+		labeldesc.erase(remove_if(begin(labeldesc), end(labeldesc), isWhiteSpace), end(labeldesc));
 		if (it.alignright) {
 			painter.drawText(it.x - fm.width(labeldesc.c_str()), it.y, fm.width(labeldesc.c_str()), 20, Qt::AlignLeft, labeldesc.c_str());
 		}
