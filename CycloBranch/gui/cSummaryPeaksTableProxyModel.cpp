@@ -1,6 +1,116 @@
 #include "gui/cSummaryPeaksTableProxyModel.h"
 
 
+bool cSummaryPeaksTableProxyModel::checkInt(int index, int row, int column, QString& str, const QModelIndex& parent) const {
+	switch (index) {
+		case 0:
+			if (sourceModel()->data(sourceModel()->index(row, column, parent)).toInt() == str.toInt()) {
+				return true;
+			}
+			break;
+		case 1:
+			if (sourceModel()->data(sourceModel()->index(row, column, parent)).toInt() < str.toInt()) {
+				return true;
+			}
+			break;
+		case 2:
+			if (sourceModel()->data(sourceModel()->index(row, column, parent)).toInt() <= str.toInt()) {
+				return true;
+			}
+			break;
+		case 3:
+			if (sourceModel()->data(sourceModel()->index(row, column, parent)).toInt() > str.toInt()) {
+				return true;
+			}
+			break;
+		case 4:
+			if (sourceModel()->data(sourceModel()->index(row, column, parent)).toInt() >= str.toInt()) {
+				return true;
+			}
+			break;
+		default:
+			break;
+	}
+	return false;
+}
+
+
+bool cSummaryPeaksTableProxyModel::checkDouble(int index, int row, int column, QString& str, const QModelIndex& parent) const {
+	switch (index) {
+		case 0:
+			if (sourceModel()->data(sourceModel()->index(row, column, parent)).toDouble() == str.toDouble()) {
+				return true;
+			}
+			break;
+		case 1:
+			if (sourceModel()->data(sourceModel()->index(row, column, parent)).toDouble() < str.toDouble()) {
+				return true;
+			}
+			break;
+		case 2:
+			if (sourceModel()->data(sourceModel()->index(row, column, parent)).toDouble() <= str.toDouble()) {
+				return true;
+			}
+			break;
+		case 3:
+			if (sourceModel()->data(sourceModel()->index(row, column, parent)).toDouble() > str.toDouble()) {
+				return true;
+			}
+			break;
+		case 4:
+			if (sourceModel()->data(sourceModel()->index(row, column, parent)).toDouble() >= str.toDouble()) {
+				return true;
+			}
+			break;
+		default:
+			break;
+	}
+	return false;
+}
+
+
+bool cSummaryPeaksTableProxyModel::checkString(int index, int row, int column, QString& str, const QModelIndex& parent) const {
+	string itemstr = sourceModel()->data(sourceModel()->index(row, column, parent)).toString().toStdString();
+	QString qstr = stripHTML(itemstr).c_str();
+
+	switch (index) {
+		case 0:
+			if (wholeword) {
+				if (qstr.compare(str, filterCaseSensitivity()) == 0) {
+					return true;
+				}
+			}
+			else {
+				return qstr.contains(str, filterCaseSensitivity());
+			}
+			break;
+		case 1:
+			if (qstr.compare(str, filterCaseSensitivity()) < 0) {
+				return true;
+			}
+			break;
+		case 2:
+			if (qstr.compare(str, filterCaseSensitivity()) <= 0) {
+				return true;
+			}
+			break;
+		case 3:
+			if (qstr.compare(str, filterCaseSensitivity()) > 0) {
+				return true;
+			}
+			break;
+		case 4:
+			if (qstr.compare(str, filterCaseSensitivity()) >= 0) {
+				return true;
+			}
+			break;
+		default:
+			break;
+	}
+	return false;
+}
+
+
 cSummaryPeaksTableProxyModel::cSummaryPeaksTableProxyModel(QObject *parent) : QSortFilterProxyModel(parent) {
 	xmin = -1;
 	xmax = -1;
@@ -10,12 +120,17 @@ cSummaryPeaksTableProxyModel::cSummaryPeaksTableProxyModel(QObject *parent) : QS
 }
 
 
-void cSummaryPeaksTableProxyModel::initialize(eModeType mode, ePeakListFileFormat peaklistfileformat, bool generateisotopepattern, QComboBox* rowsfiltercombobox, QComboBox* rowsfiltercomparatorcombobox) {
+void cSummaryPeaksTableProxyModel::initialize(eModeType mode, ePeakListFileFormat peaklistfileformat, bool generateisotopepattern, QComboBox* rowsfilteroperator, QComboBox* rowsfiltercombobox1, QComboBox* rowsfiltercomparatorcombobox1, QLineEdit* rowsfilterline1, QComboBox* rowsfiltercombobox2, QComboBox* rowsfiltercomparatorcombobox2, QLineEdit* rowsfilterline2) {
 	this->mode = mode;
 	this->peaklistfileformat = peaklistfileformat;
 	this->generateisotopepattern = generateisotopepattern;
-	this->rowsfiltercombobox = rowsfiltercombobox;
-	this->rowsfiltercomparatorcombobox = rowsfiltercomparatorcombobox;
+	this->filteroperator = rowsfilteroperator;
+	this->filtercombobox1 = rowsfiltercombobox1;
+	this->filtercomparatorcombobox1 = rowsfiltercomparatorcombobox1;
+	this->filterline1 = rowsfilterline1;
+	this->filtercombobox2 = rowsfiltercombobox2;
+	this->filtercomparatorcombobox2 = rowsfiltercomparatorcombobox2;
+	this->filterline2 = rowsfilterline2;
 }
 
 
@@ -52,118 +167,42 @@ bool cSummaryPeaksTableProxyModel::filterAcceptsRow(int sourceRow, const QModelI
 		return false;
 	}
 
-	if (filterRegExp().isEmpty()) {
+	if (filterline1->text().isEmpty() && filterline2->text().isEmpty()) {
 		return true;
 	}
 
-	int col = rowsfiltercombobox->currentIndex();
+	int col1 = filtercombobox1->currentIndex();
+	int col2 = filtercombobox2->currentIndex();
 
-	if (sourceModel()->data(sourceModel()->index(sourceRow, col, sourceParent)).type() == QVariant::ByteArray) {
-		switch (rowsfiltercomparatorcombobox->currentIndex()) {
-			case 0:
-				if (sourceModel()->data(sourceModel()->index(sourceRow, col, sourceParent)).toDouble() == filterRegExp().pattern().toDouble()) {
-					return true;
-				}
-				break;
-			case 1:
-				if (sourceModel()->data(sourceModel()->index(sourceRow, col, sourceParent)).toDouble() < filterRegExp().pattern().toDouble()) {
-					return true;
-				}
-				break;
-			case 2:
-				if (sourceModel()->data(sourceModel()->index(sourceRow, col, sourceParent)).toDouble() <= filterRegExp().pattern().toDouble()) {
-					return true;
-				}
-				break;
-			case 3:
-				if (sourceModel()->data(sourceModel()->index(sourceRow, col, sourceParent)).toDouble() > filterRegExp().pattern().toDouble()) {
-					return true;
-				}
-				break;
-			case 4:
-				if (sourceModel()->data(sourceModel()->index(sourceRow, col, sourceParent)).toDouble() >= filterRegExp().pattern().toDouble()) {
-					return true;
-				}
-				break;
-			default:
-				break;
+	if (!filterline1->text().isEmpty() && filterline2->text().isEmpty()) {
+		if (sourceModel()->data(sourceModel()->index(sourceRow, col1, sourceParent)).type() == QVariant::ByteArray) {
+			return checkDouble(filtercomparatorcombobox1->currentIndex(), sourceRow, col1, filterline1->text(), sourceParent);
 		}
-	}
-	
-	if (sourceModel()->data(sourceModel()->index(sourceRow, col, sourceParent)).type() == QVariant::String) {
 
-		string itemstr = sourceModel()->data(sourceModel()->index(sourceRow, col, sourceParent)).toString().toStdString();
-		QString qstr = stripHTML(itemstr).c_str();
+		if (sourceModel()->data(sourceModel()->index(sourceRow, col1, sourceParent)).type() == QVariant::String) {
+			return checkString(filtercomparatorcombobox1->currentIndex(), sourceRow, col1, filterline1->text(), sourceParent);
+		}
 
-		switch (rowsfiltercomparatorcombobox->currentIndex()) {
-			case 0:
-				if (wholeword) {
-					if (qstr.compare(filterRegExp().pattern(), filterCaseSensitivity()) == 0) {
-						return true;
-					}
-				}
-				else {
-					if (qstr.contains(filterRegExp())) {
-						return true;
-					}
-				}
-				break;
-			case 1:
-				if (qstr.compare(filterRegExp().pattern(), filterCaseSensitivity()) < 0) {
-					return true;
-				}
-				break;
-			case 2:
-				if (qstr.compare(filterRegExp().pattern(), filterCaseSensitivity()) <= 0) {
-					return true;
-				}
-				break;
-			case 3:
-				if (qstr.compare(filterRegExp().pattern(), filterCaseSensitivity()) > 0) {
-					return true;
-				}
-				break;
-			case 4:
-				if (qstr.compare(filterRegExp().pattern(), filterCaseSensitivity()) >= 0) {
-					return true;
-				}
-				break;
-			default:
-				break;
+		if (sourceModel()->data(sourceModel()->index(sourceRow, col1, sourceParent)).type() == QVariant::Int) {
+			return checkInt(filtercomparatorcombobox1->currentIndex(), sourceRow, col1, filterline1->text(), sourceParent);
 		}
 	}
 
-	if (sourceModel()->data(sourceModel()->index(sourceRow, col, sourceParent)).type() == QVariant::Int) {
-		switch (rowsfiltercomparatorcombobox->currentIndex()) {
-			case 0:
-				if (sourceModel()->data(sourceModel()->index(sourceRow, col, sourceParent)).toInt() == filterRegExp().pattern().toInt()) {
-					return true;
-				}
-				break;
-			case 1:
-				if (sourceModel()->data(sourceModel()->index(sourceRow, col, sourceParent)).toInt() < filterRegExp().pattern().toInt()) {
-					return true;
-				}
-				break;
-			case 2:
-				if (sourceModel()->data(sourceModel()->index(sourceRow, col, sourceParent)).toInt() <= filterRegExp().pattern().toInt()) {
-					return true;
-				}
-				break;
-			case 3:
-				if (sourceModel()->data(sourceModel()->index(sourceRow, col, sourceParent)).toInt() > filterRegExp().pattern().toInt()) {
-					return true;
-				}
-				break;
-			case 4:
-				if (sourceModel()->data(sourceModel()->index(sourceRow, col, sourceParent)).toInt() >= filterRegExp().pattern().toInt()) {
-					return true;
-				}
-				break;
-			default:
-				break;
+	if (filterline1->text().isEmpty() && !filterline2->text().isEmpty()) {
+		if (sourceModel()->data(sourceModel()->index(sourceRow, col2, sourceParent)).type() == QVariant::ByteArray) {
+			return checkDouble(filtercomparatorcombobox2->currentIndex(), sourceRow, col2, filterline2->text(), sourceParent);
+		}
+
+		if (sourceModel()->data(sourceModel()->index(sourceRow, col2, sourceParent)).type() == QVariant::String) {
+			return checkString(filtercomparatorcombobox2->currentIndex(), sourceRow, col2, filterline2->text(), sourceParent);
+		}
+
+		if (sourceModel()->data(sourceModel()->index(sourceRow, col2, sourceParent)).type() == QVariant::Int) {
+			return checkInt(filtercomparatorcombobox2->currentIndex(), sourceRow, col2, filterline2->text(), sourceParent);
 		}
 	}
+
+	// to do including operator
 
     return false;
 }

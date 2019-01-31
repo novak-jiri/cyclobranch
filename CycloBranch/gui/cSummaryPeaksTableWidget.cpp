@@ -33,22 +33,45 @@ cSummaryPeaksTableWidget::cSummaryPeaksTableWidget(QWidget* parent) {
 	menuFile = new QMenu(tr("&File"), this);
 	menuHelp = new QMenu(tr("&Help"), this);
 
-	rowsfiltercombobox = new QComboBox();
-	rowsfiltercombobox->setToolTip("Column to be Searched");
-	rowsfiltercombobox->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+	rowsfilteroperator = new QComboBox();
+	rowsfilteroperator->setToolTip("OR = any condition must be met; AND = all conditions must be met.");
+	rowsfilteroperator->addItem("OR");
+	rowsfilteroperator->addItem("AND");
+	rowsfilteroperator->setSizeAdjustPolicy(QComboBox::AdjustToContents);
 
-	rowsfiltercomparatorcombobox = new QComboBox();
-	rowsfiltercomparatorcombobox->setToolTip("Type of Comparison");
-	rowsfiltercomparatorcombobox->addItem("=");
-	rowsfiltercomparatorcombobox->addItem("<");
-	rowsfiltercomparatorcombobox->addItem("<=");
-	rowsfiltercomparatorcombobox->addItem(">");
-	rowsfiltercomparatorcombobox->addItem(">=");
-	rowsfiltercomparatorcombobox->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+	rowsfiltercombobox1 = new QComboBox();
+	rowsfiltercombobox1->setToolTip("Column to be Searched");
+	rowsfiltercombobox1->setSizeAdjustPolicy(QComboBox::AdjustToContents);
 
-	rowsfilterline = new QLineEdit();
-	rowsfilterline->setMinimumWidth(300);
-	rowsfilterline->setToolTip("Text to Find");
+	rowsfiltercomparatorcombobox1 = new QComboBox();
+	rowsfiltercomparatorcombobox1->setToolTip("Type of Comparison");
+	rowsfiltercomparatorcombobox1->addItem("=");
+	rowsfiltercomparatorcombobox1->addItem("<");
+	rowsfiltercomparatorcombobox1->addItem("<=");
+	rowsfiltercomparatorcombobox1->addItem(">");
+	rowsfiltercomparatorcombobox1->addItem(">=");
+	rowsfiltercomparatorcombobox1->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+
+	rowsfilterline1 = new QLineEdit();
+	rowsfilterline1->setMinimumWidth(150);
+	rowsfilterline1->setToolTip("Text to Find");
+
+	rowsfiltercombobox2 = new QComboBox();
+	rowsfiltercombobox2->setToolTip("Column to be Searched");
+	rowsfiltercombobox2->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+
+	rowsfiltercomparatorcombobox2 = new QComboBox();
+	rowsfiltercomparatorcombobox2->setToolTip("Type of Comparison");
+	rowsfiltercomparatorcombobox2->addItem("=");
+	rowsfiltercomparatorcombobox2->addItem("<");
+	rowsfiltercomparatorcombobox2->addItem("<=");
+	rowsfiltercomparatorcombobox2->addItem(">");
+	rowsfiltercomparatorcombobox2->addItem(">=");
+	rowsfiltercomparatorcombobox2->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+
+	rowsfilterline2 = new QLineEdit();
+	rowsfilterline2->setMinimumWidth(150);
+	rowsfilterline2->setToolTip("Text to Find");
 
 	rowsfiltercasesensitive = new QCheckBox();
 	rowsfiltercasesensitive->setToolTip("Case Sensitive");
@@ -66,11 +89,19 @@ cSummaryPeaksTableWidget::cSummaryPeaksTableWidget(QWidget* parent) {
 	rowsfilterclearbutton->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_R));
 
 	rowsfilterhbox = new QHBoxLayout();
-	rowsfilterhbox->addWidget(rowsfiltercombobox);
+	rowsfilterhbox->addWidget(rowsfiltercombobox1);
 	rowsfilterhbox->addSpacing(10);
-	rowsfilterhbox->addWidget(rowsfiltercomparatorcombobox);
+	rowsfilterhbox->addWidget(rowsfiltercomparatorcombobox1);
 	rowsfilterhbox->addSpacing(10);
-	rowsfilterhbox->addWidget(rowsfilterline);
+	rowsfilterhbox->addWidget(rowsfilterline1);
+	rowsfilterhbox->addSpacing(10);
+	rowsfilterhbox->addWidget(rowsfilteroperator);
+	rowsfilterhbox->addSpacing(10);
+	rowsfilterhbox->addWidget(rowsfiltercombobox2);
+	rowsfilterhbox->addSpacing(10);
+	rowsfilterhbox->addWidget(rowsfiltercomparatorcombobox2);
+	rowsfilterhbox->addSpacing(10);
+	rowsfilterhbox->addWidget(rowsfilterline2);
 	rowsfilterhbox->addSpacing(10);
 	rowsfilterhbox->addWidget(rowsfiltercasesensitive);
 	rowsfilterhbox->addSpacing(10);
@@ -164,9 +195,13 @@ cSummaryPeaksTableWidget::cSummaryPeaksTableWidget(QWidget* parent) {
 cSummaryPeaksTableWidget::~cSummaryPeaksTableWidget() {
 	deleteTable();
 	
-	delete rowsfiltercombobox;
-	delete rowsfiltercomparatorcombobox;
-	delete rowsfilterline;
+	delete rowsfilteroperator;
+	delete rowsfiltercombobox1;
+	delete rowsfiltercomparatorcombobox1;
+	delete rowsfilterline1;
+	delete rowsfiltercombobox2;
+	delete rowsfiltercomparatorcombobox2;
+	delete rowsfilterline2;
 	delete rowsfiltercasesensitive;
 	delete rowsfilterwholeword;
 	delete rowsfilterbutton;
@@ -242,7 +277,7 @@ bool cSummaryPeaksTableWidget::prepareToShow(QStandardItemModel* resultsstandard
 
 	resetFilter();
 	deleteTable();
-	proxymodel->initialize(parameters->mode, parameters->peaklistfileformat, parameters->generateisotopepattern, rowsfiltercombobox, rowsfiltercomparatorcombobox);
+	proxymodel->initialize(parameters->mode, parameters->peaklistfileformat, parameters->generateisotopepattern, rowsfilteroperator, rowsfiltercombobox1, rowsfiltercomparatorcombobox1, rowsfilterline1, rowsfiltercombobox2, rowsfiltercomparatorcombobox2, rowsfilterline2);
 
 	coordinates.clear();
 
@@ -409,12 +444,14 @@ bool cSummaryPeaksTableWidget::prepareToShow(QStandardItemModel* resultsstandard
 		currentcolumn++;
 	}
 
-	rowsfiltercombobox->clear();
+	rowsfiltercombobox1->clear();
+	rowsfiltercombobox2->clear();
 	for (int i = 0; i < databasemodel->columnCount(); i++) {
 		database->resizeColumnToContents(i);
 		if (((parameters->mode == denovoengine) || (parameters->mode == singlecomparison) || (parameters->mode == databasesearch)) ||
 			(((parameters->mode == dereplication) || (parameters->mode == compoundsearch)) && (i < databasemodel->columnCount() - 1))) {
-			rowsfiltercombobox->addItem(databasemodel->horizontalHeaderItem(i)->text());
+			rowsfiltercombobox1->addItem(databasemodel->horizontalHeaderItem(i)->text());
+			rowsfiltercombobox2->addItem(databasemodel->horizontalHeaderItem(i)->text());
 		}
 	}
 
@@ -678,7 +715,7 @@ bool cSummaryPeaksTableWidget::prepareToShow(QStandardItemModel* resultsstandard
 		if ((parameters->mode == dereplication) || (parameters->mode == compoundsearch)) {
 			if ((parameters->peaklistfileformat == mis) || (parameters->peaklistfileformat == imzML)) {
 				emit resetRegion();
-				emit sendFilterOptionsToImageWindow(coordinates, rowsfiltercombobox->currentText().toStdString(), rowsfiltercomparatorcombobox->currentText().toStdString(), rowsfilterline->text().toStdString(), rowsfiltercasesensitive->isChecked(), rowsfilterwholeword->isChecked());
+				emit sendFilterOptionsToImageWindow(coordinates, (bool)rowsfilteroperator->currentIndex(), rowsfiltercombobox1->currentText().toStdString(), rowsfiltercomparatorcombobox1->currentText().toStdString(), rowsfilterline1->text().toStdString(), rowsfiltercombobox2->currentText().toStdString(), rowsfiltercomparatorcombobox2->currentText().toStdString(), rowsfilterline2->text().toStdString(), rowsfiltercasesensitive->isChecked(), rowsfilterwholeword->isChecked());
 
 				if (parameters->generateisotopepattern) {
 					database->setColumnWidth(12, min(400, database->columnWidth(12)));
@@ -755,7 +792,7 @@ void cSummaryPeaksTableWidget::addEICPeak(cPeaksList& eicchromatogram, cPeaksLis
 
 void cSummaryPeaksTableWidget::keyPressEvent(QKeyEvent *event) {
 	if ((event->key() == Qt::Key_Enter) || (event->key() == Qt::Key_Return)) {
-		if (rowsfilterline->hasFocus()) {
+		if (rowsfilterline1->hasFocus() || rowsfilterline2->hasFocus()) {
 			filterRows();
 		}
 		else {
@@ -766,7 +803,7 @@ void cSummaryPeaksTableWidget::keyPressEvent(QKeyEvent *event) {
     }
 
 	if ((event->modifiers() == Qt::ControlModifier) && (event->key() == Qt::Key_F)) {
-		rowsfilterline->setFocus();
+		rowsfilterline1->setFocus();
 	}
 
 	if ((event->modifiers() == Qt::ControlModifier) && (event->key() == Qt::Key_T)) {
@@ -816,7 +853,7 @@ void cSummaryPeaksTableWidget::closeWindow() {
 
 void cSummaryPeaksTableWidget::filterRows() {
 	Qt::CaseSensitivity casesensitive = rowsfiltercasesensitive->isChecked()?Qt::CaseSensitive:Qt::CaseInsensitive;
-	QString str = rowsfilterline->text();
+	QString str = "";
 	int i, id, x, y;
 	int iontypecol, mzcol, relintcol, absintcol, namecol;
 
@@ -921,7 +958,7 @@ void cSummaryPeaksTableWidget::filterRows() {
 
 	if (((parameters->mode == dereplication) || (parameters->mode == compoundsearch)) && !progress.wasCanceled()) {
 		if ((parameters->peaklistfileformat == mis) || (parameters->peaklistfileformat == imzML)) {
-			emit sendFilterOptionsToImageWindow(coordinates, rowsfiltercombobox->currentText().toStdString(), rowsfiltercomparatorcombobox->currentText().toStdString(), rowsfilterline->text().toStdString(), rowsfiltercasesensitive->isChecked(), rowsfilterwholeword->isChecked());
+			emit sendFilterOptionsToImageWindow(coordinates, (bool)rowsfilteroperator->currentIndex(), rowsfiltercombobox1->currentText().toStdString(), rowsfiltercomparatorcombobox1->currentText().toStdString(), rowsfilterline1->text().toStdString(), rowsfiltercombobox2->currentText().toStdString(), rowsfiltercomparatorcombobox2->currentText().toStdString(), rowsfilterline2->text().toStdString(), rowsfiltercasesensitive->isChecked(), rowsfilterwholeword->isChecked());
 		}
 		else {
 			eicchromatogram.normalizeIntenzity();
@@ -934,7 +971,8 @@ void cSummaryPeaksTableWidget::filterRows() {
 
 
 void cSummaryPeaksTableWidget::resetFilter() {
-	rowsfilterline->setText("");
+	rowsfilterline1->setText("");
+	rowsfilterline2->setText("");
 
 	int rowcount = databasemodel->rowCount();
 	int i, x, y;
@@ -995,7 +1033,7 @@ void cSummaryPeaksTableWidget::resetFilter() {
 
 				progress.setValue(i);
 			}
-			emit sendFilterOptionsToImageWindow(coordinates, rowsfiltercombobox->currentText().toStdString(), rowsfiltercomparatorcombobox->currentText().toStdString(), rowsfilterline->text().toStdString(), rowsfiltercasesensitive->isChecked(), rowsfilterwholeword->isChecked());
+			emit sendFilterOptionsToImageWindow(coordinates, (bool)rowsfilteroperator->currentIndex(), rowsfiltercombobox1->currentText().toStdString(), rowsfiltercomparatorcombobox1->currentText().toStdString(), rowsfilterline1->text().toStdString(), rowsfiltercombobox2->currentText().toStdString(), rowsfiltercomparatorcombobox2->currentText().toStdString(), rowsfilterline2->text().toStdString(), rowsfiltercasesensitive->isChecked(), rowsfilterwholeword->isChecked());
 		}
 		else {
 			eicchromatogram = origeicchromatogram;

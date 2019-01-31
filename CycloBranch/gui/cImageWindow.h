@@ -342,7 +342,7 @@ private slots:
 	void saveImage();
 
 
-	void setFilterOptionsSlot(vector<cCoordinates> coordinates, string columnname, string comparatorname, string filterstring, bool casesensitive, bool wholeword);
+	void setFilterOptionsSlot(vector<cCoordinates> coordinates, bool operatortype, string columnname1, string comparatorname1, string filterstring1, string columnname2, string comparatorname2, string filterstring2, bool casesensitive, bool wholeword);
 
 
 	void setMaxButtonReleased();

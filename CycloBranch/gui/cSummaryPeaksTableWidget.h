@@ -307,9 +307,17 @@ private:
 	QToolBar* toolbarFilter;
 	QWidget* rowsfilterwidget;
 	QHBoxLayout* rowsfilterhbox;
-	QComboBox* rowsfiltercombobox;
-	QComboBox* rowsfiltercomparatorcombobox;
-	QLineEdit* rowsfilterline;
+
+	QComboBox* rowsfilteroperator;
+
+	QComboBox* rowsfiltercombobox1;
+	QComboBox* rowsfiltercomparatorcombobox1;
+	QLineEdit* rowsfilterline1;
+
+	QComboBox* rowsfiltercombobox2;
+	QComboBox* rowsfiltercomparatorcombobox2;
+	QLineEdit* rowsfilterline2;
+
 	QCheckBox* rowsfiltercasesensitive;
 	QCheckBox* rowsfilterwholeword;
 	QPushButton* rowsfilterbutton;
@@ -389,13 +397,17 @@ signals:
 	/**
 		\brief Send the vector of coordinates to image window.
 		\param coordinates a vector of coordinates x and y
-		\param columnname name of column which was compared
-		\param comparatorname name of used comparator
-		\param filterstring a string used to filter the points
+		\param operatortype the type of operator (0 = or; 1 = and)
+		\param columnname1 name of column which was compared
+		\param comparatorname1 name of used comparator
+		\param filterstring1 a string used to filter the points
+		\param columnname2 name of column which was compared
+		\param comparatorname2 name of used comparator
+		\param filterstring2 a string used to filter the points
 		\param casesensitive true if the string was used as a casesensitive, false otherwise
 		\param wholeword true if whole words only are compared, false otherwise
 	*/ 
-	void sendFilterOptionsToImageWindow(vector<cCoordinates> coordinates, string columnname, string comparatorname, string filterstring, bool casesensitive, bool wholeword);
+	void sendFilterOptionsToImageWindow(vector<cCoordinates> coordinates, bool operatortype, string columnname1, string comparatorname1, string filterstring1, string columnname2, string comparatorname2, string filterstring2, bool casesensitive, bool wholeword);
 
 
 	/**

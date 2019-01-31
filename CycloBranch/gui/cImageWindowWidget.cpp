@@ -13,9 +13,13 @@ cImageWindowWidget::cImageWindowWidget() {
 	setScene(scene);
 
 	coordinates.clear();
-	columnname = "";
-	comparatorname = "";
-	filteredstring = "";
+	operatortype = 0;
+	columnname1 = "";
+	comparatorname1 = "";
+	filteredstring1 = "";
+	columnname2 = "";
+	comparatorname2 = "";
+	filteredstring2 = "";
 	casesensitive = false;
 	wholeword = false;
 
@@ -137,11 +141,15 @@ QImage cImageWindowWidget::getImage() {
 }
 
 
-void cImageWindowWidget::setFilterOptions(vector<cCoordinates>& coordinates, string& columnname, string& comparatorname, string& filteredstring, bool casesensitive, bool wholeword) {
+void cImageWindowWidget::setFilterOptions(vector<cCoordinates>& coordinates, bool operatortype, string& columnname1, string& comparatorname1, string& filterstring1, string& columnname2, string& comparatorname2, string& filterstring2, bool casesensitive, bool wholeword) {
 	this->coordinates = coordinates;
-	this->columnname = columnname;
-	this->comparatorname = comparatorname;
-	this->filteredstring = filteredstring;
+	this->operatortype = operatortype;
+	this->columnname1 = columnname1;
+	this->comparatorname1 = comparatorname1;
+	this->filteredstring1 = filteredstring1;
+	this->columnname2 = columnname2;
+	this->comparatorname2 = comparatorname2;
+	this->filteredstring2 = filteredstring2;
 	this->casesensitive = casesensitive;
 	this->wholeword = wholeword;
 	redrawScene();
@@ -908,8 +916,25 @@ void cImageWindowWidget::redrawScene() {
 		}
 
 		qstr = "Number of Points Selected: " + QString::number(reduced_coordinates.size());
-		if (!filteredstring.empty()) {
-			qstr += " (filtered by column: \"" + QString(columnname.c_str()) + "\", comparator: \"" + QString(comparatorname.c_str()) + "\", text: \"" + QString(filteredstring.c_str()) + "\", case sensitive: " + QString((casesensitive) ? "yes" : "no") + ", whole words only: " + QString((wholeword) ? "yes" : "no") + ")";
+		if (!filteredstring1.empty() || !filteredstring2.empty()) {
+			qstr += " (";
+		}
+		if (!filteredstring1.empty()) {
+			qstr += "column: \"" + QString(columnname1.c_str()) + "\", comparator: \"" + QString(comparatorname1.c_str()) + "\", text: \"" + QString(filteredstring1.c_str()) + "\"";
+		}
+		if (!filteredstring1.empty() && !filteredstring2.empty()) {
+			if (operatortype == 0) {
+				qstr += " or ";
+			}
+			else {
+				qstr += " and ";
+			}
+		}
+		if (!filteredstring2.empty()) {
+			qstr += "column: \"" + QString(columnname2.c_str()) + "\", comparator: \"" + QString(comparatorname2.c_str()) + "\", text: \"" + QString(filteredstring2.c_str()) + "\"";
+		}
+		if (!filteredstring1.empty() || !filteredstring2.empty()) {
+			qstr += ", case sensitive: " + QString((casesensitive) ? "yes" : "no") + ", whole words only: " + QString((wholeword) ? "yes" : "no") + ")";
 		}
 		qstr += "\n";
 		qstr += "Minimum Bounding Region:\nX: " + QString::number(xmin) + "-" + QString::number(xmax) + "; Y: " + QString::number(ymin) + "-" + QString::number(ymax) + "\n";

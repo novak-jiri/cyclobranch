@@ -1074,8 +1074,8 @@ void cImageWindow::saveImage() {
 }
 
 
-void cImageWindow::setFilterOptionsSlot(vector<cCoordinates> coordinates, string columnname, string comparatorname, string filterstring, bool casesensitive, bool wholeword) {
-	imagewindowwidget->setFilterOptions(coordinates, columnname, comparatorname, filterstring, casesensitive, wholeword);
+void cImageWindow::setFilterOptionsSlot(vector<cCoordinates> coordinates, bool operatortype, string columnname1, string comparatorname1, string filterstring1, string columnname2, string comparatorname2, string filterstring2, bool casesensitive, bool wholeword) {
+	imagewindowwidget->setFilterOptions(coordinates, operatortype, columnname1, comparatorname1, filterstring1, columnname2, comparatorname2, filterstring2, casesensitive, wholeword);
 }
 
 
