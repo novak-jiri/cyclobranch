@@ -16,10 +16,10 @@ cImageWindowWidget::cImageWindowWidget() {
 	operatortype = 0;
 	columnname1 = "";
 	comparatorname1 = "";
-	filteredstring1 = "";
+	filterstring1 = "";
 	columnname2 = "";
 	comparatorname2 = "";
-	filteredstring2 = "";
+	filterstring2 = "";
 	casesensitive = false;
 	wholeword = false;
 
@@ -146,10 +146,10 @@ void cImageWindowWidget::setFilterOptions(vector<cCoordinates>& coordinates, boo
 	this->operatortype = operatortype;
 	this->columnname1 = columnname1;
 	this->comparatorname1 = comparatorname1;
-	this->filteredstring1 = filteredstring1;
+	this->filterstring1 = filterstring1;
 	this->columnname2 = columnname2;
 	this->comparatorname2 = comparatorname2;
-	this->filteredstring2 = filteredstring2;
+	this->filterstring2 = filterstring2;
 	this->casesensitive = casesensitive;
 	this->wholeword = wholeword;
 	redrawScene();
@@ -916,13 +916,13 @@ void cImageWindowWidget::redrawScene() {
 		}
 
 		qstr = "Number of Points Selected: " + QString::number(reduced_coordinates.size());
-		if (!filteredstring1.empty() || !filteredstring2.empty()) {
+		if (!filterstring1.empty() || !filterstring2.empty()) {
 			qstr += " (";
 		}
-		if (!filteredstring1.empty()) {
-			qstr += "column: \"" + QString(columnname1.c_str()) + "\", comparator: \"" + QString(comparatorname1.c_str()) + "\", text: \"" + QString(filteredstring1.c_str()) + "\"";
+		if (!filterstring1.empty()) {
+			qstr += "column: \"" + QString(columnname1.c_str()) + "\", comparator: \"" + QString(comparatorname1.c_str()) + "\", text: \"" + QString(filterstring1.c_str()) + "\"";
 		}
-		if (!filteredstring1.empty() && !filteredstring2.empty()) {
+		if (!filterstring1.empty() && !filterstring2.empty()) {
 			if (operatortype == 0) {
 				qstr += " or ";
 			}
@@ -930,10 +930,10 @@ void cImageWindowWidget::redrawScene() {
 				qstr += " and ";
 			}
 		}
-		if (!filteredstring2.empty()) {
-			qstr += "column: \"" + QString(columnname2.c_str()) + "\", comparator: \"" + QString(comparatorname2.c_str()) + "\", text: \"" + QString(filteredstring2.c_str()) + "\"";
+		if (!filterstring2.empty()) {
+			qstr += "column: \"" + QString(columnname2.c_str()) + "\", comparator: \"" + QString(comparatorname2.c_str()) + "\", text: \"" + QString(filterstring2.c_str()) + "\"";
 		}
-		if (!filteredstring1.empty() || !filteredstring2.empty()) {
+		if (!filterstring1.empty() || !filterstring2.empty()) {
 			qstr += ", case sensitive: " + QString((casesensitive) ? "yes" : "no") + ", whole words only: " + QString((wholeword) ? "yes" : "no") + ")";
 		}
 		qstr += "\n";

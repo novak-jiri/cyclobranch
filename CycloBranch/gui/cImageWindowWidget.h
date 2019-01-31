@@ -444,10 +444,10 @@ private:
 	bool operatortype;
 	string columnname1;
 	string comparatorname1;
-	string filteredstring1;
+	string filterstring1;
 	string columnname2;
 	string comparatorname2;
-	string filteredstring2;
+	string filterstring2;
 	bool casesensitive;
 	bool wholeword;
 

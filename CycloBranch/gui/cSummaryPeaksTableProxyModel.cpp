@@ -174,37 +174,50 @@ bool cSummaryPeaksTableProxyModel::filterAcceptsRow(int sourceRow, const QModelI
 	int col1 = filtercombobox1->currentIndex();
 	int col2 = filtercombobox2->currentIndex();
 
-	if (!filterline1->text().isEmpty() && filterline2->text().isEmpty()) {
+	bool result1 = false;
+	bool result2 = false;
+
+	if (!filterline1->text().isEmpty()) {
 		if (sourceModel()->data(sourceModel()->index(sourceRow, col1, sourceParent)).type() == QVariant::ByteArray) {
-			return checkDouble(filtercomparatorcombobox1->currentIndex(), sourceRow, col1, filterline1->text(), sourceParent);
+			result1 = checkDouble(filtercomparatorcombobox1->currentIndex(), sourceRow, col1, filterline1->text(), sourceParent);
 		}
 
 		if (sourceModel()->data(sourceModel()->index(sourceRow, col1, sourceParent)).type() == QVariant::String) {
-			return checkString(filtercomparatorcombobox1->currentIndex(), sourceRow, col1, filterline1->text(), sourceParent);
+			result1 = checkString(filtercomparatorcombobox1->currentIndex(), sourceRow, col1, filterline1->text(), sourceParent);
 		}
 
 		if (sourceModel()->data(sourceModel()->index(sourceRow, col1, sourceParent)).type() == QVariant::Int) {
-			return checkInt(filtercomparatorcombobox1->currentIndex(), sourceRow, col1, filterline1->text(), sourceParent);
+			result1 = checkInt(filtercomparatorcombobox1->currentIndex(), sourceRow, col1, filterline1->text(), sourceParent);
 		}
 	}
 
-	if (filterline1->text().isEmpty() && !filterline2->text().isEmpty()) {
+	if (!filterline2->text().isEmpty()) {
 		if (sourceModel()->data(sourceModel()->index(sourceRow, col2, sourceParent)).type() == QVariant::ByteArray) {
-			return checkDouble(filtercomparatorcombobox2->currentIndex(), sourceRow, col2, filterline2->text(), sourceParent);
+			result2 = checkDouble(filtercomparatorcombobox2->currentIndex(), sourceRow, col2, filterline2->text(), sourceParent);
 		}
 
 		if (sourceModel()->data(sourceModel()->index(sourceRow, col2, sourceParent)).type() == QVariant::String) {
-			return checkString(filtercomparatorcombobox2->currentIndex(), sourceRow, col2, filterline2->text(), sourceParent);
+			result2 = checkString(filtercomparatorcombobox2->currentIndex(), sourceRow, col2, filterline2->text(), sourceParent);
 		}
 
 		if (sourceModel()->data(sourceModel()->index(sourceRow, col2, sourceParent)).type() == QVariant::Int) {
-			return checkInt(filtercomparatorcombobox2->currentIndex(), sourceRow, col2, filterline2->text(), sourceParent);
+			result2 = checkInt(filtercomparatorcombobox2->currentIndex(), sourceRow, col2, filterline2->text(), sourceParent);
 		}
 	}
 
-	// to do including operator
+	if (!filterline1->text().isEmpty() && filterline2->text().isEmpty()) {
+		return result1;
+	}
 
-    return false;
+	if (filterline1->text().isEmpty() && !filterline2->text().isEmpty()) {
+		return result2;
+	}
+
+	if (filteroperator->currentIndex() == 0) {
+		return result1 || result2;
+	}
+
+    return result1 && result2;
 }
 
 
