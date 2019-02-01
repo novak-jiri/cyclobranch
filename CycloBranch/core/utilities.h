@@ -21,6 +21,8 @@
 #include <QString>
 #include <QByteArray>
 #include <QMetaType>
+#include <QAbstractItemModel>
+#include <QModelIndex>
 #include <boost/regex.hpp>
 
 class cBrick;
@@ -511,6 +513,47 @@ struct compareStringBySize {
 	}
 
 };
+
+
+/**
+	\brief Proxy model - int comparator.
+	\param model model
+	\param index index
+	\param row row
+	\param column column
+	\param str string
+	\param parent parent
+	\retval bool true if the item is valid
+*/
+bool proxyModelCheckInt(QAbstractItemModel* model, int index, int row, int column, QString& str, const QModelIndex& parent);
+
+
+/**
+	\brief Proxy model - double comparator.
+	\param model model
+	\param index index
+	\param row row
+	\param column column
+	\param str string
+	\param parent parent
+	\retval bool true if the item is valid
+*/
+bool proxyModelCheckDouble(QAbstractItemModel* model, int index, int row, int column, QString& str, const QModelIndex& parent);
+
+
+/**
+	\brief Proxy model - string comparator.
+	\param model model
+	\param index index
+	\param row row
+	\param column column
+	\param str string
+	\param parent parent
+	\param wholeword wholeword
+	\param casesensitive casesensitive
+	\retval bool true if the item is valid
+*/
+bool proxyModelCheckString(QAbstractItemModel* model, int index, int row, int column, QString& str, const QModelIndex& parent, bool wholeword, Qt::CaseSensitivity casesensitive);
 
 
 #endif

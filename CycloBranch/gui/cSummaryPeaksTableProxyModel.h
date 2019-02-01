@@ -36,12 +36,6 @@ private:
 	QLineEdit* filterline2;
 	bool wholeword;
 
-	bool checkInt(int index, int row, int column, QString& str, const QModelIndex& parent) const;
-
-	bool checkDouble(int index, int row, int column, QString& str, const QModelIndex& parent) const;
-
-	bool checkString(int index, int row, int column, QString& str, const QModelIndex& parent) const;
-
 
 public:
 
