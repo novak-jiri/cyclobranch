@@ -487,5 +487,31 @@ void stripIsomers(string& peptidesequence);
 void stripIsomersFromStringVector(vector<string>& acronyms);
 
 
+/**
+	\brief Compare items in a string vector by size.
+*/
+struct compareStringBySize {
+
+	/**
+		\brief Comparison function.
+		\param first first string
+		\param second second string
+		\retval bool true if the first string is shorter
+	*/	
+	bool operator()(const std::string& first, const std::string& second) {
+		size_t size1 = first.size();
+		size_t size2 = second.size();
+		if (first.size() < second.size()) {
+			return true;
+		}
+		if (first.size() > second.size()) {
+			return false;
+		}
+		return first.compare(second) < 0;
+	}
+
+};
+
+
 #endif
 

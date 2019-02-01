@@ -1216,8 +1216,19 @@ void cSpectrumDetailWidget::prepareToShow(QAction* actionShowIsomers, cPeakListS
 			if ((parameters->mode == denovoengine) || (parameters->mode == singlecomparison) || (parameters->mode == databasesearch)) {
 				if (localneutralosses.size() > 0) {
 					neutrallosscombobox->addItem(tr("none"));
-					for (auto& it : localneutralosses) {
-						neutrallosscombobox->addItem(tr(it.c_str()));
+					if (localneutralosses.size() <= 10000) {
+						vector<string> tmpstrvector;
+						tmpstrvector.reserve(localneutralosses.size());
+						for (auto& it : localneutralosses) {
+							tmpstrvector.push_back(it);
+						}
+
+						compareStringBySize cmp;
+						sort(tmpstrvector.begin(), tmpstrvector.end(), cmp);
+
+						for (auto& it : tmpstrvector) {
+							neutrallosscombobox->addItem(tr(it.c_str()));
+						}
 					}
 				}
 			}
