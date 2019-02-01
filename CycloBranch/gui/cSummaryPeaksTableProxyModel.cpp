@@ -73,7 +73,8 @@ bool cSummaryPeaksTableProxyModel::filterAcceptsRow(int sourceRow, const QModelI
 		}
 
 		if (sourceModel()->data(sourceModel()->index(sourceRow, col1, sourceParent)).type() == QVariant::String) {
-			result1 = proxyModelCheckString(sourceModel(), filtercomparatorcombobox1->currentIndex(), sourceRow, col1, filterline1->text(), sourceParent, wholeword, filterCaseSensitivity());
+			QString qstr = sourceModel()->data(sourceModel()->index(sourceRow, col1, sourceParent)).toString();
+			result1 = proxyModelCheckString(sourceModel(), filtercomparatorcombobox1->currentIndex(), sourceRow, col1, qstr, filterline1->text(), sourceParent, wholeword, filterCaseSensitivity());
 		}
 
 		if (sourceModel()->data(sourceModel()->index(sourceRow, col1, sourceParent)).type() == QVariant::Int) {
@@ -87,7 +88,8 @@ bool cSummaryPeaksTableProxyModel::filterAcceptsRow(int sourceRow, const QModelI
 		}
 
 		if (sourceModel()->data(sourceModel()->index(sourceRow, col2, sourceParent)).type() == QVariant::String) {
-			result2 = proxyModelCheckString(sourceModel(), filtercomparatorcombobox2->currentIndex(), sourceRow, col2, filterline2->text(), sourceParent, wholeword, filterCaseSensitivity());
+			QString qstr = sourceModel()->data(sourceModel()->index(sourceRow, col2, sourceParent)).toString();
+			result2 = proxyModelCheckString(sourceModel(), filtercomparatorcombobox2->currentIndex(), sourceRow, col2, qstr, filterline2->text(), sourceParent, wholeword, filterCaseSensitivity());
 		}
 
 		if (sourceModel()->data(sourceModel()->index(sourceRow, col2, sourceParent)).type() == QVariant::Int) {
@@ -107,7 +109,7 @@ bool cSummaryPeaksTableProxyModel::filterAcceptsRow(int sourceRow, const QModelI
 		return result1 || result2;
 	}
 
-    return result1 && result2;
+	return result1 && result2;
 }
 
 

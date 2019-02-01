@@ -510,75 +510,73 @@ bool proxyModelCheckInt(QAbstractItemModel* model, int index, int row, int colum
 
 bool proxyModelCheckDouble(QAbstractItemModel* model, int index, int row, int column, QString& str, const QModelIndex& parent) {
 	switch (index) {
-	case 0:
-		if (model->data(model->index(row, column, parent)).toDouble() == str.toDouble()) {
-			return true;
-		}
-		break;
-	case 1:
-		if (model->data(model->index(row, column, parent)).toDouble() < str.toDouble()) {
-			return true;
-		}
-		break;
-	case 2:
-		if (model->data(model->index(row, column, parent)).toDouble() <= str.toDouble()) {
-			return true;
-		}
-		break;
-	case 3:
-		if (model->data(model->index(row, column, parent)).toDouble() > str.toDouble()) {
-			return true;
-		}
-		break;
-	case 4:
-		if (model->data(model->index(row, column, parent)).toDouble() >= str.toDouble()) {
-			return true;
-		}
-		break;
-	default:
-		break;
+		case 0:
+			if (model->data(model->index(row, column, parent)).toDouble() == str.toDouble()) {
+				return true;
+			}
+			break;
+		case 1:
+			if (model->data(model->index(row, column, parent)).toDouble() < str.toDouble()) {
+				return true;
+			}
+			break;
+		case 2:
+			if (model->data(model->index(row, column, parent)).toDouble() <= str.toDouble()) {
+				return true;
+			}
+			break;
+		case 3:
+			if (model->data(model->index(row, column, parent)).toDouble() > str.toDouble()) {
+				return true;
+			}
+			break;
+		case 4:
+			if (model->data(model->index(row, column, parent)).toDouble() >= str.toDouble()) {
+				return true;
+			}
+			break;
+		default:
+			break;
 	}
 	return false;
 }
 
 
-bool proxyModelCheckString(QAbstractItemModel* model, int index, int row, int column, QString& str, const QModelIndex& parent, bool wholeword, Qt::CaseSensitivity casesensitive) {
-	string itemstr = model->data(model->index(row, column, parent)).toString().toStdString();
-	QString qstr = stripHTML(itemstr).c_str();
-
+bool proxyModelCheckString(QAbstractItemModel* model, int index, int row, int column, QString& itemstr, QString& str, const QModelIndex& parent, bool wholeword, Qt::CaseSensitivity casesensitive) {
+	QString qstr = stripHTML(itemstr.toStdString()).c_str();
 	switch (index) {
-	case 0:
-		if (wholeword) {
-			if (qstr.compare(str, casesensitive) == 0) {
+		case 0:
+			if (wholeword) {
+				if (qstr.compare(str, casesensitive) == 0) {
+					return true;
+				}
+			}
+			else {
+				return qstr.contains(str, casesensitive);
+			}
+			break;
+		case 1:
+			if (qstr.compare(str, casesensitive) < 0) {
 				return true;
 			}
-		}
-		else {
-			return qstr.contains(str, casesensitive);
-		}
-		break;
-	case 1:
-		if (qstr.compare(str, casesensitive) < 0) {
-			return true;
-		}
-		break;
-	case 2:
-		if (qstr.compare(str, casesensitive) <= 0) {
-			return true;
-		}
-		break;
-	case 3:
-		if (qstr.compare(str, casesensitive) > 0) {
-			return true;
-		}
-		break;
-	case 4:
-		if (qstr.compare(str, casesensitive) >= 0) {
-			return true;
-		}
-		break;
-	default:
-		break;
+			break;
+		case 2:
+			if (qstr.compare(str, casesensitive) <= 0) {
+				return true;
+			}
+			break;
+		case 3:
+			if (qstr.compare(str, casesensitive) > 0) {
+				return true;
+			}
+			break;
+		case 4:
+			if (qstr.compare(str, casesensitive) >= 0) {
+				return true;
+			}
+			break;
+		default:
+			break;
 	}
 	return false;
 }
