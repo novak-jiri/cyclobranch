@@ -12,7 +12,7 @@
 #include <QComboBox>
 #include <QSortFilterProxyModel>
 #include <QLineEdit>
-#include "core/cFragmentIons.h"
+#include "core/utilities.h"
 
 
 /**

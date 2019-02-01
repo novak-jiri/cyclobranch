@@ -141,22 +141,45 @@ cMainWindow::cMainWindow() {
 	toolbarHelp->addAction(actionPDFManual);
 	toolbarHelp->addAction(actionAbout);
 
-	rowsfiltercombobox = new QComboBox();
-	rowsfiltercombobox->setToolTip("Column to be Searched");
-	rowsfiltercombobox->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+	rowsfilteroperator = new QComboBox();
+	rowsfilteroperator->setToolTip("OR = any condition must be met; AND = all conditions must be met.");
+	rowsfilteroperator->addItem("OR");
+	rowsfilteroperator->addItem("AND");
+	rowsfilteroperator->setSizeAdjustPolicy(QComboBox::AdjustToContents);
 
-	rowsfiltercomparatorcombobox = new QComboBox();
-	rowsfiltercomparatorcombobox->setToolTip("Type of Comparison");
-	rowsfiltercomparatorcombobox->addItem("=");
-	rowsfiltercomparatorcombobox->addItem("<");
-	rowsfiltercomparatorcombobox->addItem("<=");
-	rowsfiltercomparatorcombobox->addItem(">");
-	rowsfiltercomparatorcombobox->addItem(">=");
-	rowsfiltercomparatorcombobox->setSizeAdjustPolicy(QComboBox::AdjustToContents);
-	
-	rowsfilterline = new QLineEdit();
-	rowsfilterline->setMinimumWidth(300);
-	rowsfilterline->setToolTip("Text to Find");
+	rowsfiltercombobox1 = new QComboBox();
+	rowsfiltercombobox1->setToolTip("Column to be Searched");
+	rowsfiltercombobox1->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+
+	rowsfiltercomparatorcombobox1 = new QComboBox();
+	rowsfiltercomparatorcombobox1->setToolTip("Type of Comparison");
+	rowsfiltercomparatorcombobox1->addItem("=");
+	rowsfiltercomparatorcombobox1->addItem("<");
+	rowsfiltercomparatorcombobox1->addItem("<=");
+	rowsfiltercomparatorcombobox1->addItem(">");
+	rowsfiltercomparatorcombobox1->addItem(">=");
+	rowsfiltercomparatorcombobox1->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+
+	rowsfilterline1 = new QLineEdit();
+	rowsfilterline1->setMinimumWidth(150);
+	rowsfilterline1->setToolTip("Text to Find");
+
+	rowsfiltercombobox2 = new QComboBox();
+	rowsfiltercombobox2->setToolTip("Column to be Searched");
+	rowsfiltercombobox2->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+
+	rowsfiltercomparatorcombobox2 = new QComboBox();
+	rowsfiltercomparatorcombobox2->setToolTip("Type of Comparison");
+	rowsfiltercomparatorcombobox2->addItem("=");
+	rowsfiltercomparatorcombobox2->addItem("<");
+	rowsfiltercomparatorcombobox2->addItem("<=");
+	rowsfiltercomparatorcombobox2->addItem(">");
+	rowsfiltercomparatorcombobox2->addItem(">=");
+	rowsfiltercomparatorcombobox2->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+
+	rowsfilterline2 = new QLineEdit();
+	rowsfilterline2->setMinimumWidth(150);
+	rowsfilterline2->setToolTip("Text to Find");
 
 	rowsfiltercasesensitive = new QCheckBox();
 	rowsfiltercasesensitive->setToolTip("Case Sensitive");
@@ -174,11 +197,19 @@ cMainWindow::cMainWindow() {
 	rowsfilterclearbutton->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_R));
 
 	rowsfilterhbox = new QHBoxLayout();
-	rowsfilterhbox->addWidget(rowsfiltercombobox);
+	rowsfilterhbox->addWidget(rowsfiltercombobox1);
 	rowsfilterhbox->addSpacing(10);
-	rowsfilterhbox->addWidget(rowsfiltercomparatorcombobox);
+	rowsfilterhbox->addWidget(rowsfiltercomparatorcombobox1);
 	rowsfilterhbox->addSpacing(10);
-	rowsfilterhbox->addWidget(rowsfilterline);
+	rowsfilterhbox->addWidget(rowsfilterline1);
+	rowsfilterhbox->addSpacing(10);
+	rowsfilterhbox->addWidget(rowsfilteroperator);
+	rowsfilterhbox->addSpacing(10);
+	rowsfilterhbox->addWidget(rowsfiltercombobox2);
+	rowsfilterhbox->addSpacing(10);
+	rowsfilterhbox->addWidget(rowsfiltercomparatorcombobox2);
+	rowsfilterhbox->addSpacing(10);
+	rowsfilterhbox->addWidget(rowsfilterline2);
 	rowsfilterhbox->addSpacing(10);
 	rowsfilterhbox->addWidget(rowsfiltercasesensitive);
 	rowsfilterhbox->addSpacing(10);
@@ -198,7 +229,7 @@ cMainWindow::cMainWindow() {
 	results = new QTableView(this);
 	resultsmodel = new QStandardItemModel(0, 0, this);
 	resultsproxymodel = new cMainWindowProxyModel(this);
-	resultsproxymodel->initialize(rowsfiltercombobox, rowsfiltercomparatorcombobox);
+	resultsproxymodel->initialize(rowsfilteroperator, rowsfiltercombobox1, rowsfiltercomparatorcombobox1, rowsfilterline1, rowsfiltercombobox2, rowsfiltercomparatorcombobox2, rowsfilterline2);
 
 	logWindow = new QTextEdit(this);
 	logWindow->setPlainText("To start the program: click \"Search -> Settings\", configure the tool and then click \"Search -> Run\".");
@@ -358,9 +389,13 @@ cMainWindow::cMainWindow() {
 cMainWindow::~cMainWindow() {
 	deleteResults();
 
-	delete rowsfiltercombobox;
-	delete rowsfiltercomparatorcombobox;
-	delete rowsfilterline;
+	delete rowsfilteroperator;
+	delete rowsfiltercombobox1;
+	delete rowsfiltercomparatorcombobox1;
+	delete rowsfilterline1;
+	delete rowsfiltercombobox2;
+	delete rowsfiltercomparatorcombobox2;
+	delete rowsfilterline2;
 	delete rowsfiltercasesensitive;
 	delete rowsfilterwholeword;
 	delete rowsfilterbutton;
@@ -422,7 +457,7 @@ cMainWindow::~cMainWindow() {
 
 void cMainWindow::keyPressEvent(QKeyEvent *event) {
 	if ((event->key() == Qt::Key_Enter) || (event->key() == Qt::Key_Return)) {
-		if (rowsfilterline->hasFocus()) {
+		if (rowsfilterline1->hasFocus() || rowsfilterline2->hasFocus()) {
 			filterResults();
 		}
 		else {
@@ -433,7 +468,7 @@ void cMainWindow::keyPressEvent(QKeyEvent *event) {
     }
 
 	if ((event->modifiers() == Qt::ControlModifier) && (event->key() == Qt::Key_F)) {
-		rowsfilterline->setFocus();
+		rowsfilterline1->setFocus();
 	}
 
 	if ((event->modifiers() == Qt::ControlModifier) && (event->key() == Qt::Key_T)) {
@@ -965,25 +1000,24 @@ void cMainWindow::reportSpectra() {
 		return;
 	}
 
-	switch (parameters.peptidetype)
-	{
-	case linear:
-	case linearpolyketide:
-		resultsspecificcolumncount = 2;
-		break;
-	case branched:
-		resultsspecificcolumncount = 3;
-		break;
-	case cyclic:
-	case cyclicpolyketide:
-		resultsspecificcolumncount = 0;
-		break;
-	case branchcyclic:
-		resultsspecificcolumncount = 1;
-		break;
-	case other:
-	default:
-		break;
+	switch (parameters.peptidetype) {
+		case linear:
+		case linearpolyketide:
+			resultsspecificcolumncount = 2;
+			break;
+		case branched:
+			resultsspecificcolumncount = 3;
+			break;
+		case cyclic:
+		case cyclicpolyketide:
+			resultsspecificcolumncount = 0;
+			break;
+		case branchcyclic:
+			resultsspecificcolumncount = 1;
+			break;
+		case other:
+		default:
+			break;
 	}
 
 
@@ -1050,51 +1084,50 @@ void cMainWindow::reportSpectra() {
 		resultsmodel->horizontalHeaderItem(5 + searchspecificcolumncount)->setText("Number of Bricks");
 		results->setItemDelegateForColumn(5 + searchspecificcolumncount, new QItemDelegate());
 
-		switch (parameters.peptidetype)
-		{
-		case linear:
-			resultsmodel->setHorizontalHeaderItem(6 + searchspecificcolumncount, new QStandardItem());
-			resultsmodel->horizontalHeaderItem(6 + searchspecificcolumncount)->setText("N-terminal Modification");
-			results->setItemDelegateForColumn(6 + searchspecificcolumncount, new QItemDelegate());
+		switch (parameters.peptidetype) {
+			case linear:
+				resultsmodel->setHorizontalHeaderItem(6 + searchspecificcolumncount, new QStandardItem());
+				resultsmodel->horizontalHeaderItem(6 + searchspecificcolumncount)->setText("N-terminal Modification");
+				results->setItemDelegateForColumn(6 + searchspecificcolumncount, new QItemDelegate());
 
-			resultsmodel->setHorizontalHeaderItem(7 + searchspecificcolumncount, new QStandardItem());
-			resultsmodel->horizontalHeaderItem(7 + searchspecificcolumncount)->setText("C-terminal Modification");
-			results->setItemDelegateForColumn(7 + searchspecificcolumncount, new QItemDelegate());
-			break;
-		case branched:
-			resultsmodel->setHorizontalHeaderItem(6 + searchspecificcolumncount, new QStandardItem());
-			resultsmodel->horizontalHeaderItem(6 + searchspecificcolumncount)->setText("N-terminal Modification");
-			results->setItemDelegateForColumn(6 + searchspecificcolumncount, new QItemDelegate());
+				resultsmodel->setHorizontalHeaderItem(7 + searchspecificcolumncount, new QStandardItem());
+				resultsmodel->horizontalHeaderItem(7 + searchspecificcolumncount)->setText("C-terminal Modification");
+				results->setItemDelegateForColumn(7 + searchspecificcolumncount, new QItemDelegate());
+				break;
+			case branched:
+				resultsmodel->setHorizontalHeaderItem(6 + searchspecificcolumncount, new QStandardItem());
+				resultsmodel->horizontalHeaderItem(6 + searchspecificcolumncount)->setText("N-terminal Modification");
+				results->setItemDelegateForColumn(6 + searchspecificcolumncount, new QItemDelegate());
 
-			resultsmodel->setHorizontalHeaderItem(7 + searchspecificcolumncount, new QStandardItem());
-			resultsmodel->horizontalHeaderItem(7 + searchspecificcolumncount)->setText("Branch Modification");
-			results->setItemDelegateForColumn(7 + searchspecificcolumncount, new QItemDelegate());
+				resultsmodel->setHorizontalHeaderItem(7 + searchspecificcolumncount, new QStandardItem());
+				resultsmodel->horizontalHeaderItem(7 + searchspecificcolumncount)->setText("Branch Modification");
+				results->setItemDelegateForColumn(7 + searchspecificcolumncount, new QItemDelegate());
 
-			resultsmodel->setHorizontalHeaderItem(8 + searchspecificcolumncount, new QStandardItem());
-			resultsmodel->horizontalHeaderItem(8 + searchspecificcolumncount)->setText("C-terminal Modification");
-			results->setItemDelegateForColumn(8 + searchspecificcolumncount, new QItemDelegate());
-			break;
-		case cyclic:
-		case cyclicpolyketide:
-			break;
-		case branchcyclic:
-			resultsmodel->setHorizontalHeaderItem(6 + searchspecificcolumncount, new QStandardItem());
-			resultsmodel->horizontalHeaderItem(6 + searchspecificcolumncount)->setText("Branch Modification");
-			results->setItemDelegateForColumn(6 + searchspecificcolumncount, new QItemDelegate());
-			break;
-		case linearpolyketide:
-			resultsmodel->setHorizontalHeaderItem(6 + searchspecificcolumncount, new QStandardItem());
-			resultsmodel->horizontalHeaderItem(6 + searchspecificcolumncount)->setText("Left Terminal Modification");
-			results->setItemDelegateForColumn(6 + searchspecificcolumncount, new QItemDelegate());
+				resultsmodel->setHorizontalHeaderItem(8 + searchspecificcolumncount, new QStandardItem());
+				resultsmodel->horizontalHeaderItem(8 + searchspecificcolumncount)->setText("C-terminal Modification");
+				results->setItemDelegateForColumn(8 + searchspecificcolumncount, new QItemDelegate());
+				break;
+			case cyclic:
+			case cyclicpolyketide:
+				break;
+			case branchcyclic:
+				resultsmodel->setHorizontalHeaderItem(6 + searchspecificcolumncount, new QStandardItem());
+				resultsmodel->horizontalHeaderItem(6 + searchspecificcolumncount)->setText("Branch Modification");
+				results->setItemDelegateForColumn(6 + searchspecificcolumncount, new QItemDelegate());
+				break;
+			case linearpolyketide:
+				resultsmodel->setHorizontalHeaderItem(6 + searchspecificcolumncount, new QStandardItem());
+				resultsmodel->horizontalHeaderItem(6 + searchspecificcolumncount)->setText("Left Terminal Modification");
+				results->setItemDelegateForColumn(6 + searchspecificcolumncount, new QItemDelegate());
 
-			resultsmodel->setHorizontalHeaderItem(7 + searchspecificcolumncount, new QStandardItem());
-			resultsmodel->horizontalHeaderItem(7 + searchspecificcolumncount)->setText("Right Terminal Modification");
-			results->setItemDelegateForColumn(7 + searchspecificcolumncount, new QItemDelegate());
+				resultsmodel->setHorizontalHeaderItem(7 + searchspecificcolumncount, new QStandardItem());
+				resultsmodel->horizontalHeaderItem(7 + searchspecificcolumncount)->setText("Right Terminal Modification");
+				results->setItemDelegateForColumn(7 + searchspecificcolumncount, new QItemDelegate());
 
-			break;
-		case other:
-		default:
-			break;
+				break;
+			case other:
+			default:
+				break;
 		}
 		
 		resultsmodel->setHorizontalHeaderItem(6 + searchspecificcolumncount + resultsspecificcolumncount, new QStandardItem());
@@ -1177,9 +1210,11 @@ void cMainWindow::reportSpectra() {
 		}
 	}
 
-	rowsfiltercombobox->clear();
+	rowsfiltercombobox1->clear();
+	rowsfiltercombobox2->clear();
 	for (int i = 0; i < resultsmodel->columnCount(); i++) {
-		rowsfiltercombobox->addItem(resultsmodel->horizontalHeaderItem(i)->text());
+		rowsfiltercombobox1->addItem(resultsmodel->horizontalHeaderItem(i)->text());
+		rowsfiltercombobox2->addItem(resultsmodel->horizontalHeaderItem(i)->text());
 	}
 
 	results->resizeColumnsToContents();
@@ -1917,7 +1952,7 @@ void cMainWindow::filterResults() {
 	resultsproxymodel->setWholeWord(rowsfilterwholeword->isChecked());
 	resultsproxymodel->setFilterKeyColumn(-1);
 	resultsproxymodel->setFilterCaseSensitivity(rowsfiltercasesensitive->isChecked()?Qt::CaseSensitive:Qt::CaseInsensitive);
-	resultsproxymodel->setFilterFixedString(rowsfilterline->text());
+	resultsproxymodel->setFilterFixedString("");
 
 	if (!summarytableofmatchedpeaks->isHidden() || !imagewindow->isHidden() || !chromatogramwindow->isHidden()) {
 		summarytableofmatchedpeaks->deleteTable();
@@ -1933,7 +1968,8 @@ void cMainWindow::filterResults() {
 
 
 void cMainWindow::resetFilter() {
-	rowsfilterline->setText("");
+	rowsfilterline1->setText("");
+	rowsfilterline2->setText("");
 
 	results->horizontalHeader()->setSortIndicator(-1, Qt::AscendingOrder);
 	resultsproxymodel->sort(-1);
