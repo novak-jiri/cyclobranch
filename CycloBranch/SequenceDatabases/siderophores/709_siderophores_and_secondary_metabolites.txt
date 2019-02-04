@@ -57,7 +57,7 @@ other	Fumigatin chlorohydrin	C8H9ClO5	220.0138513994
 other	Aeruginic acid	C10H7N1O3S1	221.0146637862					SB: 0
 other	Parvulenone	C12H14O4	222.0892089378					
 other	Aminochelin	C11H16N2O3	224.1160923903					SB: 88
-other	Aspergilic acid	C12H20N2O2	224.1524778966					
+other	Aspergilic acid	C12H20N2O2	224.1524778966					SB: 0
 other	Neoaspergillic acid	C12H20N2O2	224.1524778966					
 other	Csypyrone B1	C10H10O6	226.0477380536					
 other	Cyclo(L-leucyl-trans-4-hydroxy-L-proline)	C11H18N2O3	226.1317424545					
@@ -66,7 +66,7 @@ other	Tensidol A	C13H11NO3	229.0738932246
 other	Siderochelin A	C12H14N2O3	234.1004423261					
 other	Thio-quinolobactin	C11H9N1O3S1	235.0303138504					
 other	Siderochelin B	C11H13N3O3	235.0956912992					
-other	Desferrithiocin	C10H10N2O3S1	238.0412128877					SB: 0
+other	Desferrithiocin	C10H10N2O3S1	238.0412128877					SB: 51
 other	Agroclavin	C16H18N2	238.1469985882					
 other	Csypyrone B2	C11H12O6	240.0633881178					
 other	Festuclavin	C16H20N2	240.1626486524					
@@ -170,7 +170,7 @@ other	Salmochelin SX (Pacifarinic acid)	C16H21N1O11	403.1114605224
 other	Myxochelin B	C20H25N3O6	403.1743355507					
 other	Myxochelin A	C20H24N2O7	404.1583511355					
 other	Alcaligin	C16H28N4O8	404.1907138964					SB: 53
-other	N-deoxyschizokinen	C16H28N4O8	404.1907138964					
+other	N-deoxyschizokinen	C16H28N4O8	404.1907138964					SB: 286
 other	Shamixanthone	C25H26O5	406.1780239451					
 other	Emericellin	C25H28O5	408.1936740093					
 other	Orlandin	C22H18O8	410.1001675546					
@@ -239,7 +239,7 @@ other	Oxahomorhizoferrin	C16H24N2O13	452.1278388681
 other	Dehydroaustinol	C25H28O8	456.1784178756					
 other	Austinol	C25H30O8	458.1940679398					
 other	Fumagillin	C26H34O7	458.2304534461					
-other	Desferrioxamine H	C20H36N4O8	460.2533141532					
+other	Desferrioxamine H	C20H36N4O8	460.2533141532					SB: 116
 other	3-hydroxyfumiquinazoline A	C24H23N5O5	461.1699188748					
 other	2-Methylhomorhizoferrin	C18H28N2O12	464.1642243744					
 other	Pyripyropene F	C28H35NO5	465.2515232392					
@@ -252,7 +252,7 @@ other	Fumitremorgin B	C27H33N3O5	479.2420211854
 other	Staphyloferrin A	C17H24N2O14	480.1227534902					
 other	Yersiniabactin	C21H27N3O4S3	481.1163684407					
 other	Pyripyropene H	C28H35NO6	481.2464378613					
-other	Dimerumic acid	C22H36N4O8	484.2533141532					
+other	Dimerumic acid	C22H36N4O8	484.2533141532					SB: 3
 other	Pseudomonic acid C	C26H44O8	484.3036183892					
 other	Cepaciachelin	C24H32N4O7	488.2270994027					
 other	Terrequinone A	C32H30N2O3	490.2256428397					
@@ -273,18 +273,18 @@ other	tryptoquivaline D	C28H28N4O7	532.1957992743
 other	Tryptoquivaline M	C28H28N4O7	532.1957992743					
 other	Norisotryptoquivaline	C28H28N4O7	532.1957992743					
 other	Snychobactin B	C24H44N4O9	532.3108290321					
-other	Desferrioxamine A2	C23H44N6O8	532.3220624204					
+other	Desferrioxamine A2	C23H44N6O8	532.3220624204					SB: 107
 other	Neurosporin	C40H58	538.4538518618					
 other	Pyripyropene Q	C30H37NO8	539.2519171697					
 other	tryptoquivaline C	C29H30N4O7	546.2114493385					
 other	Isotryptoquivaline	C29H30N4O7	546.2114493385					
-other	Desferrioxamine A1	C24H46N6O8	546.3377124846					
+other	Desferrioxamine A1	C24H46N6O8	546.3377124846					SB: 106
 other	Micacocidin P2	C26H35N3O4S3	549.1789686975					
 other	Micacocidin P1	C26H37N3O4S3	551.1946187617					
 other	Pyripyropene N	C31H39NO8	553.2675672339					
-other	Desferrioxamine X2	C24H42N6O9	558.3013269783					
+other	Desferrioxamine X2	C24H42N6O9	558.3013269783					SB: 128
 other	Snychobactin C	C26H48N4O9	560.3421291605					
-other	Desferrioxamine B	C25H48N6O8	560.3533625488					
+other	Desferrioxamine B	C25H48N6O8	560.3533625488					SB: 45
 other	Micacocidin P3	C27H37N3O4S3	563.1946187617					
 other	Aerobactin	C22H36N4O13	564.2278872637					SB: 0
 other	Micacocidin	C27H39N3O4S3	565.2102688259					
@@ -292,7 +292,7 @@ other	Coelichelin	C21H39N7O11	565.2707551314					SB: 156
 other	helvolic acid	C33H44O8	568.3036183892					
 other	Acetoxyverruculogen	C29H35N3O9	569.2373297380					
 other	29-Nordammara-1.17(20).24-trien-21-oic acid. 6.16-bis(acetyloxy)-3-hydroxy-7-oxo-. (4.6.8.9.13.14.16.17Z)- (9CI)	C33H46O8	570.3192684534					
-other	Desferrioxamine X1	C25H44N6O9	572.3169770425					
+other	Desferrioxamine X1	C25H44N6O9	572.3169770425					SB: 126
 other	Nocardia heterobactin (JBIR-16)	C26H31N5O10	573.2070922421					
 other	Tryptoquivaline M acetate	C30H30N4O8	574.2063639606					
 other	Demethyltryptoquivaline A	C30H30N4O8	574.2063639606					
@@ -305,7 +305,7 @@ other	Pyripyropene M	C32H39NO9	581.2624818560
 other	Pyripyropene A	C31H37NO10	583.2417464139					
 other	Acinetoferrin	C28H48N4O9	584.3421291605					SB: 46
 other	Micacocidin P6	C26H36ClN3O4S3	585.1556467296					
-other	Desferrioxamine D2	C26H46N6O9	586.3326271067					
+other	Desferrioxamine D2	C26H46N6O9	586.3326271067					SB: 110
 other	Achromobactin	C22H29N3O16	591.1547819001					SB: 91
 other	Maduraferrin	C26H37N7O9	591.2652758230					
 other	Madurastatin C1	C26H37N7O9	591.2652758230					
@@ -313,34 +313,34 @@ other	Nigribactin	C30H32N4O9	592.2169286469
 other	Pyripyropene B	C32H39NO10	597.2573964781					
 other	Pyripyropene C	C32H39NO10	597.2573964781					
 other	Pyripyropene D	C32H39NO10	597.2573964781					
-other	Desferrioxamine E	C27H48N6O9	600.3482771709					
+other	Desferrioxamine E	C27H48N6O9	600.3482771709					SB: 49
 other	Desferrioxamine Et1	C26H46N6O10	602.3275417288					
-other	Desferrioxamine D1	C27H50N6O9	602.3639272351					
+other	Desferrioxamine D1	C27H50N6O9	602.3639272351					SB: 109
 other	Erythrochelin	C24H41N7O11	603.2864051956					
 other	Nidulanin	C34H45N5O5	603.3420695810					
 other	Mirubactin	C26H32N6O11	604.2129059015					
 other	Desferrioxamine Et2	C25H44N6O11	604.3068062867					
-other	Desferrioxamine G2A	C26H48N6O10	604.3431917930					
-other	Desferrioxamine G2B	C26H48N6O10	604.3431917930					
-other	Desferrioxamine G2C	C26H48N6O10	604.3431917930					
+other	Desferrioxamine G2A	C26H48N6O10	604.3431917930					SB: 112
+other	Desferrioxamine G2B	C26H48N6O10	604.3431917930					SB: 114
+other	Desferrioxamine G2C	C26H48N6O10	604.3431917930					SB: 115
 other	Desferrioxamine Et3	C24H42N6O12	606.2860708446					
 other	Exochelin MS	C23H44N8O11	608.3129542971					
 other	Emericellamide A	C31H55N5O7	609.4101491462					
 other	Pyripyropene J	C33H41NO10	611.2730465423					
 other	Pyripyropene K	C33H41NO10	611.2730465423					
 other	Pyripyropene L	C33H41NO10	611.2730465423					
-other	Desferrioxamine X3	C28H50N6O9	614.3639272351					
+other	Desferrioxamine X3	C28H50N6O9	614.3639272351					SB: 129
 other	Heterobactin A	C27H33N7O10	615.2288903167					
 other	Desferrioxamine P1	C26H45N7O10	615.3227907019					
 other	Desferrioxamine Te1	C26H46N6O9S1	618.3046977967					
-other	Desferrioxamine G1	C27H50N6O10	618.3588418572					
+other	Desferrioxamine G1	C27H50N6O10	618.3588418572					SB: 50
 other	Parabactin	C32H36N4O9	620.2482287753					
 other	Fluvibactin	C31H34N4O10	622.2274933332					
 other	Protochelin	C31H36N4O10	624.2431433974					
 other	Pyripyropene I	C34H43NO10	625.2886966065					
 other	Salmochelin S1	C26H30N2O16	626.1595329270					
 other	Neocoprogen II	C27H44N6O11	628.3068062867					
-other	Desferrioxamine X4	C29H52N6O9	628.3795772993					
+other	Desferrioxamine X4	C29H52N6O9	628.3795772993					SB: 0
 other	Ergosteryl palmitate	C44H74O2	634.5688816196					
 other	Agrobactin	C32H36N4O10	636.2431433974					SB: 176
 other	Desferrioxamine Te2	C25H44N6O9S2	636.2611184225					
@@ -355,8 +355,8 @@ other	Vulnibactin	C35H39N5O9	673.2747778768
 other	Acyl-desferrioxamine 2	C33H54N6O9	678.3952273635					SB: 219
 other	Ornibactin C4	C26H48N8O13	680.3340836697					
 other	Exochelin MN	C28H49N11O9	683.3714722290					
-other	Dimethylneocoprogen I	C31H52N6O11	684.3694065435					
-other	Dimethyltriornicin	C31H52N6O11	684.3694065435					
+other	Dimethylneocoprogen I	C31H52N6O11	684.3694065435					SB: 155
+other	Dimethyltriornicin	C31H52N6O11	684.3694065435					SB: 158
 other	Dimethylisoneocoprogen I	C31H52N6O11	684.3694065435					
 other	Acyl-desferrioxamine 4	C34H66N6O8	686.4942131266					SB: 223
 other	Ferrichrome	C27H45N9O12	687.3187679565					
@@ -380,17 +380,17 @@ other	Hydroxyisoneocoprogen I	C31H50N6O13	714.3435857235
 other	Hydroxyneocoprogen I	C31H50N6O13	714.3435857235					
 other	Sake colorant A	C29H49N9O12	715.3500680849					
 other	Mycobactin S C9	C36H53N5O10	715.3792429483					
-other	Desferrioxamine T8	C30H52N8O12	716.3704691760					
+other	Desferrioxamine T8	C30H52N8O12	716.3704691760					SB: 125
 other	Carboxymycobactin C4	C34H47N5O12	717.3221219999					
 other	Ferricrocin	C28H47N9O13	717.3293326428					
 other	Petrobactin	C34H50N6O11	718.3537564793					
 other	Carboxymycobactin 3 C3	C34H49N5O12	719.3377720641					
 other	Carboxymycobactin 4 C2	C34H49N5O12	719.3377720641					
-other	Dichrysobactin	C32H44N6O13	720.2966355309					
+other	Dichrysobactin	C32H44N6O13	720.2966355309					SB: 218
 other	Progenin II	C39H62O12	722.4241274554					
 other	Coprogen B	C33H54N6O12	726.3799712298					SB: 147
 other	Fusarinine C (cyclic fusigen)	C33H54N6O12	726.3799712298					SB: 20
-other	Des(diserylglycyl)ferrirhodin	C33H56N6O12	728.3956212940					
+other	Des(diserylglycyl)ferrirhodin	C33H56N6O12	728.3956212940					SB: 99
 other	Mycobactin F C9	C37H55N5O10	729.3948930125					
 other	Mycobactin S C10	C37H55N5O10	729.3948930125					
 other	Carboxymycobactin C5	C35H49N5O12	731.3377720641					
@@ -420,7 +420,7 @@ other	Carboxymycobactin 3 C5	C36H53N5O12	747.3690721925
 other	Carboxymycobactin 4 C4	C36H53N5O12	747.3690721925					
 other	Amonabactin P750	C37H46N6O11	750.3224563509					SB: 84
 other	Nannochelin B	C37H46N4O13	754.3061375847					
-other	Dimethylcoprogen	C35H58N6O12	754.4112713582					
+other	Dimethylcoprogen	C35H58N6O12	754.4112713582					SB: 154
 other	Ochrobactin A	C36H60N4O13	756.4156880341					
 other	Mycobactin F C11	C39H59N5O10	757.4261931409					
 other	Mycobactin S C12	C39H59N5O10	757.4261931409					
@@ -439,13 +439,13 @@ other	Carboxymycobactin 2 C4	C38H53N5O12	771.3690721925
 other	Mycobactin F C12	C40H61N5O10	771.4418432051					
 other	Mycobactin S C13	C40H61N5O10	771.4418432051					
 other	Mycobactin NA (Nocobactin) C11	C40H61N5O10	771.4418432051					
-other	Desferrioxamine T3	C34H60N8O12	772.4330694328					
-other	Desferrioxamine T7	C34H60N8O12	772.4330694328					
+other	Desferrioxamine T3	C34H60N8O12	772.4330694328					SB: 123
+other	Desferrioxamine T7	C34H60N8O12	772.4330694328					SB: 124
 other	Carboxymycobactin C8	C38H55N5O12	773.3847222567					
 other	Carboxymycobactin 1 C5	C38H55N5O12	773.3847222567					
 other	Vicibactin	C33H54N6O15	774.3647150961					
 other	Carboxymycobactin 3 C7	C38H57N5O12	775.4003723209					
-other	Divanchrobactin	C32H44N10O13	776.3089315517					
+other	Divanchrobactin	C32H44N10O13	776.3089315517					SB: 119
 other	Anacheline-H	C35H51N6O14	779.3463253777					SB: 0
 other	2-N-methylcoprogen	C36H58N6O13	782.4061859803					SB: 188
 other	Hydroxycoprogen	C35H56N6O14	784.3854505382					
@@ -455,7 +455,7 @@ other	Mycobactin F C13	C41H63N5O10	785.4574932693
 other	Mycobactin S C14	C41H63N5O10	785.4574932693					
 other	Mycobactin Av C11	C41H63N5O10	785.4574932693					
 other	Basidiochrome	C33H50N6O16	786.3283295898					SB: 0
-other	Desferrioxamine T2	C35H62N8O12	786.4487194970					
+other	Desferrioxamine T2	C35H62N8O12	786.4487194970					SB: 122
 other	Carboxymycobactin C9	C39H57N5O12	787.4003723209					
 other	Carboxymycobactin 1 C6	C39H57N5O12	787.4003723209					
 other	Amonabactin T789	C39H47N7O11	789.3333553882					SB: 83
@@ -464,7 +464,7 @@ other	Petrobactin sulphonate	C34H50N6O14S1	798.3105710356
 other	Mycobactin F C14	C42H65N5O10	799.4731433335					
 other	Mycobactin S C15	C42H65N5O10	799.4731433335					
 other	Mycobactin Av C12	C42H65N5O10	799.4731433335					
-other	Desferrioxamine T1	C36H64N8O12	800.4643695612					
+other	Desferrioxamine T1	C36H64N8O12	800.4643695612					SB: 121
 other	Carboxymycobactin 1 C7	C40H59N5O12	801.4160223851					
 other	Carboxymycobactin 3 C9	C40H61N5O12	803.4316724493					
 other	Amphibactin T	C36H65N7O13	803.4640352102					
@@ -576,7 +576,7 @@ other	Pyoverdin PL7	C44H62N12O18	1046.4305032504
 other	Fuscachelin B	C42H61N15O17	1047.4369856118					
 other	Pyoverdin BTP2 (amide)	C43H60N12O19	1048.4097678083					
 other	Pyoverdin BTP2	C43H59N11O20	1049.3937833931					
-other	Cyclic trichrisobactin	C48H63N9O18	1053.4291062669					
+other	Cyclic trichrisobactin	C48H63N9O18	1053.4291062669					SB: 216
 other	Hexadehydro-Astechrome	C60H63N9O9	1053.4748746680					
 other	Loihichelin A	C44H73N11O19	1059.5084192204					
 other	Astechrome	C60H69N9O9	1059.5218248606					
