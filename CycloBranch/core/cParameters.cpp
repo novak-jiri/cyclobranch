@@ -1719,7 +1719,8 @@ int cParameters::generateCompounds(bool& terminatecomputation, string& errormess
 		//stringsizeest += sizeof(string) + loss.summary.size();
 		//mapsizeest += sizeof(loss.summarymap) + loss.summarymap.size() * (sizeof(string) /* the length of string is 1 for HCONS */ + sizeof(int));
 		//doublesizeest += sizeof(double);
-
+		
+		seq.setName(loss.summary);
 		seq.setSummaryFormula(loss.summary);
 		sequencedatabase.push_back(seq);
 

@@ -200,6 +200,17 @@ string cSequence::getNameWithReferenceAsHTMLString() {
 			}
 		}
 
+		// Siderophore Base (undocumented)
+		if (!correctreference) {
+			rx = "^SB: [0-9]+$";
+			if (regex_search(reference, rx)) {
+				s += "<a href=\"http://bertrandsamuel.free.fr/siderophore_base/siderophore.php?id=" + reference.substr(4) + "\">";
+				s += name;
+				s += "</a>";
+				correctreference = true;
+			}
+		}
+
 		// DOI
 		if (!correctreference) {
 			rx = "^DOI: ";
@@ -217,7 +228,9 @@ string cSequence::getNameWithReferenceAsHTMLString() {
 	}
 
 	if (!correctreference) {
-		s = name;
+		s += "<a href=\"https://www.ncbi.nlm.nih.gov/pccompound?term=" + name + "\">";
+		s += name;
+		s += "</a>";
 	}
 
 	return s;
