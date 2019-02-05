@@ -37,7 +37,7 @@ other	trans-3.4-dihydro-3.4.8-trihydroxynaphthalen-1(2H)-one	C10H10O4	194.057908
 other	cis-3.4-dihydro-3.4.8-trihydroxynaphthalen-1(2H)-one	C10H10O4	194.0579088094					
 other	Scytalone	C10H10O4	194.0579088094					
 other	Anthrone	C14H10O	194.0731649431					
-other	Cyclo(L-Pro-L-Pro)	C10H14N2O2	194.1055277040					SB: 0
+other	Cyclo(L-Pro-L-Pro)	C10H14N2O2	194.1055277040					
 other	1H-Naphtho[2.1-b]pyran-1-one	C13H8O2	196.0524295010					
 other	Pyrrolo[1.2-a]pyrazine-1.4-dione	C10H16N2O2	196.1211777682					
 other	Pyridine-2.6-bis(thiocarboxylic acid)	C7H5N1O2S2	198.9761697899					SB: 93
@@ -54,7 +54,7 @@ other	itoic acid	C9H9N1O5	211.0480724046					SB: 113
 other	2.3-dihydroxybenzoylglycine	C9H9N1O5	211.0480724046					SB: 81
 other	Quinolobactin	C11H9N1O4	219.0531577825					SB: 278
 other	Fumigatin chlorohydrin	C8H9ClO5	220.0138513994					
-other	Aeruginic acid	C10H7N1O3S1	221.0146637862					SB: 0
+other	Aeruginic acid	C10H7N1O3S1	221.0146637862					SB: 285
 other	Parvulenone	C12H14O4	222.0892089378					
 other	Aminochelin	C11H16N2O3	224.1160923903					SB: 88
 other	Aspergilic acid	C12H20N2O2	224.1524778966					SB: 232
@@ -88,7 +88,7 @@ other	cyclo-(R-Phe-S-Ile)	C15H20N2O2	260.1524778966
 other	Violacerol I	C14H14O5	262.0841235599					
 other	Violacerol II	C14H14O5	262.0841235599					
 other	cyclo-(R-Valr-S-Tyr)	C14H18N2O3	262.1317424545					
-other	pyridoxatin	C15H21N1O3	263.1521435456					SB: 0
+other	pyridoxatin	C15H21N1O3	263.1521435456					SB: 279
 other	Fumigatin bromohydrin	C8H9BrO5	263.9633253994					
 other	Microperfuranone	C17H14O3	266.0942943157					
 other	emodin	C15H10O5	270.0528234315					
@@ -116,13 +116,13 @@ other	terezine D	C19H23N3O2	325.1790269981
 other	gliotoxin	C13H14N2O4S2	326.0394983282					
 other	Bis-N-norgliovictin	C14H18N2O3S2	326.0758838345					
 other	Bisdechlorogeodin	C17H14O7	330.0739528041					
-other	Pseudomonine	C16H18N4O4	330.1328050870					SB: 0
+other	Pseudomonine	C16H18N4O4	330.1328050870					SB: 92
 other	Asperfuranone	C19H24O5	332.1623738809					
 other	3-hydroxymugeneic acid	C12H20N2O9	336.1168802513					
 other	Thiazostatin	C15H18N2O3S2	338.0758838345					SB: 283
 other	Bis(2-hydroxy-3-tert.butyl-5-methylphenyl)methane	C23H32O2	340.2402302714					
 other	Trypacidin	C18H16O7	344.0896028683					
-other	Rhodotorulic acid	C14H24N4O6	344.1695845238					SB: 0
+other	Rhodotorulic acid	C14H24N4O6	344.1695845238					SB: 69
 other	m-Anisic acid	C18H18O7	346.1052529325					
 other	Acinetobactin	C16H18N4O5	346.1277197091					SB: 47
 other	Anguibactin	C15H16N4O4S1	348.0892257128					SB: 74
@@ -185,7 +185,7 @@ other	-12-hydroxyverruculogen TR-2	C21H25N3O6	415.1743355507
 other	Fusarin A	C23H29NO6	415.1994876687					
 other	Pseurotin F2	C21H23NO8	417.1423667203					
 other	Pseurotin F2	C21H23NO8	417.1423667203					
-other	Pistillarin	C21H27N3O6	417.1899856149					SB: 0
+other	Pistillarin	C21H27N3O6	417.1899856149					SB: 85
 other	Sphingofungin E	C21H39NO7	417.2726526118					
 other	Tryptoquivaline H	C22H18N4O5	418.1277197091					
 other	Tryptoquivaline E	C22H18N4O5	418.1277197091					
@@ -273,7 +273,6 @@ other	Tryptoquivaline M	C28H28N4O7	532.1957992743
 other	Norisotryptoquivaline	C28H28N4O7	532.1957992743					
 other	Synechobactin B	C24H44N4O9	532.3108290321					SB: 271
 other	Desferrioxamine A2	C23H44N6O8	532.3220624204					SB: 107
-other	Neurosporin	C40H58	538.4538518618					
 other	Pyripyropene Q	C30H37NO8	539.2519171697					
 other	tryptoquivaline C	C29H30N4O7	546.2114493385					
 other	Isotryptoquivaline	C29H30N4O7	546.2114493385					
@@ -485,7 +484,7 @@ other	Rhodobactin	C36H50N10O13	830.3558817443
 other	Amphibactin D	C38H69N7O13	831.4953353386					SB: 165
 other	Malonichrome	C31H47N9O18	833.3039057533					SB: 133
 other	Corynebactin	C36H36N6O18	840.2086083846					SB: 199
-other	Mycobactin P C15	C45H71N5O10	841.5200935261					
+other	Mycobactin P C15	C45H71N5O10	841.5200935261					SB: 77
 other	Mycobactin F C17	C45H71N5O10	841.5200935261					
 other	Mycobactin M C16	C45H71N5O10	841.5200935261					
 other	Mycobactin N C15	C45H71N5O10	841.5200935261					
@@ -494,6 +493,7 @@ other	Mycobactin T C18	C45H71N5O10	841.5200935261
 other	Mycobactin Av C15	C45H71N5O10	841.5200935261					
 other	Mycobactin J	C45H71N5O10	841.5200935261					
 other	Amphibactin B	C38H69N7O14	847.4902499607					SB: 163
+other	Neurosporin	C39H60N6O15	852.4116652887					SB: 143
 other	N'.N'.N'- triacetylfusarinin C	C39H60N6O15	852.4116652887					SB: 39
 other	Mycobactin P C16	C46H73N5O10	855.5357435903					
 other	Mycobactin H C17	C46H73N5O10	855.5357435903					
