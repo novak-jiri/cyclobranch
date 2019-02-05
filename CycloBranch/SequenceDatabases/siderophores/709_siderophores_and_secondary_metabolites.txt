@@ -259,7 +259,7 @@ other	Corynebactin	C18H26N2O14	494.1384035544					SB: 296
 other	Pseudomonic acid A	C26H44O9	500.2985330113					
 other	Tryptoquivaline I	C27H26N4O6	502.1852345880					
 other	Fusarinine A	C22H38N4O9	502.2638788395					SB: 306
-other	Snychobactin A	C22H40N4O9	504.2795289037					SB: 0
+other	Synechobactin C	C22H40N4O9	504.2795289037					SB: 272
 other	Pyripyropene O	C29H35NO7	509.2413524834					
 other	verruculogen	C27H33N3O7	511.2318504296					
 other	Pseudomonic acid B	C26H44O10	516.2934476334					
@@ -271,7 +271,7 @@ other	Tryptoquivaline D	C28H28N4O7	532.1957992743
 other	tryptoquivaline D	C28H28N4O7	532.1957992743					
 other	Tryptoquivaline M	C28H28N4O7	532.1957992743					
 other	Norisotryptoquivaline	C28H28N4O7	532.1957992743					
-other	Snychobactin B	C24H44N4O9	532.3108290321					SB: 0
+other	Synechobactin B	C24H44N4O9	532.3108290321					SB: 271
 other	Desferrioxamine A2	C23H44N6O8	532.3220624204					SB: 107
 other	Neurosporin	C40H58	538.4538518618					
 other	Pyripyropene Q	C30H37NO8	539.2519171697					
@@ -282,7 +282,7 @@ other	Micacocidin P2	C26H35N3O4S3	549.1789686975
 other	Micacocidin P1	C26H37N3O4S3	551.1946187617					
 other	Pyripyropene N	C31H39NO8	553.2675672339					
 other	Desferrioxamine X2	C24H42N6O9	558.3013269783					SB: 128
-other	Snychobactin C	C26H48N4O9	560.3421291605					SB: 0
+other	Synechobactin A	C26H48N4O9	560.3421291605					SB: 270
 other	Desferrioxamine B	C25H48N6O8	560.3533625488					SB: 45
 other	Micacocidin P3	C27H37N3O4S3	563.1946187617					
 other	Aerobactin	C22H36N4O13	564.2278872637					SB: 70
@@ -312,6 +312,7 @@ other	Nigribactin	C30H32N4O9	592.2169286469					SB: 312
 other	Pyripyropene B	C32H39NO10	597.2573964781					
 other	Pyripyropene C	C32H39NO10	597.2573964781					
 other	Pyripyropene D	C32H39NO10	597.2573964781					
+other	Heterobactin A	C27H30N6O10	598.2023412152					SB: 204
 other	Desferrioxamine E	C27H48N6O9	600.3482771709					SB: 49
 other	Desferrioxamine Et1	C26H46N6O10	602.3275417288					
 other	Desferrioxamine D1	C27H50N6O9	602.3639272351					SB: 109
@@ -329,7 +330,6 @@ other	Pyripyropene J	C33H41NO10	611.2730465423
 other	Pyripyropene K	C33H41NO10	611.2730465423					
 other	Pyripyropene L	C33H41NO10	611.2730465423					
 other	Desferrioxamine X3	C28H50N6O9	614.3639272351					SB: 129
-other	Heterobactin A	C27H30N6O10	598.2023412152					SB: 204
 other	Desferrioxamine P1	C26H45N7O10	615.3227907019					
 other	Desferrioxamine Te1	C26H46N6O9S1	618.3046977967					
 other	Desferrioxamine G1	C27H50N6O10	618.3588418572					SB: 50
