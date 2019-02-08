@@ -761,7 +761,7 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 			}
 		}
 		else if (mode == compoundsearch) {
-			errtype = generateCompounds(terminatecomputation, errormessage);
+			errtype = generateCompounds(terminatecomputation, errormessage); // uses ionsfortheoreticalspectra
 			if (errtype == -1) {
 				error = true;
 			}
@@ -1373,9 +1373,11 @@ int cParameters::generateCompounds(bool& terminatecomputation, string& errormess
 	vector<int> intcomposition;
 
 	bool undefinedelement;
+	bool alloutofmz;
 	int valence;
 	int atomscount;
 	double elementsratio;
+	double tmpmzdifference;
 
 	//int stringsizeest = 0;
 	//int mapsizeest = 0;
@@ -1423,9 +1425,24 @@ int cParameters::generateCompounds(bool& terminatecomputation, string& errormess
 		loss.clear();
 		loss.massdifference = tmpbrick.getMass();
 
-		// to do - charge and adducts are not considered here !!!
 		// do not modify loss.massdifference here
-		if ((loss.massdifference < minimummz) || (loss.massdifference > maximummz)) {
+		alloutofmz = true;
+		for (auto& it : ionsfortheoreticalspectra) {
+			for (int j = 0; j < abs(precursorcharge); j++) {
+				tmpmzdifference = loss.massdifference + iondefinitions[it].massdifference;
+				if (precursorcharge > 0) {
+					tmpmzdifference += j * (H - e);
+				}
+				else {
+					tmpmzdifference -= j * (H - e);
+				}
+				if ((tmpmzdifference >= minimummz) && (tmpmzdifference <= maximummz)) {
+					alloutofmz = false;
+				}
+			}
+		}
+
+		if (alloutofmz) {
 			continue;
 		}
 
@@ -1438,8 +1455,8 @@ int cParameters::generateCompounds(bool& terminatecomputation, string& errormess
 		addStringFormulaToMap(loss.summary, loss.summarymap);
 
 		undefinedelement = false;
-		for (auto it = loss.summarymap.begin(); it != loss.summarymap.end(); ++it) {
-			if ((it->first.compare("H") != 0) && (it->first.compare("C") != 0) && (it->first.compare("O") != 0) && (it->first.compare("N") != 0) && (it->first.compare("S") != 0)) {
+		for (auto& it : loss.summarymap) {
+			if ((it.first.compare("H") != 0) && (it.first.compare("C") != 0) && (it.first.compare("O") != 0) && (it.first.compare("N") != 0) && (it.first.compare("S") != 0)) {
 				undefinedelement = true;
 				break;
 			}
