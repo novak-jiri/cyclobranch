@@ -1634,35 +1634,50 @@ int cParameters::generateCompounds(bool& terminatecomputation, string& errormess
 
 			}
 
-			if ((loss.summarymap.count("H") > 0) && (loss.summarymap.count("C") > 0)) {
+			if ((loss.summarymap.count("H") > 0) && (loss.summarymap.count("C") >= 0)) {
+				if (loss.summarymap.count("C") == 0) {
+					continue;
+				}
 				elementsratio = ((double)(loss.summarymap["H"])) / ((double)(loss.summarymap["C"]));
 				if ((elementsratio < 0.2) || (elementsratio > 3.1)) {
 					continue;
 				}
 			}
 
-			if ((loss.summarymap.count("N") > 0) && (loss.summarymap.count("C") > 0)) {
+			if ((loss.summarymap.count("N") > 0) && (loss.summarymap.count("C") >= 0)) {
+				if (loss.summarymap.count("C") == 0) {
+					continue;
+				}
 				elementsratio = ((double)(loss.summarymap["N"])) / ((double)(loss.summarymap["C"]));
 				if (elementsratio > 1.3) {
 					continue;
 				}
 			}
 
-			if ((loss.summarymap.count("O") > 0) && (loss.summarymap.count("C") > 0)) {
+			if ((loss.summarymap.count("O") > 0) && (loss.summarymap.count("C") >= 0)) {
+				if (loss.summarymap.count("C") == 0) {
+					continue;
+				}
 				elementsratio = ((double)(loss.summarymap["O"])) / ((double)(loss.summarymap["C"]));
 				if (elementsratio > 1.2) {
 					continue;
 				}
 			}
 
-			if ((loss.summarymap.count("P") > 0) && (loss.summarymap.count("C") > 0)) {
+			if ((loss.summarymap.count("P") > 0) && (loss.summarymap.count("C") >= 0)) {
+				if (loss.summarymap.count("C") == 0) {
+					continue;
+				}
 				elementsratio = ((double)(loss.summarymap["P"])) / ((double)(loss.summarymap["C"]));
 				if (elementsratio > 0.3) {
 					continue;
 				}
 			}
 
-			if ((loss.summarymap.count("S") > 0) && (loss.summarymap.count("C") > 0)) {
+			if ((loss.summarymap.count("S") > 0) && (loss.summarymap.count("C") >= 0)) {
+				if (loss.summarymap.count("C") == 0) {
+					continue;
+				}
 				elementsratio = ((double)(loss.summarymap["S"])) / ((double)(loss.summarymap["C"]));
 				if (elementsratio > 0.8) {
 					continue;
