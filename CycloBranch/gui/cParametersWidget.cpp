@@ -841,6 +841,9 @@ void cParametersWidget::keyPressEvent(QKeyEvent *event) {
 			emit clearIonSelection();
 			emit setHCON();
 		}
+		if (mode->currentIndex() == (int)compoundsearch) {
+			emit setHCON();
+		}
 	}
 
 	if (event->key() == Qt::Key_F1) {
