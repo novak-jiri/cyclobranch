@@ -6,14 +6,15 @@
 <p>
 Any work based on CycloBranch shall cite any of the following references:
 <ul>
-<li><i>J. Am. Soc. Mass Spectrom.</i> (2015), 26(10):1780-1786. DOI: <a href="http://dx.doi.org/10.1007/s13361-015-1211-1"><b>10.1007/s13361-015-1211-1</b></a>
-<li><i>BBA - Proteins Proteom.</i> (2017), 1865(7):768-775. DOI: <a href="http://dx.doi.org/10.1016/j.bbapap.2016.12.003"><b>10.1016/j.bbapap.2016.12.003</b></a>
+<li><i>J. Am. Soc. Mass Spectrom.</i> (2015), 26(10):1780-1786. DOI: <a href="https://doi.org/10.1007/s13361-015-1211-1"><b>10.1007/s13361-015-1211-1</b></a>
+<li><i>BBA - Proteins Proteom.</i> (2017), 1865(7):768-775. DOI: <a href="https://doi.org/10.1016/j.bbapap.2016.12.003"><b>10.1016/j.bbapap.2016.12.003</b></a>
+<li><i>J. Mass Spectrom.</i> (2018), 53(11):1097-1103. DOI: <a href="https://doi.org/10.1002/jms.4285"><b>10.1002/jms.4285</b></a>
 </ul>
 </p>
 
 <hr>
 
-<p>The latest development version is available on <a href="http://github.com/novak-jiri/cyclobranch/releases">GitHub</a>.</p>
+<p>The latest development version is available on <a href="https://github.com/novak-jiri/cyclobranch/releases">GitHub</a>.</p>
 
 <hr>
  
@@ -44,14 +45,14 @@ Any work based on CycloBranch shall cite any of the following references:
     <li> Settings dialog - layout fixed for macOS.
     <li> FileConverter - collision of filenames between OpenMS and Xcalibur fixed.
   </ul>
-  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.3.1_win_64bit.zip" onclick="ga('send', 'event', 'Download', this.href);">Download (Windows, 64 bit - tested on Windows 7/10)</a>
-  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.3.1_linux_64bit.tgz" onclick="ga('send', 'event', 'Download', this.href);">Download (Linux, 64 bit - tested on Ubuntu 16.04)</a>
-  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.3.1_osx_64bit.dmg" onclick="ga('send', 'event', 'Download', this.href);">Download (macOS, 64 bit - tested on macOS 10.12 Sierra)</a>
-  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/docs/refman.pdf" onclick="ga('send', 'event', 'Download', this.href);">PDF manual</a>
-  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.3.1_win_sources.zip" onclick="ga('send', 'event', 'Download', this.href);">Download Sources (Windows)</a>
-  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.3.1_linux_sources.tgz" onclick="ga('send', 'event', 'Download', this.href);">Download Sources (Linux)</a>
-  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.3.1_osx_sources.dmg" onclick="ga('send', 'event', 'Download', this.href);">Download Sources (OS X)</a>
-  <li> Additional databases: <a href="http://ms.biomed.cas.cz/cyclobranch/release/Lipids.zip" onclick="ga('send', 'event', 'Download', this.href);">Lipids</a>  
+  <li> <a href="https://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.3.1_win_64bit.zip" onclick="ga('send', 'event', 'Download', this.href);">Download (Windows, 64 bit - tested on Windows 7/10)</a>
+  <li> <a href="https://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.3.1_linux_64bit.tgz" onclick="ga('send', 'event', 'Download', this.href);">Download (Linux, 64 bit - tested on Ubuntu 16.04)</a>
+  <li> <a href="https://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.3.1_osx_64bit.dmg" onclick="ga('send', 'event', 'Download', this.href);">Download (macOS, 64 bit - tested on macOS 10.12 Sierra)</a>
+  <li> <a href="https://ms.biomed.cas.cz/cyclobranch/docs/refman.pdf" onclick="ga('send', 'event', 'Download', this.href);">PDF manual</a>
+  <li> <a href="https://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.3.1_win_sources.zip" onclick="ga('send', 'event', 'Download', this.href);">Download Sources (Windows)</a>
+  <li> <a href="https://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.3.1_linux_sources.tgz" onclick="ga('send', 'event', 'Download', this.href);">Download Sources (Linux)</a>
+  <li> <a href="https://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.3.1_osx_sources.dmg" onclick="ga('send', 'event', 'Download', this.href);">Download Sources (OS X)</a>
+  <li> Additional databases: <a href="https://ms.biomed.cas.cz/cyclobranch/release/Lipids.zip" onclick="ga('send', 'event', 'Download', this.href);">Lipids</a>
 </ul>
 </p>
 
@@ -75,7 +76,7 @@ Any work based on CycloBranch shall cite any of the following references:
         <li> "Remove Hits of Fragments without Hits of Parent Fragments" - obsolete feature removed.
         <li> Obsolete scoring functions removed.
     </ul>
-    <li> Unmatched theoretical isotope patterns can now be reported in MS, MSI and MS/MS mode.  
+    <li> Unmatched theoretical isotope patterns can now be reported in MS, MSI and MS/MS mode.
     <li> Memory performance was improved.
     <li> OpenMS 2.3 is now supported.
     <li> Thermo raw files are now supported.
@@ -83,13 +84,13 @@ Any work based on CycloBranch shall cite any of the following references:
     <li> [M]+, [M]- ions added.
     <li> Bug fixed: the number of electrons was wrong if the m/z ratio of negative ions was calculated in "Generate Full Isotope Patterns" mode.
   </ul>
-  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.2.748_win_64bit.zip" onclick="ga('send', 'event', 'Download', this.href);">Download (Windows, 64 bit - tested on Windows 7/10)</a>
-  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.2.748_linux_64bit.tgz" onclick="ga('send', 'event', 'Download', this.href);">Download (Linux, 64 bit - tested on Ubuntu 16.04)</a>
-  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.2.748_osx_64bit.dmg" onclick="ga('send', 'event', 'Download', this.href);">Download (macOS, 64 bit - tested on macOS 10.12 Sierra)</a>
-  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.2.748_win_sources.zip" onclick="ga('send', 'event', 'Download', this.href);">Download Sources (Windows)</a>
-  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.2.748_linux_sources.tgz" onclick="ga('send', 'event', 'Download', this.href);">Download Sources (Linux)</a>
-  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.2.748_osx_sources.dmg" onclick="ga('send', 'event', 'Download', this.href);">Download Sources (OS X)</a>
-  <li> Additional databases: <a href="http://ms.biomed.cas.cz/cyclobranch/release/Lipids.zip" onclick="ga('send', 'event', 'Download', this.href);">Lipids</a>  
+  <li> <a href="https://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.2.748_win_64bit.zip" onclick="ga('send', 'event', 'Download', this.href);">Download (Windows, 64 bit - tested on Windows 7/10)</a>
+  <li> <a href="https://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.2.748_linux_64bit.tgz" onclick="ga('send', 'event', 'Download', this.href);">Download (Linux, 64 bit - tested on Ubuntu 16.04)</a>
+  <li> <a href="https://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.2.748_osx_64bit.dmg" onclick="ga('send', 'event', 'Download', this.href);">Download (macOS, 64 bit - tested on macOS 10.12 Sierra)</a>
+  <li> <a href="https://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.2.748_win_sources.zip" onclick="ga('send', 'event', 'Download', this.href);">Download Sources (Windows)</a>
+  <li> <a href="https://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.2.748_linux_sources.tgz" onclick="ga('send', 'event', 'Download', this.href);">Download Sources (Linux)</a>
+  <li> <a href="https://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.2.748_osx_sources.dmg" onclick="ga('send', 'event', 'Download', this.href);">Download Sources (OS X)</a>
+  <li> Additional databases: <a href="https://ms.biomed.cas.cz/cyclobranch/release/Lipids.zip" onclick="ga('send', 'event', 'Download', this.href);">Lipids</a>
 </ul>
 </p>
 
@@ -115,13 +116,13 @@ Any work based on CycloBranch shall cite any of the following references:
     <li> [M+Si-3H]+, [M+Si-4H+Na]+, [M+Si-4H+K]+, and [M+Si-5H]- ions added.
     <li> Some minor bugs were fixed and performance was improved.
   </ul>
-  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.2.660_win_64bit.zip" onclick="ga('send', 'event', 'Download', this.href);">Download (Windows, 64 bit - tested on Windows 7/10)</a>
-  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.2.660_linux_64bit.tgz" onclick="ga('send', 'event', 'Download', this.href);">Download (Linux, 64 bit - tested on Ubuntu 16.04)</a>
-  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.2.660_osx_64bit.dmg" onclick="ga('send', 'event', 'Download', this.href);">Download (macOS, 64 bit - tested on macOS 10.12 Sierra)</a>
-  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.2.660_win_sources.zip" onclick="ga('send', 'event', 'Download', this.href);">Download Sources (Windows)</a>
-  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.2.660_linux_sources.tgz" onclick="ga('send', 'event', 'Download', this.href);">Download Sources (Linux)</a>
-  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.2.660_osx_sources.dmg" onclick="ga('send', 'event', 'Download', this.href);">Download Sources (OS X)</a>
-  <li> Additional databases: <a href="http://ms.biomed.cas.cz/cyclobranch/release/Lipids.zip" onclick="ga('send', 'event', 'Download', this.href);">Lipids</a>  
+  <li> <a href="https://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.2.660_win_64bit.zip" onclick="ga('send', 'event', 'Download', this.href);">Download (Windows, 64 bit - tested on Windows 7/10)</a>
+  <li> <a href="https://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.2.660_linux_64bit.tgz" onclick="ga('send', 'event', 'Download', this.href);">Download (Linux, 64 bit - tested on Ubuntu 16.04)</a>
+  <li> <a href="https://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.2.660_osx_64bit.dmg" onclick="ga('send', 'event', 'Download', this.href);">Download (macOS, 64 bit - tested on macOS 10.12 Sierra)</a>
+  <li> <a href="https://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.2.660_win_sources.zip" onclick="ga('send', 'event', 'Download', this.href);">Download Sources (Windows)</a>
+  <li> <a href="https://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.2.660_linux_sources.tgz" onclick="ga('send', 'event', 'Download', this.href);">Download Sources (Linux)</a>
+  <li> <a href="https://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.2.660_osx_sources.dmg" onclick="ga('send', 'event', 'Download', this.href);">Download Sources (OS X)</a>
+  <li> Additional databases: <a href="https://ms.biomed.cas.cz/cyclobranch/release/Lipids.zip" onclick="ga('send', 'event', 'Download', this.href);">Lipids</a>
 </ul>
 </p>
 
@@ -151,13 +152,13 @@ Any work based on CycloBranch shall cite any of the following references:
     <li> Icon sizes increased.
     <li> Some bugs were fixed and some other minor improvements were made.
   </ul>
-  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.2.495_win_64bit.zip" onclick="ga('send', 'event', 'Download', this.href);">Download (Windows, 64 bit - tested on Windows 7/10)</a>
-  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.2.495_linux_64bit.tgz" onclick="ga('send', 'event', 'Download', this.href);">Download (Linux, 64 bit - tested on Ubuntu 16.04)</a>
-  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.2.495_osx_64bit.dmg" onclick="ga('send', 'event', 'Download', this.href);">Download (macOS, 64 bit - tested on macOS 10.12 Sierra)</a>
-  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.2.495_win_sources.zip" onclick="ga('send', 'event', 'Download', this.href);">Download Sources (Windows)</a>
-  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.2.495_linux_sources.tgz" onclick="ga('send', 'event', 'Download', this.href);">Download Sources (Linux)</a>
-  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.2.495_osx_sources.dmg" onclick="ga('send', 'event', 'Download', this.href);">Download Sources (OS X)</a>
-  <li> Additional databases: <a href="http://ms.biomed.cas.cz/cyclobranch/release/Lipids.zip" onclick="ga('send', 'event', 'Download', this.href);">Lipids</a>  
+  <li> <a href="https://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.2.495_win_64bit.zip" onclick="ga('send', 'event', 'Download', this.href);">Download (Windows, 64 bit - tested on Windows 7/10)</a>
+  <li> <a href="https://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.2.495_linux_64bit.tgz" onclick="ga('send', 'event', 'Download', this.href);">Download (Linux, 64 bit - tested on Ubuntu 16.04)</a>
+  <li> <a href="https://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.2.495_osx_64bit.dmg" onclick="ga('send', 'event', 'Download', this.href);">Download (macOS, 64 bit - tested on macOS 10.12 Sierra)</a>
+  <li> <a href="https://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.2.495_win_sources.zip" onclick="ga('send', 'event', 'Download', this.href);">Download Sources (Windows)</a>
+  <li> <a href="https://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.2.495_linux_sources.tgz" onclick="ga('send', 'event', 'Download', this.href);">Download Sources (Linux)</a>
+  <li> <a href="https://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.2.495_osx_sources.dmg" onclick="ga('send', 'event', 'Download', this.href);">Download Sources (OS X)</a>
+  <li> Additional databases: <a href="https://ms.biomed.cas.cz/cyclobranch/release/Lipids.zip" onclick="ga('send', 'event', 'Download', this.href);">Lipids</a>
 </ul>
 </p>
 
@@ -176,16 +177,16 @@ Any work based on CycloBranch shall cite any of the following references:
     <li> Summary Table of Matched Peaks improved - statistics of matched ions can now be exported.
     <li> Image Window improved - number of selected points, color scale, average intensity, median intensity, and searched text are reported.
     <li> Full isotope patterns of compounds can now be generated (MS and MSI data).
-    <li> Visualization of Waters imzML datasets is now supported. 
+    <li> Visualization of Waters imzML datasets is now supported.
     <li> Some bugs and performance issues were fixed and some other minor improvements were made.
   </ul>
-  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.2.192_win_64bit.zip" onclick="ga('send', 'event', 'Download', this.href);">Download (Windows, 64 bit - tested on Windows 7/8/10)</a>
-  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.2.192_linux_64bit.tgz" onclick="ga('send', 'event', 'Download', this.href);">Download (Linux, 64 bit - tested on Ubuntu 14.04)</a>
-  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.2.192_osx_64bit.dmg" onclick="ga('send', 'event', 'Download', this.href);">Download (OS X, 64 bit - tested on OS X 10.8 (Mountain Lion))</a>
-  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.2.192_win_sources.zip" onclick="ga('send', 'event', 'Download', this.href);">Download Sources (Windows)</a>
-  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.2.192_linux_sources.tgz" onclick="ga('send', 'event', 'Download', this.href);">Download Sources (Linux)</a>
-  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.2.192_osx_sources.dmg" onclick="ga('send', 'event', 'Download', this.href);">Download Sources (OS X)</a>
-  <li> Additional databases: <a href="http://ms.biomed.cas.cz/cyclobranch/release/Lipids.zip" onclick="ga('send', 'event', 'Download', this.href);">Lipids</a> 
+  <li> <a href="https://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.2.192_win_64bit.zip" onclick="ga('send', 'event', 'Download', this.href);">Download (Windows, 64 bit - tested on Windows 7/8/10)</a>
+  <li> <a href="https://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.2.192_linux_64bit.tgz" onclick="ga('send', 'event', 'Download', this.href);">Download (Linux, 64 bit - tested on Ubuntu 14.04)</a>
+  <li> <a href="https://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.2.192_osx_64bit.dmg" onclick="ga('send', 'event', 'Download', this.href);">Download (OS X, 64 bit - tested on OS X 10.8 (Mountain Lion))</a>
+  <li> <a href="https://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.2.192_win_sources.zip" onclick="ga('send', 'event', 'Download', this.href);">Download Sources (Windows)</a>
+  <li> <a href="https://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.2.192_linux_sources.tgz" onclick="ga('send', 'event', 'Download', this.href);">Download Sources (Linux)</a>
+  <li> <a href="https://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.2.192_osx_sources.dmg" onclick="ga('send', 'event', 'Download', this.href);">Download Sources (OS X)</a>
+  <li> Additional databases: <a href="https://ms.biomed.cas.cz/cyclobranch/release/Lipids.zip" onclick="ga('send', 'event', 'Download', this.href);">Lipids</a>
 </ul>
 </p>
 
@@ -199,20 +200,20 @@ Any work based on CycloBranch shall cite any of the following references:
   <li> Changes:
   <ul>
     <li> New features have been added in the building blocks editor, sequence database editor and modifications editor - create a new database, import a database, un/select all rows.
-    <li> Menubars have been included in the building blocks editor, sequence database editor, modifications editor and summary table of matched peaks. 
+    <li> Menubars have been included in the building blocks editor, sequence database editor, modifications editor and summary table of matched peaks.
     <li> Some bugs and multiple performance issues have been fixed.
     <li> Some keyboard shortcuts have been fixed.
     <li> The support of biometals and polyketide siderophores have been improved.
     <li> Group id is now reported for de novo sequence candidates.
     <li> Imaging mass spectra and imzML data format are now supported.
   </ul>
-  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.1.570_win_64bit.zip" onclick="ga('send', 'event', 'Download', this.href);">Download (Windows, 64 bit - tested on Windows 7/8/10)</a>
-  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.1.570_linux_64bit.tgz" onclick="ga('send', 'event', 'Download', this.href);">Download (Linux, 64 bit - tested on Ubuntu 14.04)</a>
-  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.1.570_osx_64bit.dmg" onclick="ga('send', 'event', 'Download', this.href);">Download (OS X, 64 bit - tested on OS X 10.8 (Mountain Lion))</a>
-  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.1.570_win_sources.zip" onclick="ga('send', 'event', 'Download', this.href);">Download Sources (Windows)</a>
-  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.1.570_linux_sources.tgz" onclick="ga('send', 'event', 'Download', this.href);">Download Sources (Linux)</a>
-  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.1.570_osx_sources.dmg" onclick="ga('send', 'event', 'Download', this.href);">Download Sources (OS X)</a>
-  <li> Additional databases: <a href="http://ms.biomed.cas.cz/cyclobranch/release/Lipids.zip" onclick="ga('send', 'event', 'Download', this.href);">Lipids</a>, <a href="http://ms.biomed.cas.cz/cyclobranch/release/Metabolites.zip" onclick="ga('send', 'event', 'Download', this.href);">Metabolites</a>    
+  <li> <a href="https://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.1.570_win_64bit.zip" onclick="ga('send', 'event', 'Download', this.href);">Download (Windows, 64 bit - tested on Windows 7/8/10)</a>
+  <li> <a href="https://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.1.570_linux_64bit.tgz" onclick="ga('send', 'event', 'Download', this.href);">Download (Linux, 64 bit - tested on Ubuntu 14.04)</a>
+  <li> <a href="https://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.1.570_osx_64bit.dmg" onclick="ga('send', 'event', 'Download', this.href);">Download (OS X, 64 bit - tested on OS X 10.8 (Mountain Lion))</a>
+  <li> <a href="https://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.1.570_win_sources.zip" onclick="ga('send', 'event', 'Download', this.href);">Download Sources (Windows)</a>
+  <li> <a href="https://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.1.570_linux_sources.tgz" onclick="ga('send', 'event', 'Download', this.href);">Download Sources (Linux)</a>
+  <li> <a href="https://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.1.570_osx_sources.dmg" onclick="ga('send', 'event', 'Download', this.href);">Download Sources (OS X)</a>
+  <li> Additional databases: <a href="https://ms.biomed.cas.cz/cyclobranch/release/Lipids.zip" onclick="ga('send', 'event', 'Download', this.href);">Lipids</a>, <a href="https://ms.biomed.cas.cz/cyclobranch/release/Metabolites.zip" onclick="ga('send', 'event', 'Download', this.href);">Metabolites</a>
 </ul>
 </p>
 
@@ -231,12 +232,12 @@ Any work based on CycloBranch shall cite any of the following references:
     <li> Bug fix - program crashed from time to time when combinations of building blocks were generated.
     <li> Bug fix - detection of branch-cyclic NRPs using series D) and H) fixed. 
   </ul>
-  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.1.170_win_64bit.zip" onclick="ga('send', 'event', 'Download', this.href);">Download (Windows, 64 bit - tested on Windows 7/8/10)</a>
-  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.1.170_linux_64bit.tgz" onclick="ga('send', 'event', 'Download', this.href);">Download (Linux, 64 bit - tested on Ubuntu 14.04)</a>
-  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.1.170_osx_64bit.dmg" onclick="ga('send', 'event', 'Download', this.href);">Download (OS X, 64 bit - tested on OS X 10.8 (Mountain Lion))</a>
-  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.1.170_win_sources.zip" onclick="ga('send', 'event', 'Download', this.href);">Download Sources (Windows)</a>
-  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.1.170_linux_sources.tgz" onclick="ga('send', 'event', 'Download', this.href);">Download Sources (Linux)</a>
-  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.1.170_osx_sources.dmg" onclick="ga('send', 'event', 'Download', this.href);">Download Sources (OS X)</a>  
+  <li> <a href="https://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.1.170_win_64bit.zip" onclick="ga('send', 'event', 'Download', this.href);">Download (Windows, 64 bit - tested on Windows 7/8/10)</a>
+  <li> <a href="https://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.1.170_linux_64bit.tgz" onclick="ga('send', 'event', 'Download', this.href);">Download (Linux, 64 bit - tested on Ubuntu 14.04)</a>
+  <li> <a href="https://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.1.170_osx_64bit.dmg" onclick="ga('send', 'event', 'Download', this.href);">Download (OS X, 64 bit - tested on OS X 10.8 (Mountain Lion))</a>
+  <li> <a href="https://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.1.170_win_sources.zip" onclick="ga('send', 'event', 'Download', this.href);">Download Sources (Windows)</a>
+  <li> <a href="https://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.1.170_linux_sources.tgz" onclick="ga('send', 'event', 'Download', this.href);">Download Sources (Linux)</a>
+  <li> <a href="https://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.1.170_osx_sources.dmg" onclick="ga('send', 'event', 'Download', this.href);">Download Sources (OS X)</a>
 </ul>
 </p>
 
@@ -263,12 +264,12 @@ Any work based on CycloBranch shall cite any of the following references:
     <li> A compatibility issue with CompassXPort was fixed.
     <li> Some bugs were fixed and minor improvements were made.
   </ul>
-  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.0.1512_win_64bit.zip" onclick="ga('send', 'event', 'Download', this.href);">Download (Windows, 64 bit - tested on Windows 7/8/10)</a>
-  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.0.1512_linux_64bit.tgz" onclick="ga('send', 'event', 'Download', this.href);">Download (Linux, 64 bit - tested on Ubuntu 14.04)</a>
-  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.0.1512_osx_64bit.dmg" onclick="ga('send', 'event', 'Download', this.href);">Download (OS X, 64 bit - tested on OS X 10.8 (Mountain Lion))</a>
-  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.0.1512_win_sources.zip" onclick="ga('send', 'event', 'Download', this.href);">Download Sources (Windows)</a>
-  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.0.1512_linux_sources.tgz" onclick="ga('send', 'event', 'Download', this.href);">Download Sources (Linux)</a>
-  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.0.1512_osx_sources.dmg" onclick="ga('send', 'event', 'Download', this.href);">Download Sources (OS X)</a> 
+  <li> <a href="https://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.0.1512_win_64bit.zip" onclick="ga('send', 'event', 'Download', this.href);">Download (Windows, 64 bit - tested on Windows 7/8/10)</a>
+  <li> <a href="https://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.0.1512_linux_64bit.tgz" onclick="ga('send', 'event', 'Download', this.href);">Download (Linux, 64 bit - tested on Ubuntu 14.04)</a>
+  <li> <a href="https://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.0.1512_osx_64bit.dmg" onclick="ga('send', 'event', 'Download', this.href);">Download (OS X, 64 bit - tested on OS X 10.8 (Mountain Lion))</a>
+  <li> <a href="https://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.0.1512_win_sources.zip" onclick="ga('send', 'event', 'Download', this.href);">Download Sources (Windows)</a>
+  <li> <a href="https://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.0.1512_linux_sources.tgz" onclick="ga('send', 'event', 'Download', this.href);">Download Sources (Linux)</a>
+  <li> <a href="https://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.0.1512_osx_sources.dmg" onclick="ga('send', 'event', 'Download', this.href);">Download Sources (OS X)</a>
 </ul>
 </p>
 
@@ -299,12 +300,12 @@ Any work based on CycloBranch shall cite any of the following references:
     <li> The internal periodic table has been extended.
     <li> Some bugs and performance issues fixed.
   </ul>
-  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.0.1216_win_64bit.zip" onclick="ga('send', 'event', 'Download', this.href);">Download (Windows, 64 bit - tested on Windows 7/8)</a>
-  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.0.1216_linux_64bit.tgz" onclick="ga('send', 'event', 'Download', this.href);">Download (Linux, 64 bit - tested on Ubuntu 14.04)</a>
-  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.0.1216_osx_64bit.dmg" onclick="ga('send', 'event', 'Download', this.href);">Download (OS X, 64 bit - tested on OS X 10.8 (Mountain Lion))</a>
-  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.0.1216_win_sources.zip" onclick="ga('send', 'event', 'Download', this.href);">Download Sources (Windows)</a>
-  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.0.1216_linux_sources.tgz" onclick="ga('send', 'event', 'Download', this.href);">Download Sources (Linux)</a>
-  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.0.1216_osx_sources.dmg" onclick="ga('send', 'event', 'Download', this.href);">Download Sources (OS X)</a>
+  <li> <a href="https://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.0.1216_win_64bit.zip" onclick="ga('send', 'event', 'Download', this.href);">Download (Windows, 64 bit - tested on Windows 7/8)</a>
+  <li> <a href="https://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.0.1216_linux_64bit.tgz" onclick="ga('send', 'event', 'Download', this.href);">Download (Linux, 64 bit - tested on Ubuntu 14.04)</a>
+  <li> <a href="https://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.0.1216_osx_64bit.dmg" onclick="ga('send', 'event', 'Download', this.href);">Download (OS X, 64 bit - tested on OS X 10.8 (Mountain Lion))</a>
+  <li> <a href="https://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.0.1216_win_sources.zip" onclick="ga('send', 'event', 'Download', this.href);">Download Sources (Windows)</a>
+  <li> <a href="https://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.0.1216_linux_sources.tgz" onclick="ga('send', 'event', 'Download', this.href);">Download Sources (Linux)</a>
+  <li> <a href="https://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.0.1216_osx_sources.dmg" onclick="ga('send', 'event', 'Download', this.href);">Download Sources (OS X)</a>
 </ul>
 </p>
 
@@ -331,10 +332,10 @@ Any work based on CycloBranch shall cite any of the following references:
     <li> Visualization of mass spectra improved.
     <li> Some bugs and performance issues fixed.
   </ul>
-  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.0.1106_win_64bit.zip" onclick="ga('send', 'event', 'Download', this.href);">Download (Windows, 64 bit - tested on Windows 7/8)</a>
-  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.0.1106_linux_64bit.tgz" onclick="ga('send', 'event', 'Download', this.href);">Download (Linux, 64 bit - tested on Ubuntu 14.04)</a>
-  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.0.1106_win_sources.zip" onclick="ga('send', 'event', 'Download', this.href);">Download Sources (Windows)</a>
-  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.0.1106_linux_sources.tgz" onclick="ga('send', 'event', 'Download', this.href);">Download Sources (Linux)</a>
+  <li> <a href="https://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.0.1106_win_64bit.zip" onclick="ga('send', 'event', 'Download', this.href);">Download (Windows, 64 bit - tested on Windows 7/8)</a>
+  <li> <a href="https://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.0.1106_linux_64bit.tgz" onclick="ga('send', 'event', 'Download', this.href);">Download (Linux, 64 bit - tested on Ubuntu 14.04)</a>
+  <li> <a href="https://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.0.1106_win_sources.zip" onclick="ga('send', 'event', 'Download', this.href);">Download Sources (Windows)</a>
+  <li> <a href="https://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.0.1106_linux_sources.tgz" onclick="ga('send', 'event', 'Download', this.href);">Download Sources (Linux)</a>
 </ul>
 </p>
 
@@ -356,8 +357,8 @@ Any work based on CycloBranch shall cite any of the following references:
     <li> Number of matched scrambled fragment ions is reported when a cyclic peptide is searched.
     <li> Small bugs fixed.
   </ul>
-  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.0.850_win_64bit.zip" onclick="ga('send', 'event', 'Download', this.href);">Download (Windows, 64 bit)</a>
-  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.0.850_win_sources.zip" onclick="ga('send', 'event', 'Download', this.href);">Download Sources (Windows)</a>
+  <li> <a href="https://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.0.850_win_64bit.zip" onclick="ga('send', 'event', 'Download', this.href);">Download (Windows, 64 bit)</a>
+  <li> <a href="https://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.0.850_win_sources.zip" onclick="ga('send', 'event', 'Download', this.href);">Download Sources (Windows)</a>
 </ul>
 </p>
 
@@ -375,8 +376,8 @@ Any work based on CycloBranch shall cite any of the following references:
     <li> Visualization of mass spectra improved.
     <li> Summary formulas of peptide sequence candidates added.
   </ul>
-  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.0.739_win_64bit.zip" onclick="ga('send', 'event', 'Download', this.href);">Download (Windows, 64 bit)</a>
-  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.0.739_win_sources.zip" onclick="ga('send', 'event', 'Download', this.href);">Download Sources (Windows)</a>
+  <li> <a href="https://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.0.739_win_64bit.zip" onclick="ga('send', 'event', 'Download', this.href);">Download (Windows, 64 bit)</a>
+  <li> <a href="https://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.0.739_win_sources.zip" onclick="ga('send', 'event', 'Download', this.href);">Download Sources (Windows)</a>
 </ul>
 </p>
 
@@ -391,8 +392,8 @@ Any work based on CycloBranch shall cite any of the following references:
 <p>
 <ul>
   <li> Initial release.
-  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.0.696_win_64bit.zip" onclick="ga('send', 'event', 'Download', this.href);">Download (Windows, 64 bit)</a>
-  <li> <a href="http://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.0.696_win_sources.zip" onclick="ga('send', 'event', 'Download', this.href);">Download Sources (Windows)</a>
+  <li> <a href="https://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.0.696_win_64bit.zip" onclick="ga('send', 'event', 'Download', this.href);">Download (Windows, 64 bit)</a>
+  <li> <a href="https://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.0.696_win_sources.zip" onclick="ga('send', 'event', 'Download', this.href);">Download Sources (Windows)</a>
 </ul>
 </p>
 

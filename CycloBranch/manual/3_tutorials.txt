@@ -35,7 +35,7 @@ A PDF guide through tutorials 1-11 (for CycloBranch 1.0.1216) and through the tu
 <a href="../../Tutorials/cb_tutorial1.mp4" onclick="ga('send', 'event', 'Tutorials', this.href);">Download mp4 (CycloBranch 1.0.1216)</a><br/>
 \endhtmlonly
 \latexonly
-\href{http://ms.biomed.cas.cz/cyclobranch/Tutorials/cb_tutorial1.mp4}{Download mp4 (CycloBranch 1.0.1216)}
+\href{https://ms.biomed.cas.cz/cyclobranch/Tutorials/cb_tutorial1.mp4}{Download mp4 (CycloBranch 1.0.1216)}
 
 \endlatexonly
 <a href="https://youtu.be/Yq6t-x-gDT4" target="_blank" onclick="ga('send', 'event', 'Tutorials', this.href, 'YouTube - Tutorial 1');">YouTube (CycloBranch 1.0.1216)</a>
@@ -43,7 +43,7 @@ A PDF guide through tutorials 1-11 (for CycloBranch 1.0.1216) and through the tu
 <br/>
 \htmlonly
 <p align="center">
-<video width="1296" height="740" controls onplay="ga('send', 'event', 'Tutorials', 'http://ms.biomed.cas.cz/cyclobranch/Tutorials/cb_tutorial1.mp4');">
+<video width="1296" height="740" controls onplay="ga('send', 'event', 'Tutorials', 'https://ms.biomed.cas.cz/cyclobranch/Tutorials/cb_tutorial1.mp4');">
 <source src="../../Tutorials/cb_tutorial1.mp4" type="video/mp4">
 Your browser does not support the video tag.
 </video>
@@ -58,7 +58,7 @@ Your browser does not support the video tag.
 <a href="../../Tutorials/cb_tutorial2.mp4" onclick="ga('send', 'event', 'Tutorials', this.href);">Download mp4 (CycloBranch 1.0.1216)</a><br/>
 \endhtmlonly
 \latexonly
-\href{http://ms.biomed.cas.cz/cyclobranch/Tutorials/cb_tutorial2.mp4}{Download mp4 (CycloBranch 1.0.1216)}
+\href{https://ms.biomed.cas.cz/cyclobranch/Tutorials/cb_tutorial2.mp4}{Download mp4 (CycloBranch 1.0.1216)}
 
 \endlatexonly
 <a href="https://youtu.be/jNYsh2T_gu8" target="_blank" onclick="ga('send', 'event', 'Tutorials', this.href, 'YouTube - Tutorial 2');">YouTube (CycloBranch 1.0.1216)</a>
@@ -66,7 +66,7 @@ Your browser does not support the video tag.
 <br/>
 \htmlonly
 <p align="center">
-<video width="1296" height="740" controls onplay="ga('send', 'event', 'Tutorials', 'http://ms.biomed.cas.cz/cyclobranch/Tutorials/cb_tutorial2.mp4');">
+<video width="1296" height="740" controls onplay="ga('send', 'event', 'Tutorials', 'https://ms.biomed.cas.cz/cyclobranch/Tutorials/cb_tutorial2.mp4');">
 <source src="../../Tutorials/cb_tutorial2.mp4" type="video/mp4">
 Your browser does not support the video tag.
 </video>
@@ -81,7 +81,7 @@ Your browser does not support the video tag.
 <a href="../../Tutorials/cb_tutorial3.mp4" onclick="ga('send', 'event', 'Tutorials', this.href);">Download mp4 (CycloBranch 1.0.1216)</a><br/>
 \endhtmlonly
 \latexonly
-\href{http://ms.biomed.cas.cz/cyclobranch/Tutorials/cb_tutorial3.mp4}{Download mp4 (CycloBranch 1.0.1216)}
+\href{https://ms.biomed.cas.cz/cyclobranch/Tutorials/cb_tutorial3.mp4}{Download mp4 (CycloBranch 1.0.1216)}
 
 \endlatexonly
 <a href="https://youtu.be/pjrX8HTtN_I" target="_blank" onclick="ga('send', 'event', 'Tutorials', this.href, 'YouTube - Tutorial 3');">YouTube (CycloBranch 1.0.1216)</a>
@@ -89,7 +89,7 @@ Your browser does not support the video tag.
 <br/>
 \htmlonly
 <p align="center">
-<video width="1296" height="740" controls onplay="ga('send', 'event', 'Tutorials', 'http://ms.biomed.cas.cz/cyclobranch/Tutorials/cb_tutorial3.mp4');">
+<video width="1296" height="740" controls onplay="ga('send', 'event', 'Tutorials', 'https://ms.biomed.cas.cz/cyclobranch/Tutorials/cb_tutorial3.mp4');">
 <source src="../../Tutorials/cb_tutorial3.mp4" type="video/mp4">
 Your browser does not support the video tag.
 </video>
@@ -104,7 +104,7 @@ Your browser does not support the video tag.
 <a href="../../Tutorials/cb_tutorial4.mp4" onclick="ga('send', 'event', 'Tutorials', this.href);">Download mp4 (CycloBranch 1.0.1216)</a><br/>
 \endhtmlonly
 \latexonly
-\href{http://ms.biomed.cas.cz/cyclobranch/Tutorials/cb_tutorial4.mp4}{Download mp4 (CycloBranch 1.0.1216)}
+\href{https://ms.biomed.cas.cz/cyclobranch/Tutorials/cb_tutorial4.mp4}{Download mp4 (CycloBranch 1.0.1216)}
 
 \endlatexonly
 <a href="https://youtu.be/D9yJfPdLQk4" target="_blank" onclick="ga('send', 'event', 'Tutorials', this.href, 'YouTube - Tutorial 4');">YouTube (CycloBranch 1.0.1216)</a>
@@ -112,7 +112,7 @@ Your browser does not support the video tag.
 <br/>
 \htmlonly
 <p align="center">
-<video width="1296" height="740" controls onplay="ga('send', 'event', 'Tutorials', 'http://ms.biomed.cas.cz/cyclobranch/Tutorials/cb_tutorial4.mp4');">
+<video width="1296" height="740" controls onplay="ga('send', 'event', 'Tutorials', 'https://ms.biomed.cas.cz/cyclobranch/Tutorials/cb_tutorial4.mp4');">
 <source src="../../Tutorials/cb_tutorial4.mp4" type="video/mp4">
 Your browser does not support the video tag.
 </video>
@@ -127,7 +127,7 @@ Your browser does not support the video tag.
 <a href="../../Tutorials/cb_tutorial5.mp4" onclick="ga('send', 'event', 'Tutorials', this.href);">Download mp4 (CycloBranch 1.0.1216)</a><br/>
 \endhtmlonly
 \latexonly
-\href{http://ms.biomed.cas.cz/cyclobranch/Tutorials/cb_tutorial5.mp4}{Download mp4 (CycloBranch 1.0.1216)}
+\href{https://ms.biomed.cas.cz/cyclobranch/Tutorials/cb_tutorial5.mp4}{Download mp4 (CycloBranch 1.0.1216)}
 
 \endlatexonly
 <a href="https://youtu.be/X1Xrn7VxInI" target="_blank" onclick="ga('send', 'event', 'Tutorials', this.href, 'YouTube - Tutorial 5');">YouTube (CycloBranch 1.0.1216)</a>
@@ -135,7 +135,7 @@ Your browser does not support the video tag.
 <br/>
 \htmlonly
 <p align="center">
-<video width="1296" height="740" controls onplay="ga('send', 'event', 'Tutorials', 'http://ms.biomed.cas.cz/cyclobranch/Tutorials/cb_tutorial5.mp4');">
+<video width="1296" height="740" controls onplay="ga('send', 'event', 'Tutorials', 'https://ms.biomed.cas.cz/cyclobranch/Tutorials/cb_tutorial5.mp4');">
 <source src="../../Tutorials/cb_tutorial5.mp4" type="video/mp4">
 Your browser does not support the video tag.
 </video>
@@ -150,7 +150,7 @@ Your browser does not support the video tag.
 <a href="../../Tutorials/cb_tutorial6.mp4" onclick="ga('send', 'event', 'Tutorials', this.href);">Download mp4 (CycloBranch 1.0.1216)</a><br/>
 \endhtmlonly
 \latexonly
-\href{http://ms.biomed.cas.cz/cyclobranch/Tutorials/cb_tutorial6.mp4}{Download mp4 (CycloBranch 1.0.1216)}
+\href{https://ms.biomed.cas.cz/cyclobranch/Tutorials/cb_tutorial6.mp4}{Download mp4 (CycloBranch 1.0.1216)}
 
 \endlatexonly
 <a href="https://youtu.be/heQkZW8XBz4" target="_blank" onclick="ga('send', 'event', 'Tutorials', this.href, 'YouTube - Tutorial 6');">YouTube (CycloBranch 1.0.1216)</a>
@@ -158,7 +158,7 @@ Your browser does not support the video tag.
 <br/>
 \htmlonly
 <p align="center">
-<video width="1296" height="740" controls onplay="ga('send', 'event', 'Tutorials', 'http://ms.biomed.cas.cz/cyclobranch/Tutorials/cb_tutorial6.mp4');">
+<video width="1296" height="740" controls onplay="ga('send', 'event', 'Tutorials', 'https://ms.biomed.cas.cz/cyclobranch/Tutorials/cb_tutorial6.mp4');">
 <source src="../../Tutorials/cb_tutorial6.mp4" type="video/mp4">
 Your browser does not support the video tag.
 </video>
@@ -173,7 +173,7 @@ Your browser does not support the video tag.
 <a href="../../Tutorials/cb_tutorial7.mp4" onclick="ga('send', 'event', 'Tutorials', this.href);">Download mp4 (CycloBranch 1.0.1216)</a><br/>
 \endhtmlonly
 \latexonly
-\href{http://ms.biomed.cas.cz/cyclobranch/Tutorials/cb_tutorial7.mp4}{Download mp4 (CycloBranch 1.0.1216)}
+\href{https://ms.biomed.cas.cz/cyclobranch/Tutorials/cb_tutorial7.mp4}{Download mp4 (CycloBranch 1.0.1216)}
 
 \endlatexonly
 <a href="https://youtu.be/QQ6jbaxqIgM" target="_blank" onclick="ga('send', 'event', 'Tutorials', this.href, 'YouTube - Tutorial 7');">YouTube (CycloBranch 1.0.1216)</a>
@@ -181,7 +181,7 @@ Your browser does not support the video tag.
 <br/>
 \htmlonly
 <p align="center">
-<video width="1296" height="740" controls onplay="ga('send', 'event', 'Tutorials', 'http://ms.biomed.cas.cz/cyclobranch/Tutorials/cb_tutorial7.mp4');">
+<video width="1296" height="740" controls onplay="ga('send', 'event', 'Tutorials', 'https://ms.biomed.cas.cz/cyclobranch/Tutorials/cb_tutorial7.mp4');">
 <source src="../../Tutorials/cb_tutorial7.mp4" type="video/mp4">
 Your browser does not support the video tag.
 </video>
@@ -196,7 +196,7 @@ Your browser does not support the video tag.
 <a href="../../Tutorials/cb_tutorial8.mp4" onclick="ga('send', 'event', 'Tutorials', this.href);">Download mp4 (CycloBranch 1.0.1216)</a><br/>
 \endhtmlonly
 \latexonly
-\href{http://ms.biomed.cas.cz/cyclobranch/Tutorials/cb_tutorial8.mp4}{Download mp4 (CycloBranch 1.0.1216)}
+\href{https://ms.biomed.cas.cz/cyclobranch/Tutorials/cb_tutorial8.mp4}{Download mp4 (CycloBranch 1.0.1216)}
 
 \endlatexonly
 <a href="https://youtu.be/aIBTtyhg6vM" target="_blank" onclick="ga('send', 'event', 'Tutorials', this.href, 'YouTube - Tutorial 8');">YouTube (CycloBranch 1.0.1216)</a>
@@ -204,7 +204,7 @@ Your browser does not support the video tag.
 <br/>
 \htmlonly
 <p align="center">
-<video width="1296" height="740" controls onplay="ga('send', 'event', 'Tutorials', 'http://ms.biomed.cas.cz/cyclobranch/Tutorials/cb_tutorial8.mp4');">
+<video width="1296" height="740" controls onplay="ga('send', 'event', 'Tutorials', 'https://ms.biomed.cas.cz/cyclobranch/Tutorials/cb_tutorial8.mp4');">
 <source src="../../Tutorials/cb_tutorial8.mp4" type="video/mp4">
 Your browser does not support the video tag.
 </video>
@@ -219,7 +219,7 @@ Your browser does not support the video tag.
 <a href="../../Tutorials/cb_tutorial9.mp4" onclick="ga('send', 'event', 'Tutorials', this.href);">Download mp4 (CycloBranch 1.0.1216)</a><br/>
 \endhtmlonly
 \latexonly
-\href{http://ms.biomed.cas.cz/cyclobranch/Tutorials/cb_tutorial9.mp4}{Download mp4 (CycloBranch 1.0.1216)}
+\href{https://ms.biomed.cas.cz/cyclobranch/Tutorials/cb_tutorial9.mp4}{Download mp4 (CycloBranch 1.0.1216)}
 
 \endlatexonly
 <a href="https://youtu.be/Li4onQme2qc" target="_blank" onclick="ga('send', 'event', 'Tutorials', this.href, 'YouTube - Tutorial 9');">YouTube (CycloBranch 1.0.1216)</a>
@@ -227,7 +227,7 @@ Your browser does not support the video tag.
 <br/>
 \htmlonly
 <p align="center">
-<video width="1296" height="740" controls onplay="ga('send', 'event', 'Tutorials', 'http://ms.biomed.cas.cz/cyclobranch/Tutorials/cb_tutorial9.mp4');">
+<video width="1296" height="740" controls onplay="ga('send', 'event', 'Tutorials', 'https://ms.biomed.cas.cz/cyclobranch/Tutorials/cb_tutorial9.mp4');">
 <source src="../../Tutorials/cb_tutorial9.mp4" type="video/mp4">
 Your browser does not support the video tag.
 </video>
@@ -242,7 +242,7 @@ Your browser does not support the video tag.
 <a href="../../Tutorials/cb_tutorial10.mp4" onclick="ga('send', 'event', 'Tutorials', this.href);">Download mp4 (CycloBranch 1.0.1216)</a><br/>
 \endhtmlonly
 \latexonly
-\href{http://ms.biomed.cas.cz/cyclobranch/Tutorials/cb_tutorial10.mp4}{Download mp4 (CycloBranch 1.0.1216)}
+\href{https://ms.biomed.cas.cz/cyclobranch/Tutorials/cb_tutorial10.mp4}{Download mp4 (CycloBranch 1.0.1216)}
 
 \endlatexonly
 <a href="https://youtu.be/z1dCG4Wlmu4" target="_blank" onclick="ga('send', 'event', 'Tutorials', this.href, 'YouTube - Tutorial 10');">YouTube (CycloBranch 1.0.1216)</a>
@@ -250,7 +250,7 @@ Your browser does not support the video tag.
 <br/>
 \htmlonly
 <p align="center">
-<video width="1296" height="740" controls onplay="ga('send', 'event', 'Tutorials', 'http://ms.biomed.cas.cz/cyclobranch/Tutorials/cb_tutorial10.mp4');">
+<video width="1296" height="740" controls onplay="ga('send', 'event', 'Tutorials', 'https://ms.biomed.cas.cz/cyclobranch/Tutorials/cb_tutorial10.mp4');">
 <source src="../../Tutorials/cb_tutorial10.mp4" type="video/mp4">
 Your browser does not support the video tag.
 </video>
@@ -265,7 +265,7 @@ Your browser does not support the video tag.
 <a href="../../Tutorials/cb_tutorial11.mp4" onclick="ga('send', 'event', 'Tutorials', this.href);">Download mp4 (CycloBranch 1.0.1216)</a><br/>
 \endhtmlonly
 \latexonly
-\href{http://ms.biomed.cas.cz/cyclobranch/Tutorials/cb_tutorial11.mp4}{Download mp4 (CycloBranch 1.0.1216)}
+\href{https://ms.biomed.cas.cz/cyclobranch/Tutorials/cb_tutorial11.mp4}{Download mp4 (CycloBranch 1.0.1216)}
 
 \endlatexonly
 <a href="https://youtu.be/3E3AyJt6K5s" target="_blank" onclick="ga('send', 'event', 'Tutorials', this.href, 'YouTube - Tutorial 11');">YouTube (CycloBranch 1.0.1216)</a>
@@ -273,7 +273,7 @@ Your browser does not support the video tag.
 <br/>
 \htmlonly
 <p align="center">
-<video width="1296" height="740" controls onplay="ga('send', 'event', 'Tutorials', 'http://ms.biomed.cas.cz/cyclobranch/Tutorials/cb_tutorial11.mp4');">
+<video width="1296" height="740" controls onplay="ga('send', 'event', 'Tutorials', 'https://ms.biomed.cas.cz/cyclobranch/Tutorials/cb_tutorial11.mp4');">
 <source src="../../Tutorials/cb_tutorial11.mp4" type="video/mp4">
 Your browser does not support the video tag.
 </video>
@@ -288,7 +288,7 @@ Your browser does not support the video tag.
 <a href="../../Tutorials/cb_tutorial12_siderophores.mp4" onclick="ga('send', 'event', 'Tutorials', this.href);">Download mp4 (CycloBranch 1.1.570)</a><br/>
 \endhtmlonly
 \latexonly
-\href{http://ms.biomed.cas.cz/cyclobranch/Tutorials/cb_tutorial12_siderophores.mp4}{Download mp4 (CycloBranch 1.1.570)}
+\href{https://ms.biomed.cas.cz/cyclobranch/Tutorials/cb_tutorial12_siderophores.mp4}{Download mp4 (CycloBranch 1.1.570)}
 
 \endlatexonly
 <a href="https://youtu.be/zzKTncu8BlI" target="_blank" onclick="ga('send', 'event', 'Tutorials', this.href, 'YouTube - Tutorial 12);">YouTube (CycloBranch 1.1.570)</a>
@@ -296,7 +296,7 @@ Your browser does not support the video tag.
 <br/>
 \htmlonly
 <p align="center">
-<video width="1296" height="788" controls onplay="ga('send', 'event', 'Tutorials', 'http://ms.biomed.cas.cz/cyclobranch/Tutorials/cb_tutorial12_siderophores.mp4');">
+<video width="1296" height="788" controls onplay="ga('send', 'event', 'Tutorials', 'https://ms.biomed.cas.cz/cyclobranch/Tutorials/cb_tutorial12_siderophores.mp4');">
 <source src="../../Tutorials/cb_tutorial12_siderophores.mp4" type="video/mp4">
 Your browser does not support the video tag.
 </video>
@@ -311,7 +311,7 @@ Your browser does not support the video tag.
 <a href="../../Tutorials/cb_tutorial13_siderophores.mp4" onclick="ga('send', 'event', 'Tutorials', this.href);">Download mp4 (CycloBranch 1.1.570)</a><br/>
 \endhtmlonly
 \latexonly
-\href{http://ms.biomed.cas.cz/cyclobranch/Tutorials/cb_tutorial13_siderophores.mp4}{Download mp4 (CycloBranch 1.1.570)}
+\href{https://ms.biomed.cas.cz/cyclobranch/Tutorials/cb_tutorial13_siderophores.mp4}{Download mp4 (CycloBranch 1.1.570)}
 
 \endlatexonly
 <a href="https://youtu.be/XYjeTtrXyZ0" target="_blank" onclick="ga('send', 'event', 'Tutorials', this.href, 'YouTube - Tutorial 13');">YouTube (CycloBranch 1.1.570)</a>
@@ -319,7 +319,7 @@ Your browser does not support the video tag.
 <br/>
 \htmlonly
 <p align="center">
-<video width="1296" height="788" controls onplay="ga('send', 'event', 'Tutorials', 'http://ms.biomed.cas.cz/cyclobranch/Tutorials/cb_tutorial13_siderophores.mp4');">
+<video width="1296" height="788" controls onplay="ga('send', 'event', 'Tutorials', 'https://ms.biomed.cas.cz/cyclobranch/Tutorials/cb_tutorial13_siderophores.mp4');">
 <source src="../../Tutorials/cb_tutorial13_siderophores.mp4" type="video/mp4">
 Your browser does not support the video tag.
 </video>
@@ -334,7 +334,7 @@ Your browser does not support the video tag.
 <a href="../../Tutorials/cb_tutorial14_siderophores.mp4" onclick="ga('send', 'event', 'Tutorials', this.href);">Download mp4 (CycloBranch 1.1.570)</a><br/>
 \endhtmlonly
 \latexonly
-\href{http://ms.biomed.cas.cz/cyclobranch/Tutorials/cb_tutorial14_siderophores.mp4}{Download mp4 (CycloBranch 1.1.570)}
+\href{https://ms.biomed.cas.cz/cyclobranch/Tutorials/cb_tutorial14_siderophores.mp4}{Download mp4 (CycloBranch 1.1.570)}
 
 \endlatexonly
 <a href="https://youtu.be/1ncO3VAFamc" target="_blank" onclick="ga('send', 'event', 'Tutorials', this.href, 'YouTube - Tutorial 14');">YouTube (CycloBranch 1.1.570)</a>
@@ -342,7 +342,7 @@ Your browser does not support the video tag.
 <br/>
 \htmlonly
 <p align="center">
-<video width="1296" height="788" controls onplay="ga('send', 'event', 'Tutorials', 'http://ms.biomed.cas.cz/cyclobranch/Tutorials/cb_tutorial14_siderophores.mp4');">
+<video width="1296" height="788" controls onplay="ga('send', 'event', 'Tutorials', 'https://ms.biomed.cas.cz/cyclobranch/Tutorials/cb_tutorial14_siderophores.mp4');">
 <source src="../../Tutorials/cb_tutorial14_siderophores.mp4" type="video/mp4">
 Your browser does not support the video tag.
 </video>

@@ -2,7 +2,7 @@
 
 <div align="center">
 <h1>CycloBranch</h1>
-<h2>(v. 1.3.1)</h2>
+<h2>(v. 1.3.xxx)</h2>
 </div>
 
 <div align="center">
@@ -12,7 +12,7 @@
 <b>Availability & Usability</b>
 </td>
 <td width="400" align="center" style="background-color:#C0C6E0">
-<b>Compound Search<br/> (MS and MSI)</b>
+<b>Dereplication & Compound Search<br/> (MS, LC-MS, and MSI)</b>
 </td>
 <td width="400" align="center" style="background-color:#C6CCE6">
 <b><i>De Novo</i> Sequencing &<br/>Database Search (MS/MS)</b>
@@ -69,7 +69,7 @@
 <li>[Building blocks](@ref availableblockdatabases) (MS/MS)
 <li>[Sequences](@ref availablesequencedatabases) (MS/MS)
 <li>[Compounds](@ref availablesequencedatabases) (MS and MSI)
-<li><a href="http://ms.biomed.cas.cz/cyclobranch/release/custom_databases_excel_sheets.zip" onclick="ga('send', 'event', 'Introduction', this.href);"><b>Custom</b></a>
+<li><a href="https://ms.biomed.cas.cz/cyclobranch/release/custom_databases_excel_sheets.zip" onclick="ga('send', 'event', 'Introduction', this.href);"><b>Custom</b></a>
 </ul>
 </td>
 <td style="vertical-align:top; background-color:#D6DCF6">
@@ -91,8 +91,9 @@
 <p>
 Any work based on CycloBranch shall cite any of the following references:
 <ul>
-<li><i>J. Am. Soc. Mass Spectrom.</i> (2015), 26(10):1780-1786. DOI: <a href="http://dx.doi.org/10.1007/s13361-015-1211-1"><b>10.1007/s13361-015-1211-1</b></a>
-<li><i>BBA - Proteins Proteom.</i> (2017), 1865(7):768-775. DOI: <a href="http://dx.doi.org/10.1016/j.bbapap.2016.12.003"><b>10.1016/j.bbapap.2016.12.003</b></a>
+<li><i>J. Am. Soc. Mass Spectrom.</i> (2015), 26(10):1780-1786. DOI: <a href="https://doi.org/10.1007/s13361-015-1211-1"><b>10.1007/s13361-015-1211-1</b></a>
+<li><i>BBA - Proteins Proteom.</i> (2017), 1865(7):768-775. DOI: <a href="https://doi.org/10.1016/j.bbapap.2016.12.003"><b>10.1016/j.bbapap.2016.12.003</b></a>
+<li><i>J. Mass Spectrom.</i> (2018), 53(11):1097-1103. DOI: <a href="https://doi.org/10.1002/jms.4285"><b>10.1002/jms.4285</b></a>
 </ul>
 </p>
 

@@ -177,7 +177,7 @@ A line starting with the hash '#' is a comment which is not processed.
 <tr><td>norine-terminal-blocks.txt</td><td>7 terminal blocks/modifications compiled from Norine (version July, 2013)</td></tr>
 <tr><td>putrescine.txt</td><td>putrescine</td></tr>
 <tr><td>tutorial5.txt</td><td>4 modifications used in [Tutorial 5](@ref tutorial5)</td></tr>
-<tr><td>custom</td><td><a href="http://ms.biomed.cas.cz/cyclobranch/release/custom_databases_excel_sheets.zip" onclick="ga('send', 'event', 'Modifications', this.href);">Download Template for Excel</a></td></tr>
+<tr><td>custom</td><td><a href="https://ms.biomed.cas.cz/cyclobranch/release/custom_databases_excel_sheets.zip" onclick="ga('send', 'event', 'Modifications', this.href);">Download Template for Excel</a></td></tr>
 </table>
 </div>
 

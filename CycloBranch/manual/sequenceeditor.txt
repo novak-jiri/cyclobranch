@@ -227,7 +227,7 @@ Reference ids can be written in the following formats (without quotes):
 <tr><td>lipids/LMSD_*_SL.txt</td><td>Saccharolipids (compiled from http://www.lipidmaps.org/)</td><td>MS, MSI</td></tr>
 <tr><td>lipids/LMSD_*_SP.txt</td><td>Sphingolipids (compiled from http://www.lipidmaps.org/)</td><td>MS, MSI</td></tr>
 <tr><td>lipids/LMSD_*_ST.txt</td><td>Sterol Lipids (compiled from http://www.lipidmaps.org/)</td><td>MS, MSI</td></tr>
-<tr><td>custom</td><td></td><td><a href="http://ms.biomed.cas.cz/cyclobranch/release/custom_databases_excel_sheets.zip" onclick="ga('send', 'event', 'Sequences', this.href);">Download Template for Excel</a></td></tr>
+<tr><td>custom</td><td></td><td><a href="https://ms.biomed.cas.cz/cyclobranch/release/custom_databases_excel_sheets.zip" onclick="ga('send', 'event', 'Sequences', this.href);">Download Template for Excel</a></td></tr>
 </table>
 </div>
 

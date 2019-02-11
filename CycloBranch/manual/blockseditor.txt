@@ -202,7 +202,7 @@ Corresponding residue summary formulas must be entered in the column "Residue Su
 <tr><td>D<sub><i>287</i></sub> (v3)</td><td>287 NRP building blocks (523 including isobars)</td><td>db287_v3.txt</td></tr>
 <tr><td>D<sub><i>291</i></sub></td><td>291 NRP building blocks (525 including isobars)</td><td>db291.txt</td></tr>
 <tr><td>ketide blocks</td><td>19 ketide building blocks (22 including isobars)</td><td>inhouse_siderophores_blocks.txt</td></tr>
-<tr><td>custom</td><td></td><td><a href="http://ms.biomed.cas.cz/cyclobranch/release/custom_databases_excel_sheets.zip" onclick="ga('send', 'event', 'Blocks', this.href);">Download Template for Excel</a></td></tr>
+<tr><td>custom</td><td></td><td><a href="https://ms.biomed.cas.cz/cyclobranch/release/custom_databases_excel_sheets.zip" onclick="ga('send', 'event', 'Blocks', this.href);">Download Template for Excel</a></td></tr>
 </table>
 </div>      
 

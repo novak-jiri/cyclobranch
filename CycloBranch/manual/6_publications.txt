@@ -5,17 +5,24 @@
 \section publicationstocite Publications to Cite
 
 <p>
-Jiri Novak, Lucie Sokolova, Karel Lemr, Tomas Pluhacek, Andrea Palyzova and Vladimir Havlicek.<br/>
-<b>Batch-processing of Imaging or Liquid-chromatography Mass Spectrometry Datasets and <i>De Novo</i> Sequencing of Polyketide Siderophores.</b><br/>
-<i>BBA - Proteins Proteom.</i>, vol. 1865, no. 7, pp. 768-775, 2017. DOI: <a href="http://dx.doi.org/10.1016/j.bbapap.2016.12.003"><b>10.1016/j.bbapap.2016.12.003</b></a>.<br/>
-Download citation: [ <a href="http://ms.biomed.cas.cz/cyclobranch/docs/cyclobranch_bba_ris.txt" onclick="ga('send', 'event', 'Publications', this.href);"><b>ris</b></a> ], [ <a href="http://ms.biomed.cas.cz/cyclobranch/docs/cyclobranch_bba_bib.txt" onclick="ga('send', 'event', 'Publications', this.href);"><b>bib</b></a> ]
+Jiri Novak, Karel Lemr, Kevin A. Schug and Vladimir Havlicek.<br/>
+<b>CycloBranch: <i>De Novo</i> Sequencing of Nonribosomal Peptides from Accurate Product Ion Mass Spectra.</b><br/>
+<i>J. Am. Soc. Mass Spectrom.</i>, vol. 26, no. 10, pp. 1780-1786, 2015. DOI: <a href="https://doi.org/10.1007/s13361-015-1211-1"><b>10.1007/s13361-015-1211-1</b></a>.<br/>
+Download citation: [ <a href="https://ms.biomed.cas.cz/cyclobranch/docs/cyclobranch_ris.txt" onclick="ga('send', 'event', 'Publications', this.href);"><b>ris</b></a> ], [ <a href="https://ms.biomed.cas.cz/cyclobranch/docs/cyclobranch_bib.txt" onclick="ga('send', 'event', 'Publications', this.href);"><b>bib</b></a> ]
 </p>
 
 <p>
-Jiri Novak, Karel Lemr, Kevin A. Schug and Vladimir Havlicek.<br/>
-<b>CycloBranch: <i>De Novo</i> Sequencing of Nonribosomal Peptides from Accurate Product Ion Mass Spectra.</b><br/>
-<i>J. Am. Soc. Mass Spectrom.</i>, vol. 26, no. 10, pp. 1780-1786, 2015. DOI: <a href="http://dx.doi.org/10.1007/s13361-015-1211-1"><b>10.1007/s13361-015-1211-1</b></a>.<br/>
-Download citation: [ <a href="http://ms.biomed.cas.cz/cyclobranch/docs/cyclobranch_ris.txt" onclick="ga('send', 'event', 'Publications', this.href);"><b>ris</b></a> ], [ <a href="http://ms.biomed.cas.cz/cyclobranch/docs/cyclobranch_bib.txt" onclick="ga('send', 'event', 'Publications', this.href);"><b>bib</b></a> ]
+Jiri Novak, Lucie Sokolova, Karel Lemr, Tomas Pluhacek, Andrea Palyzova and Vladimir Havlicek.<br/>
+<b>Batch-processing of Imaging or Liquid-chromatography Mass Spectrometry Datasets and <i>De Novo</i> Sequencing of Polyketide Siderophores.</b><br/>
+<i>BBA - Proteins Proteom.</i>, vol. 1865, no. 7, pp. 768-775, 2017. DOI: <a href="https://doi.org/10.1016/j.bbapap.2016.12.003"><b>10.1016/j.bbapap.2016.12.003</b></a>.<br/>
+Download citation: [ <a href="https://ms.biomed.cas.cz/cyclobranch/docs/cyclobranch_bba_ris.txt" onclick="ga('send', 'event', 'Publications', this.href);"><b>ris</b></a> ], [ <a href="https://ms.biomed.cas.cz/cyclobranch/docs/cyclobranch_bba_bib.txt" onclick="ga('send', 'event', 'Publications', this.href);"><b>bib</b></a> ]
+</p>
+
+<p>
+Jiri Novak, Anton Skriba, Jakub Zapal, Marek Kuzma and Vladimir Havlicek.<br/>
+<b>CycloBranch: An open tool for fine isotope structures in conventional and product ion mass spectra.</b><br/>
+<i>J. Mass Spectrom.</i>, vol. 53, no. 11, pp. 1097-1103, 2018. DOI: <a href="https://doi.org/10.1002/jms.4285"><b>10.1002/jms.4285</b></a>.<br/>
+Download citation: [ <a href="https://ms.biomed.cas.cz/cyclobranch/docs/cyclobranch_jms_ris.txt" onclick="ga('send', 'event', 'Publications', this.href);"><b>ris</b></a> ], [ <a href="https://ms.biomed.cas.cz/cyclobranch/docs/cyclobranch_jms_bib.txt" onclick="ga('send', 'event', 'Publications', this.href);"><b>bib</b></a> ]
 </p>
 
 <hr>
@@ -25,25 +32,25 @@ Download citation: [ <a href="http://ms.biomed.cas.cz/cyclobranch/docs/cyclobran
 <p>
 Dominika Luptakova, Tomas Pluhacek, Milos Petrik, Jiri Novak, Andrea Palyzova, Lucie Sokolova, Anton Skriba, Blanka Sediva, Karel Lemr and Vladimir Havlicek.<br/>
 <b>Non-invasive and Invasive Diagnoses of Aspergillosis in a Rat Model by Mass Spectrometry.</b><br/>
-<i>Scientific Reports</i>, vol. 7, pp. 16523, 2017. DOI: <a href="http://dx.doi.org/10.1038/s41598-017-16648-z"><b>10.1038/s41598-017-16648-z</b></a>.<br/>
+<i>Scientific Reports</i>, vol. 7, pp. 16523, 2017. DOI: <a href="https://doi.org/10.1038/s41598-017-16648-z"><b>10.1038/s41598-017-16648-z</b></a>.<br/>
 </p>
 
 <p>
 Jiri Novak and Vladimir Havlicek.<br/>
 <b>Dereplication and Visualization of Fungal Siderophores by CycloBranch.</b><br/>
-<i>Mycoses</i>, vol. 60, no. S2, pp. 200, 2017. DOI: <a href="http://dx.doi.org/10.1111/myc.12674"><b>10.1111/myc.12674</b></a>.<br/>
+<i>Mycoses</i>, vol. 60, no. S2, pp. 200, 2017. DOI: <a href="https://doi.org/10.1111/myc.12674"><b>10.1111/myc.12674</b></a>.<br/>
 </p>
 
 <p>
 Tomas Pluhacek, Karel Lemr, Dipankar Ghosh, David Milde, Jiri Novak and Vladimir Havlicek.<br/>
 <b>Characterization of Microbial Siderophores by Mass Spectrometry.</b><br/>
-<i>Mass Spectrom. Rev.</i>, vol. 35, no. 1, pp. 35-47, 2016. DOI: <a href="http://dx.doi.org/10.1002/mas.21461"><b>10.1002/mas.21461</b></a>.<br/>
+<i>Mass Spectrom. Rev.</i>, vol. 35, no. 1, pp. 35-47, 2016. DOI: <a href="https://doi.org/10.1002/mas.21461"><b>10.1002/mas.21461</b></a>.<br/>
 </p>
 
 <p>
 Jakub Prichystal, Kevin A. Schug, Karel Lemr, Jiri Novak and Vladimir Havlicek.<br/>
 <b>Structural Analysis of Natural Products.</b><br/>
-<i>Anal. Chem.</i>, vol. 88, no. 21, pp. 10338-10346, 2016. DOI: <a href="http://dx.doi.org/10.1021/acs.analchem.6b02386"><b>10.1021/acs.analchem.6b02386</b></a>.<br/>
+<i>Anal. Chem.</i>, vol. 88, no. 21, pp. 10338-10346, 2016. DOI: <a href="https://doi.org/10.1021/acs.analchem.6b02386"><b>10.1021/acs.analchem.6b02386</b></a>.<br/>
 </p>
 
 <hr>
