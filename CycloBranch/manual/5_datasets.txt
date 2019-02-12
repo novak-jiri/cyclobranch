@@ -1080,7 +1080,7 @@ can be downloaded <a href="https://ms.biomed.cas.cz/cyclobranch/datasets/msi_dat
 Reference:<br/>
 Dominika Luptakova, Tomas Pluhacek, Milos Petrik, Jiri Novak, Andrea Palyzova, Lucie Sokolova, Anton Skriba, Blanka Sediva, Karel Lemr and Vladimir Havlicek.<br/>
 <b>Non-invasive and Invasive Diagnoses of Aspergillosis in a Rat Model by Mass Spectrometry.</b><br/>
-<i>Scientific Reports</i>, vol. 7, pp. 16523, 2017. DOI: <a href="https://doi.org/10.1038/s41598-017-16648-z"><b>10.1038/s41598-017-16648-z</b></a>.<br/>
+<i>Sci. Rep.</i>, vol. 7, pp. 16523, 2017. DOI: <a href="https://doi.org/10.1038/s41598-017-16648-z"><b>10.1038/s41598-017-16648-z</b></a>.<br/>
 </p>
 
 <hr size="1">

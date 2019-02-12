@@ -30,9 +30,15 @@ Download citation: [ <a href="https://ms.biomed.cas.cz/cyclobranch/docs/cyclobra
 \section publicationsrelated Related Publications
 
 <p>
+Andrea Palyzova, Katerina Svobodova, Lucie Sokolova, Jiri Novak and Cenek Novotny.<br/>
+<b>Metabolic profiling of <i>Fusarium oxysporum</i> f. sp. <i>conglutinans</i> race 2 in dual cultures with biocontrol agents <i>Bacillus amyloliquefaciens</i>, <i>Pseudomonas aeruginosa</i>, and <i>Trichoderma harzianum</i>.</b><br/>
+<i>Folia Microbiol.</i>, 2019. DOI: <a href="https://doi.org/10.1007/s12223-019-00690-7"><b>10.1007/s12223-019-00690-7</b></a>.<br/>
+</p>
+
+<p>
 Dominika Luptakova, Tomas Pluhacek, Milos Petrik, Jiri Novak, Andrea Palyzova, Lucie Sokolova, Anton Skriba, Blanka Sediva, Karel Lemr and Vladimir Havlicek.<br/>
 <b>Non-invasive and Invasive Diagnoses of Aspergillosis in a Rat Model by Mass Spectrometry.</b><br/>
-<i>Scientific Reports</i>, vol. 7, pp. 16523, 2017. DOI: <a href="https://doi.org/10.1038/s41598-017-16648-z"><b>10.1038/s41598-017-16648-z</b></a>.<br/>
+<i>Sci. Rep.</i>, vol. 7, pp. 16523, 2017. DOI: <a href="https://doi.org/10.1038/s41598-017-16648-z"><b>10.1038/s41598-017-16648-z</b></a>.<br/>
 </p>
 
 <p>
