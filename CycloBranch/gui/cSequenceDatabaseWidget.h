@@ -164,6 +164,8 @@ private slots:
 
 	bool saveDatabaseAs();
 
+	void saveDatabaseCheck();
+
 	void addRow();
 
 	void removeSelectedRows();

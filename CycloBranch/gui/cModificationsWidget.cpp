@@ -146,7 +146,7 @@ cModificationsWidget::cModificationsWidget(QWidget* parent) {
 	actionSaveDatabase->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_S));
 	actionSaveDatabase->setToolTip("Save Database... (Ctrl + S)");
 	toolbarFile->addAction(actionSaveDatabase);
-	connect(actionSaveDatabase, SIGNAL(triggered()), this, SLOT(saveDatabase()));
+	connect(actionSaveDatabase, SIGNAL(triggered()), this, SLOT(saveDatabaseCheck()));
 
 	actionSaveDatabaseAs = new QAction(QIcon(":/images/icons/86.png"), tr("Save &Database As..."), this);
 	actionSaveDatabaseAs->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_D));
@@ -628,6 +628,18 @@ bool cModificationsWidget::saveDatabaseAs() {
 	}
 
 	return false;
+}
+
+
+void cModificationsWidget::saveDatabaseCheck() {
+	QMessageBox::StandardButton reply;
+	reply = QMessageBox::question(this, appname, "Save changes ?", QMessageBox::Yes | QMessageBox::No);
+
+	if (reply == QMessageBox::No) {
+		return;
+	}
+
+	saveDatabase();
 }
 
 
