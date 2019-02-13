@@ -2271,6 +2271,53 @@ void cSpectrumDetailWidget::rawDataStateChanged(bool state) {
 
 		}
 
+		if (parameters->peaklistfileformat == dat) {
+
+			targetid = rowid - 1;
+
+			if ((targetid >= 0) && (targetid < rawdata->size())) {
+				if (state) {
+					string mgfname = parameters->peaklistfilename.substr(0, parameters->peaklistfilename.rfind('/'));
+					// remove "_PEAKS.raw"
+					mgfname = mgfname.substr(0, mgfname.size() - 10);
+					mgfname += ".mgf";
+
+					peakliststream.open(mgfname);
+
+					(*rawdata)[targetid].clear();
+					(*rawdata)[targetid].loadFromMGFStream(peakliststream);
+					while (peakliststream.good() && (theoreticalspectrum->getExperimentalSpectrum().getTitle().compare((*rawdata)[targetid].getTitle()) != 0)) {
+						(*rawdata)[targetid].clear();
+						(*rawdata)[targetid].loadFromMGFStream(peakliststream);
+					}
+
+					if ((theoreticalspectrum->getExperimentalSpectrum().getTitle().compare((*rawdata)[targetid].getTitle()) != 0)) {
+						(*rawdata)[targetid].clear();
+					}
+
+					peakliststream.close();
+
+					progress.setValue(33);
+
+					(*rawdata)[targetid].sortbyMass();
+					(*rawdata)[targetid].normalizeIntenzityByValue(theoreticalspectrum->getExperimentalSpectrum().getMaximumAbsoluteIntensity() * 100.0 / theoreticalspectrum->getExperimentalSpectrum().getMaximumRelativeIntensity());
+					(*rawdata)[targetid].cropMinimumMZRatio(parameters->minimummz, parameters->fragmentmasserrortolerance);
+
+					if ((parameters->mode == denovoengine) || (parameters->mode == singlecomparison) || (parameters->mode == databasesearch)) {
+						(*rawdata)[targetid].cropMaximumMZRatio(charge(uncharge(parameters->precursormass, parameters->precursorcharge) + maxmzoverhead, (parameters->precursorcharge > 0) ? 1 : -1), parameters->precursormasserrortolerance);
+					}
+
+					progress.setValue(66);
+				}
+				else {
+					(*rawdata)[targetid].clear();
+				}
+			}
+
+			emit rawDataStateChangedSignal(state);
+
+		}
+
 		if ((parameters->peaklistfileformat == mzML) || (parameters->peaklistfileformat == raw)) {
 
 			if ((parameters->mode == denovoengine) || (parameters->mode == databasesearch)) {
@@ -2448,7 +2495,7 @@ void cSpectrumDetailWidget::rawDataStateChanged(bool state) {
 			emit rawDataStateChangedSignal(state);
 
 		}
-				
+			
 	}
 
 	progress.setValue(maximum);

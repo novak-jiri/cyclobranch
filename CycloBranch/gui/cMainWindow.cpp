@@ -1225,6 +1225,10 @@ void cMainWindow::reportSpectra() {
 			rawdata.resize(theoreticalspectrumlist.size());
 		}
 
+		if (parameters.peaklistfileformat == dat) {
+			rawdata.resize(theoreticalspectrumlist.size());
+		}
+
 		if ((parameters.peaklistfileformat == mzML) || (parameters.peaklistfileformat == raw)) {
 			rawdata.resize(theoreticalspectrumlist.size());
 		}

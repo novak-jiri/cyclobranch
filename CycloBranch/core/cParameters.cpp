@@ -195,83 +195,64 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 
 		if (!error) {
 
-			switch (peaklistfileformat) 
-			{
-			case txt:
-				peakliststream.open(peaklistfilename);
-				break;
-			case mgf:
-				peakliststream.open(peaklistfilename);
-				break;
-			case mzXML:
-				*os << "Converting the file " + peaklistfilename + " to mgf ... ";
+			switch (peaklistfileformat) {
+				case txt:
+					peakliststream.open(peaklistfilename);
+					break;
+				case mgf:
+					peakliststream.open(peaklistfilename);
+					break;
+				case mzXML:
+					*os << "Converting the file " + peaklistfilename + " to mgf ... ";
 				
-				#if OS_TYPE == UNX
-					s = installdir.toStdString() + "External/linux/any2mgf.sh " + peaklistfilename;
-					if (system(s.c_str()) != 0) {
-						error = true;
-						errormessage = "The file cannot be converted.\n";
-						errormessage += "Does the file '" + peaklistfilename + "' exist ?\n";
-						errormessage += "Is the directory with the file '" + peaklistfilename + "' writable ?\n";
-						errormessage += "Do you have FileConverter installed (OpenMS 2.x must be installed) ?\n";
-						errormessage += "Do you have 'any2mgf.sh' file located in '" + installdir.toStdString() + "External/linux' folder ?\n";
-						errormessage += "Is the file 'any2mgf.sh' executable (sudo chmod +x " + installdir.toStdString() + "External/linux/any2mgf.sh) ? \n";
-					}
-				#else
-					#if OS_TYPE == OSX
-						s = installdir.toStdString() + "External/macosx/any2mgf.sh " + peaklistfilename;
+					#if OS_TYPE == UNX
+						s = installdir.toStdString() + "External/linux/any2mgf.sh " + peaklistfilename;
 						if (system(s.c_str()) != 0) {
 							error = true;
 							errormessage = "The file cannot be converted.\n";
 							errormessage += "Does the file '" + peaklistfilename + "' exist ?\n";
 							errormessage += "Is the directory with the file '" + peaklistfilename + "' writable ?\n";
 							errormessage += "Do you have FileConverter installed (OpenMS 2.x must be installed) ?\n";
-							errormessage += "Do you have 'any2mgf.sh' file located in '" + installdir.toStdString() + "External/macosx' folder ?\n";
-							errormessage += "Is the file 'any2mgf.sh' executable ? \n";
+							errormessage += "Do you have 'any2mgf.sh' file located in '" + installdir.toStdString() + "External/linux' folder ?\n";
+							errormessage += "Is the file 'any2mgf.sh' executable (sudo chmod +x " + installdir.toStdString() + "External/linux/any2mgf.sh) ? \n";
 						}
-					#else		
-						s = "External\\windows\\any2mgf.bat \"" + peaklistfilename + "\"";
-						if (system(s.c_str()) != 0) {
-							error = true;
-							errormessage = "The file cannot be converted.\n";
-							errormessage += "Does the file '" + peaklistfilename + "' exist ?\n";
-							errormessage += "Is the directory with the file '" + peaklistfilename + "' writable ?\n";
-							errormessage += "Do you have FileConverter installed (OpenMS 2.x must be installed) ?\n";
-							errormessage += "Do you have a path to FileConverter in your PATH variable (e.g., 'C:/Program Files/OpenMS-2.3.0/bin') ?\n";
-							errormessage += "Do you have 'any2mgf.bat' file located in the '" + appname.toStdString() + "/External/windows' folder ?\n";
-						}
+					#else
+						#if OS_TYPE == OSX
+							s = installdir.toStdString() + "External/macosx/any2mgf.sh " + peaklistfilename;
+							if (system(s.c_str()) != 0) {
+								error = true;
+								errormessage = "The file cannot be converted.\n";
+								errormessage += "Does the file '" + peaklistfilename + "' exist ?\n";
+								errormessage += "Is the directory with the file '" + peaklistfilename + "' writable ?\n";
+								errormessage += "Do you have FileConverter installed (OpenMS 2.x must be installed) ?\n";
+								errormessage += "Do you have 'any2mgf.sh' file located in '" + installdir.toStdString() + "External/macosx' folder ?\n";
+								errormessage += "Is the file 'any2mgf.sh' executable ? \n";
+							}
+						#else		
+							s = "External\\windows\\any2mgf.bat \"" + peaklistfilename + "\"";
+							if (system(s.c_str()) != 0) {
+								error = true;
+								errormessage = "The file cannot be converted.\n";
+								errormessage += "Does the file '" + peaklistfilename + "' exist ?\n";
+								errormessage += "Is the directory with the file '" + peaklistfilename + "' writable ?\n";
+								errormessage += "Do you have FileConverter installed (OpenMS 2.x must be installed) ?\n";
+								errormessage += "Do you have a path to FileConverter in your PATH variable (e.g., 'C:/Program Files/OpenMS-2.3.0/bin') ?\n";
+								errormessage += "Do you have 'any2mgf.bat' file located in the '" + appname.toStdString() + "/External/windows' folder ?\n";
+							}
+						#endif
 					#endif
-				#endif
-
-				if (!error) {
-					*os << "ok" << endl << endl;
-					peakliststream.open(peaklistfilename + ".mgf");
-				}
-				break;
-			case baf:
-				#if OS_TYPE == WIN
-					*os << "Processing the file " + peaklistfilename + ":" << endl;
-
-					*os << "centroid spectra ... ";
-					s = "External\\windows\\baf2csv.bat \"" + peaklistfilename + "\"";
-					if (system(s.c_str()) != 0) {
-						error = true;
-						errormessage = "The file cannot be converted.\n";
-						errormessage += "Does the file '" + peaklistfilename + "' exist ?\n";
-						errormessage += "Do you have Bruker Daltonik's CompassXport installed ?\n";
-						errormessage += "Do you have path to the CompassXport.exe in your PATH variable ?\n";
-						errormessage += "Is the directory with the file '" + peaklistfilename + "' writable ?\n";
-						errormessage += "Do you have 'baf2csv.bat' file located in the 'External/windows' folder ?\n";
-					}
 
 					if (!error) {
-						*os << "ok" << endl;
-						peakliststream.open(peaklistfilename + ".csv");
+						*os << "ok" << endl << endl;
+						peakliststream.open(peaklistfilename + ".mgf");
 					}
+					break;
+				case baf:
+					#if OS_TYPE == WIN
+						*os << "Processing the file " + peaklistfilename + ":" << endl;
 
-					if (useprofiledata && convertprofiledata) {
-						*os << "profile spectra ... ";
-						s = "External\\windows\\baf2profile.bat \"" + peaklistfilename + "\"";
+						*os << "centroid spectra ... ";
+						s = "External\\windows\\baf2csv.bat \"" + peaklistfilename + "\"";
 						if (system(s.c_str()) != 0) {
 							error = true;
 							errormessage = "The file cannot be converted.\n";
@@ -279,113 +260,145 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 							errormessage += "Do you have Bruker Daltonik's CompassXport installed ?\n";
 							errormessage += "Do you have path to the CompassXport.exe in your PATH variable ?\n";
 							errormessage += "Is the directory with the file '" + peaklistfilename + "' writable ?\n";
-							errormessage += "Do you have 'baf2profile.bat' file located in the 'External/windows' folder ?\n";
+							errormessage += "Do you have 'baf2csv.bat' file located in the 'External/windows' folder ?\n";
 						}
 
 						if (!error) {
 							*os << "ok" << endl;
+							peakliststream.open(peaklistfilename + ".csv");
 						}
-					}
 
-					*os << endl;
-				#endif
-				break;
-			case raw:
-				#if OS_TYPE == WIN
-					*os << "Converting the file " + peaklistfilename + " ... ";
-					s = "External\\windows\\raw2mzml.bat \"" + peaklistfilename + "\"";
-					if (system(s.c_str()) != 0) {
-						error = true;
-						errormessage = "The file cannot be converted.\n";
-						errormessage += "Is the file '" + peaklistfilename + "' opened elsewhere ?\n";
-						errormessage += "Does the file '" + peaklistfilename + "' exist ?\n";
-						errormessage += "Is the directory with the file '" + peaklistfilename + "' writable ?\n";
-						errormessage += "Do you have msconvert.exe installed (OpenMS 2.x including ProteoWizard must be installed) ?\n";
-						errormessage += "Do you have a path to msconvert.exe in your PATH variable (e.g., 'C:/Program Files/OpenMS-2.3.0/share/OpenMS/THIRDPARTY/pwiz-bin') ?\n";
-						errormessage += "Do you have 'raw2mzml.bat' file located in the '" + appname.toStdString() + "/External/windows' folder ?\n";
-					}
+						if (useprofiledata && convertprofiledata) {
+							*os << "profile spectra ... ";
+							s = "External\\windows\\baf2profile.bat \"" + peaklistfilename + "\"";
+							if (system(s.c_str()) != 0) {
+								error = true;
+								errormessage = "The file cannot be converted.\n";
+								errormessage += "Does the file '" + peaklistfilename + "' exist ?\n";
+								errormessage += "Do you have Bruker Daltonik's CompassXport installed ?\n";
+								errormessage += "Do you have path to the CompassXport.exe in your PATH variable ?\n";
+								errormessage += "Is the directory with the file '" + peaklistfilename + "' writable ?\n";
+								errormessage += "Do you have 'baf2profile.bat' file located in the 'External/windows' folder ?\n";
+							}
 
-					if (!error) {
-						*os << "ok" << endl << endl;
-						mzmlname = peaklistfilename.substr(0, peaklistfilename.rfind('.')) + ".mzML";
-						peakliststream.open(mzmlname);
-					}
-				#endif
-				break;
-			case dat:
-				#if OS_TYPE == WIN
-					foldername = peaklistfilename.substr(0, peaklistfilename.rfind('/'));
-					*os << "Converting the raw data folder " + foldername + " ... ";
-					s = "External\\windows\\waters\\raw2mgf.exe \"" + foldername + "\"";
-					if (system(s.c_str()) != 0) {
-						error = true;
-						errormessage = "The raw data folder cannot be converted.\n";
-						errormessage += "Does the folder '" + foldername + "' exist ?\n";
-						errormessage += "Is the folder with the folder '" + foldername + "' writable ?\n";
-						errormessage += "Do you have 'raw2mgf.exe' file located in the 'External/windows/waters' folder ?\n";
-					}
+							if (!error) {
+								*os << "ok" << endl;
+							}
+						}
 
-					if (!error) {
-						*os << "ok" << endl << endl;
-						string mgfname = foldername.substr(0, foldername.rfind('.')) + ".mgf";
-						peakliststream.open(mgfname);
-					}
-				#endif
-				break;
-			case mis:
-				#if OS_TYPE == WIN
-					foldername = peaklistfilename.substr(0, peaklistfilename.rfind('.'));
-					*os << "Converting flexImaging data folder " + foldername + " ... ";
-					s = "External\\windows\\mis2csv.bat \"" + foldername + "\"";
-					if (system(s.c_str()) != 0) {
-						error = true;
-						errormessage = "The folder cannot be converted.\n";
-						errormessage += "Does the folder '" + foldername + "' exist ?\n";
-						errormessage += "Do you have Bruker Daltonik's CompassXport installed ?\n";
-						errormessage += "Do you have path to the CompassXport.exe in your PATH variable ?\n";
-						errormessage += "Is the directory with the file '" + peaklistfilename + "' writable ?\n";
-						errormessage += "Do you have 'mis2csv.bat' file located in the 'External/windows' folder ?\n";
-					}
+						*os << endl;
+					#endif
+					break;
+				case raw:
+					#if OS_TYPE == WIN
+						*os << "Converting the file " + peaklistfilename + " ... ";
+						s = "External\\windows\\raw2mzml.bat \"" + peaklistfilename + "\"";
+						if (system(s.c_str()) != 0) {
+							error = true;
+							errormessage = "The file cannot be converted.\n";
+							errormessage += "Is the file '" + peaklistfilename + "' opened elsewhere ?\n";
+							errormessage += "Does the file '" + peaklistfilename + "' exist ?\n";
+							errormessage += "Is the directory with the file '" + peaklistfilename + "' writable ?\n";
+							errormessage += "Do you have msconvert.exe installed (OpenMS 2.x including ProteoWizard must be installed) ?\n";
+							errormessage += "Do you have a path to msconvert.exe in your PATH variable (e.g., 'C:/Program Files/OpenMS-2.3.0/share/OpenMS/THIRDPARTY/pwiz-bin') ?\n";
+							errormessage += "Do you have 'raw2mzml.bat' file located in the '" + appname.toStdString() + "/External/windows' folder ?\n";
+						}
 
-					if (!error) {
-						*os << "ok" << endl << endl;
-						peakliststream.open(foldername + ".baf.csv");
-						spotliststream.open(foldername + ".baf.txt");
-					}
-				#endif
-				break;
-			case ser:
-				#if OS_TYPE == WIN
-					foldername = peaklistfilename.substr(0, peaklistfilename.length() - 4);
-					*os << "Converting apex data folder " + foldername + " ... ";
-					s = "External\\windows\\ser2csv.bat \"" + foldername + "\"";
-					if (system(s.c_str()) != 0) {
-						error = true;
-						errormessage = "The folder cannot be converted.\n";
-						errormessage += "Does the folder '" + foldername + "' exist ?\n";
-						errormessage += "Do you have Bruker Daltonik's CompassXport installed ?\n";
-						errormessage += "Do you have path to the CompassXport.exe in your PATH variable ?\n";
-						errormessage += "Is the directory with the file '" + peaklistfilename + "' writable ?\n";
-						errormessage += "Do you have 'ser2csv.bat' file located in the 'External/windows' folder ?\n";
-					}
+						if (!error) {
+							*os << "ok" << endl << endl;
+							mzmlname = peaklistfilename.substr(0, peaklistfilename.rfind('.')) + ".mzML";
+							peakliststream.open(mzmlname);
+						}
+					#endif
+					break;
+				case dat:
+					#if OS_TYPE == WIN
+						foldername = peaklistfilename.substr(0, peaklistfilename.rfind('/'));
+						if (foldername.rfind("_PEAKS.raw") == string::npos) {
+							error = true;
+							errormessage = "The selected folder must contain centroid spectra !\n\n";
+							errormessage += "1. Open MassLynx 4.1.\n";
+							errormessage += "2. Select Tools->Accurate Mass Measure.\n";
+							errormessage += "3. Select the folder \"" + foldername + "\".\n";
+							errormessage += "4. Set Output File Suffix to \"_PEAKS\".\n";
+							errormessage += "5. Set Process Type to Automatic Peak Detection.\n";
+							errormessage += "6. Click Process.\n";
+							errormessage += "7. Close MassLynx and use the \"_PEAKS\" folder as the input for " + appname.toStdString() + ".\n";
+						}
 
-					if (!error) {
-						*os << "ok" << endl << endl;
-						peakliststream.open(foldername + ".csv");
-						titleliststream.open(foldername + ".txt");
-					}
-				#endif
-				break;
-			case mzML:
-				peakliststream.open(peaklistfilename);
-				break;
-			case imzML:
-				ibdfilename = peaklistfilename.substr(0, (int)peaklistfilename.size() - 5);
-				ibdfilename += "ibd";
-				peakliststream.open(ibdfilename, std::ifstream::binary);
-				break;
-			default:
-				break;
+						if (!error) {
+							*os << "Converting the raw data folder " + foldername + " ... ";
+							s = "External\\windows\\waters\\raw2mgf.exe \"" + foldername + "\"";
+							if (system(s.c_str()) != 0) {
+								error = true;
+								errormessage = "The raw data folder cannot be converted.\n";
+								errormessage += "Does the folder '" + foldername + "' exist ?\n";
+								errormessage += "Is the folder with the folder '" + foldername + "' writable ?\n";
+								errormessage += "Do you have 'raw2mgf.exe' file located in the 'External/windows/waters' folder ?\n";
+							}
+						}
+
+						if (!error) {
+							*os << "ok" << endl << endl;
+							string mgfname = foldername.substr(0, foldername.rfind('.')) + ".mgf";
+							peakliststream.open(mgfname);
+						}
+					#endif
+					break;
+				case mis:
+					#if OS_TYPE == WIN
+						foldername = peaklistfilename.substr(0, peaklistfilename.rfind('.'));
+						*os << "Converting flexImaging data folder " + foldername + " ... ";
+						s = "External\\windows\\mis2csv.bat \"" + foldername + "\"";
+						if (system(s.c_str()) != 0) {
+							error = true;
+							errormessage = "The folder cannot be converted.\n";
+							errormessage += "Does the folder '" + foldername + "' exist ?\n";
+							errormessage += "Do you have Bruker Daltonik's CompassXport installed ?\n";
+							errormessage += "Do you have path to the CompassXport.exe in your PATH variable ?\n";
+							errormessage += "Is the directory with the file '" + peaklistfilename + "' writable ?\n";
+							errormessage += "Do you have 'mis2csv.bat' file located in the 'External/windows' folder ?\n";
+						}
+
+						if (!error) {
+							*os << "ok" << endl << endl;
+							peakliststream.open(foldername + ".baf.csv");
+							spotliststream.open(foldername + ".baf.txt");
+						}
+					#endif
+					break;
+				case ser:
+					#if OS_TYPE == WIN
+						foldername = peaklistfilename.substr(0, peaklistfilename.length() - 4);
+						*os << "Converting apex data folder " + foldername + " ... ";
+						s = "External\\windows\\ser2csv.bat \"" + foldername + "\"";
+						if (system(s.c_str()) != 0) {
+							error = true;
+							errormessage = "The folder cannot be converted.\n";
+							errormessage += "Does the folder '" + foldername + "' exist ?\n";
+							errormessage += "Do you have Bruker Daltonik's CompassXport installed ?\n";
+							errormessage += "Do you have path to the CompassXport.exe in your PATH variable ?\n";
+							errormessage += "Is the directory with the file '" + peaklistfilename + "' writable ?\n";
+							errormessage += "Do you have 'ser2csv.bat' file located in the 'External/windows' folder ?\n";
+						}
+
+						if (!error) {
+							*os << "ok" << endl << endl;
+							peakliststream.open(foldername + ".csv");
+							titleliststream.open(foldername + ".txt");
+						}
+					#endif
+					break;
+				case mzML:
+					peakliststream.open(peaklistfilename);
+					break;
+				case imzML:
+					ibdfilename = peaklistfilename.substr(0, (int)peaklistfilename.size() - 5);
+					ibdfilename += "ibd";
+					peakliststream.open(ibdfilename, std::ifstream::binary);
+					break;
+				default:
+					break;
 			}
 
 		}
