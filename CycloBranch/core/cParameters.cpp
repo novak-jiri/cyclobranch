@@ -339,6 +339,26 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 						}
 
 						if (!error) {
+							if (useprofiledata) {
+								*os << "ok" << endl << endl;
+
+								// remove "_PEAKS.raw"
+								string rawfoldername = foldername.substr(0, foldername.size() - 10);
+								rawfoldername += ".raw";
+
+								*os << "Converting the raw data folder " + rawfoldername + " ... ";
+								s = "External\\windows\\waters\\raw2mgf.exe \"" + rawfoldername + "\"";
+								if (system(s.c_str()) != 0) {
+									error = true;
+									errormessage = "The raw data folder cannot be converted.\n";
+									errormessage += "Does the folder '" + rawfoldername + "' exist ?\n";
+									errormessage += "Is the folder with the folder '" + rawfoldername + "' writable ?\n";
+									errormessage += "Do you have 'raw2mgf.exe' file located in the 'External/windows/waters' folder ?\n";
+								}
+							}
+						}
+
+						if (!error) {
 							*os << "ok" << endl << endl;
 							string mgfname = foldername.substr(0, foldername.rfind('.')) + ".mgf";
 							peakliststream.open(mgfname);
