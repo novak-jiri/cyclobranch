@@ -115,7 +115,7 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 	regex rx;
 	string s;
 	int i, errtype;
-	string foldername;
+	string foldername, peaksfoldername;
 	string ibdfilename;
 	string mzmlname;
 
@@ -314,20 +314,24 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 				case dat:
 					#if OS_TYPE == WIN
 						foldername = peaklistfilename.substr(0, peaklistfilename.rfind('/'));
-						if (foldername.rfind("_PEAKS.raw") == string::npos) {
+						peaksfoldername = foldername.substr(0, foldername.size() - 4) + "_PEAKS.raw";
+
+						*os << "Generating centroid data folder from " + foldername + " ... ";
+						s = "External\\windows\\waters\\profile2peaks.exe \"" + foldername + "\"";
+						if (system(s.c_str()) != 0) {
 							error = true;
-							errormessage = "The selected folder must contain centroid spectra !\n\n";
-							errormessage += "1. Open MassLynx 4.1.\n";
-							errormessage += "2. Select Tools->Accurate Mass Measure.\n";
-							errormessage += "3. Select the folder \"" + foldername + "\".\n";
-							errormessage += "4. Set Output File Suffix to \"_PEAKS\".\n";
-							errormessage += "5. Set Process Type to Automatic Peak Detection.\n";
-							errormessage += "6. Click Process.\n";
-							errormessage += "7. Close MassLynx and use the \"_PEAKS\" folder as the input for " + appname.toStdString() + ".\n";
+							errormessage = "The raw data folder cannot be converted.\n";
+							errormessage += "Does the folder '" + foldername + "' exist ?\n";
+							errormessage += "Is the folder with the folder '" + foldername + "' writable ?\n";
+							errormessage += "Do you have 'profile2peaks.exe' file located in the 'External/windows/waters' folder ?\n";
+						}
+						else {
+							*os << "ok" << endl << endl;
+							*os << "Centroid data folder " + peaksfoldername + " successfully created." << endl << endl;
 						}
 
 						if (!error) {
-							*os << "Converting the raw data folder " + foldername + " ... ";
+							*os << "Converting profile data " + foldername + " ... ";
 							s = "External\\windows\\waters\\raw2mgf.exe \"" + foldername + "\"";
 							if (system(s.c_str()) != 0) {
 								error = true;
@@ -336,31 +340,28 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 								errormessage += "Is the folder with the folder '" + foldername + "' writable ?\n";
 								errormessage += "Do you have 'raw2mgf.exe' file located in the 'External/windows/waters' folder ?\n";
 							}
-						}
-
-						if (!error) {
-							if (useprofiledata) {
+							else {
 								*os << "ok" << endl << endl;
-
-								// remove "_PEAKS.raw"
-								string rawfoldername = foldername.substr(0, foldername.size() - 10);
-								rawfoldername += ".raw";
-
-								*os << "Converting the raw data folder " + rawfoldername + " ... ";
-								s = "External\\windows\\waters\\raw2mgf.exe \"" + rawfoldername + "\"";
-								if (system(s.c_str()) != 0) {
-									error = true;
-									errormessage = "The raw data folder cannot be converted.\n";
-									errormessage += "Does the folder '" + rawfoldername + "' exist ?\n";
-									errormessage += "Is the folder with the folder '" + rawfoldername + "' writable ?\n";
-									errormessage += "Do you have 'raw2mgf.exe' file located in the 'External/windows/waters' folder ?\n";
-								}
 							}
 						}
 
 						if (!error) {
-							*os << "ok" << endl << endl;
-							string mgfname = foldername.substr(0, foldername.rfind('.')) + ".mgf";
+							*os << "Converting centroid data " + peaksfoldername + " ... ";
+							s = "External\\windows\\waters\\raw2mgf.exe \"" + peaksfoldername + "\"";
+							if (system(s.c_str()) != 0) {
+								error = true;
+								errormessage = "The raw data folder cannot be converted.\n";
+								errormessage += "Does the folder '" + peaksfoldername + "' exist ?\n";
+								errormessage += "Is the folder with the folder '" + peaksfoldername + "' writable ?\n";
+								errormessage += "Do you have 'raw2mgf.exe' file located in the 'External/windows/waters' folder ?\n";
+							}
+							else {
+								*os << "ok" << endl << endl;
+							}
+						}
+
+						if (!error) {
+							string mgfname = peaksfoldername.substr(0, peaksfoldername.rfind('.')) + ".mgf";
 							peakliststream.open(mgfname);
 						}
 					#endif

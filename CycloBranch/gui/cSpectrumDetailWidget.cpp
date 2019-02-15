@@ -2278,8 +2278,7 @@ void cSpectrumDetailWidget::rawDataStateChanged(bool state) {
 			if ((targetid >= 0) && (targetid < rawdata->size())) {
 				if (state) {
 					string mgfname = parameters->peaklistfilename.substr(0, parameters->peaklistfilename.rfind('/'));
-					// remove "_PEAKS.raw"
-					mgfname = mgfname.substr(0, mgfname.size() - 10);
+					mgfname = mgfname.substr(0, mgfname.size() - 4);
 					mgfname += ".mgf";
 
 					peakliststream.open(mgfname);
