@@ -164,6 +164,8 @@ private:
 	QGraphicsRectItem* zoomrect;
 	QGraphicsSimpleTextItem* zoomsimpletextitem;
 
+	QGraphicsSimpleTextItem* cursorsimpletextitem;
+
 	cParameters* parameters;
 	cTheoreticalSpectrum* theoreticalspectrum;
 	cPeaksList* rawdatapeaklist;

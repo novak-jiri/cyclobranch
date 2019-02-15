@@ -68,6 +68,9 @@ cSpectrumSceneWidget::cSpectrumSceneWidget(QWidget* parent) {
 	zoomsimpletextitem = new QGraphicsSimpleTextItem();
 	zoomgroup->addToGroup(zoomsimpletextitem);
 	scene->addItem(zoomgroup);
+	
+	cursorsimpletextitem = new QGraphicsSimpleTextItem();
+	scene->addItem(cursorsimpletextitem);
 }
 
 
@@ -229,8 +232,21 @@ void cSpectrumSceneWidget::wheelEvent(QWheelEvent *event) {
 void cSpectrumSceneWidget::mouseMoveEvent(QMouseEvent *event) {
 	QGraphicsView::mouseMoveEvent(event);
 
+	QPointF p = mapToScene(event->x(), event->y());
+
+	QPointF curpos;
+	curpos.setX(p.x() + 15);
+	curpos.setY(p.y() - 2);
+
+	double mz = getMZRatioFromXPosition((int)p.x(), origwidth);
+	QString curtext = "m/z: " + QString::number(mz);
+
+	cursorsimpletextitem->setPos(curpos);
+	cursorsimpletextitem->setText(curtext);
+
 	if ((pressedx != -1) && (pressedy != -1)) {
-		QPointF p = mapToScene(event->x(), event->y());
+		cursorsimpletextitem->setVisible(false);
+
 		currentx = (int)p.x();
 		currenty = (int)p.y();
 
@@ -246,6 +262,14 @@ void cSpectrumSceneWidget::mouseMoveEvent(QMouseEvent *event) {
 			pressedy = currenty;
 
 			redrawScene();
+		}
+	}
+	else {
+		if (((int)p.x() >= leftmargin) && ((int)p.x() <= origwidth - rightmargin) && ((int)p.y() >= topmargin) && ((int)p.y() <= origheight - bottommargin)) {
+			cursorsimpletextitem->setVisible(true);
+		}
+		else {
+			cursorsimpletextitem->setVisible(false);
 		}
 	}
 
@@ -280,6 +304,8 @@ void cSpectrumSceneWidget::mouseReleaseEvent(QMouseEvent *event) {
 
 void cSpectrumSceneWidget::mousePressEvent(QMouseEvent *event) {
 	QGraphicsView::mousePressEvent(event);
+
+	cursorsimpletextitem->setVisible(false);
 
 	if (event->button() == Qt::LeftButton) {
 		QPointF p = mapToScene(event->x(), event->y());
@@ -421,9 +447,15 @@ void cSpectrumSceneWidget::redrawScene() {
 
 
 	scene->removeItem(zoomgroup);
+	scene->removeItem(cursorsimpletextitem);
+
 	scene->clear();
+
 	zoomgroup->setVisible(false);
 	scene->addItem(zoomgroup);
+
+	cursorsimpletextitem->setVisible(false);
+	scene->addItem(cursorsimpletextitem);
 
 
 	// x axis
@@ -897,6 +929,7 @@ void cSpectrumSceneWidget::redrawScene() {
 
 
 	scene->removeItem(zoomgroup);
+	scene->removeItem(cursorsimpletextitem);
 
 	if (calledbyresizeevent) {
 		oldwidth.push_back(origwidth);
@@ -927,6 +960,9 @@ void cSpectrumSceneWidget::redrawScene() {
 
 	zoomgroup->setVisible(false);
 	scene->addItem(zoomgroup);
+
+	cursorsimpletextitem->setVisible(false);
+	scene->addItem(cursorsimpletextitem);
 
 	while (oldwidth.size() > 3) {
 		oldwidth.pop_front();
