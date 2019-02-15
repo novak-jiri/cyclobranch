@@ -4,6 +4,30 @@
 #include "core/cSummaryFormula.h"
 
 
+void cParameters::fixIntensities(cPeaksList& centroidspectrum, cPeaksList& profilespectrum) {
+	if ((centroidspectrum.size() == 0) || (profilespectrum.size() == 0)) {
+		return;
+	}
+
+	double minval;
+	int mem_j = 0;
+
+	for (int i = 0; i < centroidspectrum.size(); i++) {
+		minval = fabs(centroidspectrum[i].mzratio - profilespectrum[mem_j].mzratio);
+		for (int j = mem_j + 1; j < profilespectrum.size(); j++) {
+			if ((fabs(centroidspectrum[i].mzratio - profilespectrum[j].mzratio)) < minval) {
+				minval = fabs(centroidspectrum[i].mzratio - profilespectrum[j].mzratio);
+				mem_j = j;
+			}
+			else {
+				break;
+			}
+		}
+		centroidspectrum[i].absoluteintensity = profilespectrum[mem_j].absoluteintensity;
+	}
+}
+
+
 cParameters::cParameters() {
 	clear();
 }
@@ -115,9 +139,14 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 	regex rx;
 	string s;
 	int i, errtype;
-	string foldername, peaksfoldername;
+	string foldername;
 	string ibdfilename;
 	string mzmlname;
+
+	cPeaksList profilelist;
+	ifstream profilestream;
+	string profilemgfname;
+	string peaksfoldername;
 
 	if (peaklistfilename.empty()) {
 		error = true;
@@ -482,6 +511,24 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 				case dat:
 					#if OS_TYPE == WIN
 						peaklistseries.loadFromMGFStream(peakliststream);
+
+						profilemgfname = foldername.substr(0, foldername.rfind('.')) + ".mgf";
+						profilestream.open(profilemgfname);
+
+						for (int i = 0; i < peaklistseries.size(); i++) {
+							profilelist.clear();
+							profilelist.loadFromMGFStream(profilestream);
+
+							if (peaklistseries[i].getTitle().compare(profilelist.getTitle()) != 0) {
+								error = true;
+								errormessage = "The number of spectra in " + foldername + " and " + peaksfoldername + " is different.\n";
+								break;
+							}
+
+							fixIntensities(peaklistseries[i], profilelist);
+						}
+
+						profilestream.close();
 					#endif
 					break;
 				case mis:

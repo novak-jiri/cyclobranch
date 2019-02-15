@@ -58,6 +58,9 @@ class cParameters {
 
 	cMainThread* os;
 
+	void fixIntensities(cPeaksList& centroidspectrum, cPeaksList& profilespectrum);
+
+
 public:
 
 
