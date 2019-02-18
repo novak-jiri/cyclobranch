@@ -229,6 +229,9 @@ private:
 	void calculateMinMaxMZ();
 
 
+	double getMaximumIntensity();
+
+
 signals:
 
 

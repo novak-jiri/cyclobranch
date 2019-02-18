@@ -430,41 +430,9 @@ void cSpectrumSceneWidget::redrawScene() {
 
 	QFont myFont("Arial", 8);
 	QFontMetrics fm(myFont);
-	
-	
-	// maximum intensity in the interval <minmzratio, maxmzratio>
-	double maxintensity = 0;
-	double rawdatamaxintensity = 0;
-
-	if (parameters->useprofiledata && ((parameters->peaklistfileformat == baf) || (parameters->peaklistfileformat == dat) || (parameters->peaklistfileformat == mzML) || (parameters->peaklistfileformat == raw) || (((parameters->mode == dereplication) || (parameters->mode == compoundsearch)) && (parameters->peaklistfileformat == imzML))) && rawdatastate && (rawdatapeaklist->size() > 0)) {
-		if (absoluteintensity) {
-			maxintensity = theoreticalspectrum->getExperimentalSpectrum().getMaximumAbsoluteIntensityFromMZInterval(minmzratio, maxmzratio, false, false, other, false);
-		}
-		else {
-			maxintensity = theoreticalspectrum->getExperimentalSpectrum().getMaximumRelativeIntensityFromMZInterval(minmzratio, maxmzratio, false, false, other, false);
-		}
-				
-		if (absoluteintensity) {
-			rawdatamaxintensity = rawdatapeaklist->getMaximumAbsoluteIntensityFromMZInterval(minmzratio, maxmzratio, false, false, other, false);
-		}
-		else {
-			rawdatamaxintensity = rawdatapeaklist->getMaximumRelativeIntensityFromMZInterval(minmzratio, maxmzratio, false, false, other, false);
-		}
 		
-		if (maxintensity == 0) {
-			maxintensity = rawdatamaxintensity;
-		}
-	}
-	else {
-		if (absoluteintensity) {
-			maxintensity = theoreticalspectrum->getExperimentalSpectrum().getMaximumAbsoluteIntensityFromMZInterval(minmzratio, maxmzratio, hidematched, hideunmatched, parameters->peptidetype, hidescrambled);
-		}
-		else {
-			maxintensity = theoreticalspectrum->getExperimentalSpectrum().getMaximumRelativeIntensityFromMZInterval(minmzratio, maxmzratio, hidematched, hideunmatched, parameters->peptidetype, hidescrambled);
-		}
-	}
-
-
+	double maxintensity = getMaximumIntensity();
+	   
 	scene->removeItem(zoomgroup);
 	scene->removeItem(cursorsimpletextitem);
 
@@ -1070,6 +1038,43 @@ void cSpectrumSceneWidget::calculateMinMaxMZ() {
 			maxmzratio = max(0.0, maxmzratio - tmpmaxmzratio + tmpminmzratio);
 		}
 	}
+}
+
+
+double cSpectrumSceneWidget::getMaximumIntensity() {
+	double maxintensity = 0;
+	double rawdatamaxintensity = 0;
+
+	// get the maximum intensity in the interval <minmzratio, maxmzratio>
+	if (parameters->useprofiledata && ((parameters->peaklistfileformat == baf) || (parameters->peaklistfileformat == dat) || (parameters->peaklistfileformat == mzML) || (parameters->peaklistfileformat == raw) || (((parameters->mode == dereplication) || (parameters->mode == compoundsearch)) && (parameters->peaklistfileformat == imzML))) && rawdatastate && (rawdatapeaklist->size() > 0)) {
+		if (absoluteintensity) {
+			maxintensity = theoreticalspectrum->getExperimentalSpectrum().getMaximumAbsoluteIntensityFromMZInterval(minmzratio, maxmzratio, false, false, other, false);
+		}
+		else {
+			maxintensity = theoreticalspectrum->getExperimentalSpectrum().getMaximumRelativeIntensityFromMZInterval(minmzratio, maxmzratio, false, false, other, false);
+		}
+
+		if (absoluteintensity) {
+			rawdatamaxintensity = rawdatapeaklist->getMaximumAbsoluteIntensityFromMZInterval(minmzratio, maxmzratio, false, false, other, false);
+		}
+		else {
+			rawdatamaxintensity = rawdatapeaklist->getMaximumRelativeIntensityFromMZInterval(minmzratio, maxmzratio, false, false, other, false);
+		}
+
+		if (maxintensity == 0) {
+			maxintensity = rawdatamaxintensity;
+		}
+	}
+	else {
+		if (absoluteintensity) {
+			maxintensity = theoreticalspectrum->getExperimentalSpectrum().getMaximumAbsoluteIntensityFromMZInterval(minmzratio, maxmzratio, hidematched, hideunmatched, parameters->peptidetype, hidescrambled);
+		}
+		else {
+			maxintensity = theoreticalspectrum->getExperimentalSpectrum().getMaximumRelativeIntensityFromMZInterval(minmzratio, maxmzratio, hidematched, hideunmatched, parameters->peptidetype, hidescrambled);
+		}
+	}
+
+	return maxintensity;
 }
 
 
