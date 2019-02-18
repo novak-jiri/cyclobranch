@@ -298,6 +298,25 @@ void cSpectrumSceneWidget::mouseReleaseEvent(QMouseEvent *event) {
 		redrawScene();
 	}
 
+	QPointF p = mapToScene(event->x(), event->y());
+
+	QPointF curpos;
+	curpos.setX(p.x() + 15);
+	curpos.setY(p.y() - 2);
+
+	double mz = getMZRatioFromXPosition((int)p.x(), origwidth);
+	QString curtext = "m/z: " + QString::number(mz);
+
+	cursorsimpletextitem->setPos(curpos);
+	cursorsimpletextitem->setText(curtext);
+
+	if (((int)p.x() >= leftmargin) && ((int)p.x() <= origwidth - rightmargin) && ((int)p.y() >= topmargin) && ((int)p.y() <= origheight - bottommargin)) {
+		cursorsimpletextitem->setVisible(true);
+	}
+	else {
+		cursorsimpletextitem->setVisible(false);
+	}
+
 	event->accept();
 }
 
