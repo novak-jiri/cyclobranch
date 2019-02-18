@@ -220,6 +220,9 @@ private:
 	int getXPositionFromMZRatio(double mzratio, int w);
 
 
+	double getIntensityFromYPosition(int y, int h);
+
+
 	void redrawScene();
 
 

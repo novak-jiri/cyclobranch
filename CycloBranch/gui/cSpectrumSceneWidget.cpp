@@ -239,7 +239,11 @@ void cSpectrumSceneWidget::mouseMoveEvent(QMouseEvent *event) {
 	curpos.setY(p.y() - 2);
 
 	double mz = getMZRatioFromXPosition((int)p.x(), origwidth);
-	QString curtext = "m/z: " + QString::number(mz);
+	double intensity = getIntensityFromYPosition((int)p.y(), origheight);
+	QString curtext = "m/z: " + QString::number(mz) + ", int: " + QString::number(intensity);
+	if (!absoluteintensity) {
+		curtext += " %";
+	}
 
 	cursorsimpletextitem->setPos(curpos);
 	cursorsimpletextitem->setText(curtext);
@@ -305,7 +309,11 @@ void cSpectrumSceneWidget::mouseReleaseEvent(QMouseEvent *event) {
 	curpos.setY(p.y() - 2);
 
 	double mz = getMZRatioFromXPosition((int)p.x(), origwidth);
-	QString curtext = "m/z: " + QString::number(mz);
+	double intensity = getIntensityFromYPosition((int)p.y(), origheight);
+	QString curtext = "m/z: " + QString::number(mz) + ", int: " + QString::number(intensity);
+	if (!absoluteintensity) {
+		curtext += " %";
+	}
 
 	cursorsimpletextitem->setPos(curpos);
 	cursorsimpletextitem->setText(curtext);
@@ -388,7 +396,7 @@ void cSpectrumSceneWidget::resizeEvent(QResizeEvent *event) {
 
 
 double cSpectrumSceneWidget::getMZRatioFromXPosition(int x, int w) {
-	double mz = (double)(x - leftmargin)/(double)(w - leftmargin - rightmargin)*(maxmzratio - minmzratio) + minmzratio;
+	double mz = (double)(x - leftmargin) / (double)(w - leftmargin - rightmargin) * (maxmzratio - minmzratio) + minmzratio;
 	return max(0.0, mz);
 }
 
@@ -398,6 +406,14 @@ int cSpectrumSceneWidget::getXPositionFromMZRatio(double mzratio, int w) {
 	val /= maxmzratio - minmzratio;
 	val *= double(w - leftmargin - rightmargin);
 	return (int)val + leftmargin;
+}
+
+
+double cSpectrumSceneWidget::getIntensityFromYPosition(int y, int h) {
+	double maximumintensity = getMaximumIntensity();
+	double intensity = (double)(y - topmargin) / (double)(h - topmargin - bottommargin) * maximumintensity;
+	intensity = maximumintensity - intensity;
+	return max(0.0, intensity);
 }
 
 
@@ -432,7 +448,7 @@ void cSpectrumSceneWidget::redrawScene() {
 	QFontMetrics fm(myFont);
 		
 	double maxintensity = getMaximumIntensity();
-	   
+
 	scene->removeItem(zoomgroup);
 	scene->removeItem(cursorsimpletextitem);
 
