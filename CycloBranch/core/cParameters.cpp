@@ -335,7 +335,7 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 
 						if (!error) {
 							*os << "ok" << endl << endl;
-							mzmlname = peaklistfilename.substr(0, peaklistfilename.rfind('.')) + ".mzML";
+							mzmlname = peaklistfilename.substr(0, peaklistfilename.rfind('.')) + "_converted.mzML";
 							peakliststream.open(mzmlname);
 						}
 					#endif

@@ -845,6 +845,7 @@ void cMainWindow::run() {
 		}
 	}
 
+	/*
 	rx = "\\.[mM][zZ][mM][lL]$";
 	if (regex_search(localparameters.peaklistfilename, rx)) {
 		string convertedmzml = localparameters.peaklistfilename.substr(0, (int)localparameters.peaklistfilename.size() - 5);
@@ -865,6 +866,7 @@ void cMainWindow::run() {
 			}
 		}
 	}
+	*/
 
 	#if OS_TYPE == WIN
 		if (localparameters.useprofiledata) {
