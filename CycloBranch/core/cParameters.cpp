@@ -321,7 +321,8 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 				case raw:
 					#if OS_TYPE == WIN
 						*os << "Converting the file " + peaklistfilename + " ... ";
-						s = "External\\windows\\raw2mzml.bat \"" + peaklistfilename + "\"";
+
+						s = "External\\windows\\raw2mzmlpeaks.bat \"" + peaklistfilename + "\"";
 						if (system(s.c_str()) != 0) {
 							error = true;
 							errormessage = "The file cannot be converted.\n";
@@ -330,7 +331,21 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 							errormessage += "Is the directory with the file '" + peaklistfilename + "' writable ?\n";
 							errormessage += "Do you have msconvert.exe installed (OpenMS 2.x including ProteoWizard must be installed) ?\n";
 							errormessage += "Do you have a path to msconvert.exe in your PATH variable (e.g., 'C:/Program Files/OpenMS-2.3.0/share/OpenMS/THIRDPARTY/pwiz-bin') ?\n";
-							errormessage += "Do you have 'raw2mzml.bat' file located in the '" + appname.toStdString() + "/External/windows' folder ?\n";
+							errormessage += "Do you have 'raw2mzmlpeaks.bat' file located in the '" + appname.toStdString() + "/External/windows' folder ?\n";
+						}
+
+						if (!error && useprofiledata) {
+							s = "External\\windows\\raw2mzml.bat \"" + peaklistfilename + "\"";
+							if (system(s.c_str()) != 0) {
+								error = true;
+								errormessage = "The file cannot be converted.\n";
+								errormessage += "Is the file '" + peaklistfilename + "' opened elsewhere ?\n";
+								errormessage += "Does the file '" + peaklistfilename + "' exist ?\n";
+								errormessage += "Is the directory with the file '" + peaklistfilename + "' writable ?\n";
+								errormessage += "Do you have msconvert.exe installed (OpenMS 2.x including ProteoWizard must be installed) ?\n";
+								errormessage += "Do you have a path to msconvert.exe in your PATH variable (e.g., 'C:/Program Files/OpenMS-2.3.0/share/OpenMS/THIRDPARTY/pwiz-bin') ?\n";
+								errormessage += "Do you have 'raw2mzml.bat' file located in the '" + appname.toStdString() + "/External/windows' folder ?\n";
+							}
 						}
 
 						if (!error) {

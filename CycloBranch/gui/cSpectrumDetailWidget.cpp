@@ -2386,9 +2386,7 @@ void cSpectrumDetailWidget::rawDataStateChanged(bool state) {
 
 					bool terminatecomputation = false;
 
-					string basename;
-					basename = parameters->peaklistfilename.substr(0, (int)parameters->peaklistfilename.size() - 4);
-
+					string basename = parameters->peaklistfilename.substr(0, (int)parameters->peaklistfilename.size() - 4);
 					string mzmlname = basename + "mzML";
 
 					int resultcode = mzml.parse(mzmlname, peaklists, fileid, parameters->mode, 0 /* ok */, terminatecomputation /* ok */);
