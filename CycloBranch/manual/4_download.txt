@@ -18,6 +18,44 @@ Any work based on CycloBranch shall cite any of the following references:
 
 <hr>
  
+<p>xx.xx.2019</p>
+  
+<p>
+<b>CycloBranch 1.3.xxx</b>
+<ul>
+  <li> Changes:
+  <ul>
+    <li> compound search mode added (a database-free search mode for MS1 data)
+    <li> a list od neutral losses can now be defined for individual building blocks
+    <li> spectrum detail window can now be opened direcly from chromatogram or image window (CrossVis) by a double-click
+    <li> filter options improved - main window, summary table of matched peaks, and editors (building blocks, sequences/compounds, and modifications)
+    <li> processing of Waters data improved and visualization of profile data added 
+    <li> visualization of profile mzML/Thermo raw files added and a bug fixed during profile data processing
+    <li> visualization of mass spectra fixed (occasional flashing)
+    <li> minimum feature size can now be defined for LC-MS data
+    <li> all ions of a compound must be matched feature added (e.g. both [M+H]+ and [M+Na]+ must be matched for M) 
+    <li> percentage contributions of peak components (e.g. 13C, 17O) are now reported if theoretical isotopic patterns are calculated
+    <li> copy to clipboard function (CTRL+C) improved in spectrum detail window, main window, and summary table of matched peaks (multiple rows and columns can be selected in the table)
+    <li> a bug fixed - existing items in the list of neutral losses were not editable if the settings dialog was re-opened
+    <li> a bug was fixed when too many combinations of neutral losses were generated
+    <li> internal ions can now be generated for branch-cyclic peptides
+    <li> DOI can now be used as a reference in a compound/sequence database
+    <li> [M+Cl]- ion added in MS mode
+    <li> some other minor improvements were made 
+  </ul>
+  <li> <a href="https://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.3.xxx_win_64bit.zip" onclick="ga('send', 'event', 'Download', this.href);">Download (Windows, 64 bit - tested on Windows 7/10)</a>
+  <li> <a href="https://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.3.xxx_linux_64bit.tgz" onclick="ga('send', 'event', 'Download', this.href);">Download (Linux, 64 bit - tested on Ubuntu 16.04)</a>
+  <li> <a href="https://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.3.xxx_osx_64bit.dmg" onclick="ga('send', 'event', 'Download', this.href);">Download (macOS, 64 bit - tested on macOS 10.12 Sierra)</a>
+  <li> <a href="https://ms.biomed.cas.cz/cyclobranch/docs/refman.pdf" onclick="ga('send', 'event', 'Download', this.href);">PDF manual</a>
+  <li> <a href="https://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.3.xxx_win_sources.zip" onclick="ga('send', 'event', 'Download', this.href);">Download Sources (Windows)</a>
+  <li> <a href="https://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.3.xxx_linux_sources.tgz" onclick="ga('send', 'event', 'Download', this.href);">Download Sources (Linux)</a>
+  <li> <a href="https://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.3.xxx_osx_sources.dmg" onclick="ga('send', 'event', 'Download', this.href);">Download Sources (OS X)</a>
+  <li> Additional databases: <a href="https://ms.biomed.cas.cz/cyclobranch/release/Lipids.zip" onclick="ga('send', 'event', 'Download', this.href);">Lipids</a>
+</ul>
+</p>
+
+<hr>
+ 
 <p>22.5.2018</p>
   
 <p>
@@ -48,7 +86,6 @@ Any work based on CycloBranch shall cite any of the following references:
   <li> <a href="https://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.3.1_win_64bit.zip" onclick="ga('send', 'event', 'Download', this.href);">Download (Windows, 64 bit - tested on Windows 7/10)</a>
   <li> <a href="https://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.3.1_linux_64bit.tgz" onclick="ga('send', 'event', 'Download', this.href);">Download (Linux, 64 bit - tested on Ubuntu 16.04)</a>
   <li> <a href="https://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.3.1_osx_64bit.dmg" onclick="ga('send', 'event', 'Download', this.href);">Download (macOS, 64 bit - tested on macOS 10.12 Sierra)</a>
-  <li> <a href="https://ms.biomed.cas.cz/cyclobranch/docs/refman.pdf" onclick="ga('send', 'event', 'Download', this.href);">PDF manual</a>
   <li> <a href="https://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.3.1_win_sources.zip" onclick="ga('send', 'event', 'Download', this.href);">Download Sources (Windows)</a>
   <li> <a href="https://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.3.1_linux_sources.tgz" onclick="ga('send', 'event', 'Download', this.href);">Download Sources (Linux)</a>
   <li> <a href="https://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.3.1_osx_sources.dmg" onclick="ga('send', 'event', 'Download', this.href);">Download Sources (OS X)</a>
