@@ -108,7 +108,7 @@ cParametersWidget::cParametersWidget(QWidget* parent) {
 	peptidetype->addItem(tr("Branch-cyclic"));
 	peptidetype->addItem(tr("Linear polyketide"));
 	peptidetype->addItem(tr("Cyclic polyketide"));
-	//peptidetype->addItem(tr("Other"));
+	peptidetype->addItem(tr("Other"));
 	peptidetype->setFixedWidth(leftdefaultwidth);
 	peptidetypelabel = new QLabel("Peptide Type:");
 	experimentalspectragridlayout->addWidget(peptidetypelabel, 0, 0);
@@ -1139,6 +1139,15 @@ bool cParametersWidget::updateParameters() {
 		return false;
 	}
 
+	if (((eModeType)mode->currentIndex() == denovoengine) || ((eModeType)mode->currentIndex() == singlecomparison)) {
+		if ((ePeptideType)peptidetype->currentIndex() == other) {
+			errstr = "The peptide type 'Other' can be used only in\n'Compare Peaklist with Database - MS/MS' mode!";
+			msgBox.setText(errstr);
+			msgBox.exec();
+			return false;
+		}
+	}
+
 	/*
 	if ((maximumbricksincombinationmiddle->value() < 2) && ((eModeType)mode->currentIndex() == denovoengine) && (((ePeptideType)peptidetype->currentIndex() == branched) || ((ePeptideType)peptidetype->currentIndex() == branchcyclic))) {
 		errstr = "'Maximum Number of Combined Blocks (middle)' must be at least 2 when a branched or a branch-cyclic peptide is searched! (One block represents a branched residue, the other block(s) corresponds to a branch.)";
@@ -1202,35 +1211,37 @@ bool cParametersWidget::updateParameters() {
 	parameters.originalsequencetag = parameters.sequencetag;
 
 	parameters.ionsfortheoreticalspectra.clear();
-	int start;
-
+	
+	int start = -1;
 	if (((eModeType)mode->currentIndex() == dereplication) || ((eModeType)mode->currentIndex() == compoundsearch)) {
 		start = ms_Hplus;
 	}
 	else {
-		switch ((ePeptideType)peptidetype->currentIndex())
-		{
-		case linear:
-		case branched:
-		case cyclic:
-		case branchcyclic:
-			start = a_ion;
-			break;
-		case linearpolyketide:
-			start = l1h_ion;
-			break;
-		case cyclicpolyketide:
-			start = l1h_ion; // l0h_ion;
-			break;
-		case other:
-		default:
-			break;
+		switch ((ePeptideType)peptidetype->currentIndex()) {
+			case linear:
+			case branched:
+			case cyclic:
+			case branchcyclic:
+				start = a_ion;
+				break;
+			case linearpolyketide:
+				start = l1h_ion;
+				break;
+			case cyclicpolyketide:
+				start = l1h_ion; // l0h_ion;
+				break;
+			case other:
+				break;
+			default:
+				break;
 		}
 	}
 
-	for (int i = 0; i < iontypes->getList()->count(); i++) {
-		if (iontypes->getList()->item(i)->isSelected()) {
-			parameters.ionsfortheoreticalspectra.push_back((eFragmentIonType)(i + start));
+	if (start != -1) {
+		for (int i = 0; i < iontypes->getList()->count(); i++) {
+			if (iontypes->getList()->item(i)->isSelected()) {
+				parameters.ionsfortheoreticalspectra.push_back((eFragmentIonType)(i + start));
+			}
 		}
 	}
 
@@ -1315,33 +1326,35 @@ void cParametersWidget::restoreParameters() {
 	hitsreported->setValue(parameters.hitsreported);
 	sequencetag->setText(parameters.sequencetag.c_str());
 
-	int start;
+	int start = -1;
 	if ((parameters.mode == dereplication) || (parameters.mode == compoundsearch)) {
 		start = ms_Hplus;
 	}
 	else {
-		switch (parameters.peptidetype)
-		{
-		case linear:
-		case branched:
-		case cyclic:
-		case branchcyclic:
-			start = a_ion;
-			break;
-		case linearpolyketide:
-			start = l1h_ion;
-			break;
-		case cyclicpolyketide:
-			start = l1h_ion; // l0h_ion;
-			break;
-		case other:
-		default:
-			break;
+		switch (parameters.peptidetype) {
+			case linear:
+			case branched:
+			case cyclic:
+			case branchcyclic:
+				start = a_ion;
+				break;
+			case linearpolyketide:
+				start = l1h_ion;
+				break;
+			case cyclicpolyketide:
+				start = l1h_ion; // l0h_ion;
+				break;
+			case other:
+				break;
+			default:
+				break;
 		}
 	}
 
-	for (int i = 0; i < (int)parameters.ionsfortheoreticalspectra.size(); i++) {
-		iontypes->getList()->item(parameters.ionsfortheoreticalspectra[i] - start)->setSelected(true);
+	if (start != -1) {
+		for (int i = 0; i < (int)parameters.ionsfortheoreticalspectra.size(); i++) {
+			iontypes->getList()->item(parameters.ionsfortheoreticalspectra[i] - start)->setSelected(true);
+		}
 	}
 
 	neutrallosstypes->getList()->clear();
@@ -1388,8 +1401,18 @@ void cParametersWidget::updateSettingsWhenPeptideTypeChanged(int index) {
 		resetFragmentIonTypes();
 	}
 
+	bool denovostate = (mode->currentIndex() == denovoengine) ? false : true;
+	bool sequencetagstate = (mode->currentIndex() == denovoengine) || (mode->currentIndex() == databasesearch) ? false : true;
+
 	switch ((ePeptideType)index) {
 		case linear:
+			brickdatabaseline->setDisabled(false);
+			brickdatabasebutton->setDisabled(false);
+			maximumbricksincombinationbegin->setDisabled(denovostate);
+			maximumbricksincombinationmiddle->setDisabled(denovostate);
+			maximumbricksincombinationend->setDisabled(denovostate);
+			blindedges->setDisabled(denovostate);
+			maximumcumulativemass->setDisabled(denovostate);
 			modificationsline->setDisabled(false);
 			modificationsbutton->setDisabled(false);
 			cyclicnterminus->setDisabled(false);
@@ -1397,11 +1420,22 @@ void cParametersWidget::updateSettingsWhenPeptideTypeChanged(int index) {
 			internalfragments->setDisabled(true);
 			enablescrambling->setDisabled(true);
 			regularblocksorder->setDisabled(true);
+			sequencetag->setDisabled(sequencetagstate);
+			iontypes->setDisabled(false);
+			searchedsequenceline->setDisabled(false);
+			searchedsequencebutton->setDisabled(false);
 			searchedsequenceNtermmodif->setDisabled(false);
 			searchedsequenceCtermmodif->setDisabled(false);
 			searchedsequenceTmodif->setDisabled(true);
 			break;
 		case cyclic:
+			brickdatabaseline->setDisabled(false);
+			brickdatabasebutton->setDisabled(false);
+			maximumbricksincombinationbegin->setDisabled(denovostate);
+			maximumbricksincombinationmiddle->setDisabled(denovostate);
+			maximumbricksincombinationend->setDisabled(denovostate);
+			blindedges->setDisabled(denovostate);
+			maximumcumulativemass->setDisabled(denovostate);
 			modificationsline->setDisabled(true);
 			modificationsbutton->setDisabled(true);
 			cyclicnterminus->setDisabled(true);
@@ -1409,11 +1443,22 @@ void cParametersWidget::updateSettingsWhenPeptideTypeChanged(int index) {
 			internalfragments->setDisabled(true);
 			enablescrambling->setDisabled(false);
 			regularblocksorder->setDisabled(true);
+			sequencetag->setDisabled(sequencetagstate);
+			iontypes->setDisabled(false);
+			searchedsequenceline->setDisabled(false);
+			searchedsequencebutton->setDisabled(false);
 			searchedsequenceNtermmodif->setDisabled(true);
 			searchedsequenceCtermmodif->setDisabled(true);
 			searchedsequenceTmodif->setDisabled(true);
 			break;
 		case branched:
+			brickdatabaseline->setDisabled(false);
+			brickdatabasebutton->setDisabled(false);
+			maximumbricksincombinationbegin->setDisabled(denovostate);
+			maximumbricksincombinationmiddle->setDisabled(denovostate);
+			maximumbricksincombinationend->setDisabled(denovostate);
+			blindedges->setDisabled(denovostate);
+			maximumcumulativemass->setDisabled(denovostate);
 			modificationsline->setDisabled(false);
 			modificationsbutton->setDisabled(false);
 			cyclicnterminus->setDisabled(true);
@@ -1421,11 +1466,22 @@ void cParametersWidget::updateSettingsWhenPeptideTypeChanged(int index) {
 			internalfragments->setDisabled(true);
 			enablescrambling->setDisabled(true);
 			regularblocksorder->setDisabled(true);
+			sequencetag->setDisabled(sequencetagstate);
+			iontypes->setDisabled(false);
+			searchedsequenceline->setDisabled(false);
+			searchedsequencebutton->setDisabled(false);
 			searchedsequenceNtermmodif->setDisabled(false);
 			searchedsequenceCtermmodif->setDisabled(false);
 			searchedsequenceTmodif->setDisabled(false);
 			break;
 		case branchcyclic:
+			brickdatabaseline->setDisabled(false);
+			brickdatabasebutton->setDisabled(false);
+			maximumbricksincombinationbegin->setDisabled(denovostate);
+			maximumbricksincombinationmiddle->setDisabled(denovostate);
+			maximumbricksincombinationend->setDisabled(denovostate);
+			blindedges->setDisabled(denovostate);
+			maximumcumulativemass->setDisabled(denovostate);
 			modificationsline->setDisabled(false);
 			modificationsbutton->setDisabled(false);
 			cyclicnterminus->setDisabled(true);
@@ -1433,11 +1489,22 @@ void cParametersWidget::updateSettingsWhenPeptideTypeChanged(int index) {
 			internalfragments->setDisabled(false);
 			enablescrambling->setDisabled(true);
 			regularblocksorder->setDisabled(true);
+			sequencetag->setDisabled(sequencetagstate);
+			iontypes->setDisabled(false);
+			searchedsequenceline->setDisabled(false);
+			searchedsequencebutton->setDisabled(false);
 			searchedsequenceNtermmodif->setDisabled(true);
 			searchedsequenceCtermmodif->setDisabled(true);
 			searchedsequenceTmodif->setDisabled(false);
 			break;
 		case linearpolyketide:
+			brickdatabaseline->setDisabled(false);
+			brickdatabasebutton->setDisabled(false);
+			maximumbricksincombinationbegin->setDisabled(denovostate);
+			maximumbricksincombinationmiddle->setDisabled(denovostate);
+			maximumbricksincombinationend->setDisabled(denovostate);
+			blindedges->setDisabled(denovostate);
+			maximumcumulativemass->setDisabled(denovostate);
 			modificationsline->setDisabled(false);
 			modificationsbutton->setDisabled(false);
 			cyclicnterminus->setDisabled(false);
@@ -1445,11 +1512,22 @@ void cParametersWidget::updateSettingsWhenPeptideTypeChanged(int index) {
 			internalfragments->setDisabled(true);
 			enablescrambling->setDisabled(true);
 			regularblocksorder->setDisabled(false);
+			sequencetag->setDisabled(sequencetagstate);
+			iontypes->setDisabled(false);
+			searchedsequenceline->setDisabled(false);
+			searchedsequencebutton->setDisabled(false);
 			searchedsequenceNtermmodif->setDisabled(false);
 			searchedsequenceCtermmodif->setDisabled(false);
 			searchedsequenceTmodif->setDisabled(true);
 			break;
 		case cyclicpolyketide:
+			brickdatabaseline->setDisabled(false);
+			brickdatabasebutton->setDisabled(false);
+			maximumbricksincombinationbegin->setDisabled(denovostate);
+			maximumbricksincombinationmiddle->setDisabled(denovostate);
+			maximumbricksincombinationend->setDisabled(denovostate);
+			blindedges->setDisabled(denovostate);
+			maximumcumulativemass->setDisabled(denovostate);
 			modificationsline->setDisabled(true);
 			modificationsbutton->setDisabled(true);
 			cyclicnterminus->setDisabled(true);
@@ -1457,11 +1535,36 @@ void cParametersWidget::updateSettingsWhenPeptideTypeChanged(int index) {
 			internalfragments->setDisabled(true);
 			enablescrambling->setDisabled(true);
 			regularblocksorder->setDisabled(false);
+			sequencetag->setDisabled((mode->currentIndex() == denovoengine) || (mode->currentIndex() == databasesearch) ? false : true);
+			iontypes->setDisabled(false);
+			searchedsequenceline->setDisabled(false);
+			searchedsequencebutton->setDisabled(false);
 			searchedsequenceNtermmodif->setDisabled(true);
 			searchedsequenceCtermmodif->setDisabled(true);
 			searchedsequenceTmodif->setDisabled(true);
 			break;
 		case other:
+			brickdatabaseline->setDisabled(true);
+			brickdatabasebutton->setDisabled(true);
+			maximumbricksincombinationbegin->setDisabled(true);
+			maximumbricksincombinationmiddle->setDisabled(true);
+			maximumbricksincombinationend->setDisabled(true);
+			blindedges->setDisabled(true);
+			maximumcumulativemass->setDisabled(true);
+			modificationsline->setDisabled(true);
+			modificationsbutton->setDisabled(true);
+			cyclicnterminus->setDisabled(true);
+			cycliccterminus->setDisabled(true);
+			internalfragments->setDisabled(true);
+			enablescrambling->setDisabled(true);
+			regularblocksorder->setDisabled(true);
+			sequencetag->setDisabled(true);
+			iontypes->setDisabled(true);
+			searchedsequenceline->setDisabled(true);
+			searchedsequencebutton->setDisabled(true);
+			searchedsequenceNtermmodif->setDisabled(true);
+			searchedsequenceCtermmodif->setDisabled(true);
+			searchedsequenceTmodif->setDisabled(true);
 			break;
 		default:
 			break;
@@ -1486,12 +1589,12 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 			maximumbricksincombinationbegin->setDisabled(false);
 			maximumbricksincombinationmiddle->setDisabled(false);
 			maximumbricksincombinationend->setDisabled(false);
+			blindedges->setDisabled(false);
 			maximumcumulativemass->setDisabled(false);
 			modificationsline->setDisabled(false);
 			modificationsbutton->setDisabled(false);
 			sequencedatabaseline->setDisabled(true);
 			sequencedatabasebutton->setDisabled(true);
-			blindedges->setDisabled(false);
 			similaritysearch->setDisabled(true);
 			maximumnumberofthreads->setDisabled(false);
 			scoretype->setDisabled(false);
@@ -1526,12 +1629,12 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 			maximumbricksincombinationbegin->setDisabled(true);
 			maximumbricksincombinationmiddle->setDisabled(true);
 			maximumbricksincombinationend->setDisabled(true);
+			blindedges->setDisabled(true);
 			maximumcumulativemass->setDisabled(true);
 			modificationsline->setDisabled(false);
 			modificationsbutton->setDisabled(false);
 			sequencedatabaseline->setDisabled(true);
 			sequencedatabasebutton->setDisabled(true);
-			blindedges->setDisabled(true);
 			similaritysearch->setDisabled(true);
 			maximumnumberofthreads->setDisabled(true);
 			scoretype->setDisabled(true);
@@ -1566,10 +1669,10 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 			maximumbricksincombinationbegin->setDisabled(true);
 			maximumbricksincombinationmiddle->setDisabled(true);
 			maximumbricksincombinationend->setDisabled(true);
+			blindedges->setDisabled(true);
 			maximumcumulativemass->setDisabled(true);
 			modificationsline->setDisabled(false);
 			modificationsbutton->setDisabled(false);
-			blindedges->setDisabled(true);
 			similaritysearch->setDisabled(false);
 			sequencedatabaseline->setDisabled(false);
 			sequencedatabasebutton->setDisabled(false);
@@ -1606,10 +1709,10 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 			maximumbricksincombinationbegin->setDisabled(true);
 			maximumbricksincombinationmiddle->setDisabled(true);
 			maximumbricksincombinationend->setDisabled(true);
+			blindedges->setDisabled(true);
 			maximumcumulativemass->setDisabled(true);
 			modificationsline->setDisabled(true);
 			modificationsbutton->setDisabled(true);
-			blindedges->setDisabled(true);
 			similaritysearch->setDisabled(true);
 			sequencedatabaseline->setDisabled(false);
 			sequencedatabasebutton->setDisabled(false);
@@ -1634,6 +1737,8 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 				resetFragmentIonTypes();
 			}
 		
+			brickdatabaseline->setDisabled(true);
+			brickdatabasebutton->setDisabled(true);
 			modificationsline->setDisabled(true);
 			modificationsbutton->setDisabled(true);
 			cyclicnterminus->setDisabled(true);
@@ -1641,6 +1746,8 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 			internalfragments->setDisabled(true);
 			enablescrambling->setDisabled(true);
 			regularblocksorder->setDisabled(true);
+			sequencetag->setDisabled(true);
+			iontypes->setDisabled(false);
 			searchedsequenceNtermmodif->setDisabled(true);
 			searchedsequenceCtermmodif->setDisabled(true);
 			searchedsequenceTmodif->setDisabled(true);
@@ -1659,10 +1766,10 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 			maximumbricksincombinationbegin->setDisabled(true);
 			maximumbricksincombinationmiddle->setDisabled(true);
 			maximumbricksincombinationend->setDisabled(true);
+			blindedges->setDisabled(true);
 			maximumcumulativemass->setDisabled(true);
 			modificationsline->setDisabled(true);
 			modificationsbutton->setDisabled(true);
-			blindedges->setDisabled(true);
 			similaritysearch->setDisabled(true);
 			sequencedatabaseline->setDisabled(true);
 			sequencedatabasebutton->setDisabled(true);
@@ -1687,6 +1794,8 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 				resetFragmentIonTypes();
 			}
 
+			brickdatabaseline->setDisabled(true);
+			brickdatabasebutton->setDisabled(true);
 			modificationsline->setDisabled(true);
 			modificationsbutton->setDisabled(true);
 			cyclicnterminus->setDisabled(true);
@@ -1694,6 +1803,8 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 			internalfragments->setDisabled(true);
 			enablescrambling->setDisabled(true);
 			regularblocksorder->setDisabled(true);
+			sequencetag->setDisabled(true);
+			iontypes->setDisabled(false);
 			searchedsequenceNtermmodif->setDisabled(true);
 			searchedsequenceCtermmodif->setDisabled(true);
 			searchedsequenceTmodif->setDisabled(true);
@@ -1738,7 +1849,7 @@ void cParametersWidget::resetFragmentIonTypes() {
 				end = l2h_ion;
 				break;
 			case other:
-				break;
+				return;
 			default:
 				break;
 		}

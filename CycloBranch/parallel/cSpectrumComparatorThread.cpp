@@ -234,6 +234,7 @@ void cSpectrumComparatorThread::run() {
 				theoreticalpeaksrealsize = tsp.compareCyclicPolyketide(peaklist, *bricksdatabasewithcombinations, false, *rxsequencetag, *rxsearchedsequence, unmatchedpeaksinmatchedpatterns, 0);
 				break;
 			case other:
+				theoreticalpeaksrealsize = tsp.compareOther(peaklist, false, unmatchedpeaksinmatchedpatterns, 0);
 				break;
 			default:
 				break;

@@ -132,5 +132,8 @@ void cNeutralLossesListWidget::setHCON() {
 	addItem("N");
 
 	selectAllItems();
+
+	addItem("S");
+	addItem("P");
 }
 

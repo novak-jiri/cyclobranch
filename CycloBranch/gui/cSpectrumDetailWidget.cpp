@@ -118,38 +118,37 @@ string cSpectrumDetailWidget::getDetailsAsHTMLString() {
 				rname += " (" + to_string(parameters->searchedmodifications[theoreticalspectrum->getCandidate().getEndModifID()].massdifference) + " Da)";
 			}
 			
-			switch (parameters->peptidetype)
-			{
-			case linear:
-				s += "<br/><br/>";
-				s += "N-terminal Modification: " + lname + "<br/>";
-				s += "C-terminal Modification: " + rname + "<br/>";
-				break;
-			case cyclic:
-				s += "<br/>";
-				break;
-			case branched:
-				s += "<br/><br/>";
-				s += "N-terminal Modification: " + lname + "<br/>";
-				s += "Branch Modification: " + bname + "<br/>";
-				s += "C-terminal Modification: " + rname + "<br/>";
-				break;
-			case branchcyclic:
-				s += "<br/><br/>";
-				s += "Branch Modification: " + bname + "<br/>";
-				break;
-			case linearpolyketide:
-				s += "<br/><br/>";
-				s += "Left Modification: " + lname + "<br/>";
-				s += "Right Modification: " + rname + "<br/>";
-				break;
-			case cyclicpolyketide:
-				s += "<br/>";
-				break;
-			case other:
-				break;
-			default:
-				break;
+			switch (parameters->peptidetype) {
+				case linear:
+					s += "<br/><br/>";
+					s += "N-terminal Modification: " + lname + "<br/>";
+					s += "C-terminal Modification: " + rname + "<br/>";
+					break;
+				case cyclic:
+					s += "<br/>";
+					break;
+				case branched:
+					s += "<br/><br/>";
+					s += "N-terminal Modification: " + lname + "<br/>";
+					s += "Branch Modification: " + bname + "<br/>";
+					s += "C-terminal Modification: " + rname + "<br/>";
+					break;
+				case branchcyclic:
+					s += "<br/><br/>";
+					s += "Branch Modification: " + bname + "<br/>";
+					break;
+				case linearpolyketide:
+					s += "<br/><br/>";
+					s += "Left Modification: " + lname + "<br/>";
+					s += "Right Modification: " + rname + "<br/>";
+					break;
+				case cyclicpolyketide:
+					s += "<br/>";
+					break;
+				case other:
+					break;
+				default:
+					break;
 			}
 			
 			if ((int)theoreticalspectrum->getCandidate().getPathAsString().size() > 0) {
@@ -589,26 +588,25 @@ cSpectrumDetailWidget::~cSpectrumDetailWidget() {
 
 		if (parameters && ((parameters->mode == denovoengine) || (parameters->mode == singlecomparison) || (parameters->mode == databasesearch))) {
 
-			switch (parameters->peptidetype)
-			{
-			case linear:
-			case linearpolyketide:
-				delete linearwidget;
-				break;
-			case cyclic:
-			case cyclicpolyketide:
-				delete cyclicwidget;
-				break;
-			case branched:
-				delete branchedwidget;
-				break;
-			case branchcyclic:
-				delete branchcyclicwidget;
-				break;
-			case other:
-				break;
-			default:
-				break;
+			switch (parameters->peptidetype) {
+				case linear:
+				case linearpolyketide:
+					delete linearwidget;
+					break;
+				case cyclic:
+				case cyclicpolyketide:
+					delete cyclicwidget;
+					break;
+				case branched:
+					delete branchedwidget;
+					break;
+				case branchcyclic:
+					delete branchcyclicwidget;
+					break;
+				case other:
+					break;
+				default:
+					break;
 			}
 
 		}
@@ -1099,7 +1097,7 @@ void cSpectrumDetailWidget::prepareToShow(QAction* actionShowIsomers, cPeakListS
 		sizes.push_back(100);
 		sizes.push_back(100);
 
-		if ((parameters->mode == denovoengine) || (parameters->mode == singlecomparison) || (parameters->mode == databasesearch)) {
+		if ((parameters->mode == denovoengine) || (parameters->mode == singlecomparison) || ((parameters->mode == databasesearch) && (parameters->peptidetype != other))) {
 
 			switch (parameters->peptidetype) {
 				case linear:
@@ -1174,7 +1172,7 @@ void cSpectrumDetailWidget::prepareToShow(QAction* actionShowIsomers, cPeakListS
 
 		if (parameters && theoreticalspectrum) {
 
-			if ((parameters->mode == denovoengine) || (parameters->mode == singlecomparison) || (parameters->mode == databasesearch)) {
+			if ((parameters->mode == denovoengine) || (parameters->mode == singlecomparison) || ((parameters->mode == databasesearch) && (parameters->peptidetype != other))) {
 
 				switch (parameters->peptidetype) {
 					case linear:
@@ -2729,6 +2727,7 @@ void cSpectrumDetailWidget::showHTMLDocumentation() {
 					QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo("docs/html/cyclicketidedetail.html").absoluteFilePath()));
 					break;
 				case other:
+					// to do other
 					break;
 				default:
 					break;
@@ -2762,6 +2761,7 @@ void cSpectrumDetailWidget::showHTMLDocumentation() {
 					QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo(installdir + "docs/html/cyclicketidedetail.html").absoluteFilePath()));
 					break;
 				case other:
+					// to do other
 					break;
 				default:
 					break;

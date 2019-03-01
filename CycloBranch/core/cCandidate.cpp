@@ -738,7 +738,7 @@ void cCandidate::getPermutationsOfBranches(vector<TRotationInfo>& tpermutations)
 }
 
 
-double cCandidate::calculatePrecursorMass(cBricksDatabase& brickdatabasewithcombinations, cParameters* parameters) {
+double cCandidate::calculatePrecursorMassFromBricks(cBricksDatabase& brickdatabasewithcombinations, cParameters* parameters) {
 	cBrick b;
 	vector<int> bricks;
 	b.setComposition(internalcomposition, false);
@@ -749,30 +749,29 @@ double cCandidate::calculatePrecursorMass(cBricksDatabase& brickdatabasewithcomb
 	}
 	
 	double mass = 0;
-	switch (parameters->peptidetype)
-	{
-	case linear:
-		mass = parameters->iondefinitions[precursor_ion].massdifference + parameters->searchedmodifications[startmodifID].massdifference + parameters->searchedmodifications[endmodifID].massdifference;
-		break;
-	case cyclic: 
-		mass = parameters->iondefinitions[cyclic_precursor_ion].massdifference;
-		break;
-	case branched:
-		mass = parameters->iondefinitions[precursor_ion].massdifference + parameters->searchedmodifications[startmodifID].massdifference + parameters->searchedmodifications[endmodifID].massdifference + parameters->searchedmodifications[middlemodifID].massdifference;
-		break;
-	case branchcyclic:
-		mass = parameters->iondefinitions[cyclic_precursor_ion].massdifference + parameters->searchedmodifications[middlemodifID].massdifference;
-		break;
-	case linearpolyketide:
-		// not supported because of terminal ambiguities H- -OH, H- -H, OH- -OH
-		break;
-	case cyclicpolyketide:
-		mass = parameters->iondefinitions[cyclic_polyketide_precursor_ion].massdifference;
-		break;
-	case other:
-		break;
-	default:
-		break;
+	switch (parameters->peptidetype) {
+		case linear:
+			mass = parameters->iondefinitions[precursor_ion].massdifference + parameters->searchedmodifications[startmodifID].massdifference + parameters->searchedmodifications[endmodifID].massdifference;
+			break;
+		case cyclic: 
+			mass = parameters->iondefinitions[cyclic_precursor_ion].massdifference;
+			break;
+		case branched:
+			mass = parameters->iondefinitions[precursor_ion].massdifference + parameters->searchedmodifications[startmodifID].massdifference + parameters->searchedmodifications[endmodifID].massdifference + parameters->searchedmodifications[middlemodifID].massdifference;
+			break;
+		case branchcyclic:
+			mass = parameters->iondefinitions[cyclic_precursor_ion].massdifference + parameters->searchedmodifications[middlemodifID].massdifference;
+			break;
+		case linearpolyketide:
+			// not supported because of terminal ambiguities H- -OH, H- -H, OH- -OH
+			break;
+		case cyclicpolyketide:
+			mass = parameters->iondefinitions[cyclic_polyketide_precursor_ion].massdifference;
+			break;
+		case other:
+			break;
+		default:
+			break;
 	}
 	
 	for (int i = 0; i < (int)bricks.size(); i++) {
@@ -785,6 +784,7 @@ double cCandidate::calculatePrecursorMass(cBricksDatabase& brickdatabasewithcomb
 
 bool cCandidate::isEqualTo(cCandidate& candidate) {
 	if ((internalcomposition.compare(candidate.internalcomposition) == 0)
+		&& (name.compare(candidate.name) == 0)
 		&& (summary.getSummary().compare(candidate.summary.getSummary()) == 0) 
 		&& (summary.isPartial() == candidate.summary.isPartial())
 		&& (startmodifID == candidate.startmodifID)
@@ -986,7 +986,7 @@ void cCandidate::getBranchCyclicRotations(vector<cCandidate>& branchcyclicrotati
 }
 
 
-cSummaryFormula cCandidate::calculateSummaryFormula(cParameters& parameters, ePeptideType peptidetype, double precursormass) {
+cSummaryFormula cCandidate::calculateSummaryFormulaFromBricks(cParameters& parameters, ePeptideType peptidetype, double precursormass) {
 	cBrick b;
 	vector<int> bricks;
 	b.setComposition(internalcomposition, false);
@@ -999,36 +999,35 @@ cSummaryFormula cCandidate::calculateSummaryFormula(cParameters& parameters, ePe
 		return formula;
 	}
 
-	switch (peptidetype)
-	{
-	case linear:
-		summary = "H2O";
-		formula.addFormula(summary);
-		formula.addFormula(parameters.searchedmodifications[startmodifID].summary);
-		formula.addFormula(parameters.searchedmodifications[endmodifID].summary);
-		break;
-	case cyclic: 
-		break;
-	case branched:
-		summary = "H2O";
-		formula.addFormula(summary);
-		formula.addFormula(parameters.searchedmodifications[startmodifID].summary);
-		formula.addFormula(parameters.searchedmodifications[endmodifID].summary);
-		formula.addFormula(parameters.searchedmodifications[middlemodifID].summary);
-		break;
-	case branchcyclic:
-		formula.addFormula(parameters.searchedmodifications[middlemodifID].summary);
-		break;
-	case linearpolyketide:
-		formula.addFormula(parameters.searchedmodifications[startmodifID].summary);
-		formula.addFormula(parameters.searchedmodifications[endmodifID].summary);
-		break;
-	case cyclicpolyketide:
-		break;
-	case other:
-		break;
-	default:
-		break;
+	switch (peptidetype) {
+		case linear:
+			summary = "H2O";
+			formula.addFormula(summary);
+			formula.addFormula(parameters.searchedmodifications[startmodifID].summary);
+			formula.addFormula(parameters.searchedmodifications[endmodifID].summary);
+			break;
+		case cyclic: 
+			break;
+		case branched:
+			summary = "H2O";
+			formula.addFormula(summary);
+			formula.addFormula(parameters.searchedmodifications[startmodifID].summary);
+			formula.addFormula(parameters.searchedmodifications[endmodifID].summary);
+			formula.addFormula(parameters.searchedmodifications[middlemodifID].summary);
+			break;
+		case branchcyclic:
+			formula.addFormula(parameters.searchedmodifications[middlemodifID].summary);
+			break;
+		case linearpolyketide:
+			formula.addFormula(parameters.searchedmodifications[startmodifID].summary);
+			formula.addFormula(parameters.searchedmodifications[endmodifID].summary);
+			break;
+		case cyclicpolyketide:
+			break;
+		case other:
+			break;
+		default:
+			break;
 	}
 
 	summary = parameters.precursoradduct.empty()?"":"H-1";
@@ -1309,43 +1308,45 @@ string& cCandidate::getPathAsString() {
 
 
 void cCandidate::setRealPeptideName(cBricksDatabase& bricksdatabase, ePeptideType peptidetype) {
-	switch (peptidetype)
-	{
-	case linear:
-	case cyclic:
-	case linearpolyketide:
-	case cyclicpolyketide:
-		realpeptidename = bricksdatabase.getRealName(internalcomposition);
-		break;
-	case branched:
-	case branchcyclic:
-		realpeptidename = getRealNameTComposition(bricksdatabase);
-		break;
-	case other:
-	default:
-		realpeptidename = "";
-		break;
+	switch (peptidetype) {
+		case linear:
+		case cyclic:
+		case linearpolyketide:
+		case cyclicpolyketide:
+			realpeptidename = bricksdatabase.getRealName(internalcomposition);
+			break;
+		case branched:
+		case branchcyclic:
+			realpeptidename = getRealNameTComposition(bricksdatabase);
+			break;
+		case other:
+			realpeptidename = "";
+			break;
+		default:
+			realpeptidename = "";
+			break;
 	}
 }
 
 
 void cCandidate::setAcronymPeptideNameWithHTMLReferences(cBricksDatabase& bricksdatabase, ePeptideType peptidetype) {
-	switch (peptidetype)
-	{
-	case linear:
-	case cyclic:
-	case linearpolyketide:
-	case cyclicpolyketide:
-		acronympeptidename = bricksdatabase.getAcronymName(internalcomposition, true);
-		break;
-	case branched:
-	case branchcyclic:
-		acronympeptidename = getAcronymsTComposition(bricksdatabase);
-		break;
-	case other:
-	default:
-		acronympeptidename = "";
-		break;
+	switch (peptidetype) {
+		case linear:
+		case cyclic:
+		case linearpolyketide:
+		case cyclicpolyketide:
+			acronympeptidename = bricksdatabase.getAcronymName(internalcomposition, true);
+			break;
+		case branched:
+		case branchcyclic:
+			acronympeptidename = getAcronymsTComposition(bricksdatabase);
+			break;
+		case other:
+			acronympeptidename = "";
+			break;
+		default:
+			acronympeptidename = "";
+			break;
 	}
 }
 

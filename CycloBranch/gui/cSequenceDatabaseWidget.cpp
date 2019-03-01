@@ -417,26 +417,25 @@ bool cSequenceDatabaseWidget::checkSequence(int row) {
 
 	regex rx;
 	// [^\\[\\]]+ is used instead of .+ to prevent from a too complex regex error
-	switch ((ePeptideType)(databasemodel->item(row, 1)->data(Qt::DisplayRole).toInt()))
-	{
-	case linear:
-	case linearpolyketide:
-		rx = "^\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])*$";
-		break;
-	case cyclic:
-	case cyclicpolyketide:
-		rx = "^\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])+$";
-		break;
-	case branched:
-		rx = "^\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])*\\\\\\(\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])+\\\\\\)\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])*$";
-		break;
-	case branchcyclic:
-		rx = "(^(\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])*)?\\\\\\(\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])+\\\\\\)\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])*$|^\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])*\\\\\\(\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])+\\\\\\)(\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])*)?$)";
-		break;
-	case other:
-	default:
-		rx = ".*";
-		break;
+	switch ((ePeptideType)(databasemodel->item(row, 1)->data(Qt::DisplayRole).toInt())) {
+		case linear:
+		case linearpolyketide:
+			rx = "^\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])*$";
+			break;
+		case cyclic:
+		case cyclicpolyketide:
+			rx = "^\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])+$";
+			break;
+		case branched:
+			rx = "^\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])*\\\\\\(\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])+\\\\\\)\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])*$";
+			break;
+		case branchcyclic:
+			rx = "(^(\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])*)?\\\\\\(\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])+\\\\\\)\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])*$|^\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])*\\\\\\(\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])+\\\\\\)(\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])*)?$)";
+			break;
+		case other:
+		default:
+			rx = ".*";
+			break;
 	}
 
 	try {

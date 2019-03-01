@@ -570,33 +570,33 @@ void cMainWindow::reportSpectrum(int row, cTheoreticalSpectrum& theoreticalspect
 		resultsmodel->setItem(row, 5 + searchspecificcolumncount, new QStandardItem());
 		resultsmodel->item(row, 5 + searchspecificcolumncount)->setData(QVariant::fromValue(getNumberOfBricks(theoreticalspectrum.getCandidate().getComposition())), Qt::DisplayRole);
 
-		switch (parameters.peptidetype)
-		{
-		case linear:
-		case linearpolyketide:
-			resultsmodel->setItem(row, 6 + searchspecificcolumncount, new QStandardItem());
-			resultsmodel->item(row, 6 + searchspecificcolumncount)->setText(parameters.searchedmodifications[theoreticalspectrum.getCandidate().getStartModifID()].name.c_str());
-			resultsmodel->setItem(row, 7 + searchspecificcolumncount, new QStandardItem());
-			resultsmodel->item(row, 7 + searchspecificcolumncount)->setText(parameters.searchedmodifications[theoreticalspectrum.getCandidate().getEndModifID()].name.c_str());
-			break;
-		case branched:
-			resultsmodel->setItem(row, 6 + searchspecificcolumncount, new QStandardItem());
-			resultsmodel->item(row, 6 + searchspecificcolumncount)->setText(parameters.searchedmodifications[theoreticalspectrum.getCandidate().getStartModifID()].name.c_str());
-			resultsmodel->setItem(row, 7 + searchspecificcolumncount, new QStandardItem());
-			resultsmodel->item(row, 7 + searchspecificcolumncount)->setText(parameters.searchedmodifications[theoreticalspectrum.getCandidate().getMiddleModifID()].name.c_str());
-			resultsmodel->setItem(row, 8 + searchspecificcolumncount, new QStandardItem());
-			resultsmodel->item(row, 8 + searchspecificcolumncount)->setText(parameters.searchedmodifications[theoreticalspectrum.getCandidate().getEndModifID()].name.c_str());
-			break;
-		case cyclic:
-		case cyclicpolyketide:
-			break;
-		case branchcyclic:
-			resultsmodel->setItem(row, 6 + searchspecificcolumncount, new QStandardItem());
-			resultsmodel->item(row, 6 + searchspecificcolumncount)->setText(parameters.searchedmodifications[theoreticalspectrum.getCandidate().getMiddleModifID()].name.c_str());
-			break;
-		case other:
-		default:
-			break;
+		switch (parameters.peptidetype) {
+			case linear:
+			case linearpolyketide:
+				resultsmodel->setItem(row, 6 + searchspecificcolumncount, new QStandardItem());
+				resultsmodel->item(row, 6 + searchspecificcolumncount)->setText(parameters.searchedmodifications[theoreticalspectrum.getCandidate().getStartModifID()].name.c_str());
+				resultsmodel->setItem(row, 7 + searchspecificcolumncount, new QStandardItem());
+				resultsmodel->item(row, 7 + searchspecificcolumncount)->setText(parameters.searchedmodifications[theoreticalspectrum.getCandidate().getEndModifID()].name.c_str());
+				break;
+			case branched:
+				resultsmodel->setItem(row, 6 + searchspecificcolumncount, new QStandardItem());
+				resultsmodel->item(row, 6 + searchspecificcolumncount)->setText(parameters.searchedmodifications[theoreticalspectrum.getCandidate().getStartModifID()].name.c_str());
+				resultsmodel->setItem(row, 7 + searchspecificcolumncount, new QStandardItem());
+				resultsmodel->item(row, 7 + searchspecificcolumncount)->setText(parameters.searchedmodifications[theoreticalspectrum.getCandidate().getMiddleModifID()].name.c_str());
+				resultsmodel->setItem(row, 8 + searchspecificcolumncount, new QStandardItem());
+				resultsmodel->item(row, 8 + searchspecificcolumncount)->setText(parameters.searchedmodifications[theoreticalspectrum.getCandidate().getEndModifID()].name.c_str());
+				break;
+			case cyclic:
+			case cyclicpolyketide:
+				break;
+			case branchcyclic:
+				resultsmodel->setItem(row, 6 + searchspecificcolumncount, new QStandardItem());
+				resultsmodel->item(row, 6 + searchspecificcolumncount)->setText(parameters.searchedmodifications[theoreticalspectrum.getCandidate().getMiddleModifID()].name.c_str());
+				break;
+			case other:
+				break;
+			default:
+				break;
 		}
 
 		resultsmodel->setItem(row, 6 + searchspecificcolumncount + resultsspecificcolumncount, new QStandardItem());
@@ -1018,6 +1018,8 @@ void cMainWindow::reportSpectra() {
 			resultsspecificcolumncount = 1;
 			break;
 		case other:
+			resultsspecificcolumncount = 0;
+			break;
 		default:
 			break;
 	}
@@ -1128,6 +1130,7 @@ void cMainWindow::reportSpectra() {
 
 				break;
 			case other:
+				break;
 			default:
 				break;
 		}

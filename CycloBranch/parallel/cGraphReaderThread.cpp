@@ -289,56 +289,55 @@ void cGraphReaderThread::run() {
 	cEdge e;
 	double unchargedprecursormass = charge(uncharge(parameters->precursormass, parameters->precursorcharge), (parameters->precursorcharge > 0)?1:-1);
 
-	switch (parameters->peptidetype)
-	{
-	case cyclic:
-		e = (*graph)[0][0];
-		if (getCandidatesIter(e.targetion, candidates, e.targetnode, composition, unchargedprecursormass, 0, 0, 0, -1, perspectivepath, (*graph)[e.targetnode].getMZRatio(), e.summary, terminatecomputation) == -1) {
-			// terminated
-			return;
-		}
-		break;
-	case linear:
-	case branched:
-		for (int i = 0; i < (*graph)[0].size(); i++) {
-			e = (*graph)[0][i];
-			if (getCandidatesIter(e.targetion, candidates, e.targetnode, composition, unchargedprecursormass, e.startmodifID, 0, 0, -1, perspectivepath, (*graph)[e.targetnode].getMZRatio(), e.summary, terminatecomputation) == -1) {
-				// terminated
-				return;
-			}
-		}
-		break;
-	case branchcyclic:
-		for (int i = 0; i < (*graph)[0].size(); i++) {
-			e = (*graph)[0][i];
-			if (getCandidatesIter(e.targetion, candidates, e.targetnode, composition, unchargedprecursormass, e.startmodifID, 0, 0, -1, perspectivepath, (*graph)[e.targetnode].getMZRatio(), e.summary, terminatecomputation) == -1) {
-				// terminated
-				return;
-			}
-		}
-		break;
-	case linearpolyketide:
-		for (int i = 0; i < (*graph)[0].size(); i++) {
-			e = (*graph)[0][i];
-			if (getCandidatesIter(e.targetion, candidates, e.targetnode, composition, unchargedprecursormass, e.startmodifID, 0, 0, -1, perspectivepath, (*graph)[e.targetnode].getMZRatio(), e.summary, terminatecomputation) == -1) {
-				// terminated
-				return;
-			}
-		}
-		break;
-	case cyclicpolyketide:
-		for (int i = 0; i < (*graph)[0].size(); i++) {
-			e = (*graph)[0][i];
+	switch (parameters->peptidetype) {
+		case cyclic:
+			e = (*graph)[0][0];
 			if (getCandidatesIter(e.targetion, candidates, e.targetnode, composition, unchargedprecursormass, 0, 0, 0, -1, perspectivepath, (*graph)[e.targetnode].getMZRatio(), e.summary, terminatecomputation) == -1) {
 				// terminated
 				return;
 			}
-		}
-		break;
-	case other:
-		break;
-	default:
-		break;
+			break;
+		case linear:
+		case branched:
+			for (int i = 0; i < (*graph)[0].size(); i++) {
+				e = (*graph)[0][i];
+				if (getCandidatesIter(e.targetion, candidates, e.targetnode, composition, unchargedprecursormass, e.startmodifID, 0, 0, -1, perspectivepath, (*graph)[e.targetnode].getMZRatio(), e.summary, terminatecomputation) == -1) {
+					// terminated
+					return;
+				}
+			}
+			break;
+		case branchcyclic:
+			for (int i = 0; i < (*graph)[0].size(); i++) {
+				e = (*graph)[0][i];
+				if (getCandidatesIter(e.targetion, candidates, e.targetnode, composition, unchargedprecursormass, e.startmodifID, 0, 0, -1, perspectivepath, (*graph)[e.targetnode].getMZRatio(), e.summary, terminatecomputation) == -1) {
+					// terminated
+					return;
+				}
+			}
+			break;
+		case linearpolyketide:
+			for (int i = 0; i < (*graph)[0].size(); i++) {
+				e = (*graph)[0][i];
+				if (getCandidatesIter(e.targetion, candidates, e.targetnode, composition, unchargedprecursormass, e.startmodifID, 0, 0, -1, perspectivepath, (*graph)[e.targetnode].getMZRatio(), e.summary, terminatecomputation) == -1) {
+					// terminated
+					return;
+				}
+			}
+			break;
+		case cyclicpolyketide:
+			for (int i = 0; i < (*graph)[0].size(); i++) {
+				e = (*graph)[0][i];
+				if (getCandidatesIter(e.targetion, candidates, e.targetnode, composition, unchargedprecursormass, 0, 0, 0, -1, perspectivepath, (*graph)[e.targetnode].getMZRatio(), e.summary, terminatecomputation) == -1) {
+					// terminated
+					return;
+				}
+			}
+			break;
+		case other:
+			break;
+		default:
+			break;
 	}
 
 }

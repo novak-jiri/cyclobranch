@@ -94,6 +94,14 @@ void cMainThread::run() {
 
 	*os << appname.toStdString() << " started at " << time.currentTime().toString().toStdString() << "." << endl << endl;
 
+	if ((parameters.mode == denovoengine) || (parameters.mode == singlecomparison)) {
+		if (parameters.peptidetype == other) {
+			*os << "Error: The peptide type 'other' cannot be used in this search mode." << endl;
+			emitEndSignals();
+			return;
+		}
+	}
+
 	parameters.setOutputStream(*os);
 	if (parameters.checkAndPrepare(terminatecomputation) == -1) {
 		emitEndSignals();
@@ -109,7 +117,7 @@ void cMainThread::run() {
 		}
 	}
 
-	if ((parameters.mode == denovoengine) || (parameters.mode == singlecomparison) || (parameters.mode == databasesearch)) {
+	if ((parameters.mode == denovoengine) || (parameters.mode == singlecomparison) || ((parameters.mode == databasesearch) && (parameters.peptidetype != other))) {
 		if (!parameters.bricksdatabase.replaceAcronymsByIDs(parameters.searchedsequence, errormessage)) {
 			*os << "Error: " << errormessage << endl;
 			emitEndSignals();
@@ -200,7 +208,7 @@ void cMainThread::run() {
 			parseBranch(parameters.peptidetype, parameters.searchedsequence, v, branchstart, branchend);
 			// startmodifid, endmodifid and middlemodifid were filled up by checkModifications
 			c.setCandidate(v, netmp, fragmentIonTypeEnd, startmodifid, endmodifid, middlemodifid, branchstart, branchend);
-			cSummaryFormula formula = c.calculateSummaryFormula(parameters, parameters.peptidetype, parameters.precursormass);
+			cSummaryFormula formula = c.calculateSummaryFormulaFromBricks(parameters, parameters.peptidetype, parameters.precursormass);
 			c.setSummaryFormula(formula);
 	
 			candidates.getSet().insert(c);
@@ -314,63 +322,71 @@ void cMainThread::run() {
 				continue;
 			}
 
-			// check format of sequence
-			if (!calculatesummaries && !checkRegex(parameters.sequencedatabase[i].getPeptideType(), parameters.sequencedatabase[i].getSequence(), errormessage)) {
-				*os << "Ignored sequence: " << errormessage << endl;
-				continue;
-			}
+			if (parameters.peptidetype != other) {
 
-			// replace acronyms of bricks by ids
-			composition = parameters.sequencedatabase[i].getSequence();
-			if (!parameters.bricksdatabase.replaceAcronymsByIDs(composition, errormessage)) {
-				*os << "Ignored sequence: " << errormessage << endl;
-				continue;
-			}
-
-			// check whether modification are defined
-			if (!parameters.checkModifications(parameters.sequencedatabase[i], startmodifid, endmodifid, middlemodifid, errormessage)) {
-				*os << "Ignored sequence: " << errormessage << endl;
-				continue;
-			}
-
-			// parse branch of a branched or a branch-cyclic peptide
-			parseBranch(parameters.sequencedatabase[i].getPeptideType(), composition, v, branchstart, branchend);
-
-			// set candidate
-			c.setCandidate(v, netmp, fragmentIonTypeEnd, startmodifid, endmodifid, middlemodifid, branchstart, branchend);
-
-			if (!calculatesummaries && ((parameters.sequencedatabase[i].getPeptideType() == linearpolyketide) || (parameters.sequencedatabase[i].getPeptideType() == cyclicpolyketide))) {
-
-				if (!c.checkKetideSequence(parameters.bricksdatabase, parameters.sequencedatabase[i].getPeptideType(), parameters.regularblocksorder)) {
-					if (parameters.sequencedatabase[i].getPeptideType() == linearpolyketide) {
-						*os << "Ignored sequence: " << parameters.sequencedatabase[i].getName() << " " << parameters.sequencedatabase[i].getSequence() << "; the order of building blocks is not correct." << endl;
-					}
-					else {
-						*os << "Ignored sequence: " << parameters.sequencedatabase[i].getName() << " " << parameters.sequencedatabase[i].getSequence() << "; the number or order of building blocks is not correct." << endl;
-					}
+				// check format of sequence
+				if (!calculatesummaries && !checkRegex(parameters.sequencedatabase[i].getPeptideType(), parameters.sequencedatabase[i].getSequence(), errormessage)) {
+					*os << "Ignored sequence: " << errormessage << endl;
 					continue;
 				}
 
-				eResidueLossType leftresiduelosstype = c.getLeftResidueType(parameters.bricksdatabase);
-				eResidueLossType rightresiduelosstype = c.getRightResidueType(parameters.bricksdatabase);
-
-				if (parameters.peptidetype == linearpolyketide) {
-					if (((leftresiduelosstype == h2_loss) && (c.getStartModifID() > 0) && parameters.searchedmodifications[c.getStartModifID()].cterminal) 
-						|| ((rightresiduelosstype == h2_loss) && (c.getEndModifID() > 0) && parameters.searchedmodifications[c.getEndModifID()].cterminal)) {
-						*os << "Ignored sequence: " << parameters.sequencedatabase[i].getName() << " " << parameters.sequencedatabase[i].getSequence() << "; the C-terminal modification is attached to the N-terminus." << endl;
-						continue;
-					}
-				}
-				else {
-					if (((leftresiduelosstype == h2_loss) && (c.getStartModifID() > 0) && parameters.searchedmodifications[c.getStartModifID()].cterminal) 
-						|| ((leftresiduelosstype == h2o_loss) && (c.getStartModifID() > 0) && parameters.searchedmodifications[c.getStartModifID()].nterminal)
-						|| ((rightresiduelosstype == h2_loss) && (c.getEndModifID() > 0) && parameters.searchedmodifications[c.getEndModifID()].cterminal)
-						|| ((rightresiduelosstype == h2o_loss) && (c.getEndModifID() > 0) && parameters.searchedmodifications[c.getEndModifID()].nterminal)) {
-						*os << "Ignored sequence: " << parameters.sequencedatabase[i].getName() << " " << parameters.sequencedatabase[i].getSequence() << "; the N-terminal modification is attached to the C-terminus or vice versa." << endl;
-						continue;
-					}
+				// replace acronyms of bricks by ids
+				composition = parameters.sequencedatabase[i].getSequence();
+				if (!parameters.bricksdatabase.replaceAcronymsByIDs(composition, errormessage)) {
+					*os << "Ignored sequence: " << errormessage << endl;
+					continue;
 				}
 
+				// check whether modification are defined
+				if (!parameters.checkModifications(parameters.sequencedatabase[i], startmodifid, endmodifid, middlemodifid, errormessage)) {
+					*os << "Ignored sequence: " << errormessage << endl;
+					continue;
+				}
+
+				// parse branch of a branched or a branch-cyclic peptide
+				parseBranch(parameters.sequencedatabase[i].getPeptideType(), composition, v, branchstart, branchend);
+
+				// set candidate
+				c.setCandidate(v, netmp, fragmentIonTypeEnd, startmodifid, endmodifid, middlemodifid, branchstart, branchend);
+
+				if (!calculatesummaries && ((parameters.sequencedatabase[i].getPeptideType() == linearpolyketide) || (parameters.sequencedatabase[i].getPeptideType() == cyclicpolyketide))) {
+
+					if (!c.checkKetideSequence(parameters.bricksdatabase, parameters.sequencedatabase[i].getPeptideType(), parameters.regularblocksorder)) {
+						if (parameters.sequencedatabase[i].getPeptideType() == linearpolyketide) {
+							*os << "Ignored sequence: " << parameters.sequencedatabase[i].getName() << " " << parameters.sequencedatabase[i].getSequence() << "; the order of building blocks is not correct." << endl;
+						}
+						else {
+							*os << "Ignored sequence: " << parameters.sequencedatabase[i].getName() << " " << parameters.sequencedatabase[i].getSequence() << "; the number or order of building blocks is not correct." << endl;
+						}
+						continue;
+					}
+
+					eResidueLossType leftresiduelosstype = c.getLeftResidueType(parameters.bricksdatabase);
+					eResidueLossType rightresiduelosstype = c.getRightResidueType(parameters.bricksdatabase);
+
+					if (parameters.peptidetype == linearpolyketide) {
+						if (((leftresiduelosstype == h2_loss) && (c.getStartModifID() > 0) && parameters.searchedmodifications[c.getStartModifID()].cterminal)
+							|| ((rightresiduelosstype == h2_loss) && (c.getEndModifID() > 0) && parameters.searchedmodifications[c.getEndModifID()].cterminal)) {
+							*os << "Ignored sequence: " << parameters.sequencedatabase[i].getName() << " " << parameters.sequencedatabase[i].getSequence() << "; the C-terminal modification is attached to the N-terminus." << endl;
+							continue;
+						}
+					}
+					else {
+						if (((leftresiduelosstype == h2_loss) && (c.getStartModifID() > 0) && parameters.searchedmodifications[c.getStartModifID()].cterminal)
+							|| ((leftresiduelosstype == h2o_loss) && (c.getStartModifID() > 0) && parameters.searchedmodifications[c.getStartModifID()].nterminal)
+							|| ((rightresiduelosstype == h2_loss) && (c.getEndModifID() > 0) && parameters.searchedmodifications[c.getEndModifID()].cterminal)
+							|| ((rightresiduelosstype == h2o_loss) && (c.getEndModifID() > 0) && parameters.searchedmodifications[c.getEndModifID()].nterminal)) {
+							*os << "Ignored sequence: " << parameters.sequencedatabase[i].getName() << " " << parameters.sequencedatabase[i].getSequence() << "; the N-terminal modification is attached to the C-terminus or vice versa." << endl;
+							continue;
+						}
+					}
+
+				}
+
+			}
+			else {
+				v.push_back(to_string(i + 1));
+				c.setCandidate(v, netmp, fragmentIonTypeEnd, 0, 0, 0, -1, -1);
 			}
 
 			// check the precursor mass error
@@ -393,8 +409,8 @@ void cMainThread::run() {
 			c.setSummaryFormula(formula);
 			candidates.getSet().insert(c);
 
-			if (calculatesummaries) {
-				*os << i + 1 << " " << c.calculateSummaryFormula(parameters, parameters.sequencedatabase[i].getPeptideType()).getSummary() << endl;
+			if (calculatesummaries && (parameters.peptidetype != other)) {
+				*os << i + 1 << " " << c.calculateSummaryFormulaFromBricks(parameters, parameters.sequencedatabase[i].getPeptideType()).getSummary() << endl;
 			}
 		}
 		

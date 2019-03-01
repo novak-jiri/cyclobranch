@@ -313,12 +313,12 @@ public:
 
 
 	/**
-		\brief Calculate the precursor mass of the peptide sequence candidate.
+		\brief Calculate the precursor mass of the peptide sequence candidate from bricks.
 		\param brickdatabasewithcombinations reference to an input database of bricks with combinations of bricks
 		\param parameters a pointer to the parameters of the application
 		\retval double precursor mass of the candidate
 	*/ 
-	double calculatePrecursorMass(cBricksDatabase& brickdatabasewithcombinations, cParameters* parameters);
+	double calculatePrecursorMassFromBricks(cBricksDatabase& brickdatabasewithcombinations, cParameters* parameters);
 
 
 	/**
@@ -457,7 +457,7 @@ public:
 		\param precursormass experimantal precursor mass
 		\retval string summary formula
 	*/ 
-	cSummaryFormula calculateSummaryFormula(cParameters& parameters, ePeptideType peptidetype, double precursormass = 0);
+	cSummaryFormula calculateSummaryFormulaFromBricks(cParameters& parameters, ePeptideType peptidetype, double precursormass = 0);
 
 
 	/**

@@ -286,70 +286,69 @@ void cTheoreticalSpectrum::generatePrecursorIon(vector<int>& intcomposition, cBr
 
 	peak.isotope = false;
 
-	switch (parameters->peptidetype)
-	{
-	case linear:
-		peak.mzratio = parameters->searchedmodifications[candidate.getStartModifID()].massdifference + parameters->searchedmodifications[candidate.getEndModifID()].massdifference;
-		if (!disablesummary && (parameters->generateisotopepattern || writedescription)) {
-			addStringFormulaToMap(parameters->searchedmodifications[candidate.getStartModifID()].summary, atoms);
-			addStringFormulaToMap(parameters->searchedmodifications[candidate.getEndModifID()].summary, atoms);
-		}
-		peak.seriesid = 0;
-		starttype = (int)precursor_ion;
-		endtype = (int)precursor_ion;
-		usedmodifications.insert(candidate.getStartModifID());
-		usedmodifications.insert(candidate.getEndModifID());
-		break;
-	case cyclic:
-		peak.mzratio = 0;
-		peak.seriesid = (int)intcomposition.size() - 1;
-		starttype = (int)cyclic_precursor_ion;
-		endtype = (int)cyclic_precursor_ion;
-		break;
-	case branched:
-		peak.mzratio = parameters->searchedmodifications[candidate.getStartModifID()].massdifference + parameters->searchedmodifications[candidate.getEndModifID()].massdifference + parameters->searchedmodifications[candidate.getMiddleModifID()].massdifference;
-		if (!disablesummary && (parameters->generateisotopepattern || writedescription)) {
-			addStringFormulaToMap(parameters->searchedmodifications[candidate.getStartModifID()].summary, atoms);
-			addStringFormulaToMap(parameters->searchedmodifications[candidate.getEndModifID()].summary, atoms);
-			addStringFormulaToMap(parameters->searchedmodifications[candidate.getMiddleModifID()].summary, atoms);
-		}
-		peak.seriesid = 0;
-		starttype = (int)precursor_ion;
-		endtype = (int)precursor_ion;
-		usedmodifications.insert(candidate.getStartModifID());
-		usedmodifications.insert(candidate.getEndModifID());
-		usedmodifications.insert(candidate.getMiddleModifID());
-		break;
-	case branchcyclic:
-		peak.mzratio = parameters->searchedmodifications[candidate.getMiddleModifID()].massdifference;
-		if (!disablesummary && (parameters->generateisotopepattern || writedescription)) {
-			addStringFormulaToMap(parameters->searchedmodifications[candidate.getMiddleModifID()].summary, atoms);
-		}
-		peak.seriesid = 0;
-		starttype = (int)cyclic_precursor_ion;
-		endtype = (int)cyclic_precursor_ion;
-		usedmodifications.insert(candidate.getMiddleModifID());
-		break;
-	case linearpolyketide:
-		peak.mzratio = parameters->searchedmodifications[candidate.getStartModifID()].massdifference + parameters->searchedmodifications[candidate.getEndModifID()].massdifference;
-		if (!disablesummary && (parameters->generateisotopepattern || writedescription)) {
-			addStringFormulaToMap(parameters->searchedmodifications[candidate.getStartModifID()].summary, atoms);
-			addStringFormulaToMap(parameters->searchedmodifications[candidate.getEndModifID()].summary, atoms);
-		}
-		peak.seriesid = 0;
-		usedmodifications.insert(candidate.getStartModifID());
-		usedmodifications.insert(candidate.getEndModifID());
-		break;
-	case cyclicpolyketide:
-		peak.mzratio = 0;
-		peak.seriesid = (int)intcomposition.size() - 1;
-		starttype = (int)cyclic_polyketide_precursor_ion;
-		endtype = (int)cyclic_polyketide_precursor_ion;
-		break;
-	case other:
-		break;
-	default:
-		break;
+	switch (parameters->peptidetype) {
+		case linear:
+			peak.mzratio = parameters->searchedmodifications[candidate.getStartModifID()].massdifference + parameters->searchedmodifications[candidate.getEndModifID()].massdifference;
+			if (!disablesummary && (parameters->generateisotopepattern || writedescription)) {
+				addStringFormulaToMap(parameters->searchedmodifications[candidate.getStartModifID()].summary, atoms);
+				addStringFormulaToMap(parameters->searchedmodifications[candidate.getEndModifID()].summary, atoms);
+			}
+			peak.seriesid = 0;
+			starttype = (int)precursor_ion;
+			endtype = (int)precursor_ion;
+			usedmodifications.insert(candidate.getStartModifID());
+			usedmodifications.insert(candidate.getEndModifID());
+			break;
+		case cyclic:
+			peak.mzratio = 0;
+			peak.seriesid = (int)intcomposition.size() - 1;
+			starttype = (int)cyclic_precursor_ion;
+			endtype = (int)cyclic_precursor_ion;
+			break;
+		case branched:
+			peak.mzratio = parameters->searchedmodifications[candidate.getStartModifID()].massdifference + parameters->searchedmodifications[candidate.getEndModifID()].massdifference + parameters->searchedmodifications[candidate.getMiddleModifID()].massdifference;
+			if (!disablesummary && (parameters->generateisotopepattern || writedescription)) {
+				addStringFormulaToMap(parameters->searchedmodifications[candidate.getStartModifID()].summary, atoms);
+				addStringFormulaToMap(parameters->searchedmodifications[candidate.getEndModifID()].summary, atoms);
+				addStringFormulaToMap(parameters->searchedmodifications[candidate.getMiddleModifID()].summary, atoms);
+			}
+			peak.seriesid = 0;
+			starttype = (int)precursor_ion;
+			endtype = (int)precursor_ion;
+			usedmodifications.insert(candidate.getStartModifID());
+			usedmodifications.insert(candidate.getEndModifID());
+			usedmodifications.insert(candidate.getMiddleModifID());
+			break;
+		case branchcyclic:
+			peak.mzratio = parameters->searchedmodifications[candidate.getMiddleModifID()].massdifference;
+			if (!disablesummary && (parameters->generateisotopepattern || writedescription)) {
+				addStringFormulaToMap(parameters->searchedmodifications[candidate.getMiddleModifID()].summary, atoms);
+			}
+			peak.seriesid = 0;
+			starttype = (int)cyclic_precursor_ion;
+			endtype = (int)cyclic_precursor_ion;
+			usedmodifications.insert(candidate.getMiddleModifID());
+			break;
+		case linearpolyketide:
+			peak.mzratio = parameters->searchedmodifications[candidate.getStartModifID()].massdifference + parameters->searchedmodifications[candidate.getEndModifID()].massdifference;
+			if (!disablesummary && (parameters->generateisotopepattern || writedescription)) {
+				addStringFormulaToMap(parameters->searchedmodifications[candidate.getStartModifID()].summary, atoms);
+				addStringFormulaToMap(parameters->searchedmodifications[candidate.getEndModifID()].summary, atoms);
+			}
+			peak.seriesid = 0;
+			usedmodifications.insert(candidate.getStartModifID());
+			usedmodifications.insert(candidate.getEndModifID());
+			break;
+		case cyclicpolyketide:
+			peak.mzratio = 0;
+			peak.seriesid = (int)intcomposition.size() - 1;
+			starttype = (int)cyclic_polyketide_precursor_ion;
+			endtype = (int)cyclic_polyketide_precursor_ion;
+			break;
+		case other:
+			break;
+		default:
+			break;
 	}
 
 	for (int i = 0; i < (int)intcomposition.size(); i++) {
@@ -543,6 +542,164 @@ void cTheoreticalSpectrum::generatePrecursorIon(vector<int>& intcomposition, cBr
 
 				}
 
+			}
+
+		}
+
+	}
+
+}
+
+
+void cTheoreticalSpectrum::generatePrecursorIonForOther(int& theoreticalpeaksrealsize, bool writedescription) {
+	cPeak peak;
+	string formula;
+
+	map<string, int> atoms, tempmap;
+
+	peak.isotope = false;
+	peak.seriesid = 0;
+	peak.iontype = fragmentIonTypeEnd;
+
+	peak.mzratio = candidate.getSummaryFormula().getMass() + H - e;
+	
+	if (parameters->generateisotopepattern || writedescription) {
+		formula = "H+";
+		addStringFormulaToMap(formula, atoms);
+		formula = candidate.getSummaryFormula().getSummary();
+		addStringFormulaToMap(formula, atoms);
+	}
+	
+	if (parameters->precursoradduct.compare("") != 0) {
+		cSummaryFormula adduct;
+		adduct.setFormula(parameters->precursoradduct);
+
+		peak.mzratio += adduct.getMass() - H;
+
+		if (parameters->generateisotopepattern || writedescription) {
+			formula = "H-1";
+			addStringFormulaToMap(formula, atoms);
+			addStringFormulaToMap(parameters->precursoradduct, atoms);
+		}
+	}
+
+	double tempratio = peak.mzratio;
+
+	for (int i = -1; i < (int)parameters->neutrallossesfortheoreticalspectra.size(); i++) {
+
+		for (int j = 1; j <= abs(parameters->precursorcharge); j++) {
+
+			peak.neutrallosstype = (i == -1) ? -1 : parameters->neutrallossesfortheoreticalspectra[i];
+			peak.mzratio = tempratio;
+			if (i >= 0) {
+				peak.mzratio += parameters->neutrallossesdefinitions[peak.neutrallosstype].massdifference;
+			}
+			peak.mzratio = charge(uncharge(peak.mzratio, 1), (parameters->precursorcharge > 0) ? j : -j);
+			peak.charge = (parameters->precursorcharge > 0) ? j : -j;
+
+			if (parameters->generateisotopepattern || writedescription) {
+				tempmap = atoms;
+				if (i >= 0) {
+					mergeMaps(parameters->neutrallossesdefinitions[peak.neutrallosstype].summarymap, tempmap);
+				}
+				rechargeMap(peak.charge, tempmap);
+				peak.formula.setFromMap(tempmap, false);
+			}
+
+			if (writedescription) {
+				string str;
+
+				peak.description = "[M+zH]+";
+				if (i >= 0) {
+					peak.description += " -";
+					if (i >= 0) {
+						peak.description += parameters->neutrallossesdefinitions[peak.neutrallosstype].summary;
+					}
+				}
+				peak.description += ":";
+
+				if (parameters->precursorcharge > 0) {
+					if (!parameters->precursoradduct.empty()) {
+						str = "+" + parameters->precursoradduct;
+						if (j > 1) {
+							str += "+";
+							if (j > 2) {
+								str += to_string(j - 1);
+							}
+							str += "H";
+						}
+						peak.description.replace(peak.description.find("+zH"), 3, str);
+					}
+					else {
+						str = "+";
+						if (j > 1) {
+							str += to_string(j);
+						}
+						str += "H";
+						peak.description.replace(peak.description.find("+zH"), 3, str);
+					}
+
+					str = "]";
+					if (j > 1) {
+						str += to_string(j);
+					}
+					str += "+";
+					peak.description.replace(peak.description.find("]+"), 2, str);
+				}
+				else {
+					if (!parameters->precursoradduct.empty()) {
+						str = "-" + parameters->precursoradduct;
+						if (j > 1) {
+							str += "-";
+							if (j > 2) {
+								str += to_string(j - 1);
+							}
+							str += "H";
+						}
+						peak.description.replace(peak.description.find("+zH"), 3, str);
+					}
+					else {
+						str = "-";
+						if (j > 1) {
+							str += to_string(j);
+						}
+						str += "H";
+						peak.description.replace(peak.description.find("+zH"), 3, str);
+					}
+
+					str = "]";
+					if (j > 1) {
+						str += to_string(j);
+					}
+					str += "-";
+					peak.description.replace(peak.description.find("]+"), 2, str);
+				}
+			}
+
+			if (writedescription) {
+				if (peak.formula.hasAllElementsPositive()) {
+					if (parameters->reportunmatchedtheoreticalpeaks || searchHint(peak.mzratio, experimentalpeaks, parameters->fragmentmasserrortolerance)) {
+						addPeakToList(peak, theoreticalpeaksrealsize);
+					}
+					if (!parameters->generateisotopepattern) {
+						addMetalPeaks(peak, parameters->metaladducts, theoreticalpeaksrealsize, j, writedescription);
+					}
+				}
+			}
+			else {
+				if (parameters->generateisotopepattern) {
+					if (peak.formula.hasAllElementsPositive()) {
+						if (searchHint(peak.mzratio, experimentalpeaks, parameters->fragmentmasserrortolerance)) {
+							addPeakToList(peak, theoreticalpeaksrealsize);
+						}
+					}
+				}
+				else {
+					if (searchHint(peak.mzratio, experimentalpeaks, parameters->fragmentmasserrortolerance)) {
+						addPeakToList(peak, theoreticalpeaksrealsize);
+					}
+					addMetalPeaks(peak, parameters->metaladducts, theoreticalpeaksrealsize, j, writedescription);
+				}
 			}
 
 		}
@@ -3261,6 +3418,54 @@ int cTheoreticalSpectrum::compareCyclicPolyketide(cPeaksList& sortedpeaklist, cB
 	}
 
 	return compareCyclic(sortedpeaklist, bricksdatabasewithcombinations, writedescription, sequencetag, searchedsequence, unmatchedpeaksinmatchedpatterns, isotopeformuladesctoid);
+
+}
+
+
+int cTheoreticalSpectrum::compareOther(cPeaksList& sortedpeaklist, bool writedescription, cPeaksList& unmatchedpeaksinmatchedpatterns, unordered_map<string, int>* isotopeformuladesctoid) {
+
+	int theoreticalpeaksrealsize = 0;
+
+	// initialize the experimental peaklist
+	experimentalpeaks = sortedpeaklist;
+
+	generatePrecursorIonForOther(theoreticalpeaksrealsize, writedescription);
+
+	if (parameters->generateisotopepattern) {
+		generateFragmentIsotopePatterns(theoreticalpeaksrealsize, writedescription, isotopeformuladesctoid);
+	}
+
+	// search the theoretical peaks in the experimental peak list
+	experimentalmatches.clear();
+	searchForPeakPairs(theoreticalpeaks, theoreticalpeaksrealsize, experimentalpeaks, parameters->fragmentmasserrortolerance);
+
+	if (parameters->generateisotopepattern) {
+		removeUnmatchedIsotopePatterns(theoreticalpeaks, theoreticalpeaksrealsize, experimentalpeaks, unmatchedpeaksinmatchedpatterns, writedescription && !parameters->reportunmatchedtheoreticalpeaks);
+	}
+
+	if (!parameters->generateisotopepattern) {
+		removeUnmatchedMetalIsotopes(theoreticalpeaks, theoreticalpeaksrealsize, experimentalpeaks);
+	}
+
+	// to do other
+	fillExperimentalAnnotationsAndRemoveUnmatchedTheoreticalPeaks(theoreticalpeaksrealsize, other, unmatchedpeaksinmatchedpatterns, parameters->reportunmatchedtheoreticalpeaks, writedescription);
+
+	if (writedescription) {
+
+		theoreticalpeaks.fillOrderIDs();
+
+		if (parameters->generateisotopepattern) {
+			if (!parameters->reportunmatchedtheoreticalpeaks) {
+				theoreticalpeaks.sortbyGroupId();
+			}
+			normalizeTheoreticalIntensities(theoreticalpeaks, theoreticalpeaksrealsize);
+		}
+
+	}
+
+	computeStatistics(writedescription);
+
+	return theoreticalpeaksrealsize;
 
 }
 

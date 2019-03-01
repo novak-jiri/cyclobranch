@@ -289,6 +289,7 @@ int cTheoreticalSpectrumList::parallelCompareAndStore(cCandidateSet& candidates,
 				theoreticalpeaksrealsize = tsp.compareCyclicPolyketide(tmppeaklist, *bricksdb, true, rxsequencetag, rxsearchedsequence, unmatchedpeaksinmatchedpatterns, &isotopeformuladesctoid);
 				break;
 			case other:
+				theoreticalpeaksrealsize = tsp.compareOther(tmppeaklist, true, unmatchedpeaksinmatchedpatterns, &isotopeformuladesctoid);
 				break;
 			default:
 				break;
@@ -336,9 +337,11 @@ int cTheoreticalSpectrumList::parallelCompareAndStore(cCandidateSet& candidates,
 	string tmps;
 	for (int i = 0; i < (int)theoreticalspectra.size(); i++) {
 		theoreticalspectra[i].sortByMass();
-		theoreticalspectra[i].getCandidate().setRealPeptideName(*bricksdb, parameters->peptidetype);
-		theoreticalspectra[i].getCandidate().setAcronymPeptideNameWithHTMLReferences(*bricksdb, parameters->peptidetype);
-		theoreticalspectra[i].getCandidate().setAcronyms(*bricksdb);
+		if (parameters->peptidetype != other) {
+			theoreticalspectra[i].getCandidate().setRealPeptideName(*bricksdb, parameters->peptidetype);
+			theoreticalspectra[i].getCandidate().setAcronymPeptideNameWithHTMLReferences(*bricksdb, parameters->peptidetype);
+			theoreticalspectra[i].getCandidate().setAcronyms(*bricksdb);
+		}
 		if ((parameters->peptidetype == branched) || (parameters->peptidetype == branchcyclic)) {
 			theoreticalspectra[i].getCandidate().setBackboneAcronyms(*bricksdb);
 			theoreticalspectra[i].getCandidate().setBranchAcronyms(*bricksdb);

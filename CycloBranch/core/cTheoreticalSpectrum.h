@@ -146,6 +146,9 @@ class cTheoreticalSpectrum {
 	// generate precursor ion and its variants
 	void generatePrecursorIon(vector<int>& intcomposition, cBricksDatabase& bricksdatabasewithcombinations, int& theoreticalpeaksrealsize, bool writedescription);
 
+	// generate precursor ion and its variants for other type
+	void generatePrecursorIonForOther(int& theoreticalpeaksrealsize, bool writedescription);
+
 	// generate scrambled sequences
 	void generateScrambledIons(cBricksDatabase& bricksdatabase, bool writedescription, int& theoreticalpeaksrealsize);
 
@@ -342,6 +345,17 @@ public:
 		\retval int number theoretical peaks generated; -2 when the sequence tag does not match the peptide sequence candidate
 	*/ 
 	int compareCyclicPolyketide(cPeaksList& sortedpeaklist, cBricksDatabase& bricksdatabasewithcombinations, bool writedescription, regex& sequencetag, regex& searchedsequence, cPeaksList& unmatchedpeaksinmatchedpatterns, unordered_map<string, int>* isotopeformuladesctoid);
+
+
+	/**
+		\brief Compare the theoretical spectrum of a metabolite with an experimental spectrum.
+		\param sortedpeaklist reference to an experimental peaklist
+		\param writedescription if true then string descriptions of peaks are filled
+		\param unmatchedpeaksinmatchedpatterns unmatched peaks in matched isotope patterns
+		\param isotopeformuladesctoid a map of isotope descriptions
+		\retval int number theoretical peaks generated
+	*/
+	int compareOther(cPeaksList& sortedpeaklist, bool writedescription, cPeaksList& unmatchedpeaksinmatchedpatterns, unordered_map<string, int>* isotopeformuladesctoid);
 
 
 	/**

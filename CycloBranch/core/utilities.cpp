@@ -4,7 +4,7 @@
 
 
 QString appname = "CycloBranch";
-QString appversion = "v. 1.3.18 (64-bit)";
+QString appversion = "v. 1.3.19 (64-bit)";
 
 
 #if OS_TYPE == UNX
@@ -196,26 +196,25 @@ bool checkRegex(ePeptideType peptidetype, string& sequence, string& errormessage
 
 	regex rx;
 	// [^\\[\\]]+ is used instead of .+ to prevent from a too complex regex error
-	switch (peptidetype)
-	{
-	case linear:
-	case linearpolyketide:
-		rx = "^\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])*$";
-		break;
-	case cyclic:
-	case cyclicpolyketide:
-		rx = "^\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])+$";
-		break;
-	case branched:
-		rx = "^\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])*\\\\\\(\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])+\\\\\\)\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])*$";
-		break;
-	case branchcyclic:
-		rx = "(^(\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])*)?\\\\\\(\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])+\\\\\\)\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])*$|^\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])*\\\\\\(\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])+\\\\\\)(\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])*)?$)";
-		break;
-	case other:
-	default:
-		rx = ".*";
-		break;
+	switch (peptidetype) {
+		case linear:
+		case linearpolyketide:
+			rx = "^\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])*$";
+			break;
+		case cyclic:
+		case cyclicpolyketide:
+			rx = "^\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])+$";
+			break;
+		case branched:
+			rx = "^\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])*\\\\\\(\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])+\\\\\\)\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])*$";
+			break;
+		case branchcyclic:
+			rx = "(^(\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])*)?\\\\\\(\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])+\\\\\\)\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])*$|^\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])*\\\\\\(\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])+\\\\\\)(\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])*)?$)";
+			break;
+		case other:
+		default:
+			rx = ".*";
+			break;
 	}
 
 	try {
@@ -321,31 +320,23 @@ ePeptideType getPeptideTypeFromString(string& s) {
 
 
 string getStringFromPeptideType(ePeptideType peptidetype) {
-	switch (peptidetype)
-	{
-	case linear:
-		return "linear";
-		break;
-	case cyclic:
-		return "cyclic";
-		break;
-	case branched:
-		return "branched";
-		break;
-	case branchcyclic:
-		return "branch-cyclic";
-		break;
-	case linearpolyketide:
-		return "linear-polyketide";
-		break;
-	case cyclicpolyketide:
-		return "cyclic-polyketide";
-		break;
-	case other:
-		return "other";
-		break;
-	default:
-		break;
+	switch (peptidetype) {
+		case linear:
+			return "linear";
+		case cyclic:
+			return "cyclic";
+		case branched:
+			return "branched";
+		case branchcyclic:
+			return "branch-cyclic";
+		case linearpolyketide:
+			return "linear-polyketide";
+		case cyclicpolyketide:
+			return "cyclic-polyketide";
+		case other:
+			return "other";
+		default:
+			break;
 	}
 
 	return "other";

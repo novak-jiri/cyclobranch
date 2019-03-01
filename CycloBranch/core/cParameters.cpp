@@ -669,7 +669,7 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 
 
 	// bricksdatabase check
-	if (!error && ((mode == denovoengine) || (mode == singlecomparison) || (mode == databasesearch))) {
+	if (!error && ((mode == denovoengine) || (mode == singlecomparison) || ((mode == databasesearch) && (peptidetype != other)))) {
 
 		bricksdatabasestream.open(bricksdatabasefilename);
 		if (!bricksdatabasestream.good()) {
@@ -720,7 +720,7 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 
 
 	// modifications check
-	if (!error && ((mode == denovoengine) || (mode == singlecomparison) || (mode == databasesearch))) {
+	if (!error && ((mode == denovoengine) || (mode == singlecomparison) || ((mode == databasesearch) && (peptidetype != other)))) {
 
 		searchedmodifications.clear();
 
@@ -1270,7 +1270,7 @@ int cParameters::calculateNeutralLosses(bool& terminatecomputation, string& erro
 			parseBranch(peptidetype, upperboundsequence, v, branchstart, branchend);
 			// startmodifid, endmodifid and middlemodifid were filled up by checkModifications
 			c.setCandidate(v, netmp, fragmentIonTypeEnd, startmodifid, endmodifid, middlemodifid, branchstart, branchend);
-			cSummaryFormula formula = c.calculateSummaryFormula(*this, peptidetype, precursormass);
+			cSummaryFormula formula = c.calculateSummaryFormulaFromBricks(*this, peptidetype, precursormass);
 
 			string formulastr = formula.getSummary();
 			addStringFormulaToMap(formulastr, atoms);
