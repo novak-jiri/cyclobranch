@@ -2704,7 +2704,7 @@ void cSpectrumDetailWidget::showHTMLDocumentation() {
 			QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo("docs/html/dereplication.html").absoluteFilePath()));
 		}
 		else if (parameters->mode == compoundsearch) {
-			// to do
+			QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo("docs/html/compoundsearch.html").absoluteFilePath()));
 		} 
 		else {
 			switch (parameters->peptidetype) {
@@ -2727,7 +2727,7 @@ void cSpectrumDetailWidget::showHTMLDocumentation() {
 					QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo("docs/html/cyclicketidedetail.html").absoluteFilePath()));
 					break;
 				case other:
-					// to do other
+					QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo("docs/html/metabolitedetail.html").absoluteFilePath()));
 					break;
 				default:
 					break;
@@ -2738,7 +2738,7 @@ void cSpectrumDetailWidget::showHTMLDocumentation() {
 			QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo(installdir + "docs/html/dereplication.html").absoluteFilePath()));
 		}
 		else if (parameters->mode == compoundsearch) {
-			// to do
+			QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo(installdir + "docs/html/compoundsearch.html").absoluteFilePath()));
 		}
 		else {
 			switch (parameters->peptidetype) {
@@ -2761,7 +2761,7 @@ void cSpectrumDetailWidget::showHTMLDocumentation() {
 					QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo(installdir + "docs/html/cyclicketidedetail.html").absoluteFilePath()));
 					break;
 				case other:
-					// to do other
+					QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo(installdir + "docs/html/metabolitedetail.html").absoluteFilePath()));
 					break;
 				default:
 					break;
