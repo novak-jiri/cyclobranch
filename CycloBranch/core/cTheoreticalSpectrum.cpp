@@ -3447,7 +3447,6 @@ int cTheoreticalSpectrum::compareOther(cPeaksList& sortedpeaklist, bool writedes
 		removeUnmatchedMetalIsotopes(theoreticalpeaks, theoreticalpeaksrealsize, experimentalpeaks);
 	}
 
-	// to do other
 	fillExperimentalAnnotationsAndRemoveUnmatchedTheoreticalPeaks(theoreticalpeaksrealsize, other, unmatchedpeaksinmatchedpatterns, parameters->reportunmatchedtheoreticalpeaks, writedescription);
 
 	if (writedescription) {
