@@ -266,7 +266,7 @@ bool cSummaryPeaksTableWidget::prepareToShow(QStandardItemModel* resultsstandard
 
 	if (thpeakscount > 1000000) {
 		QMessageBox::StandardButton reply;
-		string msg = "The table contains " + to_string(thpeakscount) + " rows and might not fit into the main memory. Do you with to continue ?\n\nTip: Re-run the search using adjusted search settings to limit the number of rows. You may increase the minimum threshold of relative peak intensity, the minimum m/z ratio, decrease the m/z error tolerance or limit the number of selected ion types in theoretical spectra.";
+		string msg = "The table contains " + to_string(thpeakscount) + " rows and might not fit into the main memory. Do you wish to continue ?\n\nTip: Re-run the search using adjusted search settings to limit the number of rows. You may increase the minimum threshold of relative peak intensity, the minimum m/z ratio, decrease the m/z error tolerance or limit the number of selected ion types in theoretical spectra.";
 		reply = QMessageBox::question(this, appname, msg.c_str(), QMessageBox::Yes | QMessageBox::No);
 		if (reply == QMessageBox::No) {
 			return false;
