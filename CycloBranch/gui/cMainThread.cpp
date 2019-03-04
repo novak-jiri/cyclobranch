@@ -318,8 +318,12 @@ void cMainThread::run() {
 			errormessage = "";
 
 			// check peptide type
-			if (!calculatesummaries && (parameters.peptidetype != parameters.sequencedatabase[i].getPeptideType())) {
-				continue;
+			if (!calculatesummaries) {
+				if (parameters.peptidetype != other) {
+					if (parameters.peptidetype != parameters.sequencedatabase[i].getPeptideType()) {
+						continue;
+					}
+				}
 			}
 
 			if (parameters.peptidetype != other) {
