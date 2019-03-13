@@ -1,287 +1,287 @@
-Ethanolamine	Eta	C2H5N	43.0421990000	CSID: 13835336
-Glycine	Gly	C2H3NO	57.0214640000	CSID: 730
-pyrrolidone	Pyr	C4H5N	67.0421990000	CSID: 11530
-dehydroalanine	dh-Ala	C3H3NO	69.0214640000	CSID: 110510
-pyruvic acid	Pya	C3H2O2	70.0054790000	CSID: 1031
-butanoic acid	C4:0	C4H6O	70.0418650000	CSID: 259
-DL-Alanine/D-Alanine/beta-Alanine/N-Methyl-Glycine	Ala/D-Ala/bAla/NMe-Gly	C3H5NO	71.0371140000	CSID: 582/CSID: 64234/CSID: 234/CSID: 1057
-Lactic acid/D-lactic acid	Lac/D-Lac	C3H4O2	72.0211290000	CSID: 592/CSID: 55423
-Serinol	Serol	C3H7NO	73.0527640000	CSID: 61591
-2.3-dehydro-2-aminobutyric acid/homoserine lactone/N-Methyl-dehydroalanine/hydroxy pyrrolidone	dhAbu/HseL/NMe-Dha/OH-Pyr	C4H5NO	83.0371140000	CSID: 4952645/CSID: 66194/CSID: 118845/CSID: 134682
-2-hydroxy-3-butenoic acid	C4:1(3)-OH(2)	C4H4O2	84.0211290000	CSID: 141066
-2-methyl-butanoic acid	C4:0-Me(2)	C5H8O	84.0575150000	CSID: 8012
-alpha-formylGlycine	aFo-Gly	C3H3NO2	85.0163780000	CSID: 28
-N-Methyl-L-alanine/N-methyl-beta-alanine/alpha-aminobutyric acid/D-alpha-aminobutyric acid/2-Methylalanine/methyl alaninate	NMe-Ala/NMe-bAla/Abu/D-Abu/Aib/D-3OMe-Ala	C4H7NO	85.0527640000	CSID: 4450824/CSID: 68396/PDB: ABA/PDB: DBB/CSID: 5891/CSID: 99878
-isovalinol/valinol	Ivalol/Valol	C5H11N	85.0891490000	CSID: 8329525/CSID: 71352
-3-hydroxybutanoic acid	C4:0-OH(3)	C4H6O2	86.0367790000	CSID: 428
-2.3-Diaminopropionic acid	Dpr	C3H6N2O	86.0480130000	CSID: 357
-DL-Serine/D-Serine/isoserine	Ser/D-Ser/Iser	C3H5NO2	87.0320280000	CSID: 597/CSID: 64231/CSID: 10793
-Sorbic acid	C6:2(t2.t4)	C6H6O	94.0418650000	CSID: 558605
-methyl-succinimide	Me-Suc	C5H5NO	95.0371140000	CSID: 122158
-proline carboxamid	ProC	C5H8N2	96.0687480000	CSID: 479142
-DL-Proline/D-Proline/2-methylamino-2-dehydrobutyric acid/norcoronamic acid	Pro/D-Pro/2Dh-Mabu/norCMA	C5H7NO	97.0527640000	CSID: 594/CSID: 8640/CSID: 16743754/CSID: 28708240
-3-methylvaleric acid/hexanoic acid	Me-Vaa/C6:0	C6H10O	98.0731650000	CSID: 7469/CSID: 8552
-N-formyl-Alanine/D-N-formyl-Alanine	NFo-Ala/D-NFo-Ala	C4H5NO2	99.0320280000	CSID: 72251/CSID: 72251
-DL-Valine/D-Valine/Isovaline/D-Isovaline/Norvaline/D-Norvaline/2-methyl-3-aminobutanoic acid/N-dimethyl-Alanine/3-amino-pentanoic acid	Val/D-Val/Ival/D-Ival/Nva/D-Nva/Mab/NdMe-Ala/C5:0-NH2(3)	C5H9NO	99.0684140000	CSID: 1148/CSID: 64635/CSID: 85483/PDB: DIV/CSID: 801/CSID: 388660/CSID: 471786/CSID: 9962964/CSID: 11271826
-Leucinol/Isoleucinol	Leuol/Ileol	C6H13N	99.1047990000	CSID: 71362/CSID: 82355
-2-hydroxy-3-epoxy-butanoic acid	C4:0-OH(2)-Ep(3)	C4H4O3	100.0160440000	CSID: 15475591
-Succinic acid	Suc	C4H4O3	100.0160440000	CSID: 7634
-2-hydroxyisovaleric acid/D-2-hydroxyisovalerate	Hiv/D-Hiv	C5H8O2	100.0524300000	CSID: 90190/CID: 5289545
-2.4-diaminobutyric acid/D-2.4-diaminobutyric acid/2.3-diaminobutyric acid/(2S.3S)-2.3-diaminobutyric acid/(2R.3R)-2.3-diaminobutyric acid	Dab/D-Dab/Dbu/L-Dbu/D-Dbu	C4H8N2O	100.0636630000	CSID: 457/CID: 638153/CSID: 4475641/CID: 11768553/PDB: VDL
-dehydro-cysteine	dhCys	C3H3NOS	100.9935340000	CSID: 24784832
-Threonine/D-Threonine/allo-Threonine/D-allo-Threonine/Homoserine/D-Homoserine/N-Methyl-Serine/N-Methyl-D-Serine/4-amino-3-hydroxybutyric acid	Thr/D-Thr/aThr/D-aThr/Hse/D-Hse/NMe-Ser/D-NMe-Ser/OH-4Abu	C4H7NO2	101.0476780000	PDB: THR/PDB: DTH/PDB: ALO/CSID: 81824/CSID: 758/CSID: 2006329/CSID: 481791/PDB: DSE/CSID: 2064
-2.3-dihydroxy-butanoic acid	C4:0-OH(2.3)	C4H6O3	102.0316940000	CSID: 219301
-DL-Cysteine	Cys	C3H5NOS	103.0091840000	CSID: 574
-benzoic acid	Bz	C7H4O	104.0262150000	CSID: 238
-N-methylglutamine	NMe-Gln	C6H10N2	110.0843980000	CSID: 10652941
-4-oxo-proline/pyroglutamic acid	4oxo-Pro/pGlu	C5H5NO2	111.0320280000	CSID: 366185/CSID: 485
-3-Methylproline/4-Methylproline/homoproline/D-homoproline/coronamic acid	3Me-Pro/4Me-Pro/Hpr/D-Hpr/CMA	C6H9NO	111.0684140000	CSID: 10610754/CSID: 312597/CSID: 826/CSID: 643442/CSID: 117751
-keto-Leucine/2-epoxy-hexanoic acid/(2E)-5-Hydroxy-3-methyl-2-pentenoic acid	k-Leu/C6:0-Ep(2)/OH-MP	C6H8O2	112.0524300000	CSID: 69/CSID: 14066572/CSID: 32988805
-Hydroxy-cycloOrnithine/D-Hydroxy-cycloOrnithine	OH-cOrn/D-OH-cOrn	C5H8N2O	112.0636630000	CSID: 13539649/CSID: 13539649
-heptanoic acid/5-methyl-hexanoic acid	C7:0/iC7:0	C7H12O	112.0888150000	CSID: 7803/CID: 12344
-aziridine dicarboxylic acid	Azd	C4H3NO3	113.0112930000	CSID: 11582505
-3-Hydroxyproline/4-Hydroxyproline/D-Hydroxyproline/2-formamidobutanoic acid	3OH-Pro/4OH-Pro/D-4OH-Pro/NFo-D-Abu	C5H7NO2	113.0476780000	CSID: 486216/PDB: HYP/CID: 440014/CSID: 486348
-Leucine/D-Leucine/Isoleucine/D-Isoleucine/allo-Isoleucine/D-allo-Isoleucine/N-Methyl-L-valine/D-N-Methylvaline/3-Methylvaline/D-tert-Leu/2-methyl-3-aminopentanoic acid/D-N-methyl-norvaline	Leu/D-Leu/Ile/D-Ile/aIle/D-aIle/NMe-Val/D-NMe-Val/t-Leu/D-t-Leu/Map/D-NMe-Nva	C6H11NO	113.0840640000	CSID: 834/CSID: 388617/CSID: 769/CSID: 69017/CSID: 89698/CSID: 85019/CSID: 4225/CSID: 4225/CSID: 270637/CID: 6950340/CSID: 11643060/CSID: 10652938
-hydroxyacetyl propionyl/pentanedioic acid	Hap/Pda	C5H6O3	114.0316940000	C(C(C(CO)=O)C)(=O)O in CSID: 10477731/CSID: 723
-DL-Asparagine/D-Asparagine/N1-formyl-2.3-Diaminopropionic acid	Asn/D-Asn/NFo-Dpr	C4H6N2O2	114.0429270000	PDB: ASN/PDB: DSG/C(C(CN)NC=O)(=O)O in CSID: 8873525
-D-Leucic acid (2-hydroxy-4-methylpentanoic acid)/(R)-Leucic acid/3-hydroxyhexanoic acid/2-hydroxy-3-methyl-pentanoic acid/D-2-hydroxy-3-methyl-pentanoic acid	C5:0-Me(4)-OH(2)/4Me-D-Hva/C6:0-OH(3)/Hmp/D-Hmp	C6H10O2	114.0680800000	CSID: 83753/CSID: 388986/CSID: 133518/CSID: 144317/CSID: 144317
-DL-Ornithine/D-Ornithine	Orn/D-Orn	C5H10N2O	114.0793130000	CSID: 380/CSID: 64236
-DL-Aspartic acid/D-Aspartic acid/N-formyl-isoserine	Asp/D-Asp/NFo-Iser	C4H5NO3	115.0269430000	CSID: 411/CSID: 75697/C(C(C(=O)O)O)NC=O in CSID: 8503913
-beta-hydroxyvaline/D-beta-hydroxyvaline/N-Methylthreonine/O-Methylthreonine	bOH-Val/D-bOH-Val/NMe-Thr/OMe-Thr	C5H9NO2	115.0633290000	CSID: 244525/CID: 192763/CSID: 5373925/CSID: 193545
-2.3-dihydroxy-3-methylbutanoic acid/2.4-dihydroxy-3-methylbutanoic acid	iC5:0-OH(2.3)/iC5:0-OH(2.4)	C5H8O3	116.0473440000	CSID: 657/C(C(C(CO)C)O)(=O)O in: NOR00082
-2-Methylcysteine/Methylcysteine	aMe-Cys/NMe-Cys	C4H7NOS	117.0248350000	CSID: 8233116/CSID: 2074082
-4-Hydroxythreonine	4OH-Thr	C4H7NO3	117.0425930000	CSID: 3137512
-2.3.4-trihydroxy-butanoic acid	C4:0-OH(2.3.4)	C4H6O4	118.0266090000	CSID: 388628
-phenylacetic acid	Pha	C8H6O	118.0418650000	CSID: 10181341
-4-Hydroxybenzoic acid	pOH-Bz	C7H4O2	120.0211290000	CSID: 132
-trans2.trans4.trans6-trioctaneic acid	C8:3(t2.t4.t6)	C8H8O	120.0575150000	CSID: 4520024
-hydroxypicolinic acid	Hpa	C6H3NO2	121.0163780000	CSID: 12827
-oct-7-ynoic acid/2.trans4-octenoic acid	C8:0:1(7)/C8:2(2.t4)	C8H10O	122.0731650000	CSID: 4472125/CSID: 4944992
-4-oxo-5-methylproline/4-oxo-homoproline/N-Formyl-Proline	4oxo-5Me-Pro/4oxo-Hpr/NFo-Pro	C6H7NO2	125.0476780000	CSID: 2564339/CSID: 10739339/CSID: 87055
-octanoic acid/6-methylheptanoic acid	C8:0/iC8:0	C8H14O	126.1044650000	CSID: 370/CSID: 81904
-beta-ureido-dehydroAlanine	bU-dAla	C4H5N3O2	127.0381760000	PDB: UAL
-N-formyl-Valine/N-Acetyl-2-aminoisobutyric acid/3-Hydroxy-5-methylproline	NFo-Val/Ac-Aib/3OH-5Me-Pro	C6H9NO2	127.0633290000	CSID: 90479/CSID: 203779/CSID: 3823469
-N-Methyl-Leucine/D-N-methyl-Leucine/N-Methyl-Isoleucine/N-methyl-alloIsoleucine/D-N-methyl-alloIsoleucine/beta-methylisoleucine/homoisoleucine/alpha-ethylnorvaline/Dolavaline/2-methyl-3-aminohexadecanoic acid	NMe-Leu/D-NMe-Leu/NMe-Ile/NMe-aIle/D-NMe-aIle/bMe-Ile/Hil/Et-Nva/Dov/C6:0-Me(2)-NH2(3)	C7H13NO	127.0997140000	CSID: 493595/CSID: 493595/CSID: 487199/CCC(C)C(C(=O)O)NC in: NOR00428/CCC(C)C(C(=O)O)NC in: NOR00428/CSID: 19951406/CSID: 454232/CSID: 452678/CSID: 10731564/CSID: 21378848
-DL-Glutamine/D-Glutamine/N-methylasparagine/beta-methyl-asparagine/D-N2-methyl-asparagine/N1-acetyl-2.3-Diaminopropionic acid	Gln/D-Gln/NMe-Asn/bMe-Asn/D-N2Me-Asn/NAc-Dpr	C5H8N2O2	128.0585780000	PDB: GLN/PDB: DGN/CSID: 311563/CSID: 2284493/CSID: 288387/C(C(CN)NC(C)=O)(=O)O in CSID: 8570696
-3-methoxy-hexanoic acid/3-hydroxy-heptanoic acid	C6:0-OMe(3)/C7:0-OH(3)	C7H12O2	128.0837300000	CSID: 277923/CSID: 2340494
-DL-Lysine/D-Lysine/beta lysine/N-Hydroxy-histamine	Lys/D-Lys/bLys/N-OH-Hta	C6H12N2O	128.0949630000	CSID: 843/CSID: 51793/PDB: KBE/C1(CCCN1)CCNO in CSID: 4589228
-DL-Glutamic acid/D-Glutamic Acid/beta-methyl-aspartic acid/D-beta-methyl-aspartic acid/beta-methoxy-aspartic acid/O-acetyl-Serine	Glu/D-Glu/bMe-Asp/D-bMe-Asp/bOMe-Asp/Ac-Ser	C5H7NO3	129.0425930000	CSID: 591/PDB: DGL/PDB: 2AS/PDB: ACB/CSID: 92764/CSID: 184
-L-acosamine/3-hydroxyleucine/beta-hydroxy-N-Methyl-Valine/gamma-hydroxy-N-Methyl-Valine/L-ristosamine	Aco/3OH-Leu/bOH-NMe-Val/gOH-NMe-Val/Ria	C6H11NO2	129.0789790000	CSID: 370989/CSID: 244507/CSID: 9205156/CID: 12439044/CSID: 370989
-2-hydroxy-3-methyl-butanedioic acid	iC5:0-OH(2)-CA(4)	C5H6O4	130.0266090000	CSID: 485839
-Hydroxyasparagine/D-HydroxyAsparagine	OH-Asn/D-OH-Asn	C4H6N2O3	130.0378420000	CSID: 3670287/CSID: 3670287
-alpha-guanidino Serine	gSer	C3H6N4O2	130.0490750000	C(C(=O)O)(N)(O)NC(=N)N in: NOR00426
-2.3-dihydroxy-3-methylpentanoic acid	aC6:0-OH(2.3)	C6H10O3	130.0629940000	CSID: 7
-N5-hydroxy ornithine/D-N5-HydroxyOrnithine/hydroxy-beta lysine	OH-Orn/D-OH-Orn/OH-bLys	C5H10N2O2	130.0742280000	CSID: 148381/C(CC(C(=O)O)N)CNO in: NOR00205/C(NCC(=O)O)(CCN)O in: NOR00634
-Hydroxyaspartic acid/D-Hydroxyaspartic acid	OH-Asp/D-OH-Asp	C4H5NO4	131.0218580000	CSID: 5232/CSID: 5232
-Methionine/N.S-dimethylcysteine	Met/diMe-Cys	C5H9NOS	131.0404850000	CSID: 853/CSID: 4450935
-arabinose/lyxose	Ara/Lyx	C5H8O4	132.0422590000	CSID: 224/CSID: 831
-L-Olivose	Oli	C6H12O3	132.0786440000	CSID: 164228
-PhenylGlycine/D-PhenylGlycine	Ph-Gly/D-ph-Gly	C8H7NO	133.0527640000	CSID: 3732/PDB: PG9
-phenylalaninol	Pheol	C9H11N	133.0891490000	CSID: 69116
-4-Chloro-Threonine	4Cl-Thr	C4H6ClNO2	135.0087060000	CSID: 111708
-2.3-dihydroxy-4-chloro-butanoic acid	C4:0-OH(2.3)-Cl(4)	C4H5ClO3	135.9927220000	CSID: 25900403
-2.3-dihydroxybenzoic acid	diOH-Bz	C7H4O3	136.0160440000	CSID: 18
-2-methyl-7-octynoic acid/2.trans4-7-methyl-octenoic acid	C8:0:1(7)-Me(2)/iC9:2(2.t4)	C9H12O	136.0888150000	CSID: 24770189/CSID: 10761068
-DL-Histidine	His	C6H7N3O	137.0589120000	CSID: 752
-dehydropyrrolidone	dPyr	C6H6N2O2	138.0429270000	C1(CC(C(=CC(=O)O)N1)N)=O in CSID: 10199318
-acetylproline/2.3-dimethylpyroglutamic acid	Ac-Pro/2Me-3Me-pGlu	C7H9NO2	139.0633290000	CSID: 285677/CSID: 13080150
-5.5-dimethyl-2-oxo-hexanoic acid	C6:0-Me(5.5)-oxo(2)	C8H12O2	140.0837300000	CID: 21197379
-argininal	Argal	C6H12N4	140.1061960000	CSID: 10655329
-Nonanoic acid/d-6-Methyloctanoic acid/7-Methyloctanoic acid	C9:0/aC9:0/iC9:0	C9H16O	140.1201150000	CSID: 7866/CSID: 10015/CSID: 31022
-N-methylchloropyrrole	MCP	C6H4ClNO	140.9981420000	CSID: 7404981
-N-Acetylisovaline/N-Acetylvaline/N-Formylisoleucine/N-Formylleucin/4-Amino-2.2-dimethyl-3-oxopentanoic acid/4-oxovancosamine	Ac-Ival/Ac-Val/NFo-Ile/NFo-Leu/Ibu/4oxo-Van	C7H11NO2	141.0789790000	CSID: 272193/CSID: 198159/CSID: 383482/CSID: 90475/CSID: 29322188/C1(C(C(CC(O1)O)(C)N)=O)C in CSID: 10249894
-N-dimethyl-leucine/N.beta-dimethyl-leucine/O-acetyl-leucinol/N.O-dimethyl-isoleucine	NdMe-Leu/NMe-bMe-Leu/OAc-Leuol/NMe-OMe-Ile	C8H15NO	141.1153640000	CSID: 500040/CID: 15385160/CID: 23037829/CSID: 27194495
-beta-methylglutamine/D-beta-methylglutamine	bMe-Gln/D-bMe-Gln	C6H10N2O2	142.0742280000	CID: 44602399/CSID: 24604116
-3-hydroxy-octanoic acid/2.2-dimethyl-3-hydroxyhexanoic acid/3-hydroxy-2-methyl-heptanoic acid	C8:0-OH(3)/C6:0-Me(2.2)-OH(3)/C7:0-Me(2)-OH(3)	C8H14O2	142.0993800000	CSID: 24791/CSID: 21418738/CSID: 27143447
-3-Methyl-Glutamic acid/Glutamic Acid methyl ester/D-Glutamic Acid methyl ester/D-Glutamic Acid methyl ester/2-Aminoadipic acid	3Me-Glu/MeO-Glu/D-MeO-Glu/MeO-D-Glu/Aad	C6H9NO3	143.0582430000	CSID: 207514/CSID: 66546/CSID: 66546/CSID: 66546/CSID: 456
-L-actinosamine/L-eremosamine/norstatine/Vancosamine/N-methyl-hydroxyisoleucine	Act/Ere/Nst/Van/NMe-OH-Ile	C7H13NO2	143.0946290000	CID: 20377364/CSID: 9542085/CSID: 151726/CSID: 164304/CSID: 24770217
-beta-hydroxyglutamine/D-beta-hydroxy-N2-methyl-asparagine/D-beta-hydroxy-N2-methyl-asparagine	OH-Gln/Me-OH-Asn/D-N2Me-bOH-Asn	C5H8N2O3	144.0534920000	CID: 22592766/CSID: 24604117/C(C(=O)O)(N)C(C(=O)NC)O in: NOR00669
-methoxyaspartic acid	OMe-Asp	C5H7NO4	145.0375080000	C(C(C(C(=O)O)N)=[O]C)(=O)O in: NOR00717
-3.5-hydroxy-4-amino-hexadecanoic acid	C6:0-OH(3.5)-NH2(4)	C6H11NO3	145.0738930000	C(CC(C(C(C)O)N)O)(O)=O in: NOR00444
-L-rhamnose	Rha	C6H10O4	146.0579090000	CSID: 190747
-Methionine-S-oxide	O-Met	C5H9NO2S	147.0353990000	CSID: 824
-Chloro-Isoleucine	Cl-Ile	C6H10ClNO	147.0450920000	C(C(O)=O)(N)C(C(C)Cl)C in CSID: 10269389
-DL-Phenylalanine/D-Phenylalanine/beta-phenylalanine/D-beta-phenylalanine/N-methyl-phenylglycine	Phe/D-Phe/bPhe/D-bPhe/NMe-Ph-Gly	C9H9NO	147.0684140000	CSID: 969/CSID: 64639/CSID: 62403/CSID: 598357/CSID: 198596
-2-hydroxyphenyl-2-oxo-ethanoic acid	Hpoe	C8H4O3	148.0160440000	CSID: 348
-Phenyl-lactate/D-Phenyl-lactate	Ph-Lac/D-Ph-Lac	C9H8O2	148.0524300000	CSID: 3715/CID: 643327
-HydroxyPhenylGlycine/D-HydroxyPhenylGlycine	Hpg/D-Hpg	C8H7NO2	149.0476780000	CSID: 83189/CID: 89853
-2.trans4-8-methyl-noneoic acid	iC10:2(2.t4)	C10H14O	150.1044650000	C(C=CC=CCCC(C)C)(O)=O in CSID: 16736750
-cysteic acid/D-cysteic acid	CysA/D-CysA	C3H5NO4S	150.9939280000	PDB: OCS/PDB: 00C
-D-4-fluoroPhenylGlycin	D-F-ph-Gly	C8H6FNO	151.0433430000	CSID: 88776
-3-amino-2-methyloct-7-ynoic acid	C8:0:1(7)-Me(2)-NH2(3)	C9H13NO	151.0997140000	C(CCCC#C)(C(C(=O)O)C)N in CSID: 8230475
-2-methyl-3-hydroxy-7-octynoic acid	C8:0:1(7)-Me(2)-OH(3)	C9H12O2	152.0837300000	CSID: 9964309
-2-methyl-8-noneic acid	C9:1(8)-Me(2)	C10H16O	152.1201150000	CID: 17824924
-Hydroxyhistidine	OH-His	C6H7N3O2	153.0538260000	CSID: 379547
-N-methyl homo vinylogous Valine	NMe-hv-Val	C9H15NO	153.1153640000	C(C(NC)C(C)C)=C(C(O)=O)C in CSID: 10213622
-capreomycidine/enduracididine/D-enduracididine	Cap/End/D-End	C6H10N4O	154.0854610000	CSID: 3818574/CSID: 24775830/CSID: 24775830
-decanoic acid/isodecanoic acid/7-methylnonanoic acid	C10:0/iC10:0/aC10:0	C10H18O	154.1357650000	CSID: 2863/CID: 111470/CSID: 4471754
-Alanine-thiazole	Ala-Thz	C6H7N2OS	155.0279090000	CSID: 23916434
-N-Acetylisoleucine/N-acetyl-Leucine/O-desmethyldolaproine	NAc-Ile/NAc-Leu/dDap	C8H13NO2	155.0946290000	CSID: 270615/CSID: 1918/C(C1CCCN1)(C(C(=O)O)C)O in CSID: 9938808
-2-Aminononanoic acid	Me-AOA	C9H17NO	155.1310140000	CSID: 198341
-2-carboxyquinoxaline	COOH-Qui	C9H4N2O	156.0323630000	CSID: 87301
-N-formyl-Glutamine	NFo-Gln	C6H8N2O3	156.0534920000	CSID: 2106926
-hydroxyisovalerylpropionyl	Hip	C8H12O3	156.0786440000	CID: 18942657
-3.4-dimethylglutamine	3Me-4Me-Gln	C7H12N2O2	156.0898780000	CSID: 21376706
-DL-Arginine/D-Arginine/L-(+)-Arginine	Arg/D-Arg/L-Arg	C6H12N4O	156.1011110000	PDB: ARG/PDB: DAR/CSID: 6082
-3-hydroxy-4-methyloctanoic acid/3-hydroxy-nonanoic acid/3-hydroxy-isononanoic acid/3-hydroxy-6-methyloctanoic acid	C8:0-Me(4)-OH(3)/C9:0-OH(3)/iC9:0-OH(3)/aC9:0-OH(3)	C9H16O2	156.1150300000	CSID: 17247549/CSID: 33630/CID: 22472006/CSID: 10361823
-N-trimethyl-leucine	NtMe-Leu	C9H18NO	156.1388390000	C(C(=O)O)(CC(C)C)[N](C)(C)C in: NOR00695
-Citrulline/D-Citrulline	Cit/D-Cit	C6H11N3O2	157.0851270000	CSID: 810/CID: 637599
-isostatine/statine	Ist/Sta	C8H15NO2	157.1102790000	CSID: 19578058/CSID: 2632509
-N6-formyl-HydroxyOrnithine/D-formyl-hydroxyOrnithine	Fo-OH-Orn/D-Fo-OH-Orn	C6H10N2O3	158.0691420000	PDB: FHO/PDB: FH7
-alpha-amino-hydroxyadipic acid	Ahad	C6H9NO4	159.0531580000	CID: 22326384
-N-methyl-2.3-dehydrophenylalanine	NMe-dPhe	C10H9NO	159.0684140000	C(C(O)=O)(=CC1=CC=CC=C1)NC in CSID: 4444584
-O-methyl-L-rhamnose	2OMe-Rha	C7H12O4	160.0735590000	CSID: 4352115
-N-Methyl-Phenylalanine/D-N-Methyl-Phenylalanine/3-methylphenylalanine/Homophenylalanine	NMe-Phe/D-NMe-Phe/3Me-Phe/Hph	C10H11NO	161.0840640000	PDB: MEA/PDB: ZAE/PDB: APD/CSID: 92605
-Hexose/L-glucose/D-Glucose	Hexose/Glc/D-Glc	C6H10O5	162.0528230000	CSID: 23139/CSID: 201/PDB: GLC
-N-hydroxy-dehydro-HydroxyPhenylGlycine/D-N-hydroxy-dehydro-HydroxyPhenylGlycine	OH-dHpg/D-OH-dHpg	C8H5NO3	163.0269430000	CID: 20339127/C(C(=O)O)(C1=CC=C(C=C1)O)=NO in: NOR00822
-Methionine sulfone	O2-Met	C5H9NO3S	163.0303140000	CSID: 63154
-phosphinothricin	PT	C5H10NO3P	163.0398300000	CSID: 4630
-Tyrosine/D-Tyrosine/beta-tyrosine/Phenylserine/N-methyl-HydroxyPhenylGlycine	Tyr/D-Tyr/bTyr/Ph-Ser/NMe-Hpg	C9H9NO2	163.0633290000	CSID: 1121/CSID: 64252/CSID: 389285/CSID: 84951/CID: 15118056
-4-hydroxy-D-phenyl-lactate	4OH-D-Ph-Lac	C9H8O3	164.0473440000	CID: 9378
-propenoyl-alanyloxazole acid	PALOA	C8H8N2O2	164.0585780000	C(C=CC1=COC(=N1)C(N)C)(=O)O in CSID: 10477875
-3.4-dichloro-proline	Cl2-Pro	C5H5Cl2NO	164.9748200000	CID: 21295133
-3.5-dihydroxyphenylglycine/D-3.5-dihydroxyphenylglycine	Dhpg/D-Dhpg	C8H7NO3	165.0425930000	PDB: D3P/PDB: D3P
-cyclo alpha-ketoarginine	ck-Arg	C7H10N4O	166.0854610000	C12(C(CCCN1C(=NC2=O)-N)N)O in CSID: 9977717
-2.2-dimethyl-3-hydroxy-7-octynoic acid	C8:0:1(7)-Me(2.2)-OH(3)	C10H14O2	166.0993800000	CSID: 29330001
-2-carboxy-6-hydroxyoctahydroindole	Choi	C9H13NO2	167.0946290000	C1C(NC2C1CCC(C2)O)C(=O)O in CSID: 10480056
-3-Desoxy-Methyl-4-butenyl-4-methyl threonine	3d-NMe-Bmt	C10H17NO	167.1310140000	CC=CCC(C)CC(NC)C(=O)O in CSID: 4953086
-1-methoxy-beta-alanine-thiazole	OMe-bAla-Thz	C7H8N2OS	168.0357340000	C(N)(CC(=O)OC)C1=NC=CS1 in CSID: 26365309
-2.2-dimethyl-3-hydroxy-7-octenoic acid	C8:1(7)-Me(2.2)-OH(3)	C10H16O2	168.1150300000	C(C(C(CCCC=C)O)(C)C)(O)=O in CSID: 8732670
-9-methyldecanoic acid/8-methyldecanoic acid	iC11:0/aC11:0	C11H20O	168.1514150000	CSID: 4471714/CID: 21813
-4-butenyl-4-methyl threonine/Dolaproine	Bmt/Dap	C9H15NO2	169.1102790000	CC=CCC(C)C(C(C(=O)O)N)O in CSID: 4444325/C1C(CCN1)C(C(C(O)=O)C)OC in CSID: 7986684
-5-hydroxy-capreomycidine	5OH-Cap	C6H10N4O2	170.0803760000	C1C(NC(NC1C(C(=O)O)N)=N)O in CSID: 2301596
-hydroxysecbutyl acetyl propionyl	Hysp	C9H14O3	170.0942940000	C(C(C(C(O)C(CC)C)=O)C)(=O)O in CSID: 10477730
-homoarginine	Har	C7H14N4O	170.1167610000	CSID: 8732
-3-hydroxy-decanoic acid/3-hydroxy-2-methyl-nonanoic acid/2.2-dimethyl-3-hydroxy-octanoic acid/2.4-dimethyl-3-hydroxyisooctanoic acid	C10:0-OH(3)/C9:0-Me(2)-OH(3)/C8:0-Me(2.2)-OH(3)/iC8:0-Me(2.4)-OH(3)	C10H18O2	170.1306800000	CSID: 24790/CSID: 9587708/CSID: 8949283/CSID: 25944197
-N-methoxyacetyl-valine	NOMe-Ac-Val	C8H13NO3	171.0895430000	CSID: 11856685
-N-desmethyldolaisoleuine/alpha-hydroxy-6-methyl-3-aminooctanoic acid	dDil/aC9:0-OH(2)-NH2(3)	C9H17NO2	171.1259290000	C(C(N)C(C)CC)(CC(O)=O)OC in CSID: 9938808/C(C(C(CCC(CC)C)N)O)(=O)O in CSID: 10475103
-N-acetyl-HydroxyOrnithine/D-N-acetyl-HydroxyOrnithine/N2-acetyl-N5-hydroxy-L-ornithine	Ac-OH-Orn/D-Ac-OH-Orn/N2Ac-OH-Orn	C7H12N2O3	172.0847920000	PDB: AHO/CSID: 3670289/CSID: 0
-tryptophanol	Trpol	C11H12N2	172.1000480000	CSID: 10234
-N-methyldichloropyrrole-2-carboxylic acid	MdCP	C6H3Cl2NO	174.9591700000	CSID: 21926880
-beta.beta-dimethyl-Methionine-S-oxide	bbMe2-O-Met	C7H13NO2S	175.0666990000	CSID: 29322228
-alpha-amino-phenyl-valeric acid	Apv	C11H13NO	175.0997140000	CSID: 262061
-Homotyrosine/N-methyltyrosine/beta-hydroxy-N-Methyl-Phenylalanine	Hty/NMe-Tyr/bOH-NMe-Phe	C10H11NO2	177.0789790000	CSID: 3365526/CSID: 453342/CSID: 14028021
-propenoyl-2-aminobutanoyloxazole acid	PAOA	C9H10N2O2	178.0742280000	C(C=CC1=COC(=N1)C(N)CC)(=O)O in CSID: 27026296
-2.4-dimethyl-dec-9-ynoic acid/10-methyl-2.trans4-undecanoic acid	C10:0:1(9)-Me(2.4)/iC12:2(2.t4)	C12H18O	178.1357650000	C(C(CC(CCCCC#C)C)C)(=O)O in CSID: 23076292/C(C=CC=CCCCCC(C)C)(O)=O in CSID: 24677772
-beta-hydroxy-tyrosine/3.4-dihydroxyphenylalanine	bOH-Tyr/diOH-Phe	C9H9NO3	179.0582430000	CSID: 13930867/CSID: 813
-proline-thiazole	Pro-Thz	C8H8N2OS	180.0357340000	C1=CSC(=N1)C2CCC(N2)C(=O)O in CSID: 8971346
-2-methyl-5-dodecenoic acid	C12:1(5)	C12H20O	180.1514150000	CSID: 4471802
-Anticapsin	Aca	C9H11NO3	181.0738930000	CSID: 2796855
-D-homoarginine	D-Har	C7H10N4O2	182.0803760000	CSID: 53295
-vinylogous arginine	v-Arg	C8H14N4O	182.1167610000	C(C(N)CCCNC(=N)N)=CC(=O)O in CSID: 8946030
-dodecanoic acid/isododecanoic acid	C12:0/iC12:0	C12H22O	182.1670650000	CSID: 3756/CID: 75942
-3-chloro-4-hydroxyphenylglycine	Cl-Hpg	C8H6ClNO2	183.0087060000	CSID: 3817439
-N-methyl-butenylthreonine/2-amino-8-oxo-decanoic acid	NMe-Bmt/C10:0-NH2(2)-oxo(8)	C10H17NO2	183.1259290000	CSID: 9944222/CSID: 16281719
-2.3-Dehydro-Tryptophan	dh-Trp	C11H8N2O	184.0636630000	CSID: 7991355
-ureido-4-oxovancosamine	U4oxo-Van	C8H12N2O3	184.0847920000	C1(C2(C(CC(O1)O)(C)NC(N2)=O)O)C in: NOR00711
-alpha-ketoarginine	k-Arg	C7H12N4O2	184.0960260000	C(C(C(CCCNC(=N)N)N)=O)(=O)O in CSID: 10477079
-3-hydroxy-undecanoic acid/3-hydroxy-isoundecanoic acid/3-hydroxy-2-methyl-decanoic acid/3-hydroxy-4-methyl-decanoic acid	C11:0-OH(3)/iC11:0-OH(3)/C10:0-Me(2)-OH(3)/C10:0-Me(4)-OH(3)	C11H20O2	184.1463300000	CSID: 2340495/CC(C)CCCCCC(CC(=O)O)O in: NOR00398/CSID: 13775620/CSID: 28533406
-Dolapyrrolidone	Dpy	C12H11NO	185.0840640000	CSID: 8735462
-Dolaisoleucine/8-hydroxy-2-amino-decanoic acid/9-hydroxy-2-amino-decanoic acid	Dil/C10:0-OH(8)-NH2(2)/C10:0-OH(9)-NH2(2)	C10H19NO2	185.1415790000	C(CC(O)=O)(OC)C(C(C)CC)NC in CSID: 7986684/CSID: 26949211/C(C(N)CCCCCCC(C)O)(=O)O in CSID: 10279723
-DL-Tryptophan/D-Tryptophan	Trp/D-Trp	C11H10N2O	186.0793130000	CSID: 1116/CSID: 8707
-hydrated alpha-ketoarginine	hk-Arg	C7H14N4O2	186.1116760000	C(C(C(CCCN=C(N)N)N)O)(=O)O in CSID: 8946570
-dehydro vinylogous tyrosine	dv-Tyr	C11H9NO2	187.0633290000	C(C(N)=CC1=CC=C(C=C1)O)=CC(=O)O in CSID: 8185737
-3.4-dihydroxyArginine	diOH-Arg	C6H12N4O3	188.0909400000	C(C(C(C(O)=O)N)O)(CN=C(N)N)O in CSID: 8801410
-vinylogous tyrosine/N-acetylphenylalanine	v-Tyr/Ac-Phe	C11H11NO2	189.0789790000	C(C(N)CC1=CC=C(C=C1)O)=CC(=O)O in CSID: 10477079/CSID: 1923
-kynurenine/D-kynurenine	Kyn/D-Kyn	C10H10N2O2	190.0742280000	CSID: 823/CID: 1152206
-coronafacic acid	CFA	C12H14O2	190.0993800000	CSID: 13300082
-N-methyl-4-methylamino-phenylalanine/N.O-dimethyl-tyrosinecarboxamid	NMe-MeA-Phe/NMe-OMe-TyrC	C11H14N2O	190.1106130000	CID: 21137790/CID: 19003692
-alpha-amino-hydroxyphenyl-valeric acid/N-methyl-homotyrosine/3-methyl-homotyrosine/ethylene inserted tyrosine/N.O-dimethyl-tyrosine/D-N.O-dimethyl-tyrosine	Ahv/NMe-Hty/3Me-Hty/e-Tyr/NMe-OMe-Tyr/D-NMe-OMe-Tyr	C11H13NO2	191.0946290000	C(C(=O)O)(CCCC1=CC=C(C=C1)O)N in CSID: 142959/C1=CC(=CC=C1CCC(C(=O)O)NC)O in CSID: 10477716/C1=CC(=CC=C1CC(C(C(=O)O)N)C)O in: NOR00265/C(C(N)CC1=CC=C(C=C1)O)CC(=O)O in CSID: 9977717/CID: 18925327/CID: 18925327
-10-methyl-2.trans4-dodecenoic acid	aC13:2(2.t4)	C13H20O	192.1514150000	C(C=CC=CCCCCC(CC)C)(O)=O in CSID: 24665012
-di-chloro-N-methyl-dehydroLeucine	Cl2-NMe-dhLeu	C7H9Cl2NO	193.0061200000	C(C(O)=O)(NC)=CC(C)C(Cl)Cl in CSID: 8701761
-beta-methoxy-tyrosine	bOMe-Tyr	C10H11NO3	193.0738930000	CSID: 16174140
-O-sulfate-2-hydroxy-3-methylpentanoic acid	OSu-Hmp	C6H10O5S	194.0248940000	C(C(C(CC)C)O[S](=O)(=O)O)(=O)O in CSID: 10477875
-methyloxazoline-isoleucine	MeOx-Ile	C11H18N2O	194.1419130000	C(N)(C(C)CC)C1=NC(C(C1)C)C(=O)O in CSID: 10477991
-11-methyl-3-dodecenoic acid/10-methyl-3-dodecenoic acid	iC13:1(3)/aC13:1(3)	C13H22O	194.1670650000	C(CC=CCCCCCCC(C)C)(O)=O in: NOR00296/C(CC=CCCCCCC(CC)C)(O)=O in: NOR00767
-di-chloro-N-methyl-Leucine	Cl2-NMe-Leu	C7H11Cl2NO	195.0217700000	C(C(O)=O)(NC)CC(C)C(Cl)Cl in CSID: 8773801
-3-hydroxy-5-dodecenoic acid/9-oxo-2.4-dimethyldecanoic acid/8-hydroxy-2.4.6-trimethyl-4-nonenoic acid	C12:1(5)-OH(3)/C10:0-Me(2.4)-oxo(9)/C9:1(4)-Me(2.4.6)-OH(8)	C12H20O2	196.1463300000	CSID: 10761118/C(C(CC(CCCCC(C)=O)C)C)(=O)O in CSID: 8946480/C(C(CC(=CC(CC(C)O)C)C)C)(O)=O in CSID: 8007368
-11-methyldodecanoic acid/10-methyldodecanoic acid	iC13:0/aC13:0	C13H24O	196.1827150000	CID: 33002/CSID: 2282934
-chloro-tyrosine	Cl-Tyr	C9H8ClNO2	197.0243570000	CSID: 106510
-2-amino-9.10-epoxi-8-oxodecanoic acid	C10:0-NH2(2)-Ep(9)-oxo(8)	C10H15NO3	197.1051930000	CSID: 11345228
-4-butenyl-4-methyl-N.4-methyl threonine	Me2-Bmt	C11H19NO2	197.1415790000	CSID: 4450325
-3-hydroxy-dodecanoic acid/3-hydroxy-isododecanoic acid/3-hydroxy-2-methyl-undecanoic acid	C12:0-OH(3)/iC12:0-OH(3)/C11:0-Me(2)-OH(3)	C12H22O2	198.1619800000	CSID: 85026/CID: 15089799/CSID: 13775586
-9-hydroxy-2-amino-8-oxo-decanoic acid	C10:0-OH(9)-NH2(2)-oxo(8)	C10H17NO3	199.1208430000	CSID: 25942012
-N-acetyl-N6-formyl-N6-hydroxyOrnithine	NAc-Fo-OH-Orn	C8H12N2O4	200.0797070000	C(C(=O)O)(NC(C)=O)CCCN(O)C=O in CSID: 3294
-N1-methyl-tryptophan	1Me-Trp	C12H12N2O	200.0949630000	CSID: 88584
-5-hydroxytryptophan/phototryptophan	OH-Trp/pTrp	C11H10N2O2	202.0742280000	CSID: 141/CID: 10331043
-N-methyl-4-dimethylamino-phenylalanine	NMe-Me2A-Phe	C12H16N2O	204.1262630000	CSID: 27594543
-vinylogous hydroxy tyrosine	v-OH-Tyr	C11H11NO3	205.0738930000	C(C(N)CC1=CC(=C(C=C1)O)O)=CC(=O)O in CSID: 9204437
-alpha-amino-methoxyphenyl-valeric acid	Amv	C12H15NO2	205.1102790000	CSID: 9681632
-N-Methyl-Lanthionine	NMe-Lan	C6H10N2O4S	206.0361280000	C(SCC(C(=O)O)N)C(C(O)=O)NO in: NOR00149
-3-nitrotyrosine	3NO2-Tyr	C9H8N2O4	208.0484070000	CSID: 205676
-7-tetradecenoic acid/12-methyl-3-tridecenoic acid	C14:1(7)/iC14:1(3)	C14H24O	208.1827150000	CSID: 10722652/PDB: LNG
-D-PhosphateAsparagine	D-PO-Asn	C4H7N2O6P	210.0041720000	C(C(C(C(O)=O)N)O[P](O)(=O)O)(=O)N in: NOR00025
-propenoyl-O-methylserinylthiazole acid	PMST	C9H10N2O2S	210.0462980000	C(C=CC1=CSC(=N1)C(N)COC)(=O)O in CSID: 8503913
-5-oxo-8-hydroxy-2.4.6-trimethyl-4-nonaneic acid	C9:1(Me4)-Me(2.4.6)-OH(8)-Oxo(5)	C12H18O3	210.1255940000	C(C(CC(C(C(CC(C)O)C)=O)=C)C)(O)=O in CSID: 8434247
-tetradecanoic acid/12-methyl-tridecanoic acid	C14:0/iC14:0	C14H26O	210.1983650000	PDB: MYR/CID: 520298
-Chloro-N-methyl-tyrosine/D-3-chloro-N-methyl-Tyrosine	Cl-NMe-Tyr/D-Cl-NMe-Tyr	C10H10ClNO2	211.0400070000	PDB: CNT/C(C(=O)O)(NC)CC1=CC(=C(C=C1)O)Cl in: NOR00614
-3-amino-tridecanoic acid	C13:0-NH2(3)	C13H25NO	211.1936140000	CSID: 26283438
-3-hydroxy-tridecanoic acid/3-hydroxy-isotridecanoic acid/3-hydroxy-10-methyl-dodecanoic acid	C13:0-OH(3)/iC13:0-OH(3)/aC13:0-OH(3)	C13H24O2	212.1776300000	CSID: 4472174/CID: 15089800/C(CC(CCCCCCC(CC)C)O)(O)=O in: NOR00857
-beta-hydroxy-chloro-tyrosine	bOH-Cl-Tyr	C9H8ClNO3	213.0192710000	CSID: 25938524
-3-amino-6-hydroxy-2-piperidone	Ahp	C9H14N2O4	214.0953570000	CSID: 25058696
-N-methyl-5-hydroxytryptophan/methoxytryptophan	NMe-OH-Trp/OMe-Trp	C12H12N2O2	216.0898780000	C(C(=O)O)(NC)CC1=C[N]C2=C1C=C(C=C2)O in CSID: 10476796/O(C(=O)[C@@H](N([H])[H])CC1=C[N](C2=CC=CC=C12)OC)[H] in CSID: 5293532
-2.6-diamino-7-hydroxyazelaic acid	Daz	C9H16N2O4	216.1110070000	CSID: 391749
-4-amino-7-guanidino-2.3-dihydroxyheptanoic acid	Agdha	C8H16N4O3	216.1222400000	CSID: 21377788
-3.5-dichloro-4-hydroxyphenylglycine	Cl2-Hpg	C8H5Cl2NO2	216.9697340000	CSID: 9804791
-DHP-methyloxazolinyl group	DMOG	C11H9NO4	219.0531580000	CSID: 12721
-N-methoxyacetyl-D-phenylalanine	NOMe-Ac-D-Phe	C12H13NO3	219.0895430000	CSID: 11859621
-D-6'-chloro-tryptophan	D-Cl-Trp	C11H9ClN2O	220.0403410000	C(C(=O)O)(N)CC1=NC2=C(C1)C=CC(=C2)Cl in CSID: 8094776
-dihydroxyphenylthiazol group	DHPT	C10H7NO3S	221.0146640000	CSID: 23110909
-12-methyl-3-tetradecenoic acid	aC15:1(3)	C15H26O	222.1983650000	C(CC=CCCCCCCCC(CC)C)(O)=O in: NOR00768
-2.3-dihydroxy-2.6.8-trimethyldeca-(4Z.6E)-dienoic acid/2.3-dihydroxy-trans4.trans6-tridecenoic acid	aC11:2(4.6)-Me(2.6)-OH(2.3)/C13:2(t4.t6)-OH(2.3)	C13H20O3	224.1412450000	C(C(C(C=CC(=CC(CC)C)C)O)(O)C)(O)=O in CSID: 4977118/C(C(C(C=CC=CCCCCCC)O)O)(O)=O in CSID: 4976886
-12-methyltetradecanoic acid	aC15:0	C15H28O	224.2140160000	CSID: 20368
-bromophenylalanine	Br-Phe	C9H8BrNO	224.9789160000	CSID: 77275
-3-amino-tetradecanoic acid/3-amino-isotetradecanoic acid	C14:0-NH2(3)/iC14:0-NH2(3)	C14H27NO	225.2092640000	CSID: 15571256/CID: 22471993
-3-hydroxy-tetradecanoic acid/3-hydroxy-12-methyl-tridecanoic acid	C14:0-OH(3)/iC14:0-OH(3)	C14H26O2	226.1932800000	CSID: 15252/CID: 22471995
-tri-chloro-N-methyl-dehydroLeucine	Cl3-NMe-dhLeu	C7H8Cl3NO	226.9671480000	C(C(O)=O)(NC)=CC(C)C(Cl)(Cl)Cl in CSID: 10477276
-N-acetyltryptophan	Ac-Trp	C13H12N2O2	228.0898780000	CSID: 1925
-beta.beta.N-trimethyltryptophan	bbMe-NMe-Trp	C14H16N2O	228.1262630000	C1=CC=CC2=C1C(=C[N]2)C(C(C(O)=O)NC)(C)C in CSID: 8158974
-3-hydroxy-2.2.4-trimethyl-7-hydroxydecanoic acid	C10:0-Me(2.2.4)-OH(3.7)	C13H24O3	228.1725450000	C(C(C(C(=O)O)(C)C)O)(CCC(CCC)O)C in CSID: 8184030
-tri-chloro-N-methyl-Leucine	Cl3-NMe-Leu	C7H10Cl3NO	228.9827980000	C(C(O)=O)(NC)CC(C)C(Cl)(Cl)Cl in CSID: 10477275
-thiazolylphenylalanine	Phe-Thz	C12H10N2OS	230.0513840000	C(N)(CC1=CC=CC=C1)C2=NC(=CS2)C(O)=O in CSID: 8593238
-D-2-carboxy-tryptophan	D-COOH-Trp	C12H10N2O3	230.0691420000	C(C(O)=O)(N)CC1=C([N]C2=C1C=CC=C2)C(=O)O in CSID: 7987591
-N-methyl-6-chloro-tryptophan	NMe-Cl-Trp	C12H11ClN2O	234.0559910000	C(C(=O)O)(NC)CC1=C[N]C2=C1C=CC(=C2)Cl in CSID: 8805002
-7-hexadecenoic acid/9-hexadecenoic acid	C16:1(7)/C16:1(9)	C16H28O	236.2140160000	CSID: 4895966/CSID: 4445872
-2.3-dihydroxy-trans4.trans6-tetradecenoic acid/2.6.8-trimethyl-5.7-dihydroxy-trans2.trans8-undecenoic acid	C14:2(t4.t6)-OH(2.3)/C11:2(t2.t8)-Me(2.6.8)-OH(5.7)	C14H22O3	238.1568950000	C(C(C(C=CC=CCCCCCCC)O)O)(O)=O in CSID: 8924310/C(C(=CCC(C(C(C(=CCC)C)O)C)O)C)(O)=O in CSID: 10481263
-hexadecanoic acid	C16:0	C16H30O	238.2296660000	CSID: 960
-beta-methyl-bromophenylalanine	bMe-Br-Phe	C10H10BrNO	238.9945660000	C(C(=O)O)(C(C1=CC=C(C=C1)Br)C)N in CSID: 10475327
-3-amino-pentadecanoic acid/3-amino-isopentadecanoic acid/3-amino-12-methyl-tetradecanoic acid	C15:0-NH2(3)/iC15:0-NH2(3)/aC15:0-NH2(3)	C15H29NO	239.2249150000	CSID: 26283439/C(CC(CCCCCCCCCC(C)C)N)(O)=O in: NOR00784/C(CC(CCCCCCCCC(CC)C)N)(O)=O in: NOR00785
-3-hydroxy-13-methyltetradecanoic acid/3-hydroxy-pentadecanoic acid/3-hydroxy-isopentadecanoic acid/3-hydroxy-12-methyl-tetradecanoic acid	C14:0-Me(13)-OH(3)/C15:0-OH(3)/iC15:0-OH(3)/aC15:0-OH(3)	C15H28O2	240.2089300000	CSID: 9218624/CSID: 158374/CSID: 9218624/C(CC(CCCCCCCCC(CC)C)O)(O)=O in: NOR00211
-bromotyrosine/beta-hydroxy-bromophenylalanine	Br-Tyr/bOH-Br-Phe	C9H8BrNO2	240.9738310000	CSID: 131083/CSID: 19757850
-beta.beta.N1.N-tetramethyltryptophan	bbNMe-NMe-Trp	C15H18N2O	242.1419130000	C1=CC=CC2=C1C(=C[N]2C)C(C(C(O)=O)NC)(C)C in CSID: 8570259
-3.4-dihydroxy-tetradecanoic acid/ 3-hydroxy-2.2.4-trimethyl-7-methoxydecanoic acid	C14:0-OH(3.4)/C10:0-Me(2.2.4)-OH(3)-OMe(7)	C14H26O3	242.1881950000	CID: 22667431/CSID: 28587148
-3-amino-4-hydroxy-6-methyl-8-phenyl-5.7-octadienoic acid	C8:2(5.7)-Me(6)-OH(4)-NH2(3)-Ph(8)	C15H17NO2	243.1259290000	C(CC(C(C=C(C=CC1=CC=CC=C1)C)O)N)(=O)O in CSID: 10475327
-tri-chloro-2-hydroxy-N-methyl-Leucine/tri-chloro-5-hydroxy-N-methyl-Leucine	Cl3-2OH-NMe-Leu/Cl3-5OH-NMe-Leu	C7H10Cl3NO2	244.9777130000	C(C(O)=O)(NC)(CC(C)C(Cl)(Cl)Cl)O in CSID: 10477276/C(C(O)=O)(NC)CC(CO)C(Cl)(Cl)Cl in: NOR00511
-N-methyl-6-chloro-5-hydroxytryptophan	NMe-Cl-OH-Trp	C12H11ClN2O2	250.0509060000	C(C(=O)O)(NC)CC1=C[N]C2=C1C=C(C(=C2)Cl)O in CSID: 10473575
-2.3-dihydroxy-trans4.trans6-pentadecenoic acid	C15:2(t4.t6)-OH(2.3)	C15H24O3	252.1725450000	C(C(C(C=CC=CCCCCCCCC)O)O)(O)=O in CSID: 4976888
-3-hydroxy-9-hexadecenoic acid	C16:1(9)-OH(3)	C16H28O2	252.2089300000	C(CC(CCCCCC=CCCCCCC)O)(O)=O in: NOR00720
-3-amino-hexadecanoic acid/3-amino-isohexadecanoic acid	C16:0-NH2(3)/iC16:0-NH2(3)	C16H31NO	253.2405650000	CSID: 24597602/C(CC(CCCCCCCCCCC(C)C)N)(O)=O in: NOR00793
-3-hydroxy-hexadecanoic acid/3-hydroxy-isohexadecanoic acid	C16:0-OH(3)/iC16:0-OH(3)	C16H30O2	254.2245800000	CSID: 266538/C(CC(CCCCCCCCCCC(C)C)O)(O)=O in: NOR00897
-D-3-bromo-N-methyl-Tyrosine	D-Br-NMe-Tyr	C10H10BrNO2	254.9894810000	CSID: 2128826
-pyoverdin Pa A chromophore	ChrPaA	C13H11N3O3	257.0800410000	C1=C(C(=CC2=C1N3C(C(=C2)N)=NC(CC3)C(O)=O)O)O in CSID: 0
-N1-carboxy-bichomotryptophan	N1-COOH-bhTrp	C14H14N2O3	258.1004420000	C(CC1=C[N](C2=C1C=CC=C2)C(=O)O)CC(C(=O)O)N in CSID: 9968260
-isopyoverdin chromophore/pyoverdin chromophore	ChrI/ChrP	C13H13N3O3	259.0956910000	C1=C(C(=CC2=C1N3C(C(=C2)N)NC(CC3)C(O)=O)O)O in: NOR00163/C1=C(C(=CC2=C1N3C(C(=C2)N)NC(CC3)C(O)=O)O)O in CID: 5289234
-5.6-dihydropyoverdin chromophore	ChrD	C13H15N3O3	261.1113410000	C1=C(C(=CC2=C1N3C(C(N)C2)NCCC3C(O)=O)O)O in: NOR00903
-D-6-chloro-N2-formamidotryptophan	D-Cl-CONH2-Trp	C12H10ClN3O2	263.0461550000	C(C(O)=O)(N)CC1=C[N](C2=C1C=CC(=C2)Cl)C(=O)N in CSID: 8138519
-3-amino-8-phenyl-2.4.5-trihydroxyoct-7-enoic acid	C8:1(7)-OH(2.4.5)-NH2(3)-Ph(8)	C14H17NO4	263.1157580000	CSID: 29330841
-5-bromo-tryptophan	Br-Trp	C11H9BrN2O	263.9898150000	CSID: 87339
-9-octadecenoic acid	C18:1(9)	C18H32O	264.2453160000	CSID: 553123
-8.10-Dimethyl-9-hydroxy-7-methoxytridecadienoic acid	DHMDA	C16H26O3	266.1881950000	C(C(C(CCC)C)O)(C(C=CC=CCC(=O)O)OC)C in CSID: 10479168
-3-amino-14-methyl-hexadecanoic acid/3-amino-15-methyl-hexadecanoic acid	aC17:0-NH2(3)/iC17:0-NH2(3)	C17H33NO	267.2562150000	C(CC(CCCCCCCCCCC(CC)C)N)(O)=O in CSID: 2340866/C(CC(CCCCCCCCCCCC(C)C)N)(O)=O in: NOR00801
-3-hydroxy-14-methyl-hexadecanoic acid/3-hydroxy-15-methyl-hexadecanoic acid	aC17:0-OH(3)/iC17:0-OH(3)	C17H32O2	268.2402300000	C(CC(CCCCCCCCCCC(CC)C)O)(O)=O in: NOR00900/CSID: 141849
-3.4-dihydroxy-hexadecanoic acid	C16:0-OH(3.4)	C16H30O3	270.2194950000	CID: 22348653
-4-propenoyl-2-tyrosylthiazole acid	PTTA	C14H12N2O2S	272.0619480000	C(O)(=O)C=CC1=CSC(=N1)C(N)CC2=CC=C(C=C2)O in CSID: 16738243
-N-methyl-2-Bromo-tryptophan	NMe-Br-Trp	C12H11BrN2O	278.0054650000	C(C(=O)O)(NC)CC1=C([N]C2=C1C=CC=C2)Br in CSID: 8007368
-2-bromo-5-hydroxytryptophan	Br-OH-Trp	C11H9BrN2O2	279.9847300000	CSID: 643874
-3-hydroxy-9-octadecenoic acid	C18:1(9)-OH(3)	C18H32O2	280.2402300000	C(CC(CCCCCC=CCCCCCCCC)O)(O)=O in: NOR00724
-azotobactins chromophore	ChrA	C14H11N3O4	285.0749560000	C1=C(C(=CC2=C1N4C3C(=C2)NC(N3CCC4C(O)=O)=O)O)O in: NOR00208
-O-demethyl-Adda	DMAdda	C19H25NO2	299.1885290000	C(C(C(C=CC(=CC(C(CC1=CC=CC=C1)O)C)C)N)C)(O)=O in: NOR00129
-D-3-iodo-N-methyl-Tyrosine	D-I-NMe-Tyr	C10H10INO2	302.9756110000	C(C(=O)O)(NC)CC1=CC(=C(C=C1)O)I in CSID: 9017332
-actinomycin chromophore	ChrAct	C16H10N2O5	310.0589710000	CSID: 86817
-3-amino-9-methoxy-2.6.8-trimethyl-10-phenyldeca-4.6-dienoic acid	Adda	C20H27NO2	313.2041790000	CSID: 10471100
-3-amino-4-hydroxy-6-methyl-8-(p-bromophenyl)-5.7-octadienoic acid	C8:2(5.7)-Me(6)-OH(4)-NH2(3)-brPh(8)	C15H16BrNO2	321.0364310000	C(CC(C(C=C(C=CC1=CC=C(C=C1)Br)C)O)N)(=O)O in CSID: 10476834
-3-amino-6-methyl-12-phenyl-2.4.5-trihydroxydodeca-7.9.11-trienoic acid	C12:3(7.9.11)-Me(6)-OH(2.4.5)-NH2(3)-Ph(12)	C19H23NO4	329.1627080000	C(C(C(C(C(C(C=CC=CC=CC1=CC=CC=C1)C)O)O)N)O)(O)=O in CSID: 8923613
-3-amino-10-(p-ethoxyphenyl)-2.4.5-trihydroxydeca-7.9-dienoic acid	C10:2(7.9)-OH(2.4.5)-NH2(3)-ePh(10)	C18H23NO5	333.1576230000	CSID: 29330839
-O-Acetyl-O-demethylAdda	ADMAdda	C21H27NO3	341.1990940000	C(C(C(C=CC(=CC(C(CC1=CC=CC=C1)OC(C)=O)C)C)N)C)(O)=O in: NOR00144
-3-amino-6.10-dimethyl-12-phenyl-2.4.5-trihydroxydodeca-7.9.11-trienoic acid	C12:3(7.9.11)-Me(6.10)-OH(2.4.5)-NH2(3)-Ph(12)	C20H25NO4	343.1783580000	C(C(C(C(C(C(C=CC=C(C=CC1=CC=CC=C1)C)C)O)O)N)O)(O)=O in CSID: 10187168
-3-amino-6-methyl-12-(p-methoxyphenyl)-2.4.5-trihydroxydodec-11-enoic acid	C12:1(11)-Me(6)-OH(2.4.5)-NH2(3)-mPhe(11)	C20H29NO5	363.2045730000	CSID: 29330842
+Ethanolamine	Eta	C2H5N	43.0421990000		CSID: 13835336
+Glycine	Gly	C2H3NO	57.0214640000		CSID: 730
+pyrrolidone	Pyr	C4H5N	67.0421990000		CSID: 11530
+dehydroalanine	dh-Ala	C3H3NO	69.0214640000		CSID: 110510
+pyruvic acid	Pya	C3H2O2	70.0054790000		CSID: 1031
+butanoic acid	C4:0	C4H6O	70.0418650000		CSID: 259
+DL-Alanine/D-Alanine/beta-Alanine/N-Methyl-Glycine	Ala/D-Ala/bAla/NMe-Gly	C3H5NO	71.0371140000		CSID: 582/CSID: 64234/CSID: 234/CSID: 1057
+Lactic acid/D-lactic acid	Lac/D-Lac	C3H4O2	72.0211290000		CSID: 592/CSID: 55423
+Serinol	Serol	C3H7NO	73.0527640000		CSID: 61591
+2.3-dehydro-2-aminobutyric acid/homoserine lactone/N-Methyl-dehydroalanine/hydroxy pyrrolidone	dhAbu/HseL/NMe-Dha/OH-Pyr	C4H5NO	83.0371140000		CSID: 4952645/CSID: 66194/CSID: 118845/CSID: 134682
+2-hydroxy-3-butenoic acid	C4:1(3)-OH(2)	C4H4O2	84.0211290000		CSID: 141066
+2-methyl-butanoic acid	C4:0-Me(2)	C5H8O	84.0575150000		CSID: 8012
+alpha-formylGlycine	aFo-Gly	C3H3NO2	85.0163780000		CSID: 28
+N-Methyl-L-alanine/N-methyl-beta-alanine/alpha-aminobutyric acid/D-alpha-aminobutyric acid/2-Methylalanine/methyl alaninate	NMe-Ala/NMe-bAla/Abu/D-Abu/Aib/D-3OMe-Ala	C4H7NO	85.0527640000		CSID: 4450824/CSID: 68396/PDB: ABA/PDB: DBB/CSID: 5891/CSID: 99878
+isovalinol/valinol	Ivalol/Valol	C5H11N	85.0891490000		CSID: 8329525/CSID: 71352
+3-hydroxybutanoic acid	C4:0-OH(3)	C4H6O2	86.0367790000		CSID: 428
+2.3-Diaminopropionic acid	Dpr	C3H6N2O	86.0480130000		CSID: 357
+DL-Serine/D-Serine/isoserine	Ser/D-Ser/Iser	C3H5NO2	87.0320280000		CSID: 597/CSID: 64231/CSID: 10793
+Sorbic acid	C6:2(t2.t4)	C6H6O	94.0418650000		CSID: 558605
+methyl-succinimide	Me-Suc	C5H5NO	95.0371140000		CSID: 122158
+proline carboxamid	ProC	C5H8N2	96.0687480000		CSID: 479142
+DL-Proline/D-Proline/2-methylamino-2-dehydrobutyric acid/norcoronamic acid	Pro/D-Pro/2Dh-Mabu/norCMA	C5H7NO	97.0527640000		CSID: 594/CSID: 8640/CSID: 16743754/CSID: 28708240
+3-methylvaleric acid/hexanoic acid	Me-Vaa/C6:0	C6H10O	98.0731650000		CSID: 7469/CSID: 8552
+N-formyl-Alanine/D-N-formyl-Alanine	NFo-Ala/D-NFo-Ala	C4H5NO2	99.0320280000		CSID: 72251/CSID: 72251
+DL-Valine/D-Valine/Isovaline/D-Isovaline/Norvaline/D-Norvaline/2-methyl-3-aminobutanoic acid/N-dimethyl-Alanine/3-amino-pentanoic acid	Val/D-Val/Ival/D-Ival/Nva/D-Nva/Mab/NdMe-Ala/C5:0-NH2(3)	C5H9NO	99.0684140000		CSID: 1148/CSID: 64635/CSID: 85483/PDB: DIV/CSID: 801/CSID: 388660/CSID: 471786/CSID: 9962964/CSID: 11271826
+Leucinol/Isoleucinol	Leuol/Ileol	C6H13N	99.1047990000		CSID: 71362/CSID: 82355
+2-hydroxy-3-epoxy-butanoic acid	C4:0-OH(2)-Ep(3)	C4H4O3	100.0160440000		CSID: 15475591
+Succinic acid	Suc	C4H4O3	100.0160440000		CSID: 7634
+2-hydroxyisovaleric acid/D-2-hydroxyisovalerate	Hiv/D-Hiv	C5H8O2	100.0524300000		CSID: 90190/CID: 5289545
+2.4-diaminobutyric acid/D-2.4-diaminobutyric acid/2.3-diaminobutyric acid/(2S.3S)-2.3-diaminobutyric acid/(2R.3R)-2.3-diaminobutyric acid	Dab/D-Dab/Dbu/L-Dbu/D-Dbu	C4H8N2O	100.0636630000		CSID: 457/CID: 638153/CSID: 4475641/CID: 11768553/PDB: VDL
+dehydro-cysteine	dhCys	C3H3NOS	100.9935340000		CSID: 24784832
+Threonine/D-Threonine/allo-Threonine/D-allo-Threonine/Homoserine/D-Homoserine/N-Methyl-Serine/N-Methyl-D-Serine/4-amino-3-hydroxybutyric acid	Thr/D-Thr/aThr/D-aThr/Hse/D-Hse/NMe-Ser/D-NMe-Ser/OH-4Abu	C4H7NO2	101.0476780000		PDB: THR/PDB: DTH/PDB: ALO/CSID: 81824/CSID: 758/CSID: 2006329/CSID: 481791/PDB: DSE/CSID: 2064
+2.3-dihydroxy-butanoic acid	C4:0-OH(2.3)	C4H6O3	102.0316940000		CSID: 219301
+DL-Cysteine	Cys	C3H5NOS	103.0091840000		CSID: 574
+benzoic acid	Bz	C7H4O	104.0262150000		CSID: 238
+N-methylglutamine	NMe-Gln	C6H10N2	110.0843980000		CSID: 10652941
+4-oxo-proline/pyroglutamic acid	4oxo-Pro/pGlu	C5H5NO2	111.0320280000		CSID: 366185/CSID: 485
+3-Methylproline/4-Methylproline/homoproline/D-homoproline/coronamic acid	3Me-Pro/4Me-Pro/Hpr/D-Hpr/CMA	C6H9NO	111.0684140000		CSID: 10610754/CSID: 312597/CSID: 826/CSID: 643442/CSID: 117751
+keto-Leucine/2-epoxy-hexanoic acid/(2E)-5-Hydroxy-3-methyl-2-pentenoic acid	k-Leu/C6:0-Ep(2)/OH-MP	C6H8O2	112.0524300000		CSID: 69/CSID: 14066572/CSID: 32988805
+Hydroxy-cycloOrnithine/D-Hydroxy-cycloOrnithine	OH-cOrn/D-OH-cOrn	C5H8N2O	112.0636630000		CSID: 13539649/CSID: 13539649
+heptanoic acid/5-methyl-hexanoic acid	C7:0/iC7:0	C7H12O	112.0888150000		CSID: 7803/CID: 12344
+aziridine dicarboxylic acid	Azd	C4H3NO3	113.0112930000		CSID: 11582505
+3-Hydroxyproline/4-Hydroxyproline/D-Hydroxyproline/2-formamidobutanoic acid	3OH-Pro/4OH-Pro/D-4OH-Pro/NFo-D-Abu	C5H7NO2	113.0476780000		CSID: 486216/PDB: HYP/CID: 440014/CSID: 486348
+Leucine/D-Leucine/Isoleucine/D-Isoleucine/allo-Isoleucine/D-allo-Isoleucine/N-Methyl-L-valine/D-N-Methylvaline/3-Methylvaline/D-tert-Leu/2-methyl-3-aminopentanoic acid/D-N-methyl-norvaline	Leu/D-Leu/Ile/D-Ile/aIle/D-aIle/NMe-Val/D-NMe-Val/t-Leu/D-t-Leu/Map/D-NMe-Nva	C6H11NO	113.0840640000		CSID: 834/CSID: 388617/CSID: 769/CSID: 69017/CSID: 89698/CSID: 85019/CSID: 4225/CSID: 4225/CSID: 270637/CID: 6950340/CSID: 11643060/CSID: 10652938
+hydroxyacetyl propionyl/pentanedioic acid	Hap/Pda	C5H6O3	114.0316940000		C(C(C(CO)=O)C)(=O)O in CSID: 10477731/CSID: 723
+DL-Asparagine/D-Asparagine/N1-formyl-2.3-Diaminopropionic acid	Asn/D-Asn/NFo-Dpr	C4H6N2O2	114.0429270000		PDB: ASN/PDB: DSG/C(C(CN)NC=O)(=O)O in CSID: 8873525
+D-Leucic acid (2-hydroxy-4-methylpentanoic acid)/(R)-Leucic acid/3-hydroxyhexanoic acid/2-hydroxy-3-methyl-pentanoic acid/D-2-hydroxy-3-methyl-pentanoic acid	C5:0-Me(4)-OH(2)/4Me-D-Hva/C6:0-OH(3)/Hmp/D-Hmp	C6H10O2	114.0680800000		CSID: 83753/CSID: 388986/CSID: 133518/CSID: 144317/CSID: 144317
+DL-Ornithine/D-Ornithine	Orn/D-Orn	C5H10N2O	114.0793130000		CSID: 380/CSID: 64236
+DL-Aspartic acid/D-Aspartic acid/N-formyl-isoserine	Asp/D-Asp/NFo-Iser	C4H5NO3	115.0269430000		CSID: 411/CSID: 75697/C(C(C(=O)O)O)NC=O in CSID: 8503913
+beta-hydroxyvaline/D-beta-hydroxyvaline/N-Methylthreonine/O-Methylthreonine	bOH-Val/D-bOH-Val/NMe-Thr/OMe-Thr	C5H9NO2	115.0633290000		CSID: 244525/CID: 192763/CSID: 5373925/CSID: 193545
+2.3-dihydroxy-3-methylbutanoic acid/2.4-dihydroxy-3-methylbutanoic acid	iC5:0-OH(2.3)/iC5:0-OH(2.4)	C5H8O3	116.0473440000		CSID: 657/C(C(C(CO)C)O)(=O)O in: NOR00082
+2-Methylcysteine/Methylcysteine	aMe-Cys/NMe-Cys	C4H7NOS	117.0248350000		CSID: 8233116/CSID: 2074082
+4-Hydroxythreonine	4OH-Thr	C4H7NO3	117.0425930000		CSID: 3137512
+2.3.4-trihydroxy-butanoic acid	C4:0-OH(2.3.4)	C4H6O4	118.0266090000		CSID: 388628
+phenylacetic acid	Pha	C8H6O	118.0418650000		CSID: 10181341
+4-Hydroxybenzoic acid	pOH-Bz	C7H4O2	120.0211290000		CSID: 132
+trans2.trans4.trans6-trioctaneic acid	C8:3(t2.t4.t6)	C8H8O	120.0575150000		CSID: 4520024
+hydroxypicolinic acid	Hpa	C6H3NO2	121.0163780000		CSID: 12827
+oct-7-ynoic acid/2.trans4-octenoic acid	C8:0:1(7)/C8:2(2.t4)	C8H10O	122.0731650000		CSID: 4472125/CSID: 4944992
+4-oxo-5-methylproline/4-oxo-homoproline/N-Formyl-Proline	4oxo-5Me-Pro/4oxo-Hpr/NFo-Pro	C6H7NO2	125.0476780000		CSID: 2564339/CSID: 10739339/CSID: 87055
+octanoic acid/6-methylheptanoic acid	C8:0/iC8:0	C8H14O	126.1044650000		CSID: 370/CSID: 81904
+beta-ureido-dehydroAlanine	bU-dAla	C4H5N3O2	127.0381760000		PDB: UAL
+N-formyl-Valine/N-Acetyl-2-aminoisobutyric acid/3-Hydroxy-5-methylproline	NFo-Val/Ac-Aib/3OH-5Me-Pro	C6H9NO2	127.0633290000		CSID: 90479/CSID: 203779/CSID: 3823469
+N-Methyl-Leucine/D-N-methyl-Leucine/N-Methyl-Isoleucine/N-methyl-alloIsoleucine/D-N-methyl-alloIsoleucine/beta-methylisoleucine/homoisoleucine/alpha-ethylnorvaline/Dolavaline/2-methyl-3-aminohexadecanoic acid	NMe-Leu/D-NMe-Leu/NMe-Ile/NMe-aIle/D-NMe-aIle/bMe-Ile/Hil/Et-Nva/Dov/C6:0-Me(2)-NH2(3)	C7H13NO	127.0997140000		CSID: 493595/CSID: 493595/CSID: 487199/CCC(C)C(C(=O)O)NC in: NOR00428/CCC(C)C(C(=O)O)NC in: NOR00428/CSID: 19951406/CSID: 454232/CSID: 452678/CSID: 10731564/CSID: 21378848
+DL-Glutamine/D-Glutamine/N-methylasparagine/beta-methyl-asparagine/D-N2-methyl-asparagine/N1-acetyl-2.3-Diaminopropionic acid	Gln/D-Gln/NMe-Asn/bMe-Asn/D-N2Me-Asn/NAc-Dpr	C5H8N2O2	128.0585780000		PDB: GLN/PDB: DGN/CSID: 311563/CSID: 2284493/CSID: 288387/C(C(CN)NC(C)=O)(=O)O in CSID: 8570696
+3-methoxy-hexanoic acid/3-hydroxy-heptanoic acid	C6:0-OMe(3)/C7:0-OH(3)	C7H12O2	128.0837300000		CSID: 277923/CSID: 2340494
+DL-Lysine/D-Lysine/beta lysine/N-Hydroxy-histamine	Lys/D-Lys/bLys/N-OH-Hta	C6H12N2O	128.0949630000		CSID: 843/CSID: 51793/PDB: KBE/C1(CCCN1)CCNO in CSID: 4589228
+DL-Glutamic acid/D-Glutamic Acid/beta-methyl-aspartic acid/D-beta-methyl-aspartic acid/beta-methoxy-aspartic acid/O-acetyl-Serine	Glu/D-Glu/bMe-Asp/D-bMe-Asp/bOMe-Asp/Ac-Ser	C5H7NO3	129.0425930000		CSID: 591/PDB: DGL/PDB: 2AS/PDB: ACB/CSID: 92764/CSID: 184
+L-acosamine/3-hydroxyleucine/beta-hydroxy-N-Methyl-Valine/gamma-hydroxy-N-Methyl-Valine/L-ristosamine	Aco/3OH-Leu/bOH-NMe-Val/gOH-NMe-Val/Ria	C6H11NO2	129.0789790000		CSID: 370989/CSID: 244507/CSID: 9205156/CID: 12439044/CSID: 370989
+2-hydroxy-3-methyl-butanedioic acid	iC5:0-OH(2)-CA(4)	C5H6O4	130.0266090000		CSID: 485839
+Hydroxyasparagine/D-HydroxyAsparagine	OH-Asn/D-OH-Asn	C4H6N2O3	130.0378420000		CSID: 3670287/CSID: 3670287
+alpha-guanidino Serine	gSer	C3H6N4O2	130.0490750000		C(C(=O)O)(N)(O)NC(=N)N in: NOR00426
+2.3-dihydroxy-3-methylpentanoic acid	aC6:0-OH(2.3)	C6H10O3	130.0629940000		CSID: 7
+N5-hydroxy ornithine/D-N5-HydroxyOrnithine/hydroxy-beta lysine	OH-Orn/D-OH-Orn/OH-bLys	C5H10N2O2	130.0742280000		CSID: 148381/C(CC(C(=O)O)N)CNO in: NOR00205/C(NCC(=O)O)(CCN)O in: NOR00634
+Hydroxyaspartic acid/D-Hydroxyaspartic acid	OH-Asp/D-OH-Asp	C4H5NO4	131.0218580000		CSID: 5232/CSID: 5232
+Methionine/N.S-dimethylcysteine	Met/diMe-Cys	C5H9NOS	131.0404850000		CSID: 853/CSID: 4450935
+arabinose/lyxose	Ara/Lyx	C5H8O4	132.0422590000		CSID: 224/CSID: 831
+L-Olivose	Oli	C6H12O3	132.0786440000		CSID: 164228
+PhenylGlycine/D-PhenylGlycine	Ph-Gly/D-ph-Gly	C8H7NO	133.0527640000		CSID: 3732/PDB: PG9
+phenylalaninol	Pheol	C9H11N	133.0891490000		CSID: 69116
+4-Chloro-Threonine	4Cl-Thr	C4H6ClNO2	135.0087060000		CSID: 111708
+2.3-dihydroxy-4-chloro-butanoic acid	C4:0-OH(2.3)-Cl(4)	C4H5ClO3	135.9927220000		CSID: 25900403
+2.3-dihydroxybenzoic acid	diOH-Bz	C7H4O3	136.0160440000		CSID: 18
+2-methyl-7-octynoic acid/2.trans4-7-methyl-octenoic acid	C8:0:1(7)-Me(2)/iC9:2(2.t4)	C9H12O	136.0888150000		CSID: 24770189/CSID: 10761068
+DL-Histidine	His	C6H7N3O	137.0589120000		CSID: 752
+dehydropyrrolidone	dPyr	C6H6N2O2	138.0429270000		C1(CC(C(=CC(=O)O)N1)N)=O in CSID: 10199318
+acetylproline/2.3-dimethylpyroglutamic acid	Ac-Pro/2Me-3Me-pGlu	C7H9NO2	139.0633290000		CSID: 285677/CSID: 13080150
+5.5-dimethyl-2-oxo-hexanoic acid	C6:0-Me(5.5)-oxo(2)	C8H12O2	140.0837300000		CID: 21197379
+argininal	Argal	C6H12N4	140.1061960000		CSID: 10655329
+Nonanoic acid/d-6-Methyloctanoic acid/7-Methyloctanoic acid	C9:0/aC9:0/iC9:0	C9H16O	140.1201150000		CSID: 7866/CSID: 10015/CSID: 31022
+N-methylchloropyrrole	MCP	C6H4ClNO	140.9981420000		CSID: 7404981
+N-Acetylisovaline/N-Acetylvaline/N-Formylisoleucine/N-Formylleucin/4-Amino-2.2-dimethyl-3-oxopentanoic acid/4-oxovancosamine	Ac-Ival/Ac-Val/NFo-Ile/NFo-Leu/Ibu/4oxo-Van	C7H11NO2	141.0789790000		CSID: 272193/CSID: 198159/CSID: 383482/CSID: 90475/CSID: 29322188/C1(C(C(CC(O1)O)(C)N)=O)C in CSID: 10249894
+N-dimethyl-leucine/N.beta-dimethyl-leucine/O-acetyl-leucinol/N.O-dimethyl-isoleucine	NdMe-Leu/NMe-bMe-Leu/OAc-Leuol/NMe-OMe-Ile	C8H15NO	141.1153640000		CSID: 500040/CID: 15385160/CID: 23037829/CSID: 27194495
+beta-methylglutamine/D-beta-methylglutamine	bMe-Gln/D-bMe-Gln	C6H10N2O2	142.0742280000		CID: 44602399/CSID: 24604116
+3-hydroxy-octanoic acid/2.2-dimethyl-3-hydroxyhexanoic acid/3-hydroxy-2-methyl-heptanoic acid	C8:0-OH(3)/C6:0-Me(2.2)-OH(3)/C7:0-Me(2)-OH(3)	C8H14O2	142.0993800000		CSID: 24791/CSID: 21418738/CSID: 27143447
+3-Methyl-Glutamic acid/Glutamic Acid methyl ester/D-Glutamic Acid methyl ester/D-Glutamic Acid methyl ester/2-Aminoadipic acid	3Me-Glu/MeO-Glu/D-MeO-Glu/MeO-D-Glu/Aad	C6H9NO3	143.0582430000		CSID: 207514/CSID: 66546/CSID: 66546/CSID: 66546/CSID: 456
+L-actinosamine/L-eremosamine/norstatine/Vancosamine/N-methyl-hydroxyisoleucine	Act/Ere/Nst/Van/NMe-OH-Ile	C7H13NO2	143.0946290000		CID: 20377364/CSID: 9542085/CSID: 151726/CSID: 164304/CSID: 24770217
+beta-hydroxyglutamine/D-beta-hydroxy-N2-methyl-asparagine/D-beta-hydroxy-N2-methyl-asparagine	OH-Gln/Me-OH-Asn/D-N2Me-bOH-Asn	C5H8N2O3	144.0534920000		CID: 22592766/CSID: 24604117/C(C(=O)O)(N)C(C(=O)NC)O in: NOR00669
+methoxyaspartic acid	OMe-Asp	C5H7NO4	145.0375080000		C(C(C(C(=O)O)N)=[O]C)(=O)O in: NOR00717
+3.5-hydroxy-4-amino-hexadecanoic acid	C6:0-OH(3.5)-NH2(4)	C6H11NO3	145.0738930000		C(CC(C(C(C)O)N)O)(O)=O in: NOR00444
+L-rhamnose	Rha	C6H10O4	146.0579090000		CSID: 190747
+Methionine-S-oxide	O-Met	C5H9NO2S	147.0353990000		CSID: 824
+Chloro-Isoleucine	Cl-Ile	C6H10ClNO	147.0450920000		C(C(O)=O)(N)C(C(C)Cl)C in CSID: 10269389
+DL-Phenylalanine/D-Phenylalanine/beta-phenylalanine/D-beta-phenylalanine/N-methyl-phenylglycine	Phe/D-Phe/bPhe/D-bPhe/NMe-Ph-Gly	C9H9NO	147.0684140000		CSID: 969/CSID: 64639/CSID: 62403/CSID: 598357/CSID: 198596
+2-hydroxyphenyl-2-oxo-ethanoic acid	Hpoe	C8H4O3	148.0160440000		CSID: 348
+Phenyl-lactate/D-Phenyl-lactate	Ph-Lac/D-Ph-Lac	C9H8O2	148.0524300000		CSID: 3715/CID: 643327
+HydroxyPhenylGlycine/D-HydroxyPhenylGlycine	Hpg/D-Hpg	C8H7NO2	149.0476780000		CSID: 83189/CID: 89853
+2.trans4-8-methyl-noneoic acid	iC10:2(2.t4)	C10H14O	150.1044650000		C(C=CC=CCCC(C)C)(O)=O in CSID: 16736750
+cysteic acid/D-cysteic acid	CysA/D-CysA	C3H5NO4S	150.9939280000		PDB: OCS/PDB: 00C
+D-4-fluoroPhenylGlycin	D-F-ph-Gly	C8H6FNO	151.0433430000		CSID: 88776
+3-amino-2-methyloct-7-ynoic acid	C8:0:1(7)-Me(2)-NH2(3)	C9H13NO	151.0997140000		C(CCCC#C)(C(C(=O)O)C)N in CSID: 8230475
+2-methyl-3-hydroxy-7-octynoic acid	C8:0:1(7)-Me(2)-OH(3)	C9H12O2	152.0837300000		CSID: 9964309
+2-methyl-8-noneic acid	C9:1(8)-Me(2)	C10H16O	152.1201150000		CID: 17824924
+Hydroxyhistidine	OH-His	C6H7N3O2	153.0538260000		CSID: 379547
+N-methyl homo vinylogous Valine	NMe-hv-Val	C9H15NO	153.1153640000		C(C(NC)C(C)C)=C(C(O)=O)C in CSID: 10213622
+capreomycidine/enduracididine/D-enduracididine	Cap/End/D-End	C6H10N4O	154.0854610000		CSID: 3818574/CSID: 24775830/CSID: 24775830
+decanoic acid/isodecanoic acid/7-methylnonanoic acid	C10:0/iC10:0/aC10:0	C10H18O	154.1357650000		CSID: 2863/CID: 111470/CSID: 4471754
+Alanine-thiazole	Ala-Thz	C6H7N2OS	155.0279090000		CSID: 23916434
+N-Acetylisoleucine/N-acetyl-Leucine/O-desmethyldolaproine	NAc-Ile/NAc-Leu/dDap	C8H13NO2	155.0946290000		CSID: 270615/CSID: 1918/C(C1CCCN1)(C(C(=O)O)C)O in CSID: 9938808
+2-Aminononanoic acid	Me-AOA	C9H17NO	155.1310140000		CSID: 198341
+2-carboxyquinoxaline	COOH-Qui	C9H4N2O	156.0323630000		CSID: 87301
+N-formyl-Glutamine	NFo-Gln	C6H8N2O3	156.0534920000		CSID: 2106926
+hydroxyisovalerylpropionyl	Hip	C8H12O3	156.0786440000		CID: 18942657
+3.4-dimethylglutamine	3Me-4Me-Gln	C7H12N2O2	156.0898780000		CSID: 21376706
+DL-Arginine/D-Arginine/L-(+)-Arginine	Arg/D-Arg/L-Arg	C6H12N4O	156.1011110000		PDB: ARG/PDB: DAR/CSID: 6082
+3-hydroxy-4-methyloctanoic acid/3-hydroxy-nonanoic acid/3-hydroxy-isononanoic acid/3-hydroxy-6-methyloctanoic acid	C8:0-Me(4)-OH(3)/C9:0-OH(3)/iC9:0-OH(3)/aC9:0-OH(3)	C9H16O2	156.1150300000		CSID: 17247549/CSID: 33630/CID: 22472006/CSID: 10361823
+N-trimethyl-leucine	NtMe-Leu	C9H18NO	156.1388390000		C(C(=O)O)(CC(C)C)[N](C)(C)C in: NOR00695
+Citrulline/D-Citrulline	Cit/D-Cit	C6H11N3O2	157.0851270000		CSID: 810/CID: 637599
+isostatine/statine	Ist/Sta	C8H15NO2	157.1102790000		CSID: 19578058/CSID: 2632509
+N6-formyl-HydroxyOrnithine/D-formyl-hydroxyOrnithine	Fo-OH-Orn/D-Fo-OH-Orn	C6H10N2O3	158.0691420000		PDB: FHO/PDB: FH7
+alpha-amino-hydroxyadipic acid	Ahad	C6H9NO4	159.0531580000		CID: 22326384
+N-methyl-2.3-dehydrophenylalanine	NMe-dPhe	C10H9NO	159.0684140000		C(C(O)=O)(=CC1=CC=CC=C1)NC in CSID: 4444584
+O-methyl-L-rhamnose	2OMe-Rha	C7H12O4	160.0735590000		CSID: 4352115
+N-Methyl-Phenylalanine/D-N-Methyl-Phenylalanine/3-methylphenylalanine/Homophenylalanine	NMe-Phe/D-NMe-Phe/3Me-Phe/Hph	C10H11NO	161.0840640000		PDB: MEA/PDB: ZAE/PDB: APD/CSID: 92605
+Hexose/L-glucose/D-Glucose	Hexose/Glc/D-Glc	C6H10O5	162.0528230000		CSID: 23139/CSID: 201/PDB: GLC
+N-hydroxy-dehydro-HydroxyPhenylGlycine/D-N-hydroxy-dehydro-HydroxyPhenylGlycine	OH-dHpg/D-OH-dHpg	C8H5NO3	163.0269430000		CID: 20339127/C(C(=O)O)(C1=CC=C(C=C1)O)=NO in: NOR00822
+Methionine sulfone	O2-Met	C5H9NO3S	163.0303140000		CSID: 63154
+phosphinothricin	PT	C5H10NO3P	163.0398300000		CSID: 4630
+Tyrosine/D-Tyrosine/beta-tyrosine/Phenylserine/N-methyl-HydroxyPhenylGlycine	Tyr/D-Tyr/bTyr/Ph-Ser/NMe-Hpg	C9H9NO2	163.0633290000		CSID: 1121/CSID: 64252/CSID: 389285/CSID: 84951/CID: 15118056
+4-hydroxy-D-phenyl-lactate	4OH-D-Ph-Lac	C9H8O3	164.0473440000		CID: 9378
+propenoyl-alanyloxazole acid	PALOA	C8H8N2O2	164.0585780000		C(C=CC1=COC(=N1)C(N)C)(=O)O in CSID: 10477875
+3.4-dichloro-proline	Cl2-Pro	C5H5Cl2NO	164.9748200000		CID: 21295133
+3.5-dihydroxyphenylglycine/D-3.5-dihydroxyphenylglycine	Dhpg/D-Dhpg	C8H7NO3	165.0425930000		PDB: D3P/PDB: D3P
+cyclo alpha-ketoarginine	ck-Arg	C7H10N4O	166.0854610000		C12(C(CCCN1C(=NC2=O)-N)N)O in CSID: 9977717
+2.2-dimethyl-3-hydroxy-7-octynoic acid	C8:0:1(7)-Me(2.2)-OH(3)	C10H14O2	166.0993800000		CSID: 29330001
+2-carboxy-6-hydroxyoctahydroindole	Choi	C9H13NO2	167.0946290000		C1C(NC2C1CCC(C2)O)C(=O)O in CSID: 10480056
+3-Desoxy-Methyl-4-butenyl-4-methyl threonine	3d-NMe-Bmt	C10H17NO	167.1310140000		CC=CCC(C)CC(NC)C(=O)O in CSID: 4953086
+1-methoxy-beta-alanine-thiazole	OMe-bAla-Thz	C7H8N2OS	168.0357340000		C(N)(CC(=O)OC)C1=NC=CS1 in CSID: 26365309
+2.2-dimethyl-3-hydroxy-7-octenoic acid	C8:1(7)-Me(2.2)-OH(3)	C10H16O2	168.1150300000		C(C(C(CCCC=C)O)(C)C)(O)=O in CSID: 8732670
+9-methyldecanoic acid/8-methyldecanoic acid	iC11:0/aC11:0	C11H20O	168.1514150000		CSID: 4471714/CID: 21813
+4-butenyl-4-methyl threonine/Dolaproine	Bmt/Dap	C9H15NO2	169.1102790000		CC=CCC(C)C(C(C(=O)O)N)O in CSID: 4444325/C1C(CCN1)C(C(C(O)=O)C)OC in CSID: 7986684
+5-hydroxy-capreomycidine	5OH-Cap	C6H10N4O2	170.0803760000		C1C(NC(NC1C(C(=O)O)N)=N)O in CSID: 2301596
+hydroxysecbutyl acetyl propionyl	Hysp	C9H14O3	170.0942940000		C(C(C(C(O)C(CC)C)=O)C)(=O)O in CSID: 10477730
+homoarginine	Har	C7H14N4O	170.1167610000		CSID: 8732
+3-hydroxy-decanoic acid/3-hydroxy-2-methyl-nonanoic acid/2.2-dimethyl-3-hydroxy-octanoic acid/2.4-dimethyl-3-hydroxyisooctanoic acid	C10:0-OH(3)/C9:0-Me(2)-OH(3)/C8:0-Me(2.2)-OH(3)/iC8:0-Me(2.4)-OH(3)	C10H18O2	170.1306800000		CSID: 24790/CSID: 9587708/CSID: 8949283/CSID: 25944197
+N-methoxyacetyl-valine	NOMe-Ac-Val	C8H13NO3	171.0895430000		CSID: 11856685
+N-desmethyldolaisoleuine/alpha-hydroxy-6-methyl-3-aminooctanoic acid	dDil/aC9:0-OH(2)-NH2(3)	C9H17NO2	171.1259290000		C(C(N)C(C)CC)(CC(O)=O)OC in CSID: 9938808/C(C(C(CCC(CC)C)N)O)(=O)O in CSID: 10475103
+N-acetyl-HydroxyOrnithine/D-N-acetyl-HydroxyOrnithine/N2-acetyl-N5-hydroxy-L-ornithine	Ac-OH-Orn/D-Ac-OH-Orn/N2Ac-OH-Orn	C7H12N2O3	172.0847920000		PDB: AHO/CSID: 3670289/CSID: 0
+tryptophanol	Trpol	C11H12N2	172.1000480000		CSID: 10234
+N-methyldichloropyrrole-2-carboxylic acid	MdCP	C6H3Cl2NO	174.9591700000		CSID: 21926880
+beta.beta-dimethyl-Methionine-S-oxide	bbMe2-O-Met	C7H13NO2S	175.0666990000		CSID: 29322228
+alpha-amino-phenyl-valeric acid	Apv	C11H13NO	175.0997140000		CSID: 262061
+Homotyrosine/N-methyltyrosine/beta-hydroxy-N-Methyl-Phenylalanine	Hty/NMe-Tyr/bOH-NMe-Phe	C10H11NO2	177.0789790000		CSID: 3365526/CSID: 453342/CSID: 14028021
+propenoyl-2-aminobutanoyloxazole acid	PAOA	C9H10N2O2	178.0742280000		C(C=CC1=COC(=N1)C(N)CC)(=O)O in CSID: 27026296
+2.4-dimethyl-dec-9-ynoic acid/10-methyl-2.trans4-undecanoic acid	C10:0:1(9)-Me(2.4)/iC12:2(2.t4)	C12H18O	178.1357650000		C(C(CC(CCCCC#C)C)C)(=O)O in CSID: 23076292/C(C=CC=CCCCCC(C)C)(O)=O in CSID: 24677772
+beta-hydroxy-tyrosine/3.4-dihydroxyphenylalanine	bOH-Tyr/diOH-Phe	C9H9NO3	179.0582430000		CSID: 13930867/CSID: 813
+proline-thiazole	Pro-Thz	C8H8N2OS	180.0357340000		C1=CSC(=N1)C2CCC(N2)C(=O)O in CSID: 8971346
+2-methyl-5-dodecenoic acid	C12:1(5)	C12H20O	180.1514150000		CSID: 4471802
+Anticapsin	Aca	C9H11NO3	181.0738930000		CSID: 2796855
+D-homoarginine	D-Har	C7H10N4O2	182.0803760000		CSID: 53295
+vinylogous arginine	v-Arg	C8H14N4O	182.1167610000		C(C(N)CCCNC(=N)N)=CC(=O)O in CSID: 8946030
+dodecanoic acid/isododecanoic acid	C12:0/iC12:0	C12H22O	182.1670650000		CSID: 3756/CID: 75942
+3-chloro-4-hydroxyphenylglycine	Cl-Hpg	C8H6ClNO2	183.0087060000		CSID: 3817439
+N-methyl-butenylthreonine/2-amino-8-oxo-decanoic acid	NMe-Bmt/C10:0-NH2(2)-oxo(8)	C10H17NO2	183.1259290000		CSID: 9944222/CSID: 16281719
+2.3-Dehydro-Tryptophan	dh-Trp	C11H8N2O	184.0636630000		CSID: 7991355
+ureido-4-oxovancosamine	U4oxo-Van	C8H12N2O3	184.0847920000		C1(C2(C(CC(O1)O)(C)NC(N2)=O)O)C in: NOR00711
+alpha-ketoarginine	k-Arg	C7H12N4O2	184.0960260000		C(C(C(CCCNC(=N)N)N)=O)(=O)O in CSID: 10477079
+3-hydroxy-undecanoic acid/3-hydroxy-isoundecanoic acid/3-hydroxy-2-methyl-decanoic acid/3-hydroxy-4-methyl-decanoic acid	C11:0-OH(3)/iC11:0-OH(3)/C10:0-Me(2)-OH(3)/C10:0-Me(4)-OH(3)	C11H20O2	184.1463300000		CSID: 2340495/CC(C)CCCCCC(CC(=O)O)O in: NOR00398/CSID: 13775620/CSID: 28533406
+Dolapyrrolidone	Dpy	C12H11NO	185.0840640000		CSID: 8735462
+Dolaisoleucine/8-hydroxy-2-amino-decanoic acid/9-hydroxy-2-amino-decanoic acid	Dil/C10:0-OH(8)-NH2(2)/C10:0-OH(9)-NH2(2)	C10H19NO2	185.1415790000		C(CC(O)=O)(OC)C(C(C)CC)NC in CSID: 7986684/CSID: 26949211/C(C(N)CCCCCCC(C)O)(=O)O in CSID: 10279723
+DL-Tryptophan/D-Tryptophan	Trp/D-Trp	C11H10N2O	186.0793130000		CSID: 1116/CSID: 8707
+hydrated alpha-ketoarginine	hk-Arg	C7H14N4O2	186.1116760000		C(C(C(CCCN=C(N)N)N)O)(=O)O in CSID: 8946570
+dehydro vinylogous tyrosine	dv-Tyr	C11H9NO2	187.0633290000		C(C(N)=CC1=CC=C(C=C1)O)=CC(=O)O in CSID: 8185737
+3.4-dihydroxyArginine	diOH-Arg	C6H12N4O3	188.0909400000		C(C(C(C(O)=O)N)O)(CN=C(N)N)O in CSID: 8801410
+vinylogous tyrosine/N-acetylphenylalanine	v-Tyr/Ac-Phe	C11H11NO2	189.0789790000		C(C(N)CC1=CC=C(C=C1)O)=CC(=O)O in CSID: 10477079/CSID: 1923
+kynurenine/D-kynurenine	Kyn/D-Kyn	C10H10N2O2	190.0742280000		CSID: 823/CID: 1152206
+coronafacic acid	CFA	C12H14O2	190.0993800000		CSID: 13300082
+N-methyl-4-methylamino-phenylalanine/N.O-dimethyl-tyrosinecarboxamid	NMe-MeA-Phe/NMe-OMe-TyrC	C11H14N2O	190.1106130000		CID: 21137790/CID: 19003692
+alpha-amino-hydroxyphenyl-valeric acid/N-methyl-homotyrosine/3-methyl-homotyrosine/ethylene inserted tyrosine/N.O-dimethyl-tyrosine/D-N.O-dimethyl-tyrosine	Ahv/NMe-Hty/3Me-Hty/e-Tyr/NMe-OMe-Tyr/D-NMe-OMe-Tyr	C11H13NO2	191.0946290000		C(C(=O)O)(CCCC1=CC=C(C=C1)O)N in CSID: 142959/C1=CC(=CC=C1CCC(C(=O)O)NC)O in CSID: 10477716/C1=CC(=CC=C1CC(C(C(=O)O)N)C)O in: NOR00265/C(C(N)CC1=CC=C(C=C1)O)CC(=O)O in CSID: 9977717/CID: 18925327/CID: 18925327
+10-methyl-2.trans4-dodecenoic acid	aC13:2(2.t4)	C13H20O	192.1514150000		C(C=CC=CCCCCC(CC)C)(O)=O in CSID: 24665012
+di-chloro-N-methyl-dehydroLeucine	Cl2-NMe-dhLeu	C7H9Cl2NO	193.0061200000		C(C(O)=O)(NC)=CC(C)C(Cl)Cl in CSID: 8701761
+beta-methoxy-tyrosine	bOMe-Tyr	C10H11NO3	193.0738930000		CSID: 16174140
+O-sulfate-2-hydroxy-3-methylpentanoic acid	OSu-Hmp	C6H10O5S	194.0248940000		C(C(C(CC)C)O[S](=O)(=O)O)(=O)O in CSID: 10477875
+methyloxazoline-isoleucine	MeOx-Ile	C11H18N2O	194.1419130000		C(N)(C(C)CC)C1=NC(C(C1)C)C(=O)O in CSID: 10477991
+11-methyl-3-dodecenoic acid/10-methyl-3-dodecenoic acid	iC13:1(3)/aC13:1(3)	C13H22O	194.1670650000		C(CC=CCCCCCCC(C)C)(O)=O in: NOR00296/C(CC=CCCCCCC(CC)C)(O)=O in: NOR00767
+di-chloro-N-methyl-Leucine	Cl2-NMe-Leu	C7H11Cl2NO	195.0217700000		C(C(O)=O)(NC)CC(C)C(Cl)Cl in CSID: 8773801
+3-hydroxy-5-dodecenoic acid/9-oxo-2.4-dimethyldecanoic acid/8-hydroxy-2.4.6-trimethyl-4-nonenoic acid	C12:1(5)-OH(3)/C10:0-Me(2.4)-oxo(9)/C9:1(4)-Me(2.4.6)-OH(8)	C12H20O2	196.1463300000		CSID: 10761118/C(C(CC(CCCCC(C)=O)C)C)(=O)O in CSID: 8946480/C(C(CC(=CC(CC(C)O)C)C)C)(O)=O in CSID: 8007368
+11-methyldodecanoic acid/10-methyldodecanoic acid	iC13:0/aC13:0	C13H24O	196.1827150000		CID: 33002/CSID: 2282934
+chloro-tyrosine	Cl-Tyr	C9H8ClNO2	197.0243570000		CSID: 106510
+2-amino-9.10-epoxi-8-oxodecanoic acid	C10:0-NH2(2)-Ep(9)-oxo(8)	C10H15NO3	197.1051930000		CSID: 11345228
+4-butenyl-4-methyl-N.4-methyl threonine	Me2-Bmt	C11H19NO2	197.1415790000		CSID: 4450325
+3-hydroxy-dodecanoic acid/3-hydroxy-isododecanoic acid/3-hydroxy-2-methyl-undecanoic acid	C12:0-OH(3)/iC12:0-OH(3)/C11:0-Me(2)-OH(3)	C12H22O2	198.1619800000		CSID: 85026/CID: 15089799/CSID: 13775586
+9-hydroxy-2-amino-8-oxo-decanoic acid	C10:0-OH(9)-NH2(2)-oxo(8)	C10H17NO3	199.1208430000		CSID: 25942012
+N-acetyl-N6-formyl-N6-hydroxyOrnithine	NAc-Fo-OH-Orn	C8H12N2O4	200.0797070000		C(C(=O)O)(NC(C)=O)CCCN(O)C=O in CSID: 3294
+N1-methyl-tryptophan	1Me-Trp	C12H12N2O	200.0949630000		CSID: 88584
+5-hydroxytryptophan/phototryptophan	OH-Trp/pTrp	C11H10N2O2	202.0742280000		CSID: 141/CID: 10331043
+N-methyl-4-dimethylamino-phenylalanine	NMe-Me2A-Phe	C12H16N2O	204.1262630000		CSID: 27594543
+vinylogous hydroxy tyrosine	v-OH-Tyr	C11H11NO3	205.0738930000		C(C(N)CC1=CC(=C(C=C1)O)O)=CC(=O)O in CSID: 9204437
+alpha-amino-methoxyphenyl-valeric acid	Amv	C12H15NO2	205.1102790000		CSID: 9681632
+N-Methyl-Lanthionine	NMe-Lan	C6H10N2O4S	206.0361280000		C(SCC(C(=O)O)N)C(C(O)=O)NO in: NOR00149
+3-nitrotyrosine	3NO2-Tyr	C9H8N2O4	208.0484070000		CSID: 205676
+7-tetradecenoic acid/12-methyl-3-tridecenoic acid	C14:1(7)/iC14:1(3)	C14H24O	208.1827150000		CSID: 10722652/PDB: LNG
+D-PhosphateAsparagine	D-PO-Asn	C4H7N2O6P	210.0041720000		C(C(C(C(O)=O)N)O[P](O)(=O)O)(=O)N in: NOR00025
+propenoyl-O-methylserinylthiazole acid	PMST	C9H10N2O2S	210.0462980000		C(C=CC1=CSC(=N1)C(N)COC)(=O)O in CSID: 8503913
+5-oxo-8-hydroxy-2.4.6-trimethyl-4-nonaneic acid	C9:1(Me4)-Me(2.4.6)-OH(8)-Oxo(5)	C12H18O3	210.1255940000		C(C(CC(C(C(CC(C)O)C)=O)=C)C)(O)=O in CSID: 8434247
+tetradecanoic acid/12-methyl-tridecanoic acid	C14:0/iC14:0	C14H26O	210.1983650000		PDB: MYR/CID: 520298
+Chloro-N-methyl-tyrosine/D-3-chloro-N-methyl-Tyrosine	Cl-NMe-Tyr/D-Cl-NMe-Tyr	C10H10ClNO2	211.0400070000		PDB: CNT/C(C(=O)O)(NC)CC1=CC(=C(C=C1)O)Cl in: NOR00614
+3-amino-tridecanoic acid	C13:0-NH2(3)	C13H25NO	211.1936140000		CSID: 26283438
+3-hydroxy-tridecanoic acid/3-hydroxy-isotridecanoic acid/3-hydroxy-10-methyl-dodecanoic acid	C13:0-OH(3)/iC13:0-OH(3)/aC13:0-OH(3)	C13H24O2	212.1776300000		CSID: 4472174/CID: 15089800/C(CC(CCCCCCC(CC)C)O)(O)=O in: NOR00857
+beta-hydroxy-chloro-tyrosine	bOH-Cl-Tyr	C9H8ClNO3	213.0192710000		CSID: 25938524
+3-amino-6-hydroxy-2-piperidone	Ahp	C9H14N2O4	214.0953570000		CSID: 25058696
+N-methyl-5-hydroxytryptophan/methoxytryptophan	NMe-OH-Trp/OMe-Trp	C12H12N2O2	216.0898780000		C(C(=O)O)(NC)CC1=C[N]C2=C1C=C(C=C2)O in CSID: 10476796/O(C(=O)[C@@H](N([H])[H])CC1=C[N](C2=CC=CC=C12)OC)[H] in CSID: 5293532
+2.6-diamino-7-hydroxyazelaic acid	Daz	C9H16N2O4	216.1110070000		CSID: 391749
+4-amino-7-guanidino-2.3-dihydroxyheptanoic acid	Agdha	C8H16N4O3	216.1222400000		CSID: 21377788
+3.5-dichloro-4-hydroxyphenylglycine	Cl2-Hpg	C8H5Cl2NO2	216.9697340000		CSID: 9804791
+DHP-methyloxazolinyl group	DMOG	C11H9NO4	219.0531580000		CSID: 12721
+N-methoxyacetyl-D-phenylalanine	NOMe-Ac-D-Phe	C12H13NO3	219.0895430000		CSID: 11859621
+D-6'-chloro-tryptophan	D-Cl-Trp	C11H9ClN2O	220.0403410000		C(C(=O)O)(N)CC1=NC2=C(C1)C=CC(=C2)Cl in CSID: 8094776
+dihydroxyphenylthiazol group	DHPT	C10H7NO3S	221.0146640000		CSID: 23110909
+12-methyl-3-tetradecenoic acid	aC15:1(3)	C15H26O	222.1983650000		C(CC=CCCCCCCCC(CC)C)(O)=O in: NOR00768
+2.3-dihydroxy-2.6.8-trimethyldeca-(4Z.6E)-dienoic acid/2.3-dihydroxy-trans4.trans6-tridecenoic acid	aC11:2(4.6)-Me(2.6)-OH(2.3)/C13:2(t4.t6)-OH(2.3)	C13H20O3	224.1412450000		C(C(C(C=CC(=CC(CC)C)C)O)(O)C)(O)=O in CSID: 4977118/C(C(C(C=CC=CCCCCCC)O)O)(O)=O in CSID: 4976886
+12-methyltetradecanoic acid	aC15:0	C15H28O	224.2140160000		CSID: 20368
+bromophenylalanine	Br-Phe	C9H8BrNO	224.9789160000		CSID: 77275
+3-amino-tetradecanoic acid/3-amino-isotetradecanoic acid	C14:0-NH2(3)/iC14:0-NH2(3)	C14H27NO	225.2092640000		CSID: 15571256/CID: 22471993
+3-hydroxy-tetradecanoic acid/3-hydroxy-12-methyl-tridecanoic acid	C14:0-OH(3)/iC14:0-OH(3)	C14H26O2	226.1932800000		CSID: 15252/CID: 22471995
+tri-chloro-N-methyl-dehydroLeucine	Cl3-NMe-dhLeu	C7H8Cl3NO	226.9671480000		C(C(O)=O)(NC)=CC(C)C(Cl)(Cl)Cl in CSID: 10477276
+N-acetyltryptophan	Ac-Trp	C13H12N2O2	228.0898780000		CSID: 1925
+beta.beta.N-trimethyltryptophan	bbMe-NMe-Trp	C14H16N2O	228.1262630000		C1=CC=CC2=C1C(=C[N]2)C(C(C(O)=O)NC)(C)C in CSID: 8158974
+3-hydroxy-2.2.4-trimethyl-7-hydroxydecanoic acid	C10:0-Me(2.2.4)-OH(3.7)	C13H24O3	228.1725450000		C(C(C(C(=O)O)(C)C)O)(CCC(CCC)O)C in CSID: 8184030
+tri-chloro-N-methyl-Leucine	Cl3-NMe-Leu	C7H10Cl3NO	228.9827980000		C(C(O)=O)(NC)CC(C)C(Cl)(Cl)Cl in CSID: 10477275
+thiazolylphenylalanine	Phe-Thz	C12H10N2OS	230.0513840000		C(N)(CC1=CC=CC=C1)C2=NC(=CS2)C(O)=O in CSID: 8593238
+D-2-carboxy-tryptophan	D-COOH-Trp	C12H10N2O3	230.0691420000		C(C(O)=O)(N)CC1=C([N]C2=C1C=CC=C2)C(=O)O in CSID: 7987591
+N-methyl-6-chloro-tryptophan	NMe-Cl-Trp	C12H11ClN2O	234.0559910000		C(C(=O)O)(NC)CC1=C[N]C2=C1C=CC(=C2)Cl in CSID: 8805002
+7-hexadecenoic acid/9-hexadecenoic acid	C16:1(7)/C16:1(9)	C16H28O	236.2140160000		CSID: 4895966/CSID: 4445872
+2.3-dihydroxy-trans4.trans6-tetradecenoic acid/2.6.8-trimethyl-5.7-dihydroxy-trans2.trans8-undecenoic acid	C14:2(t4.t6)-OH(2.3)/C11:2(t2.t8)-Me(2.6.8)-OH(5.7)	C14H22O3	238.1568950000		C(C(C(C=CC=CCCCCCCC)O)O)(O)=O in CSID: 8924310/C(C(=CCC(C(C(C(=CCC)C)O)C)O)C)(O)=O in CSID: 10481263
+hexadecanoic acid	C16:0	C16H30O	238.2296660000		CSID: 960
+beta-methyl-bromophenylalanine	bMe-Br-Phe	C10H10BrNO	238.9945660000		C(C(=O)O)(C(C1=CC=C(C=C1)Br)C)N in CSID: 10475327
+3-amino-pentadecanoic acid/3-amino-isopentadecanoic acid/3-amino-12-methyl-tetradecanoic acid	C15:0-NH2(3)/iC15:0-NH2(3)/aC15:0-NH2(3)	C15H29NO	239.2249150000		CSID: 26283439/C(CC(CCCCCCCCCC(C)C)N)(O)=O in: NOR00784/C(CC(CCCCCCCCC(CC)C)N)(O)=O in: NOR00785
+3-hydroxy-13-methyltetradecanoic acid/3-hydroxy-pentadecanoic acid/3-hydroxy-isopentadecanoic acid/3-hydroxy-12-methyl-tetradecanoic acid	C14:0-Me(13)-OH(3)/C15:0-OH(3)/iC15:0-OH(3)/aC15:0-OH(3)	C15H28O2	240.2089300000		CSID: 9218624/CSID: 158374/CSID: 9218624/C(CC(CCCCCCCCC(CC)C)O)(O)=O in: NOR00211
+bromotyrosine/beta-hydroxy-bromophenylalanine	Br-Tyr/bOH-Br-Phe	C9H8BrNO2	240.9738310000		CSID: 131083/CSID: 19757850
+beta.beta.N1.N-tetramethyltryptophan	bbNMe-NMe-Trp	C15H18N2O	242.1419130000		C1=CC=CC2=C1C(=C[N]2C)C(C(C(O)=O)NC)(C)C in CSID: 8570259
+3.4-dihydroxy-tetradecanoic acid/ 3-hydroxy-2.2.4-trimethyl-7-methoxydecanoic acid	C14:0-OH(3.4)/C10:0-Me(2.2.4)-OH(3)-OMe(7)	C14H26O3	242.1881950000		CID: 22667431/CSID: 28587148
+3-amino-4-hydroxy-6-methyl-8-phenyl-5.7-octadienoic acid	C8:2(5.7)-Me(6)-OH(4)-NH2(3)-Ph(8)	C15H17NO2	243.1259290000		C(CC(C(C=C(C=CC1=CC=CC=C1)C)O)N)(=O)O in CSID: 10475327
+tri-chloro-2-hydroxy-N-methyl-Leucine/tri-chloro-5-hydroxy-N-methyl-Leucine	Cl3-2OH-NMe-Leu/Cl3-5OH-NMe-Leu	C7H10Cl3NO2	244.9777130000		C(C(O)=O)(NC)(CC(C)C(Cl)(Cl)Cl)O in CSID: 10477276/C(C(O)=O)(NC)CC(CO)C(Cl)(Cl)Cl in: NOR00511
+N-methyl-6-chloro-5-hydroxytryptophan	NMe-Cl-OH-Trp	C12H11ClN2O2	250.0509060000		C(C(=O)O)(NC)CC1=C[N]C2=C1C=C(C(=C2)Cl)O in CSID: 10473575
+2.3-dihydroxy-trans4.trans6-pentadecenoic acid	C15:2(t4.t6)-OH(2.3)	C15H24O3	252.1725450000		C(C(C(C=CC=CCCCCCCCC)O)O)(O)=O in CSID: 4976888
+3-hydroxy-9-hexadecenoic acid	C16:1(9)-OH(3)	C16H28O2	252.2089300000		C(CC(CCCCCC=CCCCCCC)O)(O)=O in: NOR00720
+3-amino-hexadecanoic acid/3-amino-isohexadecanoic acid	C16:0-NH2(3)/iC16:0-NH2(3)	C16H31NO	253.2405650000		CSID: 24597602/C(CC(CCCCCCCCCCC(C)C)N)(O)=O in: NOR00793
+3-hydroxy-hexadecanoic acid/3-hydroxy-isohexadecanoic acid	C16:0-OH(3)/iC16:0-OH(3)	C16H30O2	254.2245800000		CSID: 266538/C(CC(CCCCCCCCCCC(C)C)O)(O)=O in: NOR00897
+D-3-bromo-N-methyl-Tyrosine	D-Br-NMe-Tyr	C10H10BrNO2	254.9894810000		CSID: 2128826
+pyoverdin Pa A chromophore	ChrPaA	C13H11N3O3	257.0800410000		C1=C(C(=CC2=C1N3C(C(=C2)N)=NC(CC3)C(O)=O)O)O in CSID: 0
+N1-carboxy-bichomotryptophan	N1-COOH-bhTrp	C14H14N2O3	258.1004420000		C(CC1=C[N](C2=C1C=CC=C2)C(=O)O)CC(C(=O)O)N in CSID: 9968260
+isopyoverdin chromophore/pyoverdin chromophore	ChrI/ChrP	C13H13N3O3	259.0956910000		C1=C(C(=CC2=C1N3C(C(=C2)N)NC(CC3)C(O)=O)O)O in: NOR00163/C1=C(C(=CC2=C1N3C(C(=C2)N)NC(CC3)C(O)=O)O)O in CID: 5289234
+5.6-dihydropyoverdin chromophore	ChrD	C13H15N3O3	261.1113410000		C1=C(C(=CC2=C1N3C(C(N)C2)NCCC3C(O)=O)O)O in: NOR00903
+D-6-chloro-N2-formamidotryptophan	D-Cl-CONH2-Trp	C12H10ClN3O2	263.0461550000		C(C(O)=O)(N)CC1=C[N](C2=C1C=CC(=C2)Cl)C(=O)N in CSID: 8138519
+3-amino-8-phenyl-2.4.5-trihydroxyoct-7-enoic acid	C8:1(7)-OH(2.4.5)-NH2(3)-Ph(8)	C14H17NO4	263.1157580000		CSID: 29330841
+5-bromo-tryptophan	Br-Trp	C11H9BrN2O	263.9898150000		CSID: 87339
+9-octadecenoic acid	C18:1(9)	C18H32O	264.2453160000		CSID: 553123
+8.10-Dimethyl-9-hydroxy-7-methoxytridecadienoic acid	DHMDA	C16H26O3	266.1881950000		C(C(C(CCC)C)O)(C(C=CC=CCC(=O)O)OC)C in CSID: 10479168
+3-amino-14-methyl-hexadecanoic acid/3-amino-15-methyl-hexadecanoic acid	aC17:0-NH2(3)/iC17:0-NH2(3)	C17H33NO	267.2562150000		C(CC(CCCCCCCCCCC(CC)C)N)(O)=O in CSID: 2340866/C(CC(CCCCCCCCCCCC(C)C)N)(O)=O in: NOR00801
+3-hydroxy-14-methyl-hexadecanoic acid/3-hydroxy-15-methyl-hexadecanoic acid	aC17:0-OH(3)/iC17:0-OH(3)	C17H32O2	268.2402300000		C(CC(CCCCCCCCCCC(CC)C)O)(O)=O in: NOR00900/CSID: 141849
+3.4-dihydroxy-hexadecanoic acid	C16:0-OH(3.4)	C16H30O3	270.2194950000		CID: 22348653
+4-propenoyl-2-tyrosylthiazole acid	PTTA	C14H12N2O2S	272.0619480000		C(O)(=O)C=CC1=CSC(=N1)C(N)CC2=CC=C(C=C2)O in CSID: 16738243
+N-methyl-2-Bromo-tryptophan	NMe-Br-Trp	C12H11BrN2O	278.0054650000		C(C(=O)O)(NC)CC1=C([N]C2=C1C=CC=C2)Br in CSID: 8007368
+2-bromo-5-hydroxytryptophan	Br-OH-Trp	C11H9BrN2O2	279.9847300000		CSID: 643874
+3-hydroxy-9-octadecenoic acid	C18:1(9)-OH(3)	C18H32O2	280.2402300000		C(CC(CCCCCC=CCCCCCCCC)O)(O)=O in: NOR00724
+azotobactins chromophore	ChrA	C14H11N3O4	285.0749560000		C1=C(C(=CC2=C1N4C3C(=C2)NC(N3CCC4C(O)=O)=O)O)O in: NOR00208
+O-demethyl-Adda	DMAdda	C19H25NO2	299.1885290000		C(C(C(C=CC(=CC(C(CC1=CC=CC=C1)O)C)C)N)C)(O)=O in: NOR00129
+D-3-iodo-N-methyl-Tyrosine	D-I-NMe-Tyr	C10H10INO2	302.9756110000		C(C(=O)O)(NC)CC1=CC(=C(C=C1)O)I in CSID: 9017332
+actinomycin chromophore	ChrAct	C16H10N2O5	310.0589710000		CSID: 86817
+3-amino-9-methoxy-2.6.8-trimethyl-10-phenyldeca-4.6-dienoic acid	Adda	C20H27NO2	313.2041790000		CSID: 10471100
+3-amino-4-hydroxy-6-methyl-8-(p-bromophenyl)-5.7-octadienoic acid	C8:2(5.7)-Me(6)-OH(4)-NH2(3)-brPh(8)	C15H16BrNO2	321.0364310000		C(CC(C(C=C(C=CC1=CC=C(C=C1)Br)C)O)N)(=O)O in CSID: 10476834
+3-amino-6-methyl-12-phenyl-2.4.5-trihydroxydodeca-7.9.11-trienoic acid	C12:3(7.9.11)-Me(6)-OH(2.4.5)-NH2(3)-Ph(12)	C19H23NO4	329.1627080000		C(C(C(C(C(C(C=CC=CC=CC1=CC=CC=C1)C)O)O)N)O)(O)=O in CSID: 8923613
+3-amino-10-(p-ethoxyphenyl)-2.4.5-trihydroxydeca-7.9-dienoic acid	C10:2(7.9)-OH(2.4.5)-NH2(3)-ePh(10)	C18H23NO5	333.1576230000		CSID: 29330839
+O-Acetyl-O-demethylAdda	ADMAdda	C21H27NO3	341.1990940000		C(C(C(C=CC(=CC(C(CC1=CC=CC=C1)OC(C)=O)C)C)N)C)(O)=O in: NOR00144
+3-amino-6.10-dimethyl-12-phenyl-2.4.5-trihydroxydodeca-7.9.11-trienoic acid	C12:3(7.9.11)-Me(6.10)-OH(2.4.5)-NH2(3)-Ph(12)	C20H25NO4	343.1783580000		C(C(C(C(C(C(C=CC=C(C=CC1=CC=CC=C1)C)C)O)O)N)O)(O)=O in CSID: 10187168
+3-amino-6-methyl-12-(p-methoxyphenyl)-2.4.5-trihydroxydodec-11-enoic acid	C12:1(11)-Me(6)-OH(2.4.5)-NH2(3)-mPhe(11)	C20H29NO5	363.2045730000		CSID: 29330842
