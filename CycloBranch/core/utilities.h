@@ -525,7 +525,7 @@ struct compareStringBySize {
 	\param parent parent
 	\retval bool true if the item is valid
 */
-bool proxyModelCheckInt(QAbstractItemModel* model, int index, int row, int column, QString& str, const QModelIndex& parent);
+bool proxyModelCheckInt(QAbstractItemModel* model, int index, int row, int column, QString str, const QModelIndex& parent);
 
 
 /**
@@ -538,7 +538,7 @@ bool proxyModelCheckInt(QAbstractItemModel* model, int index, int row, int colum
 	\param parent parent
 	\retval bool true if the item is valid
 */
-bool proxyModelCheckDouble(QAbstractItemModel* model, int index, int row, int column, QString& str, const QModelIndex& parent);
+bool proxyModelCheckDouble(QAbstractItemModel* model, int index, int row, int column, QString str, const QModelIndex& parent);
 
 
 /**
@@ -554,7 +554,7 @@ bool proxyModelCheckDouble(QAbstractItemModel* model, int index, int row, int co
 	\param casesensitive casesensitive
 	\retval bool true if the item is valid
 */
-bool proxyModelCheckString(QAbstractItemModel* model, int index, int row, int column, QString& itemstr, QString& str, const QModelIndex& parent, bool wholeword, Qt::CaseSensitivity casesensitive);
+bool proxyModelCheckString(QAbstractItemModel* model, int index, int row, int column, QString& itemstr, QString str, const QModelIndex& parent, bool wholeword, Qt::CaseSensitivity casesensitive);
 
 
 #endif

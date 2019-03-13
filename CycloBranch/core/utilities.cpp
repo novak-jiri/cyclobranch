@@ -465,7 +465,7 @@ void stripIsomersFromStringVector(vector<string>& acronyms) {
 }
 
 
-bool proxyModelCheckInt(QAbstractItemModel* model, int index, int row, int column, QString& str, const QModelIndex& parent) {
+bool proxyModelCheckInt(QAbstractItemModel* model, int index, int row, int column, QString str, const QModelIndex& parent) {
 	switch (index) {
 		case 0:
 			if (model->data(model->index(row, column, parent)).toInt() == str.toInt()) {
@@ -499,7 +499,7 @@ bool proxyModelCheckInt(QAbstractItemModel* model, int index, int row, int colum
 }
 
 
-bool proxyModelCheckDouble(QAbstractItemModel* model, int index, int row, int column, QString& str, const QModelIndex& parent) {
+bool proxyModelCheckDouble(QAbstractItemModel* model, int index, int row, int column, QString str, const QModelIndex& parent) {
 	switch (index) {
 		case 0:
 			if (model->data(model->index(row, column, parent)).toDouble() == str.toDouble()) {
@@ -533,8 +533,9 @@ bool proxyModelCheckDouble(QAbstractItemModel* model, int index, int row, int co
 }
 
 
-bool proxyModelCheckString(QAbstractItemModel* model, int index, int row, int column, QString& itemstr, QString& str, const QModelIndex& parent, bool wholeword, Qt::CaseSensitivity casesensitive) {
-	QString qstr = stripHTML(itemstr.toStdString()).c_str();
+bool proxyModelCheckString(QAbstractItemModel* model, int index, int row, int column, QString& itemstr, QString str, const QModelIndex& parent, bool wholeword, Qt::CaseSensitivity casesensitive) {
+	string tmpstr = itemstr.toStdString();
+	QString qstr = stripHTML(tmpstr).c_str();
 	switch (index) {
 		case 0:
 			if (wholeword) {
