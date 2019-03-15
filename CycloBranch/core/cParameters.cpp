@@ -1450,6 +1450,7 @@ int cParameters::calculateNeutralLosses(bool& terminatecomputation, string& erro
 
 
 int cParameters::generateCompounds(bool& terminatecomputation, string& errormessage) {
+	sequencedatabase.clear();
 	errormessage = "";
 
 	if (maximumcombinedlosses == 0) {
