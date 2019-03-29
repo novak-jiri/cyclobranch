@@ -28,6 +28,31 @@ void cParameters::fixIntensities(cPeaksList& centroidspectrum, cPeaksList& profi
 }
 
 
+bool cParameters::checkSeniorRules(vector<int>& combarray, vector<int>& valences) {
+	int totalvalence = 0;
+	int maximumvalence = 0;
+	int currentvalence;
+	int i, size;
+
+	i = 0;
+	size = (int)combarray.size();
+	while ((i < size) && (combarray[i] > 0)) {
+		currentvalence = valences[combarray[i] - 1];
+		totalvalence += currentvalence;
+		if (currentvalence > maximumvalence) {
+			maximumvalence = currentvalence;
+		}
+		i++;
+	}
+
+	if ((totalvalence % 2 == 1) || (totalvalence < 2 * maximumvalence) || (totalvalence < 2 * (i - 1))) {
+		return false;
+	}
+
+	return true;
+}
+
+
 cParameters::cParameters() {
 	clear();
 }
@@ -1459,20 +1484,20 @@ int cParameters::generateCompounds(bool& terminatecomputation, string& errormess
 
 	cSequence seq;
 	cSummaryFormula tmpformula;
-	string tmpstring;
 	neutralLoss loss;
 	int i;
 
 	cBricksDatabase elementsbrickdatabase;
 	cBrick tmpbrick;
+	string tmpstr;
+	vector<int> valences;
+	bool validvalences = false;
+
 	int numberofbasicbricks = 0;
 	string compositionname;
 	vector<int> intcomposition;
 
-	bool undefinedelement;
 	bool alloutofmz;
-	int valence;
-	int atomscount;
 	double elementsratio;
 	double tmpmzdifference;
 
@@ -1486,12 +1511,13 @@ int cParameters::generateCompounds(bool& terminatecomputation, string& errormess
 	}
 
 	for (i = 0; i < (int)originalneutrallossesfortheoreticalspectra.size(); i++) {
-		tmpformula.setFormula(originalneutrallossesdefinitions[originalneutrallossesfortheoreticalspectra[i]].summary, false);
+		tmpstr = originalneutrallossesdefinitions[originalneutrallossesfortheoreticalspectra[i]].summary;
+		tmpformula.setFormula(tmpstr, false);
 
 		tmpbrick.clear();
 		tmpbrick.setComposition(to_string(numberofbasicbricks + 1), false);
 		tmpbrick.setMass(tmpformula.getMass());
-		tmpbrick.setSummary(originalneutrallossesdefinitions[originalneutrallossesfortheoreticalspectra[i]].summary);
+		tmpbrick.setSummary(tmpstr);
 		tmpbrick.createSummaryMap();
 
 		elementsbrickdatabase.push_back(tmpbrick);
@@ -1500,6 +1526,53 @@ int cParameters::generateCompounds(bool& terminatecomputation, string& errormess
 	}
 
 	elementsbrickdatabase.sortbyMass();
+
+	for (i = 0; i < elementsbrickdatabase.size(); i++) {
+		tmpstr = elementsbrickdatabase[i].getSummary();
+		if (tmpstr.compare("H") == 0) {
+			valences.push_back(1);
+		}
+		if (tmpstr.compare("C") == 0) {
+			valences.push_back(4);
+		}
+		if (tmpstr.compare("O") == 0) {
+			valences.push_back(2);
+		}
+		if (tmpstr.compare("N") == 0) {
+			valences.push_back(3);
+		}
+		if (tmpstr.compare("S") == 0) {
+			valences.push_back(6);
+		}
+		if (tmpstr.compare("P") == 0) {
+			valences.push_back(5);
+		}
+		if (tmpstr.compare("Li") == 0) {
+			valences.push_back(1);
+		}
+		if (tmpstr.compare("Na") == 0) {
+			valences.push_back(1);
+		}
+		if (tmpstr.compare("K") == 0) {
+			valences.push_back(1);
+		}
+		if (tmpstr.compare("F") == 0) {
+			valences.push_back(1);
+		}
+		if (tmpstr.compare("Cl") == 0) {
+			valences.push_back(1);
+		}
+		if (tmpstr.compare("Br") == 0) {
+			valences.push_back(1);
+		}
+		if (tmpstr.compare("I") == 0) {
+			valences.push_back(1);
+		}
+	}
+
+	if ((elementsbrickdatabase.size() > 0) && (elementsbrickdatabase.size() == valences.size())) {
+		validvalences = true;
+	}
 
 	vector<int> combarray;
 	for (i = 0; i < maximumcombinedlosses; i++) {
@@ -1511,6 +1584,12 @@ int cParameters::generateCompounds(bool& terminatecomputation, string& errormess
 		if (terminatecomputation) {
 			errormessage = "Aborted by user.";
 			return -1;
+		}
+
+		if (validvalences) {
+			if (!checkSeniorRules(combarray, valences)) {
+				continue;
+			}
 		}
 
 		getNameOfCompositionFromIntVector(compositionname, combarray);
@@ -1550,44 +1629,6 @@ int cParameters::generateCompounds(bool& terminatecomputation, string& errormess
 		}
 
 		addStringFormulaToMap(loss.summary, loss.summarymap);
-
-		undefinedelement = false;
-		for (auto& it : loss.summarymap) {
-			if ((it.first.compare("H") != 0) && (it.first.compare("C") != 0) && (it.first.compare("O") != 0) && (it.first.compare("N") != 0) && (it.first.compare("S") != 0)) {
-				undefinedelement = true;
-				break;
-			}
-		}
-
-		valence = 0;
-		atomscount = 0;
-		if (loss.summarymap.count("H") > 0) {
-			valence += loss.summarymap["H"];
-			atomscount += loss.summarymap["H"];
-		}
-		if (loss.summarymap.count("C") > 0) {
-			valence += loss.summarymap["C"] * 4;
-			atomscount += loss.summarymap["C"];
-		}
-		if (loss.summarymap.count("O") > 0) {
-			valence += loss.summarymap["O"] * 2;
-			atomscount += loss.summarymap["O"];
-		}
-		if (loss.summarymap.count("N") > 0) {
-			valence += loss.summarymap["N"] * 3;
-			atomscount += loss.summarymap["N"];
-		}
-		if (loss.summarymap.count("S") > 0) {
-			valence += loss.summarymap["S"] * 6; /* the maximum valence state is used */
-			atomscount += loss.summarymap["S"];
-		}
-
-		// SENIOR rule 1 - the sum of valences must be even
-		// SENIOR rule 3 - the sum of valences >= 2 * (atomscount - maximum number of allowed components in the graph); edges - nodes + components >= 0
-		if (!undefinedelement && ((valence % 2 == 1) || (valence < 2 * (atomscount - 1)))) {
-			//pruned++;
-			continue;
-		}
 
 		if (advancedformulacheck) {
 
