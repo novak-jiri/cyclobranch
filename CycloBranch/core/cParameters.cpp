@@ -30,24 +30,47 @@ void cParameters::fixIntensities(cPeaksList& centroidspectrum, cPeaksList& profi
 
 bool cParameters::checkSeniorRules(vector<int>& combarray, vector<int>& valences) {
 	int totalvalence = 0;
-	int maximumvalence = 0;
-	int currentvalence;
+	//int maximumvalence = 0;
+	//int currentvalence;
 	int i, size;
 
 	i = 0;
 	size = (int)combarray.size();
 	while ((i < size) && (combarray[i] > 0)) {
-		currentvalence = valences[combarray[i] - 1];
-		totalvalence += currentvalence;
-		if (currentvalence > maximumvalence) {
-			maximumvalence = currentvalence;
-		}
+		totalvalence += valences[combarray[i] - 1];
+		//currentvalence = valences[combarray[i] - 1];
+		//totalvalence += currentvalence;
+		//if (currentvalence > maximumvalence) {
+		//	maximumvalence = currentvalence;
+		//}
 		i++;
 	}
 
-	if ((totalvalence % 2 == 1) || (totalvalence < 2 * maximumvalence) || (totalvalence < 2 * (i - 1))) {
+	if ((totalvalence % 2 == 1) /*|| (totalvalence < 2 * maximumvalence)*/ || (totalvalence < 2 * (i - 1))) {
 		return false;
 	}
+
+	return true;
+}
+
+
+bool cParameters::checkAdvancedRules(vector<int>& combarray, vector<int>& countsofelements) {
+	int i, size;
+
+	i = 0;
+	size = (int)countsofelements.size();
+	for (i = 0; i < size; i++) {
+		countsofelements[i] = 0;
+	}
+
+	i = 0;
+	size = (int)combarray.size();
+	while ((i < size) && (combarray[i] > 0)) {
+		countsofelements[combarray[i] - 1]++;
+		i++;
+	}
+
+	// to do
 
 	return true;
 }
@@ -1476,6 +1499,7 @@ int cParameters::calculateNeutralLosses(bool& terminatecomputation, string& erro
 
 int cParameters::generateCompounds(bool& terminatecomputation, string& errormessage) {
 	sequencedatabase.clear();
+	//int cnt = 0;
 	errormessage = "";
 
 	if (maximumcombinedlosses == 0) {
@@ -1493,12 +1517,14 @@ int cParameters::generateCompounds(bool& terminatecomputation, string& errormess
 	vector<int> valences;
 	bool validvalences = false;
 
+	vector<int> countsofelements;
+	double elementsratio;
+
 	int numberofbasicbricks = 0;
 	string compositionname;
 	vector<int> intcomposition;
 
 	bool alloutofmz;
-	double elementsratio;
 	double tmpmzdifference;
 
 	//int stringsizeest = 0;
@@ -1528,6 +1554,8 @@ int cParameters::generateCompounds(bool& terminatecomputation, string& errormess
 	elementsbrickdatabase.sortbyMass();
 
 	for (i = 0; i < elementsbrickdatabase.size(); i++) {
+		countsofelements.push_back(0);
+
 		tmpstr = elementsbrickdatabase[i].getSummary();
 		if (tmpstr.compare("H") == 0) {
 			valences.push_back(1);
@@ -1589,6 +1617,11 @@ int cParameters::generateCompounds(bool& terminatecomputation, string& errormess
 		if (validvalences) {
 			if (!checkSeniorRules(combarray, valences)) {
 				continue;
+			}
+			if (advancedformulacheck) {
+				if (!checkAdvancedRules(combarray, countsofelements)) {
+					continue;
+				}
 			}
 		}
 
@@ -1893,6 +1926,7 @@ int cParameters::generateCompounds(bool& terminatecomputation, string& errormess
 		seq.setName(loss.summary);
 		seq.setSummaryFormula(loss.summary);
 		sequencedatabase.push_back(seq);
+		//cnt++;
 
 		i++;
 
@@ -1913,7 +1947,7 @@ int cParameters::generateCompounds(bool& terminatecomputation, string& errormess
 
 	if (os) {
 		*os << "ok" << endl;
-		*os << "Number of generated compounds: " << sequencedatabase.size() << endl << endl;
+		*os << "Number of generated compounds: " << /*cnt*/sequencedatabase.size() << endl << endl;
 	}
 
 	return 0;
