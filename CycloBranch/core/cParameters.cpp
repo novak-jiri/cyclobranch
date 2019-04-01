@@ -54,7 +54,7 @@ bool cParameters::checkSeniorRules(vector<int>& combarray, vector<int>& valences
 }
 
 
-bool cParameters::checkAdvancedRules(vector<int>& combarray, vector<int>& countsofelements) {
+double cParameters::getMassAndCounts(vector<int>& combarray, vector<int>& countsofelements, vector<double>& massesofelements) {
 	int i, size;
 
 	i = 0;
@@ -70,9 +70,15 @@ bool cParameters::checkAdvancedRules(vector<int>& combarray, vector<int>& counts
 		i++;
 	}
 
-	// to do
+	double mass = 0;
+	size = (int)countsofelements.size();
+	for (i = 0; i < size; i++) {
+		if (countsofelements[i] > 0) {
+			mass += massesofelements[i] * (double)(countsofelements[i]);
+		}
+	}
 
-	return true;
+	return mass;
 }
 
 
@@ -1499,7 +1505,8 @@ int cParameters::calculateNeutralLosses(bool& terminatecomputation, string& erro
 
 int cParameters::generateCompounds(bool& terminatecomputation, string& errormessage) {
 	sequencedatabase.clear();
-	//int cnt = 0;
+	int sequencescount = 0;
+
 	errormessage = "";
 
 	if (maximumcombinedlosses == 0) {
@@ -1508,8 +1515,7 @@ int cParameters::generateCompounds(bool& terminatecomputation, string& errormess
 
 	cSequence seq;
 	cSummaryFormula tmpformula;
-	neutralLoss loss;
-	int i;
+	int i, size;
 
 	cBricksDatabase elementsbrickdatabase;
 	cBrick tmpbrick;
@@ -1518,19 +1524,28 @@ int cParameters::generateCompounds(bool& terminatecomputation, string& errormess
 	bool validvalences = false;
 
 	vector<int> countsofelements;
+	vector<double> massesofelements;
+	vector<string> namesofelements;
 	double elementsratio;
 
 	int numberofbasicbricks = 0;
-	string compositionname;
-	vector<int> intcomposition;
 
-	bool alloutofmz;
+	double sumofmasses;
 	double tmpmzdifference;
+	bool alloutofmz;
 
-	//int stringsizeest = 0;
-	//int mapsizeest = 0;
-	//int doublesizeest = 0;
-	//int pruned = 0;
+	map<string, int> summarymap;
+
+	int countH;
+	int countC;
+	int countO;
+	int countN;
+	int countS;
+	int countP;
+	int countF;
+	int countCl;
+	int countBr;
+	int countSi;
 
 	if (os) {
 		*os << "Generating compounds... " << endl;
@@ -1546,6 +1561,18 @@ int cParameters::generateCompounds(bool& terminatecomputation, string& errormess
 		tmpbrick.setSummary(tmpstr);
 		tmpbrick.createSummaryMap();
 
+		if ((tmpbrick.getSummaryMap().size() != 1)) {
+			errormessage = "Bad input element: " + tmpstr + ". Only single elements can be used in this mode e.g. H, C, O, N, P, S.";
+			return -1;
+		}
+		else {
+			auto it = tmpbrick.getSummaryMap().begin();
+			if (it->second != 1) {
+				errormessage = "Bad input element: " + tmpstr + ". Only single elements can be used in this mode e.g. H, C, O, N, P, S.";
+				return -1;
+			}
+		}
+
 		elementsbrickdatabase.push_back(tmpbrick);
 
 		numberofbasicbricks++;
@@ -1555,8 +1582,11 @@ int cParameters::generateCompounds(bool& terminatecomputation, string& errormess
 
 	for (i = 0; i < elementsbrickdatabase.size(); i++) {
 		countsofelements.push_back(0);
+		massesofelements.push_back(elementsbrickdatabase[i].getMass());
 
 		tmpstr = elementsbrickdatabase[i].getSummary();
+		namesofelements.push_back(tmpstr);
+
 		if (tmpstr.compare("H") == 0) {
 			valences.push_back(1);
 		}
@@ -1596,6 +1626,9 @@ int cParameters::generateCompounds(bool& terminatecomputation, string& errormess
 		if (tmpstr.compare("I") == 0) {
 			valences.push_back(1);
 		}
+		if (tmpstr.compare("Si") == 0) {
+			valences.push_back(4);
+		}
 	}
 
 	if ((elementsbrickdatabase.size() > 0) && (elementsbrickdatabase.size() == valences.size())) {
@@ -1618,27 +1651,14 @@ int cParameters::generateCompounds(bool& terminatecomputation, string& errormess
 			if (!checkSeniorRules(combarray, valences)) {
 				continue;
 			}
-			if (advancedformulacheck) {
-				if (!checkAdvancedRules(combarray, countsofelements)) {
-					continue;
-				}
-			}
 		}
 
-		getNameOfCompositionFromIntVector(compositionname, combarray);
+		sumofmasses = getMassAndCounts(combarray, countsofelements, massesofelements);
 
-		tmpbrick.clear();
-		tmpbrick.setComposition(compositionname, true);
-		tmpbrick.setMass(elementsbrickdatabase.getMassOfComposition(combarray, numberofbasicbricks));
-
-		loss.clear();
-		loss.massdifference = tmpbrick.getMass();
-
-		// do not modify loss.massdifference here
 		alloutofmz = true;
 		for (auto& it : ionsfortheoreticalspectra) {
 			for (int j = 0; j < abs(precursorcharge); j++) {
-				tmpmzdifference = loss.massdifference + iondefinitions[it].massdifference;
+				tmpmzdifference = sumofmasses + iondefinitions[it].massdifference;
 				if (precursorcharge > 0) {
 					tmpmzdifference += j * (H - e);
 				}
@@ -1655,278 +1675,336 @@ int cParameters::generateCompounds(bool& terminatecomputation, string& errormess
 			continue;
 		}
 
-		intcomposition.clear();
-		tmpbrick.explodeToIntComposition(intcomposition);
-		for (int j = 0; j < (int)intcomposition.size(); j++) {
-			loss.summary += elementsbrickdatabase[intcomposition[j] - 1].getSummary();
+		summarymap.clear();
+		size = elementsbrickdatabase.size();
+		for (int j = 0; j < size; j++) {
+			if (countsofelements[j] > 0) {
+				summarymap[namesofelements[j]] = countsofelements[j];
+			}
 		}
-
-		addStringFormulaToMap(loss.summary, loss.summarymap);
 
 		if (advancedformulacheck) {
 
-			if (loss.massdifference < 500.0) {
-
-				if (loss.summarymap.count("C") > 0) {
-					if (loss.summarymap["C"] > 39) {
-						continue;
-					}
-				}
-
-				if (loss.summarymap.count("H") > 0) {
-					if (loss.summarymap["H"] > 72) {
-						continue;
-					}
-				}
-
-				if (loss.summarymap.count("N") > 0) {
-					if (loss.summarymap["N"] > 20) {
-						continue;
-					}
-				}
-
-				if (loss.summarymap.count("O") > 0) {
-					if (loss.summarymap["O"] > 20) {
-						continue;
-					}
-				}
-
-				if (loss.summarymap.count("P") > 0) {
-					if (loss.summarymap["P"] > 9) {
-						continue;
-					}
-				}
-
-				if (loss.summarymap.count("S") > 0) {
-					if (loss.summarymap["S"] > 10) {
-						continue;
-					}
-				}
-
-			}
-			else if (loss.massdifference < 1000.0) {
-
-				if (loss.summarymap.count("C") > 0) {
-					if (loss.summarymap["C"] > 78) {
-						continue;
-					}
-				}
-
-				if (loss.summarymap.count("H") > 0) {
-					if (loss.summarymap["H"] > 126) {
-						continue;
-					}
-				}
-
-				if (loss.summarymap.count("N") > 0) {
-					if (loss.summarymap["N"] > 25) {
-						continue;
-					}
-				}
-
-				if (loss.summarymap.count("O") > 0) {
-					if (loss.summarymap["O"] > 27) {
-						continue;
-					}
-				}
-
-				if (loss.summarymap.count("P") > 0) {
-					if (loss.summarymap["P"] > 9) {
-						continue;
-					}
-				}
-
-				if (loss.summarymap.count("S") > 0) {
-					if (loss.summarymap["S"] > 14) {
-						continue;
-					}
-				}
-
-			}
-			else if (loss.massdifference < 2000.0) {
-
-				if (loss.summarymap.count("C") > 0) {
-					if (loss.summarymap["C"] > 156) {
-						continue;
-					}
-				}
-
-				if (loss.summarymap.count("H") > 0) {
-					if (loss.summarymap["H"] > 236) {
-						continue;
-					}
-				}
-
-				if (loss.summarymap.count("N") > 0) {
-					if (loss.summarymap["N"] > 32) {
-						continue;
-					}
-				}
-
-				if (loss.summarymap.count("O") > 0) {
-					if (loss.summarymap["O"] > 63) {
-						continue;
-					}
-				}
-
-				if (loss.summarymap.count("P") > 0) {
-					if (loss.summarymap["P"] > 9) {
-						continue;
-					}
-				}
-
-				if (loss.summarymap.count("S") > 0) {
-					if (loss.summarymap["S"] > 14) {
-						continue;
-					}
-				}
-
-			}
-			else if (loss.massdifference < 3000.0) {
-
-				if (loss.summarymap.count("C") > 0) {
-					if (loss.summarymap["C"] > 162) {
-						continue;
-					}
-				}
-
-				if (loss.summarymap.count("H") > 0) {
-					if (loss.summarymap["H"] > 208) {
-						continue;
-					}
-				}
-
-				if (loss.summarymap.count("N") > 0) {
-					if (loss.summarymap["N"] > 48) {
-						continue;
-					}
-				}
-
-				if (loss.summarymap.count("O") > 0) {
-					if (loss.summarymap["O"] > 78) {
-						continue;
-					}
-				}
-
-				if (loss.summarymap.count("P") > 0) {
-					if (loss.summarymap["P"] > 9) {
-						continue;
-					}
-				}
-
-				if (loss.summarymap.count("S") > 0) {
-					if (loss.summarymap["S"] > 14) {
-						continue;
-					}
-				}
-
+			countH = 0;
+			if (summarymap.count("H") > 0) {
+				countH = summarymap["H"];
 			}
 
-			if ((loss.summarymap.count("H") > 0) && (loss.summarymap.count("C") >= 0)) {
-				if (loss.summarymap.count("C") == 0) {
+			countC = 0;
+			if (summarymap.count("C") > 0) {
+				countC = summarymap["C"];
+			}
+
+			countO = 0;
+			if (summarymap.count("O") > 0) {
+				countO = summarymap["O"];
+			}
+
+			countN = 0;
+			if (summarymap.count("N") > 0) {
+				countN = summarymap["N"];
+			}
+
+			countS = 0;
+			if (summarymap.count("S") > 0) {
+				countS = summarymap["S"];
+			}
+
+			countP = 0;
+			if (summarymap.count("P") > 0) {
+				countP = summarymap["P"];
+			}
+
+			countF = 0;
+			if (summarymap.count("F") > 0) {
+				countF = summarymap["F"];
+			}
+
+			countCl = 0;
+			if (summarymap.count("Cl") > 0) {
+				countCl = summarymap["Cl"];
+			}
+
+			countBr = 0;
+			if (summarymap.count("Br") > 0) {
+				countBr = summarymap["Br"];
+			}
+
+			countSi = 0;
+			if (summarymap.count("Si") > 0) {
+				countSi = summarymap["Si"];
+			}
+
+			if (sumofmasses < 500.0) {
+
+				if (countC > 39) {
 					continue;
 				}
-				elementsratio = ((double)(loss.summarymap["H"])) / ((double)(loss.summarymap["C"]));
+				if (countH > 72) {
+					continue;
+				}
+				if (countN > 20) {
+					continue;
+				}
+				if (countO > 20) {
+					continue;
+				}
+				if (countP > 9) {
+					continue;
+				}
+				if (countS > 10) {
+					continue;
+				}
+				if (countF > 16) {
+					continue;
+				}
+				if (countCl > 10) {
+					continue;
+				}
+				if (countBr > 5) {
+					continue;
+				}
+				if (countSi > 8) {
+					continue;
+				}
+
+			}
+			else if (sumofmasses < 1000.0) {
+
+				if (countC > 78) {
+					continue;
+				}
+				if (countH > 126) {
+					continue;
+				}
+				if (countN > 25) {
+					continue;
+				}
+				if (countO > 27) {
+					continue;
+				}
+				if (countP > 9) {
+					continue;
+				}
+				if (countS > 14) {
+					continue;
+				}
+				if (countF > 34) {
+					continue;
+				}
+				if (countCl > 12) {
+					continue;
+				}
+				if (countBr > 8) {
+					continue;
+				}
+				if (countSi > 14) {
+					continue;
+				}
+
+			}
+			else if (sumofmasses < 2000.0) {
+
+				if (countC > 156) {
+					continue;
+				}
+				if (countH > 236) {
+					continue;
+				}
+				if (countN > 32) {
+					continue;
+				}
+				if (countO > 63) {
+					continue;
+				}
+				if (countP > 9) {
+					continue;
+				}
+				if (countS > 14) {
+					continue;
+				}
+				if (countF > 48) {
+					continue;
+				}
+				if (countCl > 12) {
+					continue;
+				}
+				if (countBr > 10) {
+					continue;
+				}
+				if (countSi > 15) {
+					continue;
+				}
+
+			}
+			else if (sumofmasses < 3000.0) {
+
+				if (countC > 162) {
+					continue;
+				}
+				if (countH > 208) {
+					continue;
+				}
+				if (countN > 48) {
+					continue;
+				}
+				if (countO > 78) {
+					continue;
+				}
+				if (countP > 9) {
+					continue;
+				}
+				if (countS > 14) {
+					continue;
+				}
+				if (countF > 48) {
+					continue;
+				}
+				if (countCl > 12) {
+					continue;
+				}
+				if (countBr > 10) {
+					continue;
+				}
+				if (countSi > 15) {
+					continue;
+				}
+
+			}
+
+			if ((countH > 0) && (countC >= 0)) {
+				if (countC == 0) {
+					continue;
+				}
+				elementsratio = ((double)(countH)) / ((double)(countC));
 				if ((elementsratio < 0.2) || (elementsratio > 3.1)) {
 					continue;
 				}
 			}
 
-			if ((loss.summarymap.count("N") > 0) && (loss.summarymap.count("C") >= 0)) {
-				if (loss.summarymap.count("C") == 0) {
+			if ((countN > 0) && (countC >= 0)) {
+				if (countC == 0) {
 					continue;
 				}
-				elementsratio = ((double)(loss.summarymap["N"])) / ((double)(loss.summarymap["C"]));
+				elementsratio = ((double)(countN)) / ((double)(countC));
 				if (elementsratio > 1.3) {
 					continue;
 				}
 			}
 
-			if ((loss.summarymap.count("O") > 0) && (loss.summarymap.count("C") >= 0)) {
-				if (loss.summarymap.count("C") == 0) {
+			if ((countO > 0) && (countC >= 0)) {
+				if (countC == 0) {
 					continue;
 				}
-				elementsratio = ((double)(loss.summarymap["O"])) / ((double)(loss.summarymap["C"]));
+				elementsratio = ((double)(countO)) / ((double)(countC));
 				if (elementsratio > 1.2) {
 					continue;
 				}
 			}
 
-			if ((loss.summarymap.count("P") > 0) && (loss.summarymap.count("C") >= 0)) {
-				if (loss.summarymap.count("C") == 0) {
+			if ((countP > 0) && (countC >= 0)) {
+				if (countC == 0) {
 					continue;
 				}
-				elementsratio = ((double)(loss.summarymap["P"])) / ((double)(loss.summarymap["C"]));
+				elementsratio = ((double)(countP)) / ((double)(countC));
 				if (elementsratio > 0.3) {
 					continue;
 				}
 			}
 
-			if ((loss.summarymap.count("S") > 0) && (loss.summarymap.count("C") >= 0)) {
-				if (loss.summarymap.count("C") == 0) {
+			if ((countS > 0) && (countC >= 0)) {
+				if (countC == 0) {
 					continue;
 				}
-				elementsratio = ((double)(loss.summarymap["S"])) / ((double)(loss.summarymap["C"]));
+				elementsratio = ((double)(countS)) / ((double)(countC));
 				if (elementsratio > 0.8) {
 					continue;
 				}
 			}
 
-			if ((loss.summarymap.count("N") > 0) && (loss.summarymap.count("O") > 0) && (loss.summarymap.count("P") > 0) && (loss.summarymap.count("S") > 0)) {
-				if ((loss.summarymap["N"] > 1) && (loss.summarymap["O"] > 1) && (loss.summarymap["P"] > 1) && (loss.summarymap["S"] > 1)) {
-					if ((loss.summarymap["N"] >= 10) || (loss.summarymap["O"] >= 20) || (loss.summarymap["P"] >= 4) || (loss.summarymap["S"] >= 3)) {
-						continue;
-					}
+			if ((countF > 0) && (countC >= 0)) {
+				if (countC == 0) {
+					continue;
+				}
+				elementsratio = ((double)(countF)) / ((double)(countC));
+				if (elementsratio > 1.5) {
+					continue;
 				}
 			}
 
-			if ((loss.summarymap.count("N") > 0) && (loss.summarymap.count("O") > 0) && (loss.summarymap.count("P") > 0)) {
-				if ((loss.summarymap["N"] > 3) && (loss.summarymap["O"] > 3) && (loss.summarymap["P"] > 3)) {
-					if ((loss.summarymap["N"] >= 11) || (loss.summarymap["O"] >= 22) || (loss.summarymap["P"] >= 6)) {
-						continue;
-					}
+			if ((countCl > 0) && (countC >= 0)) {
+				if (countC == 0) {
+					continue;
+				}
+				elementsratio = ((double)(countCl)) / ((double)(countC));
+				if (elementsratio > 0.8) {
+					continue;
 				}
 			}
 
-			if ((loss.summarymap.count("O") > 0) && (loss.summarymap.count("P") > 0) && (loss.summarymap.count("S") > 0)) {
-				if ((loss.summarymap["O"] > 1) && (loss.summarymap["P"] > 1) && (loss.summarymap["S"] > 1)) {
-					if ((loss.summarymap["O"] >= 14) || (loss.summarymap["P"] >= 3) || (loss.summarymap["S"] >= 3)) {
-						continue;
-					}
+			if ((countBr > 0) && (countC >= 0)) {
+				if (countC == 0) {
+					continue;
+				}
+				elementsratio = ((double)(countBr)) / ((double)(countC));
+				if (elementsratio > 0.8) {
+					continue;
 				}
 			}
 
-			if ((loss.summarymap.count("P") > 0) && (loss.summarymap.count("S") > 0) && (loss.summarymap.count("N") > 0)) {
-				if ((loss.summarymap["P"] > 1) && (loss.summarymap["S"] > 1) && (loss.summarymap["N"] > 1)) {
-					if ((loss.summarymap["P"] >= 3) || (loss.summarymap["S"] >= 3) || (loss.summarymap["N"] >= 4)) {
-						continue;
-					}
+			if ((countSi > 0) && (countC >= 0)) {
+				if (countC == 0) {
+					continue;
+				}
+				elementsratio = ((double)(countSi)) / ((double)(countC));
+				if (elementsratio > 0.5) {
+					continue;
 				}
 			}
 
-			if ((loss.summarymap.count("N") > 0) && (loss.summarymap.count("O") > 0) && (loss.summarymap.count("S") > 0)) {
-				if ((loss.summarymap["N"] > 6) && (loss.summarymap["O"] > 6) && (loss.summarymap["S"] > 6)) {
-					if ((loss.summarymap["N"] >= 19) || (loss.summarymap["O"] >= 14) || (loss.summarymap["S"] >= 8)) {
-						continue;
-					}
+			if ((countN > 1) && (countO > 1) && (countP > 1) && (countS > 1)) {
+				if ((countN >= 10) || (countO >= 20) || (countP >= 4) || (countS >= 3)) {
+					continue;
+				}
+			}
+
+			if ((countN > 3) && (countO > 3) && (countP > 3)) {
+				if ((countN >= 11) || (countO >= 22) || (countP >= 6)) {
+					continue;
+				}
+			}
+
+			if ((countO > 1) && (countP > 1) && (countS > 1)) {
+				if ((countO >= 14) || (countP >= 3) || (countS >= 3)) {
+					continue;
+				}
+			}
+
+			if ((countP > 1) && (countS > 1) && (countN > 1)) {
+				if ((countP >= 3) || (countS >= 3) || (countN >= 4)) {
+					continue;
+				}
+			}
+
+			if ((countN > 6) && (countO > 6) && (countS > 6)) {
+				if ((countN >= 19) || (countO >= 14) || (countS >= 8)) {
+					continue;
 				}
 			}
 
 		}
 
-		// compress formula
 		tmpformula.clear();
-		tmpformula.addFormula(loss.summary);
-		loss.summary = tmpformula.getSummary();
+		for (auto& it : summarymap) {
+			tmpstr = it.first + to_string(it.second);
+			tmpformula.addFormula(tmpstr);
+		}
+		tmpstr = tmpformula.getSummary();
 
-		//stringsizeest += sizeof(string) + loss.summary.size();
-		//mapsizeest += sizeof(loss.summarymap) + loss.summarymap.size() * (sizeof(string) /* the length of string is 1 for HCONS */ + sizeof(int));
-		//doublesizeest += sizeof(double);
-		
-		seq.setName(loss.summary);
-		seq.setSummaryFormula(loss.summary);
+		seq.setName(tmpstr);
+		seq.setSummaryFormula(tmpstr);
 		sequencedatabase.push_back(seq);
-		//cnt++;
+		sequencescount++;
 
 		i++;
 
@@ -1934,8 +2012,6 @@ int cParameters::generateCompounds(bool& terminatecomputation, string& errormess
 			if (os) {
 				*os << i << " ";
 			}
-
-			//cout << i << " " << pruned << " - " << stringsizeest << " " << mapsizeest << " " << doublesizeest << " " << stringsizeest + mapsizeest + doublesizeest << endl;
 		}
 
 		if (i % 1000000 == 0) {
@@ -1947,7 +2023,7 @@ int cParameters::generateCompounds(bool& terminatecomputation, string& errormess
 
 	if (os) {
 		*os << "ok" << endl;
-		*os << "Number of generated compounds: " << /*cnt*/sequencedatabase.size() << endl << endl;
+		*os << "Number of generated compounds: " << sequencescount << endl << endl;
 	}
 
 	return 0;
