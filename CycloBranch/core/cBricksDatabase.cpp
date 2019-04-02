@@ -131,12 +131,24 @@ bool cBricksDatabase::nextCombination(vector<int>& combarray, int numberofbasicb
 
 	do {
 
+		if ((combarray[pointer] > 0) && (combarray[pointer] <= numberofbasicbricks)) {
+			// --
+		}
+
 		combarray[pointer]++;
+
+		if ((combarray[pointer] > 0) && (combarray[pointer] <= numberofbasicbricks)) {
+			// ++
+		}
 
 		// set combarray[pointer] to the maximum value when outside of the mass range
 		mass = getMassOfComposition(combarray, numberofbasicbricks);
 
 		if ((cyFlag == 0) && (combarray[pointer] <= numberofbasicbricks) && (((maximumcumulativemass > 0) && (mass > maximumcumulativemass)) || ((neutralprecursormass > 0) && (mass > neutralprecursormass)))) {
+			if (combarray[pointer] > 0) {
+				// --
+			}
+			
 			combarray[pointer] = numberofbasicbricks + 1;
 		}
 
@@ -145,7 +157,15 @@ bool cBricksDatabase::nextCombination(vector<int>& combarray, int numberofbasicb
 			if (cyFlag > 0) {
 
 				for (int i = pointer - 1; i >= 0; i--) {
+					if ((combarray[i] > 0) && (combarray[i] <= numberofbasicbricks)) {
+						// --
+					}
+
 					combarray[i] = combarray[pointer];
+
+					if ((combarray[i] > 0) && (combarray[i] <= numberofbasicbricks)) {
+						// ++
+					}
 				}
 
 				// skip combinations outside of the mass range
@@ -153,10 +173,27 @@ bool cBricksDatabase::nextCombination(vector<int>& combarray, int numberofbasicb
 
 				while ((combarray[pointer] <= numberofbasicbricks) && (pointer < maximumbricksincombination - 1) && (((maximumcumulativemass > 0) && (mass > maximumcumulativemass)) || ((neutralprecursormass > 0) && (mass > neutralprecursormass)))) {
 					pointer++;
+
+					if ((combarray[pointer] > 0) && (combarray[pointer] <= numberofbasicbricks)) {
+						// --
+					}
+
 					combarray[pointer]++;
 
+					if ((combarray[pointer] > 0) && (combarray[pointer] <= numberofbasicbricks)) {
+						// ++
+					}
+
 					for (int i = pointer - 1; i >= 0; i--) {
+						if ((combarray[i] > 0) && (combarray[i] <= numberofbasicbricks)) {
+							// --
+						}
+
 						combarray[i] = combarray[pointer];
+
+						if ((combarray[i] > 0) && (combarray[i] <= numberofbasicbricks)) {
+							// ++
+						}
 					}
 
 					mass = getMassOfComposition(combarray, numberofbasicbricks);
