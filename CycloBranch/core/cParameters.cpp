@@ -1994,12 +1994,10 @@ int cParameters::generateCompounds(bool& terminatecomputation, string& errormess
 
 		}
 
-		tmpformula.clear();
+		tmpstr.clear();
 		for (auto& it : summarymap) {
-			tmpstr = it.first + to_string(it.second);
-			tmpformula.addFormula(tmpstr);
+			tmpstr += it.first + to_string(it.second);
 		}
-		tmpstr = tmpformula.getSummary();
 
 		seq.setName(tmpstr);
 		seq.setSummaryFormula(tmpstr);
