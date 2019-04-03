@@ -1519,7 +1519,7 @@ int cParameters::generateCompounds(bool& terminatecomputation, string& errormess
 
 	cBricksDatabase elementsbrickdatabase;
 	cBrick tmpbrick;
-	string tmpstr;
+	string tmpstr, tmpstr2;
 	vector<int> valences;
 	bool validvalences = false;
 
@@ -1533,8 +1533,6 @@ int cParameters::generateCompounds(bool& terminatecomputation, string& errormess
 	double sumofmasses;
 	double tmpmzdifference;
 	bool alloutofmz;
-
-	map<string, int> summarymap;
 
 	int countH;
 	int countC;
@@ -1580,6 +1578,7 @@ int cParameters::generateCompounds(bool& terminatecomputation, string& errormess
 
 	elementsbrickdatabase.sortbyMass();
 
+	int carbonpos = -1;
 	for (i = 0; i < elementsbrickdatabase.size(); i++) {
 		countsofelements.push_back(0);
 		massesofelements.push_back(elementsbrickdatabase[i].getMass());
@@ -1587,45 +1586,62 @@ int cParameters::generateCompounds(bool& terminatecomputation, string& errormess
 		tmpstr = elementsbrickdatabase[i].getSummary();
 		namesofelements.push_back(tmpstr);
 
+		if (tmpstr.compare("C") == 0) {
+			carbonpos = i;
+		}
+
 		if (tmpstr.compare("H") == 0) {
 			valences.push_back(1);
 		}
+
 		if (tmpstr.compare("C") == 0) {
 			valences.push_back(4);
 		}
+
 		if (tmpstr.compare("O") == 0) {
 			valences.push_back(2);
 		}
+
 		if (tmpstr.compare("N") == 0) {
 			valences.push_back(3);
 		}
+
 		if (tmpstr.compare("S") == 0) {
 			valences.push_back(6);
 		}
+
 		if (tmpstr.compare("P") == 0) {
 			valences.push_back(5);
 		}
+
 		if (tmpstr.compare("Li") == 0) {
 			valences.push_back(1);
 		}
+
 		if (tmpstr.compare("Na") == 0) {
 			valences.push_back(1);
 		}
+
 		if (tmpstr.compare("K") == 0) {
 			valences.push_back(1);
 		}
+
 		if (tmpstr.compare("F") == 0) {
 			valences.push_back(1);
 		}
+
 		if (tmpstr.compare("Cl") == 0) {
 			valences.push_back(1);
 		}
+
 		if (tmpstr.compare("Br") == 0) {
 			valences.push_back(1);
 		}
+
 		if (tmpstr.compare("I") == 0) {
 			valences.push_back(1);
 		}
+
 		if (tmpstr.compare("Si") == 0) {
 			valences.push_back(4);
 		}
@@ -1675,64 +1691,63 @@ int cParameters::generateCompounds(bool& terminatecomputation, string& errormess
 			continue;
 		}
 
-		summarymap.clear();
-		size = elementsbrickdatabase.size();
-		for (int j = 0; j < size; j++) {
-			if (countsofelements[j] > 0) {
-				summarymap[namesofelements[j]] = countsofelements[j];
-			}
-		}
-
 		if (advancedformulacheck) {
 
 			countH = 0;
-			if (summarymap.count("H") > 0) {
-				countH = summarymap["H"];
-			}
-
 			countC = 0;
-			if (summarymap.count("C") > 0) {
-				countC = summarymap["C"];
-			}
-
 			countO = 0;
-			if (summarymap.count("O") > 0) {
-				countO = summarymap["O"];
-			}
-
 			countN = 0;
-			if (summarymap.count("N") > 0) {
-				countN = summarymap["N"];
-			}
-
 			countS = 0;
-			if (summarymap.count("S") > 0) {
-				countS = summarymap["S"];
-			}
-
 			countP = 0;
-			if (summarymap.count("P") > 0) {
-				countP = summarymap["P"];
-			}
-
 			countF = 0;
-			if (summarymap.count("F") > 0) {
-				countF = summarymap["F"];
-			}
-
 			countCl = 0;
-			if (summarymap.count("Cl") > 0) {
-				countCl = summarymap["Cl"];
-			}
-
 			countBr = 0;
-			if (summarymap.count("Br") > 0) {
-				countBr = summarymap["Br"];
-			}
-
 			countSi = 0;
-			if (summarymap.count("Si") > 0) {
-				countSi = summarymap["Si"];
+
+			size = (int)countsofelements.size();
+			for (int j = 0; j < size; j++) {
+				if (countsofelements[j] > 0) {
+					if (namesofelements[j].compare("H") == 0) {
+						countH = countsofelements[j];
+						continue;
+					}
+					if (namesofelements[j].compare("C") == 0) {
+						countC = countsofelements[j];
+						continue;
+					}
+					if (namesofelements[j].compare("O") == 0) {
+						countO = countsofelements[j];
+						continue;
+					}
+					if (namesofelements[j].compare("N") == 0) {
+						countN = countsofelements[j];
+						continue;
+					}
+					if (namesofelements[j].compare("S") == 0) {
+						countS = countsofelements[j];
+						continue;
+					}
+					if (namesofelements[j].compare("P") == 0) {
+						countP = countsofelements[j];
+						continue;
+					}
+					if (namesofelements[j].compare("F") == 0) {
+						countF = countsofelements[j];
+						continue;
+					}
+					if (namesofelements[j].compare("Cl") == 0) {
+						countCl = countsofelements[j];
+						continue;
+					}
+					if (namesofelements[j].compare("Br") == 0) {
+						countBr = countsofelements[j];
+						continue;
+					}
+					if (namesofelements[j].compare("Si") == 0) {
+						countSi = countsofelements[j];
+						continue;
+					}
+				}
 			}
 
 			if (sumofmasses < 500.0) {
@@ -1995,9 +2010,19 @@ int cParameters::generateCompounds(bool& terminatecomputation, string& errormess
 		}
 
 		tmpstr.clear();
-		for (auto& it : summarymap) {
-			tmpstr += it.first + to_string(it.second);
+		tmpstr2.clear();
+		size = (int)countsofelements.size();
+		for (int j = 0; j < size; j++) {
+			if (countsofelements[j] > 0) {
+				if (j == carbonpos) {
+					tmpstr2 = namesofelements[j] + to_string(countsofelements[j]);
+				}
+				else {
+					tmpstr += namesofelements[j] + to_string(countsofelements[j]);
+				}
+			}
 		}
+		tmpstr = tmpstr2 + tmpstr;
 
 		seq.setName(tmpstr);
 		seq.setSummaryFormula(tmpstr);
