@@ -1640,16 +1640,8 @@ int cParameters::generateCompounds(bool& terminatecomputation, string& errormess
 		combarray.push_back(0);
 	}
 
-	vector<int> combcounts;
-	vector<double> combmasses;
-	for (i = 0; i < numberofbasicbricks; i++) {
-		combcounts.push_back(0);
-		combmasses.push_back(elementsbrickdatabase[i].getMass());
-	}
-
-
 	i = 0;
-	while (elementsbrickdatabase.nextCombinationFast(combarray, combcounts, combmasses, sumofmasses, numberofbasicbricks, maximumcombinedlosses, 0, maximummz)) {
+	while (elementsbrickdatabase.nextCombinationFast(combarray, countsofelements, massesofelements, sumofmasses, numberofbasicbricks, maximumcombinedlosses, 0, maximummz)) {
 		if (terminatecomputation) {
 			errormessage = "Aborted by user.";
 			return -1;
