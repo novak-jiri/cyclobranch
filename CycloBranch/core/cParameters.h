@@ -62,7 +62,7 @@ class cParameters {
 
 	bool checkSeniorRules(vector<int>& combarray, vector<int>& valences);
 
-	double getMassAndCounts(vector<int>& combarray, vector<int>& countsofelements, vector<double>& massesofelements);
+	//double getMassAndCounts(vector<int>& combarray, vector<int>& countsofelements, vector<double>& massesofelements);
 
 
 public:

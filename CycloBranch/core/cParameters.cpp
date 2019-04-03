@@ -54,7 +54,7 @@ bool cParameters::checkSeniorRules(vector<int>& combarray, vector<int>& valences
 }
 
 
-double cParameters::getMassAndCounts(vector<int>& combarray, vector<int>& countsofelements, vector<double>& massesofelements) {
+/*double cParameters::getMassAndCounts(vector<int>& combarray, vector<int>& countsofelements, vector<double>& massesofelements) {
 	int i, size;
 
 	i = 0;
@@ -79,7 +79,7 @@ double cParameters::getMassAndCounts(vector<int>& combarray, vector<int>& counts
 	}
 
 	return mass;
-}
+}*/
 
 
 cParameters::cParameters() {
@@ -1640,8 +1640,16 @@ int cParameters::generateCompounds(bool& terminatecomputation, string& errormess
 		combarray.push_back(0);
 	}
 
+	vector<int> combcounts;
+	vector<double> combmasses;
+	for (i = 0; i < numberofbasicbricks; i++) {
+		combcounts.push_back(0);
+		combmasses.push_back(elementsbrickdatabase[i].getMass());
+	}
+
+
 	i = 0;
-	while (elementsbrickdatabase.nextCombination(combarray, numberofbasicbricks, maximumcombinedlosses, 0, maximummz)) {
+	while (elementsbrickdatabase.nextCombinationFast(combarray, combcounts, combmasses, sumofmasses, numberofbasicbricks, maximumcombinedlosses, 0, maximummz)) {
 		if (terminatecomputation) {
 			errormessage = "Aborted by user.";
 			return -1;
@@ -1653,7 +1661,7 @@ int cParameters::generateCompounds(bool& terminatecomputation, string& errormess
 			}
 		}
 
-		sumofmasses = getMassAndCounts(combarray, countsofelements, massesofelements);
+		//sumofmasses = getMassAndCounts(combarray, countsofelements, massesofelements);
 
 		alloutofmz = true;
 		for (auto& it : ionsfortheoreticalspectra) {
