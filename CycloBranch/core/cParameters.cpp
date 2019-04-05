@@ -1505,7 +1505,7 @@ int cParameters::calculateNeutralLosses(bool& terminatecomputation, string& erro
 
 int cParameters::generateCompounds(bool& terminatecomputation, string& errormessage) {
 	sequencedatabase.clear();
-	int sequencescount = 0;
+	unsigned long long sequencescount = 0;
 
 	errormessage = "";
 
