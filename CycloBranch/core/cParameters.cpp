@@ -1515,7 +1515,7 @@ int cParameters::generateCompounds(bool& terminatecomputation, string& errormess
 
 	cSequence seq;
 	cSummaryFormula tmpformula;
-	int i, size;
+	int size;
 
 	cBricksDatabase elementsbrickdatabase;
 	cBrick tmpbrick;
@@ -1549,7 +1549,7 @@ int cParameters::generateCompounds(bool& terminatecomputation, string& errormess
 		*os << "Generating compounds... " << endl;
 	}
 
-	for (i = 0; i < (int)originalneutrallossesfortheoreticalspectra.size(); i++) {
+	for (int i = 0; i < (int)originalneutrallossesfortheoreticalspectra.size(); i++) {
 		tmpstr = originalneutrallossesdefinitions[originalneutrallossesfortheoreticalspectra[i]].summary;
 		tmpformula.setFormula(tmpstr, false);
 
@@ -1579,7 +1579,7 @@ int cParameters::generateCompounds(bool& terminatecomputation, string& errormess
 	elementsbrickdatabase.sortbyMass();
 
 	int carbonpos = -1;
-	for (i = 0; i < elementsbrickdatabase.size(); i++) {
+	for (int i = 0; i < elementsbrickdatabase.size(); i++) {
 		countsofelements.push_back(0);
 		massesofelements.push_back(elementsbrickdatabase[i].getMass());
 
@@ -1652,11 +1652,11 @@ int cParameters::generateCompounds(bool& terminatecomputation, string& errormess
 	}
 
 	vector<int> combarray;
-	for (i = 0; i < maximumcombinedlosses; i++) {
+	for (int i = 0; i < maximumcombinedlosses; i++) {
 		combarray.push_back(0);
 	}
 
-	i = 0;
+	unsigned long long ui = 0;
 	while (elementsbrickdatabase.nextCombinationFast(combarray, countsofelements, massesofelements, sumofmasses, numberofbasicbricks, maximumcombinedlosses, 0, maximummz)) {
 		if (terminatecomputation) {
 			errormessage = "Aborted by user.";
@@ -2029,15 +2029,15 @@ int cParameters::generateCompounds(bool& terminatecomputation, string& errormess
 		sequencedatabase.push_back(seq);
 		sequencescount++;
 
-		i++;
+		ui++;
 
-		if (i % 100000 == 0) {
+		if (ui % 100000 == 0) {
 			if (os) {
-				*os << i << " ";
+				*os << ui << " ";
 			}
 		}
 
-		if (i % 1000000 == 0) {
+		if (ui % 1000000 == 0) {
 			if (os) {
 				*os << endl;
 			}
