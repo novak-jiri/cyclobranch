@@ -1523,6 +1523,7 @@ int cParameters::generateCompounds(bool& terminatecomputation, string& errormess
 	vector<int> valences;
 	bool validvalences = false;
 
+	vector<int> limitsofelements;
 	vector<int> countsofelements;
 	vector<double> massesofelements;
 	vector<string> namesofelements;
@@ -1551,9 +1552,15 @@ int cParameters::generateCompounds(bool& terminatecomputation, string& errormess
 
 	for (int i = 0; i < (int)originalneutrallossesfortheoreticalspectra.size(); i++) {
 		tmpstr = originalneutrallossesdefinitions[originalneutrallossesfortheoreticalspectra[i]].summary;
+
+		if (tmpstr.rfind(':') != string::npos) {
+			tmpstr = tmpstr.substr(0, tmpstr.rfind(':'));
+		}
+
 		tmpformula.setFormula(tmpstr, false);
 
 		tmpbrick.clear();
+		tmpbrick.setName(originalneutrallossesdefinitions[originalneutrallossesfortheoreticalspectra[i]].summary);
 		tmpbrick.setComposition(to_string(numberofbasicbricks + 1), false);
 		tmpbrick.setMass(tmpformula.getMass());
 		tmpbrick.setSummary(tmpstr);
@@ -1579,9 +1586,20 @@ int cParameters::generateCompounds(bool& terminatecomputation, string& errormess
 	elementsbrickdatabase.sortbyMass();
 
 	int carbonpos = -1;
+	bool enablelimitfilter = false;
 	for (int i = 0; i < elementsbrickdatabase.size(); i++) {
 		countsofelements.push_back(0);
 		massesofelements.push_back(elementsbrickdatabase[i].getMass());
+
+		tmpstr = elementsbrickdatabase[i].getName();
+		if (tmpstr.rfind(':') != string::npos) {
+			tmpstr = tmpstr.substr(tmpstr.rfind(':') + 1);
+			limitsofelements.push_back(QVariant(tmpstr.c_str()).toInt());
+			enablelimitfilter = true;
+		}
+		else {
+			limitsofelements.push_back(0);
+		}
 
 		tmpstr = elementsbrickdatabase[i].getSummary();
 		namesofelements.push_back(tmpstr);
@@ -1657,10 +1675,26 @@ int cParameters::generateCompounds(bool& terminatecomputation, string& errormess
 	}
 
 	unsigned long long ui = 0;
+	bool skipcombination;
 	while (elementsbrickdatabase.nextCombinationFast(combarray, countsofelements, massesofelements, sumofmasses, numberofbasicbricks, maximumcombinedlosses, 0, maximummz)) {
 		if (terminatecomputation) {
 			errormessage = "Aborted by user.";
 			return -1;
+		}
+
+		if (enablelimitfilter) {
+			skipcombination = false;
+			size = (int)countsofelements.size();
+			for (int j = 0; j < size; j++) {
+				if ((limitsofelements[j] > 0) && (countsofelements[j] > limitsofelements[j])) {
+					skipcombination = true;
+					break;
+				}
+			}
+
+			if (skipcombination) {
+				continue;
+			}
 		}
 
 		if (validvalences) {
