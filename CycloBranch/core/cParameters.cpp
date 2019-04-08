@@ -1676,7 +1676,7 @@ int cParameters::generateCompounds(bool& terminatecomputation, string& errormess
 
 	unsigned long long ui = 0;
 	bool skipcombination;
-	while (elementsbrickdatabase.nextCombinationFast(combarray, countsofelements, massesofelements, sumofmasses, numberofbasicbricks, maximumcombinedlosses, 0, maximummz)) {
+	while (elementsbrickdatabase.nextCombinationFast(combarray, countsofelements, limitsofelements, massesofelements, sumofmasses, numberofbasicbricks, maximumcombinedlosses, 0, maximummz)) {
 		if (terminatecomputation) {
 			errormessage = "Aborted by user.";
 			return -1;
@@ -1696,6 +1696,11 @@ int cParameters::generateCompounds(bool& terminatecomputation, string& errormess
 				continue;
 			}
 		}
+
+		//for (auto& it : combarray) {
+		//	cout << it;
+		//}
+		//cout << endl;
 
 		if (validvalences) {
 			if (!checkSeniorRules(combarray, valences)) {

@@ -196,7 +196,7 @@ bool cBricksDatabase::nextCombination(vector<int>& combarray, int numberofbasicb
 }
 
 
-bool cBricksDatabase::nextCombinationFast(vector<int>& combarray, vector<int>& combcounts, vector<double>& combmasses, double& mass, int numberofbasicbricks, int maximumbricksincombination, double maximumcumulativemass, double neutralprecursormass) {
+bool cBricksDatabase::nextCombinationFast(vector<int>& combarray, vector<int>& combcounts, vector<int>& comblimits, vector<double>& combmasses, double& mass, int numberofbasicbricks, int maximumbricksincombination, double maximumcumulativemass, double neutralprecursormass) {
 	int pointer = 0;
 	int cyFlag = 0;
 	
@@ -217,14 +217,37 @@ bool cBricksDatabase::nextCombinationFast(vector<int>& combarray, vector<int>& c
 		// set combarray[pointer] to the maximum value when outside of the mass range
 		mass = getMassFromCombCounts(combcounts, combmasses);
 
-		if ((cyFlag == 0) && (combarray[pointer] <= numberofbasicbricks) && (((maximumcumulativemass > 0) && (mass > maximumcumulativemass)) || ((neutralprecursormass > 0) && (mass > neutralprecursormass)))) {
-			if (combarray[pointer] > 0) {
-				combcounts[combarray[pointer] - 1]--;
-			}
+		if ((cyFlag == 0) && (combarray[pointer] <= numberofbasicbricks) && (((maximumcumulativemass > 0) && (mass > maximumcumulativemass)) || ((neutralprecursormass > 0) && (mass > neutralprecursormass)) /*|| ((comblimits[combarray[pointer] - 1] > 0) && (combcounts[combarray[pointer] - 1] > comblimits[combarray[pointer] - 1]))*/)) {
 			
-			combarray[pointer] = numberofbasicbricks + 1;
+			if (((maximumcumulativemass > 0) && (mass > maximumcumulativemass)) || ((neutralprecursormass > 0) && (mass > neutralprecursormass))) {
+
+				if (combarray[pointer] > 0) {
+					combcounts[combarray[pointer] - 1]--;
+				}
+
+				combarray[pointer] = numberofbasicbricks + 1;
+
+			}
+			else {
+
+				/*while ((combarray[pointer] <= numberofbasicbricks) && ((comblimits[combarray[pointer] - 1] > 0) && (combcounts[combarray[pointer] - 1] > comblimits[combarray[pointer] - 1]))) {
+
+					if ((combarray[pointer] > 0) && (combarray[pointer] <= numberofbasicbricks)) {
+						combcounts[combarray[pointer] - 1]--;
+					}
+
+					combarray[pointer]++;
+
+					if ((combarray[pointer] > 0) && (combarray[pointer] <= numberofbasicbricks)) {
+						combcounts[combarray[pointer] - 1]++;
+					}
+
+				}*/
+				
+			}
 
 			mass = getMassFromCombCounts(combcounts, combmasses);
+
 		}
 
 		if (combarray[pointer] <= numberofbasicbricks) {
@@ -237,6 +260,9 @@ bool cBricksDatabase::nextCombinationFast(vector<int>& combarray, vector<int>& c
 					}
 
 					combarray[i] = combarray[pointer];
+					//while ((combarray[i] > 0) && (combarray[i] <= numberofbasicbricks) && (comblimits[combarray[i] - 1] > 0) && (combcounts[combarray[i] - 1] + 1 > comblimits[combarray[i] - 1])) {
+					//	combarray[i]++;
+					//}
 
 					if ((combarray[i] > 0) && (combarray[i] <= numberofbasicbricks)) {
 						combcounts[combarray[i] - 1]++;
@@ -246,7 +272,7 @@ bool cBricksDatabase::nextCombinationFast(vector<int>& combarray, vector<int>& c
 				// skip combinations outside of the mass range
 				mass = getMassFromCombCounts(combcounts, combmasses);
 
-				while ((combarray[pointer] <= numberofbasicbricks) && (pointer < maximumbricksincombination - 1) && (((maximumcumulativemass > 0) && (mass > maximumcumulativemass)) || ((neutralprecursormass > 0) && (mass > neutralprecursormass)))) {
+				while ((combarray[pointer] <= numberofbasicbricks) && (pointer < maximumbricksincombination - 1) && (((maximumcumulativemass > 0) && (mass > maximumcumulativemass)) || ((neutralprecursormass > 0) && (mass > neutralprecursormass)) /*|| ((comblimits[combarray[pointer] - 1] > 0) && (combcounts[combarray[pointer] - 1] > comblimits[combarray[pointer] - 1]))*/)) {
 					pointer++;
 
 					if ((combarray[pointer] > 0) && (combarray[pointer] <= numberofbasicbricks)) {
@@ -265,6 +291,9 @@ bool cBricksDatabase::nextCombinationFast(vector<int>& combarray, vector<int>& c
 						}
 
 						combarray[i] = combarray[pointer];
+						//while ((combarray[i] > 0) && (combarray[i] <= numberofbasicbricks) && (comblimits[combarray[i] - 1] > 0) && (combcounts[combarray[i] - 1] + 1 > comblimits[combarray[i] - 1])) {
+						//	combarray[i]++;
+						//}
 
 						if ((combarray[i] > 0) && (combarray[i] <= numberofbasicbricks)) {
 							combcounts[combarray[i] - 1]++;
@@ -274,7 +303,7 @@ bool cBricksDatabase::nextCombinationFast(vector<int>& combarray, vector<int>& c
 					mass = getMassFromCombCounts(combcounts, combmasses);
 				}
 
-				if ((combarray[pointer] > numberofbasicbricks) || ((maximumcumulativemass > 0) && (mass > maximumcumulativemass)) || ((neutralprecursormass > 0) && (mass > neutralprecursormass))) {
+				if ((combarray[pointer] > numberofbasicbricks) || ((maximumcumulativemass > 0) && (mass > maximumcumulativemass)) || ((neutralprecursormass > 0) && (mass > neutralprecursormass)) /*|| ((comblimits[combarray[pointer] - 1] > 0) && (combcounts[combarray[pointer] - 1] > comblimits[combarray[pointer] - 1]))*/) {
 					return false;
 				}
 

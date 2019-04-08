@@ -360,15 +360,17 @@ public:
 
 	/**
 		\brief Generate a simple mass spectrum.
+		\param terminatecomputation reference to a variable determining that the computation must be stopped
 		\param writedescription if true then string descriptions of peaks are filled
 	*/ 
-	void generateMSSpectrum(bool writedescription);
+	void generateMSSpectrum(bool& terminatecomputation, bool writedescription);
 
 
 	/**
 		\brief Generate a simple mass spectrum with fine isotopic patterns.
+		\param terminatecomputation reference to a variable determining that the computation must be stopped
 	*/ 
-	void generateFineMSSpectrum();
+	void generateFineMSSpectrum(bool& terminatecomputation);
 
 
 	/**

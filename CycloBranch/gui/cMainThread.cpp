@@ -441,10 +441,15 @@ void cMainThread::run() {
 		ts.setParameters(&parameters);
 
 		if (parameters.generateisotopepattern) {
-			ts.generateFineMSSpectrum();
+			ts.generateFineMSSpectrum(terminatecomputation);
 		}
 		else {
-			ts.generateMSSpectrum(true);		
+			ts.generateMSSpectrum(terminatecomputation, true);
+		}
+
+		if (terminatecomputation) {
+			emitEndSignals();
+			return;
 		}
 
 		unordered_map<string, int> tempmap;

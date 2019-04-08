@@ -3469,7 +3469,7 @@ int cTheoreticalSpectrum::compareOther(cPeaksList& sortedpeaklist, bool writedes
 }
 
 
-void cTheoreticalSpectrum::generateMSSpectrum(bool writedescription) {
+void cTheoreticalSpectrum::generateMSSpectrum(bool& terminatecomputation, bool writedescription) {
 	cPeak peak;
 	cSummaryFormula formula;
 	regex rx;
@@ -3490,6 +3490,12 @@ void cTheoreticalSpectrum::generateMSSpectrum(bool writedescription) {
 	
 	int theoreticalpeaksrealsize = 0;
 	for (int i = 0; i < parameters->sequencedatabase.size(); i++) {
+
+		if (terminatecomputation) {
+			theoreticalpeaks.clear();
+			theoreticalpeaksrealsize = 0;
+			return;
+		}
 
 		peak.clear();
 		peak.compoundid = i;
@@ -3546,7 +3552,7 @@ void cTheoreticalSpectrum::generateMSSpectrum(bool writedescription) {
 }
 
 
-void cTheoreticalSpectrum::generateFineMSSpectrum() {
+void cTheoreticalSpectrum::generateFineMSSpectrum(bool& terminatecomputation) {
 	cSummaryFormula formula;
 	string proton = "H+";
 	string description;
@@ -3564,12 +3570,23 @@ void cTheoreticalSpectrum::generateFineMSSpectrum() {
 	sequence.setDecoy(true);
 
 	for (int i = 0; i < seqdbsize; i++) {
+		if (terminatecomputation) {
+			parameters->sequencedatabase.clear();
+			return;
+		}
+
 		summary = parameters->sequencedatabase[i].getSummaryFormula() + "H";
 		sequence.setSummaryFormula(summary);
 		parameters->sequencedatabase.push_back(sequence);
 	}
 
 	for (int i = 0; i < parameters->sequencedatabase.size(); i++) {
+
+		if (terminatecomputation) {
+			theoreticalpeaks.clear();
+			theoreticalpeaksrealsize = 0;
+			return;
+		}
 
 		formula.clear();
 		formula.setFormula(parameters->sequencedatabase[i].getSummaryFormula());
