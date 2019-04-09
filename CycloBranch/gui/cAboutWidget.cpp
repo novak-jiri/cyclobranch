@@ -42,7 +42,7 @@ cAboutWidget::cAboutWidget(QWidget* parent) {
 
 	QString splash = "<div align=\"center\"><img src=\":/images/splash.png\"></div><br/><hr/><br/>";
 
-	QString acknowledgement = "Acknowledgements:<br/><br/>Thanks to <a href=\"http://www.aha-soft.com/\">Aha-soft</a> and <a href=\"http://icons8.com/\">Icons8</a> for icons.<br/><hr/><br/>";
+	QString acknowledgement = "Acknowledgements:<br/><br/>This application uses <a href=\"https://www.qt.io/\">Qt library</a> under <a href=\"https://www.gnu.org/licenses/lgpl-3.0.en.html\">LGPLv3</a> license. Thanks to <a href=\"http://www.aha-soft.com/\">Aha-soft</a> and <a href=\"http://icons8.com/\">Icons8</a> for icons.<br/><hr/><br/>";
 
 	message = new QTextBrowser();
 	message->setReadOnly(true);

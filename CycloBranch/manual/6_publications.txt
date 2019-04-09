@@ -30,9 +30,9 @@ Download citation: [ <a href="https://ms.biomed.cas.cz/cyclobranch/docs/cyclobra
 \section publicationsrelated Related Publications
 
 <p>
-Tomas Pluhacek, Anton Skriba, Jiri Novak, Dominika Luptakova and Vladimir Havlicek<br/>
+Tomas Pluhacek, Anton Skriba, Jiri Novak, Dominika Luptakova and Vladimir Havlicek.<br/>
 <b>Analysis of Microbial Siderophores by Mass Spectrometry.</b><br/>
-In: Sanjoy K. Bhattacharya (ed.), <i>Metabolomics: Methods and Protocols</i>, Methods in Molecular Biology, vol. 1996, 2019, in press. DOI: <a href="https://doi.org/10.1007/978-1-4939-9488-5_12"><b>10.1007/978-1-4939-9488-5_12</b></a>.<br/>
+In: Sanjoy K. Bhattacharya (ed.), <i>Metabolomics: Methods and Protocols</i>, Methods in Molecular Biology, vol. 1996, Springer, 2019, in press. DOI: <a href="https://doi.org/10.1007/978-1-4939-9488-5_12"><b>10.1007/978-1-4939-9488-5_12</b></a>.<br/>
 </p>
 
 <p>

@@ -1586,7 +1586,7 @@ int cParameters::generateCompounds(bool& terminatecomputation, string& errormess
 	elementsbrickdatabase.sortbyMass();
 
 	int carbonpos = -1;
-	bool enablelimitfilter = false;
+	//bool enablelimitfilter = false;
 	for (int i = 0; i < elementsbrickdatabase.size(); i++) {
 		countsofelements.push_back(0);
 		massesofelements.push_back(elementsbrickdatabase[i].getMass());
@@ -1595,7 +1595,7 @@ int cParameters::generateCompounds(bool& terminatecomputation, string& errormess
 		if (tmpstr.rfind(':') != string::npos) {
 			tmpstr = tmpstr.substr(tmpstr.rfind(':') + 1);
 			limitsofelements.push_back(QVariant(tmpstr.c_str()).toInt());
-			enablelimitfilter = true;
+			//enablelimitfilter = true;
 		}
 		else {
 			limitsofelements.push_back(0);
@@ -1675,14 +1675,14 @@ int cParameters::generateCompounds(bool& terminatecomputation, string& errormess
 	}
 
 	unsigned long long ui = 0;
-	bool skipcombination;
-	while (elementsbrickdatabase.nextCombinationFast(combarray, countsofelements, limitsofelements, massesofelements, sumofmasses, numberofbasicbricks, maximumcombinedlosses, 0, maximummz)) {
+	//bool skipcombination;
+	while (elementsbrickdatabase.nextCombinationFastLimited(combarray, countsofelements, limitsofelements, massesofelements, sumofmasses, numberofbasicbricks, maximumcombinedlosses, 0, maximummz)) {
 		if (terminatecomputation) {
 			errormessage = "Aborted by user.";
 			return -1;
 		}
 
-		if (enablelimitfilter) {
+		/*if (enablelimitfilter) {
 			skipcombination = false;
 			size = (int)countsofelements.size();
 			for (int j = 0; j < size; j++) {
@@ -1695,12 +1695,7 @@ int cParameters::generateCompounds(bool& terminatecomputation, string& errormess
 			if (skipcombination) {
 				continue;
 			}
-		}
-
-		//for (auto& it : combarray) {
-		//	cout << it;
-		//}
-		//cout << endl;
+		}*/
 
 		if (validvalences) {
 			if (!checkSeniorRules(combarray, valences)) {
