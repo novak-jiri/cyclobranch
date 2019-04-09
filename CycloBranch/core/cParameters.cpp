@@ -28,25 +28,20 @@ void cParameters::fixIntensities(cPeaksList& centroidspectrum, cPeaksList& profi
 }
 
 
-bool cParameters::checkSeniorRules(vector<int>& combarray, vector<int>& valences) {
+bool cParameters::checkSeniorRules(vector<int>& combarray, vector<int>& valences, int maxcomponents) {
 	int totalvalence = 0;
-	//int maximumvalence = 0;
-	//int currentvalence;
 	int i, size;
 
 	i = 0;
 	size = (int)combarray.size();
 	while ((i < size) && (combarray[i] > 0)) {
 		totalvalence += valences[combarray[i] - 1];
-		//currentvalence = valences[combarray[i] - 1];
-		//totalvalence += currentvalence;
-		//if (currentvalence > maximumvalence) {
-		//	maximumvalence = currentvalence;
-		//}
 		i++;
 	}
 
-	if ((totalvalence % 2 == 1) /*|| (totalvalence < 2 * maximumvalence)*/ || (totalvalence < 2 * (i - 1))) {
+	// SENIOR rule 1 - the sum of valences must be even
+	// SENIOR rule 3 - the sum of valences >= 2 * (atomscount - maximum number of allowed components in the graph); edges - nodes + components >= 0
+	if ((totalvalence % 2 == 1) || (totalvalence < 2 * (i - maxcomponents))) {
 		return false;
 	}
 
@@ -1222,10 +1217,13 @@ int cParameters::calculateNeutralLosses(bool& terminatecomputation, string& erro
 	cSummaryFormula tmpformula;
 	string tmpstring;
 	neutralLoss loss;
-	int i;
 
 	cBricksDatabase neutrallossesbrickdatabase;
 	cBrick tmpbrick;
+	string tmpstr;
+	vector<int> valences;
+	bool validvalences = false;
+
 	int numberofbasicbricks = 0;
 	string compositionname;
 	vector<int> intcomposition;
@@ -1233,9 +1231,9 @@ int cParameters::calculateNeutralLosses(bool& terminatecomputation, string& erro
 	int compressionlimit = 100000;
 	bool compressformulas;
 
-	bool undefinedelement;
-	int valence;
-	int atomscount;
+	//bool undefinedelement;
+	//int valence;
+	//int atomscount;
 
 	//int stringsizeest = 0;
 	//int mapsizeest = 0;
@@ -1246,7 +1244,7 @@ int cParameters::calculateNeutralLosses(bool& terminatecomputation, string& erro
 		*os << "Calculating combinations of neutral losses... " << endl;
 	}
 
-	for (i = 0; i < (int)originalneutrallossesfortheoreticalspectra.size(); i++) {
+	for (int i = 0; i < (int)originalneutrallossesfortheoreticalspectra.size(); i++) {
 		tmpformula.setFormula(originalneutrallossesdefinitions[originalneutrallossesfortheoreticalspectra[i]].summary, false);
 
 		tmpbrick.clear();
@@ -1262,8 +1260,76 @@ int cParameters::calculateNeutralLosses(bool& terminatecomputation, string& erro
 
 	neutrallossesbrickdatabase.sortbyMass();
 
+	for (int i = 0; i < neutrallossesbrickdatabase.size(); i++) {
+		tmpstr = neutrallossesbrickdatabase[i].getSummary();
+
+		if (tmpstr.compare("H") == 0) {
+			valences.push_back(1);
+		}
+
+		if (tmpstr.compare("C") == 0) {
+			valences.push_back(4);
+		}
+
+		if (tmpstr.compare("O") == 0) {
+			valences.push_back(2);
+		}
+
+		if (tmpstr.compare("N") == 0) {
+			valences.push_back(3);
+		}
+
+		if (tmpstr.compare("S") == 0) {
+			valences.push_back(6);
+		}
+
+		if (tmpstr.compare("P") == 0) {
+			valences.push_back(5);
+		}
+
+		if (tmpstr.compare("Li") == 0) {
+			valences.push_back(1);
+		}
+
+		if (tmpstr.compare("Na") == 0) {
+			valences.push_back(1);
+		}
+
+		if (tmpstr.compare("K") == 0) {
+			valences.push_back(1);
+		}
+
+		if (tmpstr.compare("F") == 0) {
+			valences.push_back(1);
+		}
+
+		if (tmpstr.compare("Cl") == 0) {
+			valences.push_back(1);
+		}
+
+		if (tmpstr.compare("Br") == 0) {
+			valences.push_back(1);
+		}
+
+		if (tmpstr.compare("I") == 0) {
+			valences.push_back(1);
+		}
+
+		if (tmpstr.compare("Si") == 0) {
+			valences.push_back(4);
+		}
+	}
+
+	if ((neutrallossesbrickdatabase.size() > 0) && (neutrallossesbrickdatabase.size() == valences.size())) {
+		validvalences = true;
+
+		if (os) {
+			*os << "Filtering using Senior's rules has been enabled." << endl;
+		}
+	}
+
 	vector<int> combarray;
-	for (i = 0; i < maximumcombinedlosses; i++) {
+	for (int i = 0; i < maximumcombinedlosses; i++) {
 		combarray.push_back(0);
 	}
 
@@ -1276,7 +1342,7 @@ int cParameters::calculateNeutralLosses(bool& terminatecomputation, string& erro
 	if (mode == singlecomparison) {
 
 		bruteforce = true;
-		for (i = 0; i < neutrallossesbrickdatabase.size(); i++) {
+		for (int i = 0; i < neutrallossesbrickdatabase.size(); i++) {
 			if (neutrallossesbrickdatabase[i].getSummaryMap().size() == 1) {
 				auto it = neutrallossesbrickdatabase[i].getSummaryMap().begin();
 				if (it->second != 1) {
@@ -1330,7 +1396,7 @@ int cParameters::calculateNeutralLosses(bool& terminatecomputation, string& erro
 			addStringFormulaToMap(formulastr, atoms);
 
 			string tmpstr;
-			for (i = 0; i < neutrallossesbrickdatabase.size(); i++) {
+			for (int i = 0; i < neutrallossesbrickdatabase.size(); i++) {
 				tmpstr = neutrallossesbrickdatabase[i].getSummary();
 				if (atoms.count(tmpstr) == 1) {
 					max_counts.push_back(atoms[tmpstr]);
@@ -1345,7 +1411,8 @@ int cParameters::calculateNeutralLosses(bool& terminatecomputation, string& erro
 
 	}
 
-	i = 0;
+	// to do - change to unsigned long long
+	int ii = 0;
 	compressformulas = false;
 	while (neutrallossesbrickdatabase.nextCombination(combarray, numberofbasicbricks, maximumcombinedlosses, 0, uncharge(precursormass, precursorcharge) - minimummz)) {
 		if (terminatecomputation) {
@@ -1384,6 +1451,12 @@ int cParameters::calculateNeutralLosses(bool& terminatecomputation, string& erro
 			}
 		}
 
+		if (validvalences) {
+			if (!checkSeniorRules(combarray, valences, 10)) {
+				continue;
+			}
+		}
+
 		getNameOfCompositionFromIntVector(compositionname, combarray);
 
 		tmpbrick.clear();
@@ -1404,6 +1477,7 @@ int cParameters::calculateNeutralLosses(bool& terminatecomputation, string& erro
 		tmpstring = tmpformula.getSummary();
 		addStringFormulaToMap(tmpstring, loss.summarymap);
 
+		/*
 		undefinedelement = false;
 		for (auto it = loss.summarymap.begin(); it != loss.summarymap.end(); ++it) {
 			if ((it->first.compare("H") != 0) && (it->first.compare("C") != 0) && (it->first.compare("O") != 0) && (it->first.compare("N") != 0) && (it->first.compare("S") != 0)) {
@@ -1431,7 +1505,7 @@ int cParameters::calculateNeutralLosses(bool& terminatecomputation, string& erro
 			atomscount += -loss.summarymap["N"];
 		}
 		if (loss.summarymap.count("S") > 0) {
-			valence += -loss.summarymap["S"] * 6; /* the maximum valence state is used */
+			valence += -loss.summarymap["S"] * 6;
 			atomscount += -loss.summarymap["S"];
 		}
 
@@ -1441,6 +1515,7 @@ int cParameters::calculateNeutralLosses(bool& terminatecomputation, string& erro
 			//pruned++;
 			continue;
 		}
+		*/
 
 		if (compressformulas) {
 			tmpformula.clear();
@@ -1453,23 +1528,23 @@ int cParameters::calculateNeutralLosses(bool& terminatecomputation, string& erro
 		//doublesizeest += sizeof(double);
 
 		neutrallossesdefinitions.push_back(loss);
-		neutrallossesfortheoreticalspectra.push_back(i);
+		neutrallossesfortheoreticalspectra.push_back(ii);
 
-		i++;
+		ii++;
 
-		if (i == compressionlimit) {
+		if (ii == compressionlimit) {
 			compressformulas = true;
 		}
 
-		if (i % 100000 == 0) {
+		if (ii % 100000 == 0) {
 			if (os) {
-				*os << i << " ";
+				*os << ii << " ";
 			}
 
-			//cout << i << " " << pruned << " - " << stringsizeest << " " << mapsizeest << " " << doublesizeest << " " << stringsizeest + mapsizeest + doublesizeest << endl;
+			//cout << ii << " " << pruned << " - " << stringsizeest << " " << mapsizeest << " " << doublesizeest << " " << stringsizeest + mapsizeest + doublesizeest << endl;
 		}
 
-		if (i % 1000000 == 0) {
+		if (ii % 1000000 == 0) {
 			if (os) {
 				*os << endl;
 			}
@@ -1679,6 +1754,7 @@ int cParameters::generateCompounds(bool& terminatecomputation, string& errormess
 	//while (elementsbrickdatabase.nextCombinationFast(combarray, countsofelements, massesofelements, sumofmasses, numberofbasicbricks, maximumcombinedlosses, 0, maximummz)) {
 	while (elementsbrickdatabase.nextCombinationFastLimited(combarray, countsofelements, limitsofelements, massesofelements, sumofmasses, numberofbasicbricks, maximumcombinedlosses, 0, maximummz)) {
 		if (terminatecomputation) {
+			sequencedatabase.clear();
 			errormessage = "Aborted by user.";
 			return -1;
 		}
@@ -1699,7 +1775,7 @@ int cParameters::generateCompounds(bool& terminatecomputation, string& errormess
 		}*/
 
 		if (validvalences) {
-			if (!checkSeniorRules(combarray, valences)) {
+			if (!checkSeniorRules(combarray, valences, 1)) {
 				continue;
 			}
 		}

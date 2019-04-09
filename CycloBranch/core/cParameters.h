@@ -60,7 +60,7 @@ class cParameters {
 
 	void fixIntensities(cPeaksList& centroidspectrum, cPeaksList& profilespectrum);
 
-	bool checkSeniorRules(vector<int>& combarray, vector<int>& valences);
+	bool checkSeniorRules(vector<int>& combarray, vector<int>& valences, int maxcomponents);
 
 	//double getMassAndCounts(vector<int>& combarray, vector<int>& countsofelements, vector<double>& massesofelements);
 
