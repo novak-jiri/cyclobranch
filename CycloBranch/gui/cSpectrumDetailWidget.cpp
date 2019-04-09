@@ -176,6 +176,7 @@ string cSpectrumDetailWidget::getPeaksTableAsHTMLString(bool unmatchedtheoretica
 	bool isred;
 	string tdwidth;
 	string desc;
+	QString celltext;
 	size_t pos;
 
 	if (theoreticalspectrum && parameters) {
@@ -321,7 +322,16 @@ string cSpectrumDetailWidget::getPeaksTableAsHTMLString(bool unmatchedtheoretica
 					tmp1 = (int)peak->description.find('<');
 					tmp2 = (int)peak->description.rfind("</a>");
 					tmp2 += 3;
-					s += printHTMLTableCell(peak->description.substr(tmp1, rangle - tmp1 + 1) + "view" + peak->description.substr(langle, tmp2 - langle + 1), isred);
+
+					celltext = peak->description.substr(tmp1, rangle - tmp1 + 1).c_str();
+					if (celltext.contains("https://www.ncbi.nlm.nih.gov/pccompound?term=")) {
+						celltext += "search";
+					}
+					else {
+						celltext += "view";
+					}
+					celltext += peak->description.substr(langle, tmp2 - langle + 1).c_str();
+					s += printHTMLTableCell(celltext.toStdString(), isred);
 				}
 				else {
 					s += printHTMLTableCell(peak->description.substr(secondspace + 1, peak->description.rfind('(') - secondspace - 2), isred);
@@ -395,6 +405,7 @@ string cSpectrumDetailWidget::getPartialPeaksTableAsHTMLString(int id, bool expo
 	cPeak* peak;
 	bool isred;
 	string desc;
+	QString celltext;
 	size_t pos;
 
 	if (theoreticalspectrum && parameters) {
@@ -495,7 +506,16 @@ string cSpectrumDetailWidget::getPartialPeaksTableAsHTMLString(int id, bool expo
 					tmp1 = (int)peak->description.find('<');
 					tmp2 = (int)peak->description.rfind("</a>");
 					tmp2 += 3;
-					s += printHTMLTableCell(peak->description.substr(tmp1, rangle - tmp1 + 1) + "view" + peak->description.substr(langle, tmp2 - langle + 1), isred);
+
+					celltext = peak->description.substr(tmp1, rangle - tmp1 + 1).c_str();
+					if (celltext.contains("https://www.ncbi.nlm.nih.gov/pccompound?term=")) {
+						celltext += "search";
+					}
+					else {
+						celltext += "view";
+					}
+					celltext += peak->description.substr(langle, tmp2 - langle + 1).c_str();
+					s += printHTMLTableCell(celltext.toStdString(), isred);
 				}
 				else {
 					s += printHTMLTableCell(peak->description.substr(secondspace + 1, peak->description.rfind('(') - secondspace - 2), isred);

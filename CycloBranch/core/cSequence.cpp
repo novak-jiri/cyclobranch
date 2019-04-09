@@ -117,10 +117,6 @@ string& cSequence::getBranchModification() {
 
 
 string cSequence::getNameWithReferenceAsHTMLString() {
-	if (reference.empty()) {
-		return reference;
-	}
-
 	regex rx;	
 	string s = "";
 	bool correctreference = false;
