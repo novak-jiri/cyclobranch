@@ -359,7 +359,7 @@ bool cBricksDatabase::nextCombinationFastLimited(vector<int>& combarray, vector<
 						combcounts[combarray[i] - 1]--;
 					}
 
-					combarray[i] = combarray[pointer];
+					combarray[i] = combarray[i + 1];
 					while ((combarray[i] > 0) && (combarray[i] <= numberofbasicbricks) && (comblimits[combarray[i] - 1] > 0) && (combcounts[combarray[i] - 1] + 1 > comblimits[combarray[i] - 1])) {
 						combarray[i]++;
 					}
@@ -390,7 +390,7 @@ bool cBricksDatabase::nextCombinationFastLimited(vector<int>& combarray, vector<
 							combcounts[combarray[i] - 1]--;
 						}
 
-						combarray[i] = combarray[pointer];
+						combarray[i] = combarray[i + 1];
 						while ((combarray[i] > 0) && (combarray[i] <= numberofbasicbricks) && (comblimits[combarray[i] - 1] > 0) && (combcounts[combarray[i] - 1] + 1 > comblimits[combarray[i] - 1])) {
 							combarray[i]++;
 						}

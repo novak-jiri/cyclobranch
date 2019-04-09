@@ -117,8 +117,16 @@ string& cSequence::getBranchModification() {
 
 
 string cSequence::getNameWithReferenceAsHTMLString() {
-	regex rx;	
+	// performance improvement - quick return without regex_search
 	string s = "";
+	if (reference.empty()) {
+		s += "<a href=\"https://www.ncbi.nlm.nih.gov/pccompound?term=" + name + "\">";
+		s += name;
+		s += "</a>";
+		return s;
+	}
+
+	regex rx;	
 	bool correctreference = false;
 
 	try {

@@ -1676,6 +1676,7 @@ int cParameters::generateCompounds(bool& terminatecomputation, string& errormess
 
 	unsigned long long ui = 0;
 	//bool skipcombination;
+	//while (elementsbrickdatabase.nextCombinationFast(combarray, countsofelements, massesofelements, sumofmasses, numberofbasicbricks, maximumcombinedlosses, 0, maximummz)) {
 	while (elementsbrickdatabase.nextCombinationFastLimited(combarray, countsofelements, limitsofelements, massesofelements, sumofmasses, numberofbasicbricks, maximumcombinedlosses, 0, maximummz)) {
 		if (terminatecomputation) {
 			errormessage = "Aborted by user.";
