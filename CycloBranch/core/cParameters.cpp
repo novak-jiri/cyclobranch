@@ -1478,6 +1478,15 @@ int cParameters::calculateNeutralLosses(bool& terminatecomputation, string& erro
 		addStringFormulaToMap(tmpstring, loss.summarymap);
 
 		/*
+		cout << loss.summary << " " << loss.massdifference << endl;
+		for (auto& it : loss.summarymap)
+		{
+			cout << it.first << " " << it.second << endl;
+		}
+		cout << endl;
+		*/
+
+		/*
 		undefinedelement = false;
 		for (auto it = loss.summarymap.begin(); it != loss.summarymap.end(); ++it) {
 			if ((it->first.compare("H") != 0) && (it->first.compare("C") != 0) && (it->first.compare("O") != 0) && (it->first.compare("N") != 0) && (it->first.compare("S") != 0)) {
