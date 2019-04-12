@@ -107,6 +107,14 @@ void cMainThread::run() {
 		emitEndSignals();
 		return;
 	}
+
+	if ((parameters.mode == compoundsearch) && (parameters.sequencedatabase.size() > 5000000)) {
+		parameters.sequencedatabase.clear();
+		*os << "Error: The number of generated compounds exceeded the limit 5000000. Please, adjust the settings to limit the number of compounds." << endl;
+		emitEndSignals();
+		return;
+	}
+
 	*os << parameters.printToString();
 
 	if (parameters.mode == singlecomparison) {
