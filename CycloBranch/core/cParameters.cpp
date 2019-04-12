@@ -1232,15 +1232,8 @@ int cParameters::calculateNeutralLosses(bool& terminatecomputation, string& erro
 
 	double sumofmasses;
 
-	string compositionname;
-	vector<int> intcomposition;
-
 	int compressionlimit = 100000;
 	bool compressformulas;
-
-	//bool undefinedelement;
-	//int valence;
-	//int atomscount;
 
 	//int stringsizeest = 0;
 	//int mapsizeest = 0;
@@ -1484,80 +1477,28 @@ int cParameters::calculateNeutralLosses(bool& terminatecomputation, string& erro
 			}
 		}
 
-		getNameOfCompositionFromIntVector(compositionname, combarray);
-
-		tmpbrick.clear();
-		tmpbrick.setComposition(compositionname, true);
-		tmpbrick.setMass(neutrallossesbrickdatabase.getMassOfComposition(combarray, numberofbasicbricks));
-
 		loss.clear();
-		loss.massdifference = -tmpbrick.getMass();
+		loss.massdifference = -sumofmasses;
 
-		intcomposition.clear();
-		tmpbrick.explodeToIntComposition(intcomposition);
-		for (int j = 0; j < (int)intcomposition.size(); j++) {
-			loss.summary += neutrallossesbrickdatabase[intcomposition[j] - 1].getSummary();
-		}
-
-		tmpformula.clear();
-		tmpformula.addFormula(loss.summary, true);
-		tmpstring = tmpformula.getSummary();
-		addStringFormulaToMap(tmpstring, loss.summarymap);
-
-		/*
-		cout << loss.summary << " " << loss.massdifference << endl;
-		for (auto& it : loss.summarymap)
-		{
-			cout << it.first << " " << it.second << endl;
-		}
-		cout << endl;
-		*/
-
-		/*
-		undefinedelement = false;
-		for (auto it = loss.summarymap.begin(); it != loss.summarymap.end(); ++it) {
-			if ((it->first.compare("H") != 0) && (it->first.compare("C") != 0) && (it->first.compare("O") != 0) && (it->first.compare("N") != 0) && (it->first.compare("S") != 0)) {
-				undefinedelement = true;
+		for (int j = 0; j < (int)combarray.size(); j++) {
+			if ((combarray[j] > 0) && (combarray[j] <= numberofbasicbricks)) {
+				loss.summary += neutrallossesbrickdatabase[combarray[j] - 1].getSummary();
+			}
+			else {
 				break;
 			}
 		}
-
-		valence = 0;
-		atomscount = 0;
-		if (loss.summarymap.count("H") > 0) {
-			valence += -loss.summarymap["H"];
-			atomscount += -loss.summarymap["H"];
-		}
-		if (loss.summarymap.count("C") > 0) {
-			valence += -loss.summarymap["C"] * 4;
-			atomscount += -loss.summarymap["C"];
-		}
-		if (loss.summarymap.count("O") > 0) {
-			valence += -loss.summarymap["O"] * 2;
-			atomscount += -loss.summarymap["O"];
-		}
-		if (loss.summarymap.count("N") > 0) {
-			valence += -loss.summarymap["N"] * 3;
-			atomscount += -loss.summarymap["N"];
-		}
-		if (loss.summarymap.count("S") > 0) {
-			valence += -loss.summarymap["S"] * 6;
-			atomscount += -loss.summarymap["S"];
-		}
-
-		// SENIOR rule 1 - the sum of valences must be even
-		// SENIOR rule 3 - the sum of valences >= 2 * (atomscount - maximum number of allowed components in the graph); edges - nodes + components >= 0
-		if (!undefinedelement && ((valence % 2 == 1) || (valence < 2 * (atomscount - 10)))) {
-			//pruned++;
-			continue;
-		}
-		*/
 
 		if (compressformulas) {
 			tmpformula.clear();
 			tmpformula.addFormula(loss.summary);
 			loss.summary = tmpformula.getSummary();
 		}
+
+		tmpformula.clear();
+		tmpformula.addFormula(loss.summary, true);
+		tmpstring = tmpformula.getSummary();
+		addStringFormulaToMap(tmpstring, loss.summarymap);
 
 		//stringsizeest += sizeof(string) + loss.summary.size();
 		//mapsizeest += sizeof(loss.summarymap) + loss.summarymap.size() * (sizeof(string) /* the length of string is 1 for HCONS */ + sizeof(int));
