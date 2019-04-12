@@ -1224,7 +1224,14 @@ int cParameters::calculateNeutralLosses(bool& terminatecomputation, string& erro
 	vector<int> valences;
 	bool validvalences = false;
 
+	vector<int> limitsofelements;
+	vector<int> countsofelements;
+	vector<double> massesofelements;
+
 	int numberofbasicbricks = 0;
+
+	double sumofmasses;
+
 	string compositionname;
 	vector<int> intcomposition;
 
@@ -1245,12 +1252,19 @@ int cParameters::calculateNeutralLosses(bool& terminatecomputation, string& erro
 	}
 
 	for (int i = 0; i < (int)originalneutrallossesfortheoreticalspectra.size(); i++) {
-		tmpformula.setFormula(originalneutrallossesdefinitions[originalneutrallossesfortheoreticalspectra[i]].summary, false);
+		tmpstr = originalneutrallossesdefinitions[originalneutrallossesfortheoreticalspectra[i]].summary;
+
+		if (tmpstr.rfind(':') != string::npos) {
+			tmpstr = tmpstr.substr(0, tmpstr.rfind(':'));
+		}
+
+		tmpformula.setFormula(tmpstr, false);
 
 		tmpbrick.clear();
+		tmpbrick.setName(originalneutrallossesdefinitions[originalneutrallossesfortheoreticalspectra[i]].summary);
 		tmpbrick.setComposition(to_string(numberofbasicbricks + 1), false);
 		tmpbrick.setMass(tmpformula.getMass());
-		tmpbrick.setSummary(originalneutrallossesdefinitions[originalneutrallossesfortheoreticalspectra[i]].summary);
+		tmpbrick.setSummary(tmpstr);
 		tmpbrick.createSummaryMap();
 
 		neutrallossesbrickdatabase.push_back(tmpbrick);
@@ -1261,6 +1275,18 @@ int cParameters::calculateNeutralLosses(bool& terminatecomputation, string& erro
 	neutrallossesbrickdatabase.sortbyMass();
 
 	for (int i = 0; i < neutrallossesbrickdatabase.size(); i++) {
+		countsofelements.push_back(0);
+		massesofelements.push_back(neutrallossesbrickdatabase[i].getMass());
+
+		tmpstr = neutrallossesbrickdatabase[i].getName();
+		if (tmpstr.rfind(':') != string::npos) {
+			tmpstr = tmpstr.substr(tmpstr.rfind(':') + 1);
+			limitsofelements.push_back(QVariant(tmpstr.c_str()).toInt());
+		}
+		else {
+			limitsofelements.push_back(0);
+		}
+
 		tmpstr = neutrallossesbrickdatabase[i].getSummary();
 
 		if (tmpstr.compare("H") == 0) {
@@ -1414,13 +1440,20 @@ int cParameters::calculateNeutralLosses(bool& terminatecomputation, string& erro
 	// to do - change to unsigned long long
 	int ii = 0;
 	compressformulas = false;
-	while (neutrallossesbrickdatabase.nextCombination(combarray, numberofbasicbricks, maximumcombinedlosses, 0, uncharge(precursormass, precursorcharge) - minimummz)) {
+	//while (neutrallossesbrickdatabase.nextCombination(combarray, numberofbasicbricks, maximumcombinedlosses, 0, uncharge(precursormass, precursorcharge) - minimummz)) {
+	while (neutrallossesbrickdatabase.nextCombinationFastLimited(combarray, countsofelements, limitsofelements, massesofelements, sumofmasses, numberofbasicbricks, maximumcombinedlosses, 0, uncharge(precursormass, precursorcharge) - minimummz)) {
 		if (terminatecomputation) {
 			neutrallossesdefinitions.clear();
 			neutrallossesfortheoreticalspectra.clear();
 			numberofgeneratedneutrallosses = 0;
 			errormessage = "Aborted by user.";
 			return -1;
+		}
+
+		if (validvalences) {
+			if (!checkSeniorRules(combarray, valences, 10)) {
+				continue;
+			}
 		}
 
 		if (bruteforce) {
@@ -1447,12 +1480,6 @@ int cParameters::calculateNeutralLosses(bool& terminatecomputation, string& erro
 			}
 
 			if (skipcombination) {
-				continue;
-			}
-		}
-
-		if (validvalences) {
-			if (!checkSeniorRules(combarray, valences, 10)) {
 				continue;
 			}
 		}

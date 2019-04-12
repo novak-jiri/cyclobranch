@@ -1160,11 +1160,9 @@ bool cParametersWidget::updateParameters() {
 	for (int i = 0; i < neutrallosstypes->getList()->count(); i++) {
 		tmpstring = neutrallosstypes->getList()->item(i)->text().toStdString();
 		
-		if ((eModeType)mode->currentIndex() == compoundsearch) {
-			if (tmpstring.rfind(':') != string::npos) {
-				tmpstring = tmpstring.substr(0, tmpstring.rfind(':'));
-			}		
-		}
+		if (tmpstring.rfind(':') != string::npos) {
+			tmpstring = tmpstring.substr(0, tmpstring.rfind(':'));
+		}		
 
 		tmpformula.setFormula(tmpstring, false);
 		if (!tmpformula.isValid(errmsg)) {
