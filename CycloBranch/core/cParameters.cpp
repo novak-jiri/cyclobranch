@@ -1353,7 +1353,6 @@ int cParameters::calculateNeutralLosses(bool& terminatecomputation, string& erro
 	}
 
 	map<string, int> atoms;
-	map<int, int> counts;
 	vector<int> max_counts;
 	bool skipcombination;
 	bool bruteforce = false;
@@ -1450,23 +1449,9 @@ int cParameters::calculateNeutralLosses(bool& terminatecomputation, string& erro
 		}
 
 		if (bruteforce) {
-			counts.clear();
-			int cnt = 0;
-			for (int j = 0; j < maximumcombinedlosses; j++) {
-				if (combarray[j] == 0) {
-					break;
-				}
-				if (counts.count(combarray[j]) > 0) {
-					counts[combarray[j]]++;
-				}
-				else {
-					counts[combarray[j]] = 1;
-				}
-			}
-
 			skipcombination = false;
-			for (auto& it : counts) {
-				if (it.second > max_counts[it.first - 1]) {
+			for (int j = 0; j < numberofbasicbricks; j++) {
+				if (countsofelements[j] > max_counts[j]) {
 					skipcombination = true;
 					break;
 				}
