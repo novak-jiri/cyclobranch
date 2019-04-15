@@ -1572,6 +1572,9 @@ int cParameters::generateCompounds(bool& terminatecomputation, string& errormess
 	double tmpmzdifference;
 	bool alloutofmz;
 
+	double minadd = 0;
+	//double maxadd = 0;
+
 	int countH;
 	int countC;
 	int countO;
@@ -1711,10 +1714,23 @@ int cParameters::generateCompounds(bool& terminatecomputation, string& errormess
 		combarray.push_back(0);
 	}
 
+	if (ionsfortheoreticalspectra.size() > 0) {
+		minadd = iondefinitions[ionsfortheoreticalspectra[0]].massdifference;
+		//maxadd = iondefinitions[ionsfortheoreticalspectra[0]].massdifference;
+		for (int i = 1; i < (int)ionsfortheoreticalspectra.size(); i++) {
+			if (iondefinitions[ionsfortheoreticalspectra[i]].massdifference < minadd) {
+				minadd = iondefinitions[ionsfortheoreticalspectra[i]].massdifference;
+			}
+			//if (iondefinitions[ionsfortheoreticalspectra[i]].massdifference > maxadd) {
+			//	maxadd = iondefinitions[ionsfortheoreticalspectra[i]].massdifference;
+			//}
+		}
+	}
+
 	unsigned long long ui = 0;
 	//bool skipcombination;
 	//while (elementsbrickdatabase.nextCombinationFast(combarray, countsofelements, massesofelements, sumofmasses, numberofbasicbricks, maximumcombinedlosses, 0, maximummz)) {
-	while (elementsbrickdatabase.nextCombinationFastLimited(combarray, countsofelements, limitsofelements, massesofelements, sumofmasses, numberofbasicbricks, maximumcombinedlosses, 0, maximummz)) {
+	while (elementsbrickdatabase.nextCombinationFastLimited(combarray, countsofelements, limitsofelements, massesofelements, sumofmasses, numberofbasicbricks, maximumcombinedlosses, 0, maximummz - minadd)) {
 		if (terminatecomputation) {
 			sequencedatabase.clear();
 			errormessage = "Aborted by user.";
@@ -1753,6 +1769,9 @@ int cParameters::generateCompounds(bool& terminatecomputation, string& errormess
 				}
 				else {
 					tmpmzdifference -= j * (H - e);
+				}
+				if (j > 0) {
+					tmpmzdifference /= (double)(j + 1);
 				}
 				if ((tmpmzdifference >= minimummz) && (tmpmzdifference <= maximummz)) {
 					alloutofmz = false;
