@@ -36,10 +36,11 @@ Use F1 to open this help.
 
 <p>
 <ul>
-<li>'De Novo Search Engine' - the default mode of the application.
-<li>'Compare Peaklist(s) with Spectrum of Searched Sequence' - a theoretical spectrum is generated for the input "Searched Sequence" and is compared with the peaklist(s).
-<li>'Compare Peaklist with Database - MS/MS data' - a peaklist is compared with theoretical spectra generated from a database of sequences.
-<li>'Compare Peaklist(s) with Database - MS or MSI data' - compound search; dereplication; the peaklists are compared with theoretical peaks generated from a database of compounds/sequences.
+<li><b>'De Novo Search Engine - MS/MS'</b> - perform the <i>de novo</i> sequencing.
+<li><b>'Compare Peaklist(s) with Spectrum of Searched Sequence - MS/MS'</b> - a theoretical spectrum is generated from the input "Searched Sequence" and compared with the peaklist(s).
+<li><b>'Compare Peaklist with Database - MS/MS'</b> - a peaklist is compared with theoretical spectra generated from a database of sequences.
+<li><b>'Compare Peaklist(s) with Database - MS, LC-MS, MSI'</b> - dereplication; the peaklist(s) are compared with a theoretical peaklist generated from a database of compounds.
+<li><b>'Compound Search - MS, LC-MS, MSI'</b> - the peaklist(s) are compared with a theoretical peaklist generated from a list of input chemical elements (a database-free search method).
 </ul>
 </p>
 
@@ -62,7 +63,14 @@ Use F1 to open this help.
 <li> [Branch-cyclic](@ref branchcyclicdetail)
 <li> [Linear polyketide](@ref linearketidedetail)
 <li> [Cyclic polyketide](@ref cyclicketidedetail)
+<li> Other
 </ul>
+
+The type 'Other' can be used only in 'Compare Peaklist with Database - MS/MS' mode. In this case, the theoretical peptide fragment ion series (e.g. b-ions or y-ions) are not generated 
+but the list of 'Neutral Losses/Chemical Elements' is applied on a molecular formula of a compound in a database. The peptide type of compounds in the database is ignored (i.e. all the compounds are used).
+
+The type 'Other' can also be used for compounds in a database if the mode 'Compare Peaklist(s) with Database - MS, LC-MS, MSI' is used.
+In this case, the mandatory items in the database for each compound are only a name and a molecular formula (i.e., a peptide sequence does not have to be defined).
 
 \subsection settings_peaklistfile File (CTRL + P)
 
@@ -94,7 +102,7 @@ Use F1 to open this help.
 <tr>
 <td>mzML</td>
 <td>profile and centroid</td>
-<td>centroid</td>
+<td>profile and centroid</td>
 <td><a href="http://www.psidev.info/mzml_1_0_0">standard data format</a></td>
 <td>m/z values and intensities must be stored as 64-bit/32-bit floats; no compression. <a href="http://www.openms.de">OpenMS 2.x</a> must be installed.</td>
 </tr>
@@ -122,14 +130,14 @@ Use F1 to open this help.
 <tr>
 <td>raw</td>
 <td>profile and centroid</td>
-<td>centroid</td>
+<td>profile and centroid</td>
 <td>Thermo raw file</td>
 <td><a href="http://www.openms.de">OpenMS 2.x</a> including ProteoWizard must be installed; Windows only.</td>
 </tr>
 <tr>
 <td>raw</td>
-<td>centroid</td>
-<td>centroid</td>
+<td>profile and centroid</td>
+<td>profile and centroid</td>
 <td>Waters raw directory</td>
 <td>Select a *.dat file in the raw directory; Windows only.</td>
 </tr>
@@ -153,9 +161,12 @@ If the file "[name].mis" is selected, all the "analysis.baf" files in the subfol
 </table>
 </div>
 
-<p>The visualization of profile mass spectra is enabled if the checkbox next to the file name is checked. This feature is currenly available for the following file formats:
+<p>The visualization of profile mass spectra is enabled if the checkbox next to the file name is checked. This feature is available for the following file formats:
 <ul>
-<li>Bruker's baf files (Windows only)
+<li>baf files (Bruker; Windows only)
+<li>raw directories (Waters; Windows only)
+<li>raw files (Thermo; Windows only)
+<li>mzML
 <li>imzML
 </ul>
 </p>
@@ -233,9 +244,10 @@ peaks of compounds are generated with charge 1-.</p>
 
 <p>Enter the minimum threshold of absolute intensity. Peaks with absolute intensities below the threshold are removed from the peaklist.</p>
 
-\subsection settings_minmz Minimum m/z Ratio
+\subsection settings_mz m/z Ratio
 
-<p>Enter the minimum m/z ratio. Peaks with m/z ratios below the threshold are removed from the peaklist.</p>
+<p>Enter the minimum m/z ratio and maximum m/z ratio if applicable. Experimental peaks with m/z ratios below the threshold are removed from the peaklist.
+The maximum m/z ratio is used only in 'Compound Search - MS, LC-MS, MSI' mode to limit the number of generated compounds.</p>
 
 \subsection settings_fwhm FWHM
 
@@ -278,6 +290,17 @@ Otherwise, beauverolide I is not detected when "Incomplete Paths in De Novo Grap
 
 <p>When a branch-cyclic peptide is analyzed, the minimum values are 1/2/1, 1/1/2 or 2/1/1. See also [Branch-cyclic Sequence Detection](@ref branchcyclicdetection).</p>
 
+\subsection settings_blindpaths Incomplete Paths in De Novo Graph
+
+<p>The operation to be performed with edges forming incomplete paths (i.e., the paths which do not lead from the start node or do not lead to the end node). 
+The following options can be selected:
+<ul>
+<li> keep (edges are kept - you can see a complete de novo graph in 'View -> Graph')
+<li> remove (edges are removed - speeds up the search)
+<li> connect (edges are connected - allow detection of sequence tags)
+</ul>
+</p>
+
 \subsection settings_maxblocksmass Maximum Cumulative Mass of Blocks
 
 <p>Enter the maximum cumulative mass of combined blocks (0 = the maximum mass is unlimited). A small value speeds up the search and vice versa.</p>
@@ -290,16 +313,17 @@ Otherwise, beauverolide I is not detected when "Incomplete Paths in De Novo Grap
 
 \section settingsmisc Miscellaneous
 
-\subsection settings_blindpaths Incomplete Paths in De Novo Graph
+\subsection settings_disableprecursor Disable Precursor Mass Filter
 
-<p>The operation to be performed with edges forming incomplete paths (i.e., the paths which do not lead from the start node or do not lead to the end node). 
-The following options can be selected:
-<ul>
-<li> keep (edges are kept - useful if you would like to see the whole de novo graph in 'View -> Graph')
-<li> remove (edges are removed - speeds up the search)
-<li> connect (edges are connected - useful if you are looking for sequence tags)
-</ul>
-</p>
+<p>Disable the filtering of compounds by precursor mass.</p>
+
+\subsection settings_internalfragments Internal Fragments
+
+<p>Generate internal fragment ions in theoretical spectra. This feature is currently available only for branch-cyclic peptides.</p>
+
+\subsection settings_scrambling Enable Scrambling
+
+<p>Generate scrambled fragment ions of cyclic peptides in theoretical spectra.</p>
 
 \subsection settings_cyclicnterm Cyclic N-terminus
 
@@ -308,14 +332,6 @@ The following options can be selected:
 \subsection settings_cycliccterm Cyclic C-terminus
 
 <p>The water molecule is subtracted from all theoretical C-terminal fragment ions and the theoretical precursor mass. This feature is useful if a linear peptide includes a small cycle close to the C-terminus. If the linear polyketide is selected as the peptide type, the water molecule is subtracted only from the precursor ion.</p>
-
-\subsection settings_scrambling Enable Scrambling
-
-<p>Generate scrambled fragment ions of cyclic peptides in theoretical spectra.</p>
-
-\subsection settings_simsearch Disable Precursor Mass Filter
-
-<p>Disable the filtering of sequence candidates by precursor mass. This option can be used to determine a peptide family when a modified peptide is included in a sequence database.</p>
 
 \subsection settings_regularblocksorder Regular Order of Ketide Blocks
 

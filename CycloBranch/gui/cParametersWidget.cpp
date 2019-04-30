@@ -67,11 +67,11 @@ cParametersWidget::cParametersWidget(QWidget* parent) {
 
 	mode = new QComboBox();
 	mode->setSizeAdjustPolicy(QComboBox::AdjustToContents);
-	QString modetooltip = "'De Novo Search Engine - MS/MS': de novo sequencing.\n";
+	QString modetooltip = "'De Novo Search Engine - MS/MS': perform the de novo sequencing.\n";
 	modetooltip += "'Compare Peaklist(s) with Spectrum of Searched Sequence - MS/MS': a theoretical spectrum is generated from the input 'Searched Sequence' and compared with the peaklist(s).\n";
 	modetooltip += "'Compare Peaklist with Database - MS/MS': a peaklist is compared with theoretical spectra generated from a database of sequences.\n";
-	modetooltip += "'Compare Peaklist(s) with Database - MS, LC-MS, MSI': dereplication; the peaklists are compared with theoretical peaks generated from a database of compounds/sequences.\n";
-	modetooltip += "'Compound Search - MS, LC-MS, MSI': detection of compounds without using a database.";
+	modetooltip += "'Compare Peaklist(s) with Database - MS, LC-MS, MSI': dereplication; the peaklist(s) are compared with a theoretical peaklist generated from a database of compounds.\n";
+	modetooltip += "'Compound Search - MS, LC-MS, MSI': the peaklist(s) are compared with a theoretical peaklist generated from a list of input chemical elements (a database-free search method).";
 	mode->setToolTip(modetooltip);
 	mode->addItem(tr("De Novo Search Engine - MS/MS"));
 	mode->addItem(tr("Compare Peaklist(s) with Spectrum of Searched Sequence - MS/MS"));
@@ -216,14 +216,14 @@ cParametersWidget::cParametersWidget(QWidget* parent) {
 	experimentalspectragridlayout->addWidget(minimumabsoluteintensitythreshold, 9, 1);
 
 	minimummz = new QDoubleSpinBox();
-	minimummz->setToolTip("Enter the minimum m/z ratio. Peaks with m/z ratios below the threshold will be removed from the peaklist.");
+	minimummz->setToolTip("Enter the minimum m/z ratio. Peaks with m/z ratios below the threshold are removed from the peaklist.");
 	minimummz->setDecimals(3);
 	minimummz->setRange(0, 100000);
 	minimummz->setSingleStep(1);
 	minimummz->setPrefix("minimum: ");
 
 	maximummz = new QDoubleSpinBox();
-	maximummz->setToolTip("Enter the maximum m/z ratio. Peaks with m/z ratios above the threshold will be removed from the peaklist\n(0.0 = the feature is disabled).");
+	maximummz->setToolTip("Enter the maximum m/z ratio. The value is used only in 'Compound Search - MS, LC-MS, MSI' mode to limit the number of generated compounds.");
 	maximummz->setDecimals(3);
 	maximummz->setRange(0, 100000);
 	maximummz->setSingleStep(1);
@@ -347,14 +347,14 @@ cParametersWidget::cParametersWidget(QWidget* parent) {
 	miscgridlayout = new QGridLayout();
 
 	similaritysearch = new QCheckBox();
-	similaritysearch->setToolTip("Disable the filtering of sequence candidates by precursor mass. This option can be used to determine a peptide family when a modified peptide is included in a sequence database.");
+	similaritysearch->setToolTip("Disable the filtering of compounds by precursor mass.");
 	similaritysearch->setFixedWidth(checkboxfieldwidth);
 	similaritysearchlabel = new QLabel("Disable Precursor Mass Filter:");
 	miscgridlayout->addWidget(similaritysearchlabel, 0, 0);
 	miscgridlayout->addWidget(similaritysearch, 0, 1);
 
 	internalfragments = new QCheckBox();
-	internalfragments->setToolTip("Generate internal fragment ions in theoretical spectra.");
+	internalfragments->setToolTip("Generate internal fragment ions in theoretical spectra.\nThis feature is currently available only for branch-cyclic peptides.");
 	internalfragments->setFixedWidth(checkboxfieldwidth);
 	internalfragmentslabel = new QLabel("Internal Fragments:");
 	miscgridlayout->addWidget(internalfragmentslabel, 1, 0);
