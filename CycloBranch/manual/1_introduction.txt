@@ -68,7 +68,7 @@
 <ul>
 <li>[Building blocks](@ref availableblockdatabases) (MS/MS)
 <li>[Sequences](@ref availablesequencedatabases) (MS/MS)
-<li>[Compounds](@ref availablesequencedatabases) (MS and MSI)
+<li>[Compounds](@ref availablesequencedatabases) (MS, LC-MS and MSI)
 <li><a href="https://ms.biomed.cas.cz/cyclobranch/release/custom_databases_excel_sheets.zip" onclick="ga('send', 'event', 'Introduction', this.href);"><b>Custom</b></a>
 </ul>
 </td>

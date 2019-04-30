@@ -83,8 +83,8 @@ cMainWindow::cMainWindow() {
 	actionNorine = new QAction(QIcon(":/images/icons/25.png"), tr("&Norine"), this);
 	actionNorine->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_1));
 
-	actionSmilesToMonomers = new QAction(QIcon(":/images/icons/5.png"), tr("Smiles2Monome&rs"), this);
-	actionSmilesToMonomers->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_2));
+	actionBBDGNC = new QAction(QIcon(":/images/icons/5.png"), tr("Gene&rate Blocks and Sequences using BBDGNC"), this);
+	actionBBDGNC->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_2));
 
 	actionShowIsomers = new QAction(QIcon(":/images/icons/95.png"), tr("Show &Isomers"), this);
 	actionShowIsomers->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_I));
@@ -129,7 +129,7 @@ cMainWindow::cMainWindow() {
 	toolbarTools->addAction(actionImageWindow);
 	toolbarTools->addSeparator();
 	toolbarTools->addAction(actionNorine);
-	toolbarTools->addAction(actionSmilesToMonomers);
+	toolbarTools->addAction(actionBBDGNC);
 
 	toolbarView = addToolBar(tr("View"));
 	toolbarView->addAction(actionShowIsomers);
@@ -261,7 +261,7 @@ cMainWindow::cMainWindow() {
 	connect(actionModifications, SIGNAL(triggered()), this, SLOT(showModifications()));
 	connect(actionDrawPeptide, SIGNAL(triggered()), this, SLOT(showDrawPeptideWidget()));
 	connect(actionNorine, SIGNAL(triggered()), this, SLOT(gotoNorine()));
-	connect(actionSmilesToMonomers, SIGNAL(triggered()), this, SLOT(gotoSmiles2Monomers()));
+	connect(actionBBDGNC, SIGNAL(triggered()), this, SLOT(gotoBBDGNC()));
 	connect(actionShowIsomers, SIGNAL(triggered()), this, SLOT(showIsomersStateChanged()));
 	connect(actionGraph, SIGNAL(triggered()), this, SLOT(showGraph()));
 	connect(actionSummaryTableOfMatchedPeaks, SIGNAL(triggered()), this, SLOT(showSummaryTableOfMatchedPeaks()));
@@ -308,7 +308,7 @@ cMainWindow::cMainWindow() {
 	menuTools->addAction(actionImageWindow);
 	menuTools->addSeparator();
 	menuTools->addAction(actionNorine);
-	menuTools->addAction(actionSmilesToMonomers);
+	menuTools->addAction(actionBBDGNC);
 
 	menuView->addAction(actionShowIsomers);
 	menuView->addSeparator();
@@ -434,7 +434,7 @@ cMainWindow::~cMainWindow() {
 	delete actionModifications;
 	delete actionDrawPeptide;
 	delete actionNorine;
-	delete actionSmilesToMonomers;
+	delete actionBBDGNC;
 	delete actionShowIsomers;
 	delete actionGraph;
 	delete actionSummaryTableOfMatchedPeaks;
@@ -2005,8 +2005,8 @@ void cMainWindow::gotoNorine() {
 }
 
 
-void cMainWindow::gotoSmiles2Monomers() {
-	QDesktopServices::openUrl(QUrl("http://bioinfo.lifl.fr/norine/smiles2monomers.jsp"));
+void cMainWindow::gotoBBDGNC() {
+	QDesktopServices::openUrl(QUrl("https://ms.biomed.cas.cz/bbdgnc/"));
 }
 
 

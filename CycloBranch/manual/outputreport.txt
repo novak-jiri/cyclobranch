@@ -84,7 +84,7 @@ The following additional columns are shown if a <b>linear polyketide</b> was sea
 </p>
           
 <p>
-The following columns are shown if the mode "Compare Peaklist(s) with Database - MS or MSI data" was selected (see [Mode](@ref settings_mode)): 
+The following columns are shown if MS, LC-MS, and MSI data is processed (see [Mode](@ref settings_mode)): 
 <ul>
 <li> <b>*</b>
 <li> <b>Spectrum ID</b> - a number an experimental spectrum when a series of peaklists was processed (e.g., LC-MS or MSI data)

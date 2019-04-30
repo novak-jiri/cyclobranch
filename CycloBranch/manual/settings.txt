@@ -66,11 +66,11 @@ Use F1 to open this help.
 <li> Other
 </ul>
 
-The type 'Other' can be used only in 'Compare Peaklist with Database - MS/MS' mode. In this case, the theoretical peptide fragment ion series (e.g. b-ions or y-ions) are not generated 
-but the list of 'Neutral Losses/Chemical Elements' is applied on a molecular formula of a compound in a database. The peptide type of compounds in the database is ignored (i.e. all the compounds are used).
+<p>The type 'Other' can be used only in 'Compare Peaklist with Database - MS/MS' mode. In this case, the theoretical peptide fragment ion series (e.g. b-ions or y-ions) are not generated 
+but the list of 'Neutral Losses/Chemical Elements' is applied on a molecular formula of a compound in a database. The peptide type of compounds in the database is ignored (i.e. all the compounds are used).</p>
 
-The type 'Other' can also be used for compounds in a database if the mode 'Compare Peaklist(s) with Database - MS, LC-MS, MSI' is used.
-In this case, the mandatory items in the database for each compound are only a name and a molecular formula (i.e., a peptide sequence does not have to be defined).
+<p>The type 'Other' can also be used for compounds in a database if the mode 'Compare Peaklist(s) with Database - MS, LC-MS, MSI' is used.
+In this case, the mandatory items in the database for each compound are only a name and a molecular formula (i.e., a peptide sequence does not have to be defined).</p>
 
 \subsection settings_peaklistfile File (CTRL + P)
 
@@ -196,7 +196,7 @@ The "filename_converted_fwhm_value.imzML" can be used directly as a peaklist fil
 
 \subsection settings_adduct Precursor Ion Adduct
 
-<p>Enter the formula of a precursor ion adduct (e.g., Na, K, Li). H is used by default if the field is empty. If a metal is used (e.g., FeH-2) 
+<p>Enter the formula of a precursor ion adduct (e.g., Na, K, Li). H is used by default if the field is empty. m/z ratios of theoretical peaks are shifted by mass of adduct. If a metal is used (e.g., FeH-2) 
 and the option "Generate Full Isotope Patterns" is disabled, the peaks of isotopes having natural abundances greater than 3% are generated automatically 
 in theoretical peaklists next to the peaks of most abundant isotopes.
 </p>
@@ -492,9 +492,9 @@ If a metallic ion is selected, the isotopes having natural abundance greater tha
 If the option [Generate Full Isotope Patterns](@ref settings_isotopepatterns) is selected, this feature is disabled and vice versa.
 </p>
 
-\subsection settings_neutrallosses Neutral Losses
+\subsection settings_neutrallosses Neutral Losses / Chemical Elements
 
-<p>Define and select the types of neutral losses which will be generated in theoretical spectra.</p>
+<p>Define and select the types of neutral losses or chemical elements which will be used when generating theoretical spectra.</p>
 
 <p>Buttons:
 <ul>
@@ -502,7 +502,8 @@ If the option [Generate Full Isotope Patterns](@ref settings_isotopepatterns) is
 <li> "Clear All" - unselect all neutral losses in the list.
 <li> "Add" - add a new item at the end of the list - a valid molecular formula must be entered.
 <li> "Remove" - remove selected items from the list. 
-<li> "Default" - clear the list and defines a list of default neutral losses.
+<li> "Default" - clear the list and define a list of default neutral losses.
+<li> "HCON" - clear the list and set the default chemical elements H, C, O, N, S, and P.
 </ul>                 
 </p>
 
@@ -546,9 +547,12 @@ If the option [Generate Full Isotope Patterns](@ref settings_isotopepatterns) is
 </table>
 </div>
 
-\subsection settings_maximumcombinedlosses Maximum Number of Combined Losses
+<p>In some cases, the list of neutral losses can be replaced by a list of chemical elements (e.g. H, C, O, N, S, and P). This is useful if an experimental spectrum contains 
+peaks corresponding to ions with unknown neutral losses, if a metabolite (i.e. a non-peptidic compound) is fragmented or if the mode 'Compound Search - MS, LC-MS, MSI' is used.</p>
 
-<p>Maximum number of combined neutral losses.</p>
+\subsection settings_maximumcombinedlosses Maximum Number of Combined Losses / Elements
+
+<p>Maximum number of combined neutral losses or chemical elements.</p>
 
 \subsection settings_reportunmatched Report Unmatched Theoretical Peaks
 
@@ -565,6 +569,25 @@ The full isotope patterns of compounds are generated in theoretical spectra. The
 
 <p>
 The minimum number of matched peaks in an isotope pattern to be reported. The option "Generate Full Isotope Patterns" must be enabled.
+</p>
+
+\subsection settings_minimumfeaturesize Minimum Feature Size
+
+<p>
+The minimum number of consecutive scans in which a compound must be identified to be reported (LC-MS data only).
+</p>
+
+\subsection settings_allionsmustbeannotated All Ions Must be Annotated
+
+<p>
+If enabled, all ions must be annotated in a spectrum for a compound to be reported. For example, if [M+H]+, [M+Na]+, and [M+K]+ are selected, all the ions of the same compound must be present in a spectrum simultaneously to be reported.
+Note that this option is affected by Charge, list of Neutral Losses, and Maximum Number of Combined Losses. Recommended settings are - Charge: 1, Neutral Losses: all unselected, and Maximum Number of Combined Losses: 0.
+</p>
+
+\subsection settings_advancedformulacheck Advanced Formula Check
+
+<p>
+Advanced filtering rules are applied if molecular formulas of compounds are generated. See the tables 1, 2, and 3 in <a href="https://doi.org/10.1186/1471-2105-8-105">https://doi.org/10.1186/1471-2105-8-105</a> for more details.
 </p>
 
 <hr>

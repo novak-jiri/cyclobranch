@@ -217,7 +217,7 @@ https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.23.3/css/theme.green
 </p>
 <p>Go to <a href="http://bioinfo.lifl.fr/norine/" target="_blank">Norine</a> (3<sup>rd</sup> party application).</p>
 
-<p><b>Smiles2Monomers (CTRL + 2)</b>
+<p><b>Generate Blocks and Sequences using BBDGNC (CTRL + 2)</b>
 \htmlonly
 <img src="5.png">
 \endhtmlonly
@@ -225,7 +225,7 @@ https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.23.3/css/theme.green
 \includegraphics{5.png}
 \endlatexonly
 </p>
-<p>Go to <a href="http://bioinfo.lifl.fr/norine/smiles2monomers.jsp" target="_blank">Smiles2Monomers</a> (3<sup>rd</sup> party application).</p>
+<p>Go to <a href="https://ms.biomed.cas.cz/bbdgnc/" target="_blank">BBDGNC</a> (Building Blocks Database Generator of Natural Compounds).</p>
 
 <hr>
 

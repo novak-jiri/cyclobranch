@@ -25,25 +25,26 @@ Any work based on CycloBranch shall cite any of the following references:
 <ul>
   <li> Changes:
   <ul>
-    <li> compound search mode added (a database-free search mode for MS1 data)
-    <li> fragmentation of metabolites is now supported (mode "Compare Peaklist with Database - MS/MS data", peptide type "Other")
-    <li> a list od neutral losses can now be defined for individual building blocks
-    <li> the databases of blocks were updated to a new file format
-    <li> spectrum detail window can now be opened direcly from chromatogram or image window (CrossVis) by a double-click
-    <li> filter options improved - main window, summary table of matched peaks, and editors (building blocks, sequences/compounds, and modifications)
-    <li> processing of Waters data improved and visualization of profile data added 
-    <li> visualization of profile mzML/Thermo raw files added and a bug fixed during profile data processing
-    <li> visualization of mass spectra fixed (occasional flashing)
-    <li> minimum feature size can now be defined for LC-MS data
-    <li> all ions of a compound must be matched feature added (e.g. both [M+H]+ and [M+Na]+ must be matched for M) 
-    <li> percentage contributions of peak components (e.g. 13C, 17O) are now reported if theoretical isotopic patterns are calculated
-    <li> copy to clipboard function (CTRL+C) improved in spectrum detail window, main window, and summary table of matched peaks (multiple rows and columns can be selected in the table)
-    <li> a bug fixed - existing items in the list of neutral losses were not editable if the settings dialog was re-opened
-    <li> a bug was fixed when too many combinations of neutral losses were generated
-    <li> internal ions can now be generated for branch-cyclic peptides
-    <li> DOI can now be used as a reference in a compound/sequence database
-    <li> [M+Cl]- ion added in MS mode
-    <li> some other minor improvements were made 
+    <li> Compound search mode added (a database-free search mode for MS1 data).
+    <li> Fragmentation of metabolites is now supported (mode "Compare Peaklist with Database - MS/MS data", peptide type "Other").
+    <li> A list od neutral losses can now be defined for individual building blocks.
+    <li> The databases of blocks were updated to a new file format (the column neutral losses was added).
+    <li> Spectrum detail window can now be opened direcly from chromatogram or image window (CrossVis) by a double-click.
+    <li> Filter options improved - main window, summary table of matched peaks, and editors (building blocks, sequences/compounds, and modifications).
+    <li> Processing of Waters data improved and visualization of profile data added. 
+    <li> Visualization of profile mzML/Thermo raw files added and a bug fixed during profile data processing.
+    <li> Visualization of mass spectra fixed (occasional flashing).
+    <li> Minimum feature size can now be defined for LC-MS data.
+    <li> All ions of a compound must be matched feature added (e.g. both [M+H]+ and [M+Na]+ must be matched for M). 
+    <li> Percentage contributions of peak components (e.g. 13C, 17O) are now reported if theoretical isotopic patterns are calculated.
+    <li> Copy to clipboard function (CTRL+C) improved in spectrum detail window, main window, and summary table of matched peaks (multiple rows and columns can be selected in the table).
+    <li> A bug fixed - existing items in the list of neutral losses were not editable if the settings dialog was re-opened.
+    <li> A bug was fixed when too many combinations of neutral losses were generated.
+    <li> Internal ions can now be generated for branch-cyclic peptides.
+    <li> DOI can now be used as a reference in a compound/sequence database.
+    <li> [M+Cl]- ion added in MS mode.
+    <li> Link to BBDGNC added.
+    <li> Some other minor improvements were made. 
   </ul>
   <li> <a href="https://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.3.xxx_win_64bit.zip" onclick="ga('send', 'event', 'Download', this.href);">Download (Windows, 64 bit - tested on Windows 7/10)</a>
   <li> <a href="https://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v1.3.xxx_linux_64bit.tgz" onclick="ga('send', 'event', 'Download', this.href);">Download (Linux, 64 bit - tested on Ubuntu 16.04)</a>
@@ -299,7 +300,7 @@ Any work based on CycloBranch shall cite any of the following references:
     <li> Support of common biometals added (MS and MS/MS mode).
     <li> Some keyboard shortcuts were added in the building blocks editor, sequence database editor, modifications editor, draw peptide tool, main window, settings dialog, and de novo graph window.
     <li> Terminal modifications are now reported in spectra detail windows.
-    <li> Links to Norine and Smiles2Monomers added.
+    <li> Link to Norine added.
     <li> A compatibility issue with CompassXPort was fixed.
     <li> Some bugs were fixed and minor improvements were made.
   </ul>

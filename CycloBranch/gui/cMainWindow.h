@@ -102,7 +102,7 @@ private:
 	QAction* actionModifications;
 	QAction *actionDrawPeptide;
 	QAction *actionNorine;
-	QAction *actionSmilesToMonomers;
+	QAction *actionBBDGNC;
 	QAction* actionShowIsomers;
 	QAction* actionGraph;
 	QAction* actionSummaryTableOfMatchedPeaks;
@@ -254,7 +254,7 @@ private slots:
 
 	void gotoNorine();
 
-	void gotoSmiles2Monomers();
+	void gotoBBDGNC();
 
 	void summaryPeaksTableCancelled();
 

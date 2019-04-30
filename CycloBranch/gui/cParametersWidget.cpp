@@ -158,7 +158,7 @@ cParametersWidget::cParametersWidget(QWidget* parent) {
 	experimentalspectragridlayout->addWidget(precursormass, 3, 1);
 
 	precursoradduct = new QLineEdit();
-	precursoradduct->setToolTip("Enter the formula of a precursor ion adduct (e.g., Na, K, Li).\nH is used by default if the field is empty.\nSee the manual for more options.");
+	precursoradduct->setToolTip("Enter the formula of a precursor ion adduct (e.g., Na, K, Li).\nH is used by default if the field is empty.\nm/z ratios of theoretical peaks are shifted by mass of adduct.\nSee the manual for more details.");
 	precursoradduct->setFixedWidth(leftdefaultwidth);
 	precursoradductlabel = new QLabel("Precursor Ion Adduct:");
 	experimentalspectragridlayout->addWidget(precursoradductlabel, 4, 0);
@@ -448,7 +448,7 @@ cParametersWidget::cParametersWidget(QWidget* parent) {
 	theoreticalspectragridlayout->addWidget(iontypes, 4, 1);
 
 	neutrallosstypes = new cNeutralLossesListWidget(this);
-	neutrallosstypes->setToolTip("Define and select the types of neutral losses or chemical elements which will be used in theoretical spectra.");
+	neutrallosstypes->setToolTip("Define and select the types of neutral losses or chemical elements which will be used when generating theoretical spectra.");
 	neutrallosstypes->setFixedWidth(rightdefaultwidth);
 	neutrallosstypeslabel = new QLabel("Neutral Losses / Chemical Elements:");
 	theoreticalspectragridlayout->addWidget(neutrallosstypeslabel, 5, 0);
