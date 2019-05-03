@@ -14,15 +14,31 @@ The text filter is embedded in the [Main Window](@ref mainwindow), [Summary Tabl
 [Sequence/Compound Database Editor](@ref sequenceeditor), and [Modifications Editor](@ref modificationseditor).
 </p>
 
-<p><b>Dropdown menu - column</b></p>
+<p><b>Dropdown menu - column 1</b></p>
 
-<p>Select the name of column to be searched.</p>
+<p>Select the name of column 1 to be searched.</p>
 
-<p><b>Dropdown menu - comparator</b></p>
+<p><b>Dropdown menu - comparator 1</b></p>
 
-<p>Select the type of comparator. The value in a selected column can be =, <, <=, >, >= than a value entered in the input line.</p>
+<p>Select the type of comparator for the column number 1. The value in a selected column can be =, <, <=, >, >= than a value entered in the input line.</p>
 
-<p><b>Input Line - Text to Find (CTRL + F)</b></p>
+<p><b>Input Line - Text to Find 1 (CTRL + F)</b></p>
+
+<p>Enter the text to be found.</p>
+
+<p><b>Dropdown menu - logical operator </b></p>
+
+<p>Select the logical operator OR/AND for the conditions 1 and 2.</p>
+
+<p><b>Dropdown menu - column 2 </b></p>
+
+<p>Select the name of column 2 to be searched.</p>
+
+<p><b>Dropdown menu - comparator 2 </b></p>
+
+<p>Select the type of comparator for the column number 2. The value in a selected column can be =, <, <=, >, >= than a value entered in the input line.</p>
+
+<p><b>Input Line - Text to Find 2</b></p>
 
 <p>Enter the text to be found into the input line.</p>
 

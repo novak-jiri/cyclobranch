@@ -138,6 +138,7 @@ Use F1 to open this help.</p>
 <li> Acronym(s) - Acronym of a building block (or more blocks corresponding to isomers separated by '/').
 <li> Residue Summary - Residue summary formula of a building block.
 <li> Monoisotopic Residue Mass - Monoisotopic mass corresponding to a block. The value is recalculated when the summary formula is changed.
+<li> Neutral Loss(es) - List of molecular formulas of neutral losses separated by semicolon (one list is used for all isomers i.e. the symbol '/' cannot be used in this column).
 <li> Reference(s) - Reference id of a building block (or more blocks corresponding to isomers separated by '/'). See [Format of Building Blocks Databases](@ref blockseditordbformat).
 <li> Preview - A link to a reference database (e.g., ChemSpider) generated from the fields acronym and reference. The link is generated automatically and cannot be edited manually.
 </ul>
@@ -156,6 +157,7 @@ The names and acronyms must not contain the characters '[' or ']'.
 <li> acronym of a block (or more blocks corresponding to isomers separated by '/')
 <li> residue summary formula of a block (important: an exact mass of the block is calculated from this value)
 <li> mass corresponding to the block (the value is ignored; the mass is automatically calculated from the residue summary formula)
+<li> list of neutral losses separated by semicolon (one list is used for all isomers i.e. the symbol '/' cannot be used in this column)
 <li> reference id (or more blocks corresponding to isomers separated by '/')
 </ul>
 
@@ -195,6 +197,7 @@ Corresponding residue summary formulas must be entered in the column "Residue Su
 <table width="80%" class="doxtable">
 <tr><th>Database</th><th>Content</th><th>Location</th></tr>
 <tr><td>D<sub><i>19</i></sub></td><td>19 proteinogenic amino acids (20 including isobars)</td><td>20_amino_acids.txt</td></tr>
+<tr><td>D<sub><i>19</i></sub> (nl)</td><td>19 proteinogenic amino acids (20 including isobars) with neutral losses</td><td>20_amino_acids_nl.txt</td></tr>
 <tr><td>D<sub><i>33</i></sub> (v1)</td><td>33 NRP building blocks (42 including isobars)</td><td>db33_v1.txt</td></tr>
 <tr><td>D<sub><i>33</i></sub> (v2)</td><td>33 NRP building blocks (132 including isobars)</td><td>db33_v2.txt</td></tr>
 <tr><td>D<sub><i>287</i></sub> (v1)</td><td>287 NRP building blocks (412 including isobars)</td><td>db287_v1.txt</td></tr>
