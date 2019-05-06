@@ -314,7 +314,7 @@ string cBrick::getAcronymsWithReferencesAsHTMLString() {
 			if (!correctreference) {
 				rx = "^CHEBI: [0-9]+$";
 				if (regex_search(references[i], rx)) {
-					s += "<a href=\"https://www.ebi.ac.uk/chebi/searchId.do?chebiId=" + references[i].substr(7) + "\">";
+					s += "<a href=\"https://www.ebi.ac.uk/chebi/searchId.do?chebiId=CHEBI:" + references[i].substr(7) + "\">";
 					s += name;
 					s += "</a>";
 					correctreference = true;

@@ -157,7 +157,7 @@ string cSequence::getNameWithReferenceAsHTMLString() {
 		if (!correctreference) {
 			rx = "^CHEBI: [0-9]+$";
 			if (regex_search(reference, rx)) {
-				s += "<a href=\"https://www.ebi.ac.uk/chebi/searchId.do?chebiId=" + reference.substr(7) + "\">";
+				s += "<a href=\"https://www.ebi.ac.uk/chebi/searchId.do?chebiId=CHEBI:" + reference.substr(7) + "\">";
 				s += name;
 				s += "</a>";
 				correctreference = true;

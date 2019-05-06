@@ -171,6 +171,7 @@ Reference ids can be written in the following formats (without quotes):
 <ul>
 <li> "CSID: <number>" (ChemSpider ID; example: "CSID: 13539649")
 <li> "CID: <number>" (PubChem ID; example: "CID: 12439044")
+<li> "CHEBI: <number>" (ChEBI ID; example: "CHEBI: 4031")
 <li> "PDB: <pdb_code>" (PDB code; example: "PDB: UAL")
 <li> "<smiles> in CSID: <number>" (smiles in ChemSpider ID; example: "C(C(CN)NC(C)=O)(=O)O in CSID: 8570696")
 <li> "<smiles> in CID: <number>" (smiles in PubChem ID; example: "C1=C(C(=CC2=C1N3C(C(=C2)N)NC(CC3)C(O)=O)O)O in CID: 5289234")
