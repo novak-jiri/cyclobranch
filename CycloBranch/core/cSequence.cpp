@@ -135,7 +135,7 @@ string cSequence::getNameWithReferenceAsHTMLString() {
 		if (!correctreference) {
 			rx = "^CSID: [0-9]+$";
 			if (regex_search(reference, rx)) {
-				s += "<a href=\"http://www.chemspider.com/Chemical-Structure." + reference.substr(6) + ".html\">";
+				s += "<a href=\"https://www.chemspider.com/Chemical-Structure." + reference.substr(6) + ".html\">";
 				s += name;
 				s += "</a>";
 				correctreference = true;
@@ -146,7 +146,18 @@ string cSequence::getNameWithReferenceAsHTMLString() {
 		if (!correctreference) {
 			rx = "^CID: [0-9]+$";
 			if (regex_search(reference, rx)) {
-				s += "<a href=\"http://pubchem.ncbi.nlm.nih.gov/summary/summary.cgi?cid=" + reference.substr(5) + "\">";
+				s += "<a href=\"https://pubchem.ncbi.nlm.nih.gov/summary/summary.cgi?cid=" + reference.substr(5) + "\">";
+				s += name;
+				s += "</a>";
+				correctreference = true;
+			}
+		}
+
+		// ChEBI
+		if (!correctreference) {
+			rx = "^CHEBI: [0-9]+$";
+			if (regex_search(reference, rx)) {
+				s += "<a href=\"https://www.ebi.ac.uk/chebi/searchId.do?chebiId=" + reference.substr(7) + "\">";
 				s += name;
 				s += "</a>";
 				correctreference = true;
@@ -168,7 +179,7 @@ string cSequence::getNameWithReferenceAsHTMLString() {
 		if (!correctreference) {
 			rx = "^LM([A-Z]|[0-9])+$";
 			if (regex_search(reference, rx)) {
-				s += "<a href=\"http://www.lipidmaps.org/data/LMSDRecord.php?LMID=" + reference + "\">";
+				s += "<a href=\"https://www.lipidmaps.org/data/LMSDRecord.php?LMID=" + reference + "\">";
 				s += name;
 				s += "</a>";
 				correctreference = true;

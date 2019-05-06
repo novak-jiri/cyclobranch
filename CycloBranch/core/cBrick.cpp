@@ -292,7 +292,7 @@ string cBrick::getAcronymsWithReferencesAsHTMLString() {
 			if (!correctreference) {
 				rx = "^CSID: [0-9]+$";
 				if (regex_search(references[i], rx)) {
-					s += "<a href=\"http://www.chemspider.com/Chemical-Structure." + references[i].substr(6) + ".html\">";
+					s += "<a href=\"https://www.chemspider.com/Chemical-Structure." + references[i].substr(6) + ".html\">";
 					s += acronyms[i];
 					s += "</a>";
 					correctreference = true;
@@ -303,8 +303,19 @@ string cBrick::getAcronymsWithReferencesAsHTMLString() {
 			if (!correctreference) {
 				rx = "^CID: [0-9]+$";
 				if (regex_search(references[i], rx)) {
-					s += "<a href=\"http://pubchem.ncbi.nlm.nih.gov/summary/summary.cgi?cid=" + references[i].substr(5) + "\">";
+					s += "<a href=\"https://pubchem.ncbi.nlm.nih.gov/summary/summary.cgi?cid=" + references[i].substr(5) + "\">";
 					s += acronyms[i];
+					s += "</a>";
+					correctreference = true;
+				}
+			}
+
+			// ChEBI
+			if (!correctreference) {
+				rx = "^CHEBI: [0-9]+$";
+				if (regex_search(references[i], rx)) {
+					s += "<a href=\"https://www.ebi.ac.uk/chebi/searchId.do?chebiId=" + references[i].substr(7) + "\">";
+					s += name;
 					s += "</a>";
 					correctreference = true;
 				}
@@ -314,7 +325,7 @@ string cBrick::getAcronymsWithReferencesAsHTMLString() {
 			if (!correctreference) {
 				rx = "^PDB: ([A-Z]|[0-9])+$";
 				if (regex_search(references[i], rx)) {
-					s += "<a href=\"http://www.ebi.ac.uk/pdbe-srv/pdbechem/chemicalCompound/show/" + references[i].substr(5) + "\">";
+					s += "<a href=\"https://www.ebi.ac.uk/pdbe-srv/pdbechem/chemicalCompound/show/" + references[i].substr(5) + "\">";
 					s += acronyms[i];
 					s += "</a>";
 					correctreference = true;
