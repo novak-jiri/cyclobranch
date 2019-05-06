@@ -247,7 +247,7 @@ In case of a microscopy non-navigation image, both - the size and the position a
 
 \subsection subsec_crossvisvendordetails Vendor-specific Details
 
-<p><b>imzML exported from FlexImaging 4.1 (Bruker)</b></p>
+<p><b>imzML exported from FlexImaging 4.1/5.0 (Bruker)</b></p>
 
 <p>The correct values of 'Max X' and 'Max Y' must be determined by hand as they are not included in the imzML file. 
 Open the dataset in FlexImaging 4.1 and determine the coordinates of the bottom-right corner of an optical image as shown in the following image.
