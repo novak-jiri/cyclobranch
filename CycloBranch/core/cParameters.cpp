@@ -894,6 +894,28 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 	}
 
 
+	// report errors and return
+	if (error) {
+		if (os) {
+			*os << endl << endl;
+			*os << "Error: " << errormessage.c_str() << endl;
+			*os << endl;
+			*os << endl;
+		}
+		return -1;
+	}
+
+
+	return 0;
+}
+
+
+int cParameters::prepareLossesAndCompounds(bool& terminatecomputation) {
+	bool error = false;
+	string errormessage = "";
+	int errtype;
+
+
 	// calculate combinations of neutral losses or generate compounds
 	neutrallossesdefinitions.clear();
 	neutrallossesfortheoreticalspectra.clear();

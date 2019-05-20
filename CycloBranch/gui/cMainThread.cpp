@@ -108,19 +108,6 @@ void cMainThread::run() {
 		return;
 	}
 
-	if (parameters.mode == compoundsearch) {
-		int compoundslimit = 5000000;
-		if (parameters.generateisotopepattern) {
-			compoundslimit = 1000000;
-		}
-		if (parameters.sequencedatabase.size() > compoundslimit) {
-			parameters.sequencedatabase.clear();
-			*os << "Error: The number of generated compounds exceeded the limit " + to_string(compoundslimit) + ". Please, adjust the settings to limit the number of compounds." << endl;
-			emitEndSignals();
-			return;
-		}
-	}
-
 	*os << parameters.printToString();
 
 	if (parameters.mode == singlecomparison) {
@@ -192,6 +179,24 @@ void cMainThread::run() {
 			}
 			*os << endl;
 			*os << parameters.peaklistseries[i].print();
+		}
+	}
+
+	if (parameters.prepareLossesAndCompounds(terminatecomputation) == -1) {
+		emitEndSignals();
+		return;
+	}
+
+	if (parameters.mode == compoundsearch) {
+		int compoundslimit = 5000000;
+		if (parameters.generateisotopepattern) {
+			compoundslimit = 1000000;
+		}
+		if (parameters.sequencedatabase.size() > compoundslimit) {
+			parameters.sequencedatabase.clear();
+			*os << "Error: The number of generated compounds exceeded the limit " + to_string(compoundslimit) + ". Please, adjust the settings to limit the number of compounds." << endl;
+			emitEndSignals();
+			return;
 		}
 	}
 

@@ -521,6 +521,14 @@ public:
 
 
 	/**
+		\brief Prepare neutral losses and compounds.
+		\param terminatecomputation reference to a variable determining that the computation must be stopped
+		\retval int -1 when an error occurred, 0 otherwise
+	*/
+	int prepareLossesAndCompounds(bool& terminatecomputation);
+
+
+	/**
 		\brief Check if the names of modifications used in a sequence are correct.
 		\param sequence an input sequence
 		\param startmodifid an output identifier of a start modification
