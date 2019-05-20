@@ -1593,6 +1593,7 @@ int cParameters::generateCompounds(bool& terminatecomputation, string& errormess
 	double sumofmasses;
 	double tmpmzdifference;
 	bool alloutofmz;
+	bool hintfound;
 
 	double minadd = 0;
 	//double maxadd = 0;
@@ -2122,6 +2123,31 @@ int cParameters::generateCompounds(bool& terminatecomputation, string& errormess
 			}
 
 		}
+
+		//if (!reportunmatchedtheoreticalpeaks) {
+
+			hintfound = false;
+			for (auto& it : ionsfortheoreticalspectra) {
+				for (int j = 0; j < abs(precursorcharge); j++) {
+					tmpmzdifference = sumofmasses + iondefinitions[it].massdifference;
+					if (precursorcharge > 0) {
+						tmpmzdifference += j * (H - e);
+					}
+					else {
+						tmpmzdifference -= j * (H - e);
+					}
+					if (j > 0) {
+						tmpmzdifference /= (double)(j + 1);
+					}
+					// to do 
+				}
+			}
+
+			if (hintfound) {
+				continue;
+			}
+
+		//}
 
 		tmpstr.clear();
 		tmpstr2.clear();
