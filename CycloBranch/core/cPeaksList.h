@@ -53,6 +53,16 @@ double ppmError(double experimentalmass, double theoreticalmass);
 
 
 /**
+	\brief Check if an m/z ratio exists in an experimental spectrum.
+	\param mzratio theoretical m/z ratio
+	\param experimentalpeaks an input experimental spectrum (sorted in ascending order)
+	\param fragmentmasserrortolerance m/z error tolerance
+	\retval true if the theoretical m/z ratio was mathed; false otherwise
+*/
+bool searchHint(double mzratio, cPeaksList& experimentalpeaks, double fragmentmasserrortolerance);
+
+
+/**
 	\brief The class representing a peak list.
 */
 class cPeaksList {

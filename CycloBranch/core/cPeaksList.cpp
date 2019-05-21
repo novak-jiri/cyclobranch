@@ -18,6 +18,28 @@ double ppmError(double experimentalmass, double theoreticalmass) {
 }
 
 
+bool searchHint(double mzratio, cPeaksList& experimentalpeaks, double fragmentmasserrortolerance) {
+	int left, right, middle;
+	int experimentalpeakssize = experimentalpeaks.size();
+
+	left = 0;
+	right = experimentalpeakssize - 1;
+	while (left <= right) {
+		middle = (left + right) / 2;
+		if (isInPpmMassErrorTolerance(experimentalpeaks[middle].mzratio, mzratio, fragmentmasserrortolerance)) {
+			return true;
+		}
+		if (mzratio < experimentalpeaks[middle].mzratio) {
+			right = middle - 1;
+		}
+		else {
+			left = middle + 1;
+		}
+	}
+	return false;
+}
+
+
 cPeaksList::cPeaksList() {
 	clear();
 }

@@ -134,9 +134,6 @@ class cTheoreticalSpectrum {
 	// search for matches of experimental and theoretical peaks
 	void searchForPeakPairs(cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks, double fragmentmasserrortolerance);
 
-	// search a m/z ratio in the experimental spectrum to decide whether its description should be generated
-	bool searchHint(double mzratio, cPeaksList& experimentalpeaks, double fragmentmasserrortolerance);
-
 	// compute additional scores
 	void computeStatistics(bool writedescription);
 

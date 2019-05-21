@@ -2124,7 +2124,7 @@ int cParameters::generateCompounds(bool& terminatecomputation, string& errormess
 
 		}
 
-		//if (!reportunmatchedtheoreticalpeaks) {
+		if (!reportunmatchedtheoreticalpeaks) {
 
 			hintfound = false;
 			for (auto& it : ionsfortheoreticalspectra) {
@@ -2139,15 +2139,27 @@ int cParameters::generateCompounds(bool& terminatecomputation, string& errormess
 					if (j > 0) {
 						tmpmzdifference /= (double)(j + 1);
 					}
-					// to do 
+					size = peaklistseries.size();
+					for (int k = 0; k < size; k++) {
+						hintfound = searchHint(tmpmzdifference, peaklistseries[k], fragmentmasserrortolerance);
+						if (hintfound) {
+							break;
+						}
+					}
+					if (hintfound) {
+						break;
+					}
+				}
+				if (hintfound) {
+					break;
 				}
 			}
 
-			if (hintfound) {
+			if (!hintfound) {
 				continue;
 			}
 
-		//}
+		}
 
 		tmpstr.clear();
 		tmpstr2.clear();
