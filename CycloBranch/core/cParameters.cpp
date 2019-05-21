@@ -1564,7 +1564,8 @@ int cParameters::calculateNeutralLosses(bool& terminatecomputation, string& erro
 
 int cParameters::generateCompounds(bool& terminatecomputation, string& errormessage) {
 	sequencedatabase.clear();
-	unsigned long long sequencescount = 0;
+	unsigned long long compoundsgenerated = 0;
+	unsigned long long compoundsused = 0;
 
 	errormessage = "";
 
@@ -2124,6 +2125,8 @@ int cParameters::generateCompounds(bool& terminatecomputation, string& errormess
 
 		}
 
+		compoundsgenerated++;
+
 		if (!reportunmatchedtheoreticalpeaks) {
 
 			hintfound = false;
@@ -2179,7 +2182,7 @@ int cParameters::generateCompounds(bool& terminatecomputation, string& errormess
 		seq.setName(tmpstr);
 		seq.setSummaryFormula(tmpstr);
 		sequencedatabase.push_back(seq);
-		sequencescount++;
+		compoundsused++;
 
 		ui++;
 
@@ -2198,7 +2201,8 @@ int cParameters::generateCompounds(bool& terminatecomputation, string& errormess
 
 	if (os) {
 		*os << "ok" << endl;
-		*os << "Number of generated compounds: " << sequencescount << endl << endl;
+		*os << "Number of generated compounds: " << compoundsgenerated << endl;
+		*os << "Number of used compounds: " << compoundsused << endl << endl;
 	}
 
 	return 0;
