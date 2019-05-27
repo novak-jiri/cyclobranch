@@ -157,6 +157,13 @@ void cSequenceDatabase::push_back(cSequence& sequence) {
 }
 
 
+void cSequenceDatabase::erase(int index) {
+	if ((index >= 0) && (index < (int)sequences.size())) {
+		sequences.erase(sequences.begin() + index);
+	}
+}
+
+
 void cSequenceDatabase::store(ofstream& os) {
 	int size;
 

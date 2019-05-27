@@ -80,6 +80,13 @@ public:
 
 
 	/**
+		\brief Erase a sequence.
+		\param index index of a sequence
+	*/
+	void erase(int index);
+
+
+	/**
 		\brief Store the structure into an output stream.
 		\param os an output stream
 	*/ 

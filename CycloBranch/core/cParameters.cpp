@@ -1379,7 +1379,7 @@ int cParameters::calculateNeutralLosses(bool& terminatecomputation, string& erro
 	bool skipcombination;
 	bool bruteforce = false;
 
-	if (mode == singlecomparison) {
+	if ((mode == singlecomparison) || ((mode == databasesearch) && (peptidetype == other))) {
 
 		bruteforce = true;
 		for (int i = 0; i < neutrallossesbrickdatabase.size(); i++) {
@@ -1396,6 +1396,10 @@ int cParameters::calculateNeutralLosses(bool& terminatecomputation, string& erro
 			}
 		}
 
+	}
+
+	if (mode == singlecomparison) {
+			
 		// calculate molecular formula of searched sequence
 		if (bruteforce) {
 
@@ -1403,13 +1407,13 @@ int cParameters::calculateNeutralLosses(bool& terminatecomputation, string& erro
 
 			string upperboundsequence = searchedsequence;
 
-			if (!checkRegex(peptidetype, upperboundsequence, errormessage)) {
-				return -1;
-			}
+			//if (!checkRegex(peptidetype, upperboundsequence, errormessage)) {
+			//	return -1;
+			//}
 
-			if (!bricksdatabase.replaceAcronymsByIDs(upperboundsequence, errormessage)) {
-				return -1;
-			}
+			//if (!bricksdatabase.replaceAcronymsByIDs(upperboundsequence, errormessage)) {
+			//	return -1;
+			//}
 
 			cSequence tmpsequence;
 			tmpsequence.setNTterminalModification(searchedsequenceNtermmodif);
@@ -1435,7 +1439,6 @@ int cParameters::calculateNeutralLosses(bool& terminatecomputation, string& erro
 			string formulastr = formula.getSummary();
 			addStringFormulaToMap(formulastr, atoms);
 
-			string tmpstr;
 			for (int i = 0; i < neutrallossesbrickdatabase.size(); i++) {
 				tmpstr = neutrallossesbrickdatabase[i].getSummary();
 				if (atoms.count(tmpstr) == 1) {
@@ -1449,6 +1452,57 @@ int cParameters::calculateNeutralLosses(bool& terminatecomputation, string& erro
 
 		}
 
+	}
+
+	if ((mode == databasesearch) && (peptidetype == other)) {
+
+		if (bruteforce) {
+
+			*os << "Brute force fragmentation enabled. Maximum numbers of elements: " << endl;
+
+			for (int j = 0; j < neutrallossesbrickdatabase.size(); j++) {
+				max_counts.push_back(0);
+			}
+		
+			int i = 0;
+			while (i < sequencedatabase.size()) {
+				tmpformula.setFormula(sequencedatabase[i].getSummaryFormula());
+				tmpstr = "H+";
+				tmpformula.addFormula(tmpstr);
+				tmpstr = (precursorcharge > 0) ? "" : "H-2+-2";
+				tmpformula.addFormula(tmpstr);
+				tmpstr = precursoradduct.empty() ? "" : "H-1";
+				tmpformula.addFormula(tmpstr);
+				tmpstr = precursoradduct;
+				tmpformula.addFormula(tmpstr);
+
+				if (similaritysearch || isInPpmMassErrorTolerance(charge(uncharge(precursormass, precursorcharge), (precursorcharge > 0) ? 1 : -1), tmpformula.getMass(), precursormasserrortolerance)) {
+					atoms.clear();
+					tmpstr = tmpformula.getSummary();
+					tmpstr += (precursorcharge > 0) ? "H-1+-1" : "H+";
+					addStringFormulaToMap(tmpstr, atoms);
+
+					for (int j = 0; j < neutrallossesbrickdatabase.size(); j++) {
+						tmpstr = neutrallossesbrickdatabase[j].getSummary();
+						if ((atoms.count(tmpstr) == 1) && (atoms[tmpstr] > max_counts[j])) {
+							max_counts[j] = atoms[tmpstr];
+						}
+					}
+
+					i++;
+				}
+				else {
+					sequencedatabase.erase(i);
+				}
+			}
+
+			for (int j = 0; j < neutrallossesbrickdatabase.size(); j++) {
+				tmpstr = neutrallossesbrickdatabase[j].getSummary();
+				*os << tmpstr << ": " << max_counts[j] << endl;
+			}
+	
+		}
+	
 	}
 
 	// to do - change to unsigned long long
