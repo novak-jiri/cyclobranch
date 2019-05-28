@@ -254,6 +254,8 @@ private:
 	QLineEdit* searchedsequenceCtermmodif;
 	QLabel* searchedsequenceTmodiflabel;
 	QLineEdit* searchedsequenceTmodif;
+	QLabel* searchedsequenceformulalabel;
+	QLineEdit* searchedsequenceformula;
 
 	QString lastdirloadsettings;
 	QString lastdirsavesettings;

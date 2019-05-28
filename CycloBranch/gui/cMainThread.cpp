@@ -94,9 +94,9 @@ void cMainThread::run() {
 
 	*os << appname.toStdString() << " started at " << time.currentTime().toString().toStdString() << "." << endl << endl;
 
-	if ((parameters.mode == denovoengine) || (parameters.mode == singlecomparison)) {
+	if (parameters.mode == denovoengine) {
 		if (parameters.peptidetype == other) {
-			*os << "Error: The peptide type 'other' cannot be used in this search mode." << endl;
+			*os << "Error: The peptide type 'other' cannot be used in this mode." << endl;
 			emitEndSignals();
 			return;
 		}
@@ -110,7 +110,7 @@ void cMainThread::run() {
 
 	*os << parameters.printToString();
 
-	if (parameters.mode == singlecomparison) {
+	if ((parameters.mode == singlecomparison) && (parameters.peptidetype != other)) {
 		if (!checkRegex(parameters.peptidetype, parameters.searchedsequence, errormessage)) {
 			*os << "Error: " << errormessage << endl;
 			emitEndSignals();
@@ -118,7 +118,7 @@ void cMainThread::run() {
 		}
 	}
 
-	if ((parameters.mode == denovoengine) || (parameters.mode == singlecomparison) || ((parameters.mode == databasesearch) && (parameters.peptidetype != other))) {
+	if ((parameters.mode == denovoengine) || ((parameters.mode == singlecomparison) && (parameters.peptidetype != other)) || ((parameters.mode == databasesearch) && (parameters.peptidetype != other))) {
 		if (!parameters.bricksdatabase.replaceAcronymsByIDs(parameters.searchedsequence, errormessage)) {
 			*os << "Error: " << errormessage << endl;
 			emitEndSignals();
@@ -224,14 +224,28 @@ void cMainThread::run() {
 			cCandidate c;
 			vector<nodeEdge> netmp;
 
-			parseBranch(parameters.peptidetype, parameters.searchedsequence, v, branchstart, branchend);
-			// startmodifid, endmodifid and middlemodifid were filled up by checkModifications
-			c.setCandidate(v, netmp, fragmentIonTypeEnd, startmodifid, endmodifid, middlemodifid, branchstart, branchend);
-			cSummaryFormula formula = c.calculateSummaryFormulaFromBricks(parameters, parameters.peptidetype, parameters.precursormass);
+			cSummaryFormula formula;
+			string formstr;
+			if (parameters.peptidetype == other) {
+				v.push_back(to_string(1));
+				c.setCandidate(v, netmp, fragmentIonTypeEnd, 0, 0, 0, -1, -1);
+
+				formula.setFormula(parameters.searchedsequenceformula);
+				formstr = parameters.precursoradduct.empty() ? "" : "H-1";
+				formula.addFormula(formstr);
+				formstr = parameters.precursoradduct;
+				formula.addFormula(formstr);
+			}
+			else {
+				parseBranch(parameters.peptidetype, parameters.searchedsequence, v, branchstart, branchend);
+				// startmodifid, endmodifid and middlemodifid were filled up by checkModifications
+				c.setCandidate(v, netmp, fragmentIonTypeEnd, startmodifid, endmodifid, middlemodifid, branchstart, branchend);
+				formula = c.calculateSummaryFormulaFromBricks(parameters, parameters.peptidetype, parameters.precursormass);
+			}
+
 			c.setSummaryFormula(formula);
-	
 			candidates.getSet().insert(c);
-		
+
 			graphreaderisworking = false;
 		}
 	}
@@ -628,7 +642,7 @@ void cMainThread::run() {
 	}
 	
 
-	if ((parameters.mode == denovoengine) || (parameters.mode == singlecomparison) || (parameters.mode == databasesearch)) {
+	if ((parameters.mode == denovoengine) || (parameters.mode == singlecomparison) || (parameters.mode == databasesearch)) {	
 		*os << "Comparing theoretical spectra of candidates with the peak list... " << endl;
 		theoreticalspectrumlist->initialize(*os, parameters, &graph);
 		if (theoreticalspectrumlist->parallelCompareAndStore(candidates, terminatecomputation) == -1) {

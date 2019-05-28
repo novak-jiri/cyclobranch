@@ -1117,7 +1117,7 @@ void cSpectrumDetailWidget::prepareToShow(QAction* actionShowIsomers, cPeakListS
 		sizes.push_back(100);
 		sizes.push_back(100);
 
-		if ((parameters->mode == denovoengine) || (parameters->mode == singlecomparison) || ((parameters->mode == databasesearch) && (parameters->peptidetype != other))) {
+		if ((parameters->mode == denovoengine) || ((parameters->mode == singlecomparison) && (parameters->peptidetype != other)) || ((parameters->mode == databasesearch) && (parameters->peptidetype != other))) {
 
 			switch (parameters->peptidetype) {
 				case linear:
@@ -1192,7 +1192,7 @@ void cSpectrumDetailWidget::prepareToShow(QAction* actionShowIsomers, cPeakListS
 
 		if (parameters && theoreticalspectrum) {
 
-			if ((parameters->mode == denovoengine) || (parameters->mode == singlecomparison) || ((parameters->mode == databasesearch) && (parameters->peptidetype != other))) {
+			if ((parameters->mode == denovoengine) || ((parameters->mode == singlecomparison) && (parameters->peptidetype != other)) || ((parameters->mode == databasesearch) && (parameters->peptidetype != other))) {
 
 				switch (parameters->peptidetype) {
 					case linear:

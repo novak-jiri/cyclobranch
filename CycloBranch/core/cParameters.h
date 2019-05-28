@@ -387,6 +387,12 @@ public:
 
 
 	/**
+		\brief Formula of searched sequence.
+	*/
+	string searchedsequenceformula;
+
+
+	/**
 		\brief Maximum number of peptide sequence candidates.
     */
     int maximumnumberofcandidates;

@@ -718,7 +718,7 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 
 
 	// bricksdatabase check
-	if (!error && ((mode == denovoengine) || (mode == singlecomparison) || ((mode == databasesearch) && (peptidetype != other)))) {
+	if (!error && ((mode == denovoengine) || ((mode == singlecomparison) && (peptidetype != other)) || ((mode == databasesearch) && (peptidetype != other)))) {
 
 		bricksdatabasestream.open(bricksdatabasefilename);
 		if (!bricksdatabasestream.good()) {
@@ -1204,6 +1204,7 @@ string cParameters::printToString() {
 	s += "N-terminal Modification: " + searchedsequenceNtermmodif + "\n";
 	s += "C-terminal Modification: " + searchedsequenceCtermmodif + "\n";
 	s += "Branch Modification: " + searchedsequenceTmodif + "\n";
+	s += "Formula: " + searchedsequenceformula + "\n";
 
 	s += "\n";
 
@@ -1379,21 +1380,25 @@ int cParameters::calculateNeutralLosses(bool& terminatecomputation, string& erro
 	bool skipcombination;
 	bool bruteforce = false;
 
-	if ((mode == singlecomparison) || ((mode == databasesearch) && (peptidetype == other))) {
+	if ((mode == singlecomparison) || (mode == databasesearch)) {
 
-		bruteforce = true;
-		for (int i = 0; i < neutrallossesbrickdatabase.size(); i++) {
-			if (neutrallossesbrickdatabase[i].getSummaryMap().size() == 1) {
-				auto it = neutrallossesbrickdatabase[i].getSummaryMap().begin();
-				if (it->second != 1) {
+		if ((peptidetype == other) && (neutrallossesbrickdatabase.size() > 0)) {
+
+			bruteforce = true;
+			for (int i = 0; i < neutrallossesbrickdatabase.size(); i++) {
+				if (neutrallossesbrickdatabase[i].getSummaryMap().size() == 1) {
+					auto it = neutrallossesbrickdatabase[i].getSummaryMap().begin();
+					if (it->second != 1) {
+						bruteforce = false;
+						break;
+					}
+				}
+				else {
 					bruteforce = false;
 					break;
 				}
 			}
-			else {
-				bruteforce = false;
-				break;
-			}
+
 		}
 
 	}
@@ -1405,38 +1410,45 @@ int cParameters::calculateNeutralLosses(bool& terminatecomputation, string& erro
 
 			*os << "Brute force fragmentation enabled. Maximum numbers of elements: " << endl;
 
-			string upperboundsequence = searchedsequence;
+			string formulastr;
+			if (peptidetype == other) {
+				formulastr = searchedsequenceformula;
+			}
+			else {
+				string upperboundsequence = searchedsequence;
 
-			//if (!checkRegex(peptidetype, upperboundsequence, errormessage)) {
-			//	return -1;
-			//}
+				//if (!checkRegex(peptidetype, upperboundsequence, errormessage)) {
+				//	return -1;
+				//}
 
-			//if (!bricksdatabase.replaceAcronymsByIDs(upperboundsequence, errormessage)) {
-			//	return -1;
-			//}
+				//if (!bricksdatabase.replaceAcronymsByIDs(upperboundsequence, errormessage)) {
+				//	return -1;
+				//}
 
-			cSequence tmpsequence;
-			tmpsequence.setNTterminalModification(searchedsequenceNtermmodif);
-			tmpsequence.setCTterminalModification(searchedsequenceCtermmodif);
-			tmpsequence.setBranchModification(searchedsequenceTmodif);
-			tmpsequence.setPeptideType(peptidetype);
+				cSequence tmpsequence;
+				tmpsequence.setNTterminalModification(searchedsequenceNtermmodif);
+				tmpsequence.setCTterminalModification(searchedsequenceCtermmodif);
+				tmpsequence.setBranchModification(searchedsequenceTmodif);
+				tmpsequence.setPeptideType(peptidetype);
 
-			int startmodifid, endmodifid, middlemodifid;
-			if (!checkModifications(tmpsequence, startmodifid, endmodifid, middlemodifid, errormessage)) {
-				return -1;
+				int startmodifid, endmodifid, middlemodifid;
+				if (!checkModifications(tmpsequence, startmodifid, endmodifid, middlemodifid, errormessage)) {
+					return -1;
+				}
+
+				int branchstart, branchend;
+				vector<string> v;
+				cCandidate c;
+				vector<nodeEdge> netmp;
+
+				parseBranch(peptidetype, upperboundsequence, v, branchstart, branchend);
+				// startmodifid, endmodifid and middlemodifid were filled up by checkModifications
+				c.setCandidate(v, netmp, fragmentIonTypeEnd, startmodifid, endmodifid, middlemodifid, branchstart, branchend);
+				cSummaryFormula formula = c.calculateSummaryFormulaFromBricks(*this, peptidetype, precursormass);
+
+				formulastr = formula.getSummary();
 			}
 
-			int branchstart, branchend;
-			vector<string> v;
-			cCandidate c;
-			vector<nodeEdge> netmp;
-
-			parseBranch(peptidetype, upperboundsequence, v, branchstart, branchend);
-			// startmodifid, endmodifid and middlemodifid were filled up by checkModifications
-			c.setCandidate(v, netmp, fragmentIonTypeEnd, startmodifid, endmodifid, middlemodifid, branchstart, branchend);
-			cSummaryFormula formula = c.calculateSummaryFormulaFromBricks(*this, peptidetype, precursormass);
-
-			string formulastr = formula.getSummary();
 			addStringFormulaToMap(formulastr, atoms);
 
 			for (int i = 0; i < neutrallossesbrickdatabase.size(); i++) {
@@ -2337,6 +2349,7 @@ void cParameters::store(ofstream& os) {
 	storeString(searchedsequenceNtermmodif, os);
 	storeString(searchedsequenceCtermmodif, os);
 	storeString(searchedsequenceTmodif, os);
+	storeString(searchedsequenceformula, os);
 
 	os.write((char *)&maximumnumberofcandidates, sizeof(int));
 	os.write((char *)&blindedges, sizeof(int));
@@ -2469,6 +2482,7 @@ void cParameters::load(ifstream& is) {
 	loadString(searchedsequenceNtermmodif, is);
 	loadString(searchedsequenceCtermmodif, is);
 	loadString(searchedsequenceTmodif, is);
+	loadString(searchedsequenceformula, is);
 
 	is.read((char *)&maximumnumberofcandidates, sizeof(int));
 	is.read((char *)&blindedges, sizeof(int));

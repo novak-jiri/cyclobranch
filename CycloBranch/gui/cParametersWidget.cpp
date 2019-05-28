@@ -559,6 +559,13 @@ cParametersWidget::cParametersWidget(QWidget* parent) {
 	searchedsequencegridlayout->addWidget(searchedsequenceTmodiflabel, 3, 0);
 	searchedsequencegridlayout->addWidget(searchedsequenceTmodif, 3, 1);
 
+	searchedsequenceformula = new QLineEdit();
+	searchedsequenceformula->setToolTip("Formula of searched sequence.");
+	searchedsequenceformula->setFixedWidth(searchedsequencedefaultwidth);
+	searchedsequenceformulalabel = new QLabel("Formula:");
+	searchedsequencegridlayout->addWidget(searchedsequenceformulalabel, 4, 0);
+	searchedsequencegridlayout->addWidget(searchedsequenceformula, 4, 1);
+
 	searchedsequencegroupbox = new QGroupBox("Searched Sequence");
 	searchedsequencegroupbox->setLayout(searchedsequencegridlayout);
 
@@ -767,6 +774,8 @@ cParametersWidget::~cParametersWidget() {
 	delete searchedsequenceCtermmodif;
 	delete searchedsequenceTmodiflabel;
 	delete searchedsequenceTmodif;
+	delete searchedsequenceformulalabel;
+	delete searchedsequenceformula;
 	delete searchedsequencegridlayout;
 	delete searchedsequencegroupbox;
 
@@ -947,6 +956,7 @@ void cParametersWidget::loadSettings() {
 		searchedsequenceNtermmodif->setText(settings.value("searchedsequenceNtermmodif", "").toString());
 		searchedsequenceCtermmodif->setText(settings.value("searchedsequenceCtermmodif", "").toString());
 		searchedsequenceTmodif->setText(settings.value("searchedsequenceTmodif", "").toString());
+		searchedsequenceformula->setText(settings.value("searchedsequenceformula", "").toString());
 	}
 
 }
@@ -1028,6 +1038,7 @@ void cParametersWidget::saveSettings() {
 	settings.setValue("searchedsequenceNtermmodif", searchedsequenceNtermmodif->text());
 	settings.setValue("searchedsequenceCtermmodif", searchedsequenceCtermmodif->text());
 	settings.setValue("searchedsequenceTmodif", searchedsequenceTmodif->text());
+	settings.setValue("searchedsequenceformula", searchedsequenceformula->text());
 
 }
 
@@ -1104,7 +1115,7 @@ bool cParametersWidget::updateParameters() {
 		return false;
 	}
 
-	if ((brickdatabaseline->text().toStdString().compare("") == 0) && (((eModeType)mode->currentIndex() == denovoengine) || ((eModeType)mode->currentIndex() == singlecomparison) || ((eModeType)mode->currentIndex() == databasesearch))) {
+	if ((brickdatabaseline->text().toStdString().compare("") == 0) && (((eModeType)mode->currentIndex() == denovoengine) || (((eModeType)mode->currentIndex() == databasesearch) && ((ePeptideType)peptidetype->currentIndex() != other)) || (((eModeType)mode->currentIndex() == singlecomparison) && ((ePeptideType)peptidetype->currentIndex() != other)))) {
 		errstr = "A database of building blocks must be specified!";
 		msgBox.setText(errstr);
 		msgBox.exec();
@@ -1139,12 +1150,33 @@ bool cParametersWidget::updateParameters() {
 		return false;
 	}
 
-	if (((eModeType)mode->currentIndex() == denovoengine) || ((eModeType)mode->currentIndex() == singlecomparison)) {
+	if ((eModeType)mode->currentIndex() == denovoengine) {
 		if ((ePeptideType)peptidetype->currentIndex() == other) {
-			errstr = "The peptide type 'Other' can be used only in\n'Compare Peaklist with Database - MS/MS' mode!";
+			errstr = "The peptide type 'Other' cannot be used in this mode!";
 			msgBox.setText(errstr);
 			msgBox.exec();
 			return false;
+		}
+	}
+
+	if ((eModeType)mode->currentIndex() == singlecomparison) {
+		if ((ePeptideType)peptidetype->currentIndex() == other) {
+			if (searchedsequenceformula->text().isEmpty()) {
+				errstr = "The field 'Formula' is empty!";
+				msgBox.setText(errstr);
+				msgBox.exec();
+				return false;
+			}
+
+			tmpstring = searchedsequenceformula->text().toStdString();
+			tmpformula.setFormula(tmpstring, false);
+			if (!tmpformula.isValid(errmsg)) {
+				errstr = "The field 'Formula' is not valid!\n\n";
+				errstr += errmsg.c_str();
+				msgBox.setText(errstr);
+				msgBox.exec();
+				return false;
+			}
 		}
 	}
 
@@ -1275,6 +1307,7 @@ bool cParametersWidget::updateParameters() {
 	parameters.searchedsequenceNtermmodif = searchedsequenceNtermmodif->text().toStdString();
 	parameters.searchedsequenceCtermmodif = searchedsequenceCtermmodif->text().toStdString();
 	parameters.searchedsequenceTmodif = searchedsequenceTmodif->text().toStdString();
+	parameters.searchedsequenceformula = searchedsequenceformula->text().toStdString();
 
 	parameters.updateFragmentDefinitions();
 
@@ -1383,6 +1416,7 @@ void cParametersWidget::restoreParameters() {
 	searchedsequenceNtermmodif->setText(parameters.searchedsequenceNtermmodif.c_str());
 	searchedsequenceCtermmodif->setText(parameters.searchedsequenceCtermmodif.c_str());
 	searchedsequenceTmodif->setText(parameters.searchedsequenceTmodif.c_str());
+	searchedsequenceformula->setText(parameters.searchedsequenceformula.c_str());
 
 	settingsfile = oldsettingsfile;
 	if (settingsfile.toStdString().compare("") == 0) {
@@ -1431,6 +1465,7 @@ void cParametersWidget::updateSettingsWhenPeptideTypeChanged(int index) {
 			searchedsequenceNtermmodif->setDisabled(false);
 			searchedsequenceCtermmodif->setDisabled(false);
 			searchedsequenceTmodif->setDisabled(true);
+			searchedsequenceformula ->setDisabled(true);
 			break;
 		case cyclic:
 			brickdatabaseline->setDisabled(false);
@@ -1454,6 +1489,7 @@ void cParametersWidget::updateSettingsWhenPeptideTypeChanged(int index) {
 			searchedsequenceNtermmodif->setDisabled(true);
 			searchedsequenceCtermmodif->setDisabled(true);
 			searchedsequenceTmodif->setDisabled(true);
+			searchedsequenceformula->setDisabled(true);
 			break;
 		case branched:
 			brickdatabaseline->setDisabled(false);
@@ -1477,6 +1513,7 @@ void cParametersWidget::updateSettingsWhenPeptideTypeChanged(int index) {
 			searchedsequenceNtermmodif->setDisabled(false);
 			searchedsequenceCtermmodif->setDisabled(false);
 			searchedsequenceTmodif->setDisabled(false);
+			searchedsequenceformula->setDisabled(true);
 			break;
 		case branchcyclic:
 			brickdatabaseline->setDisabled(false);
@@ -1500,6 +1537,7 @@ void cParametersWidget::updateSettingsWhenPeptideTypeChanged(int index) {
 			searchedsequenceNtermmodif->setDisabled(true);
 			searchedsequenceCtermmodif->setDisabled(true);
 			searchedsequenceTmodif->setDisabled(false);
+			searchedsequenceformula->setDisabled(true);
 			break;
 		case linearpolyketide:
 			brickdatabaseline->setDisabled(false);
@@ -1523,6 +1561,7 @@ void cParametersWidget::updateSettingsWhenPeptideTypeChanged(int index) {
 			searchedsequenceNtermmodif->setDisabled(false);
 			searchedsequenceCtermmodif->setDisabled(false);
 			searchedsequenceTmodif->setDisabled(true);
+			searchedsequenceformula->setDisabled(true);
 			break;
 		case cyclicpolyketide:
 			brickdatabaseline->setDisabled(false);
@@ -1546,6 +1585,7 @@ void cParametersWidget::updateSettingsWhenPeptideTypeChanged(int index) {
 			searchedsequenceNtermmodif->setDisabled(true);
 			searchedsequenceCtermmodif->setDisabled(true);
 			searchedsequenceTmodif->setDisabled(true);
+			searchedsequenceformula->setDisabled(true);
 			break;
 		case other:
 			brickdatabaseline->setDisabled(true);
@@ -1569,6 +1609,7 @@ void cParametersWidget::updateSettingsWhenPeptideTypeChanged(int index) {
 			searchedsequenceNtermmodif->setDisabled(true);
 			searchedsequenceCtermmodif->setDisabled(true);
 			searchedsequenceTmodif->setDisabled(true);
+			searchedsequenceformula->setDisabled(false);
 			break;
 		default:
 			break;
@@ -1755,6 +1796,7 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 			searchedsequenceNtermmodif->setDisabled(true);
 			searchedsequenceCtermmodif->setDisabled(true);
 			searchedsequenceTmodif->setDisabled(true);
+			searchedsequenceformula->setDisabled(true);
 			break;
 		case compoundsearch:
 			peptidetype->setDisabled(true);
@@ -1812,6 +1854,7 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 			searchedsequenceNtermmodif->setDisabled(true);
 			searchedsequenceCtermmodif->setDisabled(true);
 			searchedsequenceTmodif->setDisabled(true);
+			searchedsequenceformula->setDisabled(true);
 			break;
 		default:
 			break;
