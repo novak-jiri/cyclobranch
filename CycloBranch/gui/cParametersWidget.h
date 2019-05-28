@@ -248,12 +248,12 @@ private:
 	QPushButton* searchedsequencebutton;
 	QHBoxLayout* searchedsequencelayout;
 	QWidget* searchedsequencewidget;
-	QLabel* searchedsequenceNtermmodiflabel;
+	QLabel* searchedsequencemodiflabel;
 	QLineEdit* searchedsequenceNtermmodif;
-	QLabel* searchedsequenceCtermmodiflabel;
 	QLineEdit* searchedsequenceCtermmodif;
-	QLabel* searchedsequenceTmodiflabel;
 	QLineEdit* searchedsequenceTmodif;
+	QHBoxLayout* searchedsequencemodiflayout;
+	QWidget* searchedsequencemodifwidget;
 	QLabel* searchedsequenceformulalabel;
 	QLineEdit* searchedsequenceformula;
 

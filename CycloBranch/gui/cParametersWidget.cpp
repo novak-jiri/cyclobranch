@@ -540,31 +540,34 @@ cParametersWidget::cParametersWidget(QWidget* parent) {
 
 	searchedsequenceNtermmodif = new QLineEdit();
 	searchedsequenceNtermmodif->setToolTip("A name of an N-terminal modification which belongs to the searched peptide. The name must be defined in \"N-/C-terminal Modifications File\".");
-	searchedsequenceNtermmodif->setFixedWidth(searchedsequencedefaultwidth);
-	searchedsequenceNtermmodiflabel = new QLabel("N-terminal Modification:");
-	searchedsequencegridlayout->addWidget(searchedsequenceNtermmodiflabel, 1, 0);
-	searchedsequencegridlayout->addWidget(searchedsequenceNtermmodif, 1, 1);
+	searchedsequenceNtermmodif->setPlaceholderText("N-terminal");
 
 	searchedsequenceCtermmodif = new QLineEdit();
 	searchedsequenceCtermmodif->setToolTip("A name of a C-terminal modification which belongs to the searched peptide. The name must be defined in \"N-/C-terminal Modifications File\".");
-	searchedsequenceCtermmodif->setFixedWidth(searchedsequencedefaultwidth);
-	searchedsequenceCtermmodiflabel = new QLabel("C-terminal Modification:");
-	searchedsequencegridlayout->addWidget(searchedsequenceCtermmodiflabel, 2, 0);
-	searchedsequencegridlayout->addWidget(searchedsequenceCtermmodif, 2, 1);
+	searchedsequenceCtermmodif->setPlaceholderText("C-terminal");
 
 	searchedsequenceTmodif = new QLineEdit();
 	searchedsequenceTmodif->setToolTip("A name of an N-terminal or C-terminal modification which belongs to a branch of a searched peptide (branched and branch-cyclic peptides only). The name must be defined in \"N-/C-terminal Modifications File\".");
-	searchedsequenceTmodif->setFixedWidth(searchedsequencedefaultwidth);
-	searchedsequenceTmodiflabel = new QLabel("Branch Modification:");
-	searchedsequencegridlayout->addWidget(searchedsequenceTmodiflabel, 3, 0);
-	searchedsequencegridlayout->addWidget(searchedsequenceTmodif, 3, 1);
+	searchedsequenceTmodif->setPlaceholderText("Branch");
+
+	searchedsequencemodiflayout = new QHBoxLayout();
+	searchedsequencemodiflayout->addWidget(searchedsequenceNtermmodif);
+	searchedsequencemodiflayout->addWidget(searchedsequenceCtermmodif);
+	searchedsequencemodiflayout->addWidget(searchedsequenceTmodif);
+	searchedsequencemodiflayout->setMargin(0);
+	searchedsequencemodifwidget = new QWidget();
+	searchedsequencemodifwidget->setLayout(searchedsequencemodiflayout);
+	searchedsequencemodifwidget->setFixedWidth(searchedsequencedefaultwidth);
+	searchedsequencemodiflabel = new QLabel("Modifications:");
+	searchedsequencegridlayout->addWidget(searchedsequencemodiflabel, 1, 0);
+	searchedsequencegridlayout->addWidget(searchedsequencemodifwidget, 1, 1);
 
 	searchedsequenceformula = new QLineEdit();
 	searchedsequenceformula->setToolTip("Formula of searched sequence.");
 	searchedsequenceformula->setFixedWidth(searchedsequencedefaultwidth);
 	searchedsequenceformulalabel = new QLabel("Formula:");
-	searchedsequencegridlayout->addWidget(searchedsequenceformulalabel, 4, 0);
-	searchedsequencegridlayout->addWidget(searchedsequenceformula, 4, 1);
+	searchedsequencegridlayout->addWidget(searchedsequenceformulalabel, 2, 0);
+	searchedsequencegridlayout->addWidget(searchedsequenceformula, 2, 1);
 
 	searchedsequencegroupbox = new QGroupBox("Searched Sequence");
 	searchedsequencegroupbox->setLayout(searchedsequencegridlayout);
@@ -768,12 +771,12 @@ cParametersWidget::~cParametersWidget() {
 	delete searchedsequencebutton;
 	delete searchedsequencelayout;
 	delete searchedsequencewidget;
-	delete searchedsequenceNtermmodiflabel;
+	delete searchedsequencemodiflabel;
 	delete searchedsequenceNtermmodif;
-	delete searchedsequenceCtermmodiflabel;
 	delete searchedsequenceCtermmodif;
-	delete searchedsequenceTmodiflabel;
 	delete searchedsequenceTmodif;
+	delete searchedsequencemodiflayout;
+	delete searchedsequencemodifwidget;
 	delete searchedsequenceformulalabel;
 	delete searchedsequenceformula;
 	delete searchedsequencegridlayout;
