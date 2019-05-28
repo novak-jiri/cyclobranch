@@ -66,11 +66,7 @@ Use F1 to open this help.
 <li> Other
 </ul>
 
-<p>The type 'Other' can be used only in 'Compare Peaklist with Database - MS/MS' mode. In this case, the theoretical peptide fragment ion series (e.g. b-ions or y-ions) are not generated 
-but the list of 'Neutral Losses/Chemical Elements' is applied on a molecular formula of a compound in a database. The peptide type of compounds in the database is ignored (i.e. all the compounds are used).</p>
-
-<p>The type 'Other' can also be used for compounds in a database if the mode 'Compare Peaklist(s) with Database - MS, LC-MS, MSI' is used.
-In this case, the mandatory items in the database for each compound are only a name and a molecular formula (i.e., a peptide sequence does not have to be defined).</p>
+<p>The type 'Other' can be used for fragmentation metabolites.</p>
 
 \subsection settings_peaklistfile File (CTRL + P)
 
@@ -614,6 +610,10 @@ Regular expressions like <p><code>([Val]-[Lac]-[Val]-[Hiv]-*){3}</code></p> are 
 \subsection settings_branchmodif Branch Modification
 
 <p>A name of an N-terminal or C-terminal modification which belongs to a branch of a searched peptide (branched and branch-cyclic peptides only). The name must be defined in [N-/C-terminal Modifications File](@ref settings_modif).</p>
+
+\subsection settings_formula Formula
+
+<p>Formula of searched sequence.</p>
 
 <br/>
 

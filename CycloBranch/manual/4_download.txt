@@ -26,7 +26,7 @@ Any work based on CycloBranch shall cite any of the following references:
   <li> Changes:
   <ul>
     <li> Compound search mode added (a database-free search mode for MS1 data).
-    <li> Fragmentation of metabolites is now supported (mode "Compare Peaklist with Database - MS/MS data", peptide type "Other").
+    <li> Fragmentation of metabolites is now supported (peptide type "Other" in MS/MS mode).
     <li> A list od neutral losses can now be defined for individual building blocks.
     <li> The databases of blocks were updated to a new file format (the column neutral losses was added).
     <li> Spectrum detail window can now be opened direcly from chromatogram or image window (CrossVis) by a double-click.
