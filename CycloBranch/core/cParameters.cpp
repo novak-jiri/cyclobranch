@@ -1530,12 +1530,6 @@ int cParameters::calculateNeutralLosses(bool& terminatecomputation, string& erro
 			return -1;
 		}
 
-		if (validvalences) {
-			if (!checkSeniorRules(combarray, valences, 10)) {
-				continue;
-			}
-		}
-
 		if (bruteforce) {
 			skipcombination = false;
 			for (int j = 0; j < numberofbasicbricks; j++) {
@@ -1546,6 +1540,12 @@ int cParameters::calculateNeutralLosses(bool& terminatecomputation, string& erro
 			}
 
 			if (skipcombination) {
+				continue;
+			}
+		}
+
+		if (validvalences) {
+			if (!checkSeniorRules(combarray, valences, 10)) {
 				continue;
 			}
 		}

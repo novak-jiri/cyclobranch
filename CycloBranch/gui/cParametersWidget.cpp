@@ -569,7 +569,7 @@ cParametersWidget::cParametersWidget(QWidget* parent) {
 	searchedsequencegridlayout->addWidget(searchedsequenceformulalabel, 2, 0);
 	searchedsequencegridlayout->addWidget(searchedsequenceformula, 2, 1);
 
-	searchedsequencegroupbox = new QGroupBox("Searched Sequence");
+	searchedsequencegroupbox = new QGroupBox("Searched Sequence/Compound");
 	searchedsequencegroupbox->setLayout(searchedsequencegridlayout);
 
 

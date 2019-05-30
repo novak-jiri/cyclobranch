@@ -588,7 +588,7 @@ Advanced filtering rules are applied if molecular formulas of compounds are gene
 
 <hr>
 
-\section settingssearchedseq Searched Sequence
+\section settingssearchedseq Searched Sequence/Compound
 
 \subsection settings_searchedseq Sequence
 
