@@ -1660,7 +1660,8 @@ int cParameters::generateCompounds(bool& terminatecomputation, string& errormess
 	double sumofmasses;
 	double tmpmzdifference;
 	bool alloutofmz;
-	bool hintfound;
+	int hintsfound;
+	bool hintend;
 
 	double minadd = 0;
 	//double maxadd = 0;
@@ -1675,6 +1676,8 @@ int cParameters::generateCompounds(bool& terminatecomputation, string& errormess
 	int countCl;
 	int countBr;
 	int countSi;
+
+	bool lcms = (peaklistseries.size() > 1) && !((peaklistfileformat == mis) || (peaklistfileformat == imzML));
 
 	if (os) {
 		*os << "Generating compounds... " << endl;
@@ -2195,9 +2198,10 @@ int cParameters::generateCompounds(bool& terminatecomputation, string& errormess
 
 		if (!reportunmatchedtheoreticalpeaks) {
 
-			hintfound = false;
 			for (auto& it : ionsfortheoreticalspectra) {
+
 				for (int j = 0; j < abs(precursorcharge); j++) {
+
 					tmpmzdifference = sumofmasses + iondefinitions[it].massdifference;
 					if (precursorcharge > 0) {
 						tmpmzdifference += j * (H - e);
@@ -2208,23 +2212,46 @@ int cParameters::generateCompounds(bool& terminatecomputation, string& errormess
 					if (j > 0) {
 						tmpmzdifference /= (double)(j + 1);
 					}
+
+					hintsfound = 0;
 					size = peaklistseries.size();
 					for (int k = 0; k < size; k++) {
-						hintfound = searchHint(tmpmzdifference, peaklistseries[k], fragmentmasserrortolerance);
-						if (hintfound) {
+						if (searchHint(tmpmzdifference, peaklistseries[k], fragmentmasserrortolerance)) {
+							hintsfound++;
+						}
+						else {
+							hintsfound = 0;
+						}
+
+						hintend = false;
+						if (lcms) {
+							if (hintsfound >= minimumfeaturesize) {
+								hintend = true;
+							}
+						}
+						else {
+							if (hintsfound > 0) {
+								hintend = true;
+							}
+						}
+
+						if (hintend) {
 							break;
 						}
 					}
-					if (hintfound) {
+					if (hintend) {
 						break;
 					}
+
 				}
-				if (hintfound) {
+
+				if (hintend) {
 					break;
 				}
+
 			}
 
-			if (!hintfound) {
+			if (!hintend) {
 				continue;
 			}
 
