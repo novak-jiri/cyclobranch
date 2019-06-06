@@ -3488,6 +3488,10 @@ void cTheoreticalSpectrum::generateMSSpectrum(bool& terminatecomputation, bool w
 
 				for (int m = 0; m < abs(parameters->precursorcharge); m++) {
 
+					peak.iontype = parameters->ionsfortheoreticalspectra[j];
+					peak.neutrallosstype = (k >= 0) ? parameters->neutrallossesfortheoreticalspectra[k] : -1;
+					peak.charge = (parameters->precursorcharge > 0) ? m + 1 : -(m + 1);
+
 					peak.mzratio = (double)parameters->iondefinitions[parameters->ionsfortheoreticalspectra[j]].multiplier*formula.getMass() + parameters->iondefinitions[parameters->ionsfortheoreticalspectra[j]].massdifference;
 					if (parameters->iondefinitions[parameters->ionsfortheoreticalspectra[j]].positive) {
 						peak.mzratio += (double)m*(H - e);
@@ -3617,6 +3621,9 @@ void cTheoreticalSpectrum::generateFineMSSpectrum(bool& terminatecomputation) {
 					cPeaksList isotopepattern = chargedformula.getIsotopePattern(parameters->fwhm, n + 1, parameters->iondefinitions[parameters->ionsfortheoreticalspectra[j]].positive, true);
 					for (int p = 0; p < isotopepattern.size(); p++) {
 						isotopepattern[p].description = description + isotopepattern[p].description + "): ";
+						isotopepattern[p].iontype = parameters->ionsfortheoreticalspectra[j];
+						isotopepattern[p].neutrallosstype = (k >= 0) ? parameters->neutrallossesfortheoreticalspectra[k] : -1;
+						isotopepattern[p].charge = (parameters->precursorcharge > 0) ? n + 1 : -(n + 1);
 						isotopepattern[p].groupid = groupid;
 						isotopepattern[p].compoundid = i;
 						isotopepattern[p].decoy = parameters->sequencedatabase[i].isDecoy();
