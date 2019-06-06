@@ -1538,13 +1538,15 @@ void cTheoreticalSpectrum::removeUnmatchedCompounds(cPeaksList& theoreticalpeaks
 		return;
 	}
 
+	int minimummatchedions = 1;
+
 	int start = 0;
 	int stop = 0;
 	int currid = theoreticalpeaks[0].compoundid;
-	bool matched = true;
+	int matched = 0;
 	for (int i = 0; i < theoreticalpeaksrealsize; i++) {
 		if (currid != theoreticalpeaks[i].compoundid) {
-			if (!matched) {
+			if (matched < minimummatchedions) {
 				for (int j = start; j <= stop; j++) {
 					if (theoreticalpeaks[j].matched > 0) {
 						experimentalmatches[theoreticalpeaks[j].matchedid].erase(experimentalmatches[theoreticalpeaks[j].matchedid].find(j));
@@ -1558,16 +1560,16 @@ void cTheoreticalSpectrum::removeUnmatchedCompounds(cPeaksList& theoreticalpeaks
 			
 			currid = theoreticalpeaks[i].compoundid;
 			start = i;
-			matched = true;
+			matched = 0;
 		}
 
-		if (!theoreticalpeaks[i].isotope && (theoreticalpeaks[i].matched == 0)) {
-			matched = false;
+		if (!theoreticalpeaks[i].isotope && (theoreticalpeaks[i].matched > 0)) {
+			matched++;
 		}
 		stop = i;
 	}
 
-	if (!matched) {
+	if (matched < minimummatchedions) {
 		for (int j = start; j <= stop; j++) {
 			if (theoreticalpeaks[j].matched > 0) {
 				experimentalmatches[theoreticalpeaks[j].matchedid].erase(experimentalmatches[theoreticalpeaks[j].matchedid].find(j));
@@ -3656,7 +3658,7 @@ void cTheoreticalSpectrum::compareMSSpectrum(int id, cTheoreticalSpectrum& tsful
 	// pre-cleaning (relative intensity threshold, minimumpatternsize)
 	if (parameters->generateisotopepattern) {
 		if (parameters->allionsmustbepresent || (lcms && (parameters->minimumfeaturesize > 1))) {
-			removeUnmatchedIsotopePatterns(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks, unmatchedpeaksinmatchedpatterns, false);
+			removeUnmatchedIsotopePatterns(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks, unmatchedpeaksinmatchedpatterns, false); // to do
 		}
 	}
 
@@ -3671,7 +3673,7 @@ void cTheoreticalSpectrum::compareMSSpectrum(int id, cTheoreticalSpectrum& tsful
 	if (lcms) {
 		if (parameters->minimumfeaturesize > 1) {
 			if (parameters->allionsmustbepresent) {
-				removeUnmatchedFeaturesAndCompounds(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks, id);
+				removeUnmatchedFeaturesAndCompounds(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks, id); // to do
 			}
 			else {
 				removeUnmatchedFeatures(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks, id);
