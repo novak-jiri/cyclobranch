@@ -183,7 +183,7 @@ class cTheoreticalSpectrum {
 	void removeUnmatchedFeaturesAndCompounds(cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks, int id);
 
 	// remove unmatched compounds
-	void removeUnmatchedCompounds(cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks);
+	void removeUnmatchedCompounds(cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks, int minimumiontypes);
 
 	// calculate envelope scores
 	void calculateEnvelopeScores(cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks);

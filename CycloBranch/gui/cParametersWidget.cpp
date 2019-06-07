@@ -500,12 +500,14 @@ cParametersWidget::cParametersWidget(QWidget* parent) {
 	theoreticalspectragridlayout->addWidget(minimumfeaturesizelabel, 10, 0);
 	theoreticalspectragridlayout->addWidget(minimumfeaturesize, 10, 1);
 
-	allionsmustbepresent = new QCheckBox();
-	allionsmustbepresent->setToolTip("If enabled, all ions must be annotated in a spectrum for a compound to be reported.");
-	allionsmustbepresent->setFixedWidth(rightdefaultwidth);
-	allionsmustbepresentlabel = new QLabel("All Ions Must be Annotated:");
-	theoreticalspectragridlayout->addWidget(allionsmustbepresentlabel, 11, 0);
-	theoreticalspectragridlayout->addWidget(allionsmustbepresent, 11, 1);
+	minimumiontypes = new QSpinBox();
+	minimumiontypes->setToolTip("The minimum number of ion types which must be matched to report a given compound.");
+	minimumiontypes->setRange(1, 100);
+	minimumiontypes->setSingleStep(1);
+	minimumiontypes->setFixedWidth(rightdefaultwidth);
+	minimumiontypeslabel = new QLabel("Minimum Ion Types:");
+	theoreticalspectragridlayout->addWidget(minimumiontypeslabel, 11, 0);
+	theoreticalspectragridlayout->addWidget(minimumiontypes, 11, 1);
 
 	advancedformulacheck = new QCheckBox();
 	advancedformulacheck->setToolTip("Apply advanced filtering rules if molecular formulas of compounds are generated.");
@@ -759,8 +761,8 @@ cParametersWidget::~cParametersWidget() {
 	delete minimumpatternsize;
 	delete minimumfeaturesizelabel;
 	delete minimumfeaturesize;
-	delete allionsmustbepresentlabel;
-	delete allionsmustbepresent;
+	delete minimumiontypeslabel;
+	delete minimumiontypes;
 	delete advancedformulachecklabel;
 	delete advancedformulacheck;
 	delete theoreticalspectragridlayout;
@@ -952,7 +954,7 @@ void cParametersWidget::loadSettings() {
 		settings.value("generateisotopepattern", 0).toInt() == 0 ? generateisotopepattern->setChecked(false) : generateisotopepattern->setChecked(true);
 		minimumpatternsize->setValue(settings.value("minimumpatternsize", 1).toInt());
 		minimumfeaturesize->setValue(settings.value("minimumfeaturesize", 1).toInt());
-		settings.value("allionsmustbepresent", 0).toInt() == 0 ? allionsmustbepresent->setChecked(false) : allionsmustbepresent->setChecked(true);
+		minimumiontypes->setValue(settings.value("minimumiontypes", 1).toInt());
 		settings.value("advancedformulacheck", 1).toInt() == 0 ? advancedformulacheck->setChecked(false) : advancedformulacheck->setChecked(true);
 
 		searchedsequenceline->setText(settings.value("searchedsequence", "").toString());
@@ -1034,7 +1036,7 @@ void cParametersWidget::saveSettings() {
 	generateisotopepattern->isChecked() ? settings.setValue("generateisotopepattern", 1) : settings.setValue("generateisotopepattern", 0);
 	settings.setValue("minimumpatternsize", minimumpatternsize->value());
 	settings.setValue("minimumfeaturesize", minimumfeaturesize->value());
-	allionsmustbepresent->isChecked() ? settings.setValue("allionsmustbepresent", 1) : settings.setValue("allionsmustbepresent", 0);
+	settings.setValue("minimumiontypes", minimumiontypes->value());
 	advancedformulacheck->isChecked() ? settings.setValue("advancedformulacheck", 1) : settings.setValue("advancedformulacheck", 0);
 
 	settings.setValue("searchedsequence", searchedsequenceline->text());
@@ -1302,7 +1304,7 @@ bool cParametersWidget::updateParameters() {
 	parameters.generateisotopepattern = generateisotopepattern->isChecked();
 	parameters.minimumpatternsize = minimumpatternsize->value();
 	parameters.minimumfeaturesize = minimumfeaturesize->value();
-	parameters.allionsmustbepresent = allionsmustbepresent->isChecked();
+	parameters.minimumiontypes = minimumiontypes->value();
 	parameters.advancedformulacheck = advancedformulacheck->isChecked();
 
 	parameters.searchedsequence = searchedsequenceline->text().toStdString();
@@ -1412,7 +1414,7 @@ void cParametersWidget::restoreParameters() {
 	generateisotopepattern->setChecked(parameters.generateisotopepattern);
 	minimumpatternsize->setValue(parameters.minimumpatternsize);
 	minimumfeaturesize->setValue(parameters.minimumfeaturesize);
-	allionsmustbepresent->setChecked(parameters.allionsmustbepresent);
+	minimumiontypes->setValue(parameters.minimumiontypes);
 	advancedformulacheck->setChecked(parameters.advancedformulacheck);
 
 	searchedsequenceline->setText(parameters.searchedsequence.c_str());
@@ -1657,7 +1659,7 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 			generateisotopepattern->setDisabled(false);
 			minimumpatternsize->setDisabled(false);
 			minimumfeaturesize->setDisabled(true);
-			allionsmustbepresent->setDisabled(true);
+			minimumiontypes->setDisabled(true);
 			searchedsequenceline->setDisabled(false);
 			searchedsequencebutton->setDisabled(false);
 
@@ -1697,7 +1699,7 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 			generateisotopepattern->setDisabled(false);
 			minimumpatternsize->setDisabled(false);
 			minimumfeaturesize->setDisabled(true);
-			allionsmustbepresent->setDisabled(true);
+			minimumiontypes->setDisabled(true);
 			searchedsequenceline->setDisabled(false);
 			searchedsequencebutton->setDisabled(false);
 
@@ -1737,7 +1739,7 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 			generateisotopepattern->setDisabled(false);
 			minimumpatternsize->setDisabled(false);
 			minimumfeaturesize->setDisabled(true);
-			allionsmustbepresent->setDisabled(true);
+			minimumiontypes->setDisabled(true);
 			searchedsequenceline->setDisabled(false);
 			searchedsequencebutton->setDisabled(false);
 
@@ -1777,7 +1779,7 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 			generateisotopepattern->setDisabled(false);
 			minimumpatternsize->setDisabled(false);
 			minimumfeaturesize->setDisabled(false);
-			allionsmustbepresent->setDisabled(false);
+			minimumiontypes->setDisabled(false);
 			searchedsequenceline->setDisabled(true);
 			searchedsequencebutton->setDisabled(true);
 
@@ -1835,7 +1837,7 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 			generateisotopepattern->setDisabled(false);
 			minimumpatternsize->setDisabled(false);
 			minimumfeaturesize->setDisabled(false);
-			allionsmustbepresent->setDisabled(false);
+			minimumiontypes->setDisabled(false);
 			searchedsequenceline->setDisabled(true);
 			searchedsequencebutton->setDisabled(true);
 

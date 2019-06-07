@@ -1533,12 +1533,10 @@ void cTheoreticalSpectrum::removeUnmatchedFeaturesAndCompounds(cPeaksList& theor
 }
 
 
-void cTheoreticalSpectrum::removeUnmatchedCompounds(cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks) {
+void cTheoreticalSpectrum::removeUnmatchedCompounds(cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks, int minimumiontypes) {
 	if (theoreticalpeaksrealsize == 0) {
 		return;
 	}
-
-	int minimummatchedions = 1;
 
 	int start = 0;
 	int stop = 0;
@@ -1546,7 +1544,7 @@ void cTheoreticalSpectrum::removeUnmatchedCompounds(cPeaksList& theoreticalpeaks
 	int matched = 0;
 	for (int i = 0; i < theoreticalpeaksrealsize; i++) {
 		if (currid != theoreticalpeaks[i].compoundid) {
-			if (matched < minimummatchedions) {
+			if (matched < minimumiontypes) {
 				for (int j = start; j <= stop; j++) {
 					if (theoreticalpeaks[j].matched > 0) {
 						experimentalmatches[theoreticalpeaks[j].matchedid].erase(experimentalmatches[theoreticalpeaks[j].matchedid].find(j));
@@ -1569,7 +1567,7 @@ void cTheoreticalSpectrum::removeUnmatchedCompounds(cPeaksList& theoreticalpeaks
 		stop = i;
 	}
 
-	if (matched < minimummatchedions) {
+	if (matched < minimumiontypes) {
 		for (int j = start; j <= stop; j++) {
 			if (theoreticalpeaks[j].matched > 0) {
 				experimentalmatches[theoreticalpeaks[j].matchedid].erase(experimentalmatches[theoreticalpeaks[j].matchedid].find(j));
@@ -3657,14 +3655,14 @@ void cTheoreticalSpectrum::compareMSSpectrum(int id, cTheoreticalSpectrum& tsful
 
 	// pre-cleaning (relative intensity threshold, minimumpatternsize)
 	if (parameters->generateisotopepattern) {
-		if (parameters->allionsmustbepresent || (lcms && (parameters->minimumfeaturesize > 1))) {
+		if ((parameters->minimumiontypes > 1) || (lcms && (parameters->minimumfeaturesize > 1))) {
 			removeUnmatchedIsotopePatterns(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks, unmatchedpeaksinmatchedpatterns, false); // to do
 		}
 	}
 
 	// mark isotopes
 	if (parameters->generateisotopepattern) {
-		if ((parameters->allionsmustbepresent) || (lcms && (parameters->minimumfeaturesize > 1))) {
+		if ((parameters->minimumiontypes > 1) || (lcms && (parameters->minimumfeaturesize > 1))) {
 			tsfullpeaklist->markIsotopes();
 		}
 	}
@@ -3672,7 +3670,7 @@ void cTheoreticalSpectrum::compareMSSpectrum(int id, cTheoreticalSpectrum& tsful
 	// LC-MS data
 	if (lcms) {
 		if (parameters->minimumfeaturesize > 1) {
-			if (parameters->allionsmustbepresent) {
+			if (parameters->minimumiontypes > 1) {
 				removeUnmatchedFeaturesAndCompounds(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks, id); // to do
 			}
 			else {
@@ -3680,21 +3678,21 @@ void cTheoreticalSpectrum::compareMSSpectrum(int id, cTheoreticalSpectrum& tsful
 			}
 		}
 		else {
-			if (parameters->allionsmustbepresent) {
-				removeUnmatchedCompounds(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks);
+			if (parameters->minimumiontypes > 1) {
+				removeUnmatchedCompounds(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks, parameters->minimumiontypes);
 			}
 		}
 	}
 	// direct MS or MSI data
 	else {
-		if (parameters->allionsmustbepresent) {
-			removeUnmatchedCompounds(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks);
+		if (parameters->minimumiontypes > 1) {
+			removeUnmatchedCompounds(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks, parameters->minimumiontypes);
 		}
 	}
 
 	// clear marks of isotopes
 	if (parameters->generateisotopepattern) {
-		if ((parameters->allionsmustbepresent) || (lcms && (parameters->minimumfeaturesize > 1))) {
+		if ((parameters->minimumiontypes > 1) || (lcms && (parameters->minimumfeaturesize > 1))) {
 			tsfullpeaklist->setIsotopeFlags(false);
 		}
 	}

@@ -291,9 +291,9 @@ public:
 
 
 	/**
-		\brief If true, all ions must be annotated in a spectrum for a compound to be reported.
+		\brief The minimum number of ion types which must be matched to report a given compound.
 	*/
-	bool allionsmustbepresent;
+	int minimumiontypes;
 
 
 	/**

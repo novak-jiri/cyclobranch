@@ -573,11 +573,11 @@ The minimum number of matched peaks in an isotope pattern to be reported. The op
 The minimum number of consecutive scans in which a compound must be identified to be reported (LC-MS data only).
 </p>
 
-\subsection settings_allionsmustbeannotated All Ions Must be Annotated
+\subsection settings_minimumiontypes Minimum Ion Types
 
 <p>
-If enabled, all ions must be annotated in a spectrum for a compound to be reported. For example, if [M+H]+, [M+Na]+, and [M+K]+ are selected, all the ions of the same compound must be present in a spectrum simultaneously to be reported.
-Note that this option is affected by Charge, list of Neutral Losses, and Maximum Number of Combined Losses. Recommended settings are - Charge: 1, Neutral Losses: all unselected, and Maximum Number of Combined Losses: 0.
+The minimum number of ion types which must be matched to report a given compound. Use e.g. Ion Types: [M+H]+, [M+Na]+; Charge: 2; Neutral Losses: H2O; Maximum Number of Combined Losses: 1.
+If Minimum Ion Types: 2, then any pair of ions from the set of ions [M+H]+, [M+Na]+, [M+2H]2+, [M+Na+H]2+, [M+H-H2O]+, [M+Na-H2O]+, [M+2H-H2O]2+, [M+Na+H-H2O]2+ must be matched to report a given compound.  
 </p>
 
 \subsection settings_advancedformulacheck Advanced Formula Check

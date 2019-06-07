@@ -236,8 +236,8 @@ private:
 	QSpinBox* minimumpatternsize;
 	QLabel* minimumfeaturesizelabel;
 	QSpinBox* minimumfeaturesize;
-	QLabel* allionsmustbepresentlabel;
-	QCheckBox* allionsmustbepresent;
+	QLabel* minimumiontypeslabel;
+	QSpinBox* minimumiontypes;
 	QLabel* advancedformulachecklabel;
 	QCheckBox* advancedformulacheck;
 

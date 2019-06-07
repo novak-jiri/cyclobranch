@@ -35,7 +35,7 @@ Any work based on CycloBranch shall cite any of the following references:
     <li> Visualization of profile mzML/Thermo raw files added and a bug fixed during profile data processing.
     <li> Visualization of mass spectra fixed (occasional flashing).
     <li> Minimum feature size can now be defined for LC-MS data.
-    <li> All ions of a compound must be matched feature added (e.g. both [M+H]+ and [M+Na]+ must be matched for M). 
+    <li> Minimum number of matched ions can now be defined for MS, LC-MS, and MSI data. 
     <li> Percentage contributions of peak components (e.g. 13C, 17O) are now reported if theoretical isotopic patterns are calculated.
     <li> Copy to clipboard function (CTRL+C) improved in spectrum detail window, main window, and summary table of matched peaks (multiple rows and columns can be selected in the table).
     <li> A bug fixed - existing items in the list of neutral losses were not editable if the settings dialog was re-opened.

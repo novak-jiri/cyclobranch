@@ -124,7 +124,7 @@ void cParameters::clear() {
 	generateisotopepattern = false;
 	minimumpatternsize = 1;
 	minimumfeaturesize = 1;
-	allionsmustbepresent = false;
+	minimumiontypes = 1;
 	cyclicnterminus = false;
 	cycliccterminus = false;
 	internalfragments = false;
@@ -1192,9 +1192,7 @@ string cParameters::printToString() {
 
 	s += "Minimum Feature Size: " + to_string(minimumfeaturesize) + "\n";
 
-	s += "All Ions Must be Annotated: ";
-	s += allionsmustbepresent ? "on" : "off";
-	s += "\n";
+	s += "Minimum Ion Types: " + to_string(minimumiontypes) + "\n";
 
 	s += "Advanced Formula Check: ";
 	s += advancedformulacheck ? "on" : "off";
@@ -2359,7 +2357,7 @@ void cParameters::store(ofstream& os) {
 	os.write((char *)&generateisotopepattern, sizeof(bool));
 	os.write((char *)&minimumpatternsize, sizeof(int));
 	os.write((char *)&minimumfeaturesize, sizeof(int));
-	os.write((char *)&allionsmustbepresent, sizeof(bool));
+	os.write((char *)&minimumiontypes, sizeof(int));
 	os.write((char *)&advancedformulacheck, sizeof(bool));
 	os.write((char *)&cyclicnterminus, sizeof(bool));
 	os.write((char *)&cycliccterminus, sizeof(bool));
@@ -2492,7 +2490,7 @@ void cParameters::load(ifstream& is) {
 	is.read((char *)&generateisotopepattern, sizeof(bool));
 	is.read((char *)&minimumpatternsize, sizeof(int));
 	is.read((char *)&minimumfeaturesize, sizeof(int));
-	is.read((char *)&allionsmustbepresent, sizeof(bool));
+	is.read((char *)&minimumiontypes, sizeof(int));
 	is.read((char *)&advancedformulacheck, sizeof(bool));
 	is.read((char *)&cyclicnterminus, sizeof(bool));
 	is.read((char *)&cycliccterminus, sizeof(bool));
