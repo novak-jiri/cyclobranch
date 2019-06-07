@@ -1395,45 +1395,102 @@ void cTheoreticalSpectrum::removeUnmatchedIsotopePatterns(cPeaksList& theoretica
 
 
 void cTheoreticalSpectrum::removeUnmatchedFeatures(cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks, int id) {
-	int requestedfeaturesize;
-	bool clearfeature;
+	int size = parameters->peaklistseries.size();
+	vector<int> hintsfound;
+	
+	vector<int> hints;
+	hints.reserve(size);
+	bool hintsempty;
+
 	int k;
+	int fsize;
+	bool falsehit;
 
 	for (int i = 0; i < theoreticalpeaksrealsize; i++) {
 		if (theoreticalpeaks[i].isotope || (theoreticalpeaks[i].matched == 0)) {
 			continue;
 		}
 
-		requestedfeaturesize = parameters->minimumfeaturesize;
-
-		k = id - 1;
-		while ((k >= 0) && (requestedfeaturesize > 1)) {
-			if (!searchHint(theoreticalpeaks[i].mzratio, parameters->peaklistseries[k], parameters->fragmentmasserrortolerance)) {
-				break;
+		hintsfound.clear();
+		hints.clear();
+		hints.resize(size, 0);
+		hintsempty = true;
+		for (int j = 0; j < size; j++) {
+			if (searchHint(theoreticalpeaks[i].mzratio, parameters->peaklistseries[j], parameters->fragmentmasserrortolerance)) {
+				hintsfound.push_back(j);
 			}
-			requestedfeaturesize--;
-			k--;
-		}
-						
-		clearfeature = false;
-		if (id + requestedfeaturesize > parameters->peaklistseries.size()) {
-			clearfeature = true;
-		}
-		else {
-			for (int j = id + 1; j < id + requestedfeaturesize; j++) {
-				if (!searchHint(theoreticalpeaks[i].mzratio, parameters->peaklistseries[j], parameters->fragmentmasserrortolerance)) {
-					clearfeature = true;
-					break;
+			else {
+				if ((int)hintsfound.size() >= parameters->minimumfeaturesize) {
+					for (auto& it : hintsfound) {
+						hints[it]++;
+					}
+					hintsempty = false;
 				}
+				hintsfound.clear();
 			}
 		}
+		if ((int)hintsfound.size() >= parameters->minimumfeaturesize) {
+			for (auto& it : hintsfound) {
+				hints[it]++;
+			}
+			hintsempty = false;
+		}
 
-		if (clearfeature) {
+		if (hintsempty) {
 			experimentalmatches[theoreticalpeaks[i].matchedid].erase(experimentalmatches[theoreticalpeaks[i].matchedid].find(i));
 			experimentalpeaks[theoreticalpeaks[i].matchedid].matched--;
 
 			theoreticalpeaks[i].matched--;
 			theoreticalpeaks[i].matchedid = -1;
+		}
+		else {
+			if (parameters->generateisotopepattern) {
+				k = i;
+				while ((k >= 0) && (theoreticalpeaks[k].groupid == theoreticalpeaks[i].groupid)) {
+					k--;
+				}
+				k++;
+
+				while ((k < theoreticalpeaksrealsize) && (theoreticalpeaks[k].groupid == theoreticalpeaks[i].groupid)) {
+					if ((k != i) && (theoreticalpeaks[k].matched > 0)) {
+						for (int m = 0; m < (int)hints.size(); m++) {
+							if (hints[m] > 0) {
+								if (searchHint(theoreticalpeaks[k].mzratio, parameters->peaklistseries[m], parameters->fragmentmasserrortolerance)) {
+									hints[m]++;
+								}
+							}
+						}
+					}
+									   
+					k++;
+				}
+
+				fsize = 0;
+				falsehit = true;
+				for (int m = 0; m < (int)hints.size(); m++) {
+					// to do - the matched isotopes can be different (only count is taken into account)
+					// isotopes can be sorted e.g. by intensity to improve this feature
+					if (hints[m] >= parameters->minimumpatternsize) {
+						fsize++;
+					}
+					else {
+						fsize = 0;
+					}
+
+					if (fsize >= parameters->minimumfeaturesize) {
+						falsehit = false;
+						break;
+					}
+				}
+
+				if (falsehit) {
+					experimentalmatches[theoreticalpeaks[i].matchedid].erase(experimentalmatches[theoreticalpeaks[i].matchedid].find(i));
+					experimentalpeaks[theoreticalpeaks[i].matchedid].matched--;
+
+					theoreticalpeaks[i].matched--;
+					theoreticalpeaks[i].matchedid = -1;
+				}
+			}
 		}
 	}
 }
@@ -3656,7 +3713,7 @@ void cTheoreticalSpectrum::compareMSSpectrum(int id, cTheoreticalSpectrum& tsful
 	// pre-cleaning (relative intensity threshold, minimumpatternsize)
 	if (parameters->generateisotopepattern) {
 		if ((parameters->minimumiontypes > 1) || (lcms && (parameters->minimumfeaturesize > 1))) {
-			removeUnmatchedIsotopePatterns(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks, unmatchedpeaksinmatchedpatterns, false); // to do
+			removeUnmatchedIsotopePatterns(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks, unmatchedpeaksinmatchedpatterns, false);
 		}
 	}
 
