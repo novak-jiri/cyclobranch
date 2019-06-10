@@ -1933,6 +1933,10 @@ int cParameters::generateCompounds(bool& terminatecomputation, string& errormess
 				}
 			}
 
+			if ((countH == 0) || (countC == 0)) {
+				continue;
+			}
+
 			if (sumofmasses < 500.0) {
 
 				if (countC > 39) {

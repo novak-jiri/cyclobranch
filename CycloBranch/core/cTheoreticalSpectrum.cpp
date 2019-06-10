@@ -1394,7 +1394,7 @@ void cTheoreticalSpectrum::removeUnmatchedIsotopePatterns(cPeaksList& theoretica
 }
 
 
-void cTheoreticalSpectrum::removeUnmatchedFeatures(cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks, int id) {
+int cTheoreticalSpectrum::removeUnmatchedFeatures(cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks, int id) {
 	int size = parameters->peaklistseries.size();
 	vector<int> hintsfound;
 	
@@ -1405,6 +1405,8 @@ void cTheoreticalSpectrum::removeUnmatchedFeatures(cPeaksList& theoreticalpeaks,
 	int k;
 	int fsize;
 	bool falsehit;
+
+	int peaksremoved = 0;
 
 	for (int i = 0; i < theoreticalpeaksrealsize; i++) {
 		if (theoreticalpeaks[i].isotope || (theoreticalpeaks[i].matched == 0)) {
@@ -1442,6 +1444,8 @@ void cTheoreticalSpectrum::removeUnmatchedFeatures(cPeaksList& theoreticalpeaks,
 
 			theoreticalpeaks[i].matched--;
 			theoreticalpeaks[i].matchedid = -1;
+
+			peaksremoved++;
 		}
 		else {
 			if (parameters->generateisotopepattern) {
@@ -1489,111 +1493,23 @@ void cTheoreticalSpectrum::removeUnmatchedFeatures(cPeaksList& theoreticalpeaks,
 
 					theoreticalpeaks[i].matched--;
 					theoreticalpeaks[i].matchedid = -1;
+
+					peaksremoved++;
 				}
 			}
 		}
 	}
+
+	return peaksremoved;
 }
 
 
-void cTheoreticalSpectrum::removeUnmatchedFeaturesAndCompounds(cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks, int id) {
+int cTheoreticalSpectrum::removeUnmatchedCompounds(cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks, int minimumiontypes) {
 	if (theoreticalpeaksrealsize == 0) {
-		return;
+		return 0;
 	}
 
-	int start = 0;
-	int stop = 0;
-	int currid = theoreticalpeaks[0].compoundid;
-	bool matched = true;
-	int featurestart = 0;
-	int featureend = parameters->peaklistseries.size() - 1;
-	int k;
-
-	for (int i = 0; i < theoreticalpeaksrealsize; i++) {
-		if (currid != theoreticalpeaks[i].compoundid) {
-			if (matched) {
-				if (featureend - featurestart + 1 < parameters->minimumfeaturesize) {
-					matched = false;
-				}
-			}
-
-			if (!matched) {
-				for (int j = start; j <= stop; j++) {
-					if (theoreticalpeaks[j].matched > 0) {
-						experimentalmatches[theoreticalpeaks[j].matchedid].erase(experimentalmatches[theoreticalpeaks[j].matchedid].find(j));
-						experimentalpeaks[theoreticalpeaks[j].matchedid].matched--;
-
-						theoreticalpeaks[j].matched--;
-						theoreticalpeaks[j].matchedid = -1;
-					}
-				}
-			}
-
-			currid = theoreticalpeaks[i].compoundid;
-			start = i;
-			matched = true;
-			featurestart = 0;
-			featureend = parameters->peaklistseries.size() - 1;
-		}
-
-		if (!theoreticalpeaks[i].isotope) {
-			if (theoreticalpeaks[i].matched == 0) {
-				matched = false;
-			}
-			else {
-
-				if (matched) {
-
-					k = id - 1;
-					while (k >= 0) {
-						if (!searchHint(theoreticalpeaks[i].mzratio, parameters->peaklistseries[k], parameters->fragmentmasserrortolerance)) {
-							break;
-						}
-						k--;
-					}
-					featurestart = max(featurestart, k + 1);
-
-					k = id + 1;
-					while (k < parameters->peaklistseries.size()) {
-						if (!searchHint(theoreticalpeaks[i].mzratio, parameters->peaklistseries[k], parameters->fragmentmasserrortolerance)) {
-							break;
-						}
-						k++;
-					}
-					featureend = min(featureend, k - 1);
-
-				}
-
-			}
-
-		}
-		stop = i;
-	}
-
-	if (matched) {
-		if (featureend - featurestart + 1 < parameters->minimumfeaturesize) {
-			matched = false;
-		}
-	}
-
-	if (!matched) {
-		for (int j = start; j <= stop; j++) {
-			if (theoreticalpeaks[j].matched > 0) {
-				experimentalmatches[theoreticalpeaks[j].matchedid].erase(experimentalmatches[theoreticalpeaks[j].matchedid].find(j));
-				experimentalpeaks[theoreticalpeaks[j].matchedid].matched--;
-
-				theoreticalpeaks[j].matched--;
-				theoreticalpeaks[j].matchedid = -1;
-			}
-		}
-	}
-}
-
-
-void cTheoreticalSpectrum::removeUnmatchedCompounds(cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks, int minimumiontypes) {
-	if (theoreticalpeaksrealsize == 0) {
-		return;
-	}
+	int peaksremoved = 0;
 
 	int start = 0;
 	int stop = 0;
@@ -1609,6 +1525,8 @@ void cTheoreticalSpectrum::removeUnmatchedCompounds(cPeaksList& theoreticalpeaks
 
 						theoreticalpeaks[j].matched--;
 						theoreticalpeaks[j].matchedid = -1;
+
+						peaksremoved++;
 					}
 				}
 			}
@@ -1632,9 +1550,13 @@ void cTheoreticalSpectrum::removeUnmatchedCompounds(cPeaksList& theoreticalpeaks
 
 				theoreticalpeaks[j].matched--;
 				theoreticalpeaks[j].matchedid = -1;
+
+				peaksremoved++;
 			}
 		}
 	}
+
+	return peaksremoved;
 }
 
 
@@ -3727,12 +3649,20 @@ void cTheoreticalSpectrum::compareMSSpectrum(int id, cTheoreticalSpectrum& tsful
 	// LC-MS data
 	if (lcms) {
 		if (parameters->minimumfeaturesize > 1) {
-			if (parameters->minimumiontypes > 1) {
-				removeUnmatchedFeaturesAndCompounds(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks, id); // to do
+			int removedcompounds = removeUnmatchedCompounds(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks, parameters->minimumiontypes);
+			//cout << "removedcompounds: " << removedcompounds << endl;
+			int removedfeatures = removeUnmatchedFeatures(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks, id);
+			//cout << "removedfeatures: " << removedfeatures << endl;
+			while (removedfeatures > 0) {
+				removedcompounds = removeUnmatchedCompounds(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks, parameters->minimumiontypes);
+				//cout << "removedcompounds: " << removedcompounds << endl;
+				if (removedcompounds == 0) {
+					break;
+				}
+				removedfeatures = removeUnmatchedFeatures(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks, id);
+				//cout << "removedfeatures: " << removedfeatures << endl;
 			}
-			else {
-				removeUnmatchedFeatures(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks, id);
-			}
+			//cout << endl;
 		}
 		else {
 			if (parameters->minimumiontypes > 1) {
