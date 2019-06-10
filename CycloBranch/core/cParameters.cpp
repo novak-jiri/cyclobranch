@@ -1658,7 +1658,8 @@ int cParameters::generateCompounds(bool& terminatecomputation, string& errormess
 	double sumofmasses;
 	double tmpmzdifference;
 	bool alloutofmz;
-	int hintsfound;
+	int featureshint;
+	int compoundshint;
 	bool hintend;
 
 	double minadd = 0;
@@ -2200,6 +2201,8 @@ int cParameters::generateCompounds(bool& terminatecomputation, string& errormess
 
 		if (!reportunmatchedtheoreticalpeaks) {
 
+			compoundshint = 0;
+
 			for (auto& it : ionsfortheoreticalspectra) {
 
 				for (int j = 0; j < abs(precursorcharge); j++) {
@@ -2215,24 +2218,28 @@ int cParameters::generateCompounds(bool& terminatecomputation, string& errormess
 						tmpmzdifference /= (double)(j + 1);
 					}
 
-					hintsfound = 0;
+					featureshint = 0;
+
 					size = peaklistseries.size();
 					for (int k = 0; k < size; k++) {
+
 						if (searchHint(tmpmzdifference, peaklistseries[k], fragmentmasserrortolerance)) {
-							hintsfound++;
+							featureshint++;
 						}
 						else {
-							hintsfound = 0;
+							featureshint = 0;
 						}
 
 						hintend = false;
 						if (lcms) {
-							if (hintsfound >= minimumfeaturesize) {
+							if (featureshint >= minimumfeaturesize) {
+								compoundshint++;
 								hintend = true;
 							}
 						}
 						else {
-							if (hintsfound > 0) {
+							if (featureshint > 0) {
+								compoundshint++;
 								hintend = true;
 							}
 						}
@@ -2240,20 +2247,22 @@ int cParameters::generateCompounds(bool& terminatecomputation, string& errormess
 						if (hintend) {
 							break;
 						}
+
 					}
-					if (hintend) {
+
+					if (compoundshint >= minimumiontypes) {
 						break;
 					}
 
 				}
 
-				if (hintend) {
+				if (compoundshint >= minimumiontypes) {
 					break;
 				}
 
 			}
 
-			if (!hintend) {
+			if (compoundshint < minimumiontypes) {
 				continue;
 			}
 
