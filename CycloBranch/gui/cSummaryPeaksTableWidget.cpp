@@ -23,9 +23,11 @@
 
 
 cSummaryPeaksTableWidget::cSummaryPeaksTableWidget(QWidget* parent) {
+	title = "Summary Table of Matched Peaks";
+
 	this->parent = parent;
 
-	setWindowTitle("Summary Table of Matched Peaks");
+	setWindowTitle(title);
 	setWindowIcon(QIcon(":/images/icons/43.png"));
 
 	menuBar = new QMenuBar(this);
@@ -52,9 +54,22 @@ cSummaryPeaksTableWidget::cSummaryPeaksTableWidget(QWidget* parent) {
 	rowsfiltercomparatorcombobox1->addItem(">=");
 	rowsfiltercomparatorcombobox1->setSizeAdjustPolicy(QComboBox::AdjustToContents);
 
+	rowsfilterstringlistmodel1 = new QStringListModel();
+	rowsfilterlinecompleter1 = new QCompleter();
+	rowsfilterlinecompleter1->setModel(rowsfilterstringlistmodel1);
+	rowsfilterlinecompleter1->setCaseSensitivity(Qt::CaseInsensitive);
+	rowsfilterlinecompleter1->setCompletionMode(QCompleter::UnfilteredPopupCompletion);
+
 	rowsfilterline1 = new QLineEdit();
 	rowsfilterline1->setMinimumWidth(150);
 	rowsfilterline1->setToolTip("Text to Find");
+	rowsfilterline1->setCompleter(rowsfilterlinecompleter1);
+
+	rowsfilterleft1 = new QPushButton("<");
+	rowsfilterleft1->setMaximumWidth(25);
+
+	rowsfilterright1 = new QPushButton(">");
+	rowsfilterright1->setMaximumWidth(25);
 
 	rowsfiltercombobox2 = new QComboBox();
 	rowsfiltercombobox2->setToolTip("Column to be Searched");
@@ -69,9 +84,22 @@ cSummaryPeaksTableWidget::cSummaryPeaksTableWidget(QWidget* parent) {
 	rowsfiltercomparatorcombobox2->addItem(">=");
 	rowsfiltercomparatorcombobox2->setSizeAdjustPolicy(QComboBox::AdjustToContents);
 
+	rowsfilterstringlistmodel2 = new QStringListModel();
+	rowsfilterlinecompleter2 = new QCompleter();
+	rowsfilterlinecompleter2->setModel(rowsfilterstringlistmodel2);
+	rowsfilterlinecompleter2->setCaseSensitivity(Qt::CaseInsensitive);
+	rowsfilterlinecompleter2->setCompletionMode(QCompleter::UnfilteredPopupCompletion);
+
 	rowsfilterline2 = new QLineEdit();
 	rowsfilterline2->setMinimumWidth(150);
 	rowsfilterline2->setToolTip("Text to Find");
+	rowsfilterline2->setCompleter(rowsfilterlinecompleter2);
+
+	rowsfilterleft2 = new QPushButton("<");
+	rowsfilterleft2->setMaximumWidth(25);
+
+	rowsfilterright2 = new QPushButton(">");
+	rowsfilterright2->setMaximumWidth(25);
 
 	rowsfiltercasesensitive = new QCheckBox();
 	rowsfiltercasesensitive->setToolTip("Case Sensitive");
@@ -94,6 +122,8 @@ cSummaryPeaksTableWidget::cSummaryPeaksTableWidget(QWidget* parent) {
 	rowsfilterhbox->addWidget(rowsfiltercomparatorcombobox1);
 	rowsfilterhbox->addSpacing(10);
 	rowsfilterhbox->addWidget(rowsfilterline1);
+	rowsfilterhbox->addWidget(rowsfilterleft1);
+	rowsfilterhbox->addWidget(rowsfilterright1);
 	rowsfilterhbox->addSpacing(10);
 	rowsfilterhbox->addWidget(rowsfilteroperator);
 	rowsfilterhbox->addSpacing(10);
@@ -102,6 +132,8 @@ cSummaryPeaksTableWidget::cSummaryPeaksTableWidget(QWidget* parent) {
 	rowsfilterhbox->addWidget(rowsfiltercomparatorcombobox2);
 	rowsfilterhbox->addSpacing(10);
 	rowsfilterhbox->addWidget(rowsfilterline2);
+	rowsfilterhbox->addWidget(rowsfilterleft2);
+	rowsfilterhbox->addWidget(rowsfilterright2);
 	rowsfilterhbox->addSpacing(10);
 	rowsfilterhbox->addWidget(rowsfiltercasesensitive);
 	rowsfilterhbox->addSpacing(10);
@@ -172,6 +204,11 @@ cSummaryPeaksTableWidget::cSummaryPeaksTableWidget(QWidget* parent) {
 
 	setMenuBar(menuBar);
 
+	connect(rowsfilterleft1, SIGNAL(released()), this, SLOT(rowsFilterLeft1Slot()));
+	connect(rowsfilterright1, SIGNAL(released()), this, SLOT(rowsFilterRight1Slot()));
+	connect(rowsfilterleft2, SIGNAL(released()), this, SLOT(rowsFilterLeft2Slot()));
+	connect(rowsfilterright2, SIGNAL(released()), this, SLOT(rowsFilterRight2Slot()));
+
 	connect(rowsfilterbutton, SIGNAL(released()), this, SLOT(filterRows()));
 	connect(rowsfilterclearbutton, SIGNAL(released()), this, SLOT(resetFilter()));
 
@@ -198,10 +235,18 @@ cSummaryPeaksTableWidget::~cSummaryPeaksTableWidget() {
 	delete rowsfilteroperator;
 	delete rowsfiltercombobox1;
 	delete rowsfiltercomparatorcombobox1;
+	delete rowsfilterstringlistmodel1;
+	delete rowsfilterlinecompleter1;
 	delete rowsfilterline1;
+	delete rowsfilterleft1;
+	delete rowsfilterright1;
 	delete rowsfiltercombobox2;
 	delete rowsfiltercomparatorcombobox2;
+	delete rowsfilterstringlistmodel2;
+	delete rowsfilterlinecompleter2;
 	delete rowsfilterline2;
+	delete rowsfilterleft2;
+	delete rowsfilterright2;
 	delete rowsfiltercasesensitive;
 	delete rowsfilterwholeword;
 	delete rowsfilterbutton;
@@ -455,6 +500,14 @@ bool cSummaryPeaksTableWidget::prepareToShow(QStandardItemModel* resultsstandard
 		}
 	}
 
+	if ((parameters->mode == dereplication) || (parameters->mode == compoundsearch)) {
+		rowsfiltercombobox1->setCurrentIndex(rowsfiltercombobox1->count() - 1);
+		rowsfiltercombobox2->setCurrentIndex(rowsfiltercombobox2->count() - 1);
+
+		rowsfiltercomparatorcombobox1->setCurrentIndex(0);
+		rowsfiltercomparatorcombobox2->setCurrentIndex(0);
+	}
+
 
 	// fill new data
 	QProgressDialog* progress;
@@ -481,6 +534,8 @@ bool cSummaryPeaksTableWidget::prepareToShow(QStandardItemModel* resultsstandard
 
 	QBrush brush;
 	brush.setColor(QColor(0, 0, 0));
+
+	set<QString> completernameset;
 
 	for (int i = 0; i < spectracount; i++) {
 
@@ -614,17 +669,24 @@ bool cSummaryPeaksTableWidget::prepareToShow(QStandardItemModel* resultsstandard
 					currentcolumn++;
 				}
 
+				stmp = peak->description.substr(peak->description.rfind('(') + 1, peak->description.rfind(')') - peak->description.rfind('(') - 1);
+
 				databasemodel->setItem(currentrow, currentcolumn, new QStandardItem());
 				databasemodel->item(currentrow, currentcolumn)->setForeground(brush);
-				databasemodel->item(currentrow, currentcolumn)->setText(peak->description.substr(peak->description.rfind('(') + 1, peak->description.rfind(')') - peak->description.rfind('(') - 1).c_str());
+				databasemodel->item(currentrow, currentcolumn)->setText(stmp.c_str());
 				currentcolumn++;
 
 				langle = (int)peak->description.rfind("</a>");
 				rangle = (int)peak->description.find('>');
 				if ((langle != string::npos) && (rangle != string::npos)) {
+					stmp = peak->description.substr(rangle + 1, langle - rangle - 1);
+
 					databasemodel->setItem(currentrow, currentcolumn, new QStandardItem());
 					databasemodel->item(currentrow, currentcolumn)->setForeground(brush);
-					databasemodel->item(currentrow, currentcolumn)->setText(peak->description.substr(rangle + 1, langle - rangle - 1).c_str());
+					databasemodel->item(currentrow, currentcolumn)->setText(stmp.c_str());
+
+					completernameset.insert(stmp.c_str());
+
 					if ((parameters->peaklistfileformat == mis) || (parameters->peaklistfileformat == imzML)) {
 						coordinates.back().name = databasemodel->item(currentrow, iontypecol)->text().toStdString() + " ";
 						if (databasemodel->item(currentrow, currentcolumn)->text().length() > 40) {
@@ -747,7 +809,16 @@ bool cSummaryPeaksTableWidget::prepareToShow(QStandardItemModel* resultsstandard
 				database->setColumnWidth(8, min(400, database->columnWidth(8)));
 			}
 		}
+
+		QStringList completerlist;
+		for (auto& it: completernameset) {
+			completerlist.push_back(it);
+		}
+		rowsfilterstringlistmodel1->setStringList(completerlist);
+		rowsfilterstringlistmodel2->setStringList(completerlist);
 	}
+
+	setWindowTitle(title);
 
 	progress->setValue(spectracount);
 	delete progress;
@@ -852,6 +923,8 @@ void cSummaryPeaksTableWidget::closeWindow() {
 
 
 void cSummaryPeaksTableWidget::filterRows() {
+	setWindowTitle(title);
+
 	Qt::CaseSensitivity casesensitive = rowsfiltercasesensitive->isChecked()?Qt::CaseSensitive:Qt::CaseInsensitive;
 	QString str = "";
 	int i, id, x, y;
@@ -971,6 +1044,8 @@ void cSummaryPeaksTableWidget::filterRows() {
 
 
 void cSummaryPeaksTableWidget::resetFilter() {
+	setWindowTitle(title);
+
 	rowsfilterline1->setText("");
 	rowsfilterline2->setText("");
 
@@ -1743,6 +1818,93 @@ void cSummaryPeaksTableWidget::rowDoubleClicked(const QModelIndex& item) {
 
 	if (column < size) {
 		emit summaryPeaksTableRowDoubleClicked(databasemodel->item(row, idcolumn)->data(Qt::DisplayRole).toInt() - 1, databasemodel->item(row, experimentalmzcolumn)->data(Qt::DisplayRole).toDouble());
+	}
+}
+
+void cSummaryPeaksTableWidget::rowsFilterLeft1Slot() {
+	if ((parameters->mode != dereplication) && (parameters->mode != compoundsearch)) {
+		return;
+	}
+
+	QStringList list = ((QStringListModel*)rowsfilterlinecompleter1->model())->stringList();
+	int index = list.indexOf(rowsfilterline1->text());
+	int comboindex = rowsfiltercombobox1->findText("Name");
+
+	if ((index > 0) && (comboindex >= 0)) {
+		rowsfiltercombobox1->setCurrentIndex(comboindex);
+		rowsfiltercomparatorcombobox1->setCurrentIndex(0);
+		rowsfilterline1->setText(list[index - 1]);
+		filterRows();
+		setWindowTitle(title + " - compound " + QVariant(index).toString() + " of " + QVariant(((QStringListModel*)rowsfilterlinecompleter1->model())->stringList().size()).toString());
+	}
+	else {
+		setWindowTitle(title);
+	}
+}
+
+
+void cSummaryPeaksTableWidget::rowsFilterRight1Slot() {
+	if ((parameters->mode != dereplication) && (parameters->mode != compoundsearch)) {
+		return;
+	}
+
+	QStringList list = ((QStringListModel*)rowsfilterlinecompleter1->model())->stringList();
+	int index = list.indexOf(rowsfilterline1->text());
+	int comboindex = rowsfiltercombobox1->findText("Name");
+
+	if ((index < list.size() - 1) && (comboindex >= 0)) {
+		rowsfiltercombobox1->setCurrentIndex(comboindex);
+		rowsfiltercomparatorcombobox1->setCurrentIndex(0);
+		rowsfilterline1->setText(list[index + 1]);
+		filterRows();
+		setWindowTitle(title + " - compound " + QVariant(index + 2).toString() + " of " + QVariant(((QStringListModel*)rowsfilterlinecompleter1->model())->stringList().size()).toString());
+	}
+	else {
+		setWindowTitle(title);
+	}
+}
+
+
+void cSummaryPeaksTableWidget::rowsFilterLeft2Slot() {
+	if ((parameters->mode != dereplication) && (parameters->mode != compoundsearch)) {
+		return;
+	}
+
+	QStringList list = ((QStringListModel*)rowsfilterlinecompleter2->model())->stringList();
+	int index = list.indexOf(rowsfilterline2->text());
+	int comboindex = rowsfiltercombobox2->findText("Name");
+
+	if ((index > 0) && (comboindex >= 0)) {
+		rowsfiltercombobox2->setCurrentIndex(comboindex);
+		rowsfiltercomparatorcombobox2->setCurrentIndex(0);
+		rowsfilterline2->setText(list[index - 1]);
+		filterRows();
+		setWindowTitle(title + " - compound " + QVariant(index).toString() + " of " + QVariant(((QStringListModel*)rowsfilterlinecompleter2->model())->stringList().size()).toString());
+	}
+	else {
+		setWindowTitle(title);
+	}
+}
+
+
+void cSummaryPeaksTableWidget::rowsFilterRight2Slot() {
+	if ((parameters->mode != dereplication) && (parameters->mode != compoundsearch)) {
+		return;
+	}
+
+	QStringList list = ((QStringListModel*)rowsfilterlinecompleter2->model())->stringList();
+	int index = list.indexOf(rowsfilterline2->text());
+	int comboindex = rowsfiltercombobox2->findText("Name");
+
+	if ((index < list.size() - 1) && (comboindex >= 0)) {
+		rowsfiltercombobox2->setCurrentIndex(comboindex);
+		rowsfiltercomparatorcombobox2->setCurrentIndex(0);
+		rowsfilterline2->setText(list[index + 1]);
+		filterRows();
+		setWindowTitle(title + " - compound " + QVariant(index + 2).toString() + " of " + QVariant(((QStringListModel*)rowsfilterlinecompleter2->model())->stringList().size()).toString());
+	}
+	else {
+		setWindowTitle(title);
 	}
 }
 

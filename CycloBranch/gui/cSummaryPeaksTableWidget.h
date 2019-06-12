@@ -20,6 +20,8 @@
 #include <QItemDelegate>
 #include <QMessageBox>
 #include <QComboBox>
+#include <QStringListModel>
+#include <QCompleter>
 #include <map>
 #include "core/utilities.h"
 #include "gui/cViewButtonDelegate.h"
@@ -289,6 +291,8 @@ public:
 
 private:
 
+	QString title;
+
 	cParameters* parameters;
 	QWidget* parent;
 
@@ -312,11 +316,19 @@ private:
 
 	QComboBox* rowsfiltercombobox1;
 	QComboBox* rowsfiltercomparatorcombobox1;
+	QStringListModel* rowsfilterstringlistmodel1;
+	QCompleter* rowsfilterlinecompleter1;
 	QLineEdit* rowsfilterline1;
+	QPushButton* rowsfilterleft1;
+	QPushButton* rowsfilterright1;
 
 	QComboBox* rowsfiltercombobox2;
 	QComboBox* rowsfiltercomparatorcombobox2;
+	QStringListModel* rowsfilterstringlistmodel2;
+	QCompleter* rowsfilterlinecompleter2;
 	QLineEdit* rowsfilterline2;
+	QPushButton* rowsfilterleft2;
+	QPushButton* rowsfilterright2;
 
 	QCheckBox* rowsfiltercasesensitive;
 	QCheckBox* rowsfilterwholeword;
@@ -369,6 +381,19 @@ private slots:
 
 
 	void rowDoubleClicked(const QModelIndex& item);
+
+
+	void rowsFilterLeft1Slot();
+
+
+	void rowsFilterRight1Slot();
+
+
+	void rowsFilterLeft2Slot();
+
+
+	void rowsFilterRight2Slot();
+
 
 
 signals:
