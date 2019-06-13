@@ -1518,6 +1518,12 @@ int cParameters::calculateNeutralLosses(bool& terminatecomputation, string& erro
 	// to do - change to unsigned long long
 	int ii = 0;
 	compressformulas = false;
+
+	if (bruteforce && (peptidetype == other) && ((mode == databasesearch) || (mode == singlecomparison))) {
+		compressionlimit = 0;
+		compressformulas = true;
+	}
+
 	//while (neutrallossesbrickdatabase.nextCombination(combarray, numberofbasicbricks, maximumcombinedlosses, 0, uncharge(precursormass, precursorcharge) - minimummz)) {
 	while (neutrallossesbrickdatabase.nextCombinationFastLimited(combarray, countsofelements, limitsofelements, massesofelements, sumofmasses, numberofbasicbricks, maximumcombinedlosses, 0, uncharge(precursormass, precursorcharge) - minimummz)) {
 		if (terminatecomputation) {
