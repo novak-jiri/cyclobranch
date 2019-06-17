@@ -514,6 +514,26 @@ void cMainThread::run() {
 			parameters.peaklistseries[i].sortbyMass();
 		}
 
+		unordered_multimap<int, int> hintsmap;
+		bool lcms = (parameters.peaklistseries.size() > 1) && !((parameters.peaklistfileformat == mis) || (parameters.peaklistfileformat == imzML));
+
+		if (lcms) {
+			cPeaksList* thpeaks = ts.getTheoreticalPeaks();
+			int thpeakssize = thpeaks->size();
+			for (int i = 0; i < parameters.peaklistseries.size(); i++) {
+				for (int j = 0; j < thpeakssize; j++) {
+					if (terminatecomputation) {
+						emitEndSignals();
+						return;
+					}
+
+					if (searchHint((*thpeaks)[j].mzratio, parameters.peaklistseries[i], parameters.fragmentmasserrortolerance)) {
+						hintsmap.insert(make_pair(j, i));
+					}
+				}
+			}
+		}
+
 		for (int i = 0; i < parameters.peaklistseries.size(); i++) {
 			if ((i + 1) % 100 == 0) {
 				*os << i + 1 << " ";
@@ -529,7 +549,7 @@ void cMainThread::run() {
 
 			cTheoreticalSpectrum tstmp;
 			tstmp.setParameters(&parameters);
-			tstmp.compareMSSpectrum(i, ts, unmatchedpeaks[i]);
+			tstmp.compareMSSpectrum(i, ts, unmatchedpeaks[i], hintsmap);
 			if ((parameters.peaklistfileformat == mis) || (parameters.peaklistfileformat == imzML)) {
 				parameters.peaklistseries[i].clear();
 			}
