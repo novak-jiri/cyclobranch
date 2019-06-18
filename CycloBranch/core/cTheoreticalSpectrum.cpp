@@ -1455,8 +1455,17 @@ int cTheoreticalSpectrum::removeUnmatchedFeatures(cPeaksList& theoreticalpeaks, 
 
 			featuresize = 0;
 			maxfeaturesize = 0;
-			if (parameters->generateisotopepattern) {
-				for (int j = 0; j < (int)feature.size(); j++) {
+
+			for (int j = 0; j < (int)feature.size(); j++) {
+
+				if ((j > 0) && (feature[j - 1] + 1 != feature[j])) {
+					if (featuresize > maxfeaturesize) {
+						maxfeaturesize = featuresize;
+					}
+					featuresize = 0;
+				}
+
+				if (parameters->generateisotopepattern) {					
 					k = i;
 					while ((k >= 0) && (theoreticalpeaks[k].groupid == theoreticalpeaks[i].groupid)) {
 						k--;
@@ -1483,33 +1492,15 @@ int cTheoreticalSpectrum::removeUnmatchedFeatures(cPeaksList& theoreticalpeaks, 
 					if (patternsize >= parameters->minimumpatternsize) {
 						featuresize++;
 					}
-					else {
-						if (featuresize > maxfeaturesize) {
-							maxfeaturesize = featuresize;
-						}
-						featuresize = 0;
-					}
 				}
-
-				if (featuresize > maxfeaturesize) {
-					maxfeaturesize = featuresize;
-				}
-			}
-			else {
-				for (int j = 0; j < (int)feature.size(); j++) {
-					if ((j > 0) && (feature[j - 1] + 1 != feature[j])) {
-						if (featuresize > maxfeaturesize) {
-							maxfeaturesize = featuresize;
-						}
-						featuresize = 0;
-					}
-
+				else {
 					featuresize++;
 				}
 
-				if (featuresize > maxfeaturesize) {
-					maxfeaturesize = featuresize;
-				}
+			}
+
+			if (featuresize > maxfeaturesize) {
+				maxfeaturesize = featuresize;
 			}
 
 			if (maxfeaturesize >= parameters->minimumfeaturesize) {

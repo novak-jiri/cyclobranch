@@ -535,6 +535,7 @@ void cMainThread::run() {
 				cTheoreticalSpectrum tstmp;
 				tstmp.setParameters(&parameters);
 				tstmp.getHintsMap(i, ts, unmatchedpeaks[i], hintsmap);
+
 			}
 
 			*os << " ok" << endl;

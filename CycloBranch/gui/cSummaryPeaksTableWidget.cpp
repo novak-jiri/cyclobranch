@@ -811,8 +811,10 @@ bool cSummaryPeaksTableWidget::prepareToShow(QStandardItemModel* resultsstandard
 		}
 
 		QStringList completerlist;
-		for (auto& it: completernameset) {
-			completerlist.push_back(it);
+		if (completernameset.size() <= 10000) {
+			for (auto& it : completernameset) {
+				completerlist.push_back(it);
+			}
 		}
 		rowsfilterstringlistmodel1->setStringList(completerlist);
 		rowsfilterstringlistmodel2->setStringList(completerlist);
