@@ -3656,6 +3656,38 @@ void cTheoreticalSpectrum::generateFineMSSpectrum(bool& terminatecomputation) {
 }
 
 
+void cTheoreticalSpectrum::getHintsMap(int id, cTheoreticalSpectrum& tsfull, cPeaksList& unmatchedpeaksinmatchedpatterns, unordered_multimap<int, int>& hintsmap) {
+	experimentalpeaks = parameters->peaklistseries[id];
+
+	cPeaksList* tsfullpeaklist = tsfull.getTheoreticalPeaks();
+
+	experimentalmatches.clear();
+	searchForPeakPairs(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks, parameters->fragmentmasserrortolerance);
+
+	// clear matched isotopes of unmatched monoisotopic peaks
+	unmatchedpeaksinmatchedpatterns.clear();
+	if (parameters->generateisotopepattern) {
+		removeUnmatchedIsotopePatterns(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks, unmatchedpeaksinmatchedpatterns, false);
+	}
+	else {
+		removeUnmatchedMetalIsotopes(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks);
+	}
+
+	if (parameters->generateisotopepattern) {
+		removeDecoyPeakMatches(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks);
+	}
+
+	for (int i = 0; i < (int)experimentalpeaks.size(); i++) {
+		for (auto it = experimentalmatches[i].begin(); it != experimentalmatches[i].end(); ++it) {
+			hintsmap.insert(make_pair(*it, id));
+
+			(*tsfullpeaklist)[*it].matched = 0;
+			(*tsfullpeaklist)[*it].matchedid = -1;
+		}
+	}
+}
+
+
 void cTheoreticalSpectrum::compareMSSpectrum(int id, cTheoreticalSpectrum& tsfull, cPeaksList& unmatchedpeaksinmatchedpatterns, unordered_multimap<int, int>& hintsmap) {
 	experimentalpeaks = parameters->peaklistseries[id];
 

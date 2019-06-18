@@ -368,11 +368,21 @@ public:
 
 
 	/**
+		\brief Get a map of search hints to identify features in LC-MS data.
+		\param id identifier of an experimental spectrum
+		\param tsfull theoretical spectrum
+		\param unmatchedpeaksinmatchedpatterns unmatched peaks in matched isotope patterns
+		\param hintsmap map of peak matches for LC-MS data [theoretical peak id, experimental spectrum id]
+	*/
+	void getHintsMap(int id, cTheoreticalSpectrum& tsfull, cPeaksList& unmatchedpeaksinmatchedpatterns, unordered_multimap<int, int>& hintsmap);
+
+
+	/**
 		\brief Compare theoretical peaks with an experimental spectrum.
 		\param id identifier of an experimental spectrum
 		\param tsfull theoretical spectrum with descriptions of peaks
 		\param unmatchedpeaksinmatchedpatterns unmatched peaks in matched isotope patterns
-		\param hintsmap multimap of peak matches for LC-MS data [theoretical peak id, experimental spectrum id]
+		\param hintsmap map of peak matches for LC-MS data [theoretical peak id, experimental spectrum id]
 	*/
 	void compareMSSpectrum(int id, cTheoreticalSpectrum& tsfull, cPeaksList& unmatchedpeaksinmatchedpatterns, unordered_multimap<int, int>& hintsmap);
 

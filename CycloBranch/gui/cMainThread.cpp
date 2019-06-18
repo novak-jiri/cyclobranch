@@ -500,7 +500,6 @@ void cMainThread::run() {
 		*os << "ok" << endl;
 		*os << "Comparing theoretical peaks with the experimental peaklist(s)... " << endl;
 		*os << "Number of experimental peaklists: " << parameters.peaklistseries.size() << endl;
-		*os << "Processing the peaklist no. : " << endl;
 
 		vector<cPeaksList> unmatchedpeaks;
 		unmatchedpeaks.resize(parameters.peaklistseries.size());
@@ -518,21 +517,30 @@ void cMainThread::run() {
 		bool lcms = (parameters.peaklistseries.size() > 1) && !((parameters.peaklistfileformat == mis) || (parameters.peaklistfileformat == imzML));
 
 		if (lcms) {
-			cPeaksList* thpeaks = ts.getTheoreticalPeaks();
-			int thpeakssize = thpeaks->size();
-			for (int i = 0; i < parameters.peaklistseries.size(); i++) {
-				for (int j = 0; j < thpeakssize; j++) {
-					if (terminatecomputation) {
-						emitEndSignals();
-						return;
-					}
+			*os << "Analyzing spectra : " << endl;
 
-					if (searchHint((*thpeaks)[j].mzratio, parameters.peaklistseries[i], parameters.fragmentmasserrortolerance)) {
-						hintsmap.insert(make_pair(j, i));
-					}
+			for (int i = 0; i < parameters.peaklistseries.size(); i++) {
+				if ((i + 1) % 100 == 0) {
+					*os << i + 1 << " ";
 				}
+				if ((i + 1) % 2500 == 0) {
+					*os << endl;
+				}
+
+				if (terminatecomputation) {
+					emitEndSignals();
+					return;
+				}
+
+				cTheoreticalSpectrum tstmp;
+				tstmp.setParameters(&parameters);
+				tstmp.getHintsMap(i, ts, unmatchedpeaks[i], hintsmap);
 			}
+
+			*os << " ok" << endl;
 		}
+
+		*os << "Processing the peaklist no. : " << endl;
 
 		for (int i = 0; i < parameters.peaklistseries.size(); i++) {
 			if ((i + 1) % 100 == 0) {
