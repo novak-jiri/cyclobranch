@@ -548,6 +548,7 @@ void cTheoreticalSpectrum::generatePrecursorIonForOther(int& theoreticalpeaksrea
 		addStringFormulaToMap(formula, atoms);
 	}
 	
+	/*
 	if (parameters->precursoradduct.compare("") != 0) {
 		cSummaryFormula adduct;
 		adduct.setFormula(parameters->precursoradduct);
@@ -560,6 +561,7 @@ void cTheoreticalSpectrum::generatePrecursorIonForOther(int& theoreticalpeaksrea
 			addStringFormulaToMap(parameters->precursoradduct, atoms);
 		}
 	}
+	*/
 
 	double tempratio = peak.mzratio;
 
