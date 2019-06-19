@@ -580,6 +580,12 @@ The minimum number of ion types which must be matched to report a given compound
 If Minimum Ion Types: 2, then any pair of ions from the set of ions [M+H]+, [M+Na]+, [M+2H]2+, [M+Na+H]2+, [M+H-H2O]+, [M+Na-H2O]+, [M+2H-H2O]2+, [M+Na+H-H2O]2+ must be matched to report a given compound.  
 </p>
 
+\subsection settings_basicformulacheck Basic Formula Check
+
+<p>
+Apply Senior's filtering rules. See <a href="https://doi.org/10.1186/1471-2105-8-105">https://doi.org/10.1186/1471-2105-8-105</a> for more details.
+</p>
+
 \subsection settings_advancedformulacheck Advanced Formula Check
 
 <p>

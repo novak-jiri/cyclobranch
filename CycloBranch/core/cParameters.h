@@ -297,6 +297,12 @@ public:
 
 
 	/**
+		\brief Apply Senior's filtering rules.
+	*/
+	bool basicformulacheck;
+
+
+	/**
 		\brief Advanced filtering rules are aplied if compounds are generated in MS mode.
 	*/
 	bool advancedformulacheck;

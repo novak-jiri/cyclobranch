@@ -509,12 +509,19 @@ cParametersWidget::cParametersWidget(QWidget* parent) {
 	theoreticalspectragridlayout->addWidget(minimumiontypeslabel, 11, 0);
 	theoreticalspectragridlayout->addWidget(minimumiontypes, 11, 1);
 
+	basicformulacheck = new QCheckBox();
+	basicformulacheck->setToolTip("Apply Senior's filtering rules.");
+	basicformulacheck->setFixedWidth(rightdefaultwidth);
+	basicformulachecklabel = new QLabel("Basic Formula Check:");
+	theoreticalspectragridlayout->addWidget(basicformulachecklabel, 12, 0);
+	theoreticalspectragridlayout->addWidget(basicformulacheck, 12, 1);
+
 	advancedformulacheck = new QCheckBox();
 	advancedformulacheck->setToolTip("Apply advanced filtering rules if molecular formulas of compounds are generated.");
 	advancedformulacheck->setFixedWidth(rightdefaultwidth);
 	advancedformulachecklabel = new QLabel("Advanced Formula Check:");
-	theoreticalspectragridlayout->addWidget(advancedformulachecklabel, 12, 0);
-	theoreticalspectragridlayout->addWidget(advancedformulacheck, 12, 1);
+	theoreticalspectragridlayout->addWidget(advancedformulachecklabel, 13, 0);
+	theoreticalspectragridlayout->addWidget(advancedformulacheck, 13, 1);
 
 	theoreticalspectragroupbox = new QGroupBox("Theoretical Spectrum/Spectra");
 	theoreticalspectragroupbox->setLayout(theoreticalspectragridlayout);
@@ -763,6 +770,8 @@ cParametersWidget::~cParametersWidget() {
 	delete minimumfeaturesize;
 	delete minimumiontypeslabel;
 	delete minimumiontypes;
+	delete basicformulachecklabel;
+	delete basicformulacheck;
 	delete advancedformulachecklabel;
 	delete advancedformulacheck;
 	delete theoreticalspectragridlayout;
@@ -955,6 +964,7 @@ void cParametersWidget::loadSettings() {
 		minimumpatternsize->setValue(settings.value("minimumpatternsize", 1).toInt());
 		minimumfeaturesize->setValue(settings.value("minimumfeaturesize", 1).toInt());
 		minimumiontypes->setValue(settings.value("minimumiontypes", 1).toInt());
+		settings.value("basicformulacheck", 1).toInt() == 0 ? basicformulacheck->setChecked(false) : basicformulacheck->setChecked(true);
 		settings.value("advancedformulacheck", 1).toInt() == 0 ? advancedformulacheck->setChecked(false) : advancedformulacheck->setChecked(true);
 
 		searchedsequenceline->setText(settings.value("searchedsequence", "").toString());
@@ -1037,6 +1047,7 @@ void cParametersWidget::saveSettings() {
 	settings.setValue("minimumpatternsize", minimumpatternsize->value());
 	settings.setValue("minimumfeaturesize", minimumfeaturesize->value());
 	settings.setValue("minimumiontypes", minimumiontypes->value());
+	basicformulacheck->isChecked() ? settings.setValue("basicformulacheck", 1) : settings.setValue("basicformulacheck", 0);
 	advancedformulacheck->isChecked() ? settings.setValue("advancedformulacheck", 1) : settings.setValue("advancedformulacheck", 0);
 
 	settings.setValue("searchedsequence", searchedsequenceline->text());
@@ -1305,6 +1316,7 @@ bool cParametersWidget::updateParameters() {
 	parameters.minimumpatternsize = minimumpatternsize->value();
 	parameters.minimumfeaturesize = minimumfeaturesize->value();
 	parameters.minimumiontypes = minimumiontypes->value();
+	parameters.basicformulacheck = basicformulacheck->isChecked();
 	parameters.advancedformulacheck = advancedformulacheck->isChecked();
 
 	parameters.searchedsequence = searchedsequenceline->text().toStdString();
@@ -1415,6 +1427,7 @@ void cParametersWidget::restoreParameters() {
 	minimumpatternsize->setValue(parameters.minimumpatternsize);
 	minimumfeaturesize->setValue(parameters.minimumfeaturesize);
 	minimumiontypes->setValue(parameters.minimumiontypes);
+	basicformulacheck->setChecked(parameters.basicformulacheck);
 	advancedformulacheck->setChecked(parameters.advancedformulacheck);
 
 	searchedsequenceline->setText(parameters.searchedsequence.c_str());
@@ -1654,6 +1667,7 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 			neutrallosstypes->setDisabled(false);
 			maximumcombinedlosses->setDisabled(false);
 			//clearhitswithoutparent->setDisabled(false);
+			basicformulacheck->setDisabled(false);
 			advancedformulacheck->setDisabled(true);
 			reportunmatchedtheoreticalpeaks->setDisabled(false);
 			generateisotopepattern->setDisabled(false);
@@ -1694,6 +1708,7 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 			neutrallosstypes->setDisabled(false);
 			maximumcombinedlosses->setDisabled(false);
 			//clearhitswithoutparent->setDisabled(false);
+			basicformulacheck->setDisabled(false);
 			advancedformulacheck->setDisabled(true);
 			reportunmatchedtheoreticalpeaks->setDisabled(false);
 			generateisotopepattern->setDisabled(false);
@@ -1734,6 +1749,7 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 			neutrallosstypes->setDisabled(false);
 			maximumcombinedlosses->setDisabled(false);
 			//clearhitswithoutparent->setDisabled(false);
+			basicformulacheck->setDisabled(false);
 			advancedformulacheck->setDisabled(true);
 			reportunmatchedtheoreticalpeaks->setDisabled(false);
 			generateisotopepattern->setDisabled(false);
@@ -1774,6 +1790,7 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 			neutrallosstypes->setDisabled(false);
 			maximumcombinedlosses->setDisabled(false);
 			//clearhitswithoutparent->setDisabled(true);
+			basicformulacheck->setDisabled(false);
 			advancedformulacheck->setDisabled(true);
 			reportunmatchedtheoreticalpeaks->setDisabled(false);
 			generateisotopepattern->setDisabled(false);
@@ -1832,6 +1849,7 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 			neutrallosstypes->setDisabled(false);
 			maximumcombinedlosses->setDisabled(false);
 			//clearhitswithoutparent->setDisabled(true);
+			basicformulacheck->setDisabled(false);
 			advancedformulacheck->setDisabled(false);
 			reportunmatchedtheoreticalpeaks->setDisabled(false);
 			generateisotopepattern->setDisabled(false);

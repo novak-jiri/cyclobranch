@@ -119,6 +119,7 @@ void cParameters::clear() {
 	scoretype = number_of_matched_peaks;
 	maximumcombinedlosses = 2;
 	//clearhitswithoutparent = false;
+	basicformulacheck = true;
 	advancedformulacheck = true;
 	reportunmatchedtheoreticalpeaks = false;
 	generateisotopepattern = false;
@@ -1194,6 +1195,10 @@ string cParameters::printToString() {
 
 	s += "Minimum Ion Types: " + to_string(minimumiontypes) + "\n";
 
+	s += "Basic Formula Check: ";
+	s += basicformulacheck ? "on" : "off";
+	s += "\n";
+
 	s += "Advanced Formula Check: ";
 	s += advancedformulacheck ? "on" : "off";
 	s += "\n";
@@ -1360,7 +1365,7 @@ int cParameters::calculateNeutralLosses(bool& terminatecomputation, string& erro
 		}
 	}
 
-	if ((neutrallossesbrickdatabase.size() > 0) && (neutrallossesbrickdatabase.size() == valences.size())) {
+	if (basicformulacheck && (neutrallossesbrickdatabase.size() > 0) && (neutrallossesbrickdatabase.size() == valences.size())) {
 		validvalences = true;
 
 		if (os) {
@@ -1803,7 +1808,7 @@ int cParameters::generateCompounds(bool& terminatecomputation, string& errormess
 		}
 	}
 
-	if ((elementsbrickdatabase.size() > 0) && (elementsbrickdatabase.size() == valences.size())) {
+	if (basicformulacheck && (elementsbrickdatabase.size() > 0) && (elementsbrickdatabase.size() == valences.size())) {
 		validvalences = true;
 	}
 
@@ -2377,6 +2382,7 @@ void cParameters::store(ofstream& os) {
 	os.write((char *)&minimumpatternsize, sizeof(int));
 	os.write((char *)&minimumfeaturesize, sizeof(int));
 	os.write((char *)&minimumiontypes, sizeof(int));
+	os.write((char *)&basicformulacheck, sizeof(bool));
 	os.write((char *)&advancedformulacheck, sizeof(bool));
 	os.write((char *)&cyclicnterminus, sizeof(bool));
 	os.write((char *)&cycliccterminus, sizeof(bool));
@@ -2510,6 +2516,7 @@ void cParameters::load(ifstream& is) {
 	is.read((char *)&minimumpatternsize, sizeof(int));
 	is.read((char *)&minimumfeaturesize, sizeof(int));
 	is.read((char *)&minimumiontypes, sizeof(int));
+	is.read((char *)&basicformulacheck, sizeof(bool));
 	is.read((char *)&advancedformulacheck, sizeof(bool));
 	is.read((char *)&cyclicnterminus, sizeof(bool));
 	is.read((char *)&cycliccterminus, sizeof(bool));

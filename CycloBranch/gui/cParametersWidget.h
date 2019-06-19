@@ -238,6 +238,8 @@ private:
 	QSpinBox* minimumfeaturesize;
 	QLabel* minimumiontypeslabel;
 	QSpinBox* minimumiontypes;
+	QLabel* basicformulachecklabel;
+	QCheckBox* basicformulacheck;
 	QLabel* advancedformulachecklabel;
 	QCheckBox* advancedformulacheck;
 
