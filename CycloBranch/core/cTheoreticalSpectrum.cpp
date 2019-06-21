@@ -1618,7 +1618,7 @@ void cTheoreticalSpectrum::removeUnmatchedIronPatterns(cPeaksList& theoreticalpe
 
 		// normalize the theoretical intensities
 		if (groupid != theoreticalpeaks[i].groupid) {
-			if ((theoreticalpeaks[i].iontype == ms_MFe2H) || (theoreticalpeaks[i].iontype == ms_MFe3HNa) || (theoreticalpeaks[i].iontype == ms_MFe3HK)) {
+			if ((theoreticalpeaks[start].iontype == ms_MFe2H) || (theoreticalpeaks[start].iontype == ms_MFe3HNa) || (theoreticalpeaks[start].iontype == ms_MFe3HK)) {
 
 				if ((theoreticalpeaks[start].matched == 0) && (theoreticalpeaks[maximumintensityid].matched > 0)) {
 					for (int j = start; j <= stop; j++) {
@@ -1638,7 +1638,7 @@ void cTheoreticalSpectrum::removeUnmatchedIronPatterns(cPeaksList& theoreticalpe
 
 						if (theoreticalpeaks[start].relativeintensity*maximumexperimentalintensity / 100.0 >= parameters->minimumrelativeintensitythreshold) {
 
-							if (theoreticalpeaks[start].relativeintensity*maximumexperimentalintensity / 100.0 > 0.1 * maximumexperimentalintensity) {
+							if (experimentalpeaks[theoreticalpeaks[start].matchedid].relativeintensity > 0.1 * maximumexperimentalintensity) {
 
 								for (int j = start; j <= stop; j++) {
 									if (theoreticalpeaks[j].matched > 0) {
