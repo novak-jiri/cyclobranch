@@ -1949,6 +1949,10 @@ int cParameters::generateCompounds(bool& terminatecomputation, string& errormess
 				continue;
 			}
 
+			if (countN > countO) {
+				continue;
+			}
+
 			if (sumofmasses < 500.0) {
 
 				if (countC > 39) {
