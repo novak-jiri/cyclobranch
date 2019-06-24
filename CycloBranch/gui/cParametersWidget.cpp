@@ -223,7 +223,7 @@ cParametersWidget::cParametersWidget(QWidget* parent) {
 	minimummz->setPrefix("minimum: ");
 
 	maximummz = new QDoubleSpinBox();
-	maximummz->setToolTip("Enter the maximum m/z ratio. The value is used only in 'Compound Search - MS, LC-MS, MSI' mode to limit the number of generated compounds.");
+	maximummz->setToolTip("Enter the maximum m/z ratio. Peaks with m/z ratios above the threshold are removed from the peaklist (0 = disabled).");
 	maximummz->setDecimals(3);
 	maximummz->setRange(0, 100000);
 	maximummz->setSingleStep(1);
@@ -1768,7 +1768,7 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 			precursoradduct->setDisabled(true);
 			precursorcharge->setDisabled(false);
 			precursormasserrortolerance->setDisabled(true);
-			maximummz->setDisabled(true);
+			maximummz->setDisabled(false);
 			fwhm->setDisabled(false);
 			brickdatabaseline->setDisabled(true);
 			brickdatabasebutton->setDisabled(true);

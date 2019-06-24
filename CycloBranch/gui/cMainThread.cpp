@@ -168,6 +168,12 @@ void cMainThread::run() {
 			parameters.peaklistseries[i].cropMaximumMZRatio(charge(uncharge(parameters.precursormass, parameters.precursorcharge), (parameters.precursorcharge > 0)?1:-1), parameters.precursormasserrortolerance);
 		}
 
+		if ((parameters.mode == dereplication) || (parameters.mode == compoundsearch)) {
+			if (parameters.maximummz > 0) {
+				parameters.peaklistseries[i].cropMaximumMZRatio(parameters.maximummz, parameters.fragmentmasserrortolerance);
+			}
+		}
+
 		parameters.peaklistseries[i].cropAbsoluteIntenzity(parameters.minimumabsoluteintensitythreshold);
 		parameters.peaklistseries[i].cropRelativeIntenzity(parameters.minimumrelativeintensitythreshold);
 

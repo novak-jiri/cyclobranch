@@ -242,8 +242,7 @@ peaks of compounds are generated with charge 1-.</p>
 
 \subsection settings_mz m/z Ratio
 
-<p>Enter the minimum m/z ratio and maximum m/z ratio if applicable. Experimental peaks with m/z ratios below the threshold are removed from the peaklist.
-The maximum m/z ratio is used only in 'Compound Search - MS, LC-MS, MSI' mode to limit the number of generated compounds.</p>
+<p>Enter the minimum m/z ratio and maximum m/z ratio. Experimental peaks with m/z ratios below/above the thresholds are removed from the peaklist(s). For maximum m/z, 0 = disabled.</p>
 
 \subsection settings_fwhm FWHM
 

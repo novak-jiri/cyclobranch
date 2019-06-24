@@ -1529,8 +1529,13 @@ int cParameters::calculateNeutralLosses(bool& terminatecomputation, string& erro
 		compressformulas = true;
 	}
 
+	double crop = uncharge(precursormass, precursorcharge) - minimummz;
+	if (mode == dereplication) {
+		crop = 0;
+	}
+
 	//while (neutrallossesbrickdatabase.nextCombination(combarray, numberofbasicbricks, maximumcombinedlosses, 0, uncharge(precursormass, precursorcharge) - minimummz)) {
-	while (neutrallossesbrickdatabase.nextCombinationFastLimited(combarray, countsofelements, limitsofelements, massesofelements, sumofmasses, numberofbasicbricks, maximumcombinedlosses, 0, uncharge(precursormass, precursorcharge) - minimummz)) {
+	while (neutrallossesbrickdatabase.nextCombinationFastLimited(combarray, countsofelements, limitsofelements, massesofelements, sumofmasses, numberofbasicbricks, maximumcombinedlosses, 0, crop)) {
 		if (terminatecomputation) {
 			neutrallossesdefinitions.clear();
 			neutrallossesfortheoreticalspectra.clear();
