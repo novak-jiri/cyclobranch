@@ -198,6 +198,9 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 	string profilemgfname;
 	string peaksfoldername;
 
+	int hrs, mins, secs;
+	QTime time;
+
 	if (peaklistfilename.empty()) {
 		error = true;
 		errormessage = "A peaklist is not specified. Have you configured the engine (Search -> Settings...) ?\n";
@@ -328,6 +331,8 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 					break;
 				case baf:
 					#if OS_TYPE == WIN
+						time.start();
+
 						*os << "Processing the file " + peaklistfilename + ":" << endl;
 
 						*os << "centroid spectra ... ";
@@ -366,6 +371,13 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 						}
 
 						*os << endl;
+
+						secs = time.elapsed() / 1000;
+						mins = (secs / 60) % 60;
+						hrs = (secs / 3600);
+						secs = secs % 60;
+
+						*os << "The data conversion took: " << to_string(hrs) << " hrs, " << to_string(mins) << " min, " << to_string(secs) << " sec." << endl << endl;
 					#endif
 					break;
 				case raw:

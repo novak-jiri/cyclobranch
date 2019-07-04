@@ -87,6 +87,8 @@ void cMainThread::run() {
 	isotopepatterncache.clear();
 	isotopepatterncache.unlock();
 
+	int hrs, mins, secs;
+
 	QTime time;
 	time.start();
 
@@ -687,9 +689,9 @@ void cMainThread::run() {
 		*os << " ok" << endl;
 	}
 
-	int secs = time.elapsed() / 1000;
-	int mins = (secs / 60) % 60;
-	int hrs =  (secs / 3600);
+	secs = time.elapsed() / 1000;
+	mins = (secs / 60) % 60;
+	hrs =  (secs / 3600);
 	secs = secs % 60;
 
 	*os << endl << appname.toStdString() << " successfully finished at " << time.currentTime().toString().toStdString();
