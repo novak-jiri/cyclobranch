@@ -1658,6 +1658,7 @@ int cParameters::generateCompounds(bool& terminatecomputation, string& errormess
 	sequencedatabase.clear();
 	unsigned long long compoundsgenerated = 0;
 	unsigned long long compoundsused = 0;
+	unsigned long long compoundslimit = 5000000;
 
 	errormessage = "";
 
@@ -1847,7 +1848,6 @@ int cParameters::generateCompounds(bool& terminatecomputation, string& errormess
 		}
 	}
 
-	unsigned long long ui = 0;
 	//bool skipcombination;
 	//while (elementsbrickdatabase.nextCombinationFast(combarray, countsofelements, massesofelements, sumofmasses, numberofbasicbricks, maximumcombinedlosses, 0, maximummz)) {
 	while (elementsbrickdatabase.nextCombinationFastLimited(combarray, countsofelements, limitsofelements, massesofelements, sumofmasses, numberofbasicbricks, maximumcombinedlosses, 0, maximummz - minadd)) {
@@ -2317,18 +2317,18 @@ int cParameters::generateCompounds(bool& terminatecomputation, string& errormess
 
 		seq.setName(tmpstr);
 		seq.setSummaryFormula(tmpstr);
-		sequencedatabase.push_back(seq);
+		if (compoundsused <= compoundslimit) {
+			sequencedatabase.push_back(seq);
+		}
 		compoundsused++;
 
-		ui++;
-
-		if (ui % 100000 == 0) {
+		if (compoundsused % 100000 == 0) {
 			if (os) {
-				*os << ui << " ";
+				*os << compoundsused << " ";
 			}
 		}
 
-		if (ui % 1000000 == 0) {
+		if (compoundsused % 1000000 == 0) {
 			if (os) {
 				*os << endl;
 			}
