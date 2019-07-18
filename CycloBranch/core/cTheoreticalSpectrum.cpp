@@ -1616,8 +1616,7 @@ void cTheoreticalSpectrum::removeUnmatchedIronPatterns(cPeaksList& theoreticalpe
 			stop = i;
 		}
 
-		// normalize the theoretical intensities
-		if (groupid != theoreticalpeaks[i].groupid) {
+		if ((groupid != theoreticalpeaks[i].groupid) || (i == theoreticalpeaksrealsize - 1)) {
 			if ((theoreticalpeaks[start].iontype == ms_MFe2H) || (theoreticalpeaks[start].iontype == ms_MFe3HNa) || (theoreticalpeaks[start].iontype == ms_MFe3HK)) {
 
 				if ((theoreticalpeaks[start].matched == 0) && (theoreticalpeaks[maximumintensityid].matched > 0)) {
@@ -1665,6 +1664,98 @@ void cTheoreticalSpectrum::removeUnmatchedIronPatterns(cPeaksList& theoreticalpe
 			stop = i;
 			maximumintensityid = i;
 			maximumintensity = theoreticalpeaks[i].relativeintensity;
+			if (theoreticalpeaks[i].matched) {
+				maximumexperimentalintensity = experimentalpeaks[theoreticalpeaks[i].matchedid].relativeintensity;
+			}
+		}
+	}
+}
+
+
+void cTheoreticalSpectrum::removeUnmatchedPatternsByIntensityRatio(cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks) {
+	if (theoreticalpeaksrealsize == 0) {
+		return;
+	}
+
+	int groupid = theoreticalpeaks[0].groupid;
+	int start = 0;
+	int stop = 0;
+	int maximumintensityid = 0;
+	double maximumintensity = theoreticalpeaks[0].relativeintensity;
+	bool cleargroup = false;
+
+	double maximumexperimentalintensity;
+	if (theoreticalpeaks[maximumintensityid].matched) {
+		maximumexperimentalintensity = experimentalpeaks[theoreticalpeaks[maximumintensityid].matchedid].relativeintensity;
+	}
+
+	double thratio, expratio;
+
+	for (int i = 0; i < theoreticalpeaksrealsize; i++) {
+		if (groupid == theoreticalpeaks[i].groupid) {
+			if (theoreticalpeaks[i].relativeintensity > maximumintensity) {
+				maximumintensityid = i;
+				maximumintensity = theoreticalpeaks[i].relativeintensity;
+				if (theoreticalpeaks[i].matched) {
+					maximumexperimentalintensity = experimentalpeaks[theoreticalpeaks[i].matchedid].relativeintensity;
+				}
+			}
+
+			stop = i;
+		}
+
+		if ((groupid != theoreticalpeaks[i].groupid) || (i == theoreticalpeaksrealsize - 1)) {
+
+			if (theoreticalpeaks[maximumintensityid].matched > 0) {
+				if (maximumexperimentalintensity >= parameters->minimumrelativeintensitythreshold) {
+					for (int j = start; j <= stop; j++) {
+						if (j == maximumintensityid) {
+							continue;
+						}
+
+						if (theoreticalpeaks[j].relativeintensity*maximumexperimentalintensity / 100.0 >= parameters->minimumrelativeintensitythreshold) {
+							if (theoreticalpeaks[j].matched > 0) {
+								thratio = theoreticalpeaks[j].relativeintensity / theoreticalpeaks[maximumintensityid].relativeintensity;
+								expratio = experimentalpeaks[theoreticalpeaks[j].matchedid].relativeintensity / experimentalpeaks[theoreticalpeaks[maximumintensityid].matchedid].relativeintensity;
+
+								if (fabs(thratio - expratio) > 0.1) {
+									cleargroup = true;
+									break;
+								}
+							}
+							else {
+								//cleargroup = true;
+								//break;
+							}
+						}
+					}
+				}
+				else {
+					cleargroup = true;
+				}
+			}
+			else {
+				cleargroup = true;
+			}
+
+			if (cleargroup) {
+				for (int j = start; j <= stop; j++) {
+					if (theoreticalpeaks[j].matched > 0) {
+						experimentalmatches[theoreticalpeaks[j].matchedid].erase(experimentalmatches[theoreticalpeaks[j].matchedid].find(j));
+						experimentalpeaks[theoreticalpeaks[j].matchedid].matched--;
+
+						theoreticalpeaks[j].matched--;
+						theoreticalpeaks[j].matchedid = -1;
+					}
+				}
+			}
+
+			groupid = theoreticalpeaks[i].groupid;
+			start = i;
+			stop = i;
+			maximumintensityid = i;
+			maximumintensity = theoreticalpeaks[i].relativeintensity;
+			cleargroup = false;
 			if (theoreticalpeaks[i].matched) {
 				maximumexperimentalintensity = experimentalpeaks[theoreticalpeaks[i].matchedid].relativeintensity;
 			}
@@ -3744,7 +3835,8 @@ void cTheoreticalSpectrum::getHintsMap(int id, cTheoreticalSpectrum& tsfull, cPe
 	searchForPeakPairs(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks, parameters->fragmentmasserrortolerance);
 
 	if (parameters->generateisotopepattern) {
-		removeUnmatchedIronPatterns(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks);
+		//removeUnmatchedIronPatterns(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks);
+		removeUnmatchedPatternsByIntensityRatio(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks);
 	}
 
 	// clear matched isotopes of unmatched monoisotopic peaks
@@ -3780,7 +3872,8 @@ void cTheoreticalSpectrum::compareMSSpectrum(int id, cTheoreticalSpectrum& tsful
 	searchForPeakPairs(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks, parameters->fragmentmasserrortolerance);
 
 	if (parameters->generateisotopepattern) {
-		removeUnmatchedIronPatterns(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks);
+		//removeUnmatchedIronPatterns(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks);
+		removeUnmatchedPatternsByIntensityRatio(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks);
 	}
 
 	bool lcms = (parameters->peaklistseries.size() > 1) && !((parameters->peaklistfileformat == mis) || (parameters->peaklistfileformat == imzML));
