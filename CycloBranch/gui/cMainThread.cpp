@@ -203,6 +203,14 @@ void cMainThread::run() {
 		if (parameters.sequencedatabase.size() > compoundslimit) {
 			parameters.sequencedatabase.clear();
 			*os << "Error: The number of generated compounds exceeded the limit " + to_string(compoundslimit) + ". Please, adjust the settings to limit the number of compounds." << endl;
+
+			secs = time.elapsed() / 1000;
+			mins = (secs / 60) % 60;
+			hrs = (secs / 3600);
+			secs = secs % 60;
+
+			*os << "Execution time: " << to_string(hrs) << " hrs, " << to_string(mins) << " min, " << to_string(secs) << " sec." << endl << endl;
+
 			emitEndSignals();
 			return;
 		}
