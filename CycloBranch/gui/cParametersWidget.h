@@ -242,6 +242,8 @@ private:
 	QCheckBox* basicformulacheck;
 	QLabel* advancedformulachecklabel;
 	QCheckBox* advancedformulacheck;
+	QLabel* isotopicratiolabel;
+	QDoubleSpinBox* isotopicratio;
 
 	QGroupBox* searchedsequencegroupbox;
 	QGridLayout* searchedsequencegridlayout;

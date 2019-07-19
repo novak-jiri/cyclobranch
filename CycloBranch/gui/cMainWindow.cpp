@@ -359,7 +359,7 @@ cMainWindow::cMainWindow() {
 
 	setCentralWidget(splitter);
 
-	resize(1280, 780);
+	resize(defaultwinsizex, defaultwinsizey);
 
 	theoreticalspectrumlist.clear();
 	spectradetails.clear();

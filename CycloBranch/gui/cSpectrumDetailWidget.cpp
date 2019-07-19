@@ -1188,7 +1188,7 @@ void cSpectrumDetailWidget::prepareToShow(QAction* actionShowIsomers, cPeakListS
 
 		setMenuBar(menuBar);
 
-		resize(1280, 780);
+		resize(defaultwinsizex, defaultwinsizey);
 
 		if (parameters && theoreticalspectrum) {
 

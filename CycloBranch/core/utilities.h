@@ -62,6 +62,18 @@ const double pi = 3.141592653589793;
 
 
 /**
+	\brief Default window size x.
+*/
+const int defaultwinsizex = 1450;
+
+
+/**
+	\brief Default window size y.
+*/
+const int defaultwinsizey = 890;
+
+
+/**
 	\brief Vendor types.
 */
 enum eVendorType {

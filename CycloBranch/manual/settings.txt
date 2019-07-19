@@ -591,6 +591,12 @@ Apply Senior's filtering rules. See <a href="https://doi.org/10.1186/1471-2105-8
 Advanced filtering rules are applied if molecular formulas of compounds are generated. See the tables 1, 2, and 3 in <a href="https://doi.org/10.1186/1471-2105-8-105">https://doi.org/10.1186/1471-2105-8-105</a> for more details.
 </p>
 
+\subsection settings_isotopicratio Isotopic Ratio Threshold
+
+<p>
+Check the ratios of intensities of matched peaks (0 = disabled).
+</p>
+
 <hr>
 
 \section settingssearchedseq Searched Sequence/Compound

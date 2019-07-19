@@ -1713,19 +1713,15 @@ void cTheoreticalSpectrum::removeUnmatchedPatternsByIntensityRatio(cPeaksList& t
 							continue;
 						}
 
-						if (theoreticalpeaks[j].relativeintensity*maximumexperimentalintensity / 100.0 >= parameters->minimumrelativeintensitythreshold) {
-							if (theoreticalpeaks[j].matched > 0) {
+						if (theoreticalpeaks[j].matched > 0) {
+							if (theoreticalpeaks[j].relativeintensity*maximumexperimentalintensity / 100.0 >= parameters->minimumrelativeintensitythreshold) {
 								thratio = theoreticalpeaks[j].relativeintensity / theoreticalpeaks[maximumintensityid].relativeintensity;
 								expratio = experimentalpeaks[theoreticalpeaks[j].matchedid].relativeintensity / experimentalpeaks[theoreticalpeaks[maximumintensityid].matchedid].relativeintensity;
 
-								if (fabs(thratio - expratio) > 0.1) {
+								if (fabs(thratio - expratio) > parameters->isotopicratio) {
 									cleargroup = true;
 									break;
 								}
-							}
-							else {
-								//cleargroup = true;
-								//break;
 							}
 						}
 					}
@@ -3835,8 +3831,10 @@ void cTheoreticalSpectrum::getHintsMap(int id, cTheoreticalSpectrum& tsfull, cPe
 	searchForPeakPairs(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks, parameters->fragmentmasserrortolerance);
 
 	if (parameters->generateisotopepattern) {
-		//removeUnmatchedIronPatterns(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks);
-		removeUnmatchedPatternsByIntensityRatio(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks);
+		removeUnmatchedIronPatterns(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks);
+		if (parameters->isotopicratio > 0) {
+			removeUnmatchedPatternsByIntensityRatio(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks);
+		}
 	}
 
 	// clear matched isotopes of unmatched monoisotopic peaks
@@ -3872,8 +3870,10 @@ void cTheoreticalSpectrum::compareMSSpectrum(int id, cTheoreticalSpectrum& tsful
 	searchForPeakPairs(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks, parameters->fragmentmasserrortolerance);
 
 	if (parameters->generateisotopepattern) {
-		//removeUnmatchedIronPatterns(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks);
-		removeUnmatchedPatternsByIntensityRatio(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks);
+		removeUnmatchedIronPatterns(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks);
+		if (parameters->isotopicratio > 0) {
+			removeUnmatchedPatternsByIntensityRatio(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks);
+		}
 	}
 
 	bool lcms = (parameters->peaklistseries.size() > 1) && !((parameters->peaklistfileformat == mis) || (parameters->peaklistfileformat == imzML));

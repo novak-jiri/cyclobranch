@@ -509,7 +509,7 @@ cImageWindow::cImageWindow(QWidget* parent) {
 	connect(imagewindowwidget, SIGNAL(updateHistologyPosition(int, int, int, int, double)), this, SLOT(updateHistologySlot(int, int, int, int, double)));
 	connect(imagewindowwidget, SIGNAL(updateMicroscopyPosition(double, double, double, double, double)), this, SLOT(updateMicroscopySlot(double, double, double, double, double)));
 
-	resize(1280, 780);
+	resize(defaultwinsizex, defaultwinsizey);
 
 	lastimagedir = "./";
 	

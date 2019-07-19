@@ -309,6 +309,12 @@ public:
 
 
 	/**
+		\brief Check the ratios of intensities of matched peaks.
+	*/
+	double isotopicratio;
+
+
+	/**
 		\brief True if the N-terminus of a linear peptide is cyclized.
     */
 	bool cyclicnterminus;
