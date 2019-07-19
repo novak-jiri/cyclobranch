@@ -230,6 +230,17 @@ string cSequence::getNameWithReferenceAsHTMLString() {
 			}
 		}
 
+		// MIBIG (undocumented)
+		if (!correctreference) {
+			rx = "^MIBIG: BGC[0-9]+$";
+			if (regex_search(reference, rx)) {
+				s += "<a href=\"https://mibig.secondarymetabolites.org/repository/" + reference.substr(7) + "\">";
+				s += name;
+				s += "</a>";
+				correctreference = true;
+			}
+		}
+
 		// DOI
 		if (!correctreference) {
 			rx = "^DOI: ";
