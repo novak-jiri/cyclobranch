@@ -70,7 +70,7 @@ const int defaultwinsizex = 1450;
 /**
 	\brief Default window size y.
 */
-const int defaultwinsizey = 890;
+const int defaultwinsizey = 925;
 
 
 /**
