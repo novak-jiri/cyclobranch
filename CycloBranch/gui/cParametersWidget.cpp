@@ -523,15 +523,15 @@ cParametersWidget::cParametersWidget(QWidget* parent) {
 	theoreticalspectragridlayout->addWidget(advancedformulachecklabel, 13, 0);
 	theoreticalspectragridlayout->addWidget(advancedformulacheck, 13, 1);
 
-	isotopicratio = new QDoubleSpinBox();
-	isotopicratio->setToolTip("Check the ratios of intensities of matched peaks (0 = disabled).");
-	isotopicratio->setDecimals(3);
-	isotopicratio->setRange(0, 1);
-	isotopicratio->setSingleStep(0.1);
-	isotopicratio->setFixedWidth(rightdefaultwidth);
-	isotopicratiolabel = new QLabel("Isotopic Ratio Threshold:");
-	theoreticalspectragridlayout->addWidget(isotopicratiolabel, 14, 0);
-	theoreticalspectragridlayout->addWidget(isotopicratio, 14, 1);
+	intensitytolerance = new QDoubleSpinBox();
+	intensitytolerance->setToolTip("Maximum difference of intensities of matched isotopes (0 = disabled).");
+	intensitytolerance->setDecimals(3);
+	intensitytolerance->setRange(0, 1);
+	intensitytolerance->setSingleStep(0.1);
+	intensitytolerance->setFixedWidth(rightdefaultwidth);
+	intensitytolerancelabel = new QLabel("Isotope Intensity Tolerance:");
+	theoreticalspectragridlayout->addWidget(intensitytolerancelabel, 14, 0);
+	theoreticalspectragridlayout->addWidget(intensitytolerance, 14, 1);
 
 	theoreticalspectragroupbox = new QGroupBox("Theoretical Spectrum/Spectra");
 	theoreticalspectragroupbox->setLayout(theoreticalspectragridlayout);
@@ -784,8 +784,8 @@ cParametersWidget::~cParametersWidget() {
 	delete basicformulacheck;
 	delete advancedformulachecklabel;
 	delete advancedformulacheck;
-	delete isotopicratiolabel;
-	delete isotopicratio;
+	delete intensitytolerancelabel;
+	delete intensitytolerance;
 	delete theoreticalspectragridlayout;
 	delete theoreticalspectragroupbox;
 
@@ -978,7 +978,7 @@ void cParametersWidget::loadSettings() {
 		minimumiontypes->setValue(settings.value("minimumiontypes", 1).toInt());
 		settings.value("basicformulacheck", 1).toInt() == 0 ? basicformulacheck->setChecked(false) : basicformulacheck->setChecked(true);
 		settings.value("advancedformulacheck", 1).toInt() == 0 ? advancedformulacheck->setChecked(false) : advancedformulacheck->setChecked(true);
-		isotopicratio->setValue(settings.value("isotopicratio", 0.1).toDouble());
+		intensitytolerance->setValue(settings.value("intensitytolerance", 0.1).toDouble());
 
 		searchedsequenceline->setText(settings.value("searchedsequence", "").toString());
 		searchedsequenceNtermmodif->setText(settings.value("searchedsequenceNtermmodif", "").toString());
@@ -1062,7 +1062,7 @@ void cParametersWidget::saveSettings() {
 	settings.setValue("minimumiontypes", minimumiontypes->value());
 	basicformulacheck->isChecked() ? settings.setValue("basicformulacheck", 1) : settings.setValue("basicformulacheck", 0);
 	advancedformulacheck->isChecked() ? settings.setValue("advancedformulacheck", 1) : settings.setValue("advancedformulacheck", 0);
-	settings.setValue("isotopicratio", isotopicratio->value());
+	settings.setValue("intensitytolerance", intensitytolerance->value());
 
 	settings.setValue("searchedsequence", searchedsequenceline->text());
 	settings.setValue("searchedsequenceNtermmodif", searchedsequenceNtermmodif->text());
@@ -1332,7 +1332,7 @@ bool cParametersWidget::updateParameters() {
 	parameters.minimumiontypes = minimumiontypes->value();
 	parameters.basicformulacheck = basicformulacheck->isChecked();
 	parameters.advancedformulacheck = advancedformulacheck->isChecked();
-	parameters.isotopicratio = isotopicratio->value();
+	parameters.intensitytolerance = intensitytolerance->value();
 
 	parameters.searchedsequence = searchedsequenceline->text().toStdString();
 	parameters.originalsearchedsequence = parameters.searchedsequence;
@@ -1444,7 +1444,7 @@ void cParametersWidget::restoreParameters() {
 	minimumiontypes->setValue(parameters.minimumiontypes);
 	basicformulacheck->setChecked(parameters.basicformulacheck);
 	advancedformulacheck->setChecked(parameters.advancedformulacheck);
-	isotopicratio->setValue(parameters.isotopicratio);
+	intensitytolerance->setValue(parameters.intensitytolerance);
 
 	searchedsequenceline->setText(parameters.searchedsequence.c_str());
 	searchedsequenceNtermmodif->setText(parameters.searchedsequenceNtermmodif.c_str());
@@ -1685,7 +1685,7 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 			//clearhitswithoutparent->setDisabled(false);
 			basicformulacheck->setDisabled(false);
 			advancedformulacheck->setDisabled(true);
-			isotopicratio->setDisabled(true);
+			intensitytolerance->setDisabled(true);
 			reportunmatchedtheoreticalpeaks->setDisabled(false);
 			generateisotopepattern->setDisabled(false);
 			minimumpatternsize->setDisabled(false);
@@ -1727,7 +1727,7 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 			//clearhitswithoutparent->setDisabled(false);
 			basicformulacheck->setDisabled(false);
 			advancedformulacheck->setDisabled(true);
-			isotopicratio->setDisabled(true);
+			intensitytolerance->setDisabled(true);
 			reportunmatchedtheoreticalpeaks->setDisabled(false);
 			generateisotopepattern->setDisabled(false);
 			minimumpatternsize->setDisabled(false);
@@ -1769,7 +1769,7 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 			//clearhitswithoutparent->setDisabled(false);
 			basicformulacheck->setDisabled(false);
 			advancedformulacheck->setDisabled(true);
-			isotopicratio->setDisabled(true);
+			intensitytolerance->setDisabled(true);
 			reportunmatchedtheoreticalpeaks->setDisabled(false);
 			generateisotopepattern->setDisabled(false);
 			minimumpatternsize->setDisabled(false);
@@ -1811,7 +1811,7 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 			//clearhitswithoutparent->setDisabled(true);
 			basicformulacheck->setDisabled(false);
 			advancedformulacheck->setDisabled(true);
-			isotopicratio->setDisabled(false);
+			intensitytolerance->setDisabled(false);
 			reportunmatchedtheoreticalpeaks->setDisabled(false);
 			generateisotopepattern->setDisabled(false);
 			minimumpatternsize->setDisabled(false);
@@ -1871,7 +1871,7 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 			//clearhitswithoutparent->setDisabled(true);
 			basicformulacheck->setDisabled(false);
 			advancedformulacheck->setDisabled(false);
-			isotopicratio->setDisabled(false);
+			intensitytolerance->setDisabled(false);
 			reportunmatchedtheoreticalpeaks->setDisabled(false);
 			generateisotopepattern->setDisabled(false);
 			minimumpatternsize->setDisabled(false);

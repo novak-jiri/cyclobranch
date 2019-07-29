@@ -309,9 +309,9 @@ public:
 
 
 	/**
-		\brief Check the ratios of intensities of matched peaks.
+		\brief Maximum difference of intensities of matched isotopes.
 	*/
-	double isotopicratio;
+	double intensitytolerance;
 
 
 	/**

@@ -121,7 +121,7 @@ void cParameters::clear() {
 	//clearhitswithoutparent = false;
 	basicformulacheck = true;
 	advancedformulacheck = true;
-	isotopicratio = 0.1;
+	intensitytolerance = 0.1;
 	reportunmatchedtheoreticalpeaks = false;
 	generateisotopepattern = false;
 	minimumpatternsize = 1;
@@ -1216,7 +1216,7 @@ string cParameters::printToString() {
 	s += advancedformulacheck ? "on" : "off";
 	s += "\n";
 
-	s += "Isotopic Ratio Threshold: " + to_string(isotopicratio) + "\n";
+	s += "Isotope Intensity Tolerance: " + to_string(intensitytolerance) + "\n";
 
 	s += "Searched Sequence: " + originalsearchedsequence + "\n";
 	s += "N-terminal Modification: " + searchedsequenceNtermmodif + "\n";
@@ -2408,7 +2408,7 @@ void cParameters::store(ofstream& os) {
 	os.write((char *)&minimumiontypes, sizeof(int));
 	os.write((char *)&basicformulacheck, sizeof(bool));
 	os.write((char *)&advancedformulacheck, sizeof(bool));
-	os.write((char *)&isotopicratio, sizeof(double));
+	os.write((char *)&intensitytolerance, sizeof(double));
 	os.write((char *)&cyclicnterminus, sizeof(bool));
 	os.write((char *)&cycliccterminus, sizeof(bool));
 	os.write((char *)&internalfragments, sizeof(bool));
@@ -2543,7 +2543,7 @@ void cParameters::load(ifstream& is) {
 	is.read((char *)&minimumiontypes, sizeof(int));
 	is.read((char *)&basicformulacheck, sizeof(bool));
 	is.read((char *)&advancedformulacheck, sizeof(bool));
-	is.read((char *)&isotopicratio, sizeof(double));
+	is.read((char *)&intensitytolerance, sizeof(double));
 	is.read((char *)&cyclicnterminus, sizeof(bool));
 	is.read((char *)&cycliccterminus, sizeof(bool));
 	is.read((char *)&internalfragments, sizeof(bool));

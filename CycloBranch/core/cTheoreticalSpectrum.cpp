@@ -1718,7 +1718,7 @@ void cTheoreticalSpectrum::removeUnmatchedPatternsByIntensityRatio(cPeaksList& t
 								thratio = theoreticalpeaks[j].relativeintensity / theoreticalpeaks[maximumintensityid].relativeintensity;
 								expratio = experimentalpeaks[theoreticalpeaks[j].matchedid].relativeintensity / experimentalpeaks[theoreticalpeaks[maximumintensityid].matchedid].relativeintensity;
 
-								if (fabs(thratio - expratio) > parameters->isotopicratio) {
+								if (fabs(thratio - expratio) > parameters->intensitytolerance) {
 									cleargroup = true;
 									break;
 								}
@@ -3832,7 +3832,7 @@ void cTheoreticalSpectrum::getHintsMap(int id, cTheoreticalSpectrum& tsfull, cPe
 
 	if (parameters->generateisotopepattern) {
 		removeUnmatchedIronPatterns(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks);
-		if (parameters->isotopicratio > 0) {
+		if (parameters->intensitytolerance > 0) {
 			removeUnmatchedPatternsByIntensityRatio(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks);
 		}
 	}
@@ -3871,7 +3871,7 @@ void cTheoreticalSpectrum::compareMSSpectrum(int id, cTheoreticalSpectrum& tsful
 
 	if (parameters->generateisotopepattern) {
 		removeUnmatchedIronPatterns(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks);
-		if (parameters->isotopicratio > 0) {
+		if (parameters->intensitytolerance > 0) {
 			removeUnmatchedPatternsByIntensityRatio(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks);
 		}
 	}
