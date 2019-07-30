@@ -1682,6 +1682,8 @@ void cTheoreticalSpectrum::removeUnmatchedPatternsByIntensityRatio(cPeaksList& t
 	int stop = 0;
 	int maximumintensityid = 0;
 	double maximumintensity = theoreticalpeaks[0].relativeintensity;
+	//int minimummatchedintensityid = 0;
+	double minimummatchedintensity = DBL_MAX;
 	bool cleargroup = false;
 
 	double maximumexperimentalintensity;
@@ -1709,6 +1711,15 @@ void cTheoreticalSpectrum::removeUnmatchedPatternsByIntensityRatio(cPeaksList& t
 			if (theoreticalpeaks[maximumintensityid].matched > 0) {
 				if (maximumexperimentalintensity >= parameters->minimumrelativeintensitythreshold) {
 					for (int j = start; j <= stop; j++) {
+						if ((theoreticalpeaks[j].matched > 0)
+							&& (theoreticalpeaks[j].relativeintensity*maximumexperimentalintensity / 100.0 >= parameters->minimumrelativeintensitythreshold)
+							&& (theoreticalpeaks[j].relativeintensity < minimummatchedintensity)) {
+							//minimummatchedintensityid = j;
+							minimummatchedintensity = theoreticalpeaks[j].relativeintensity;
+						}
+					}
+
+					for (int j = start; j <= stop; j++) {
 						if (j == maximumintensityid) {
 							continue;
 						}
@@ -1722,6 +1733,12 @@ void cTheoreticalSpectrum::removeUnmatchedPatternsByIntensityRatio(cPeaksList& t
 									cleargroup = true;
 									break;
 								}
+							}
+						}
+						else {
+							if (theoreticalpeaks[j].relativeintensity > minimummatchedintensity) {
+								cleargroup = true;
+								break;
 							}
 						}
 					}
@@ -1751,6 +1768,8 @@ void cTheoreticalSpectrum::removeUnmatchedPatternsByIntensityRatio(cPeaksList& t
 			stop = i;
 			maximumintensityid = i;
 			maximumintensity = theoreticalpeaks[i].relativeintensity;
+			//minimummatchedintensityid = i;
+			minimummatchedintensity = DBL_MAX;
 			cleargroup = false;
 			if (theoreticalpeaks[i].matched) {
 				maximumexperimentalintensity = experimentalpeaks[theoreticalpeaks[i].matchedid].relativeintensity;
