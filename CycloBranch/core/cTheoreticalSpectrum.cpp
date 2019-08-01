@@ -1597,6 +1597,7 @@ void cTheoreticalSpectrum::removeUnmatchedIronPatterns(cPeaksList& theoreticalpe
 	int stop = 0;
 	int maximumintensityid = 0;
 	double maximumintensity = theoreticalpeaks[0].relativeintensity;
+	bool cleargroup = false;
 	
 	double maximumexperimentalintensity;
 	if (theoreticalpeaks[maximumintensityid].matched) {
@@ -1620,43 +1621,34 @@ void cTheoreticalSpectrum::removeUnmatchedIronPatterns(cPeaksList& theoreticalpe
 			if ((theoreticalpeaks[start].iontype == ms_MFe2H) || (theoreticalpeaks[start].iontype == ms_MFe3HNa) || (theoreticalpeaks[start].iontype == ms_MFe3HK)) {
 
 				if ((theoreticalpeaks[start].matched == 0) && (theoreticalpeaks[maximumintensityid].matched > 0)) {
-					for (int j = start; j <= stop; j++) {
-						if (theoreticalpeaks[j].matched > 0) {
-							experimentalmatches[theoreticalpeaks[j].matchedid].erase(experimentalmatches[theoreticalpeaks[j].matchedid].find(j));
-							experimentalpeaks[theoreticalpeaks[j].matchedid].matched--;
-
-							theoreticalpeaks[j].matched--;
-							theoreticalpeaks[j].matchedid = -1;
-						}
-					}
+					cleargroup = true;
 				}
 
 				if ((theoreticalpeaks[start].matched > 0) && (theoreticalpeaks[maximumintensityid].matched > 0)) {
-
 					if (maximumexperimentalintensity >= parameters->minimumrelativeintensitythreshold) {
-
 						if (theoreticalpeaks[start].relativeintensity*maximumexperimentalintensity / 100.0 >= parameters->minimumrelativeintensitythreshold) {
-
 							if (experimentalpeaks[theoreticalpeaks[start].matchedid].relativeintensity > 0.1 * maximumexperimentalintensity) {
-
-								for (int j = start; j <= stop; j++) {
-									if (theoreticalpeaks[j].matched > 0) {
-										experimentalmatches[theoreticalpeaks[j].matchedid].erase(experimentalmatches[theoreticalpeaks[j].matchedid].find(j));
-										experimentalpeaks[theoreticalpeaks[j].matchedid].matched--;
-
-										theoreticalpeaks[j].matched--;
-										theoreticalpeaks[j].matchedid = -1;
-									}
-								}
-
+								cleargroup = true;
 							}
-
 						}
-
+						else {
+							cleargroup = true;
+						}
 					}
-
 				}
 				
+			}
+
+			if (cleargroup) {
+				for (int j = start; j <= stop; j++) {
+					if (theoreticalpeaks[j].matched > 0) {
+						experimentalmatches[theoreticalpeaks[j].matchedid].erase(experimentalmatches[theoreticalpeaks[j].matchedid].find(j));
+						experimentalpeaks[theoreticalpeaks[j].matchedid].matched--;
+
+						theoreticalpeaks[j].matched--;
+						theoreticalpeaks[j].matchedid = -1;
+					}
+				}
 			}
 			
 			groupid = theoreticalpeaks[i].groupid;
@@ -1664,6 +1656,7 @@ void cTheoreticalSpectrum::removeUnmatchedIronPatterns(cPeaksList& theoreticalpe
 			stop = i;
 			maximumintensityid = i;
 			maximumintensity = theoreticalpeaks[i].relativeintensity;
+			cleargroup = false;
 			if (theoreticalpeaks[i].matched) {
 				maximumexperimentalintensity = experimentalpeaks[theoreticalpeaks[i].matchedid].relativeintensity;
 			}
