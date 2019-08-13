@@ -1722,7 +1722,7 @@ void cTheoreticalSpectrum::removeUnmatchedPatternsByIntensityRatio(cPeaksList& t
 								thratio = theoreticalpeaks[j].relativeintensity / theoreticalpeaks[maximumintensityid].relativeintensity;
 								expratio = experimentalpeaks[theoreticalpeaks[j].matchedid].relativeintensity / experimentalpeaks[theoreticalpeaks[maximumintensityid].matchedid].relativeintensity;
 
-								if (fabs(thratio - expratio) > parameters->intensitytolerance) {
+								if (fabs(thratio - expratio) * 100.0 > parameters->intensitytolerance) {
 									cleargroup = true;
 									break;
 								}

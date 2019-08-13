@@ -121,7 +121,7 @@ void cParameters::clear() {
 	//clearhitswithoutparent = false;
 	basicformulacheck = true;
 	advancedformulacheck = true;
-	intensitytolerance = 0.1;
+	intensitytolerance = 10.0;
 	mzdifftolerance = 0;
 	reportunmatchedtheoreticalpeaks = false;
 	generateisotopepattern = false;

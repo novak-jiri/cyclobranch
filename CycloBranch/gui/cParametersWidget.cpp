@@ -524,17 +524,18 @@ cParametersWidget::cParametersWidget(QWidget* parent) {
 	theoreticalspectragridlayout->addWidget(advancedformulacheck, 13, 1);
 
 	intensitytolerance = new QDoubleSpinBox();
-	intensitytolerance->setToolTip("Maximum tolerance of intensities of matched isotopes (0 = disabled).");
+	intensitytolerance->setToolTip("Maximum tolerance of intensities of matched isotopes (0 = disabled) [in % of relative intensity of monoisotopic peak].\nExample:\nIsotope Intensity Tolerance = 10%, Relative Intensity of Monoisotopic Peak = 100% => the tolerance of relative intensities of isotopes is 10%;\nIsotope Intensity Tolerance = 10%, Relative Intensity of Monoisotopic Peak = 50% => the tolerance of relative intensities of isotopes is 5%; etc.");
 	intensitytolerance->setDecimals(3);
-	intensitytolerance->setRange(0, 1);
-	intensitytolerance->setSingleStep(0.1);
+	intensitytolerance->setRange(0, 100);
+	intensitytolerance->setSingleStep(1);
+	intensitytolerance->setSuffix(" %");
 	intensitytolerance->setFixedWidth(rightdefaultwidth);
 	intensitytolerancelabel = new QLabel("Isotope Intensity Tolerance:");
 	theoreticalspectragridlayout->addWidget(intensitytolerancelabel, 14, 0);
 	theoreticalspectragridlayout->addWidget(intensitytolerance, 14, 1);
 
 	mzdifftolerance = new QDoubleSpinBox();
-	mzdifftolerance->setToolTip("Maximum tolerance of m/z differences of matched isotopes (0 = disabled).");
+	mzdifftolerance->setToolTip("Maximum tolerance of m/z differences of matched isotopes (0 = disabled) [ppm].");
 	mzdifftolerance->setDecimals(3);
 	mzdifftolerance->setRange(0, 10000);
 	mzdifftolerance->setSingleStep(1);
@@ -991,7 +992,7 @@ void cParametersWidget::loadSettings() {
 		minimumiontypes->setValue(settings.value("minimumiontypes", 1).toInt());
 		settings.value("basicformulacheck", 1).toInt() == 0 ? basicformulacheck->setChecked(false) : basicformulacheck->setChecked(true);
 		settings.value("advancedformulacheck", 1).toInt() == 0 ? advancedformulacheck->setChecked(false) : advancedformulacheck->setChecked(true);
-		intensitytolerance->setValue(settings.value("intensitytolerance", 0.1).toDouble());
+		intensitytolerance->setValue(settings.value("intensitytolerance", 10.0).toDouble());
 		mzdifftolerance->setValue(settings.value("mzdifftolerance", 0).toDouble());
 
 		searchedsequenceline->setText(settings.value("searchedsequence", "").toString());

@@ -594,7 +594,16 @@ Advanced filtering rules are applied if molecular formulas of compounds are gene
 \subsection settings_intensitytolerance Isotope Intensity Tolerance
 
 <p>
-Maximum difference of intensities of matched isotopes (0 = disabled). 
+Maximum tolerance of intensities of matched isotopes (0 = disabled) [in % of relative intensity of monoisotopic peak].<br/>
+Example:<br/>
+Isotope Intensity Tolerance = 10%, Relative Intensity of Monoisotopic Peak = 100% => the tolerance of relative intensities of isotopes is 10%;<br/>
+Isotope Intensity Tolerance = 10%, Relative Intensity of Monoisotopic Peak = 50% => the tolerance of relative intensities of isotopes is 5%; etc. 
+</p>
+
+\subsection settings_mzdifftolerance m/z Difference Tolerance
+
+<p>
+Maximum tolerance of m/z differences of matched isotopes (0 = disabled) [ppm].
 </p>
 
 <hr>
