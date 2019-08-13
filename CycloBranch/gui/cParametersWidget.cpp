@@ -523,6 +523,13 @@ cParametersWidget::cParametersWidget(QWidget* parent) {
 	theoreticalspectragridlayout->addWidget(advancedformulachecklabel, 13, 0);
 	theoreticalspectragridlayout->addWidget(advancedformulacheck, 13, 1);
 
+	noratiocheck = new QCheckBox();
+	noratiocheck->setToolTip("Check if the number of nitrogen atoms is less or equal to the number of oxygen atoms.");
+	noratiocheck->setFixedWidth(rightdefaultwidth);
+	noratiochecklabel = new QLabel("N/O Ratio Check:");
+	theoreticalspectragridlayout->addWidget(noratiochecklabel, 14, 0);
+	theoreticalspectragridlayout->addWidget(noratiocheck, 14, 1);
+
 	intensitytolerance = new QDoubleSpinBox();
 	intensitytolerance->setToolTip("Maximum tolerance of intensities of matched isotopes (0 = disabled) [in % of relative intensity of monoisotopic peak].\nExample:\nIsotope Intensity Tolerance = 10%, Relative Intensity of Monoisotopic Peak = 100% => the tolerance of relative intensities of isotopes is 10%;\nIsotope Intensity Tolerance = 10%, Relative Intensity of Monoisotopic Peak = 50% => the tolerance of relative intensities of isotopes is 5%; etc.");
 	intensitytolerance->setDecimals(3);
@@ -531,8 +538,8 @@ cParametersWidget::cParametersWidget(QWidget* parent) {
 	intensitytolerance->setSuffix(" %");
 	intensitytolerance->setFixedWidth(rightdefaultwidth);
 	intensitytolerancelabel = new QLabel("Isotope Intensity Tolerance:");
-	theoreticalspectragridlayout->addWidget(intensitytolerancelabel, 14, 0);
-	theoreticalspectragridlayout->addWidget(intensitytolerance, 14, 1);
+	theoreticalspectragridlayout->addWidget(intensitytolerancelabel, 15, 0);
+	theoreticalspectragridlayout->addWidget(intensitytolerance, 15, 1);
 
 	mzdifftolerance = new QDoubleSpinBox();
 	mzdifftolerance->setToolTip("Maximum tolerance of m/z differences of matched isotopes (0 = disabled) [ppm].");
@@ -542,8 +549,8 @@ cParametersWidget::cParametersWidget(QWidget* parent) {
 	mzdifftolerance->setSuffix(" ppm");
 	mzdifftolerance->setFixedWidth(rightdefaultwidth);
 	mzdifftolerancelabel = new QLabel("m/z Difference Tolerance:");
-	theoreticalspectragridlayout->addWidget(mzdifftolerancelabel, 15, 0);
-	theoreticalspectragridlayout->addWidget(mzdifftolerance, 15, 1);
+	theoreticalspectragridlayout->addWidget(mzdifftolerancelabel, 16, 0);
+	theoreticalspectragridlayout->addWidget(mzdifftolerance, 16, 1);
 
 	theoreticalspectragroupbox = new QGroupBox("Theoretical Spectrum/Spectra");
 	theoreticalspectragroupbox->setLayout(theoreticalspectragridlayout);
@@ -796,6 +803,8 @@ cParametersWidget::~cParametersWidget() {
 	delete basicformulacheck;
 	delete advancedformulachecklabel;
 	delete advancedformulacheck;
+	delete noratiochecklabel;
+	delete noratiocheck;
 	delete intensitytolerancelabel;
 	delete intensitytolerance;
 	delete mzdifftolerancelabel;
@@ -992,6 +1001,7 @@ void cParametersWidget::loadSettings() {
 		minimumiontypes->setValue(settings.value("minimumiontypes", 1).toInt());
 		settings.value("basicformulacheck", 1).toInt() == 0 ? basicformulacheck->setChecked(false) : basicformulacheck->setChecked(true);
 		settings.value("advancedformulacheck", 1).toInt() == 0 ? advancedformulacheck->setChecked(false) : advancedformulacheck->setChecked(true);
+		settings.value("noratiocheck", 1).toInt() == 0 ? noratiocheck->setChecked(false) : noratiocheck->setChecked(true);
 		intensitytolerance->setValue(settings.value("intensitytolerance", 10.0).toDouble());
 		mzdifftolerance->setValue(settings.value("mzdifftolerance", 0).toDouble());
 
@@ -1077,6 +1087,7 @@ void cParametersWidget::saveSettings() {
 	settings.setValue("minimumiontypes", minimumiontypes->value());
 	basicformulacheck->isChecked() ? settings.setValue("basicformulacheck", 1) : settings.setValue("basicformulacheck", 0);
 	advancedformulacheck->isChecked() ? settings.setValue("advancedformulacheck", 1) : settings.setValue("advancedformulacheck", 0);
+	noratiocheck->isChecked() ? settings.setValue("noratiocheck", 1) : settings.setValue("noratiocheck", 0);
 	settings.setValue("intensitytolerance", intensitytolerance->value());
 	settings.setValue("mzdifftolerance", mzdifftolerance->value());
 
@@ -1348,6 +1359,7 @@ bool cParametersWidget::updateParameters() {
 	parameters.minimumiontypes = minimumiontypes->value();
 	parameters.basicformulacheck = basicformulacheck->isChecked();
 	parameters.advancedformulacheck = advancedformulacheck->isChecked();
+	parameters.noratiocheck = noratiocheck->isChecked();
 	parameters.intensitytolerance = intensitytolerance->value();
 	parameters.mzdifftolerance = mzdifftolerance->value();
 
@@ -1461,6 +1473,7 @@ void cParametersWidget::restoreParameters() {
 	minimumiontypes->setValue(parameters.minimumiontypes);
 	basicformulacheck->setChecked(parameters.basicformulacheck);
 	advancedformulacheck->setChecked(parameters.advancedformulacheck);
+	noratiocheck->setChecked(parameters.noratiocheck);
 	intensitytolerance->setValue(parameters.intensitytolerance);
 	mzdifftolerance->setValue(parameters.mzdifftolerance);
 
@@ -1703,6 +1716,7 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 			//clearhitswithoutparent->setDisabled(false);
 			basicformulacheck->setDisabled(false);
 			advancedformulacheck->setDisabled(true);
+			noratiocheck->setDisabled(true);
 			intensitytolerance->setDisabled(true);
 			mzdifftolerance->setDisabled(true);
 			reportunmatchedtheoreticalpeaks->setDisabled(false);
@@ -1746,6 +1760,7 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 			//clearhitswithoutparent->setDisabled(false);
 			basicformulacheck->setDisabled(false);
 			advancedformulacheck->setDisabled(true);
+			noratiocheck->setDisabled(true);
 			intensitytolerance->setDisabled(true);
 			mzdifftolerance->setDisabled(true);
 			reportunmatchedtheoreticalpeaks->setDisabled(false);
@@ -1789,6 +1804,7 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 			//clearhitswithoutparent->setDisabled(false);
 			basicformulacheck->setDisabled(false);
 			advancedformulacheck->setDisabled(true);
+			noratiocheck->setDisabled(true);
 			intensitytolerance->setDisabled(true);
 			mzdifftolerance->setDisabled(true);
 			reportunmatchedtheoreticalpeaks->setDisabled(false);
@@ -1832,6 +1848,7 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 			//clearhitswithoutparent->setDisabled(true);
 			basicformulacheck->setDisabled(false);
 			advancedformulacheck->setDisabled(true);
+			noratiocheck->setDisabled(true);
 			intensitytolerance->setDisabled(false);
 			mzdifftolerance->setDisabled(false);
 			reportunmatchedtheoreticalpeaks->setDisabled(false);
@@ -1893,6 +1910,7 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 			//clearhitswithoutparent->setDisabled(true);
 			basicformulacheck->setDisabled(false);
 			advancedformulacheck->setDisabled(false);
+			noratiocheck->setDisabled(false);
 			intensitytolerance->setDisabled(false);
 			mzdifftolerance->setDisabled(false);
 			reportunmatchedtheoreticalpeaks->setDisabled(false);

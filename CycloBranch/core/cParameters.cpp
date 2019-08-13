@@ -121,6 +121,7 @@ void cParameters::clear() {
 	//clearhitswithoutparent = false;
 	basicformulacheck = true;
 	advancedformulacheck = true;
+	noratiocheck = true;
 	intensitytolerance = 10.0;
 	mzdifftolerance = 0;
 	reportunmatchedtheoreticalpeaks = false;
@@ -1217,6 +1218,10 @@ string cParameters::printToString() {
 	s += advancedformulacheck ? "on" : "off";
 	s += "\n";
 
+	s += "N/O Ratio Check: ";
+	s += noratiocheck ? "on" : "off";
+	s += "\n";
+
 	s += "Isotope Intensity Tolerance: " + to_string(intensitytolerance) + "\n";
 
 	s += "m/z Difference Tolerance: " + to_string(mzdifftolerance) + "\n";
@@ -1972,8 +1977,10 @@ int cParameters::generateCompounds(bool& terminatecomputation, string& errormess
 				continue;
 			}
 
-			if (countN > countO) {
-				continue;
+			if (noratiocheck) {
+				if (countN > countO) {
+					continue;
+				}
 			}
 
 			if (sumofmasses < 500.0) {
@@ -2411,6 +2418,7 @@ void cParameters::store(ofstream& os) {
 	os.write((char *)&minimumiontypes, sizeof(int));
 	os.write((char *)&basicformulacheck, sizeof(bool));
 	os.write((char *)&advancedformulacheck, sizeof(bool));
+	os.write((char *)&noratiocheck, sizeof(bool));
 	os.write((char *)&intensitytolerance, sizeof(double));
 	os.write((char *)&mzdifftolerance, sizeof(double));
 	os.write((char *)&cyclicnterminus, sizeof(bool));
@@ -2547,6 +2555,7 @@ void cParameters::load(ifstream& is) {
 	is.read((char *)&minimumiontypes, sizeof(int));
 	is.read((char *)&basicformulacheck, sizeof(bool));
 	is.read((char *)&advancedformulacheck, sizeof(bool));
+	is.read((char *)&noratiocheck, sizeof(bool));
 	is.read((char *)&intensitytolerance, sizeof(double));
 	is.read((char *)&mzdifftolerance, sizeof(double));
 	is.read((char *)&cyclicnterminus, sizeof(bool));

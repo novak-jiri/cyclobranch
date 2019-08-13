@@ -309,6 +309,12 @@ public:
 
 
 	/**
+		\brief Check N/O ratio.
+	*/
+	bool noratiocheck;
+
+
+	/**
 		\brief Maximum tolerance of intensities of matched isotopes.
 	*/
 	double intensitytolerance;

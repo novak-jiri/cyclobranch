@@ -242,6 +242,8 @@ private:
 	QCheckBox* basicformulacheck;
 	QLabel* advancedformulachecklabel;
 	QCheckBox* advancedformulacheck;
+	QLabel* noratiochecklabel;
+	QCheckBox* noratiocheck;
 	QLabel* intensitytolerancelabel;
 	QDoubleSpinBox* intensitytolerance;
 	QLabel* mzdifftolerancelabel;
