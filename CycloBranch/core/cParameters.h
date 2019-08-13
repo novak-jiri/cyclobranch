@@ -321,7 +321,7 @@ public:
 
 
 	/**
-		\brief Maximum tolerance of m/z differences of matched isotopes.
+		\brief Maximum m/z tolerance of matched isotopes.
 	*/
 	double mzdifftolerance;
 

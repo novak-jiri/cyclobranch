@@ -591,6 +591,12 @@ Apply Senior's filtering rules. See <a href="https://doi.org/10.1186/1471-2105-8
 Advanced filtering rules are applied if molecular formulas of compounds are generated. See the tables 1, 2, and 3 in <a href="https://doi.org/10.1186/1471-2105-8-105">https://doi.org/10.1186/1471-2105-8-105</a> for more details.
 </p>
 
+\subsection settings_noratiocheck N/O Ratio Check
+
+<p>
+Check if the number of nitrogen atoms is less or equal to the number of oxygen atoms.
+</p>
+
 \subsection settings_intensitytolerance Isotope Intensity Tolerance
 
 <p>
@@ -600,10 +606,10 @@ Isotope Intensity Tolerance = 10%, Relative Intensity of Monoisotopic Peak = 100
 Isotope Intensity Tolerance = 10%, Relative Intensity of Monoisotopic Peak = 50% => the tolerance of relative intensities of isotopes is 5%; etc. 
 </p>
 
-\subsection settings_mzdifftolerance m/z Difference Tolerance
+\subsection settings_mzdifftolerance Isotope m/z Tolerance
 
 <p>
-Maximum tolerance of m/z differences of matched isotopes (0 = disabled) [ppm].
+Maximum m/z tolerance of matched isotopes (0 = disabled) [ppm].
 </p>
 
 <hr>

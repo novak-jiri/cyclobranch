@@ -1224,7 +1224,7 @@ string cParameters::printToString() {
 
 	s += "Isotope Intensity Tolerance: " + to_string(intensitytolerance) + "\n";
 
-	s += "m/z Difference Tolerance: " + to_string(mzdifftolerance) + "\n";
+	s += "Isotope m/z Tolerance: " + to_string(mzdifftolerance) + "\n";
 
 	s += "Searched Sequence: " + originalsearchedsequence + "\n";
 	s += "N-terminal Modification: " + searchedsequenceNtermmodif + "\n";

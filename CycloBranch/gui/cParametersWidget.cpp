@@ -542,13 +542,13 @@ cParametersWidget::cParametersWidget(QWidget* parent) {
 	theoreticalspectragridlayout->addWidget(intensitytolerance, 15, 1);
 
 	mzdifftolerance = new QDoubleSpinBox();
-	mzdifftolerance->setToolTip("Maximum tolerance of m/z differences of matched isotopes (0 = disabled) [ppm].");
+	mzdifftolerance->setToolTip("Maximum m/z tolerance of matched isotopes (0 = disabled) [ppm].");
 	mzdifftolerance->setDecimals(3);
 	mzdifftolerance->setRange(0, 10000);
 	mzdifftolerance->setSingleStep(1);
 	mzdifftolerance->setSuffix(" ppm");
 	mzdifftolerance->setFixedWidth(rightdefaultwidth);
-	mzdifftolerancelabel = new QLabel("m/z Difference Tolerance:");
+	mzdifftolerancelabel = new QLabel("Isotope m/z Tolerance:");
 	theoreticalspectragridlayout->addWidget(mzdifftolerancelabel, 16, 0);
 	theoreticalspectragridlayout->addWidget(mzdifftolerance, 16, 1);
 
