@@ -1772,6 +1772,94 @@ void cTheoreticalSpectrum::removeUnmatchedPatternsByIntensityRatio(cPeaksList& t
 }
 
 
+void cTheoreticalSpectrum::removeUnmatchedPatternsByMZDifference(cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks) {
+	if (theoreticalpeaksrealsize == 0) {
+		return;
+	}
+
+	int groupid = theoreticalpeaks[0].groupid;
+	int start = 0;
+	int stop = 0;
+	int maximumintensityid = 0;
+	double maximumintensity = theoreticalpeaks[0].relativeintensity;
+	bool cleargroup = false;
+
+	double maximumexperimentalintensity;
+	if (theoreticalpeaks[maximumintensityid].matched) {
+		maximumexperimentalintensity = experimentalpeaks[theoreticalpeaks[maximumintensityid].matchedid].relativeintensity;
+	}
+
+	double thdiff, expdiff;
+
+	for (int i = 0; i < theoreticalpeaksrealsize; i++) {
+		if (groupid == theoreticalpeaks[i].groupid) {
+			if (theoreticalpeaks[i].relativeintensity > maximumintensity) {
+				maximumintensityid = i;
+				maximumintensity = theoreticalpeaks[i].relativeintensity;
+				if (theoreticalpeaks[i].matched) {
+					maximumexperimentalintensity = experimentalpeaks[theoreticalpeaks[i].matchedid].relativeintensity;
+				}
+			}
+
+			stop = i;
+		}
+
+		if ((groupid != theoreticalpeaks[i].groupid) || (i == theoreticalpeaksrealsize - 1)) {
+
+			if (theoreticalpeaks[maximumintensityid].matched > 0) {
+				if (maximumexperimentalintensity >= parameters->minimumrelativeintensitythreshold) {
+					for (int j = start; j <= stop; j++) {
+						if (j == maximumintensityid) {
+							continue;
+						}
+
+						if (theoreticalpeaks[j].matched > 0) {
+							if (theoreticalpeaks[j].relativeintensity*maximumexperimentalintensity / 100.0 >= parameters->minimumrelativeintensitythreshold) {
+								thdiff = fabs(theoreticalpeaks[maximumintensityid].mzratio - theoreticalpeaks[j].mzratio);
+								expdiff = fabs(experimentalpeaks[theoreticalpeaks[maximumintensityid].matchedid].mzratio - experimentalpeaks[theoreticalpeaks[j].matchedid].mzratio);
+
+								if (fabs(thdiff - expdiff) / theoreticalpeaks[maximumintensityid].mzratio * 1000000.0 > parameters->mzdifftolerance) {
+									cleargroup = true;
+									break;
+								}
+							}
+						}
+					}
+				}
+				else {
+					cleargroup = true;
+				}
+			}
+			else {
+				cleargroup = true;
+			}
+
+			if (cleargroup) {
+				for (int j = start; j <= stop; j++) {
+					if (theoreticalpeaks[j].matched > 0) {
+						experimentalmatches[theoreticalpeaks[j].matchedid].erase(experimentalmatches[theoreticalpeaks[j].matchedid].find(j));
+						experimentalpeaks[theoreticalpeaks[j].matchedid].matched--;
+
+						theoreticalpeaks[j].matched--;
+						theoreticalpeaks[j].matchedid = -1;
+					}
+				}
+			}
+
+			groupid = theoreticalpeaks[i].groupid;
+			start = i;
+			stop = i;
+			maximumintensityid = i;
+			maximumintensity = theoreticalpeaks[i].relativeintensity;
+			cleargroup = false;
+			if (theoreticalpeaks[i].matched) {
+				maximumexperimentalintensity = experimentalpeaks[theoreticalpeaks[i].matchedid].relativeintensity;
+			}
+		}
+	}
+}
+
+
 void cTheoreticalSpectrum::calculateEnvelopeScores(cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks) {
 	
 	// theoreticalpeaks must not be modified here
@@ -3847,6 +3935,9 @@ void cTheoreticalSpectrum::getHintsMap(int id, cTheoreticalSpectrum& tsfull, cPe
 		if (parameters->intensitytolerance > 0) {
 			removeUnmatchedPatternsByIntensityRatio(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks);
 		}
+		if (parameters->mzdifftolerance > 0) {
+			removeUnmatchedPatternsByMZDifference(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks);
+		}
 	}
 
 	// clear matched isotopes of unmatched monoisotopic peaks
@@ -3885,6 +3976,9 @@ void cTheoreticalSpectrum::compareMSSpectrum(int id, cTheoreticalSpectrum& tsful
 		removeUnmatchedIronPatterns(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks);
 		if (parameters->intensitytolerance > 0) {
 			removeUnmatchedPatternsByIntensityRatio(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks);
+		}
+		if (parameters->mzdifftolerance > 0) {
+			removeUnmatchedPatternsByMZDifference(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks);
 		}
 	}
 

@@ -244,6 +244,8 @@ private:
 	QCheckBox* advancedformulacheck;
 	QLabel* intensitytolerancelabel;
 	QDoubleSpinBox* intensitytolerance;
+	QLabel* mzdifftolerancelabel;
+	QDoubleSpinBox* mzdifftolerance;
 
 	QGroupBox* searchedsequencegroupbox;
 	QGridLayout* searchedsequencegridlayout;

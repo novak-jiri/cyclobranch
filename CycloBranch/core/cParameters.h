@@ -309,9 +309,15 @@ public:
 
 
 	/**
-		\brief Maximum difference of intensities of matched isotopes.
+		\brief Maximum tolerance of intensities of matched isotopes.
 	*/
 	double intensitytolerance;
+
+
+	/**
+		\brief Maximum tolerance of m/z differences of matched isotopes.
+	*/
+	double mzdifftolerance;
 
 
 	/**
