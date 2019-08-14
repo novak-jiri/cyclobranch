@@ -122,8 +122,8 @@ void cParameters::clear() {
 	basicformulacheck = true;
 	advancedformulacheck = true;
 	noratiocheck = true;
-	intensitytolerance = 10.0;
 	mzdifftolerance = 0;
+	intensitytolerance = 10.0;
 	reportunmatchedtheoreticalpeaks = false;
 	generateisotopepattern = false;
 	minimumpatternsize = 1;
@@ -1222,9 +1222,9 @@ string cParameters::printToString() {
 	s += noratiocheck ? "on" : "off";
 	s += "\n";
 
-	s += "Isotope Intensity Tolerance: " + to_string(intensitytolerance) + "\n";
-
 	s += "Isotope m/z Tolerance: " + to_string(mzdifftolerance) + "\n";
+
+	s += "Isotope Intensity Tolerance: " + to_string(intensitytolerance) + "\n";
 
 	s += "Searched Sequence: " + originalsearchedsequence + "\n";
 	s += "N-terminal Modification: " + searchedsequenceNtermmodif + "\n";
@@ -2419,8 +2419,8 @@ void cParameters::store(ofstream& os) {
 	os.write((char *)&basicformulacheck, sizeof(bool));
 	os.write((char *)&advancedformulacheck, sizeof(bool));
 	os.write((char *)&noratiocheck, sizeof(bool));
-	os.write((char *)&intensitytolerance, sizeof(double));
 	os.write((char *)&mzdifftolerance, sizeof(double));
+	os.write((char *)&intensitytolerance, sizeof(double));
 	os.write((char *)&cyclicnterminus, sizeof(bool));
 	os.write((char *)&cycliccterminus, sizeof(bool));
 	os.write((char *)&internalfragments, sizeof(bool));
@@ -2556,8 +2556,8 @@ void cParameters::load(ifstream& is) {
 	is.read((char *)&basicformulacheck, sizeof(bool));
 	is.read((char *)&advancedformulacheck, sizeof(bool));
 	is.read((char *)&noratiocheck, sizeof(bool));
-	is.read((char *)&intensitytolerance, sizeof(double));
 	is.read((char *)&mzdifftolerance, sizeof(double));
+	is.read((char *)&intensitytolerance, sizeof(double));
 	is.read((char *)&cyclicnterminus, sizeof(bool));
 	is.read((char *)&cycliccterminus, sizeof(bool));
 	is.read((char *)&internalfragments, sizeof(bool));

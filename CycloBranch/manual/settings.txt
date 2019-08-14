@@ -597,6 +597,12 @@ Advanced filtering rules are applied if molecular formulas of compounds are gene
 Check if the number of nitrogen atoms is less or equal to the number of oxygen atoms.
 </p>
 
+\subsection settings_mzdifftolerance Isotope m/z Tolerance
+
+<p>
+Maximum m/z tolerance of matched isotopes (0 = disabled) [ppm].
+</p>
+
 \subsection settings_intensitytolerance Isotope Intensity Tolerance
 
 <p>
@@ -604,12 +610,6 @@ Maximum tolerance of intensities of matched isotopes (0 = disabled) [in % of rel
 Example:<br/>
 Isotope Intensity Tolerance = 10%, Relative Intensity of Monoisotopic Peak = 100% => the tolerance of relative intensities of isotopes is 10%;<br/>
 Isotope Intensity Tolerance = 10%, Relative Intensity of Monoisotopic Peak = 50% => the tolerance of relative intensities of isotopes is 5%; etc. 
-</p>
-
-\subsection settings_mzdifftolerance Isotope m/z Tolerance
-
-<p>
-Maximum m/z tolerance of matched isotopes (0 = disabled) [ppm].
 </p>
 
 <hr>

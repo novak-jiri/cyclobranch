@@ -315,15 +315,15 @@ public:
 
 
 	/**
-		\brief Maximum tolerance of intensities of matched isotopes.
-	*/
-	double intensitytolerance;
-
-
-	/**
 		\brief Maximum m/z tolerance of matched isotopes.
 	*/
 	double mzdifftolerance;
+
+
+	/**
+		\brief Maximum tolerance of intensities of matched isotopes.
+	*/
+	double intensitytolerance;
 
 
 	/**

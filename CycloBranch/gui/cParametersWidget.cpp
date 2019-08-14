@@ -530,17 +530,6 @@ cParametersWidget::cParametersWidget(QWidget* parent) {
 	theoreticalspectragridlayout->addWidget(noratiochecklabel, 14, 0);
 	theoreticalspectragridlayout->addWidget(noratiocheck, 14, 1);
 
-	intensitytolerance = new QDoubleSpinBox();
-	intensitytolerance->setToolTip("Maximum tolerance of intensities of matched isotopes (0 = disabled) [in % of relative intensity of monoisotopic peak].\nExample:\nIsotope Intensity Tolerance = 10%, Relative Intensity of Monoisotopic Peak = 100% => the tolerance of relative intensities of isotopes is 10%;\nIsotope Intensity Tolerance = 10%, Relative Intensity of Monoisotopic Peak = 50% => the tolerance of relative intensities of isotopes is 5%; etc.");
-	intensitytolerance->setDecimals(3);
-	intensitytolerance->setRange(0, 100);
-	intensitytolerance->setSingleStep(1);
-	intensitytolerance->setSuffix(" %");
-	intensitytolerance->setFixedWidth(rightdefaultwidth);
-	intensitytolerancelabel = new QLabel("Isotope Intensity Tolerance:");
-	theoreticalspectragridlayout->addWidget(intensitytolerancelabel, 15, 0);
-	theoreticalspectragridlayout->addWidget(intensitytolerance, 15, 1);
-
 	mzdifftolerance = new QDoubleSpinBox();
 	mzdifftolerance->setToolTip("Maximum m/z tolerance of matched isotopes (0 = disabled) [ppm].");
 	mzdifftolerance->setDecimals(3);
@@ -549,8 +538,19 @@ cParametersWidget::cParametersWidget(QWidget* parent) {
 	mzdifftolerance->setSuffix(" ppm");
 	mzdifftolerance->setFixedWidth(rightdefaultwidth);
 	mzdifftolerancelabel = new QLabel("Isotope m/z Tolerance:");
-	theoreticalspectragridlayout->addWidget(mzdifftolerancelabel, 16, 0);
-	theoreticalspectragridlayout->addWidget(mzdifftolerance, 16, 1);
+	theoreticalspectragridlayout->addWidget(mzdifftolerancelabel, 15, 0);
+	theoreticalspectragridlayout->addWidget(mzdifftolerance, 15, 1);
+
+	intensitytolerance = new QDoubleSpinBox();
+	intensitytolerance->setToolTip("Maximum tolerance of intensities of matched isotopes (0 = disabled) [in % of relative intensity of monoisotopic peak].\nExample:\nIsotope Intensity Tolerance = 10%, Relative Intensity of Monoisotopic Peak = 100% => the tolerance of relative intensities of isotopes is 10%;\nIsotope Intensity Tolerance = 10%, Relative Intensity of Monoisotopic Peak = 50% => the tolerance of relative intensities of isotopes is 5%; etc.");
+	intensitytolerance->setDecimals(3);
+	intensitytolerance->setRange(0, 100);
+	intensitytolerance->setSingleStep(1);
+	intensitytolerance->setSuffix(" %");
+	intensitytolerance->setFixedWidth(rightdefaultwidth);
+	intensitytolerancelabel = new QLabel("Isotope Intensity Tolerance:");
+	theoreticalspectragridlayout->addWidget(intensitytolerancelabel, 16, 0);
+	theoreticalspectragridlayout->addWidget(intensitytolerance, 16, 1);
 
 	theoreticalspectragroupbox = new QGroupBox("Theoretical Spectrum/Spectra");
 	theoreticalspectragroupbox->setLayout(theoreticalspectragridlayout);
@@ -805,10 +805,10 @@ cParametersWidget::~cParametersWidget() {
 	delete advancedformulacheck;
 	delete noratiochecklabel;
 	delete noratiocheck;
-	delete intensitytolerancelabel;
-	delete intensitytolerance;
 	delete mzdifftolerancelabel;
 	delete mzdifftolerance;
+	delete intensitytolerancelabel;
+	delete intensitytolerance;
 	delete theoreticalspectragridlayout;
 	delete theoreticalspectragroupbox;
 
@@ -1002,8 +1002,8 @@ void cParametersWidget::loadSettings() {
 		settings.value("basicformulacheck", 1).toInt() == 0 ? basicformulacheck->setChecked(false) : basicformulacheck->setChecked(true);
 		settings.value("advancedformulacheck", 1).toInt() == 0 ? advancedformulacheck->setChecked(false) : advancedformulacheck->setChecked(true);
 		settings.value("noratiocheck", 1).toInt() == 0 ? noratiocheck->setChecked(false) : noratiocheck->setChecked(true);
-		intensitytolerance->setValue(settings.value("intensitytolerance", 10.0).toDouble());
 		mzdifftolerance->setValue(settings.value("mzdifftolerance", 0).toDouble());
+		intensitytolerance->setValue(settings.value("intensitytolerance", 10.0).toDouble());
 
 		searchedsequenceline->setText(settings.value("searchedsequence", "").toString());
 		searchedsequenceNtermmodif->setText(settings.value("searchedsequenceNtermmodif", "").toString());
@@ -1088,8 +1088,8 @@ void cParametersWidget::saveSettings() {
 	basicformulacheck->isChecked() ? settings.setValue("basicformulacheck", 1) : settings.setValue("basicformulacheck", 0);
 	advancedformulacheck->isChecked() ? settings.setValue("advancedformulacheck", 1) : settings.setValue("advancedformulacheck", 0);
 	noratiocheck->isChecked() ? settings.setValue("noratiocheck", 1) : settings.setValue("noratiocheck", 0);
-	settings.setValue("intensitytolerance", intensitytolerance->value());
 	settings.setValue("mzdifftolerance", mzdifftolerance->value());
+	settings.setValue("intensitytolerance", intensitytolerance->value());
 
 	settings.setValue("searchedsequence", searchedsequenceline->text());
 	settings.setValue("searchedsequenceNtermmodif", searchedsequenceNtermmodif->text());
@@ -1360,8 +1360,8 @@ bool cParametersWidget::updateParameters() {
 	parameters.basicformulacheck = basicformulacheck->isChecked();
 	parameters.advancedformulacheck = advancedformulacheck->isChecked();
 	parameters.noratiocheck = noratiocheck->isChecked();
-	parameters.intensitytolerance = intensitytolerance->value();
 	parameters.mzdifftolerance = mzdifftolerance->value();
+	parameters.intensitytolerance = intensitytolerance->value();
 
 	parameters.searchedsequence = searchedsequenceline->text().toStdString();
 	parameters.originalsearchedsequence = parameters.searchedsequence;
@@ -1474,8 +1474,8 @@ void cParametersWidget::restoreParameters() {
 	basicformulacheck->setChecked(parameters.basicformulacheck);
 	advancedformulacheck->setChecked(parameters.advancedformulacheck);
 	noratiocheck->setChecked(parameters.noratiocheck);
-	intensitytolerance->setValue(parameters.intensitytolerance);
 	mzdifftolerance->setValue(parameters.mzdifftolerance);
+	intensitytolerance->setValue(parameters.intensitytolerance);
 
 	searchedsequenceline->setText(parameters.searchedsequence.c_str());
 	searchedsequenceNtermmodif->setText(parameters.searchedsequenceNtermmodif.c_str());
@@ -1717,8 +1717,8 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 			basicformulacheck->setDisabled(false);
 			advancedformulacheck->setDisabled(true);
 			noratiocheck->setDisabled(true);
-			intensitytolerance->setDisabled(true);
 			mzdifftolerance->setDisabled(true);
+			intensitytolerance->setDisabled(true);
 			reportunmatchedtheoreticalpeaks->setDisabled(false);
 			generateisotopepattern->setDisabled(false);
 			minimumpatternsize->setDisabled(false);
@@ -1761,8 +1761,8 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 			basicformulacheck->setDisabled(false);
 			advancedformulacheck->setDisabled(true);
 			noratiocheck->setDisabled(true);
-			intensitytolerance->setDisabled(true);
 			mzdifftolerance->setDisabled(true);
+			intensitytolerance->setDisabled(true);
 			reportunmatchedtheoreticalpeaks->setDisabled(false);
 			generateisotopepattern->setDisabled(false);
 			minimumpatternsize->setDisabled(false);
@@ -1805,8 +1805,8 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 			basicformulacheck->setDisabled(false);
 			advancedformulacheck->setDisabled(true);
 			noratiocheck->setDisabled(true);
-			intensitytolerance->setDisabled(true);
 			mzdifftolerance->setDisabled(true);
+			intensitytolerance->setDisabled(true);
 			reportunmatchedtheoreticalpeaks->setDisabled(false);
 			generateisotopepattern->setDisabled(false);
 			minimumpatternsize->setDisabled(false);
@@ -1849,8 +1849,8 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 			basicformulacheck->setDisabled(false);
 			advancedformulacheck->setDisabled(true);
 			noratiocheck->setDisabled(true);
-			intensitytolerance->setDisabled(false);
 			mzdifftolerance->setDisabled(false);
+			intensitytolerance->setDisabled(false);
 			reportunmatchedtheoreticalpeaks->setDisabled(false);
 			generateisotopepattern->setDisabled(false);
 			minimumpatternsize->setDisabled(false);
@@ -1911,8 +1911,8 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 			basicformulacheck->setDisabled(false);
 			advancedformulacheck->setDisabled(false);
 			noratiocheck->setDisabled(false);
-			intensitytolerance->setDisabled(false);
 			mzdifftolerance->setDisabled(false);
+			intensitytolerance->setDisabled(false);
 			reportunmatchedtheoreticalpeaks->setDisabled(false);
 			generateisotopepattern->setDisabled(false);
 			minimumpatternsize->setDisabled(false);

@@ -64,13 +64,13 @@ const double pi = 3.141592653589793;
 /**
 	\brief Default window size x.
 */
-const int defaultwinsizex = 1450;
+const int defaultwinsizex = 1350;
 
 
 /**
 	\brief Default window size y.
 */
-const int defaultwinsizey = 925;
+const int defaultwinsizey = 875;
 
 
 /**

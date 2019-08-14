@@ -244,10 +244,10 @@ private:
 	QCheckBox* advancedformulacheck;
 	QLabel* noratiochecklabel;
 	QCheckBox* noratiocheck;
-	QLabel* intensitytolerancelabel;
-	QDoubleSpinBox* intensitytolerance;
 	QLabel* mzdifftolerancelabel;
 	QDoubleSpinBox* mzdifftolerance;
+	QLabel* intensitytolerancelabel;
+	QDoubleSpinBox* intensitytolerance;
 
 	QGroupBox* searchedsequencegroupbox;
 	QGridLayout* searchedsequencegridlayout;
