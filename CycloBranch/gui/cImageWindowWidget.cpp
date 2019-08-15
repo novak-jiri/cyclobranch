@@ -574,41 +574,44 @@ void cImageWindowWidget::mouseDoubleClickEvent(QMouseEvent *event) {
 	int x, y, spectrumid;
 
 	if (event->button() == Qt::LeftButton) {
+		QPointF p = mapToScene(event->x(), event->y());
+		pressedx = (int)p.x();
+		pressedy = (int)p.y();
 
-		if ((pressedx == currentx) && (pressedy == currenty)) {
+		currentx = pressedx;
+		currenty = pressedy;
 
-			if (vendor == bruker) {
-				x = currentx * (maxx + 1) / max(1, currentwidth) - leftshift;
-				y = currenty * (maxy + 1) / max(1, currentheight) - topshift;
-			}
-			else {
-				x = currentx * maxx / max(1, currentwidth) - leftshift + 1;
-				y = currenty * maxy / max(1, currentheight) - topshift + 1;
-			}
-
-			if ((currentx > 0) && (currenty > 0) && (currentx < currentwidth) && (currenty < currentheight)) {
-				
-				spectrumid = -1;
-				for (auto& it : coordinates) {
-					if ((it.x == x) && (it.y == y)) {
-						spectrumid = it.id;
-						break;
-					}
-				}
-
-				if (spectrumid != -1) {
-					emit imageWidgetDoubleClicked(spectrumid - 1);
-				}
-			}
-
-			pressedx = -1;
-			pressedy = -1;
-
-			setCursor(Qt::ArrowCursor);
-			cursoractivity = cursoractivity_none;
-
-			redrawScene();
+		if (vendor == bruker) {
+			x = currentx * (maxx + 1) / max(1, currentwidth) - leftshift;
+			y = currenty * (maxy + 1) / max(1, currentheight) - topshift;
 		}
+		else {
+			x = currentx * maxx / max(1, currentwidth) - leftshift + 1;
+			y = currenty * maxy / max(1, currentheight) - topshift + 1;
+		}
+
+		if ((currentx > 0) && (currenty > 0) && (currentx < currentwidth) && (currenty < currentheight)) {
+				
+			spectrumid = -1;
+			for (auto& it : coordinates) {
+				if ((it.x == x) && (it.y == y)) {
+					spectrumid = it.id;
+					break;
+				}
+			}
+
+			if (spectrumid != -1) {
+				emit imageWidgetDoubleClicked(spectrumid - 1);
+			}
+		}
+
+		pressedx = -1;
+		pressedy = -1;
+
+		setCursor(Qt::ArrowCursor);
+		cursoractivity = cursoractivity_none;
+
+		redrawScene();
 
 	}
 

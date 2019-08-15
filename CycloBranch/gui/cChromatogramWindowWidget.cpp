@@ -294,16 +294,21 @@ void cChromatogramWindowWidget::mouseDoubleClickEvent(QMouseEvent *event) {
 	int currentscan;
 
 	if (event->button() == Qt::LeftButton) {
-		if (pressedx == currentx) {
-			currentscan = getScanIDFromXPosition(currentx + origwidth / max(1, 2 * (maxscan - minscan + 1)), origwidth);
+		QPointF p = mapToScene(event->x(), event->y());
+		pressedx = (int)p.x();
+		pressedy = (int)p.y();
 
-			emit chromatogramWidgetDoubleClicked(currentscan - 1);
+		currentx = pressedx;
+		currenty = pressedy;
 
-			pressedx = -1;
-			currentx = -1;
+		currentscan = getScanIDFromXPosition(currentx + origwidth / max(1, 2 * (maxscan - minscan + 1)), origwidth);
 
-			redrawScene();
-		}
+		emit chromatogramWidgetDoubleClicked(currentscan - 1);
+
+		pressedx = -1;
+		currentx = -1;
+
+		redrawScene();
 	}
 
 	event->accept();
