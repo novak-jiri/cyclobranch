@@ -50,6 +50,17 @@ cMzML::~cMzML() {
 
 int cMzML::parse(string& filename, vector<cPeaksList>& peaklists, int profilespectrumid, eModeType mode, cMainThread* os, bool& terminatecomputation) {
 
+	ifstream f;
+	bool good;
+
+	f.open(filename.c_str());
+	good = f.good();
+	f.close();
+
+	if (!good) {
+		return 0;
+	}
+
 	parser->parse(filename.c_str());
 	document = parser->getDocument();
 
