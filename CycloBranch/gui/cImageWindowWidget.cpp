@@ -736,7 +736,9 @@ void cImageWindowWidget::redrawScene() {
 			coord.mzratio = 0;
 			coord.relativeintensity += coordinates[i].relativeintensity;
 			coord.absoluteintensity += coordinates[i].absoluteintensity;
-			coord.name += "\n" + coordinates[i].name;
+			if (coord.name.find(coordinates[i].name) == string::npos) {
+				coord.name += "\n" + coordinates[i].name;
+			}
 			reduced_coordinates.erase(it);
 			reduced_coordinates.insert(coord);
 
