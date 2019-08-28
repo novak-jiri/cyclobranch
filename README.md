@@ -47,7 +47,7 @@ An open-source, cross-platform and stand-alone tool for mass spectrometry data a
     * tab separated mass-to-charge ratio and intensity on each line; multiple peaklists separated by an empty line
   
 ## Homepage
-http://ms.biomed.cas.cz/cyclobranch/
+https://ms.biomed.cas.cz/cyclobranch/
   
 ## Publications
   * [1] *J. Am. Soc. Mass Spectrom.* (2015), 26(10):1780-1786. DOI: [10.1007/s13361-015-1211-1](https://doi.org/10.1007/s13361-015-1211-1)
