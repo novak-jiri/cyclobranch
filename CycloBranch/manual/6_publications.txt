@@ -27,7 +27,7 @@ Download citation: [ <a href="https://ms.biomed.cas.cz/cyclobranch/docs/cyclobra
 
 <hr>
 
-\section publicationsrelated Related Publications
+\section publicationsrelated Other Related Publications
 
 <p>
 Tomas Pluhacek, Anton Skriba, Jiri Novak, Dominika Luptakova and Vladimir Havlicek.<br/>

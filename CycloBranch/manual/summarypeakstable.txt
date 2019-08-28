@@ -61,7 +61,9 @@ to limit the rows from which the summary table of peaks is generated.</p>
 
 \subsection subsec_summarypeakstablefilter Text Filter
 
-<p>See details [here](@ref filter).</p>
+<p>See details [here](@ref filter). The text filter contains a suggester of names of identified compounds if the mode "Compare Peaklist(s) with Database - MS, LC-MS, MSI" (see [Mode](@ref settings_mode)) was used.
+The molecular formulas are used instead of the names if the mode "Compound Search - MS, LC-MS, MSI" was used. The arrows \< and \> can be used to browse all identified compounds.
+A compound can also be directly seen in [Chromatogram](@ref chromatogram) window (LC-MS) or [CrossVis](@ref crossvis) tool (MSI data).</p>
 
 \subsection subsec_summarypeakstablecolumns Columns
 

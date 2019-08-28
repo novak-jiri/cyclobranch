@@ -89,7 +89,7 @@
 <hr>
 
 <p>
-Any work based on CycloBranch shall cite any of the following references:
+If you use CycloBranch in your work, please cite us using any related reference:
 <ul>
 <li><i>J. Am. Soc. Mass Spectrom.</i> (2015), 26(10):1780-1786. DOI: <a href="https://doi.org/10.1007/s13361-015-1211-1"><b>10.1007/s13361-015-1211-1</b></a>
 <li><i>BBA - Proteins Proteom.</i> (2017), 1865(7):768-775. DOI: <a href="https://doi.org/10.1016/j.bbapap.2016.12.003"><b>10.1016/j.bbapap.2016.12.003</b></a>

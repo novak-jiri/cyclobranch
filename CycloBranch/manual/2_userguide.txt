@@ -2,6 +2,15 @@
   
 \page userguide User's Guide
 
+<p>
+See also a recent protocol on how to configure CycloBranch for different use-cases:<br/><br/>
+Tomas Pluhacek, Anton Skriba, Jiri Novak, Dominika Luptakova and Vladimir Havlicek.<br/>
+<b>Analysis of Microbial Siderophores by Mass Spectrometry.</b><br/>
+In: Sanjoy K. Bhattacharya (ed.), <i>Metabolomics: Methods and Protocols</i>, Methods in Molecular Biology, vol. 1996, pp. 131-153, Springer, 2019. DOI: <a href="https://doi.org/10.1007/978-1-4939-9488-5_12"><b>10.1007/978-1-4939-9488-5_12</b></a>.<br/>
+</p>
+
+<hr>
+
 - \subpage mainwindow
   - \ref mainwindowimg "Main Window"
   - \ref menufile "File"

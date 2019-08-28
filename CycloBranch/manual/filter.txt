@@ -26,6 +26,10 @@ The text filter is embedded in the [Main Window](@ref mainwindow), [Summary Tabl
 
 <p>Enter the text to be found.</p>
 
+<p><b>Arrows 1 (\< and \>)</b></p>
+
+<p>Browse identified compounds ([Summary Table of Matched Peaks](@ref summarypeakstable) only).</p>
+
 <p><b>Dropdown menu - logical operator </b></p>
 
 <p>Select the logical operator OR/AND for the conditions 1 and 2.</p>
@@ -41,6 +45,10 @@ The text filter is embedded in the [Main Window](@ref mainwindow), [Summary Tabl
 <p><b>Input Line - Text to Find 2</b></p>
 
 <p>Enter the text to be found into the input line.</p>
+
+<p><b>Arrows 2 (\< and \>)</b></p>
+
+<p>Browse identified compounds ([Summary Table of Matched Peaks](@ref summarypeakstable) only).</p>
 
 <p><b>Checkbox - Case In/sensitive (CTRL + T)</b></p>
 
