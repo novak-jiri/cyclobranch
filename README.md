@@ -54,3 +54,4 @@ http://ms.biomed.cas.cz/cyclobranch/
   * [2] *BBA - Proteins Proteom.* (2017), 1865(7):768-775. DOI: [10.1016/j.bbapap.2016.12.003](https://doi.org/10.1016/j.bbapap.2016.12.003)
   * [3] *Sci. Rep.* (2017), 7:16523. DOI: [10.1038/s41598-017-16648-z](https://doi.org/10.1038/s41598-017-16648-z)
   * [4] *J. Mass Spectrom.* (2018), 53(11):1097-1103. DOI: [10.1002/jms.4285](https://doi.org/10.1002/jms.4285)
+  * [5] *Methods in Molecular Biology* (2019), 1996:131-153. DOI: [10.1007/978-1-4939-9488-5_12](https://doi.org/10.1007/978-1-4939-9488-5_12)
