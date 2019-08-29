@@ -90,20 +90,31 @@
       <tab type="user" visible="yes" url="@ref filter" title="Text Filter"/>
     </tab>
     <tab type="usergroup" visible="yes" url="@ref tutorials" title="Tutorials">
-      <tab type="user" visible="yes" url="@ref tutorial1" title="Tutorial 1: Does a peptide have a cycle ?"/>
-      <tab type="user" visible="yes" url="@ref tutorial2" title="Tutorial 2: How to determine a tag ?"/>
-      <tab type="user" visible="yes" url="@ref tutorial3" title="Tutorial 3: How to determine a complete sequence ?"/>
-      <tab type="user" visible="yes" url="@ref tutorial4" title="Tutorial 4: How to determine a branched sequence ?"/>
-      <tab type="user" visible="yes" url="@ref tutorial5" title="Tutorial 5: How to determine terminal modifications ?"/>
-      <tab type="user" visible="yes" url="@ref tutorial6" title="Tutorial 6: How to compare a theoretical spectrum with a peaklist ?"/>
-      <tab type="user" visible="yes" url="@ref tutorial7" title="Tutorial 7: How to search in a database of MS/MS spectra ?"/>
-      <tab type="user" visible="yes" url="@ref tutorial8" title="Tutorial 8: How to search MS spectrum against a database of compounds ?"/>
-      <tab type="user" visible="yes" url="@ref tutorial9" title="Tutorial 9: Draw Peptide Tool"/>
-      <tab type="user" visible="yes" url="@ref tutorial10" title="Tutorial 10: Identification of Branch-Cyclic Peptide with a Long-sized Branch"/>
-      <tab type="user" visible="yes" url="@ref tutorial11" title="Tutorial 11: Identification of Peptide Family using Similarity Search"/>
-      <tab type="user" visible="yes" url="@ref tutorial12" title="Tutorial 12: Identification of Siderophores in MS/MS data"/>
-      <tab type="user" visible="yes" url="@ref tutorial13" title="Tutorial 13: Identification of Siderophores in MALDI-MS and LC-MS data"/>
-      <tab type="user" visible="yes" url="@ref tutorial14" title="Tutorial 14: Identification of Siderophores in Imaging Mass Spectra"/>
+      <tab type="user" visible="yes" url="@ref tutorial1_cb2" title="Tutorial 1: to do"/>
+      <tab type="user" visible="yes" url="@ref tutorial2_cb2" title="Tutorial 2: to do"/>
+      <tab type="user" visible="yes" url="@ref tutorial3_cb2" title="Tutorial 3: to do"/>
+      <tab type="user" visible="yes" url="@ref tutorial4_cb2" title="Tutorial 4: to do"/>
+      <tab type="user" visible="yes" url="@ref tutorial5_cb2" title="Tutorial 5: to do"/>
+      <tab type="user" visible="yes" url="@ref tutorial6_cb2" title="Tutorial 6: to do"/>
+      <tab type="user" visible="yes" url="@ref tutorial7_cb2" title="Tutorial 7: to do"/>
+      <tab type="user" visible="yes" url="@ref tutorial8_cb2" title="Tutorial 8: to do"/>
+      <tab type="user" visible="yes" url="@ref tutorial9_cb2" title="Tutorial 9: to do"/>
+       <tab type="usergroup" visible="yes" url="@ref tutorials_cb1" title="Tutorials (CycloBranch 1.x)">
+        <tab type="user" visible="yes" url="@ref tutorial1_cb1" title="Tutorial 1: Does a peptide have a cycle ?"/>
+        <tab type="user" visible="yes" url="@ref tutorial2_cb1" title="Tutorial 2: How to determine a tag ?"/>
+        <tab type="user" visible="yes" url="@ref tutorial3_cb1" title="Tutorial 3: How to determine a complete sequence ?"/>
+        <tab type="user" visible="yes" url="@ref tutorial4_cb1" title="Tutorial 4: How to determine a branched sequence ?"/>
+        <tab type="user" visible="yes" url="@ref tutorial5_cb1" title="Tutorial 5: How to determine terminal modifications ?"/>
+        <tab type="user" visible="yes" url="@ref tutorial6_cb1" title="Tutorial 6: How to compare a theoretical spectrum with a peaklist ?"/>
+        <tab type="user" visible="yes" url="@ref tutorial7_cb1" title="Tutorial 7: How to search in a database of MS/MS spectra ?"/>
+        <tab type="user" visible="yes" url="@ref tutorial8_cb1" title="Tutorial 8: How to search MS spectrum against a database of compounds ?"/>
+        <tab type="user" visible="yes" url="@ref tutorial9_cb1" title="Tutorial 9: Draw Peptide Tool"/>
+        <tab type="user" visible="yes" url="@ref tutorial10_cb1" title="Tutorial 10: Identification of Branch-Cyclic Peptide with a Long-sized Branch"/>
+        <tab type="user" visible="yes" url="@ref tutorial11_cb1" title="Tutorial 11: Identification of Peptide Family using Similarity Search"/>
+        <tab type="user" visible="yes" url="@ref tutorial12_cb1" title="Tutorial 12: Identification of Siderophores in MS/MS data"/>
+        <tab type="user" visible="yes" url="@ref tutorial13_cb1" title="Tutorial 13: Identification of Siderophores in MALDI-MS and LC-MS data"/>
+        <tab type="user" visible="yes" url="@ref tutorial14_cb1" title="Tutorial 14: Identification of Siderophores in Imaging Mass Spectra"/>
+      </tab>
     </tab>
     <tab type="user" visible="yes" url="@ref download" title="Download"/>
     <tab type="usergroup" visible="yes" url="@ref datasets" title="Datasets">

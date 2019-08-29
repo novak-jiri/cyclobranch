@@ -1,0 +1,230 @@
+/*!
+  
+\page tutorials_cb2 Tutorials (CycloBranch 2.x)
+
+\section listoftutorials_cb2 List of Tutorials
+
+<p>
+<ul>
+<li> [Tutorial 1: Dereplication in MS1 data - MALDI-MS, direct infusion ESI](@ref tutorial1_cb2)
+<li> [Tutorial 2: Dereplication in MS1 data - LC-MS](@ref tutorial2_cb2)
+<li> [Tutorial 3: Dereplication in MS1 data - MSI (mass spectrometry imaging)](@ref tutorial3_cb2)
+<li> [Tutorial 4: Fusion of MSI data with histology](@ref tutorial4_cb2)
+<li> [Tutorial 5: Identification of unknown compounds in MS1 data - LC-MS](@ref tutorial5_cb2)
+<li> [Tutorial 6: Identification of unknown compounds in MS1 data - MSI](@ref tutorial6_cb2)
+<li> [Tutorial 7: Annotate MS/MS spectrum of a peptide - static list of neutral losses](@ref tutorial7_cb2)
+<li> [Tutorial 8: Annotate MS/MS spectrum of a peptide - dynamic list of neutral losses](@ref tutorial8_cb2)
+<li> [Tutorial 9: Annotate MS/MS spectrum of a metabolite](@ref tutorial9_cb2)
+</ul>
+</p>
+
+<hr>
+
+\section tutorial1_cb2 Tutorial 1: to do
+<p>
+\htmlonly
+<a href="../../Tutorials/cb2_tutorial1.mp4" onclick="ga('send', 'event', 'Tutorials', this.href);">Download mp4</a><br/>
+\endhtmlonly
+\latexonly
+\href{https://ms.biomed.cas.cz/cyclobranch/Tutorials/cb2_tutorial1.mp4}{Download mp4}
+
+\endlatexonly
+<a href="https://" target="_blank" onclick="ga('send', 'event', 'Tutorials', this.href, 'YouTube - Tutorial 1');">YouTube</a>
+</p>
+<br/>
+\htmlonly
+<p align="center">
+<video width="1296" height="740" controls onplay="ga('send', 'event', 'Tutorials', 'https://ms.biomed.cas.cz/cyclobranch/Tutorials/cb2_tutorial1.mp4');">
+<source src="../../Tutorials/cb2_tutorial1.mp4" type="video/mp4">
+Your browser does not support the video tag.
+</video>
+</p>
+\endhtmlonly
+
+<br><hr>
+
+\section tutorial2_cb2 Tutorial 2: to do
+<p>
+\htmlonly
+<a href="../../Tutorials/cb2_tutorial2.mp4" onclick="ga('send', 'event', 'Tutorials', this.href);">Download mp4</a><br/>
+\endhtmlonly
+\latexonly
+\href{https://ms.biomed.cas.cz/cyclobranch/Tutorials/cb2_tutorial2.mp4}{Download mp4}
+
+\endlatexonly
+<a href="https://" target="_blank" onclick="ga('send', 'event', 'Tutorials', this.href, 'YouTube - Tutorial 2');">YouTube</a>
+</p>
+<br/>
+\htmlonly
+<p align="center">
+<video width="1296" height="740" controls onplay="ga('send', 'event', 'Tutorials', 'https://ms.biomed.cas.cz/cyclobranch/Tutorials/cb2_tutorial2.mp4');">
+<source src="../../Tutorials/cb2_tutorial2.mp4" type="video/mp4">
+Your browser does not support the video tag.
+</video>
+</p>
+\endhtmlonly
+
+<br><hr>
+
+\section tutorial3_cb2 Tutorial 3: to do
+<p>
+\htmlonly
+<a href="../../Tutorials/cb2_tutorial3.mp4" onclick="ga('send', 'event', 'Tutorials', this.href);">Download mp4</a><br/>
+\endhtmlonly
+\latexonly
+\href{https://ms.biomed.cas.cz/cyclobranch/Tutorials/cb2_tutorial3.mp4}{Download mp4}
+
+\endlatexonly
+<a href="https://" target="_blank" onclick="ga('send', 'event', 'Tutorials', this.href, 'YouTube - Tutorial 3');">YouTube</a>
+</p>
+<br/>
+\htmlonly
+<p align="center">
+<video width="1296" height="740" controls onplay="ga('send', 'event', 'Tutorials', 'https://ms.biomed.cas.cz/cyclobranch/Tutorials/cb2_tutorial3.mp4');">
+<source src="../../Tutorials/cb2_tutorial3.mp4" type="video/mp4">
+Your browser does not support the video tag.
+</video>
+</p>
+\endhtmlonly
+
+<br><hr>
+
+\section tutorial4_cb2 Tutorial 4: to do
+<p>
+\htmlonly
+<a href="../../Tutorials/cb2_tutorial4.mp4" onclick="ga('send', 'event', 'Tutorials', this.href);">Download mp4</a><br/>
+\endhtmlonly
+\latexonly
+\href{https://ms.biomed.cas.cz/cyclobranch/Tutorials/cb2_tutorial4.mp4}{Download mp4}
+
+\endlatexonly
+<a href="https://" target="_blank" onclick="ga('send', 'event', 'Tutorials', this.href, 'YouTube - Tutorial 4');">YouTube</a>
+</p>
+<br/>
+\htmlonly
+<p align="center">
+<video width="1296" height="740" controls onplay="ga('send', 'event', 'Tutorials', 'https://ms.biomed.cas.cz/cyclobranch/Tutorials/cb2_tutorial4.mp4');">
+<source src="../../Tutorials/cb2_tutorial4.mp4" type="video/mp4">
+Your browser does not support the video tag.
+</video>
+</p>
+\endhtmlonly
+
+<br><hr>
+
+\section tutorial5_cb2 Tutorial 5: to do
+<p>
+\htmlonly
+<a href="../../Tutorials/cb2_tutorial5.mp4" onclick="ga('send', 'event', 'Tutorials', this.href);">Download mp4</a><br/>
+\endhtmlonly
+\latexonly
+\href{https://ms.biomed.cas.cz/cyclobranch/Tutorials/cb2_tutorial5.mp4}{Download mp4}
+
+\endlatexonly
+<a href="https://" target="_blank" onclick="ga('send', 'event', 'Tutorials', this.href, 'YouTube - Tutorial 5');">YouTube</a>
+</p>
+<br/>
+\htmlonly
+<p align="center">
+<video width="1296" height="740" controls onplay="ga('send', 'event', 'Tutorials', 'https://ms.biomed.cas.cz/cyclobranch/Tutorials/cb2_tutorial5.mp4');">
+<source src="../../Tutorials/cb2_tutorial5.mp4" type="video/mp4">
+Your browser does not support the video tag.
+</video>
+</p>
+\endhtmlonly
+
+<br><hr>
+
+\section tutorial6_cb2 Tutorial 6: to do
+<p>
+\htmlonly
+<a href="../../Tutorials/cb2_tutorial6.mp4" onclick="ga('send', 'event', 'Tutorials', this.href);">Download mp4</a><br/>
+\endhtmlonly
+\latexonly
+\href{https://ms.biomed.cas.cz/cyclobranch/Tutorials/cb2_tutorial6.mp4}{Download mp4}
+
+\endlatexonly
+<a href="https://" target="_blank" onclick="ga('send', 'event', 'Tutorials', this.href, 'YouTube - Tutorial 6');">YouTube</a>
+</p>
+<br/>
+\htmlonly
+<p align="center">
+<video width="1296" height="740" controls onplay="ga('send', 'event', 'Tutorials', 'https://ms.biomed.cas.cz/cyclobranch/Tutorials/cb2_tutorial6.mp4');">
+<source src="../../Tutorials/cb2_tutorial6.mp4" type="video/mp4">
+Your browser does not support the video tag.
+</video>
+</p>
+\endhtmlonly
+
+<br><hr>
+
+\section tutorial7_cb2 Tutorial 7: to do
+<p>
+\htmlonly
+<a href="../../Tutorials/cb2_tutorial7.mp4" onclick="ga('send', 'event', 'Tutorials', this.href);">Download mp4</a><br/>
+\endhtmlonly
+\latexonly
+\href{https://ms.biomed.cas.cz/cyclobranch/Tutorials/cb2_tutorial7.mp4}{Download mp4}
+
+\endlatexonly
+<a href="https://" target="_blank" onclick="ga('send', 'event', 'Tutorials', this.href, 'YouTube - Tutorial 7');">YouTube</a>
+</p>
+<br/>
+\htmlonly
+<p align="center">
+<video width="1296" height="740" controls onplay="ga('send', 'event', 'Tutorials', 'https://ms.biomed.cas.cz/cyclobranch/Tutorials/cb2_tutorial7.mp4');">
+<source src="../../Tutorials/cb2_tutorial7.mp4" type="video/mp4">
+Your browser does not support the video tag.
+</video>
+</p>
+\endhtmlonly
+
+<br><hr>
+
+\section tutorial8_cb2 Tutorial 8: to do
+<p>
+\htmlonly
+<a href="../../Tutorials/cb2_tutorial8.mp4" onclick="ga('send', 'event', 'Tutorials', this.href);">Download mp4</a><br/>
+\endhtmlonly
+\latexonly
+\href{https://ms.biomed.cas.cz/cyclobranch/Tutorials/cb2_tutorial8.mp4}{Download mp4}
+
+\endlatexonly
+<a href="https://" target="_blank" onclick="ga('send', 'event', 'Tutorials', this.href, 'YouTube - Tutorial 8');">YouTube</a>
+</p>
+<br/>
+\htmlonly
+<p align="center">
+<video width="1296" height="740" controls onplay="ga('send', 'event', 'Tutorials', 'https://ms.biomed.cas.cz/cyclobranch/Tutorials/cb2_tutorial8.mp4');">
+<source src="../../Tutorials/cb2_tutorial8.mp4" type="video/mp4">
+Your browser does not support the video tag.
+</video>
+</p>
+\endhtmlonly
+
+<br><hr>
+
+\section tutorial9_cb2 Tutorial 9: to do
+<p>
+\htmlonly
+<a href="../../Tutorials/cb2_tutorial9.mp4" onclick="ga('send', 'event', 'Tutorials', this.href);">Download mp4</a><br/>
+\endhtmlonly
+\latexonly
+\href{https://ms.biomed.cas.cz/cyclobranch/Tutorials/cb2_tutorial9.mp4}{Download mp4}
+
+\endlatexonly
+<a href="https://" target="_blank" onclick="ga('send', 'event', 'Tutorials', this.href, 'YouTube - Tutorial 9');">YouTube</a>
+</p>
+<br/>
+\htmlonly
+<p align="center">
+<video width="1296" height="740" controls onplay="ga('send', 'event', 'Tutorials', 'https://ms.biomed.cas.cz/cyclobranch/Tutorials/cb2_tutorial9.mp4');">
+<source src="../../Tutorials/cb2_tutorial9.mp4" type="video/mp4">
+Your browser does not support the video tag.
+</video>
+</p>
+\endhtmlonly
+
+<br/>
+
+*/

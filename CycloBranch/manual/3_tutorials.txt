@@ -2,29 +2,43 @@
   
 \page tutorials Tutorials
 
-\section listoftutorials List of Tutorials
+<p>[Tutorials (CycloBranch 2.x)](@ref tutorials_cb2)</p>
 
 <p>
 <ul>
-<li> [Tutorial 1: Does a peptide have a cycle ?](@ref tutorial1)
-<li> [Tutorial 2: How to determine a tag ?](@ref tutorial2)
-<li> [Tutorial 3: How to determine a complete sequence ?](@ref tutorial3)
-<li> [Tutorial 4: How to determine a branched sequence ?](@ref tutorial4)
-<li> [Tutorial 5: How to determine terminal modifications ?](@ref tutorial5)
-<li> [Tutorial 6: How to compare a theoretical spectrum with a peaklist ?](@ref tutorial6)
-<li> [Tutorial 7: How to search in a database of MS/MS spectra ?](@ref tutorial7)
-<li> [Tutorial 8: How to search MS spectrum against a database of compounds ?](@ref tutorial8)
-<li> [Tutorial 9: Draw Peptide Tool](@ref tutorial9)
-<li> [Tutorial 10: Identification of Branch-Cyclic Peptide with a Long-sized Branch](@ref tutorial10)
-<li> [Tutorial 11: Identification of Peptide Family using Similarity Search](@ref tutorial11)
-<li> [Tutorial 12: Identification of Siderophores in MS/MS data](@ref tutorial12)
-<li> [Tutorial 13: Identification of Siderophores in MALDI-MS and LC-MS data](@ref tutorial13)
-<li> [Tutorial 14: Identification of Siderophores in Imaging Mass Spectra](@ref tutorial14)
+<li> [Tutorial 1: Dereplication in MS1 data - MALDI-MS, direct infusion ESI](@ref tutorial1_cb2)
+<li> [Tutorial 2: Dereplication in MS1 data - LC-MS](@ref tutorial2_cb2)
+<li> [Tutorial 3: Dereplication in MS1 data - MSI (mass spectrometry imaging)](@ref tutorial3_cb2)
+<li> [Tutorial 4: Fusion of MSI data with histology](@ref tutorial4_cb2)
+<li> [Tutorial 5: Identification of unknown compounds in MS1 data - LC-MS](@ref tutorial5_cb2)
+<li> [Tutorial 6: Identification of unknown compounds in MS1 data - MSI](@ref tutorial6_cb2)
+<li> [Tutorial 7: Annotate MS/MS spectrum of a peptide - static list of neutral losses](@ref tutorial7_cb2)
+<li> [Tutorial 8: Annotate MS/MS spectrum of a peptide - dynamic list of neutral losses](@ref tutorial8_cb2)
+<li> [Tutorial 9: Annotate MS/MS spectrum of a metabolite](@ref tutorial9_cb2)
 </ul>
 </p>
 
+<hr>
+
+<p>[Tutorials (CycloBranch 1.x)](@ref tutorials_cb1)</p>
+
 <p>
-A PDF guide through tutorials 1-11 (for CycloBranch 1.0.1216) and through the tutorials 12-14 (for CycloBranch 1.1.570) is available <a href="../../docs/cyclobranch_tutorials.pdf" onclick="ga('send', 'event', 'Tutorials', this.href);"><b>here</b></a>.
+<ul>
+<li> [Tutorial 1: Does a peptide have a cycle ?](@ref tutorial1_cb1)
+<li> [Tutorial 2: How to determine a tag ?](@ref tutorial2_cb1)
+<li> [Tutorial 3: How to determine a complete sequence ?](@ref tutorial3_cb1)
+<li> [Tutorial 4: How to determine a branched sequence ?](@ref tutorial4_cb1)
+<li> [Tutorial 5: How to determine terminal modifications ?](@ref tutorial5_cb1)
+<li> [Tutorial 6: How to compare a theoretical spectrum with a peaklist ?](@ref tutorial6_cb1)
+<li> [Tutorial 7: How to search in a database of MS/MS spectra ?](@ref tutorial7_cb1)
+<li> [Tutorial 8: How to search MS spectrum against a database of compounds ?](@ref tutorial8_cb1)
+<li> [Tutorial 9: Draw Peptide Tool](@ref tutorial9_cb1)
+<li> [Tutorial 10: Identification of Branch-Cyclic Peptide with a Long-sized Branch](@ref tutorial10_cb1)
+<li> [Tutorial 11: Identification of Peptide Family using Similarity Search](@ref tutorial11_cb1)
+<li> [Tutorial 12: Identification of Siderophores in MS/MS data](@ref tutorial12_cb1)
+<li> [Tutorial 13: Identification of Siderophores in MALDI-MS and LC-MS data](@ref tutorial13_cb1)
+<li> [Tutorial 14: Identification of Siderophores in Imaging Mass Spectra](@ref tutorial14_cb1)
+</ul>
 </p>
 
 <hr>
@@ -37,326 +51,6 @@ In: Sanjoy K. Bhattacharya (ed.), <i>Metabolomics: Methods and Protocols</i>, Me
 </p>
 
 <hr>
-
-\section tutorial1 Tutorial 1: Does a peptide have a cycle ?
-<p>
-\htmlonly
-<a href="../../Tutorials/cb_tutorial1.mp4" onclick="ga('send', 'event', 'Tutorials', this.href);">Download mp4 (CycloBranch 1.0.1216)</a><br/>
-\endhtmlonly
-\latexonly
-\href{https://ms.biomed.cas.cz/cyclobranch/Tutorials/cb_tutorial1.mp4}{Download mp4 (CycloBranch 1.0.1216)}
-
-\endlatexonly
-<a href="https://youtu.be/Yq6t-x-gDT4" target="_blank" onclick="ga('send', 'event', 'Tutorials', this.href, 'YouTube - Tutorial 1');">YouTube (CycloBranch 1.0.1216)</a>
-</p>
-<br/>
-\htmlonly
-<p align="center">
-<video width="1296" height="740" controls onplay="ga('send', 'event', 'Tutorials', 'https://ms.biomed.cas.cz/cyclobranch/Tutorials/cb_tutorial1.mp4');">
-<source src="../../Tutorials/cb_tutorial1.mp4" type="video/mp4">
-Your browser does not support the video tag.
-</video>
-</p>
-\endhtmlonly
-
-<br><hr>
-
-\section tutorial2 Tutorial 2: How to determine a tag ?
-<p>
-\htmlonly
-<a href="../../Tutorials/cb_tutorial2.mp4" onclick="ga('send', 'event', 'Tutorials', this.href);">Download mp4 (CycloBranch 1.0.1216)</a><br/>
-\endhtmlonly
-\latexonly
-\href{https://ms.biomed.cas.cz/cyclobranch/Tutorials/cb_tutorial2.mp4}{Download mp4 (CycloBranch 1.0.1216)}
-
-\endlatexonly
-<a href="https://youtu.be/jNYsh2T_gu8" target="_blank" onclick="ga('send', 'event', 'Tutorials', this.href, 'YouTube - Tutorial 2');">YouTube (CycloBranch 1.0.1216)</a>
-</p>
-<br/>
-\htmlonly
-<p align="center">
-<video width="1296" height="740" controls onplay="ga('send', 'event', 'Tutorials', 'https://ms.biomed.cas.cz/cyclobranch/Tutorials/cb_tutorial2.mp4');">
-<source src="../../Tutorials/cb_tutorial2.mp4" type="video/mp4">
-Your browser does not support the video tag.
-</video>
-</p>
-\endhtmlonly
-
-<br><hr>
-
-\section tutorial3 Tutorial 3: How to determine a complete sequence ?
-<p>
-\htmlonly
-<a href="../../Tutorials/cb_tutorial3.mp4" onclick="ga('send', 'event', 'Tutorials', this.href);">Download mp4 (CycloBranch 1.0.1216)</a><br/>
-\endhtmlonly
-\latexonly
-\href{https://ms.biomed.cas.cz/cyclobranch/Tutorials/cb_tutorial3.mp4}{Download mp4 (CycloBranch 1.0.1216)}
-
-\endlatexonly
-<a href="https://youtu.be/pjrX8HTtN_I" target="_blank" onclick="ga('send', 'event', 'Tutorials', this.href, 'YouTube - Tutorial 3');">YouTube (CycloBranch 1.0.1216)</a>
-</p>
-<br/>
-\htmlonly
-<p align="center">
-<video width="1296" height="740" controls onplay="ga('send', 'event', 'Tutorials', 'https://ms.biomed.cas.cz/cyclobranch/Tutorials/cb_tutorial3.mp4');">
-<source src="../../Tutorials/cb_tutorial3.mp4" type="video/mp4">
-Your browser does not support the video tag.
-</video>
-</p>
-\endhtmlonly
-
-<br><hr>
-
-\section tutorial4 Tutorial 4: How to determine a branched sequence ?
-<p>
-\htmlonly
-<a href="../../Tutorials/cb_tutorial4.mp4" onclick="ga('send', 'event', 'Tutorials', this.href);">Download mp4 (CycloBranch 1.0.1216)</a><br/>
-\endhtmlonly
-\latexonly
-\href{https://ms.biomed.cas.cz/cyclobranch/Tutorials/cb_tutorial4.mp4}{Download mp4 (CycloBranch 1.0.1216)}
-
-\endlatexonly
-<a href="https://youtu.be/D9yJfPdLQk4" target="_blank" onclick="ga('send', 'event', 'Tutorials', this.href, 'YouTube - Tutorial 4');">YouTube (CycloBranch 1.0.1216)</a>
-</p>
-<br/>
-\htmlonly
-<p align="center">
-<video width="1296" height="740" controls onplay="ga('send', 'event', 'Tutorials', 'https://ms.biomed.cas.cz/cyclobranch/Tutorials/cb_tutorial4.mp4');">
-<source src="../../Tutorials/cb_tutorial4.mp4" type="video/mp4">
-Your browser does not support the video tag.
-</video>
-</p>
-\endhtmlonly
-
-<br><hr>
-
-\section tutorial5 Tutorial 5: How to determine terminal modifications ?
-<p>
-\htmlonly
-<a href="../../Tutorials/cb_tutorial5.mp4" onclick="ga('send', 'event', 'Tutorials', this.href);">Download mp4 (CycloBranch 1.0.1216)</a><br/>
-\endhtmlonly
-\latexonly
-\href{https://ms.biomed.cas.cz/cyclobranch/Tutorials/cb_tutorial5.mp4}{Download mp4 (CycloBranch 1.0.1216)}
-
-\endlatexonly
-<a href="https://youtu.be/X1Xrn7VxInI" target="_blank" onclick="ga('send', 'event', 'Tutorials', this.href, 'YouTube - Tutorial 5');">YouTube (CycloBranch 1.0.1216)</a>
-</p>
-<br/>
-\htmlonly
-<p align="center">
-<video width="1296" height="740" controls onplay="ga('send', 'event', 'Tutorials', 'https://ms.biomed.cas.cz/cyclobranch/Tutorials/cb_tutorial5.mp4');">
-<source src="../../Tutorials/cb_tutorial5.mp4" type="video/mp4">
-Your browser does not support the video tag.
-</video>
-</p>
-\endhtmlonly
-
-<br><hr>
-
-\section tutorial6 Tutorial 6: How to compare a theoretical spectrum with a peaklist ?
-<p>
-\htmlonly
-<a href="../../Tutorials/cb_tutorial6.mp4" onclick="ga('send', 'event', 'Tutorials', this.href);">Download mp4 (CycloBranch 1.0.1216)</a><br/>
-\endhtmlonly
-\latexonly
-\href{https://ms.biomed.cas.cz/cyclobranch/Tutorials/cb_tutorial6.mp4}{Download mp4 (CycloBranch 1.0.1216)}
-
-\endlatexonly
-<a href="https://youtu.be/heQkZW8XBz4" target="_blank" onclick="ga('send', 'event', 'Tutorials', this.href, 'YouTube - Tutorial 6');">YouTube (CycloBranch 1.0.1216)</a>
-</p>
-<br/>
-\htmlonly
-<p align="center">
-<video width="1296" height="740" controls onplay="ga('send', 'event', 'Tutorials', 'https://ms.biomed.cas.cz/cyclobranch/Tutorials/cb_tutorial6.mp4');">
-<source src="../../Tutorials/cb_tutorial6.mp4" type="video/mp4">
-Your browser does not support the video tag.
-</video>
-</p>
-\endhtmlonly
-
-<br><hr>
-
-\section tutorial7 Tutorial 7: How to search in a database of MS/MS spectra ?
-<p>
-\htmlonly
-<a href="../../Tutorials/cb_tutorial7.mp4" onclick="ga('send', 'event', 'Tutorials', this.href);">Download mp4 (CycloBranch 1.0.1216)</a><br/>
-\endhtmlonly
-\latexonly
-\href{https://ms.biomed.cas.cz/cyclobranch/Tutorials/cb_tutorial7.mp4}{Download mp4 (CycloBranch 1.0.1216)}
-
-\endlatexonly
-<a href="https://youtu.be/QQ6jbaxqIgM" target="_blank" onclick="ga('send', 'event', 'Tutorials', this.href, 'YouTube - Tutorial 7');">YouTube (CycloBranch 1.0.1216)</a>
-</p>
-<br/>
-\htmlonly
-<p align="center">
-<video width="1296" height="740" controls onplay="ga('send', 'event', 'Tutorials', 'https://ms.biomed.cas.cz/cyclobranch/Tutorials/cb_tutorial7.mp4');">
-<source src="../../Tutorials/cb_tutorial7.mp4" type="video/mp4">
-Your browser does not support the video tag.
-</video>
-</p>
-\endhtmlonly
-
-<br><hr>
-
-\section tutorial8 Tutorial 8: How to search MS spectrum against a database of compounds ?
-<p>
-\htmlonly
-<a href="../../Tutorials/cb_tutorial8.mp4" onclick="ga('send', 'event', 'Tutorials', this.href);">Download mp4 (CycloBranch 1.0.1216)</a><br/>
-\endhtmlonly
-\latexonly
-\href{https://ms.biomed.cas.cz/cyclobranch/Tutorials/cb_tutorial8.mp4}{Download mp4 (CycloBranch 1.0.1216)}
-
-\endlatexonly
-<a href="https://youtu.be/aIBTtyhg6vM" target="_blank" onclick="ga('send', 'event', 'Tutorials', this.href, 'YouTube - Tutorial 8');">YouTube (CycloBranch 1.0.1216)</a>
-</p>
-<br/>
-\htmlonly
-<p align="center">
-<video width="1296" height="740" controls onplay="ga('send', 'event', 'Tutorials', 'https://ms.biomed.cas.cz/cyclobranch/Tutorials/cb_tutorial8.mp4');">
-<source src="../../Tutorials/cb_tutorial8.mp4" type="video/mp4">
-Your browser does not support the video tag.
-</video>
-</p>
-\endhtmlonly
-    
-<br><hr>
-
-\section tutorial9 Tutorial 9: Draw Peptide Tool
-<p>
-\htmlonly
-<a href="../../Tutorials/cb_tutorial9.mp4" onclick="ga('send', 'event', 'Tutorials', this.href);">Download mp4 (CycloBranch 1.0.1216)</a><br/>
-\endhtmlonly
-\latexonly
-\href{https://ms.biomed.cas.cz/cyclobranch/Tutorials/cb_tutorial9.mp4}{Download mp4 (CycloBranch 1.0.1216)}
-
-\endlatexonly
-<a href="https://youtu.be/Li4onQme2qc" target="_blank" onclick="ga('send', 'event', 'Tutorials', this.href, 'YouTube - Tutorial 9');">YouTube (CycloBranch 1.0.1216)</a>
-</p>
-<br/>
-\htmlonly
-<p align="center">
-<video width="1296" height="740" controls onplay="ga('send', 'event', 'Tutorials', 'https://ms.biomed.cas.cz/cyclobranch/Tutorials/cb_tutorial9.mp4');">
-<source src="../../Tutorials/cb_tutorial9.mp4" type="video/mp4">
-Your browser does not support the video tag.
-</video>
-</p>
-\endhtmlonly
-
-<br><hr>
-
-\section tutorial10 Tutorial 10: Identification of Branch-Cyclic Peptide with a Long-sized Branch
-<p>
-\htmlonly
-<a href="../../Tutorials/cb_tutorial10.mp4" onclick="ga('send', 'event', 'Tutorials', this.href);">Download mp4 (CycloBranch 1.0.1216)</a><br/>
-\endhtmlonly
-\latexonly
-\href{https://ms.biomed.cas.cz/cyclobranch/Tutorials/cb_tutorial10.mp4}{Download mp4 (CycloBranch 1.0.1216)}
-
-\endlatexonly
-<a href="https://youtu.be/z1dCG4Wlmu4" target="_blank" onclick="ga('send', 'event', 'Tutorials', this.href, 'YouTube - Tutorial 10');">YouTube (CycloBranch 1.0.1216)</a>
-</p>
-<br/>
-\htmlonly
-<p align="center">
-<video width="1296" height="740" controls onplay="ga('send', 'event', 'Tutorials', 'https://ms.biomed.cas.cz/cyclobranch/Tutorials/cb_tutorial10.mp4');">
-<source src="../../Tutorials/cb_tutorial10.mp4" type="video/mp4">
-Your browser does not support the video tag.
-</video>
-</p>
-\endhtmlonly
-
-<br><hr>
-
-\section tutorial11 Tutorial 11: Identification of Peptide Family using Similarity Search
-<p>
-\htmlonly
-<a href="../../Tutorials/cb_tutorial11.mp4" onclick="ga('send', 'event', 'Tutorials', this.href);">Download mp4 (CycloBranch 1.0.1216)</a><br/>
-\endhtmlonly
-\latexonly
-\href{https://ms.biomed.cas.cz/cyclobranch/Tutorials/cb_tutorial11.mp4}{Download mp4 (CycloBranch 1.0.1216)}
-
-\endlatexonly
-<a href="https://youtu.be/3E3AyJt6K5s" target="_blank" onclick="ga('send', 'event', 'Tutorials', this.href, 'YouTube - Tutorial 11');">YouTube (CycloBranch 1.0.1216)</a>
-</p>
-<br/>
-\htmlonly
-<p align="center">
-<video width="1296" height="740" controls onplay="ga('send', 'event', 'Tutorials', 'https://ms.biomed.cas.cz/cyclobranch/Tutorials/cb_tutorial11.mp4');">
-<source src="../../Tutorials/cb_tutorial11.mp4" type="video/mp4">
-Your browser does not support the video tag.
-</video>
-</p>
-\endhtmlonly
-
-<br><hr>
-
-\section tutorial12 Tutorial 12: Identification of Siderophores in MS/MS data
-<p>
-\htmlonly
-<a href="../../Tutorials/cb_tutorial12_siderophores.mp4" onclick="ga('send', 'event', 'Tutorials', this.href);">Download mp4 (CycloBranch 1.1.570)</a><br/>
-\endhtmlonly
-\latexonly
-\href{https://ms.biomed.cas.cz/cyclobranch/Tutorials/cb_tutorial12_siderophores.mp4}{Download mp4 (CycloBranch 1.1.570)}
-
-\endlatexonly
-<a href="https://youtu.be/zzKTncu8BlI" target="_blank" onclick="ga('send', 'event', 'Tutorials', this.href, 'YouTube - Tutorial 12);">YouTube (CycloBranch 1.1.570)</a>
-</p>
-<br/>
-\htmlonly
-<p align="center">
-<video width="1296" height="788" controls onplay="ga('send', 'event', 'Tutorials', 'https://ms.biomed.cas.cz/cyclobranch/Tutorials/cb_tutorial12_siderophores.mp4');">
-<source src="../../Tutorials/cb_tutorial12_siderophores.mp4" type="video/mp4">
-Your browser does not support the video tag.
-</video>
-</p>
-\endhtmlonly
-
-<br><hr>
-
-\section tutorial13 Tutorial 13: Identification of Siderophores in MALDI-MS and LC-MS data
-<p>
-\htmlonly
-<a href="../../Tutorials/cb_tutorial13_siderophores.mp4" onclick="ga('send', 'event', 'Tutorials', this.href);">Download mp4 (CycloBranch 1.1.570)</a><br/>
-\endhtmlonly
-\latexonly
-\href{https://ms.biomed.cas.cz/cyclobranch/Tutorials/cb_tutorial13_siderophores.mp4}{Download mp4 (CycloBranch 1.1.570)}
-
-\endlatexonly
-<a href="https://youtu.be/XYjeTtrXyZ0" target="_blank" onclick="ga('send', 'event', 'Tutorials', this.href, 'YouTube - Tutorial 13');">YouTube (CycloBranch 1.1.570)</a>
-</p>
-<br/>
-\htmlonly
-<p align="center">
-<video width="1296" height="788" controls onplay="ga('send', 'event', 'Tutorials', 'https://ms.biomed.cas.cz/cyclobranch/Tutorials/cb_tutorial13_siderophores.mp4');">
-<source src="../../Tutorials/cb_tutorial13_siderophores.mp4" type="video/mp4">
-Your browser does not support the video tag.
-</video>
-</p>
-\endhtmlonly
-
-<br><hr>
-
-\section tutorial14 Tutorial 14: Identification of Siderophores in Imaging Mass Spectra
-<p>
-\htmlonly
-<a href="../../Tutorials/cb_tutorial14_siderophores.mp4" onclick="ga('send', 'event', 'Tutorials', this.href);">Download mp4 (CycloBranch 1.1.570)</a><br/>
-\endhtmlonly
-\latexonly
-\href{https://ms.biomed.cas.cz/cyclobranch/Tutorials/cb_tutorial14_siderophores.mp4}{Download mp4 (CycloBranch 1.1.570)}
-
-\endlatexonly
-<a href="https://youtu.be/1ncO3VAFamc" target="_blank" onclick="ga('send', 'event', 'Tutorials', this.href, 'YouTube - Tutorial 14');">YouTube (CycloBranch 1.1.570)</a>
-</p>
-<br/>
-\htmlonly
-<p align="center">
-<video width="1296" height="788" controls onplay="ga('send', 'event', 'Tutorials', 'https://ms.biomed.cas.cz/cyclobranch/Tutorials/cb_tutorial14_siderophores.mp4');">
-<source src="../../Tutorials/cb_tutorial14_siderophores.mp4" type="video/mp4">
-Your browser does not support the video tag.
-</video>
-</p>
-\endhtmlonly
 
 <br/>
 
