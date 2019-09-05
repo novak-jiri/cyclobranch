@@ -44,6 +44,7 @@ If you use CycloBranch in your work, please cite us using any related reference:
     <li> DOI can now be used as a reference in a compound/sequence database.
     <li> [M+Cl]- ion added in MS mode.
     <li> Link to BBDGNC added.
+    <li> zlib compression is now supported in mzML files.
     <li> Some other minor improvements were made. 
   </ul>
   <li> <a href="https://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v2.0.xxx_win_64bit.zip" onclick="ga('send', 'event', 'Download', this.href);">Download (Windows, 64 bit - tested on Windows 7/10)</a>

@@ -582,10 +582,6 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 							errormessage += "Do you have a path to OpenMS binaries folder in your PATH variable (e.g., 'C:/Program Files/OpenMS-2.3.0/bin') ?\n";
 							errormessage += "Do you have 'raw2peaks.bat' file located in the '" + appname.toStdString() + "/External/windows' folder ?\n";
 						}
-						if (errtype == -3) {
-							error = true;
-							errormessage = "Failed to load the mzML file, zlib compression is not supported. The spectra must be stored in the mzML file with the attribute \"no compression\".\n";
-						}
 					#endif
 					break;
 				case dat:
@@ -673,10 +669,6 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 								errormessage += "Do you have 'raw2peaks.bat' file located in the '" + appname.toStdString() + "/External/windows' folder ?\n";
 							#endif
 						#endif
-					}
-					if (errtype == -3) {
-						error = true;
-						errormessage = "Failed to load the mzML file, zlib compression is not supported. The spectra must be stored in the mzML file with the attribute \"no compression\".\n";
 					}
 					break;
 				case imzML:

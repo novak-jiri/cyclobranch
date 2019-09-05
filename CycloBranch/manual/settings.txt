@@ -100,7 +100,7 @@ Use F1 to open this help.
 <td>profile and centroid</td>
 <td>profile and centroid</td>
 <td><a href="http://www.psidev.info/mzml_1_0_0">standard data format</a></td>
-<td>m/z values and intensities must be stored as 64-bit/32-bit floats; no compression. <a href="http://www.openms.de">OpenMS 2.x</a> must be installed.</td>
+<td>m/z values and intensities must be stored as 64-bit/32-bit floats; no compression and zlib compression are supported. <a href="http://www.openms.de">OpenMS 2.x</a> must be installed.</td>
 </tr>
 <tr>
 <td>mzXML</td>

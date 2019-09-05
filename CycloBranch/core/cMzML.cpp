@@ -1,5 +1,10 @@
 #include "core/cMzML.h"
 
+#include <boost/iostreams/device/back_inserter.hpp>
+#include <boost/iostreams/copy.hpp>
+#include <boost/iostreams/filtering_stream.hpp>
+#include <boost/iostreams/filter/zlib.hpp>
+
 #include <xercesc/framework/LocalFileFormatTarget.hpp>
 
 #include "core/cPeaksList.h"
@@ -208,6 +213,7 @@ int cMzML::parse(string& filename, vector<cPeaksList>& peaklists, int profilespe
 
 																// childrens of binaryDataArray
 																bool precision64 = false;
+																bool zlib = false;
 																bool mzratio = false;
 																bool intensity = false;
 
@@ -237,11 +243,7 @@ int cMzML::parse(string& filename, vector<cPeaksList>& peaklists, int profilespe
 																			}
 
 																			if (accession.compare("MS:1000574") == 0) {
-																				// zlib compression detected
-																				if (mgfofstream.is_open()) {
-																					mgfofstream.close();
-																				}
-																				return -3;
+																				zlib = true;
 																			}
 
 																			
@@ -262,44 +264,62 @@ int cMzML::parse(string& filename, vector<cPeaksList>& peaklists, int profilespe
 																					datasize = 8;
 																				}
 
-																				if (mzratio) {																					
-																					for (int ii = 0; ii < binarysize/datasize; ii++) {
+																				string datastring;
+																				datastring.resize(binarysize);
+																				for (int ii = 0; ii < binarysize; ii++) {
+																					datastring[ii] = decoded[ii];
+																				}
+
+																				if (zlib) {
+																					string compressed = datastring;
+																					datastring.clear();
+
+																					boost::iostreams::filtering_streambuf<boost::iostreams::input> in;
+																					in.push(boost::iostreams::zlib_decompressor());
+																					in.push(boost::make_iterator_range(compressed));
+																					boost::iostreams::copy(in, boost::iostreams::back_inserter(datastring));
+																				}
+
+																				int size = (int)datastring.size() / datasize;
+
+																				if (mzratio) {
+																					for (int ii = 0; ii < size; ii++) {
 																						if (precision64) {
-																							memcpy(&dblval, &decoded[ii*datasize], datasize);
+																							memcpy(&dblval, &(datastring.data())[ii*datasize], datasize);
 																						}
 																						else {
-																							memcpy(&fltval, &decoded[ii*datasize], datasize);
+																							memcpy(&fltval, &(datastring.data())[ii*datasize], datasize);
 																						}
 
 																						if (peaklistdefined) {
-																							peaklist[ii].mzratio = precision64?dblval:fltval;
+																							peaklist[ii].mzratio = precision64 ? dblval : fltval;
 																						}
 																						else {
 																							cPeak peak;
-																							peak.mzratio = precision64?dblval:fltval;
+																							peak.mzratio = precision64 ? dblval : fltval;
 																							peaklist.add(peak);
 																						}
 																					}
 																				}
 
 																				if (intensity) {
-																					for (int ii = 0; ii < binarysize/datasize; ii++) {
+																					for (int ii = 0; ii < size; ii++) {
 																						if (precision64) {
-																							memcpy(&dblval, &decoded[ii*datasize], datasize);
+																							memcpy(&dblval, &(datastring.data())[ii*datasize], datasize);
 																						}
 																						else {
-																							memcpy(&fltval, &decoded[ii*datasize], datasize);
+																							memcpy(&fltval, &(datastring.data())[ii*datasize], datasize);
 																						}
 
 																						if (peaklistdefined) {
-																							peaklist[ii].absoluteintensity = precision64?dblval:fltval;
+																							peaklist[ii].absoluteintensity = precision64 ? dblval : fltval;
 																						}
 																						else {
 																							cPeak peak;
-																							peak.absoluteintensity = precision64?dblval:fltval;
+																							peak.absoluteintensity = precision64 ? dblval : fltval;
 																							peaklist.add(peak);
 																						}
-																					}																					
+																					}
 																				}
 
 																				XMLPlatformUtils::fgMemoryManager->deallocate(decoded);
