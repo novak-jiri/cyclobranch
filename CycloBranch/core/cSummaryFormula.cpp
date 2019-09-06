@@ -219,7 +219,9 @@ void cSummaryFormula::getIsotopeSummary(string& description, cBricksDatabase& br
 		if (isotopesummary[i] != 0) {
 			description += bricks[i].getSummary();
 			if ((isotopesummary[i] != 1)) {
-				description += "<sub>" + to_string(isotopesummary[i]) + "</sub>";
+				//description += "<sub>";
+				description += to_string(isotopesummary[i]);
+				//description += "</sub>";
 			}
 			description += " ";
 		}
