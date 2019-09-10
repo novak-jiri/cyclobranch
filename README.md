@@ -25,17 +25,17 @@ An open-source, cross-platform and stand-alone tool for mass spectrometry data a
 ## Supported file formats
   * mzML, imzML
     * profile or centroid spectra
-    * profile spectra require [OpenMS 2.x](https://sourceforge.net/projects/open-ms/files/OpenMS/OpenMS-2.3/) installed 
+    * profile spectra require [OpenMS 2.x](https://sourceforge.net/projects/open-ms/files/OpenMS/OpenMS-2.4/) installed 
   * mzXML
     * centroid spectra
-    * requires [OpenMS 2.x](https://sourceforge.net/projects/open-ms/files/OpenMS/OpenMS-2.3/) installed
+    * requires [OpenMS 2.x](https://sourceforge.net/projects/open-ms/files/OpenMS/OpenMS-2.4/) installed
   * baf (Bruker)
     * profile spectra
     * requires [CompassXport 3.0](http://www.bruker.com/service/support-upgrades/software-downloads/mass-spectrometry.html) installed
     * Windows only
   * raw (Thermo)
     * profile or centroid spectra
-    * requires [OpenMS 2.x](https://sourceforge.net/projects/open-ms/files/OpenMS/OpenMS-2.3/) including ProteoWizard installed
+    * requires [OpenMS 2.x](https://sourceforge.net/projects/open-ms/files/OpenMS/OpenMS-2.4/) including ProteoWizard installed
     * Windows only
   * raw (Waters)
     * centroid spectra
