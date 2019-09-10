@@ -483,20 +483,20 @@ cParametersWidget::cParametersWidget(QWidget* parent) {
 	theoreticalspectragridlayout->addWidget(generateisotopepattern, 8, 1);
 
 	minimumpatternsize = new QSpinBox();
-	minimumpatternsize->setToolTip("The minimum number of matched peaks in an isotope pattern to be reported. The option \"Generate Full Isotope Patterns\" must be enabled.");
+	minimumpatternsize->setToolTip("The minimum number of peaks which must be annotated in an isotopic pattern. The option \"Generate Full Isotope Patterns\" must be enabled.");
 	minimumpatternsize->setRange(1, 100);
 	minimumpatternsize->setSingleStep(1);
 	minimumpatternsize->setFixedWidth(rightdefaultwidth);
-	minimumpatternsizelabel = new QLabel("Minimum Pattern Size:");
+	minimumpatternsizelabel = new QLabel("Minimum Number of Isotopic Peaks:");
 	theoreticalspectragridlayout->addWidget(minimumpatternsizelabel, 9, 0);
 	theoreticalspectragridlayout->addWidget(minimumpatternsize, 9, 1);
 
 	minimumfeaturesize = new QSpinBox();
-	minimumfeaturesize->setToolTip("The minimum number of consecutive scans in which a compound must be identified to be reported (LC-MS data only).");
+	minimumfeaturesize->setToolTip("The minimum number of spectra in which a compound must be identified to be reported.\nLC-MS data = the minimum number of consecutive scans;\nMSI data = the minimum number of pixels.");
 	minimumfeaturesize->setRange(1, 10000);
 	minimumfeaturesize->setSingleStep(1);
 	minimumfeaturesize->setFixedWidth(rightdefaultwidth);
-	minimumfeaturesizelabel = new QLabel("Minimum Feature Size:");
+	minimumfeaturesizelabel = new QLabel("Minimum Number of Spectra:");
 	theoreticalspectragridlayout->addWidget(minimumfeaturesizelabel, 10, 0);
 	theoreticalspectragridlayout->addWidget(minimumfeaturesize, 10, 1);
 
@@ -505,7 +505,7 @@ cParametersWidget::cParametersWidget(QWidget* parent) {
 	minimumiontypes->setRange(1, 100);
 	minimumiontypes->setSingleStep(1);
 	minimumiontypes->setFixedWidth(rightdefaultwidth);
-	minimumiontypeslabel = new QLabel("Minimum Ion Types:");
+	minimumiontypeslabel = new QLabel("Minimum Number of Ion Types:");
 	theoreticalspectragridlayout->addWidget(minimumiontypeslabel, 11, 0);
 	theoreticalspectragridlayout->addWidget(minimumiontypes, 11, 1);
 
@@ -682,6 +682,7 @@ cParametersWidget::cParametersWidget(QWidget* parent) {
 		lastdirselectsequencedatabase = installdir + "SequenceDatabases/";
 	#endif
 	
+	mode->setCurrentIndex(dereplication);
 }
 
 
@@ -929,7 +930,7 @@ void cParametersWidget::loadSettings() {
 		save->setText(QString("  Save '") + QString(settingsfile.toStdString().substr(settingsfile.toStdString().rfind('/') + 1, settingsfile.toStdString().size()).c_str()) + QString("'  "));
 		QSettings settings(settingsfile, QSettings::IniFormat);
 
-		mode->setCurrentIndex(settings.value("mode", 0).toInt());
+		mode->setCurrentIndex(settings.value("mode", 3).toInt());
 		maximumnumberofthreads->setValue(settings.value("maximumnumberofthreads", 1).toInt());
 
 		peptidetype->setCurrentIndex(settings.value("peptidetype", 0).toInt());
@@ -1003,7 +1004,7 @@ void cParametersWidget::loadSettings() {
 		settings.value("advancedformulacheck", 1).toInt() == 0 ? advancedformulacheck->setChecked(false) : advancedformulacheck->setChecked(true);
 		settings.value("noratiocheck", 1).toInt() == 0 ? noratiocheck->setChecked(false) : noratiocheck->setChecked(true);
 		mzdifftolerance->setValue(settings.value("mzdifftolerance", 0).toDouble());
-		intensitytolerance->setValue(settings.value("intensitytolerance", 10.0).toDouble());
+		intensitytolerance->setValue(settings.value("intensitytolerance", 0).toDouble());
 
 		searchedsequenceline->setText(settings.value("searchedsequence", "").toString());
 		searchedsequenceNtermmodif->setText(settings.value("searchedsequenceNtermmodif", "").toString());

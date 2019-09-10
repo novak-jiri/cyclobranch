@@ -529,10 +529,12 @@ void cMainThread::run() {
 			parameters.peaklistseries[i].sortbyMass();
 		}
 
-		unordered_multimap<int, int> hintsmap;
+		vector< vector<int> > hintsindex;
+		hintsindex.resize(ts.getNumberOfPeaks());
+
 		bool lcms = (parameters.peaklistseries.size() > 1) && !((parameters.peaklistfileformat == mis) || (parameters.peaklistfileformat == imzML));
 
-		if (lcms) {
+		if (lcms || (parameters.peaklistfileformat == mis) || (parameters.peaklistfileformat == imzML)) {
 			*os << "Analyzing spectra : " << endl;
 
 			for (int i = 0; i < parameters.peaklistseries.size(); i++) {
@@ -550,8 +552,11 @@ void cMainThread::run() {
 
 				cTheoreticalSpectrum tstmp;
 				tstmp.setParameters(&parameters);
-				tstmp.getHintsMap(i, ts, unmatchedpeaks[i], hintsmap);
+				tstmp.getHintsIndex(i, ts, unmatchedpeaks[i], hintsindex);
 
+				for (auto& it : hintsindex) {
+					sort(it.begin(), it.end());
+				}
 			}
 
 			*os << " ok" << endl;
@@ -574,7 +579,7 @@ void cMainThread::run() {
 
 			cTheoreticalSpectrum tstmp;
 			tstmp.setParameters(&parameters);
-			tstmp.compareMSSpectrum(i, ts, unmatchedpeaks[i], hintsmap);
+			tstmp.compareMSSpectrum(i, ts, unmatchedpeaks[i], hintsindex);
 			if ((parameters.peaklistfileformat == mis) || (parameters.peaklistfileformat == imzML)) {
 				parameters.peaklistseries[i].clear();
 			}

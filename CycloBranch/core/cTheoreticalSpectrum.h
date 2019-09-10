@@ -177,7 +177,7 @@ class cTheoreticalSpectrum {
 	void removeUnmatchedIsotopePatterns(cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks, cPeaksList& outputtheoreticalpeaks, bool storeunmatchedpeaks);
 
 	// remove unmatched features
-	int removeUnmatchedFeatures(cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks, unordered_multimap<int, int>& hintsmap, int id);
+	int removeUnmatchedFeatures(bool lcms, cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks, vector< vector<int> >& hintsindex/*, int id*/);
 
 	// remove unmatched compounds
 	int removeUnmatchedCompounds(cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks, int minimumiontypes);
@@ -381,9 +381,9 @@ public:
 		\param id identifier of an experimental spectrum
 		\param tsfull theoretical spectrum
 		\param unmatchedpeaksinmatchedpatterns unmatched peaks in matched isotope patterns
-		\param hintsmap map of peak matches for LC-MS data [theoretical peak id, experimental spectrum id]
+		\param hintsindex index of experimental spectra for every matched theoretical peak
 	*/
-	void getHintsMap(int id, cTheoreticalSpectrum& tsfull, cPeaksList& unmatchedpeaksinmatchedpatterns, unordered_multimap<int, int>& hintsmap);
+	void getHintsIndex(int id, cTheoreticalSpectrum& tsfull, cPeaksList& unmatchedpeaksinmatchedpatterns, vector< vector<int> >& hintsindex);
 
 
 	/**
@@ -391,9 +391,9 @@ public:
 		\param id identifier of an experimental spectrum
 		\param tsfull theoretical spectrum with descriptions of peaks
 		\param unmatchedpeaksinmatchedpatterns unmatched peaks in matched isotope patterns
-		\param hintsmap map of peak matches for LC-MS data [theoretical peak id, experimental spectrum id]
+		\param hintsindex index of experimental spectra for every matched theoretical peak
 	*/
-	void compareMSSpectrum(int id, cTheoreticalSpectrum& tsfull, cPeaksList& unmatchedpeaksinmatchedpatterns, unordered_multimap<int, int>& hintsmap);
+	void compareMSSpectrum(int id, cTheoreticalSpectrum& tsfull, cPeaksList& unmatchedpeaksinmatchedpatterns, vector< vector<int> >& hintsindex);
 
 
 	/**

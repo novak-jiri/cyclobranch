@@ -1396,7 +1396,7 @@ void cTheoreticalSpectrum::removeUnmatchedIsotopePatterns(cPeaksList& theoretica
 }
 
 
-int cTheoreticalSpectrum::removeUnmatchedFeatures(cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks, unordered_multimap<int, int>& hintsmap, int id) {
+int cTheoreticalSpectrum::removeUnmatchedFeatures(bool lcms, cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks, vector< vector<int> >& hintsindex/*, int id*/) {
 	if (theoreticalpeaksrealsize == 0) {
 		return 0;
 	}
@@ -1406,7 +1406,6 @@ int cTheoreticalSpectrum::removeUnmatchedFeatures(cPeaksList& theoreticalpeaks, 
 
 	int peaksremoved = 0;
 
-	vector<int> feature;
 	int featuresize;
 	int maxfeaturesize;
 
@@ -1416,6 +1415,7 @@ int cTheoreticalSpectrum::removeUnmatchedFeatures(cPeaksList& theoreticalpeaks, 
 	int stop = 0;
 	int currid = theoreticalpeaks[0].compoundid;
 	int compoundsize = 0;
+	int msize;
 
 	for (int i = 0; i < theoreticalpeaksrealsize; i++) {
 
@@ -1441,30 +1441,25 @@ int cTheoreticalSpectrum::removeUnmatchedFeatures(cPeaksList& theoreticalpeaks, 
 
 		stop = i;
 
-		// ok, matched and unmatched peaks are searched (except isotopes) to calculate csize correctly 
+		// ok, matched and unmatched peaks are searched (except isotopes) to calculate compoundsize correctly 
 		if ((theoreticalpeaks[i].isotope) /*|| (theoreticalpeaks[i].matched == 0)*/) {
 			continue;
 		}
 
-		if (hintsmap.count(i) >= parameters->minimumfeaturesize) {
-
-			feature.clear();
-			auto range1 = hintsmap.equal_range(i);
-			for (auto& it = range1.first; it != range1.second; ++it) {
-				feature.push_back((*it).second);
-			}
-			sort(feature.begin(), feature.end());
+		if ((int)hintsindex[i].size() >= parameters->minimumfeaturesize) {
 
 			featuresize = 0;
 			maxfeaturesize = 0;
 
-			for (int j = 0; j < (int)feature.size(); j++) {
+			for (int j = 0; j < (int)hintsindex[i].size(); j++) {
 
-				if ((j > 0) && (feature[j - 1] + 1 != feature[j])) {
-					if (featuresize > maxfeaturesize) {
-						maxfeaturesize = featuresize;
+				if (lcms) {
+					if ((j > 0) && (hintsindex[i][j - 1] + 1 != hintsindex[i][j])) {
+						if (featuresize > maxfeaturesize) {
+							maxfeaturesize = featuresize;
+						}
+						featuresize = 0;
 					}
-					featuresize = 0;
 				}
 
 				if (parameters->generateisotopepattern) {					
@@ -1476,9 +1471,9 @@ int cTheoreticalSpectrum::removeUnmatchedFeatures(cPeaksList& theoreticalpeaks, 
 
 					patternsize = 0;
 					while ((k < theoreticalpeaksrealsize) && (theoreticalpeaks[k].groupid == theoreticalpeaks[i].groupid)) {
-						auto range2 = hintsmap.equal_range(k);
-						for (auto& it = range2.first; it != range2.second; ++it) {
-							if ((*it).second == feature[j]) {
+						msize = (int)hintsindex[k].size();
+						for (int m = 0; m < msize; m++) {
+							if (hintsindex[k][m] == hintsindex[i][j]) {
 								patternsize++;
 								break;
 							}
@@ -3922,7 +3917,7 @@ void cTheoreticalSpectrum::generateFineMSSpectrum(bool& terminatecomputation) {
 }
 
 
-void cTheoreticalSpectrum::getHintsMap(int id, cTheoreticalSpectrum& tsfull, cPeaksList& unmatchedpeaksinmatchedpatterns, unordered_multimap<int, int>& hintsmap) {
+void cTheoreticalSpectrum::getHintsIndex(int id, cTheoreticalSpectrum& tsfull, cPeaksList& unmatchedpeaksinmatchedpatterns, vector< vector<int> >& hintsindex) {
 	experimentalpeaks = parameters->peaklistseries[id];
 
 	cPeaksList* tsfullpeaklist = tsfull.getTheoreticalPeaks();
@@ -3955,7 +3950,7 @@ void cTheoreticalSpectrum::getHintsMap(int id, cTheoreticalSpectrum& tsfull, cPe
 
 	for (int i = 0; i < (int)experimentalpeaks.size(); i++) {
 		for (auto it = experimentalmatches[i].begin(); it != experimentalmatches[i].end(); ++it) {
-			hintsmap.insert(make_pair(*it, id));
+			hintsindex[*it].push_back(id);
 
 			(*tsfullpeaklist)[*it].matched = 0;
 			(*tsfullpeaklist)[*it].matchedid = -1;
@@ -3964,7 +3959,7 @@ void cTheoreticalSpectrum::getHintsMap(int id, cTheoreticalSpectrum& tsfull, cPe
 }
 
 
-void cTheoreticalSpectrum::compareMSSpectrum(int id, cTheoreticalSpectrum& tsfull, cPeaksList& unmatchedpeaksinmatchedpatterns, unordered_multimap<int, int>& hintsmap) {
+void cTheoreticalSpectrum::compareMSSpectrum(int id, cTheoreticalSpectrum& tsfull, cPeaksList& unmatchedpeaksinmatchedpatterns, vector< vector<int> >& hintsindex) {
 	experimentalpeaks = parameters->peaklistseries[id];
 
 	cPeaksList* tsfullpeaklist = tsfull.getTheoreticalPeaks();
@@ -3998,11 +3993,11 @@ void cTheoreticalSpectrum::compareMSSpectrum(int id, cTheoreticalSpectrum& tsful
 		}
 	}
 
-	// LC-MS data
-	if (lcms) {
-		removeUnmatchedFeatures(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks, hintsmap, id);
+	// LC-MS data or MSI data
+	if (lcms || (parameters->peaklistfileformat == mis) || (parameters->peaklistfileformat == imzML)) {
+		removeUnmatchedFeatures(lcms, *tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks, hintsindex/*, id*/);
 	}
-	// direct MS or MSI data
+	// direct MS 
 	else {
 		if (parameters->minimumiontypes > 1) {
 			removeUnmatchedCompounds(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks, parameters->minimumiontypes);

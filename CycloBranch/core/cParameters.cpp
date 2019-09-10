@@ -115,7 +115,7 @@ void cParameters::clear() {
 	modificationsfilename = "";
 	searchedmodifications.clear();
 	maximumnumberofthreads = 1;
-	mode = denovoengine;
+	mode = dereplication;
 	scoretype = number_of_matched_peaks;
 	maximumcombinedlosses = 2;
 	//clearhitswithoutparent = false;
@@ -123,7 +123,7 @@ void cParameters::clear() {
 	advancedformulacheck = true;
 	noratiocheck = true;
 	mzdifftolerance = 0;
-	intensitytolerance = 10.0;
+	intensitytolerance = 0;
 	reportunmatchedtheoreticalpeaks = false;
 	generateisotopepattern = false;
 	minimumpatternsize = 1;
@@ -1196,11 +1196,11 @@ string cParameters::printToString() {
 	s += generateisotopepattern ? "on" : "off";
 	s += "\n";
 	
-	s += "Minimum Pattern Size: " + to_string(minimumpatternsize) + "\n";
+	s += "Minimum Number of Isotopic Peaks: " + to_string(minimumpatternsize) + "\n";
 
-	s += "Minimum Feature Size: " + to_string(minimumfeaturesize) + "\n";
+	s += "Minimum Number of Spectra: " + to_string(minimumfeaturesize) + "\n";
 
-	s += "Minimum Ion Types: " + to_string(minimumiontypes) + "\n";
+	s += "Minimum Number of Ion Types: " + to_string(minimumiontypes) + "\n";
 
 	s += "Basic Formula Check: ";
 	s += basicformulacheck ? "on" : "off";
@@ -2264,11 +2264,13 @@ int cParameters::generateCompounds(bool& terminatecomputation, string& errormess
 							featureshint++;
 						}
 						else {
-							featureshint = 0;
+							if (lcms) {
+								featureshint = 0;
+							}
 						}
 
 						hintend = false;
-						if (lcms) {
+						if (lcms || (peaklistfileformat == imzML) || (peaklistfileformat == mis)) {
 							if (featureshint >= minimumfeaturesize) {
 								compoundshint++;
 								hintend = true;
