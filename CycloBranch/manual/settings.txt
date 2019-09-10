@@ -560,19 +560,19 @@ This feature may spend a lot of main memory, keep it disabled if possible.</p>
 The full isotope patterns of compounds are generated in theoretical spectra. The [FWHM](@ref settings_fwhm) value is used for this purpose. If checked, the deisotoping is disabled automatically.
 </p>
 
-\subsection settings_minimumpatternsize Minimum Pattern Size
+\subsection settings_minimumpatternsize Minimum Number of Isotopic Peaks
 
 <p>
-The minimum number of matched peaks in an isotope pattern to be reported. The option "Generate Full Isotope Patterns" must be enabled.
+The minimum number of peaks which must be annotated in an isotopic pattern. The option "Generate Full Isotope Patterns" must be enabled.
 </p>
 
-\subsection settings_minimumfeaturesize Minimum Feature Size
+\subsection settings_minimumfeaturesize Minimum Number of Spectra
 
 <p>
-The minimum number of consecutive scans in which a compound must be identified to be reported (LC-MS data only).
+The minimum number of spectra in which a compound must be identified to be reported.<br/>LC-MS data = the minimum number of consecutive scans;<br/>MSI data = the minimum number of pixels.
 </p>
 
-\subsection settings_minimumiontypes Minimum Ion Types
+\subsection settings_minimumiontypes Minimum Number of Ion Types
 
 <p>
 The minimum number of ion types which must be matched to report a given compound. Use e.g. Ion Types: [M+H]+, [M+Na]+; Charge: 2; Neutral Losses: H2O; Maximum Number of Combined Losses: 1.
