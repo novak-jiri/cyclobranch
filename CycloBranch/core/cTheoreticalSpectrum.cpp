@@ -1724,7 +1724,7 @@ void cTheoreticalSpectrum::removeUnmatchedPatternsByIntensityRatio(cPeaksList& t
 							}
 						}
 						else {
-							if (theoreticalpeaks[j].relativeintensity > minimummatchedintensity) {
+							if ((parameters->fwhm >= 0.01) && (theoreticalpeaks[j].relativeintensity > minimummatchedintensity)) {
 								cleargroup = true;
 								break;
 							}
