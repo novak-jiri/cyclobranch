@@ -3926,7 +3926,9 @@ void cTheoreticalSpectrum::getHintsIndex(int id, cTheoreticalSpectrum& tsfull, c
 	searchForPeakPairs(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks, parameters->fragmentmasserrortolerance);
 
 	if (parameters->generateisotopepattern) {
-		removeUnmatchedIronPatterns(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks);
+		if (parameters->minimumpatternsize > 1) {
+			removeUnmatchedIronPatterns(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks);
+		}
 		if (parameters->intensitytolerance > 0) {
 			removeUnmatchedPatternsByIntensityRatio(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks);
 		}
@@ -3968,7 +3970,9 @@ void cTheoreticalSpectrum::compareMSSpectrum(int id, cTheoreticalSpectrum& tsful
 	searchForPeakPairs(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks, parameters->fragmentmasserrortolerance);
 
 	if (parameters->generateisotopepattern) {
-		removeUnmatchedIronPatterns(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks);
+		if (parameters->minimumpatternsize > 1) {
+			removeUnmatchedIronPatterns(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks);
+		}
 		if (parameters->intensitytolerance > 0) {
 			removeUnmatchedPatternsByIntensityRatio(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks);
 		}
