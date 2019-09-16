@@ -182,8 +182,8 @@ class cTheoreticalSpectrum {
 	// remove unmatched compounds
 	int removeUnmatchedCompounds(cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks, int minimumiontypes);
 
-	// remove unmatched patterns of iron
-	void removeUnmatchedIronPatterns(cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks);
+	// remove unmatched patterns in fine isotopic patterns
+	void removeUnmatchedPatternsFineSpectra(cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks);
 
 	// remove unmatched pattern by intensity ratio
 	void removeUnmatchedPatternsByIntensityRatio(cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks);

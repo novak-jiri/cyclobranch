@@ -1582,7 +1582,7 @@ int cTheoreticalSpectrum::removeUnmatchedCompounds(cPeaksList& theoreticalpeaks,
 }
 
 
-void cTheoreticalSpectrum::removeUnmatchedIronPatterns(cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks) {
+void cTheoreticalSpectrum::removeUnmatchedPatternsFineSpectra(cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks) {
 	if (theoreticalpeaksrealsize == 0) {
 		return;
 	}
@@ -1593,10 +1593,23 @@ void cTheoreticalSpectrum::removeUnmatchedIronPatterns(cPeaksList& theoreticalpe
 	int maximumintensityid = 0;
 	double maximumintensity = theoreticalpeaks[0].relativeintensity;
 	bool cleargroup = false;
-	
+
+	double fwhmthreshold = 0.001;
+	bool hasS = false;
+	int posK = -1;
+	int posS = -1;
+
 	double maximumexperimentalintensity;
 	if (theoreticalpeaks[maximumintensityid].matched) {
 		maximumexperimentalintensity = experimentalpeaks[theoreticalpeaks[maximumintensityid].matchedid].relativeintensity;
+	}
+
+	int langle = (int)parameters->peakidtodesc[theoreticalpeaks[start].descriptionid].rfind('(');
+	int rangle = (int)parameters->peakidtodesc[theoreticalpeaks[start].descriptionid].rfind(')');
+	if ((langle != string::npos) && (rangle != string::npos)) {
+		if (parameters->peakidtodesc[theoreticalpeaks[start].descriptionid].substr(langle + 1, rangle - langle - 1).find("S") != string::npos) {
+			hasS = true;
+		}
 	}
 
 	for (int i = 0; i < theoreticalpeaksrealsize; i++) {
@@ -1609,12 +1622,33 @@ void cTheoreticalSpectrum::removeUnmatchedIronPatterns(cPeaksList& theoreticalpe
 				}
 			}
 
+			// to do - can locate 41K in different isotope
+			if ((theoreticalpeaks[i].matched > 0) && (theoreticalpeaks[i].iontype == ms_Kplus)) {
+				if (parameters->fwhm <= fwhmthreshold) {
+					if (parameters->peakidtodesc[theoreticalpeaks[i].descriptionid].find("\\[") == string::npos) {
+						if (parameters->peakidtodesc[theoreticalpeaks[i].descriptionid].find(" 41K ") != string::npos) {
+							posK = i;
+						}
+					}
+				}
+			}
+
+			// to do - can locate 34S in different isotope
+			if ((theoreticalpeaks[i].matched > 0) && hasS) {
+				if (parameters->fwhm <= fwhmthreshold) {
+					if (parameters->peakidtodesc[theoreticalpeaks[i].descriptionid].find("\\[") == string::npos) {
+						if (parameters->peakidtodesc[theoreticalpeaks[i].descriptionid].find(" 34S ") != string::npos) {
+							posS = i;
+						}
+					}
+				}
+			}
+
 			stop = i;
 		}
 
 		if ((groupid != theoreticalpeaks[i].groupid) || (i == theoreticalpeaksrealsize - 1)) {
 			if ((theoreticalpeaks[start].iontype == ms_MFe2H) || (theoreticalpeaks[start].iontype == ms_MFe3HNa) || (theoreticalpeaks[start].iontype == ms_MFe3HK)) {
-
 				if ((theoreticalpeaks[start].matched == 0) && (theoreticalpeaks[maximumintensityid].matched > 0)) {
 					cleargroup = true;
 				}
@@ -1630,8 +1664,23 @@ void cTheoreticalSpectrum::removeUnmatchedIronPatterns(cPeaksList& theoreticalpe
 							cleargroup = true;
 						}
 					}
+				}				
+			}
+
+			if (theoreticalpeaks[start].iontype == ms_Kplus) {
+				if (parameters->fwhm <= fwhmthreshold) {
+					if (posK == -1) {
+						cleargroup = true;
+					}
 				}
-				
+			}
+
+			if (hasS) {
+				if (parameters->fwhm <= fwhmthreshold) {
+					if (posS == -1) {
+						cleargroup = true;
+					}
+				}
 			}
 
 			if (cleargroup) {
@@ -1652,8 +1701,18 @@ void cTheoreticalSpectrum::removeUnmatchedIronPatterns(cPeaksList& theoreticalpe
 			maximumintensityid = i;
 			maximumintensity = theoreticalpeaks[i].relativeintensity;
 			cleargroup = false;
+			hasS = false;
+			posK = -1;
+			posS = -1;
 			if (theoreticalpeaks[i].matched) {
 				maximumexperimentalintensity = experimentalpeaks[theoreticalpeaks[i].matchedid].relativeintensity;
+			}
+			langle = (int)parameters->peakidtodesc[theoreticalpeaks[start].descriptionid].rfind('(');
+			rangle = (int)parameters->peakidtodesc[theoreticalpeaks[start].descriptionid].find(')');
+			if ((langle != string::npos) && (rangle != string::npos)) {
+				if (parameters->peakidtodesc[theoreticalpeaks[start].descriptionid].substr(langle + 1, rangle - langle - 1).find("S") != string::npos) {
+					hasS = true;
+				}
 			}
 		}
 	}
@@ -3927,7 +3986,7 @@ void cTheoreticalSpectrum::getHintsIndex(int id, cTheoreticalSpectrum& tsfull, c
 
 	if (parameters->generateisotopepattern) {
 		if (parameters->minimumpatternsize > 1) {
-			removeUnmatchedIronPatterns(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks);
+			removeUnmatchedPatternsFineSpectra(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks);
 		}
 		if (parameters->intensitytolerance > 0) {
 			removeUnmatchedPatternsByIntensityRatio(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks);
@@ -3971,7 +4030,7 @@ void cTheoreticalSpectrum::compareMSSpectrum(int id, cTheoreticalSpectrum& tsful
 
 	if (parameters->generateisotopepattern) {
 		if (parameters->minimumpatternsize > 1) {
-			removeUnmatchedIronPatterns(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks);
+			removeUnmatchedPatternsFineSpectra(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks);
 		}
 		if (parameters->intensitytolerance > 0) {
 			removeUnmatchedPatternsByIntensityRatio(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks);
