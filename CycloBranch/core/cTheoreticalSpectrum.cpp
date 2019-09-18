@@ -1593,26 +1593,39 @@ void cTheoreticalSpectrum::removeUnmatchedPatternsFineSpectra(cPeaksList& theore
 	int maximumintensityid = 0;
 	double maximumintensity = theoreticalpeaks[0].relativeintensity;
 	bool cleargroup = false;
-	double mzdiff;
 
 	int langle = 0;
 	int rangle = 0;
 	double fwhmthreshold = 0.001;
+	double mzdiff;
+	string subdesc;
+
 	bool hasS = false;
-	int posK = -1;
+	bool hasK = false;
+	bool hasFe = false;
+
 	int posS = -1;
+	int posK = -1;
+	int posFe = -1;
 
 	double maximumexperimentalintensity;
 	if (theoreticalpeaks[maximumintensityid].matched) {
 		maximumexperimentalintensity = experimentalpeaks[theoreticalpeaks[maximumintensityid].matchedid].relativeintensity;
 	}
 
-	if (parameters->fwhm <= fwhmthreshold) {
-		langle = (int)parameters->peakidtodesc[theoreticalpeaks[start].descriptionid].rfind('(');
-		rangle = (int)parameters->peakidtodesc[theoreticalpeaks[start].descriptionid].rfind(')');
-		if ((langle != string::npos) && (rangle != string::npos)) {
-			if (parameters->peakidtodesc[theoreticalpeaks[start].descriptionid].substr(langle + 1, rangle - langle - 1).find("S") != string::npos) {
+	langle = (int)parameters->peakidtodesc[theoreticalpeaks[start].descriptionid].rfind('(');
+	rangle = (int)parameters->peakidtodesc[theoreticalpeaks[start].descriptionid].rfind(')');
+	if ((langle != string::npos) && (rangle != string::npos)) {
+		subdesc = parameters->peakidtodesc[theoreticalpeaks[start].descriptionid].substr(langle + 1, rangle - langle - 1);
+		if (subdesc.find("Fe") != string::npos) {
+			hasFe = true;
+		}
+		if (parameters->fwhm <= fwhmthreshold) {
+			if (subdesc.find("S") != string::npos) {
 				hasS = true;
+			}
+			if (subdesc.find("K") != string::npos) {
+				hasK = true;
 			}
 		}
 	}
@@ -1633,6 +1646,7 @@ void cTheoreticalSpectrum::removeUnmatchedPatternsFineSpectra(cPeaksList& theore
 
 		if ((groupid != theoreticalpeaks[i].groupid) || (i == theoreticalpeaksrealsize - 1)) {
 
+			/*
 			if ((theoreticalpeaks[start].iontype == ms_MFe2H) || (theoreticalpeaks[start].iontype == ms_MFe3HNa) || (theoreticalpeaks[start].iontype == ms_MFe3HK)) {
 
 				if ((theoreticalpeaks[start].matched == 0) && (theoreticalpeaks[maximumintensityid].matched > 0)) {
@@ -1653,47 +1667,46 @@ void cTheoreticalSpectrum::removeUnmatchedPatternsFineSpectra(cPeaksList& theore
 				}
 
 			}
+			*/
 
-			if (parameters->fwhm <= fwhmthreshold) {
-
-				if (theoreticalpeaks[start].iontype == ms_Kplus) {
-
-					if (theoreticalpeaks[maximumintensityid].matched > 0) {
-						if (maximumexperimentalintensity >= parameters->minimumrelativeintensitythreshold) {
-							for (int j = start; j <= stop; j++) {
-								if (theoreticalpeaks[j].matched > 0) {
-									mzdiff = fabs(theoreticalpeaks[j].mzratio - theoreticalpeaks[maximumintensityid].mzratio - K41 + K39);
-									if (mzdiff < 0.000001) {
-										//if (parameters->peakidtodesc[theoreticalpeaks[j].descriptionid].find("\\[") == string::npos) {
-											//if (parameters->peakidtodesc[theoreticalpeaks[j].descriptionid].find(" 41K ") != string::npos) {
-												posK = j;
-											//}
+			if (hasFe) {
+				if (theoreticalpeaks[maximumintensityid].matched > 0) {
+					if (maximumexperimentalintensity >= parameters->minimumrelativeintensitythreshold) {
+						for (int j = start; j <= stop; j++) {
+							if (theoreticalpeaks[j].matched > 0) {
+								mzdiff = fabs(theoreticalpeaks[j].mzratio - theoreticalpeaks[maximumintensityid].mzratio - Fe54 + Fe56);
+								if (mzdiff < 0.000001) {
+									//if (parameters->peakidtodesc[theoreticalpeaks[j].descriptionid].find("\\[") == string::npos) {
+										//if (parameters->peakidtodesc[theoreticalpeaks[j].descriptionid].find(" 54Fe ") != string::npos) {
+											posFe = j;
 										//}
-									}
+									//}
 								}
 							}
 						}
 					}
+				}
 
-					if (posK == -1) {
-						cleargroup = true;
-					}
-					else {
-						if ((theoreticalpeaks[posK].matched > 0) && (theoreticalpeaks[maximumintensityid].matched > 0)) {
-							if (maximumexperimentalintensity >= parameters->minimumrelativeintensitythreshold) {
-								if (theoreticalpeaks[posK].relativeintensity*maximumexperimentalintensity / 100.0 >= parameters->minimumrelativeintensitythreshold) {
-									if (experimentalpeaks[theoreticalpeaks[posK].matchedid].relativeintensity > 0.1 * maximumexperimentalintensity) {
-										cleargroup = true;
-									}
-								}
-								else {
+				if (posFe == -1) {
+					cleargroup = true;
+				}
+				else {
+					if ((theoreticalpeaks[posFe].matched > 0) && (theoreticalpeaks[maximumintensityid].matched > 0)) {
+						if (maximumexperimentalintensity >= parameters->minimumrelativeintensitythreshold) {
+							if (theoreticalpeaks[posFe].relativeintensity*maximumexperimentalintensity / 100.0 >= parameters->minimumrelativeintensitythreshold) {
+								if (experimentalpeaks[theoreticalpeaks[posFe].matchedid].relativeintensity > 0.1 * maximumexperimentalintensity) {
 									cleargroup = true;
 								}
 							}
+							else {
+								cleargroup = true;
+							}
 						}
 					}
-
 				}
+			}
+
+			if (parameters->fwhm <= fwhmthreshold) {
 
 				if (hasS) {
 					if (theoreticalpeaks[maximumintensityid].matched > 0) {
@@ -1731,6 +1744,44 @@ void cTheoreticalSpectrum::removeUnmatchedPatternsFineSpectra(cPeaksList& theore
 						}
 					}
 				}
+
+				if (hasK) {
+					if (theoreticalpeaks[maximumintensityid].matched > 0) {
+						if (maximumexperimentalintensity >= parameters->minimumrelativeintensitythreshold) {
+							for (int j = start; j <= stop; j++) {
+								if (theoreticalpeaks[j].matched > 0) {
+									mzdiff = fabs(theoreticalpeaks[j].mzratio - theoreticalpeaks[maximumintensityid].mzratio - K41 + K39);
+									if (mzdiff < 0.000001) {
+										//if (parameters->peakidtodesc[theoreticalpeaks[j].descriptionid].find("\\[") == string::npos) {
+											//if (parameters->peakidtodesc[theoreticalpeaks[j].descriptionid].find(" 41K ") != string::npos) {
+										posK = j;
+										//}
+									//}
+									}
+								}
+							}
+						}
+					}
+
+					if (posK == -1) {
+						cleargroup = true;
+					}
+					else {
+						if ((theoreticalpeaks[posK].matched > 0) && (theoreticalpeaks[maximumintensityid].matched > 0)) {
+							if (maximumexperimentalintensity >= parameters->minimumrelativeintensitythreshold) {
+								if (theoreticalpeaks[posK].relativeintensity*maximumexperimentalintensity / 100.0 >= parameters->minimumrelativeintensitythreshold) {
+									if (experimentalpeaks[theoreticalpeaks[posK].matchedid].relativeintensity > 0.1 * maximumexperimentalintensity) {
+										cleargroup = true;
+									}
+								}
+								else {
+									cleargroup = true;
+								}
+							}
+						}
+					}
+				}
+
 			}
 
 			if (cleargroup) {
@@ -1751,20 +1802,32 @@ void cTheoreticalSpectrum::removeUnmatchedPatternsFineSpectra(cPeaksList& theore
 			maximumintensityid = i;
 			maximumintensity = theoreticalpeaks[i].relativeintensity;
 			cleargroup = false;
+
 			hasS = false;
-			posK = -1;
+			hasK = false;
+			hasFe = false;
+			
 			posS = -1;
+			posK = -1;
+			posFe = -1;
 
 			if (theoreticalpeaks[i].matched) {
 				maximumexperimentalintensity = experimentalpeaks[theoreticalpeaks[i].matchedid].relativeintensity;
 			}
 
-			if (parameters->fwhm <= fwhmthreshold) {
-				langle = (int)parameters->peakidtodesc[theoreticalpeaks[start].descriptionid].rfind('(');
-				rangle = (int)parameters->peakidtodesc[theoreticalpeaks[start].descriptionid].find(')');
-				if ((langle != string::npos) && (rangle != string::npos)) {
-					if (parameters->peakidtodesc[theoreticalpeaks[start].descriptionid].substr(langle + 1, rangle - langle - 1).find("S") != string::npos) {
+			langle = (int)parameters->peakidtodesc[theoreticalpeaks[start].descriptionid].rfind('(');
+			rangle = (int)parameters->peakidtodesc[theoreticalpeaks[start].descriptionid].rfind(')');
+			if ((langle != string::npos) && (rangle != string::npos)) {
+				subdesc = parameters->peakidtodesc[theoreticalpeaks[start].descriptionid].substr(langle + 1, rangle - langle - 1);
+				if (subdesc.find("Fe") != string::npos) {
+					hasFe = true;
+				}
+				if (parameters->fwhm <= fwhmthreshold) {
+					if (subdesc.find("S") != string::npos) {
 						hasS = true;
+					}
+					if (subdesc.find("K") != string::npos) {
+						hasK = true;
 					}
 				}
 			}
