@@ -1754,9 +1754,9 @@ void cTheoreticalSpectrum::removeUnmatchedPatternsFineSpectra(cPeaksList& theore
 									if (mzdiff < 0.1) {
 										//if (parameters->peakidtodesc[theoreticalpeaks[j].descriptionid].find("\\[") == string::npos) {
 											//if (parameters->peakidtodesc[theoreticalpeaks[j].descriptionid].find(" 41K ") != string::npos) {
-										posK = j;
+												posK = j;
+											//}
 										//}
-									//}
 									}
 								}
 							}
