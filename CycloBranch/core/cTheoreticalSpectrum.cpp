@@ -1674,8 +1674,8 @@ void cTheoreticalSpectrum::removeUnmatchedPatternsFineSpectra(cPeaksList& theore
 					if (maximumexperimentalintensity >= parameters->minimumrelativeintensitythreshold) {
 						for (int j = start; j <= stop; j++) {
 							if (theoreticalpeaks[j].matched > 0) {
-								mzdiff = fabs(theoreticalpeaks[j].mzratio - theoreticalpeaks[maximumintensityid].mzratio - Fe54 + Fe56);
-								if (mzdiff < 0.000001) {
+								mzdiff = fabs(uncharge(theoreticalpeaks[j].mzratio, theoreticalpeaks[j].charge) - uncharge(theoreticalpeaks[maximumintensityid].mzratio, theoreticalpeaks[maximumintensityid].charge) - Fe54 + Fe56);
+								if (mzdiff < 0.1) {
 									//if (parameters->peakidtodesc[theoreticalpeaks[j].descriptionid].find("\\[") == string::npos) {
 										//if (parameters->peakidtodesc[theoreticalpeaks[j].descriptionid].find(" 54Fe ") != string::npos) {
 											posFe = j;
@@ -1713,8 +1713,8 @@ void cTheoreticalSpectrum::removeUnmatchedPatternsFineSpectra(cPeaksList& theore
 						if (maximumexperimentalintensity >= parameters->minimumrelativeintensitythreshold) {
 							for (int j = start; j <= stop; j++) {
 								if (theoreticalpeaks[j].matched > 0) {
-									mzdiff = fabs(theoreticalpeaks[j].mzratio - theoreticalpeaks[maximumintensityid].mzratio - S34 + S32);
-									if (mzdiff < 0.000001) {
+									mzdiff = fabs(uncharge(theoreticalpeaks[j].mzratio, theoreticalpeaks[j].charge) - uncharge(theoreticalpeaks[maximumintensityid].mzratio, theoreticalpeaks[maximumintensityid].charge) - S34 + S32);
+									if (mzdiff < 0.1) {
 										//if (parameters->peakidtodesc[theoreticalpeaks[j].descriptionid].find("\\[") == string::npos) {
 											//if (parameters->peakidtodesc[theoreticalpeaks[j].descriptionid].find(" 34S ") != string::npos) {
 												posS = j;
@@ -1750,8 +1750,8 @@ void cTheoreticalSpectrum::removeUnmatchedPatternsFineSpectra(cPeaksList& theore
 						if (maximumexperimentalintensity >= parameters->minimumrelativeintensitythreshold) {
 							for (int j = start; j <= stop; j++) {
 								if (theoreticalpeaks[j].matched > 0) {
-									mzdiff = fabs(theoreticalpeaks[j].mzratio - theoreticalpeaks[maximumintensityid].mzratio - K41 + K39);
-									if (mzdiff < 0.000001) {
+									mzdiff = fabs(uncharge(theoreticalpeaks[j].mzratio, theoreticalpeaks[j].charge) - uncharge(theoreticalpeaks[maximumintensityid].mzratio, theoreticalpeaks[maximumintensityid].charge) - K41 + K39);
+									if (mzdiff < 0.1) {
 										//if (parameters->peakidtodesc[theoreticalpeaks[j].descriptionid].find("\\[") == string::npos) {
 											//if (parameters->peakidtodesc[theoreticalpeaks[j].descriptionid].find(" 41K ") != string::npos) {
 										posK = j;
