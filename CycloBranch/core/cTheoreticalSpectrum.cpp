@@ -1593,7 +1593,10 @@ void cTheoreticalSpectrum::removeUnmatchedPatternsFineSpectra(cPeaksList& theore
 	int maximumintensityid = 0;
 	double maximumintensity = theoreticalpeaks[0].relativeintensity;
 	bool cleargroup = false;
+	double mzdiff;
 
+	int langle = 0;
+	int rangle = 0;
 	double fwhmthreshold = 0.001;
 	bool hasS = false;
 	int posK = -1;
@@ -1604,15 +1607,18 @@ void cTheoreticalSpectrum::removeUnmatchedPatternsFineSpectra(cPeaksList& theore
 		maximumexperimentalintensity = experimentalpeaks[theoreticalpeaks[maximumintensityid].matchedid].relativeintensity;
 	}
 
-	int langle = (int)parameters->peakidtodesc[theoreticalpeaks[start].descriptionid].rfind('(');
-	int rangle = (int)parameters->peakidtodesc[theoreticalpeaks[start].descriptionid].rfind(')');
-	if ((langle != string::npos) && (rangle != string::npos)) {
-		if (parameters->peakidtodesc[theoreticalpeaks[start].descriptionid].substr(langle + 1, rangle - langle - 1).find("S") != string::npos) {
-			hasS = true;
+	if (parameters->fwhm <= fwhmthreshold) {
+		langle = (int)parameters->peakidtodesc[theoreticalpeaks[start].descriptionid].rfind('(');
+		rangle = (int)parameters->peakidtodesc[theoreticalpeaks[start].descriptionid].rfind(')');
+		if ((langle != string::npos) && (rangle != string::npos)) {
+			if (parameters->peakidtodesc[theoreticalpeaks[start].descriptionid].substr(langle + 1, rangle - langle - 1).find("S") != string::npos) {
+				hasS = true;
+			}
 		}
 	}
 
 	for (int i = 0; i < theoreticalpeaksrealsize; i++) {
+
 		if (groupid == theoreticalpeaks[i].groupid) {
 			if (theoreticalpeaks[i].relativeintensity > maximumintensity) {
 				maximumintensityid = i;
@@ -1622,33 +1628,13 @@ void cTheoreticalSpectrum::removeUnmatchedPatternsFineSpectra(cPeaksList& theore
 				}
 			}
 
-			// to do - can locate 41K in different isotope
-			if ((theoreticalpeaks[i].matched > 0) && (theoreticalpeaks[i].iontype == ms_Kplus)) {
-				if (parameters->fwhm <= fwhmthreshold) {
-					if (parameters->peakidtodesc[theoreticalpeaks[i].descriptionid].find("\\[") == string::npos) {
-						if (parameters->peakidtodesc[theoreticalpeaks[i].descriptionid].find(" 41K ") != string::npos) {
-							posK = i;
-						}
-					}
-				}
-			}
-
-			// to do - can locate 34S in different isotope
-			if ((theoreticalpeaks[i].matched > 0) && hasS) {
-				if (parameters->fwhm <= fwhmthreshold) {
-					if (parameters->peakidtodesc[theoreticalpeaks[i].descriptionid].find("\\[") == string::npos) {
-						if (parameters->peakidtodesc[theoreticalpeaks[i].descriptionid].find(" 34S ") != string::npos) {
-							posS = i;
-						}
-					}
-				}
-			}
-
 			stop = i;
 		}
 
 		if ((groupid != theoreticalpeaks[i].groupid) || (i == theoreticalpeaksrealsize - 1)) {
+
 			if ((theoreticalpeaks[start].iontype == ms_MFe2H) || (theoreticalpeaks[start].iontype == ms_MFe3HNa) || (theoreticalpeaks[start].iontype == ms_MFe3HK)) {
+
 				if ((theoreticalpeaks[start].matched == 0) && (theoreticalpeaks[maximumintensityid].matched > 0)) {
 					cleargroup = true;
 				}
@@ -1664,21 +1650,85 @@ void cTheoreticalSpectrum::removeUnmatchedPatternsFineSpectra(cPeaksList& theore
 							cleargroup = true;
 						}
 					}
-				}				
+				}
+
 			}
 
-			if (theoreticalpeaks[start].iontype == ms_Kplus) {
-				if (parameters->fwhm <= fwhmthreshold) {
+			if (parameters->fwhm <= fwhmthreshold) {
+
+				if (theoreticalpeaks[start].iontype == ms_Kplus) {
+
+					if (theoreticalpeaks[maximumintensityid].matched > 0) {
+						if (maximumexperimentalintensity >= parameters->minimumrelativeintensitythreshold) {
+							for (int j = start; j <= stop; j++) {
+								if (theoreticalpeaks[j].matched > 0) {
+									mzdiff = fabs(theoreticalpeaks[j].mzratio - theoreticalpeaks[maximumintensityid].mzratio - K41 + K39);
+									if (mzdiff < 0.000001) {
+										//if (parameters->peakidtodesc[theoreticalpeaks[j].descriptionid].find("\\[") == string::npos) {
+											//if (parameters->peakidtodesc[theoreticalpeaks[j].descriptionid].find(" 41K ") != string::npos) {
+												posK = j;
+											//}
+										//}
+									}
+								}
+							}
+						}
+					}
+
 					if (posK == -1) {
 						cleargroup = true;
 					}
-				}
-			}
+					else {
+						if ((theoreticalpeaks[posK].matched > 0) && (theoreticalpeaks[maximumintensityid].matched > 0)) {
+							if (maximumexperimentalintensity >= parameters->minimumrelativeintensitythreshold) {
+								if (theoreticalpeaks[posK].relativeintensity*maximumexperimentalintensity / 100.0 >= parameters->minimumrelativeintensitythreshold) {
+									if (experimentalpeaks[theoreticalpeaks[posK].matchedid].relativeintensity > 0.1 * maximumexperimentalintensity) {
+										cleargroup = true;
+									}
+								}
+								else {
+									cleargroup = true;
+								}
+							}
+						}
+					}
 
-			if (hasS) {
-				if (parameters->fwhm <= fwhmthreshold) {
+				}
+
+				if (hasS) {
+					if (theoreticalpeaks[maximumintensityid].matched > 0) {
+						if (maximumexperimentalintensity >= parameters->minimumrelativeintensitythreshold) {
+							for (int j = start; j <= stop; j++) {
+								if (theoreticalpeaks[j].matched > 0) {
+									mzdiff = fabs(theoreticalpeaks[j].mzratio - theoreticalpeaks[maximumintensityid].mzratio - S34 + S32);
+									if (mzdiff < 0.000001) {
+										//if (parameters->peakidtodesc[theoreticalpeaks[j].descriptionid].find("\\[") == string::npos) {
+											//if (parameters->peakidtodesc[theoreticalpeaks[j].descriptionid].find(" 34S ") != string::npos) {
+												posS = j;
+											//}
+										//}
+									}
+								}
+							}
+						}
+					}
+
 					if (posS == -1) {
 						cleargroup = true;
+					}
+					else {
+						if ((theoreticalpeaks[posS].matched > 0) && (theoreticalpeaks[maximumintensityid].matched > 0)) {
+							if (maximumexperimentalintensity >= parameters->minimumrelativeintensitythreshold) {
+								if (theoreticalpeaks[posS].relativeintensity*maximumexperimentalintensity / 100.0 >= parameters->minimumrelativeintensitythreshold) {
+									if (experimentalpeaks[theoreticalpeaks[posS].matchedid].relativeintensity > 0.1 * maximumexperimentalintensity) {
+										cleargroup = true;
+									}
+								}
+								else {
+									cleargroup = true;
+								}
+							}
+						}
 					}
 				}
 			}
@@ -1704,18 +1754,25 @@ void cTheoreticalSpectrum::removeUnmatchedPatternsFineSpectra(cPeaksList& theore
 			hasS = false;
 			posK = -1;
 			posS = -1;
+
 			if (theoreticalpeaks[i].matched) {
 				maximumexperimentalintensity = experimentalpeaks[theoreticalpeaks[i].matchedid].relativeintensity;
 			}
-			langle = (int)parameters->peakidtodesc[theoreticalpeaks[start].descriptionid].rfind('(');
-			rangle = (int)parameters->peakidtodesc[theoreticalpeaks[start].descriptionid].find(')');
-			if ((langle != string::npos) && (rangle != string::npos)) {
-				if (parameters->peakidtodesc[theoreticalpeaks[start].descriptionid].substr(langle + 1, rangle - langle - 1).find("S") != string::npos) {
-					hasS = true;
+
+			if (parameters->fwhm <= fwhmthreshold) {
+				langle = (int)parameters->peakidtodesc[theoreticalpeaks[start].descriptionid].rfind('(');
+				rangle = (int)parameters->peakidtodesc[theoreticalpeaks[start].descriptionid].find(')');
+				if ((langle != string::npos) && (rangle != string::npos)) {
+					if (parameters->peakidtodesc[theoreticalpeaks[start].descriptionid].substr(langle + 1, rangle - langle - 1).find("S") != string::npos) {
+						hasS = true;
+					}
 				}
 			}
+
 		}
+
 	}
+
 }
 
 
