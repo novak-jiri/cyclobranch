@@ -1676,11 +1676,12 @@ void cTheoreticalSpectrum::removeUnmatchedPatternsFineSpectra(cPeaksList& theore
 							if (theoreticalpeaks[j].matched > 0) {
 								mzdiff = fabs(uncharge(theoreticalpeaks[j].mzratio, theoreticalpeaks[j].charge) - uncharge(theoreticalpeaks[maximumintensityid].mzratio, theoreticalpeaks[maximumintensityid].charge) - Fe54 + Fe56);
 								if (mzdiff < 0.1) {
-									//if (parameters->peakidtodesc[theoreticalpeaks[j].descriptionid].find("\\[") == string::npos) {
-										//if (parameters->peakidtodesc[theoreticalpeaks[j].descriptionid].find(" 54Fe ") != string::npos) {
+									if (parameters->peakidtodesc[theoreticalpeaks[j].descriptionid].find("\\[") == string::npos) {
+										if (parameters->peakidtodesc[theoreticalpeaks[j].descriptionid].find(" 54Fe ") != string::npos) {
 											posFe = j;
-										//}
-									//}
+											break;
+										}
+									}
 								}
 							}
 						}
@@ -1715,11 +1716,12 @@ void cTheoreticalSpectrum::removeUnmatchedPatternsFineSpectra(cPeaksList& theore
 								if (theoreticalpeaks[j].matched > 0) {
 									mzdiff = fabs(uncharge(theoreticalpeaks[j].mzratio, theoreticalpeaks[j].charge) - uncharge(theoreticalpeaks[maximumintensityid].mzratio, theoreticalpeaks[maximumintensityid].charge) - S34 + S32);
 									if (mzdiff < 0.1) {
-										//if (parameters->peakidtodesc[theoreticalpeaks[j].descriptionid].find("\\[") == string::npos) {
-											//if (parameters->peakidtodesc[theoreticalpeaks[j].descriptionid].find(" 34S ") != string::npos) {
+										if (parameters->peakidtodesc[theoreticalpeaks[j].descriptionid].find("\\[") == string::npos) {
+											if (parameters->peakidtodesc[theoreticalpeaks[j].descriptionid].find(" 34S ") != string::npos) {
 												posS = j;
-											//}
-										//}
+												break;
+											}
+										}
 									}
 								}
 							}
@@ -1752,11 +1754,12 @@ void cTheoreticalSpectrum::removeUnmatchedPatternsFineSpectra(cPeaksList& theore
 								if (theoreticalpeaks[j].matched > 0) {
 									mzdiff = fabs(uncharge(theoreticalpeaks[j].mzratio, theoreticalpeaks[j].charge) - uncharge(theoreticalpeaks[maximumintensityid].mzratio, theoreticalpeaks[maximumintensityid].charge) - K41 + K39);
 									if (mzdiff < 0.1) {
-										//if (parameters->peakidtodesc[theoreticalpeaks[j].descriptionid].find("\\[") == string::npos) {
-											//if (parameters->peakidtodesc[theoreticalpeaks[j].descriptionid].find(" 41K ") != string::npos) {
+										if (parameters->peakidtodesc[theoreticalpeaks[j].descriptionid].find("\\[") == string::npos) {
+											if (parameters->peakidtodesc[theoreticalpeaks[j].descriptionid].find(" 41K ") != string::npos) {
 												posK = j;
-											//}
-										//}
+												break;
+											}
+										}
 									}
 								}
 							}
