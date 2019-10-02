@@ -1629,6 +1629,46 @@ void cTheoreticalSpectrum::removeUnmatchedPatternsFineSpectra(cPeaksList& theore
 			}
 		}
 	}
+	
+	/*
+	if (parameters->fwhm <= fwhmthreshold) {
+		langle = (int)parameters->peakidtodesc[theoreticalpeaks[start].descriptionid].rfind('(');
+		rangle = (int)parameters->peakidtodesc[theoreticalpeaks[start].descriptionid].rfind(')');
+		if ((langle != string::npos) && (rangle != string::npos)) {
+			subdesc = parameters->peakidtodesc[theoreticalpeaks[start].descriptionid].substr(langle + 1, rangle - langle - 1);
+			if (subdesc.find("Fe") != string::npos) {
+				hasFe = true;
+			}
+			if (subdesc.find("S") != string::npos) {
+				hasS = true;
+			}
+			if (subdesc.find("K") != string::npos) {
+				hasK = true;
+			}
+		}
+	}
+	else {
+		if ((theoreticalpeaks[start].iontype == ms_MFe2H)
+			|| (theoreticalpeaks[start].iontype == ms_MFe3HNa)
+			|| (theoreticalpeaks[start].iontype == ms_MFe3HK)
+			|| (theoreticalpeaks[start].iontype == ms_2MFe2H)
+			|| (theoreticalpeaks[start].iontype == ms_2MFe3HNa)
+			|| (theoreticalpeaks[start].iontype == ms_2MFe3HK)
+			|| (theoreticalpeaks[start].iontype == ms_3MFe2H)
+			|| (theoreticalpeaks[start].iontype == ms_3MFe3HNa)
+			|| (theoreticalpeaks[start].iontype == ms_3MFe3HK)
+			//|| (theoreticalpeaks[start].iontype == ms_3M2Fe5H) 
+			//|| (theoreticalpeaks[start].iontype == ms_3M2Fe6HNa) 
+			//|| (theoreticalpeaks[start].iontype == ms_3M2Fe6HK)
+			|| (theoreticalpeaks[start].iontype == ms_MFe4H)
+			|| (theoreticalpeaks[start].iontype == ms_2MFe4H)
+			|| (theoreticalpeaks[start].iontype == ms_3MFe4H)
+			//|| (theoreticalpeaks[start].iontype == ms_3M2Fe7H)
+			) {
+			hasFe = true;
+		}
+	}
+	*/
 
 	for (int i = 0; i < theoreticalpeaksrealsize; i++) {
 
@@ -1834,6 +1874,46 @@ void cTheoreticalSpectrum::removeUnmatchedPatternsFineSpectra(cPeaksList& theore
 					}
 				}
 			}
+			
+			/*
+			if (parameters->fwhm <= fwhmthreshold) {
+				langle = (int)parameters->peakidtodesc[theoreticalpeaks[start].descriptionid].rfind('(');
+				rangle = (int)parameters->peakidtodesc[theoreticalpeaks[start].descriptionid].rfind(')');
+				if ((langle != string::npos) && (rangle != string::npos)) {
+					subdesc = parameters->peakidtodesc[theoreticalpeaks[start].descriptionid].substr(langle + 1, rangle - langle - 1);
+					if (subdesc.find("Fe") != string::npos) {
+						hasFe = true;
+					}
+					if (subdesc.find("S") != string::npos) {
+						hasS = true;
+					}
+					if (subdesc.find("K") != string::npos) {
+						hasK = true;
+					}
+				}
+			}
+			else {
+				if ((theoreticalpeaks[start].iontype == ms_MFe2H)
+					|| (theoreticalpeaks[start].iontype == ms_MFe3HNa)
+					|| (theoreticalpeaks[start].iontype == ms_MFe3HK)
+					|| (theoreticalpeaks[start].iontype == ms_2MFe2H)
+					|| (theoreticalpeaks[start].iontype == ms_2MFe3HNa)
+					|| (theoreticalpeaks[start].iontype == ms_2MFe3HK)
+					|| (theoreticalpeaks[start].iontype == ms_3MFe2H)
+					|| (theoreticalpeaks[start].iontype == ms_3MFe3HNa)
+					|| (theoreticalpeaks[start].iontype == ms_3MFe3HK)
+					//|| (theoreticalpeaks[start].iontype == ms_3M2Fe5H) 
+					//|| (theoreticalpeaks[start].iontype == ms_3M2Fe6HNa) 
+					//|| (theoreticalpeaks[start].iontype == ms_3M2Fe6HK)
+					|| (theoreticalpeaks[start].iontype == ms_MFe4H)
+					|| (theoreticalpeaks[start].iontype == ms_2MFe4H)
+					|| (theoreticalpeaks[start].iontype == ms_3MFe4H)
+					//|| (theoreticalpeaks[start].iontype == ms_3M2Fe7H)
+					) {
+					hasFe = true;
+				}
+			}
+			*/
 
 		}
 
