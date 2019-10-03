@@ -299,6 +299,7 @@ bool cBricksDatabase::nextCombinationFast(vector<int>& combarray, vector<int>& c
 bool cBricksDatabase::nextCombinationFastLimited(vector<int>& combarray, vector<int>& combcounts, vector<int>& comblimits, vector<double>& combmasses, double& mass, int numberofbasicbricks, int maximumbricksincombination, double maximumcumulativemass, double neutralprecursormass) {
 	int pointer = 0;
 	int cyFlag = 0;
+	int lastval;
 	
 	mass = 0;
 	
@@ -321,12 +322,26 @@ bool cBricksDatabase::nextCombinationFastLimited(vector<int>& combarray, vector<
 			
 			if (((maximumcumulativemass > 0) && (mass > maximumcumulativemass)) || ((neutralprecursormass > 0) && (mass > neutralprecursormass))) {
 
+				lastval = combarray[pointer];
+
 				if (combarray[pointer] > 0) {
 					combcounts[combarray[pointer] - 1]--;
 				}
 
 				combarray[pointer] = numberofbasicbricks + 1;
 
+				while ((pointer + 1 < maximumbricksincombination) && (combarray[pointer + 1] >= lastval - 1)) {
+
+					pointer++;
+
+					if (combarray[pointer] > 0) {
+						combcounts[combarray[pointer] - 1]--;
+					}
+
+					combarray[pointer] = numberofbasicbricks + 1;
+
+				}
+				
 			}
 			else {
 
