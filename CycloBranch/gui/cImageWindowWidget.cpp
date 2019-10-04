@@ -656,7 +656,21 @@ void cImageWindowWidget::redrawScene() {
 	QRectF rect_scene = mapToScene(rect_viewport).boundingRect();
 
 	QPixmap scaledpixmap = layersvector[layer_optical_image].pixmap->copy(rect_scene.x() / currentscale, rect_scene.y() / currentscale, rect_scene.width() / currentscale + 1, rect_scene.height() / currentscale + 1);
+
+	if (scaledpixmap.isNull()) {
+		return;
+	}
+
+	if (scaledpixmap.width() * currentscale * scaledpixmap.height() * currentscale > 100000000) {
+		// too many pixels
+		return;
+	}
+
 	scaledpixmap = scaledpixmap.scaledToHeight(scaledpixmap.height()*currentscale);
+
+	if (scaledpixmap.isNull()) {
+		return;
+	}
 
 	currentwidth = layersvector[layer_optical_image].pixmap->width()*currentscale;
 	currentheight = layersvector[layer_optical_image].pixmap->height()*currentscale;
