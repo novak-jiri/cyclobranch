@@ -2004,7 +2004,7 @@ void cSpectrumDetailWidget::openFindDialog() {
 
 
 void cSpectrumDetailWidget::openExportImageDialog() {
-	if (parameters && ((parameters->mode == denovoengine) || (parameters->mode == singlecomparison) || (parameters->mode == databasesearch))) {
+	if (parameters && ((parameters->mode == denovoengine) || (parameters->mode == singlecomparison) || (parameters->mode == databasesearch)) && (parameters->peptidetype != other)) {
 		exportdialog->exec();
 	}
 	else {
