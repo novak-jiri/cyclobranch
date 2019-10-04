@@ -1996,7 +1996,15 @@ void cImageWindowWidget::setRulerValue(double value) {
 
 	if ((horizontalshift != horizontalScrollBar()->value()) || (verticalshift != verticalScrollBar()->value())) {
 		horizontalScrollBar()->setValue(horizontalshift);
+		if (horizontalshift != horizontalScrollBar()->value()) {
+			// if horizontalshift > maximum value, setValue was ignored
+			redrawScene();
+		}
 		verticalScrollBar()->setValue(verticalshift);
+		if (verticalshift != verticalScrollBar()->value()) {
+			// if verticalshift > maximum value, setValue was ignored
+			redrawScene();
+		}
 	}
 	else {
 		redrawScene();
