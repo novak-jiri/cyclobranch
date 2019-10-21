@@ -338,10 +338,10 @@ bool cSummaryPeaksTableWidget::prepareToShow(QStandardItemModel* resultsstandard
 		}
 		else {
 			if (parameters->generateisotopepattern) {
-				databasemodel->setColumnCount(13);
+				databasemodel->setColumnCount(14);
 			}
 			else {
-				databasemodel->setColumnCount(10);
+				databasemodel->setColumnCount(11);
 			}
 		}
 	}
@@ -378,6 +378,12 @@ bool cSummaryPeaksTableWidget::prepareToShow(QStandardItemModel* resultsstandard
 
 			databasemodel->setHorizontalHeaderItem(currentcolumn, new QStandardItem());
 			databasemodel->horizontalHeaderItem(currentcolumn)->setText("Coordinate Y");
+			database->setItemDelegateForColumn(currentcolumn, new QItemDelegate());
+			currentcolumn++;
+		}
+		else {
+			databasemodel->setHorizontalHeaderItem(currentcolumn, new QStandardItem());
+			databasemodel->horizontalHeaderItem(currentcolumn)->setText("Time");
 			database->setItemDelegateForColumn(currentcolumn, new QItemDelegate());
 			currentcolumn++;
 		}
@@ -603,6 +609,13 @@ bool cSummaryPeaksTableWidget::prepareToShow(QStandardItemModel* resultsstandard
 
 					coordinates.push_back(cCoordinates((*spectralist)[spectrumindex].getExperimentalSpectrum().getCoordinateX(), (*spectralist)[spectrumindex].getExperimentalSpectrum().getCoordinateY(), spectrumindex + 1, cropPrecisionToSixDecimals(peak->matchedmz), cropPrecisionToSixDecimals(peak->matchedrelativeintensity), peak->matchedabsoluteintensity));
 				}
+				else {
+					databasemodel->setItem(currentrow, currentcolumn, new QStandardItem());
+					databasemodel->item(currentrow, currentcolumn)->setForeground(brush);
+					databasemodel->item(currentrow, currentcolumn)->setData(QVariant::fromValue(cropPrecisionToSixDecimalsByteArray((*spectralist)[spectrumindex].getExperimentalSpectrum().getRetentionTime())), Qt::DisplayRole);
+					currentcolumn++;
+				}
+
 				secondspace = (int)peak->description.find(' ', peak->description.find(' ') + 1);
 				databasemodel->setItem(currentrow, currentcolumn, new QStandardItem());
 				databasemodel->item(currentrow, currentcolumn)->setForeground(brush);
@@ -792,10 +805,10 @@ bool cSummaryPeaksTableWidget::prepareToShow(QStandardItemModel* resultsstandard
 				emit sendFilterOptionsToChromatogram(eicchromatogram);
 
 				if (parameters->generateisotopepattern) {
-					database->setColumnWidth(10, min(400, database->columnWidth(10)));
+					database->setColumnWidth(11, min(400, database->columnWidth(11)));
 				}
 				else {
-					database->setColumnWidth(7, min(400, database->columnWidth(7)));
+					database->setColumnWidth(8, min(400, database->columnWidth(8)));
 				}
 			}
 		}
@@ -953,10 +966,10 @@ void cSummaryPeaksTableWidget::filterRows() {
 		}
 		else {
 			if (parameters->generateisotopepattern) {
-				absintcol = 6;
+				absintcol = 7;
 			}
 			else {
-				absintcol = 5;
+				absintcol = 6;
 			}
 
 			eicchromatogram = origeicchromatogram;
@@ -1272,26 +1285,26 @@ void cSummaryPeaksTableWidget::exportStatistics() {
 			}
 			else {
 				if (parameters->generateisotopepattern) {
-					iontypecol = 1;
-					theoreticalmzcol = 2;
-					summaryformulacol = 10;
-					namecol = 11;
-					referencecol = 12;
-					scorecol = 8;
-					fdrcol = 9;
+					iontypecol = 2;
+					theoreticalmzcol = 3;
+					summaryformulacol = 11;
+					namecol = 12;
+					referencecol = 13;
+					scorecol = 9;
+					fdrcol = 10;
+					idcol = 0;
+					relintcol = 6;
+					absintcol = 7;
+				}
+				else {
+					iontypecol = 2;
+					theoreticalmzcol = 3;
+					summaryformulacol = 8;
+					namecol = 9;
+					referencecol = 10;
 					idcol = 0;
 					relintcol = 5;
 					absintcol = 6;
-				}
-				else {
-					iontypecol = 1;
-					theoreticalmzcol = 2;
-					summaryformulacol = 7;
-					namecol = 8;
-					referencecol = 9;
-					idcol = 0;
-					relintcol = 4;
-					absintcol = 5;
 				}
 			}
 
@@ -1785,12 +1798,12 @@ void cSummaryPeaksTableWidget::rowDoubleClicked(const QModelIndex& item) {
 		}
 		else {
 			if (parameters->generateisotopepattern) {
-				size = 12;
-				experimentalmzcolumn = 4;
+				size = 13;
+				experimentalmzcolumn = 5;
 			}
 			else {
-				size = 9;
-				experimentalmzcolumn = 3;
+				size = 10;
+				experimentalmzcolumn = 4;
 			}
 		}
 	}

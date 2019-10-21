@@ -456,6 +456,9 @@ string cSpectrumDetailWidget::getPartialPeaksTableAsHTMLString(int id, bool expo
 					s += printHTMLTableCell(to_string(theoreticalspectrum->getExperimentalSpectrum().getCoordinateX()), isred);
 					s += printHTMLTableCell(to_string(theoreticalspectrum->getExperimentalSpectrum().getCoordinateY()), isred);
 				}
+				else {
+					s += printHTMLTableCell(to_string(cropPrecisionToSixDecimals(theoreticalspectrum->getExperimentalSpectrum().getRetentionTime())), isred);
+				}
 				secondspace = (int)peak->description.find(' ', peak->description.find(' ') + 1);
 				s += printHTMLTableCell(peak->description.substr(0, secondspace), isred);
 			}

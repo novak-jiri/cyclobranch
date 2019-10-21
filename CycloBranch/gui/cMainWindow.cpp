@@ -634,24 +634,37 @@ void cMainWindow::reportSpectrum(int row, cTheoreticalSpectrum& theoreticalspect
 
 
 	if ((parameters.mode == dereplication) || (parameters.mode == compoundsearch)) {
-		resultsmodel->setItem(row, 2, new QStandardItem());
-		resultsmodel->item(row, 2)->setText(theoreticalspectrum.getExperimentalSpectrum().getTitle().c_str());
+		int mscol = 2;
 
-		resultsmodel->setItem(row, 3, new QStandardItem());
-		resultsmodel->item(row, 3)->setData(QVariant::fromValue(theoreticalspectrum.getNumberOfMatchedPeaks()), Qt::DisplayRole);
+		if ((parameters.peaklistfileformat != mis) && (parameters.peaklistfileformat != imzML)) {
+			resultsmodel->setItem(row, mscol, new QStandardItem());
+			resultsmodel->item(row, mscol)->setData(QVariant::fromValue(cropPrecisionToSixDecimalsByteArray(theoreticalspectrum.getExperimentalSpectrum().getRetentionTime())), Qt::DisplayRole);
+			mscol++;
+		}
 
-		resultsmodel->setItem(row, 4, new QStandardItem());
-		resultsmodel->item(row, 4)->setData(QVariant::fromValue(cropPrecisionToSixDecimalsByteArray(theoreticalspectrum.getRatioOfMatchedPeaks()*100)), Qt::DisplayRole);
+		resultsmodel->setItem(row, mscol, new QStandardItem());
+		resultsmodel->item(row, mscol)->setText(theoreticalspectrum.getExperimentalSpectrum().getTitle().c_str());
+		mscol++;
 
-		resultsmodel->setItem(row, 5, new QStandardItem());
-		resultsmodel->item(row, 5)->setData(QVariant::fromValue(cropPrecisionToSixDecimalsByteArray(theoreticalspectrum.getSumOfRelativeIntensities())), Qt::DisplayRole);
+		resultsmodel->setItem(row, mscol, new QStandardItem());
+		resultsmodel->item(row, mscol)->setData(QVariant::fromValue(theoreticalspectrum.getNumberOfMatchedPeaks()), Qt::DisplayRole);
+		mscol++;
+
+		resultsmodel->setItem(row, mscol, new QStandardItem());
+		resultsmodel->item(row, mscol)->setData(QVariant::fromValue(cropPrecisionToSixDecimalsByteArray(theoreticalspectrum.getRatioOfMatchedPeaks()*100)), Qt::DisplayRole);
+		mscol++;
+
+		resultsmodel->setItem(row, mscol, new QStandardItem());
+		resultsmodel->item(row, mscol)->setData(QVariant::fromValue(cropPrecisionToSixDecimalsByteArray(theoreticalspectrum.getSumOfRelativeIntensities())), Qt::DisplayRole);
+		mscol++;
 
 		if ((parameters.peaklistfileformat == mis) || (parameters.peaklistfileformat == imzML)) {
-			resultsmodel->setItem(row, 6, new QStandardItem());
-			resultsmodel->item(row, 6)->setData(QVariant::fromValue(theoreticalspectrum.getExperimentalSpectrum().getCoordinateX()), Qt::DisplayRole);	
+			resultsmodel->setItem(row, mscol, new QStandardItem());
+			resultsmodel->item(row, mscol)->setData(QVariant::fromValue(theoreticalspectrum.getExperimentalSpectrum().getCoordinateX()), Qt::DisplayRole);
+			mscol++;
 
-			resultsmodel->setItem(row, 7, new QStandardItem());
-			resultsmodel->item(row, 7)->setData(QVariant::fromValue(theoreticalspectrum.getExperimentalSpectrum().getCoordinateY()), Qt::DisplayRole);		
+			resultsmodel->setItem(row, mscol, new QStandardItem());
+			resultsmodel->item(row, mscol)->setData(QVariant::fromValue(theoreticalspectrum.getExperimentalSpectrum().getCoordinateY()), Qt::DisplayRole);
 		}
 	}
 
@@ -1177,41 +1190,57 @@ void cMainWindow::reportSpectra() {
 			resultsmodel->setColumnCount(8);
 		}
 		else {
-			resultsmodel->setColumnCount(6);
+			resultsmodel->setColumnCount(7);
 		}
 
-		resultsmodel->setHorizontalHeaderItem(0, new QStandardItem());
-		resultsmodel->horizontalHeaderItem(0)->setText("*");
-		results->setItemDelegateForColumn(0, new QItemDelegate());
+		int mscol = 0;
 
-		resultsmodel->setHorizontalHeaderItem(1, new QStandardItem());
-		resultsmodel->horizontalHeaderItem(1)->setText("Spectrum ID");
-		results->setItemDelegateForColumn(1, new QItemDelegate());
+		resultsmodel->setHorizontalHeaderItem(mscol, new QStandardItem());
+		resultsmodel->horizontalHeaderItem(mscol)->setText("*");
+		results->setItemDelegateForColumn(mscol, new QItemDelegate());
+		mscol++;
 
-		resultsmodel->setHorizontalHeaderItem(2, new QStandardItem());
-		resultsmodel->horizontalHeaderItem(2)->setText("Title");
-		results->setItemDelegateForColumn(2, new QItemDelegate());
+		resultsmodel->setHorizontalHeaderItem(mscol, new QStandardItem());
+		resultsmodel->horizontalHeaderItem(mscol)->setText("Spectrum ID");
+		results->setItemDelegateForColumn(mscol, new QItemDelegate());
+		mscol++;
 
-		resultsmodel->setHorizontalHeaderItem(3, new QStandardItem());
-		resultsmodel->horizontalHeaderItem(3)->setText("Matched Peaks");
-		results->setItemDelegateForColumn(3, new QItemDelegate());
+		if ((parameters.peaklistfileformat != mis) && (parameters.peaklistfileformat != imzML)) {
+			resultsmodel->setHorizontalHeaderItem(mscol, new QStandardItem());
+			resultsmodel->horizontalHeaderItem(mscol)->setText("Time");
+			results->setItemDelegateForColumn(mscol, new QItemDelegate());
+			mscol++;
+		}
 
-		resultsmodel->setHorizontalHeaderItem(4, new QStandardItem());
-		resultsmodel->horizontalHeaderItem(4)->setText("Ratio of Matched Peaks [%]");
-		results->setItemDelegateForColumn(4, new QItemDelegate());
+		resultsmodel->setHorizontalHeaderItem(mscol, new QStandardItem());
+		resultsmodel->horizontalHeaderItem(mscol)->setText("Title");
+		results->setItemDelegateForColumn(mscol, new QItemDelegate());
+		mscol++;
 
-		resultsmodel->setHorizontalHeaderItem(5, new QStandardItem());
-		resultsmodel->horizontalHeaderItem(5)->setText("Sum of Relative Intensities");
-		results->setItemDelegateForColumn(5, new QItemDelegate());
+		resultsmodel->setHorizontalHeaderItem(mscol, new QStandardItem());
+		resultsmodel->horizontalHeaderItem(mscol)->setText("Matched Peaks");
+		results->setItemDelegateForColumn(mscol, new QItemDelegate());
+		mscol++;
+
+		resultsmodel->setHorizontalHeaderItem(mscol, new QStandardItem());
+		resultsmodel->horizontalHeaderItem(mscol)->setText("Ratio of Matched Peaks [%]");
+		results->setItemDelegateForColumn(mscol, new QItemDelegate());
+		mscol++;
+
+		resultsmodel->setHorizontalHeaderItem(mscol, new QStandardItem());
+		resultsmodel->horizontalHeaderItem(mscol)->setText("Sum of Relative Intensities");
+		results->setItemDelegateForColumn(mscol, new QItemDelegate());
+		mscol++;
 
 		if ((parameters.peaklistfileformat == mis) || (parameters.peaklistfileformat == imzML)) {
-			resultsmodel->setHorizontalHeaderItem(6, new QStandardItem());
-			resultsmodel->horizontalHeaderItem(6)->setText("Coordinate X");
-			results->setItemDelegateForColumn(6, new QItemDelegate());
+			resultsmodel->setHorizontalHeaderItem(mscol, new QStandardItem());
+			resultsmodel->horizontalHeaderItem(mscol)->setText("Coordinate X");
+			results->setItemDelegateForColumn(mscol, new QItemDelegate());
+			mscol++;
 
-			resultsmodel->setHorizontalHeaderItem(7, new QStandardItem());
-			resultsmodel->horizontalHeaderItem(7)->setText("Coordinate Y");
-			results->setItemDelegateForColumn(7, new QItemDelegate());			
+			resultsmodel->setHorizontalHeaderItem(mscol, new QStandardItem());
+			resultsmodel->horizontalHeaderItem(mscol)->setText("Coordinate Y");
+			results->setItemDelegateForColumn(mscol, new QItemDelegate());
 		}
 	}
 
@@ -1557,10 +1586,10 @@ void cMainWindow::exportToHTML() {
 					}
 					else {
 						if (parameters.generateisotopepattern) {
-							columncount = 13;
+							columncount = 14;
 						}
 						else {
-							columncount = 10;
+							columncount = 11;
 						}
 					}
 				}
@@ -1589,6 +1618,9 @@ void cMainWindow::exportToHTML() {
 					if ((parameters.peaklistfileformat == mis) || (parameters.peaklistfileformat == imzML)) {
 						out << "<th width=\"" << tdwidth.c_str() << "%\"><b>Coordinate X</b></th>";
 						out << "<th width=\"" << tdwidth.c_str() << "%\"><b>Coordinate Y</b></th>";
+					}
+					else {
+						out << "<th width=\"" << tdwidth.c_str() << "%\"><b>Time</b></th>";
 					}
 					if (parameters.generateisotopepattern) {
 						out << "<th width=\"" << tdwidth.c_str() << "%\"><b>Pattern Type</b></th>";
