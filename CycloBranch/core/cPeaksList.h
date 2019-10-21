@@ -68,7 +68,11 @@ bool searchHint(double mzratio, cPeaksList& experimentalpeaks, double fragmentma
 class cPeaksList {
 
 	vector<cPeak> peaks;
+
+	double rt;
+
 	int x, y;
+
 	string title;
 
 public:
@@ -367,6 +371,20 @@ public:
 		\retval double maximum absolute intensity
 	*/
 	double getMaximumAbsoluteIntensity();
+
+
+	/**
+		\brief Set the retention time.
+		\param rt retention time
+	*/
+	void setRetentionTime(double rt);
+
+
+	/**
+		\brief Get the retention time.
+		\retval double retention time
+	*/
+	double getRetentionTime();
 
 
 	/**

@@ -52,6 +52,7 @@ cPeaksList::cPeaksList(const cPeaksList& peakslist) {
 
 cPeaksList& cPeaksList::operator=(const cPeaksList& peakslist) {
 	peaks = peakslist.peaks;
+	rt = peakslist.rt;
 	x = peakslist.x;
 	y = peakslist.y;
 	title = peakslist.title;
@@ -61,6 +62,7 @@ cPeaksList& cPeaksList::operator=(const cPeaksList& peakslist) {
 
 void cPeaksList::clear() {
 	peaks.clear();
+	rt = 0;
 	x = 0;
 	y = 0;
 	title = "";
@@ -751,6 +753,17 @@ double cPeaksList::getMaximumAbsoluteIntensity() {
 }
 
 
+void cPeaksList::setRetentionTime(double rt) {
+	this->rt = rt;
+}
+
+
+
+double cPeaksList::getRetentionTime() {
+	return rt;
+}
+
+
 void cPeaksList::setCoordinates(int x, int y) {
 	this->x = x;
 	this->y = y;
@@ -777,6 +790,8 @@ void cPeaksList::store(ofstream& os) {
 		peaks[i].store(os);
 	}
 
+	os.write((char *)&rt, sizeof(double));
+
 	os.write((char *)&x, sizeof(int));
 	os.write((char *)&y, sizeof(int));
 
@@ -793,6 +808,8 @@ void cPeaksList::load(ifstream& is) {
 	for (int i = 0; i < (int)peaks.size(); i++) {
 		peaks[i].load(is);
 	}
+
+	is.read((char *)&rt, sizeof(double));
 
 	is.read((char *)&x, sizeof(int));
 	is.read((char *)&y, sizeof(int));

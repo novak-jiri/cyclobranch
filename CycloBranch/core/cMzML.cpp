@@ -116,6 +116,8 @@ int cMzML::parse(string& filename, vector<cPeaksList>& peaklists, int profilespe
 
 	string mgfname = filename.substr(0, (int)filename.size() - 4);
 	stringstream ss;
+
+	cPeaksList peaklist;
 	
 	// childrens of mzML
 	DOMNode* currentNode1 = root->getFirstChild();
@@ -148,6 +150,7 @@ int cMzML::parse(string& filename, vector<cPeaksList>& peaklists, int profilespe
 									DOMElement* currentElement3 = dynamic_cast<xercesc::DOMElement*>(currentNode3);
 									if (compareElementTagName(currentElement3, "spectrum")) {
 
+										peaklist.clear();
 
 										string title = getAttribute(currentElement3, "id");
 										bool skipspectrum = false;
@@ -165,36 +168,90 @@ int cMzML::parse(string& filename, vector<cPeaksList>& peaklists, int profilespe
 												if (compareElementTagName(currentElement4, "cvParam")) {
 
 
-														string accession = getAttribute(currentElement4, "accession");
+													string accession = getAttribute(currentElement4, "accession");
 
-														if (accession.compare("MS:1000128") == 0) {			
-															isprofilespectrum = true;
+													if (accession.compare("MS:1000128") == 0) {			
+														isprofilespectrum = true;
+													}
+
+													if (accession.compare("MS:1000511") == 0) {
+
+														int level = atoi(getAttribute(currentElement4, "value").c_str());
+
+														if ((level == 1) && ((mode == denovoengine) || (mode == singlecomparison) || (mode == databasesearch))) {
+															skipspectrum = true;
 														}
-
-														if (accession.compare("MS:1000511") == 0) {
-
-															int level = atoi(getAttribute(currentElement4, "value").c_str());
-
-															if ((level == 1) && ((mode == denovoengine) || (mode == singlecomparison) || (mode == databasesearch))) {
-																skipspectrum = true;
-															}
 															
-															if ((level > 1) && ((mode == dereplication) || (mode == compoundsearch))) {
-																skipspectrum = true;
-															}
-
+														if ((level > 1) && ((mode == dereplication) || (mode == compoundsearch))) {
+															skipspectrum = true;
 														}
+
+													}
 
 
 												}
 
+
+												if (!skipspectrum && compareElementTagName(currentElement4, "scanList")) {
+
+													// childrens of scanList
+													DOMNode* currentNode5 = currentNode4->getFirstChild();
+													while (currentNode5) {
+
+
+														if (currentNode5->getNodeType() == DOMNode::ELEMENT_NODE) {
+
+															DOMElement* currentElement5 = dynamic_cast<xercesc::DOMElement*>(currentNode5);
+															if (compareElementTagName(currentElement5, "scan")) {
+																																
+
+																// childrens of scan
+																DOMNode* currentNode6 = currentNode5->getFirstChild();
+																while (currentNode6) {
+
+
+																	if (currentNode6->getNodeType() == DOMNode::ELEMENT_NODE) {
+
+																		DOMElement* currentElement6 = dynamic_cast<xercesc::DOMElement*>(currentNode6);
+																		if (compareElementTagName(currentElement6, "cvParam")) {
+
+
+																			string accession = getAttribute(currentElement6, "accession");
+
+																			if (accession.compare("MS:1000016") == 0) {
+																				double rt = atof(getAttribute(currentElement6, "value").c_str());
+																				peaklist.setRetentionTime(rt);
+																			}
+
+
+																		}
+
+																	}
+
+
+																	currentNode6 = currentNode6->getNextSibling();
+
+
+																}
+
+
+															}
+
+														}
+
+
+														currentNode5 = currentNode5->getNextSibling();
+
+													}
+
+												}
+
+
 												if (!skipspectrum && compareElementTagName(currentElement4, "binaryDataArrayList")) {
 
 
-													cPeaksList peaklist;
 													bool peaklistdefined = false;
-
-													
+												
 													if (isprofilespectrum) {
 														profilespectra = true;
 													}
