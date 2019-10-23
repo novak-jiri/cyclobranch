@@ -203,6 +203,7 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 
 	int hrs, mins, secs;
 	QTime time;
+	bool good;
 
 	if (peaklistfilename.empty()) {
 		error = true;
@@ -338,7 +339,7 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 
 						*os << "Processing the file " + peaklistfilename + ":" << endl;
 
-						*os << "centroid spectra ... ";
+						/*
 						s = "External\\windows\\baf2csv.bat \"" + peaklistfilename + "\"";
 						if (system(s.c_str()) != 0) {
 							error = true;
@@ -354,8 +355,40 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 							*os << "ok" << endl;
 							peakliststream.open(peaklistfilename + ".csv");
 						}
+						*/
 
-						if (useprofiledata && convertprofiledata) {
+						mzmlname = peaklistfilename + ".mzML";
+						peakliststream.open(mzmlname);
+						good = peakliststream.good();
+						peakliststream.close();
+
+						if (good) {
+							*os << "The previously converted centroid spectra were found." << endl;
+							*os << "The following file was used: " << mzmlname << endl;
+						}
+						else {
+							*os << "centroid spectra ... ";
+
+							s = "External\\windows\\baf2mzml.bat \"" + peaklistfilename + "\"";
+							if (system(s.c_str()) != 0) {
+								error = true;
+								errormessage = "The file cannot be converted.\n";
+								errormessage += "Does the file '" + peaklistfilename + "' exist ?\n";
+								errormessage += "Do you have Bruker Daltonik's CompassXport installed ?\n";
+								errormessage += "Do you have path to the CompassXport.exe in your PATH variable ?\n";
+								errormessage += "Is the directory with the file '" + peaklistfilename + "' writable ?\n";
+								errormessage += "Do you have 'baf2mzml.bat' file located in the 'External/windows' folder ?\n";
+							}
+							if (!error) {
+								*os << "ok" << endl;
+							}
+						}
+
+						if (!error) {
+							peakliststream.open(mzmlname);
+						}
+
+						if (!error && useprofiledata && convertprofiledata) {
 							*os << "profile spectra ... ";
 							s = "External\\windows\\baf2profile.bat \"" + peaklistfilename + "\"";
 							if (system(s.c_str()) != 0) {
@@ -549,7 +582,7 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 				}
 			}
 			else {
-				if (os && (peaklistfileformat != mzML) && (peaklistfileformat != imzML) && (peaklistfileformat != raw) && (peaklistfileformat != ser)) {
+				if (os && (peaklistfileformat != mzML) && (peaklistfileformat != imzML) && (peaklistfileformat != baf) && (peaklistfileformat != raw) && (peaklistfileformat != ser)) {
 					*os << "Loading the peaklist(s)... ";
 				}
 				switch (peaklistfileformat) {
@@ -561,8 +594,17 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 					peaklistseries.loadFromMGFStream(peakliststream);
 					break;
 				case baf:
+					/*
 					#if OS_TYPE == WIN
 						peaklistseries.loadFromBAFStream(peakliststream);
+					#endif
+					*/
+					#if OS_TYPE == WIN
+						errtype = peaklistseries.loadFromMZMLStream(mzmlname, peakliststream, fwhm, mode, os, terminatecomputation);
+						if (errtype == -1) {
+							error = true;
+							errormessage = "Aborted by user.\n";
+						}
 					#endif
 					break;
 				case raw:
@@ -715,7 +757,7 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 				default:
 					break;
 				}
-				if (os && (peaklistfileformat != mzML) && (peaklistfileformat != imzML) && (peaklistfileformat != raw) && (peaklistfileformat != ser)) {
+				if (os && (peaklistfileformat != mzML) && (peaklistfileformat != imzML) && (peaklistfileformat != baf) && (peaklistfileformat != raw) && (peaklistfileformat != ser)) {
 					*os << "ok" << endl << endl;
 				}
 			}
