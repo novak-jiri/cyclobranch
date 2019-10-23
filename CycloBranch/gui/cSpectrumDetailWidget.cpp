@@ -682,7 +682,22 @@ void cSpectrumDetailWidget::prepareToShow(QAction* actionShowIsomers, cPeakListS
 	if (!preparedToShow) {
 
 		if (parameters) {
-			if ((parameters->mode == dereplication) || (parameters->mode == compoundsearch) || (parameters->mode == singlecomparison)) {
+			if ((parameters->mode == dereplication) || (parameters->mode == compoundsearch)) {
+				string title = "Experimental Spectrum No. " + to_string(rowid);
+				if (theoreticalspectrum) {
+					if ((parameters->peaklistfileformat == mis) || (parameters->peaklistfileformat == imzML)) {
+						title += " - X: " + to_string(theoreticalspectrum->getExperimentalSpectrum().getCoordinateX());
+						title += " Y: " + to_string(theoreticalspectrum->getExperimentalSpectrum().getCoordinateY());
+					}
+					else {
+						if (theoreticalspectrum->getExperimentalSpectrum().getRetentionTime() > 0) {
+							title += " - Time: " + to_string(theoreticalspectrum->getExperimentalSpectrum().getRetentionTime());
+						}
+					}
+				}
+				setWindowTitle(title.c_str());
+			}
+			else if (parameters->mode == singlecomparison) {
 				setWindowTitle(("Experimental Spectrum No. " + to_string(rowid)).c_str());
 			}
 			else {
