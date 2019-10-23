@@ -7,6 +7,7 @@ cChromatogramWindowWidget::cChromatogramWindowWidget(cTheoreticalSpectrumList& t
 
 	ticchromatogram.clear();
 	eicchromatogram.clear();
+	rtimes.clear();
 
 	currentscale = 1;
 	factor = 0.2;
@@ -26,6 +27,7 @@ cChromatogramWindowWidget::cChromatogramWindowWidget(cTheoreticalSpectrumList& t
 	firstshow = true;
 	enablemouseselection = true;
 
+	retentiontime = false;
 	absoluteintensity = true;
 	hidetic = false;
 	hideeic = false;
@@ -135,6 +137,8 @@ void cChromatogramWindowWidget::recalculateTICChromatogram() {
 
 	ticchromatogram.clear();
 	spectrumcount = theoreticalspectrumlist->size();
+
+	rtimes.clear();
 	
 	QProgressDialog progress("Updating...", /*"Cancel"*/0, 0, spectrumcount, this);
 	progress.setMinimumWidth(250);
@@ -142,6 +146,8 @@ void cChromatogramWindowWidget::recalculateTICChromatogram() {
 	progress.installEventFilter(&filter);
 	progress.setMinimumDuration(0);
 	progress.setWindowModality(Qt::ApplicationModal);
+
+	rtimes.resize(spectrumcount);
 	
 	for (int i = 0; i < spectrumcount; i++) {
 		intensity = 0;
@@ -153,6 +159,8 @@ void cChromatogramWindowWidget::recalculateTICChromatogram() {
 		chromatogrampeak.mzratio = (double)(ticchromatogram.size() + 1);
 		chromatogrampeak.absoluteintensity = intensity;
 		ticchromatogram.add(chromatogrampeak);
+
+		rtimes[i] = (*theoreticalspectrumlist)[i].getExperimentalSpectrum().getRetentionTime();
 
 		progress.setValue(i);
 	}
@@ -377,6 +385,9 @@ void cChromatogramWindowWidget::redrawScene() {
 
 	int peakscount = 0;
 
+	int printscan;
+	bool printintensity;
+
 	if (!hidetic) {
 		if (absoluteintensity) {
 			maxintensitytic = ticchromatogram.getMaximumAbsoluteIntensityFromMZInterval((double)minscan, (double)maxscan, false, false, other, false);
@@ -424,18 +435,51 @@ void cChromatogramWindowWidget::redrawScene() {
 	}
 	scene->addLine(w - rightmargin, h - bottommargin, w - rightmargin, h - bottommargin + 10, QPen(Qt::black, 2, Qt::SolidLine));
 
-	simpletext = scene->addSimpleText(QString::number(minscan - 1), myFont);
+	printscan = minscan - 1;
+	if (retentiontime) {
+		if (printscan - 1 >= 0) {
+			simpletext = scene->addSimpleText(QString::number(rtimes[printscan - 1]), myFont);
+		}
+		else {
+			simpletext = scene->addSimpleText(QString::number(0), myFont);
+		}
+	}
+	else {
+		simpletext = scene->addSimpleText(QString::number(printscan), myFont);
+	}
 	simpletext->setPos(QPointF(leftmargin - simpletext->boundingRect().width() / 2, h - bottommargin + 12));
 
 	if (maxscan - minscan > rulergranularity) {
 		xstep = (w - leftmargin - rightmargin) / rulergranularity;
 		for (int i = 1; i < rulergranularity; i++) {
-			simpletext = scene->addSimpleText(QString::number(minscan + (maxscan - minscan) / rulergranularity * i), myFont);
+			printscan = minscan + (maxscan - minscan) / rulergranularity * i;
+			if (retentiontime) {
+				if (printscan - 1 >= 0) {
+					simpletext = scene->addSimpleText(QString::number(rtimes[printscan - 1]), myFont);
+				}
+				else {
+					simpletext = scene->addSimpleText(QString::number(0), myFont);
+				}
+			}
+			else {
+				simpletext = scene->addSimpleText(QString::number(printscan), myFont);
+			}
 			simpletext->setPos(QPointF(leftmargin + xstep * i - simpletext->boundingRect().width() / 2, h - bottommargin + 12));
 		}
 	}
 
-	simpletext = scene->addSimpleText(QString::number(maxscan), myFont);
+	printscan = maxscan;
+	if (retentiontime) {
+		if (printscan - 1 >= 0) {
+			simpletext = scene->addSimpleText(QString::number(rtimes[printscan - 1]), myFont);
+		}
+		else {
+			simpletext = scene->addSimpleText(QString::number(0), myFont);
+		}
+	}
+	else {
+		simpletext = scene->addSimpleText(QString::number(printscan), myFont);
+	}
 	simpletext->setPos(QPointF(w - rightmargin - simpletext->boundingRect().width() / 2, h - bottommargin + 12));
 
 	// y axis
@@ -493,15 +537,24 @@ void cChromatogramWindowWidget::redrawScene() {
 
 			x = getXPositionFromScanID((int)ticchromatogram[i].mzratio, w);
 
+			printintensity = true;
 			if (absoluteintensity) {
 				y = ticchromatogram[i].absoluteintensity / maxintensity * (h - topmargin - bottommargin);
+				if (ticchromatogram[i].absoluteintensity == 0) {
+					printintensity = false;
+				}
 			}
 			else {
 				y = ticchromatogram[i].relativeintensity / maxintensity * (h - topmargin - bottommargin);
+				if (ticchromatogram[i].relativeintensity == 0) {
+					printintensity = false;
+				}
 			}
 
-			line = scene->addLine(x, h - bottommargin - 2, x, h - bottommargin - std::max((int)y, 2), QPen(Qt::black, 2, Qt::SolidLine));
-			peakscount++;
+			if (printintensity) {
+				line = scene->addLine(x, h - bottommargin - 2, x, h - bottommargin - std::max((int)y, 2), QPen(Qt::black, 2, Qt::SolidLine));
+				peakscount++;
+			}
 
 		}
 
@@ -518,16 +571,25 @@ void cChromatogramWindowWidget::redrawScene() {
 
 			x = getXPositionFromScanID((int)eicchromatogram[i].mzratio, w);
 
+			printintensity = true;
 			if (absoluteintensity) {
 				y = eicchromatogram[i].absoluteintensity / maxintensity * (h - topmargin - bottommargin);
+				if (eicchromatogram[i].absoluteintensity == 0) {
+					printintensity = false;
+				}
 			}
 			else {
 				y = eicchromatogram[i].relativeintensity / maxintensity * (h - topmargin - bottommargin);
+				if (eicchromatogram[i].relativeintensity == 0) {
+					printintensity = false;
+				}
 			}
 
-			line = scene->addLine(x, h - bottommargin - 2, x, h - bottommargin - std::max((int)y, 2), QPen(Qt::red, 2, Qt::SolidLine));
-			line->setZValue(1);
-			peakscount++;
+			if (printintensity) {
+				line = scene->addLine(x, h - bottommargin - 2, x, h - bottommargin - std::max((int)y, 2), QPen(Qt::red, 2, Qt::SolidLine));
+				line->setZValue(1);
+				peakscount++;
+			}
 
 		}
 
@@ -544,21 +606,37 @@ void cChromatogramWindowWidget::redrawScene() {
 
 			x = getXPositionFromScanID((int)ticchromatogram[i].mzratio, w);
 
+			printintensity = true;
 			if (absoluteintensity) {
 				y = ticchromatogram[i].absoluteintensity / maxintensity * (h - topmargin - bottommargin);
+				if (ticchromatogram[i].absoluteintensity == 0) {
+					printintensity = false;
+				}
 			}
 			else {
 				y = ticchromatogram[i].relativeintensity / maxintensity * (h - topmargin - bottommargin);
+				if (ticchromatogram[i].relativeintensity == 0) {
+					printintensity = false;
+				}
 			}
 
-			simpletext = scene->addSimpleText(QString::number((int)ticchromatogram[i].mzratio) + " ", myFont);
-			tx = x - 2;
-			ty = h - bottommargin - std::max((int)y, 2) - simpletext->boundingRect().height() - 1 - 4;
-			simpletext->setPos(tx, ty);
-			simpletext->setBrush(Qt::black);
+			if (printintensity) {
+			
+				if (retentiontime) {
+					simpletext = scene->addSimpleText(QString::number(rtimes[i]) + " ", myFont);
+				}
+				else {
+					simpletext = scene->addSimpleText(QString::number((int)ticchromatogram[i].mzratio) + " ", myFont);
+				}
+				tx = x - 2;
+				ty = h - bottommargin - std::max((int)y, 2) - simpletext->boundingRect().height() - 1 - 4;
+				simpletext->setPos(tx, ty);
+				simpletext->setBrush(Qt::black);
 
-			if (scene->collidingItems(simpletext, Qt::IntersectsItemBoundingRect).size() > 0) {
-				scene->removeItem(simpletext);
+				if (scene->collidingItems(simpletext, Qt::IntersectsItemBoundingRect).size() > 0) {
+					scene->removeItem(simpletext);
+				}
+
 			}
 
 		}
@@ -576,22 +654,38 @@ void cChromatogramWindowWidget::redrawScene() {
 
 			x = getXPositionFromScanID((int)eicchromatogram[i].mzratio, w);
 
+			printintensity = true;
 			if (absoluteintensity) {
 				y = eicchromatogram[i].absoluteintensity / maxintensity * (h - topmargin - bottommargin);
+				if (eicchromatogram[i].absoluteintensity == 0) {
+					printintensity = false;
+				}
 			}
 			else {
 				y = eicchromatogram[i].relativeintensity / maxintensity * (h - topmargin - bottommargin);
+				if (eicchromatogram[i].relativeintensity == 0) {
+					printintensity = false;
+				}
 			}
 
-			simpletext = scene->addSimpleText(QString::number((int)eicchromatogram[i].mzratio) + " ", myFont);
-			tx = x - 2;
-			ty = h - bottommargin - std::max((int)y, 2) - simpletext->boundingRect().height() - 1 - 4;
-			simpletext->setPos(tx, ty);
-			simpletext->setBrush(Qt::red);
-			simpletext->setZValue(1);
+			if (printintensity) {
 
-			if (scene->collidingItems(simpletext, Qt::IntersectsItemBoundingRect).size() > 0) {
-				scene->removeItem(simpletext);
+				if (retentiontime) {
+					simpletext = scene->addSimpleText(QString::number(rtimes[i]) + " ", myFont);
+				}
+				else {
+					simpletext = scene->addSimpleText(QString::number((int)eicchromatogram[i].mzratio) + " ", myFont);
+				}
+				tx = x - 2;
+				ty = h - bottommargin - std::max((int)y, 2) - simpletext->boundingRect().height() - 1 - 4;
+				simpletext->setPos(tx, ty);
+				simpletext->setBrush(Qt::red);
+				simpletext->setZValue(1);
+
+				if (scene->collidingItems(simpletext, Qt::IntersectsItemBoundingRect).size() > 0) {
+					scene->removeItem(simpletext);
+				}
+
 			}
 
 		}
@@ -723,6 +817,12 @@ void cChromatogramWindowWidget::normalSize() {
 	currentscale = 1;
 	setMatrix(originalmatrix);
 	verticalScrollBar()->setSliderPosition(verticalScrollBar()->maximum());
+}
+
+
+void cChromatogramWindowWidget::retentionTimeStateChanged(bool state) {
+	retentiontime = state;
+	redrawScene();
 }
 
 

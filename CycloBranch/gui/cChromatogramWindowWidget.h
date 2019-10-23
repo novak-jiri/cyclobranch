@@ -140,6 +140,7 @@ private:
 	cTheoreticalSpectrumList* theoreticalspectrumlist;
 	cPeaksList ticchromatogram;
 	cPeaksList eicchromatogram;
+	vector<double> rtimes;
 
 	QWidget* parent;
 	QGraphicsScene* scene;
@@ -172,6 +173,7 @@ private:
 	bool firstshow;
 	bool enablemouseselection;
 
+	bool retentiontime;
 	bool absoluteintensity;
 	bool hidetic;
 	bool hideeic;
@@ -220,6 +222,9 @@ private slots:
 
 
 	void normalSize();
+
+
+	void retentionTimeStateChanged(bool state);
 
 
 	void absoluteIntensityStateChanged(bool state);

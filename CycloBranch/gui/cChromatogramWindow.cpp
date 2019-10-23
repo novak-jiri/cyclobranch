@@ -56,6 +56,14 @@ cChromatogramWindow::cChromatogramWindow(cTheoreticalSpectrumList& theoreticalsp
 
 	toolbarView->addSeparator();
 
+	actionRetentionTime = new QAction(QIcon(":/images/icons/12.png"), tr("Retention Ti&me"), this);
+	actionRetentionTime->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_M));
+	actionRetentionTime->setToolTip("Retention Time (Ctrl + M)");
+	actionRetentionTime->setCheckable(true);
+	//actionRetentionTime->setChecked(true);
+	toolbarView->addAction(actionRetentionTime);
+	connect(actionRetentionTime, SIGNAL(toggled(bool)), chromatogramwindowwidget, SLOT(retentionTimeStateChanged(bool)));
+
 	actionAbsoluteIntensity = new QAction(QIcon(":/images/icons/11.png"), tr("&Absolute Intensity"), this);
 	actionAbsoluteIntensity->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_I));
 	actionAbsoluteIntensity->setToolTip("Absolute Intensity (Ctrl + I)");
@@ -147,6 +155,7 @@ cChromatogramWindow::cChromatogramWindow(cTheoreticalSpectrumList& theoreticalsp
 	menuView->addAction(actionZoomOut);
 	menuView->addAction(actionZoomReset);
 	menuView->addSeparator();
+	menuView->addAction(actionRetentionTime);
 	menuView->addAction(actionAbsoluteIntensity);
 	menuView->addSeparator();
 	menuView->addAction(actionHideTIC);
@@ -185,6 +194,7 @@ cChromatogramWindow::~cChromatogramWindow() {
 	delete actionZoomIn;
 	delete actionZoomOut;
 	delete actionZoomReset;
+	delete actionRetentionTime;
 	delete actionAbsoluteIntensity;
 	delete actionHideTIC;
 	delete actionHideEIC;

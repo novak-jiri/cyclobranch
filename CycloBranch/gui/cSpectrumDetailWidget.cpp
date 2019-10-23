@@ -688,7 +688,6 @@ void cSpectrumDetailWidget::prepareToShow(QAction* actionShowIsomers, cPeakListS
 			else {
 				setWindowTitle(("Theoretical Spectrum No. " + to_string(rowid)).c_str());
 			}
-
 		}
 
 		this->rawdata = rawdata;

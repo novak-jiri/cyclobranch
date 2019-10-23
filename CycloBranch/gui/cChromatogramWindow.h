@@ -71,6 +71,7 @@ private:
 	QAction* actionZoomIn;
 	QAction* actionZoomOut;
 	QAction* actionZoomReset;
+	QAction* actionRetentionTime;
 	QAction* actionAbsoluteIntensity;
 	QAction* actionHideTIC;
 	QAction* actionHideEIC;
