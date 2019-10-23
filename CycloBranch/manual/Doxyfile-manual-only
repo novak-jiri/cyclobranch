@@ -1341,7 +1341,8 @@ HTML_EXTRA_FILES       = ../images/icons/2.png \
                          ../images/icons/flip_horizontal.png \
                          ../images/icons/flip_vertical.png \
                          ../images/icons/rectangle.png \
-                         ../images/icons/79.png
+                         ../images/icons/79.png \
+                         ../images/icons/12.png
 
 # The HTML_COLORSTYLE_HUE tag controls the color of the HTML output. Doxygen
 # will adjust the colors in the style sheet and background images according to
@@ -2022,7 +2023,8 @@ LATEX_EXTRA_FILES      = ../images/icons/2.png \
                          ../images/icons/flip_horizontal.png \
                          ../images/icons/flip_vertical.png \
                          ../images/icons/rectangle.png \
-                         ../images/icons/79.png
+                         ../images/icons/79.png \
+                         ../images/icons/12.png
 
 # If the PDF_HYPERLINKS tag is set to YES, the LaTeX that is generated is
 # prepared for conversion to PDF (using ps2pdf or pdflatex). The PDF file will
