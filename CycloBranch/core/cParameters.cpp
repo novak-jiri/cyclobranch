@@ -289,33 +289,33 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 					peakliststream.open(peaklistfilename);
 					break;
 				case mzXML:
-					*os << "Converting the file " + peaklistfilename + " to mgf ... ";
+					*os << "Converting the file " + peaklistfilename + " to mzML ... ";
 				
 					#if OS_TYPE == UNX
-						s = installdir.toStdString() + "External/linux/any2mgf.sh " + peaklistfilename;
+						s = installdir.toStdString() + "External/linux/any2mzml.sh " + peaklistfilename;
 						if (system(s.c_str()) != 0) {
 							error = true;
 							errormessage = "The file cannot be converted.\n";
 							errormessage += "Does the file '" + peaklistfilename + "' exist ?\n";
 							errormessage += "Is the directory with the file '" + peaklistfilename + "' writable ?\n";
 							errormessage += "Do you have FileConverter installed (OpenMS 2.x must be installed) ?\n";
-							errormessage += "Do you have 'any2mgf.sh' file located in '" + installdir.toStdString() + "External/linux' folder ?\n";
-							errormessage += "Is the file 'any2mgf.sh' executable (sudo chmod +x " + installdir.toStdString() + "External/linux/any2mgf.sh) ? \n";
+							errormessage += "Do you have 'any2mzml.sh' file located in '" + installdir.toStdString() + "External/linux' folder ?\n";
+							errormessage += "Is the file 'any2mzml.sh' executable (sudo chmod +x " + installdir.toStdString() + "External/linux/any2mzml.sh) ? \n";
 						}
 					#else
 						#if OS_TYPE == OSX
-							s = installdir.toStdString() + "External/macosx/any2mgf.sh " + peaklistfilename;
+							s = installdir.toStdString() + "External/macosx/any2mzml.sh " + peaklistfilename;
 							if (system(s.c_str()) != 0) {
 								error = true;
 								errormessage = "The file cannot be converted.\n";
 								errormessage += "Does the file '" + peaklistfilename + "' exist ?\n";
 								errormessage += "Is the directory with the file '" + peaklistfilename + "' writable ?\n";
 								errormessage += "Do you have FileConverter installed (OpenMS 2.x must be installed) ?\n";
-								errormessage += "Do you have 'any2mgf.sh' file located in '" + installdir.toStdString() + "External/macosx' folder ?\n";
-								errormessage += "Is the file 'any2mgf.sh' executable ? \n";
+								errormessage += "Do you have 'any2mzml.sh' file located in '" + installdir.toStdString() + "External/macosx' folder ?\n";
+								errormessage += "Is the file 'any2mzml.sh' executable ? \n";
 							}
 						#else		
-							s = "External\\windows\\any2mgf.bat \"" + peaklistfilename + "\"";
+							s = "External\\windows\\any2mzml.bat \"" + peaklistfilename + "\"";
 							if (system(s.c_str()) != 0) {
 								error = true;
 								errormessage = "The file cannot be converted.\n";
@@ -323,14 +323,15 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 								errormessage += "Is the directory with the file '" + peaklistfilename + "' writable ?\n";
 								errormessage += "Do you have FileConverter installed (OpenMS 2.x must be installed) ?\n";
 								errormessage += "Do you have a path to FileConverter in your PATH variable (e.g., 'C:/Program Files/OpenMS-2.3.0/bin') ?\n";
-								errormessage += "Do you have 'any2mgf.bat' file located in the '" + appname.toStdString() + "/External/windows' folder ?\n";
+								errormessage += "Do you have 'any2mzml.bat' file located in the '" + appname.toStdString() + "/External/windows' folder ?\n";
 							}
 						#endif
 					#endif
 
 					if (!error) {
 						*os << "ok" << endl << endl;
-						peakliststream.open(peaklistfilename + ".mgf");
+						mzmlname = peaklistfilename + ".mzML";
+						peakliststream.open(mzmlname);
 					}
 					break;
 				case baf:
@@ -582,7 +583,7 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 				}
 			}
 			else {
-				if (os && (peaklistfileformat != mzML) && (peaklistfileformat != imzML) && (peaklistfileformat != baf) && (peaklistfileformat != raw) && (peaklistfileformat != ser)) {
+				if (os && (peaklistfileformat != mzML) && (peaklistfileformat != mzXML) && (peaklistfileformat != imzML) && (peaklistfileformat != baf) && (peaklistfileformat != raw) && (peaklistfileformat != ser)) {
 					*os << "Loading the peaklist(s)... ";
 				}
 				switch (peaklistfileformat) {
@@ -590,6 +591,42 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 					peaklistseries.loadFromPlainTextStream(peakliststream);
 					break;
 				case mzXML:
+					errtype = peaklistseries.loadFromMZMLStream(mzmlname, peakliststream, fwhm, mode, os, terminatecomputation);
+					if (errtype == -1) {
+						error = true;
+						errormessage = "Aborted by user.\n";
+					}
+					if (errtype == -2) {
+						error = true;
+						#if OS_TYPE == UNX
+							errormessage = "Raw data cannot be converted.\n";
+							errormessage += "Does the file '" + mzmlname + "' exist ?\n";
+							errormessage += "Is the directory with the file '" + mzmlname + "' writable ?\n";
+							errormessage += "Do you have enough space on your hard drive ?\n";
+							errormessage += "Do you have OpenMS 2.x installed ?\n";
+							errormessage += "Do you have 'raw2peaks.sh' file located in '" + installdir.toStdString() + "External/linux' folder ?\n";
+							errormessage += "Is the file 'raw2peaks.sh' executable (sudo chmod +x " + installdir.toStdString() + "External/linux/raw2peaks.sh) ? \n";
+						#else
+							#if OS_TYPE == OSX
+								errormessage = "Raw data cannot be converted.\n";
+								errormessage += "Does the file '" + mzmlname + "' exist ?\n";
+								errormessage += "Is the directory with the file '" + mzmlname + "' writable ?\n";
+								errormessage += "Do you have enough space on your hard drive ?\n";
+								errormessage += "Do you have OpenMS 2.x installed ?\n";
+								errormessage += "Do you have 'raw2peaks.sh' file located in '" + installdir.toStdString() + "External/macosx' folder ?\n";
+								errormessage += "Is the file 'raw2peaks.sh' executable (sudo chmod +x " + installdir.toStdString() + "External/macosx/raw2peaks.sh) ? \n";
+							#else		
+								errormessage = "Raw data cannot be converted.\n";
+								errormessage += "Does the file '" + mzmlname + "' exist ?\n";
+								errormessage += "Is the directory with the file '" + mzmlname + "' writable ?\n";
+								errormessage += "Do you have enough space on your hard drive ?\n";
+								errormessage += "Do you have OpenMS 2.x installed ?\n";
+								errormessage += "Do you have a path to OpenMS binaries folder in your PATH variable (e.g., 'C:/Program Files/OpenMS-2.3.0/bin') ?\n";
+								errormessage += "Do you have 'raw2peaks.bat' file located in the '" + appname.toStdString() + "/External/windows' folder ?\n";
+							#endif
+						#endif
+					}
+					break;
 				case mgf:
 					peaklistseries.loadFromMGFStream(peakliststream);
 					break;
@@ -757,7 +794,7 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 				default:
 					break;
 				}
-				if (os && (peaklistfileformat != mzML) && (peaklistfileformat != imzML) && (peaklistfileformat != baf) && (peaklistfileformat != raw) && (peaklistfileformat != ser)) {
+				if (os && (peaklistfileformat != mzML) && (peaklistfileformat != mzXML) && (peaklistfileformat != imzML) && (peaklistfileformat != baf) && (peaklistfileformat != raw) && (peaklistfileformat != ser)) {
 					*os << "ok" << endl << endl;
 				}
 			}
