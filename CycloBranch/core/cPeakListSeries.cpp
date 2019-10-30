@@ -106,7 +106,7 @@ int cPeakListSeries::loadFromProfileApexStream(string& filename, ifstream &strea
 
 			mgfofstream << "BEGIN IONS" << endl;
 			mgfofstream << "TITLE=" << title << endl;
-			mgfofstream << "SCAN=" << to_string(count + 1) << endl;
+			mgfofstream << "SCANS=" << to_string(count + 1) << endl;
 			mgfofstream << "PEPMASS=1" << endl;
 			mgfofstream << "RTINSECONDS=1" << endl;
 			mgfofstream << "CHARGE=1+" << endl << endl;
@@ -312,7 +312,7 @@ int cPeakListSeries::loadFromIMZMLStream(string& imzmlfilename, ifstream &ibdstr
 		if (rawdata) {
 			mgfofstream << "BEGIN IONS" << endl;
 			mgfofstream << "TITLE=" << endl;
-			mgfofstream << "SCAN=" << to_string(i + 1) << endl;
+			mgfofstream << "SCANS=" << to_string(i + 1) << endl;
 			mgfofstream << "PEPMASS=1" << endl;
 			mgfofstream << "RTINSECONDS=1" << endl;
 			mgfofstream << "CHARGE=1+" << endl << endl;

@@ -2512,7 +2512,7 @@ void cSpectrumDetailWidget::rawDataStateChanged(bool state) {
 
 					mgfofstream << "BEGIN IONS" << endl;
 					mgfofstream << "TITLE=" << endl;
-					mgfofstream << "SCAN=" << to_string(rowid) << endl;
+					mgfofstream << "SCANS=" << to_string(rowid) << endl;
 					mgfofstream << "PEPMASS=1" << endl;
 					mgfofstream << "RTINSECONDS=1" << endl;
 					mgfofstream << "CHARGE=1+" << endl << endl;

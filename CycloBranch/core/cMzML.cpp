@@ -434,9 +434,9 @@ int cMzML::parse(string& filename, vector<cPeaksList>& peaklists, int profilespe
 														if ((profilespectrumid == -1) || (profilespectrumid == count)) {
 															mgfofstream << "BEGIN IONS" << endl;
 															mgfofstream << "TITLE=" << title << endl;
-															mgfofstream << "SCAN=" << to_string(count + 1) << endl;
+															mgfofstream << "SCANS=" << to_string(count + 1) << endl;
 															mgfofstream << "PEPMASS=1" << endl;
-															mgfofstream << "RTINSECONDS=1" << endl;
+															mgfofstream << "RTINSECONDS=" << to_string(peaklist.getRetentionTime()) << endl;
 															mgfofstream << "CHARGE=1+" << endl << endl;
 
 															peaksstring.clear();
