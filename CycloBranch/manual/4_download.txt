@@ -33,6 +33,7 @@ If you use CycloBranch in your work, please cite us using any related reference:
     <li> Filter options improved - main window, summary table of matched peaks, and editors (building blocks, sequences/compounds, and modifications).
     <li> Processing of Waters data improved and visualization of profile data added. 
     <li> Visualization of profile mzML/Thermo raw files added and a bug fixed during profile data processing.
+    <li> Retention time is now reported for LC-MS data.
     <li> Visualization of mass spectra fixed (occasional flashing).
     <li> Minimum number of spectra can now be defined for LC-MS and MSI data.
     <li> Minimum number of matched ions can now be defined for MS, LC-MS, and MSI data.
@@ -46,7 +47,7 @@ If you use CycloBranch in your work, please cite us using any related reference:
     <li> [M+Cl]- ion added in MS mode.
     <li> Link to BBDGNC added.
     <li> zlib compression is now supported in mzML files.
-    <li> Some other minor improvements were made. 
+    <li> Some bugs were fixed and other minor improvements were made. 
   </ul>
   <li> <a href="https://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v2.0.xxx_win_64bit.zip" onclick="ga('send', 'event', 'Download', this.href);">Download (Windows, 64 bit - tested on Windows 7/10)</a>
   <li> <a href="https://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v2.0.xxx_linux_64bit.tgz" onclick="ga('send', 'event', 'Download', this.href);">Download (Linux, 64 bit - tested on Ubuntu 16.04)</a>

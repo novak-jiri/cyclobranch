@@ -107,7 +107,7 @@ Use F1 to open this help.
 <td>centroid</td>
 <td>centroid</td>
 <td>standard data format</td>
-<td><a href="http://www.openms.de">OpenMS 2.x</a> must be installed; the FileConverter tool is used to automatically convert this file format into mgf.</td>
+<td><a href="http://www.openms.de">OpenMS 2.x</a> must be installed; the FileConverter tool is used to automatically convert this file format into mzML.</td>
 </tr>
 <tr>
 <td>imzML</td>
