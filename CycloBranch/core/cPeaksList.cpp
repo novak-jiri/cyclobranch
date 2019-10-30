@@ -227,7 +227,7 @@ void cPeaksList::storeToIBDStream(ofstream &ibdstream, bool use_64bit_float_mz_p
 
 
 void cPeaksList::loadFromMGFStream(ifstream &stream) {
-	string s;
+	string s, tmps;
 	cPeak p;
 	size_t pos;
 
@@ -245,6 +245,17 @@ void cPeaksList::loadFromMGFStream(ifstream &stream) {
 		}
 		if (s.substr(0, 6).compare("TITLE=") == 0) {
 			title = s.substr(6);
+		}
+		if (s.substr(0, 11).compare("RTINSECONDS") == 0) {
+			pos = s.find('=');
+			if (pos != string::npos) {
+				tmps = s.substr(pos + 1);
+				pos = tmps.find('-');
+				if (pos != string::npos) {
+					tmps = tmps.substr(0, pos);
+				}
+				rt = atof(tmps.c_str());
+			}
 		}
 	}
 
