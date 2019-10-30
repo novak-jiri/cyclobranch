@@ -6,6 +6,7 @@
 
 #include "include/MassLynxRawInfoReader.hpp"
 #include "include/MassLynxRawScanReader.hpp"
+#include "include/MassLynxRawChromatogramReader.hpp"
 
 
 using namespace std;
@@ -29,6 +30,9 @@ int main(int argc, char* argv[]) {
 		vector<float> masses;
 		vector<float> intensities;
 
+		vector<float> chrtimes;
+		vector<float> chrintensities;
+
 		string outputfile;
 		ofstream outputstream;
 
@@ -40,12 +44,25 @@ int main(int argc, char* argv[]) {
 		outputstream << setprecision(10);
 
 		MassLynxRawScanReader RSR(RI);
+		MassLynxRawChromatogramReader RCR(RSR);
+
+		bool exporttime = true;
 
 		for (int i = 0; i < nFuncs; i++) {
 
-			cout << "Exporting scan no. " << i << "... ";
+			cout << "Exporting scans from function no. " << i << "... ";
 
+			chrtimes.clear();
+			chrintensities.clear();
+
+			RCR.ReadTICChromatogram(i, chrtimes, chrintensities);
 			int nScans = RI.GetScansInFunction(i);
+
+			if (nScans != (int)chrtimes.size()) {
+				cout << "Warning: The chromatogram size is different from the number of scans. The retention time will not be exported." << endl;
+				exporttime = false;
+			}
+
 			for (int j = 0; j < nScans; j++) {
 				masses.clear();
 				intensities.clear();
@@ -53,6 +70,9 @@ int main(int argc, char* argv[]) {
 				outputstream << "BEGIN IONS\nTITLE=";
 				outputstream << "function=" << to_string(i) << " ";
 				outputstream << "scan=" << to_string(j);
+				if (exporttime) {
+					outputstream << "\nRTINSECONDS=" << to_string(chrtimes[j]);
+				}
 				outputstream << "\nCHARGE=1+\n\n";
 
 				RSR.ReadScan(i, j, masses, intensities);
