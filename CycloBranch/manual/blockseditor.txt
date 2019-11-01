@@ -208,7 +208,7 @@ Corresponding residue summary formulas must be entered in the column "Residue Su
 <tr><td>ketide blocks</td><td>19 ketide building blocks (22 including isobars)</td><td>inhouse_siderophores_blocks.txt</td></tr>
 <tr><td>custom</td><td></td><td><a href="https://ms.biomed.cas.cz/cyclobranch/release/custom_databases_excel_sheets.zip" onclick="ga('send', 'event', 'Blocks', this.href);">Download Template for Excel</a></td></tr>
 </table>
-</div>      
+</div>
 
 <br/>
 

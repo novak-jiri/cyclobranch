@@ -83,5 +83,5 @@ If a ferri-form of a siderophore is being detected, masses of all starting point
 </p>
 
 <br/>
-  
-*/                   
+
+*/

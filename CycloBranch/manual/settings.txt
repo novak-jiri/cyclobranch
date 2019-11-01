@@ -499,7 +499,7 @@ If the option [Generate Full Isotope Patterns](@ref settings_isotopepatterns) is
 <li> "Remove" - remove selected items from the list. 
 <li> "Default" - clear the list and define a list of default neutral losses.
 <li> "HCON" - clear the list and set the default chemical elements H, C, O, N, S, and P.
-</ul>                 
+</ul>
 </p>
 
 <p>The default neutral losses are defined as follows:</p>

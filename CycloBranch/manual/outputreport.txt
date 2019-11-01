@@ -5,7 +5,7 @@
 <p>
 If the search is finished, an output report is shown. The report for MS/MS data is shown below. For other data, see [Dereplication in MS Data](@ref msdatadereplication),
 [Dereplication in LC-MS Data](@ref lcmsdatadereplication), and [Dereplication in MSI Data](@ref msidatadereplication).
-</p>                                                                                                                  
+</p>
 
 <p>
 Peptide sequence candidates in yellow rows contain a regular expression used in [Searched Sequence](@ref settings_searchedseq). Note that
@@ -50,8 +50,10 @@ a sequence tag "[198.136914]-[Val/Ival]-[Me-Leu]-[Ala/bAla/Sar]-[Ala/bAla/Sar]-[
 </ul>
 </p>
 
+<p>
 Note that the numbers of fragment ions are reported if a desired type of a fragment ion has been selected in [Ion Types in Theoretical Spectra](@ref settings_iontypes).
 The different types of fragment ions are reported for linear and cyclic polyketides, see [Nomenclature of Linear Polyketide Series](@ref linearpolyketidenomenclature) for details.
+</p>
 
 <p>
 The following additional columns are shown if a <b>linear</b> or <b>branched</b> peptide was searched:
@@ -96,7 +98,14 @@ The following columns are shown if MS, LC-MS, and MSI data is processed (see [Mo
 </p>
 
 <p>
-The following columns are shown if the imaging mass spectra were processed: 
+The following column is shown if the LC-MS data is processed: 
+<ul>
+<li> <b>Time</b> - retention time (time units are dataset dependent)
+</ul>
+</p>
+
+<p>
+The following columns are shown if the imaging mass spectra are processed: 
 <ul>
 <li> <b>Coordinate X</b> - x coordinate of a single mass spectrum
 <li> <b>Coordinate Y</b> - y coordinate of a single mass spectrum
