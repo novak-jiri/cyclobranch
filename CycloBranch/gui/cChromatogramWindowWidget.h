@@ -162,6 +162,9 @@ private:
 	int currentx;
 	int currenty;
 
+	double mintime;
+	double maxtime;
+
 	int minscan;
 	int maxscan;
 
@@ -196,9 +199,16 @@ private:
 
 signals:
 
+	/**
+		\brief The signal is emitted when the range of retention time has been changed.
+		\param mintime minimum retention time
+		\param maxtime maximum retention time
+	*/
+	void updateRetentionTimeInterval(double mintime, double maxtime);
+
 
 	/**
-		\brief The signal is emitted when the range of scans has been changed.
+		\brief The signal is emitted when the range of scan numbers has been changed.
 		\param minid minimum scan id
 		\param maxid maximum scan id
 	*/
@@ -228,6 +238,12 @@ private slots:
 
 
 	void absoluteIntensityStateChanged(bool state);
+
+
+	void setRetentionTimeInterval(double mintime, double maxtime);
+
+
+	void resetRetentionTimeInterval();
 
 
 	void setScanIDInterval(int minid, int maxid);

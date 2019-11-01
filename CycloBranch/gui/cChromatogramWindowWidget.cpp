@@ -16,6 +16,8 @@ cChromatogramWindowWidget::cChromatogramWindowWidget(cTheoreticalSpectrumList& t
 	pressedy = -1;
 	currentx = 0;
 	currenty = 0;
+	mintime = 0;
+	maxtime = 0;
 	minscan = 0;
 	maxscan = 0;
 
@@ -27,7 +29,7 @@ cChromatogramWindowWidget::cChromatogramWindowWidget(cTheoreticalSpectrumList& t
 	firstshow = true;
 	enablemouseselection = true;
 
-	retentiontime = false;
+	retentiontime = true;
 	absoluteintensity = true;
 	hidetic = false;
 	hideeic = false;
@@ -169,11 +171,7 @@ void cChromatogramWindowWidget::recalculateTICChromatogram() {
 
 	progress.setValue(spectrumcount);
 
-	minscan = 1;
-	maxscan = max(1, ticchromatogram.size());
-	emit updateScanIDInterval(minscan, maxscan);
-
-	redrawScene();
+	resetScanIDInterval();
 }
 
 
@@ -199,7 +197,16 @@ void cChromatogramWindowWidget::wheelEvent(QWheelEvent *event) {
 	if (newmin < newmax) {
 		minscan = newmin;
 		maxscan = newmax;
+
 		emit updateScanIDInterval(minscan, maxscan);
+
+		if ((rtimes.size() > 0) && (rtimes.size() == ticchromatogram.size())) {
+			mintime = rtimes[minscan - 1];
+			maxtime = rtimes[maxscan - 1];
+			emit updateRetentionTimeInterval(mintime, maxtime);
+		}
+
+
 		redrawScene();
 	}
 
@@ -222,6 +229,12 @@ void cChromatogramWindowWidget::mouseMoveEvent(QMouseEvent *event) {
 			calculateMinMaxScan();
 
 			emit updateScanIDInterval(minscan, maxscan);
+
+			if ((rtimes.size() > 0) && (rtimes.size() == ticchromatogram.size())) {
+				mintime = rtimes[minscan - 1];
+				maxtime = rtimes[maxscan - 1];
+				emit updateRetentionTimeInterval(mintime, maxtime);
+			}
 
 			pressedx = currentx;
 			pressedy = currenty;
@@ -248,6 +261,12 @@ void cChromatogramWindowWidget::mouseReleaseEvent(QMouseEvent *event) {
 		calculateMinMaxScan();
 
 		emit updateScanIDInterval(minscan, maxscan);
+
+		if ((rtimes.size() > 0) && (rtimes.size() == ticchromatogram.size())) {
+			mintime = rtimes[minscan - 1];
+			maxtime = rtimes[maxscan - 1];
+			emit updateRetentionTimeInterval(mintime, maxtime);
+		}
 
 		pressedx = -1;
 		pressedy = -1;
@@ -832,9 +851,36 @@ void cChromatogramWindowWidget::absoluteIntensityStateChanged(bool state) {
 }
 
 
+void cChromatogramWindowWidget::setRetentionTimeInterval(double mintime, double maxtime) {
+	if (rtimes.size() == 0) {
+		return;
+	}
+
+	int minid = 0;
+	int maxid = 0;
+
+	int size = (int)rtimes.size();
+	for (int i = 0; i < size; i++) {
+		if (fabs(rtimes[i] - mintime) < fabs(rtimes[minid] - mintime)) {
+			minid = i;
+		}
+		if (fabs(rtimes[i] - maxtime) < fabs(rtimes[maxid] - maxtime)) {
+			maxid = i;
+		}
+	}
+	
+	setScanIDInterval(minid + 1, maxid + 1);
+}
+
+
+void cChromatogramWindowWidget::resetRetentionTimeInterval() {
+	resetScanIDInterval();
+}
+
+
 void cChromatogramWindowWidget::setScanIDInterval(int minid, int maxid) {
 	if (maxid < minid) {
-		double tmp = maxid;
+		int tmp = maxid;
 		maxid = minid;
 		minid = tmp;
 	}
@@ -842,6 +888,12 @@ void cChromatogramWindowWidget::setScanIDInterval(int minid, int maxid) {
 	minscan = max(1, minid);
 	maxscan = min(maxid, ticchromatogram.size());
 	emit updateScanIDInterval(minscan, maxscan);
+
+	if ((rtimes.size() > 0) && (rtimes.size() == ticchromatogram.size())) {
+		mintime = rtimes[minscan - 1];
+		maxtime = rtimes[maxscan - 1];
+		emit updateRetentionTimeInterval(mintime, maxtime);
+	}
 
 	redrawScene();
 }
@@ -851,6 +903,12 @@ void cChromatogramWindowWidget::resetScanIDInterval() {
 	minscan = 1;
 	maxscan = max(1, ticchromatogram.size());
 	emit updateScanIDInterval(minscan, maxscan);
+
+	if (rtimes.size() > 0) {
+		mintime = rtimes[0];
+		maxtime = rtimes[rtimes.size() - 1];
+		emit updateRetentionTimeInterval(mintime, maxtime);
+	}
 
 	redrawScene();
 }
