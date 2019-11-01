@@ -167,6 +167,12 @@ void cChromatogramWindowWidget::recalculateTICChromatogram() {
 		progress.setValue(i);
 	}
 
+	if ((spectrumcount > 0) && (rtimes[rtimes.size() - 1] == 0)) {
+		for (int i = 0; i < spectrumcount; i++) {
+			rtimes[i] = i + 1;
+		}
+	}
+
 	ticchromatogram.normalizeIntenzity();
 
 	progress.setValue(spectrumcount);
@@ -370,7 +376,7 @@ void cChromatogramWindowWidget::resizeEvent(QResizeEvent *event) {
 
 int cChromatogramWindowWidget::getScanIDFromXPosition(int x, int w) {
 	int scanid = (double)(x - leftmargin) / (double)(w - leftmargin - rightmargin)*(maxscan - minscan + 1) + minscan - 1;
-	return max(1, scanid);
+	return min(max(1, scanid), (int)ticchromatogram.size());
 }
 
 
@@ -758,12 +764,29 @@ void cChromatogramWindowWidget::updateZoomGroup() {
 	zoomrect->setPen(QPen(Qt::black, 1, Qt::DashLine));
 	zoomrect->setRect(QRectF(QPointF(rx1, ry1), QPointF(rx2, ry2)));
 
-	QString qstr = "Spectrum ID: ";
-	qstr += QString::number(getScanIDFromXPosition((pressedx < currentx) ? pressedx : currentx, origwidth));
-	qstr += "-";
-	qstr += QString::number(getScanIDFromXPosition((pressedx < currentx) ? currentx : pressedx, origwidth));
-	qstr += "\ndiff: ";
-	qstr += QString::number(getScanIDFromXPosition((pressedx < currentx) ? currentx : pressedx, origwidth) - getScanIDFromXPosition((pressedx < currentx) ? pressedx : currentx, origwidth));
+	int from = getScanIDFromXPosition((pressedx < currentx) ? pressedx : currentx, origwidth);
+	int to = getScanIDFromXPosition((pressedx < currentx) ? currentx : pressedx, origwidth);
+
+	QString qstr;
+
+	if (retentiontime) {
+		if ((from > 0) && (from <= (int)rtimes.size()) && (to > 0) && (to <= (int)rtimes.size())) {
+			qstr += "Time: ";
+			qstr += QString::number(rtimes[from - 1]);
+			qstr += "-";
+			qstr += QString::number(rtimes[to - 1]);
+			qstr += "\ndiff: ";
+			qstr += QString::number(rtimes[to - 1] - rtimes[from - 1]);
+		}
+	}
+	else {
+		qstr += "Spectrum ID: ";
+		qstr += QString::number(from);
+		qstr += "-";
+		qstr += QString::number(to);
+		qstr += "\ndiff: ";
+		qstr += QString::number(to - from);
+	}
 
 	zoomsimpletextitem->setFont(myFont);
 	zoomsimpletextitem->setText(qstr);
