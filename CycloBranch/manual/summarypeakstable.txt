@@ -68,7 +68,7 @@ A compound can also be directly seen in [Chromatogram](@ref chromatogram) window
 \subsection subsec_summarypeakstablecolumns Columns
 
 <p>
-The following columns are reported for MS and MSI data:
+The following columns are reported for MS, LC-MS and MSI data:
 <ul>
 <li> ID - Spectrum ID in the [Output Report](@ref outputreport)
 <li> Ion Type - a name of a theoretical peak including information about its charge (if [Generate Full Isotope Patterns](@ref settings_isotopepatterns) is disabled)
@@ -84,6 +84,13 @@ The following columns are reported for MS and MSI data:
 <li> Summary Formula - a summary formula of a neutral molecule
 <li> Name - a name of a compound
 <li> Reference - a link into a database if available (ChemSpider, PubChem or Norine)
+</ul>
+</p>
+
+<p>
+The following column is reported for LC-MS data:
+<ul>
+<li> Time - retention time (time units are dataset dependent)
 </ul>
 </p>
 

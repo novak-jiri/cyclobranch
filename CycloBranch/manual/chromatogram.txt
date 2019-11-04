@@ -66,6 +66,38 @@ Use F1 to open this help.
 </p>
 <p>Reset zoom.</p>
 
+<p><b>Mouse Selection Tool (CTRL + T)</b>
+\htmlonly
+<img src="64.png">
+\endhtmlonly
+\latexonly
+\includegraphics{64.png}
+\endlatexonly
+</p>
+<p>If the button is enabled, the mouse can be used to select a range retention time (or IDs) to be shown.
+<ul>
+<li> Left mouse button - press and hold the button to draw a rectangle determining the minimum and maximum values of retention time (IDs); release the button to apply the changes.
+<li> Right mouse button - press the button during the drawing of a rectangle to cancel the drawing.
+<li> Middle mouse button - reset the range of retention time (IDs).
+<li> Mouse wheel up - zoom the interval in.
+<li> Mouse wheel down - zoom the interval out.
+</ul>
+</p>
+
+<p>
+If the button is disabled, the mouse can be used to move the interval of retention time (IDs) to the left or right. Press and hold the left mouse button to shift the chromatogram.
+</p>
+
+<p><b>Retention Time (CTRL + M)</b>
+\htmlonly
+<img src="12.png">
+\endhtmlonly
+\latexonly
+\includegraphics{12.png}
+\endlatexonly
+</p>
+<p>View retention time or IDs of spectra.</p>
+
 <p><b>Absolute Intensity (CTRL + I)</b>
 \htmlonly
 <img src="11.png">
@@ -74,7 +106,7 @@ Use F1 to open this help.
 \includegraphics{11.png}
 \endlatexonly
 </p>
-<p>View absolute/relative intensities of peaks.</p>
+<p>View absolute/relative intensities.</p>
 
 <p><b>Hide TIC (CTRL + Shift + T)</b>
 \htmlonly
@@ -106,26 +138,14 @@ Use F1 to open this help.
 </p>
 <p>Show HTML documentation.</p>
 
-<p><b>Mouse Spectrum ID Selection Tool (CTRL + T)</b>
-\htmlonly
-<img src="64.png">
-\endhtmlonly
-\latexonly
-\includegraphics{64.png}
-\endlatexonly
-</p>
-<p>If the button is enabled, the mouse can be used to select a range of IDs to be shown.
-<ul>
-<li> Left mouse button - press and hold the button to draw a rectangle determining the minimum and maximum values of IDs; release the button to apply the changes.
-<li> Right mouse button - press the button during the drawing of a rectangle to cancel the drawing.
-<li> Middle mouse button - reset the range of IDs.
-<li> Mouse wheel up - zoom the interval in.
-<li> Mouse wheel down - zoom the interval out.
-</ul>
-</p>
-
 <p>
-If the button is disabled, the mouse can be used to shift the interval of IDs to the left or right. Press and hold the left mouse button to shift the chromatogram.
+<b>Time</b>
+<ul>
+<li> First field - a minimum value of retention time to be shown.
+<li> Second field - a maximum value of retention time to be shown.
+<li> "Set Time" button (or Enter key if the field is focused) - apply the changes.
+<li> "Reset Time" button - reset the range of retention time.
+</ul>
 </p>
 
 <p>
@@ -133,8 +153,8 @@ If the button is disabled, the mouse can be used to shift the interval of IDs to
 <ul>
 <li> First field - a minimum value of ID to be shown.
 <li> Second field - a maximum value of ID to be shown.
-<li> "Set" button (or Enter key) - apply the changes.
-<li> "Reset" button - reset the range of IDs.
+<li> "Set ID" button (or Enter key if the field is focused) - apply the changes.
+<li> "Reset ID" button - reset the range of IDs.
 </ul>
 </p>
 
