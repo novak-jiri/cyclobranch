@@ -961,6 +961,7 @@ void cParametersWidget::loadSettings() {
 		maximumcumulativemass->setValue(settings.value("maximumcumulativemass", 0).toDouble());
 		modificationsline->setText(settings.value("modificationsfile", "").toString());
 		lastdirselectmodifications = modificationsline->text();
+
 		blindedges->setCurrentIndex(settings.value("blindedges", 2).toInt());
 		settings.value("cyclicnterminus", 0).toInt() == 0 ? cyclicnterminus->setChecked(false) : cyclicnterminus->setChecked(true);
 		settings.value("cycliccterminus", 0).toInt() == 0 ? cycliccterminus->setChecked(false) : cycliccterminus->setChecked(true);
