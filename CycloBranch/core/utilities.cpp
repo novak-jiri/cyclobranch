@@ -4,7 +4,7 @@
 
 
 QString appname = "CycloBranch";
-QString appversion = "v. 1.3.71 (64-bit)";
+QString appversion = "v. 1.3.72 (64-bit)";
 
 
 #if OS_TYPE == UNX
@@ -229,6 +229,12 @@ bool checkRegex(ePeptideType peptidetype, string& sequence, string& errormessage
 	}
 
 	return true;
+}
+
+
+bool checkFile(string filename) {
+	ifstream f(filename.c_str());
+	return f.good();
 }
 
 

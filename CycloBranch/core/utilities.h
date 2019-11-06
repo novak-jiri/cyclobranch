@@ -282,6 +282,14 @@ bool checkRegex(ePeptideType peptidetype, string& sequence, string& errormessage
 
 
 /**
+	\brief Check if a file exists.
+	\param filename filename
+	\retval bool true if the file exists, false otherwise
+*/
+bool checkFile(string filename);
+
+
+/**
 	\brief Parse a position of a branch from a peptide sequence.
 	\param peptidetype peptide type
 	\param composition a peptide sequence where all blocks "[blockX]-[blockY]" were replaced by ids "1-2"; but "\(" and "\)" are still included
