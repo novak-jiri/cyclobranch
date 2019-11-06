@@ -1396,6 +1396,7 @@ void cParametersWidget::restoreParameters() {
 
 	peptidetype->setCurrentIndex(parameters.peptidetype);
 	peaklistline->setText(parameters.peaklistfilename.c_str());
+	lastdirselectpeaklist = peaklistline->text();
 	useprofiledata->setChecked(parameters.useprofiledata);
 	scannumber->setValue(parameters.scannumber);
 	precursormass->setValue(parameters.precursormass);
@@ -1410,11 +1411,13 @@ void cParametersWidget::restoreParameters() {
 	fwhm->setValue(parameters.fwhm);
 
 	brickdatabaseline->setText(parameters.bricksdatabasefilename.c_str());
+	lastdirselectbricksdatabase = brickdatabaseline->text();
 	maximumbricksincombinationbegin->setValue(parameters.maximumbricksincombinationbegin);
 	maximumbricksincombinationmiddle->setValue(parameters.maximumbricksincombinationmiddle);
 	maximumbricksincombinationend->setValue(parameters.maximumbricksincombinationend);
 	maximumcumulativemass->setValue(parameters.maximumcumulativemass);
 	modificationsline->setText(parameters.modificationsfilename.c_str());
+	lastdirselectmodifications = modificationsline->text();
 
 	blindedges->setCurrentIndex(parameters.blindedges);
 	cyclicnterminus->setChecked(parameters.cyclicnterminus);
@@ -1425,6 +1428,7 @@ void cParametersWidget::restoreParameters() {
 	regularblocksorder->setChecked(parameters.regularblocksorder);
 
 	sequencedatabaseline->setText(parameters.sequencedatabasefilename.c_str());
+	lastdirselectsequencedatabase = sequencedatabaseline->text();
 	scoretype->setCurrentIndex(parameters.scoretype);
 	hitsreported->setValue(parameters.hitsreported);
 	sequencetag->setText(parameters.sequencetag.c_str());
