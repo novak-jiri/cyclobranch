@@ -939,6 +939,7 @@ void cParametersWidget::loadSettings() {
 		updateSettingsWhenModeChanged(mode->currentIndex());
 
 		peaklistline->setText(settings.value("peaklist", "").toString());
+		lastdirselectpeaklist = peaklistline->text();
 		settings.value("useprofiledata", 0).toInt() == 0 ? useprofiledata->setChecked(false) : useprofiledata->setChecked(true);
 		scannumber->setValue(settings.value("scannumber", 1).toInt());
 		precursormass->setValue(settings.value("precursormass", 0.0).toDouble());
@@ -953,12 +954,13 @@ void cParametersWidget::loadSettings() {
 		fwhm->setValue(settings.value("fwhm", 0.05).toDouble());
 
 		brickdatabaseline->setText(settings.value("brickdatabase", "").toString());
+		lastdirselectbricksdatabase = brickdatabaseline->text();
 		maximumbricksincombinationbegin->setValue(settings.value("maximumbricksincombinationbegin", 1).toInt());
 		maximumbricksincombinationmiddle->setValue(settings.value("maximumbricksincombinationmiddle", 1).toInt());
 		maximumbricksincombinationend->setValue(settings.value("maximumbricksincombinationend", 1).toInt());
 		maximumcumulativemass->setValue(settings.value("maximumcumulativemass", 0).toDouble());
 		modificationsline->setText(settings.value("modificationsfile", "").toString());
-
+		lastdirselectmodifications = modificationsline->text();
 		blindedges->setCurrentIndex(settings.value("blindedges", 2).toInt());
 		settings.value("cyclicnterminus", 0).toInt() == 0 ? cyclicnterminus->setChecked(false) : cyclicnterminus->setChecked(true);
 		settings.value("cycliccterminus", 0).toInt() == 0 ? cycliccterminus->setChecked(false) : cycliccterminus->setChecked(true);
@@ -968,6 +970,7 @@ void cParametersWidget::loadSettings() {
 		settings.value("regularblocksorder", 0).toInt() == 0 ? regularblocksorder->setChecked(false) : regularblocksorder->setChecked(true);
 
 		sequencedatabaseline->setText(settings.value("sequencedatabase", "").toString());
+		lastdirselectsequencedatabase = sequencedatabaseline->text();
 		scoretype->setCurrentIndex(settings.value("scoretype", (int)number_of_matched_peaks).toInt());
 		if ((scoretype->currentIndex() < (int)number_of_matched_peaks) || (scoretype->currentIndex() > (int)number_of_b_and_y_ions)) {
 			scoretype->setCurrentIndex((int)number_of_matched_peaks);
