@@ -56,9 +56,9 @@ to keep the correct number of columns/tabulators to make the file readable by th
 <p><b>Ion Types</b> - select the types of ions to be searched. Remember that for negative ions (e.g. [M-H]-), the value of charge must be negative (i.e. -1). </p>
 
 <p><b>Generate Full Isotope Patterns</b> - enable the checkbox to generate the full isotopic patterns of compounds (the parameter FWHM must be estimated correctly). Optionally, you can disable this feature to generate only
-the theoretical peaks monoisotopic ions. It may be advantageous for a fast check of a dataset.</p>
+the theoretical peaks of monoisotopic ions. It may be advantageous for a fast check of a dataset.</p>
 
-<p><b>Minimum Pattern Size</b> - define the minimum number of peaks which must be matched in a isotopic pattern to report a given compound. The feature <b>Generate Full Isotope Patterns</b> must be enabled.</p>
+<p><b>Minimum Pattern Size</b> - define the minimum number of peaks which must be matched in an isotopic pattern to report a given compound. The feature <b>Generate Full Isotope Patterns</b> must be enabled.</p>
 
 <p>We recommend to save the configuration into an '.ini' file.</p>
 
