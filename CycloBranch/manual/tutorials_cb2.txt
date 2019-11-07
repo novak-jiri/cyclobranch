@@ -69,7 +69,7 @@ the theoretical peaks monoisotopic ions. It may be advantageous for a fast check
 \image latex tutorial-2-1-result.png "Tutorial 1: Search process completed." width=16cm
 </p>
 
-<p>Double-click on the row to display the details. Click on the highlighted icon to display profile spectrum (if the option was enabled in the settings dialog).</p>
+<p>Double-click on the row to display the details. Click on the highlighted icon to display the profile spectrum (if the option was enabled in the settings dialog).</p>
 
 <p>
 \image html tutorial-2-1-detail.png "Tutorial 1: Detail of a mass spectrum. The red peaks were matched."
