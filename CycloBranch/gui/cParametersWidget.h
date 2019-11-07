@@ -267,10 +267,11 @@ private:
 
 	QString lastdirloadsettings;
 	QString lastdirsavesettings;
-	QString lastdirselectpeaklist;
-	QString lastdirselectbricksdatabase;
-	QString lastdirselectmodifications;
-	QString lastdirselectsequencedatabase;
+
+	QString defaultdirselectpeaklist;
+	QString defaultdirselectbricksdatabase;
+	QString defaultdirselectmodifications;
+	QString defaultdirselectsequencedatabase;
 
 
 protected:

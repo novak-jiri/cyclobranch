@@ -669,17 +669,19 @@ cParametersWidget::cParametersWidget(QWidget* parent) {
 	#if OS_TYPE == WIN
 		lastdirloadsettings = "./Settings/";
 		lastdirsavesettings = "./Settings/";
-		lastdirselectpeaklist = "./PeakLists/";
-		lastdirselectbricksdatabase = "./BrickDatabases/";
-		lastdirselectmodifications = "./Modifications/";
-		lastdirselectsequencedatabase = "./SequenceDatabases/";
+
+		defaultdirselectpeaklist = "./PeakLists/";
+		defaultdirselectbricksdatabase = "./BrickDatabases/";
+		defaultdirselectmodifications = "./Modifications/";
+		defaultdirselectsequencedatabase = "./SequenceDatabases/";
 	#else
 		lastdirloadsettings = installdir + "Settings/";
 		lastdirsavesettings = installdir + "Settings/";
-		lastdirselectpeaklist = installdir + "PeakLists/";
-		lastdirselectbricksdatabase = installdir + "BrickDatabases/";
-		lastdirselectmodifications = installdir + "Modifications/";
-		lastdirselectsequencedatabase = installdir + "SequenceDatabases/";
+
+		defaultdirselectpeaklist = installdir + "PeakLists/";
+		defaultdirselectbricksdatabase = installdir + "BrickDatabases/";
+		defaultdirselectmodifications = installdir + "Modifications/";
+		defaultdirselectsequencedatabase = installdir + "SequenceDatabases/";
 	#endif
 	
 	mode->setCurrentIndex(dereplication);
@@ -939,9 +941,6 @@ void cParametersWidget::loadSettings() {
 		updateSettingsWhenModeChanged(mode->currentIndex());
 
 		peaklistline->setText(settings.value("peaklist", "").toString());
-		if (checkFile(peaklistline->text().toStdString())) {
-			lastdirselectpeaklist = peaklistline->text();
-		}
 		settings.value("useprofiledata", 0).toInt() == 0 ? useprofiledata->setChecked(false) : useprofiledata->setChecked(true);
 		scannumber->setValue(settings.value("scannumber", 1).toInt());
 		precursormass->setValue(settings.value("precursormass", 0.0).toDouble());
@@ -956,17 +955,11 @@ void cParametersWidget::loadSettings() {
 		fwhm->setValue(settings.value("fwhm", 0.05).toDouble());
 
 		brickdatabaseline->setText(settings.value("brickdatabase", "").toString());
-		if (checkFile(brickdatabaseline->text().toStdString())) {
-			lastdirselectbricksdatabase = brickdatabaseline->text();
-		}
 		maximumbricksincombinationbegin->setValue(settings.value("maximumbricksincombinationbegin", 1).toInt());
 		maximumbricksincombinationmiddle->setValue(settings.value("maximumbricksincombinationmiddle", 1).toInt());
 		maximumbricksincombinationend->setValue(settings.value("maximumbricksincombinationend", 1).toInt());
 		maximumcumulativemass->setValue(settings.value("maximumcumulativemass", 0).toDouble());
 		modificationsline->setText(settings.value("modificationsfile", "").toString());
-		if (checkFile(modificationsline->text().toStdString())) {
-			lastdirselectmodifications = modificationsline->text();
-		}
 
 		blindedges->setCurrentIndex(settings.value("blindedges", 2).toInt());
 		settings.value("cyclicnterminus", 0).toInt() == 0 ? cyclicnterminus->setChecked(false) : cyclicnterminus->setChecked(true);
@@ -977,9 +970,6 @@ void cParametersWidget::loadSettings() {
 		settings.value("regularblocksorder", 0).toInt() == 0 ? regularblocksorder->setChecked(false) : regularblocksorder->setChecked(true);
 
 		sequencedatabaseline->setText(settings.value("sequencedatabase", "").toString());
-		if (checkFile(sequencedatabaseline->text().toStdString())) {
-			lastdirselectsequencedatabase = sequencedatabaseline->text();
-		}
 		scoretype->setCurrentIndex(settings.value("scoretype", (int)number_of_matched_peaks).toInt());
 		if ((scoretype->currentIndex() < (int)number_of_matched_peaks) || (scoretype->currentIndex() > (int)number_of_b_and_y_ions)) {
 			scoretype->setCurrentIndex((int)number_of_matched_peaks);
@@ -1127,44 +1117,60 @@ void cParametersWidget::saveSettingsAs() {
 
 
 void cParametersWidget::peaklistButtonReleased() {
+	QString currentdir = peaklistline->text();
+	if (!checkFile(currentdir.toStdString())) {
+		currentdir = defaultdirselectpeaklist;
+	}
+
 	#if OS_TYPE != WIN
-		QString filename = QFileDialog::getOpenFileName(this, tr("Select Peaklist..."), lastdirselectpeaklist, tr("Peak Lists (*.txt *.mgf *.mzML *.mzXML *.imzML)"));
+		QString filename = QFileDialog::getOpenFileName(this, tr("Select Peaklist..."), currentdir, tr("Peak Lists (*.txt *.mgf *.mzML *.mzXML *.imzML)"));
 	#else
-		QString filename = QFileDialog::getOpenFileName(this, tr("Select Peaklist..."), lastdirselectpeaklist, tr("Peak Lists (*.txt *.mgf *.mzML *.mzXML *.imzML *.baf *.raw *.dat *.mis ser)"));
+		QString filename = QFileDialog::getOpenFileName(this, tr("Select Peaklist..."), currentdir, tr("Peak Lists (*.txt *.mgf *.mzML *.mzXML *.imzML *.baf *.raw *.dat *.mis ser)"));
 	#endif
 
 	if (!filename.isEmpty()) {
-		lastdirselectpeaklist = filename;
 		peaklistline->setText(filename);
 	}
 }
 
 
 void cParametersWidget::brickDatabaseButtonReleased() {
-	QString filename = QFileDialog::getOpenFileName(this, tr("Select Building Blocks Database..."), lastdirselectbricksdatabase, tr("Text Files (*.txt)"));
+	QString currentdir = brickdatabaseline->text();
+	if (!checkFile(currentdir.toStdString())) {
+		currentdir = defaultdirselectbricksdatabase;
+	}
+
+	QString filename = QFileDialog::getOpenFileName(this, tr("Select Building Blocks Database..."), currentdir, tr("Text Files (*.txt)"));
 	
 	if (!filename.isEmpty()) {
-		lastdirselectbricksdatabase = filename;
 		brickdatabaseline->setText(filename);
 	}
 }
 
 
 void cParametersWidget::modificationsButtonReleased() {
-	QString filename = QFileDialog::getOpenFileName(this, tr("Select Modifications File..."), lastdirselectmodifications, tr("Text Files (*.txt)"));
+	QString currentdir = modificationsline->text();
+	if (!checkFile(currentdir.toStdString())) {
+		currentdir = defaultdirselectmodifications;
+	}
+
+	QString filename = QFileDialog::getOpenFileName(this, tr("Select Modifications File..."), currentdir, tr("Text Files (*.txt)"));
 	
 	if (!filename.isEmpty()) {
-		lastdirselectmodifications = filename;
 		modificationsline->setText(filename);
 	}
 }
 
 
 void cParametersWidget::sequenceDatabaseButtonReleased() {
-	QString filename = QFileDialog::getOpenFileName(this, tr("Select Sequence Database..."), lastdirselectsequencedatabase, tr("Text Files (*.txt)"));
+	QString currentdir = sequencedatabaseline->text();
+	if (!checkFile(currentdir.toStdString())) {
+		currentdir = defaultdirselectsequencedatabase;
+	}
+
+	QString filename = QFileDialog::getOpenFileName(this, tr("Select Sequence Database..."), currentdir, tr("Text Files (*.txt)"));
 
 	if (!filename.isEmpty()) {
-		lastdirselectsequencedatabase = filename;
 		sequencedatabaseline->setText(filename);
 	}
 }
@@ -1404,9 +1410,6 @@ void cParametersWidget::restoreParameters() {
 
 	peptidetype->setCurrentIndex(parameters.peptidetype);
 	peaklistline->setText(parameters.peaklistfilename.c_str());
-	if (checkFile(peaklistline->text().toStdString())) {
-		lastdirselectpeaklist = peaklistline->text();
-	}
 	useprofiledata->setChecked(parameters.useprofiledata);
 	scannumber->setValue(parameters.scannumber);
 	precursormass->setValue(parameters.precursormass);
@@ -1421,17 +1424,11 @@ void cParametersWidget::restoreParameters() {
 	fwhm->setValue(parameters.fwhm);
 
 	brickdatabaseline->setText(parameters.bricksdatabasefilename.c_str());
-	if (checkFile(brickdatabaseline->text().toStdString())) {
-		lastdirselectbricksdatabase = brickdatabaseline->text();
-	}
 	maximumbricksincombinationbegin->setValue(parameters.maximumbricksincombinationbegin);
 	maximumbricksincombinationmiddle->setValue(parameters.maximumbricksincombinationmiddle);
 	maximumbricksincombinationend->setValue(parameters.maximumbricksincombinationend);
 	maximumcumulativemass->setValue(parameters.maximumcumulativemass);
 	modificationsline->setText(parameters.modificationsfilename.c_str());
-	if (checkFile(modificationsline->text().toStdString())) {
-		lastdirselectmodifications = modificationsline->text();
-	}
 
 	blindedges->setCurrentIndex(parameters.blindedges);
 	cyclicnterminus->setChecked(parameters.cyclicnterminus);
@@ -1442,9 +1439,6 @@ void cParametersWidget::restoreParameters() {
 	regularblocksorder->setChecked(parameters.regularblocksorder);
 
 	sequencedatabaseline->setText(parameters.sequencedatabasefilename.c_str());
-	if (checkFile(sequencedatabaseline->text().toStdString())) {
-		lastdirselectsequencedatabase = sequencedatabaseline->text();
-	}
 	scoretype->setCurrentIndex(parameters.scoretype);
 	hitsreported->setValue(parameters.hitsreported);
 	sequencetag->setText(parameters.sequencetag.c_str());
