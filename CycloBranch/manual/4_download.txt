@@ -25,7 +25,7 @@ If you use CycloBranch in your work, please cite us using any related reference:
 <ul>
   <li> Changes:
   <ul>
-    <li> Compound search mode added (a database-free search mode for MS1 data).
+    <li> Compound search mode added (a database-free search mode for MS1, LC-MS, and MSI data).
     <li> Fragmentation of metabolites is now supported (peptide type "Other" in MS/MS mode).
     <li> A list od neutral losses can now be defined for individual building blocks.
     <li> The databases of blocks were updated to a new file format (the column neutral losses was added).
@@ -34,12 +34,12 @@ If you use CycloBranch in your work, please cite us using any related reference:
     <li> Processing of Waters data improved and visualization of profile data added. 
     <li> Visualization of profile mzML/Thermo raw files added and a bug fixed during profile data processing.
     <li> Retention time is now reported for LC-MS data.
-    <li> Visualization of mass spectra fixed (occasional flashing).
     <li> Minimum number of spectra can now be defined for LC-MS and MSI data.
     <li> Minimum number of matched ions can now be defined for MS, LC-MS, and MSI data.
     <li> New parameters added: Basic Formula Check, Advanced Formula Check, N/O Ratio Check, Isotope m/z Tolerance, and Isotope Intensity Tolerance. 
     <li> Percentage contributions of peak components (e.g. 13C, 17O) are now reported if theoretical isotopic patterns are calculated.
     <li> Copy to clipboard function (CTRL+C) improved in spectrum detail window, main window, and summary table of matched peaks (multiple rows and columns can be selected in the table).
+    <li> Visualization of mass spectra fixed (occasional flashing).
     <li> A bug fixed - existing items in the list of neutral losses were not editable if the settings dialog was re-opened.
     <li> A bug was fixed when too many combinations of neutral losses were generated.
     <li> Internal ions can now be generated for branch-cyclic peptides.
@@ -47,7 +47,7 @@ If you use CycloBranch in your work, please cite us using any related reference:
     <li> [M+Cl]- ion added in MS mode.
     <li> Link to BBDGNC added.
     <li> zlib compression is now supported in mzML files.
-    <li> Some bugs were fixed and other minor improvements were made. 
+    <li> Some other bugs were fixed and minor improvements were made. 
   </ul>
   <li> <a href="https://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v2.0.xxx_win_64bit.zip" onclick="ga('send', 'event', 'Download', this.href);">Download (Windows, 64 bit - tested on Windows 7/10)</a>
   <li> <a href="https://ms.biomed.cas.cz/cyclobranch/release/CycloBranch_v2.0.xxx_linux_64bit.tgz" onclick="ga('send', 'event', 'Download', this.href);">Download (Linux, 64 bit - tested on Ubuntu 16.04)</a>

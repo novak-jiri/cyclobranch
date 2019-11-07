@@ -90,15 +90,15 @@
       <tab type="user" visible="yes" url="@ref filter" title="Text Filter"/>
     </tab>
     <tab type="usergroup" visible="yes" url="@ref tutorials" title="Tutorials">
-      <tab type="user" visible="yes" url="@ref tutorial1_cb2" title="Tutorial 1: to do"/>
-      <tab type="user" visible="yes" url="@ref tutorial2_cb2" title="Tutorial 2: to do"/>
-      <tab type="user" visible="yes" url="@ref tutorial3_cb2" title="Tutorial 3: to do"/>
-      <tab type="user" visible="yes" url="@ref tutorial4_cb2" title="Tutorial 4: to do"/>
-      <tab type="user" visible="yes" url="@ref tutorial5_cb2" title="Tutorial 5: to do"/>
-      <tab type="user" visible="yes" url="@ref tutorial6_cb2" title="Tutorial 6: to do"/>
-      <tab type="user" visible="yes" url="@ref tutorial7_cb2" title="Tutorial 7: to do"/>
-      <tab type="user" visible="yes" url="@ref tutorial8_cb2" title="Tutorial 8: to do"/>
-      <tab type="user" visible="yes" url="@ref tutorial9_cb2" title="Tutorial 9: to do"/>
+      <tab type="user" visible="yes" url="@ref tutorial1_cb2" title="Tutorial 1: Dereplication in MS1 data"/>
+      <tab type="user" visible="yes" url="@ref tutorial2_cb2" title="Tutorial 2: Dereplication in LC-MS data"/>
+      <tab type="user" visible="yes" url="@ref tutorial3_cb2" title="Tutorial 3: Identification of unknown compounds LC-MS data"/>
+      <tab type="user" visible="yes" url="@ref tutorial4_cb2" title="Tutorial 4: Dereplication in MSI data"/>
+      <tab type="user" visible="yes" url="@ref tutorial5_cb2" title="Tutorial 5: Identification of unknown compounds MSI data"/>
+      <tab type="user" visible="yes" url="@ref tutorial6_cb2" title="Tutorial 6: Fusion of MSI data with histology image"/>
+      <tab type="user" visible="yes" url="@ref tutorial7_cb2" title="Tutorial 7: Annotate MS/MS spectrum of a peptide - static list of neutral losses"/>
+      <tab type="user" visible="yes" url="@ref tutorial8_cb2" title="Tutorial 8: Annotate MS/MS spectrum of a peptide - dynamic list of neutral losses"/>
+      <tab type="user" visible="yes" url="@ref tutorial9_cb2" title="Tutorial 9: Annotate MS/MS spectrum of a metabolite"/>
        <tab type="usergroup" visible="yes" url="@ref tutorials_cb1" title="Tutorials (CycloBranch 1.x)">
         <tab type="user" visible="yes" url="@ref tutorial1_cb1" title="Tutorial 1: Does a peptide have a cycle ?"/>
         <tab type="user" visible="yes" url="@ref tutorial2_cb1" title="Tutorial 2: How to determine a tag ?"/>

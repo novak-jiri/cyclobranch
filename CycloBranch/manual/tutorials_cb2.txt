@@ -6,12 +6,12 @@
 
 <p>
 <ul>
-<li> [Tutorial 1: Dereplication in MS1 data - MALDI-MS, direct infusion ESI](@ref tutorial1_cb2)
-<li> [Tutorial 2: Dereplication in MS1 data - LC-MS](@ref tutorial2_cb2)
-<li> [Tutorial 3: Dereplication in MS1 data - MSI (mass spectrometry imaging)](@ref tutorial3_cb2)
-<li> [Tutorial 4: Fusion of MSI data with histology](@ref tutorial4_cb2)
-<li> [Tutorial 5: Identification of unknown compounds in MS1 data - LC-MS](@ref tutorial5_cb2)
-<li> [Tutorial 6: Identification of unknown compounds in MS1 data - MSI](@ref tutorial6_cb2)
+<li> [Tutorial 1: Dereplication in MS1 data](@ref tutorial1_cb2)
+<li> [Tutorial 2: Dereplication in LC-MS data](@ref tutorial2_cb2)
+<li> [Tutorial 3: Identification of unknown compounds LC-MS data](@ref tutorial3_cb2)
+<li> [Tutorial 4: Dereplication in MSI data](@ref tutorial4_cb2)
+<li> [Tutorial 5: Identification of unknown compounds MSI data](@ref tutorial5_cb2)
+<li> [Tutorial 6: Fusion of MSI data with histology image](@ref tutorial6_cb2)
 <li> [Tutorial 7: Annotate MS/MS spectrum of a peptide - static list of neutral losses](@ref tutorial7_cb2)
 <li> [Tutorial 8: Annotate MS/MS spectrum of a peptide - dynamic list of neutral losses](@ref tutorial8_cb2)
 <li> [Tutorial 9: Annotate MS/MS spectrum of a metabolite](@ref tutorial9_cb2)
@@ -20,210 +20,109 @@
 
 <hr>
 
-\section tutorial1_cb2 Tutorial 1: to do
+\section tutorial1_cb2 Tutorial 1: Dereplication in MS1 data
+
+<p>The dereplication is the process of annotation of already known compounds (i.e. the database search). To perform the dereplication, click on <b>Search->Settings</b> in the main window of the application. 
+
 <p>
-\htmlonly
-<a href="../../Tutorials/cb2_tutorial1.mp4" onclick="ga('send', 'event', 'Tutorials', this.href);">Download mp4</a><br/>
-\endhtmlonly
-\latexonly
-\href{https://ms.biomed.cas.cz/cyclobranch/Tutorials/cb2_tutorial1.mp4}{Download mp4}
-
-\endlatexonly
-<a href="https://" target="_blank" onclick="ga('send', 'event', 'Tutorials', this.href, 'YouTube - Tutorial 1');">YouTube</a>
+\image html tutorial-2-1-mainwindow.png "Tutorial 1: Main window of the engine."
+\image latex tutorial-2-1-mainwindow.png "Tutorial 1: Main window of the engine." width=16cm
 </p>
-<br/>
-\htmlonly
-<p align="center">
-<video width="1296" height="740" controls onplay="ga('send', 'event', 'Tutorials', 'https://ms.biomed.cas.cz/cyclobranch/Tutorials/cb2_tutorial1.mp4');">
-<source src="../../Tutorials/cb2_tutorial1.mp4" type="video/mp4">
-Your browser does not support the video tag.
-</video>
-</p>
-\endhtmlonly
 
-<br><hr>
+<p>The most important parameters in the settings dialog are:</p>
 
-\section tutorial2_cb2 Tutorial 2: to do
 <p>
-\htmlonly
-<a href="../../Tutorials/cb2_tutorial2.mp4" onclick="ga('send', 'event', 'Tutorials', this.href);">Download mp4</a><br/>
-\endhtmlonly
-\latexonly
-\href{https://ms.biomed.cas.cz/cyclobranch/Tutorials/cb2_tutorial2.mp4}{Download mp4}
-
-\endlatexonly
-<a href="https://" target="_blank" onclick="ga('send', 'event', 'Tutorials', this.href, 'YouTube - Tutorial 2');">YouTube</a>
+\image html tutorial-2-1-settings.png "Tutorial 1: Configuration for dereplication in MS1 data."
+\image latex tutorial-2-1-settings.png "Tutorial 1: Configuration for dereplication in MS1 data." width=16cm
 </p>
-<br/>
-\htmlonly
-<p align="center">
-<video width="1296" height="740" controls onplay="ga('send', 'event', 'Tutorials', 'https://ms.biomed.cas.cz/cyclobranch/Tutorials/cb2_tutorial2.mp4');">
-<source src="../../Tutorials/cb2_tutorial2.mp4" type="video/mp4">
-Your browser does not support the video tag.
-</video>
-</p>
-\endhtmlonly
 
-<br><hr>
+<p><b>Mode</b> - select [Compare Peaklist(s) with Database - MS, LC-MS, MSI](@ref settings_mode)</p>
 
-\section tutorial3_cb2 Tutorial 3: to do
+<p><b>File</b> - select an input file with mass spectra. The list of supported file formats is available [here](@ref settings_peaklistfile) (you may need a third-party software for some file formats). 
+Enable the checkbox, if you would like to extract profile mass spectra from the file for later visualization (note: the input file must include profile spectra; the extraction may be time-consuming; 
+and the visualization must be enabled in the spectrum detail window).</p>
+
+<p><b>Charge</b> - the maximum charge of generated theoretical peaks. If the value is equal to 2, then the theoretical peaks of singly and doubly charged ions are generated. Use -1 for negative mode.</p>
+
+<p><b>FWHM</b> - see the peaks in your spectra and estimate the full width at half maximum (i.e. the width of a representative peak at half of his height; the value corresponds to m/z ratio of a peak divided by its resolution). 
+The theoretical peaks are split or merged using FWHM value prior they are matched with experimental peaks.</p>
+
+<p><b>Sequence/Compound Database File</b> - select a text file serving as a database. The proper text file can be prepared using  [Sequence/Compound Database Editor](@ref sequenceeditorinterface) or created using 
+a <a href="https://ms.biomed.cas.cz/cyclobranch/release/custom_databases_excel_sheets.zip" onclick="ga('send', 'event', 'Sequences', this.href);">template in Excel</a>. Several [in-house prepared databases](@ref availablesequencedatabases)
+are also available. In this mode, it is sufficient if you define only a name and a molecular formula (neutral) for every compound. The type of compound can be defined as 'other' 
+and the monoisotopic mass is calculated from the molecular formula automatically. The text file has items separated by tabulator on each row and can also be easily prepared using a script (please, remember that you have 
+to keep the correct number of columns/tabulators to make the file readable by the search engine).</p>
+
+<p><b>Ion Types</b> - select the types of ions to be searched. Remember that for negative ions (e.g. [M-H]-), the value of charge must be negative (i.e. -1). </p>
+
+<p><b>Generate Full Isotope Patterns</b> - enable the checkbox to generate the full isotopic patterns of compounds (the parameter FWHM must be estimated correctly). Optionally, you can disable this feature to generate only
+the theoretical peaks monoisotopic ions. It may be advantageous for a fast check of a dataset.</p>
+
+<p><b>Minimum Pattern Size</b> - define the minimum number of peaks which must be matched in a isotopic pattern to report a given compound. The feature <b>Generate Full Isotope Patterns</b> must be enabled.</p>
+
+<p>We recommend to save the configuration into an '.ini' file.</p>
+
+<p>Click <b>OK</b>. In the main window select <b>Search->Run</b> to process the dataset.</p>
+
 <p>
-\htmlonly
-<a href="../../Tutorials/cb2_tutorial3.mp4" onclick="ga('send', 'event', 'Tutorials', this.href);">Download mp4</a><br/>
-\endhtmlonly
-\latexonly
-\href{https://ms.biomed.cas.cz/cyclobranch/Tutorials/cb2_tutorial3.mp4}{Download mp4}
-
-\endlatexonly
-<a href="https://" target="_blank" onclick="ga('send', 'event', 'Tutorials', this.href, 'YouTube - Tutorial 3');">YouTube</a>
+\image html tutorial-2-1-result.png "Tutorial 1: Search process completed."
+\image latex tutorial-2-1-result.png "Tutorial 1: Search process completed." width=16cm
 </p>
-<br/>
-\htmlonly
-<p align="center">
-<video width="1296" height="740" controls onplay="ga('send', 'event', 'Tutorials', 'https://ms.biomed.cas.cz/cyclobranch/Tutorials/cb2_tutorial3.mp4');">
-<source src="../../Tutorials/cb2_tutorial3.mp4" type="video/mp4">
-Your browser does not support the video tag.
-</video>
-</p>
-\endhtmlonly
 
-<br><hr>
+<p>Double-click on the row to display the details. Click on the highlighted icon to display profile spectrum (if the option was enabled in the settings dialog).</p>
 
-\section tutorial4_cb2 Tutorial 4: to do
 <p>
-\htmlonly
-<a href="../../Tutorials/cb2_tutorial4.mp4" onclick="ga('send', 'event', 'Tutorials', this.href);">Download mp4</a><br/>
-\endhtmlonly
-\latexonly
-\href{https://ms.biomed.cas.cz/cyclobranch/Tutorials/cb2_tutorial4.mp4}{Download mp4}
-
-\endlatexonly
-<a href="https://" target="_blank" onclick="ga('send', 'event', 'Tutorials', this.href, 'YouTube - Tutorial 4');">YouTube</a>
+\image html tutorial-2-1-detail.png "Tutorial 1: Detail of a mass spectrum. The red peaks were matched."
+\image latex tutorial-2-1-detail.png "Tutorial 1: Detail of a mass spectrum. The red peaks were matched." width=16cm
 </p>
-<br/>
-\htmlonly
-<p align="center">
-<video width="1296" height="740" controls onplay="ga('send', 'event', 'Tutorials', 'https://ms.biomed.cas.cz/cyclobranch/Tutorials/cb2_tutorial4.mp4');">
-<source src="../../Tutorials/cb2_tutorial4.mp4" type="video/mp4">
-Your browser does not support the video tag.
-</video>
-</p>
-\endhtmlonly
 
-<br><hr>
+<br/><hr>
 
-\section tutorial5_cb2 Tutorial 5: to do
-<p>
-\htmlonly
-<a href="../../Tutorials/cb2_tutorial5.mp4" onclick="ga('send', 'event', 'Tutorials', this.href);">Download mp4</a><br/>
-\endhtmlonly
-\latexonly
-\href{https://ms.biomed.cas.cz/cyclobranch/Tutorials/cb2_tutorial5.mp4}{Download mp4}
+\section tutorial2_cb2 Tutorial 2: Dereplication in LC-MS data
 
-\endlatexonly
-<a href="https://" target="_blank" onclick="ga('send', 'event', 'Tutorials', this.href, 'YouTube - Tutorial 5');">YouTube</a>
-</p>
-<br/>
-\htmlonly
-<p align="center">
-<video width="1296" height="740" controls onplay="ga('send', 'event', 'Tutorials', 'https://ms.biomed.cas.cz/cyclobranch/Tutorials/cb2_tutorial5.mp4');">
-<source src="../../Tutorials/cb2_tutorial5.mp4" type="video/mp4">
-Your browser does not support the video tag.
-</video>
-</p>
-\endhtmlonly
+<p>Coming soon.</p>
 
-<br><hr>
+<br/><hr>
 
-\section tutorial6_cb2 Tutorial 6: to do
-<p>
-\htmlonly
-<a href="../../Tutorials/cb2_tutorial6.mp4" onclick="ga('send', 'event', 'Tutorials', this.href);">Download mp4</a><br/>
-\endhtmlonly
-\latexonly
-\href{https://ms.biomed.cas.cz/cyclobranch/Tutorials/cb2_tutorial6.mp4}{Download mp4}
+\section tutorial3_cb2 Tutorial 3: Identification of unknown compounds LC-MS data
 
-\endlatexonly
-<a href="https://" target="_blank" onclick="ga('send', 'event', 'Tutorials', this.href, 'YouTube - Tutorial 6');">YouTube</a>
-</p>
-<br/>
-\htmlonly
-<p align="center">
-<video width="1296" height="740" controls onplay="ga('send', 'event', 'Tutorials', 'https://ms.biomed.cas.cz/cyclobranch/Tutorials/cb2_tutorial6.mp4');">
-<source src="../../Tutorials/cb2_tutorial6.mp4" type="video/mp4">
-Your browser does not support the video tag.
-</video>
-</p>
-\endhtmlonly
+<p>Coming soon.</p>
 
-<br><hr>
+<br/><hr>
 
-\section tutorial7_cb2 Tutorial 7: to do
-<p>
-\htmlonly
-<a href="../../Tutorials/cb2_tutorial7.mp4" onclick="ga('send', 'event', 'Tutorials', this.href);">Download mp4</a><br/>
-\endhtmlonly
-\latexonly
-\href{https://ms.biomed.cas.cz/cyclobranch/Tutorials/cb2_tutorial7.mp4}{Download mp4}
+\section tutorial4_cb2 Tutorial 4: Dereplication in MSI data
 
-\endlatexonly
-<a href="https://" target="_blank" onclick="ga('send', 'event', 'Tutorials', this.href, 'YouTube - Tutorial 7');">YouTube</a>
-</p>
-<br/>
-\htmlonly
-<p align="center">
-<video width="1296" height="740" controls onplay="ga('send', 'event', 'Tutorials', 'https://ms.biomed.cas.cz/cyclobranch/Tutorials/cb2_tutorial7.mp4');">
-<source src="../../Tutorials/cb2_tutorial7.mp4" type="video/mp4">
-Your browser does not support the video tag.
-</video>
-</p>
-\endhtmlonly
+<p>Coming soon.</p>
 
-<br><hr>
+<br/><hr>
 
-\section tutorial8_cb2 Tutorial 8: to do
-<p>
-\htmlonly
-<a href="../../Tutorials/cb2_tutorial8.mp4" onclick="ga('send', 'event', 'Tutorials', this.href);">Download mp4</a><br/>
-\endhtmlonly
-\latexonly
-\href{https://ms.biomed.cas.cz/cyclobranch/Tutorials/cb2_tutorial8.mp4}{Download mp4}
+\section tutorial5_cb2 Tutorial 5: Identification of unknown compounds MSI data
 
-\endlatexonly
-<a href="https://" target="_blank" onclick="ga('send', 'event', 'Tutorials', this.href, 'YouTube - Tutorial 8');">YouTube</a>
-</p>
-<br/>
-\htmlonly
-<p align="center">
-<video width="1296" height="740" controls onplay="ga('send', 'event', 'Tutorials', 'https://ms.biomed.cas.cz/cyclobranch/Tutorials/cb2_tutorial8.mp4');">
-<source src="../../Tutorials/cb2_tutorial8.mp4" type="video/mp4">
-Your browser does not support the video tag.
-</video>
-</p>
-\endhtmlonly
+<p>Coming soon.</p>
 
-<br><hr>
+<br/><hr>
 
-\section tutorial9_cb2 Tutorial 9: to do
-<p>
-\htmlonly
-<a href="../../Tutorials/cb2_tutorial9.mp4" onclick="ga('send', 'event', 'Tutorials', this.href);">Download mp4</a><br/>
-\endhtmlonly
-\latexonly
-\href{https://ms.biomed.cas.cz/cyclobranch/Tutorials/cb2_tutorial9.mp4}{Download mp4}
+\section tutorial6_cb2 Tutorial 6: Fusion of MSI data with histology image
 
-\endlatexonly
-<a href="https://" target="_blank" onclick="ga('send', 'event', 'Tutorials', this.href, 'YouTube - Tutorial 9');">YouTube</a>
-</p>
-<br/>
-\htmlonly
-<p align="center">
-<video width="1296" height="740" controls onplay="ga('send', 'event', 'Tutorials', 'https://ms.biomed.cas.cz/cyclobranch/Tutorials/cb2_tutorial9.mp4');">
-<source src="../../Tutorials/cb2_tutorial9.mp4" type="video/mp4">
-Your browser does not support the video tag.
-</video>
-</p>
-\endhtmlonly
+<p>Coming soon.</p>
+
+<br/><hr>
+
+\section tutorial7_cb2 Tutorial 7: Annotate MS/MS spectrum of a peptide - static list of neutral losses
+
+<p>Coming soon.</p>
+
+<br/><hr>
+
+\section tutorial8_cb2 Tutorial 8: Annotate MS/MS spectrum of a peptide - dynamic list of neutral losses
+
+<p>Coming soon.</p>
+
+<br/><hr>
+
+\section tutorial9_cb2 Tutorial 9: Annotate MS/MS spectrum of a metabolite
+
+<p>Coming soon.</p>
 
 <br/>
 
