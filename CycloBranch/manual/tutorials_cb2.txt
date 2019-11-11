@@ -31,7 +31,7 @@
 
 <p>The most important parameters are:</p>
 
-<p><b>Mode</b> - select [Compare Peaklist(s) with Database - MS, LC-MS, MSI](@ref settings_mode)</p>
+<p><b>Mode</b> - select [Compare Peaklist(s) with Database - MS, LC-MS, MSI](@ref settings_mode).</p>
 
 <p><b>File</b> - select an input file with mass spectra. The list of supported file formats is available [here](@ref settings_peaklistfile) (you may need a third-party software for some file formats). 
 Enable the checkbox, if you would like to extract profile mass spectra from the file for later visualization (note: the input file must include profile spectra; the extraction may be time-consuming; 
@@ -48,12 +48,12 @@ are also available. In this mode, it is sufficient if you define only a name and
 and the monoisotopic mass is calculated from the molecular formula automatically. The text file has items separated by tabulator on each row and can also be easily prepared using a script (please, remember that you have 
 to keep the correct number of columns/tabulators to make the file readable by the search engine).</p>
 
-<p><b>Ion Types</b> - select the types of ions to be searched. Remember that for negative ions (e.g. [M-H]-), the value of charge must be negative (i.e. -1). </p>
+<p><b>Ion Types</b> - select the types of ions to be searched. Remember that for negative ions (e.g. [M-H]-), the value of charge must be negative (i.e. -1).</p>
 
 <p><b>Generate Full Isotope Patterns</b> - enable the checkbox to generate the full isotopic patterns of compounds (the parameter FWHM must be estimated correctly). Optionally, you can disable this feature to generate only
 the theoretical peaks of monoisotopic ions. It may be advantageous for a fast check of a dataset.</p>
 
-<p><b>Minimum Pattern Size</b> - define the minimum number of peaks which must be matched in an isotopic pattern to report a given compound. The feature <b>Generate Full Isotope Patterns</b> must be enabled.</p>
+<p><b>Minimum Number of Isotopic Peaks</b> - define the minimum number of peaks which must be matched in an isotopic pattern to report a given compound. The feature <b>Generate Full Isotope Patterns</b> must be enabled.</p>
 
 <p>
 \image html tutorial-2-1-settings.png "Tutorial 1: Configuration for dereplication in MS1 data."
@@ -80,7 +80,7 @@ the theoretical peaks of monoisotopic ions. It may be advantageous for a fast ch
 
 \section tutorial2_cb2 Tutorial 2: Dereplication in LC-MS data
 
-<p>Follow the instructions in Tutorial 1 and use the following extra parameter:</p>
+<p>Follow the instructions in [Tutorial 1](@ref tutorial1_cb2) and use the following extra parameter:</p>
 
 <p><b>Minimum Number of Spectra</b> - the minimum number of consecutive scans in which a compound must be matched to be reported.</p>
 
@@ -118,7 +118,60 @@ Use the arrows to browse the identified compounds individually.</p>
 
 \section tutorial3_cb2 Tutorial 3: Identification of unknown compounds LC-MS data
 
-<p>Coming soon.</p>
+<p>See the [Tutorial 1](@ref tutorial1_cb2) and [Tutorial 2](@ref tutorial2_cb2). In this example, any database of compounds is not used but the molecular formulas of compounds are generated from an input list
+of chemical elements e.g. H, C, O, N, S, and P. Because the search space grows exponentially with increasing m/z value and the number of input elements, carefully configure the following parameters 
+to limit the number of false-positive formulas reported, to speed-up the search process and to save the computer's main memory:</p>
+
+<p><b>Mode</b> - select [Compound Search - MS, LC-MS, MSI](@ref settings_mode).</p>
+
+<p><b>m/z Error Tolerance</b> - define m/z error tolerance e.g. 2 ppm. You can use bigger value e.g. 5 or 10 ppm but in this case define also the parameter <b>Isotope m/z Tolerance</b>.</p>
+
+<p><b>Minimum Threshold of Relative Intensity [%]</b> - use e.g. 3 or 5% for an initial check of a dataset. Check the results and optionally reduce to 1% or lower value. Use 0 to disable this feature. The value is used together with <b>Minimum Threshold of Absolute Intensity</b>.</p>
+
+<p><b>Minimum Threshold of Absolute Intensity</b> - use bigger value (e.g. 100000) for an initial check of a dataset and then optionally reduce to lower value. Use 0 to disable this feature. The value is used together with <b>Minimum Threshold of Relative Intensity</b>.</p>
+
+<p><b>m/z Ratio</b> - define the range of m/z values in which the compounds should be detected. If a narrow interval is used (e.g. 100 or 200 Da), the search process is faster. If a wide interval (e.g. 1000 Da) is used, the searching is slower.</p>
+
+<p><b>FWHM</b> - see the profile peaks in your spectra and estimate the full width at half maximum (i.e. the width of a representative peak at half of his height; the value corresponds to m/z ratio of a peak divided by its resolution). 
+The theoretical peaks are split or merged using FWHM value prior they are matched with experimental peaks.</p>
+
+<p><b>Ion Types</b> - select the types of ions to be searched. Remember that for negative ions (e.g. [M-H]-), the value of charge must be negative (i.e. -1). For an initial check of a dataset, use only one or a very small number of ions.</p>
+
+<p><b>Neutral Losses / Chemical Elements</b> - Define an input list of chemical elements. Even if any custom element can be added, use the smallest number of elements as possible. Use the colon to limit the maximum number of occurrences 
+of elements like sulfur or phosphorus (e.g. S:2 or P:1; double-click on an element to edit this value). If the ions like [M+Na]+, [M+K]+ and [M+Fe-2H]+ are searched, do not add the elements Na, K, and Fe, respectively. 
+They are used automatically.</p>
+
+<p><b>Maximum Number of Combined Losses / Elements</b> - define the maximum number of elements in a molecule (e.g. 150 or 200). Example, the ion [C39H60N6O15+H]+ has 39+60+6+15+1=121 elements.</p>
+
+<p><b>Generate Full Isotope Patterns</b> - enable the checkbox to generate the full isotopic patterns of compounds (the parameter FWHM must be estimated correctly).</p>
+
+<p><b>Minimum Number of Isotopic Peaks</b> - define the minimum number of peaks which must be matched in an isotopic pattern to report a given compound. The feature <b>Generate Full Isotope Patterns</b> must be enabled.
+Use e.g. 2 if a big value of <b>Minimum Threshold of Relative Intensity [%]</b> is used.</p>
+
+<p><b>Minimum Number of Spectra</b> - the minimum number of consecutive scans in which a compound must be matched to be reported.</p>
+
+<p><b>Basic Formula Check</b> - apply Senior's filtering rules to remove unlikely molecular formulas. See <a href="https://doi.org/10.1186/1471-2105-8-105">https://doi.org/10.1186/1471-2105-8-105</a> for more details.</p>
+
+<p><b>Advanced Formula Check</b> - advanced filtering rules are applied if molecular formulas of compounds are generated. See the tables 1, 2, and 3 in <a href="https://doi.org/10.1186/1471-2105-8-105">https://doi.org/10.1186/1471-2105-8-105</a> for more details.</p>
+
+<p><b>N/O Ratio Check</b> - check if the number of nitrogen atoms is less or equal to the number of oxygen atoms.</p>
+
+<p><b>Isotope m/z Tolerance</b> - maximum m/z difference between an isotopic peak and the monoisotopic peak in an isotopic pattern (0 = disabled); see the definition of [Isotope m/z Tolerance](@ref settings_mzdifftolerance).
+
+<p><b>Isotope Intensity Tolerance</b> - the maximum tolerance of intensities of matched isotopes (e.g. 10%); see the definition of [Isotope Intensity Tolerance](@ref settings_intensitytolerance).</p>
+
+<p>
+\image html tutorial-2-3-settings.png "Tutorial 3: Configuration for identification of unknown compounds LC-MS data."
+\image latex tutorial-2-3-settings.png "Tutorial 3: Configuration for identification of unknown compounds LC-MS data." width=16cm
+</p>
+
+<p>Similarly to the [Tutorial 2](@ref tutorial2_cb2), the compounds can be browsed in the <b>Summary Table of Matched Peaks</b> while their extracted ion chromatograms can be directly seen in the <b>Chromatogram</b> window.
+The difference is that the formulas of compounds are automatically suggested instead of the names of compounds.</p>
+
+<p>
+\image html tutorial-2-3-summarytable.png "Tutorial 3: Summary Table of Matched Peaks."
+\image latex tutorial-2-3-summarytable.png "Tutorial 3: Summary Table of Matched Peaks." width=16cm
+</p>
 
 <br/><hr>
 

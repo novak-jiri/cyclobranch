@@ -399,7 +399,7 @@ Buttons:
 <li> "Clear All" - unselect all fragment ions in the list.
 <li> "Reset" - b-ion is selected automatically if a cyclic peptide is choosen as "Peptide Type". B-ion and y-ion are selected if a linear, branched or branch-cyclic peptide is choosen.
 [M+H]+ ion is selected if the mode 'Compare Peaklist(s) with Database - MS or MSI data' is selected.
-</ul>  
+</ul>
 </p>
 
 <p>The following types of ions are defined for MS and MSI spectra:
@@ -600,13 +600,16 @@ Check if the number of nitrogen atoms is less or equal to the number of oxygen a
 \subsection settings_mzdifftolerance Isotope m/z Tolerance
 
 <p>
-Maximum m/z tolerance of matched isotopes (0 = disabled) [ppm].
+Maximum m/z difference between an isotopic peak and the monoisotopic peak in an isotopic pattern (0 = disabled) [ppm].<br/>
+Example, let's have two matched peaks in an isotopic pattern of a compound, an isotopic peak with m/z error 7 ppm and the monoisotopic peak with m/z error 4 ppm:<br/>
+if m/z Error Tolerance = 10 ppm (i.e. <-10,10>), Isotope m/z Tolerance = 0 ppm (i.e. disabled) => the compound is reported as a correct hit;<br/>
+if m/z Error Tolerance = 10 ppm (i.e. <-10,10>), Isotope m/z Tolerance = 2 ppm (i.e. <0,2>) => the compound is discarded because 7-4=3 is bigger than 2.
 </p>
 
 \subsection settings_intensitytolerance Isotope Intensity Tolerance
 
 <p>
-Maximum tolerance of intensities of matched isotopes (0 = disabled) [in % of relative intensity of monoisotopic peak].<br/>
+Maximum tolerance of intensities of matched isotopes (0% or 100% = disabled) [in % of relative intensity of monoisotopic peak].<br/>
 Example:<br/>
 Isotope Intensity Tolerance = 10%, Relative Intensity of Monoisotopic Peak = 100% => the tolerance of relative intensities of isotopes is 10%;<br/>
 Isotope Intensity Tolerance = 10%, Relative Intensity of Monoisotopic Peak = 50% => the tolerance of relative intensities of isotopes is 5%; etc. 
