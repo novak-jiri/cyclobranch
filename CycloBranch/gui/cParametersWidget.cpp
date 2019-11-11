@@ -531,7 +531,7 @@ cParametersWidget::cParametersWidget(QWidget* parent) {
 	theoreticalspectragridlayout->addWidget(noratiocheck, 14, 1);
 
 	mzdifftolerance = new QDoubleSpinBox();
-	mzdifftolerance->setToolTip("Maximum m/z tolerance of matched isotopes (0 = disabled) [ppm].");
+	mzdifftolerance->setToolTip("Maximum m/z difference between an isotopic peak and the monoisotopic peak in an isotopic pattern (0 = disabled) [ppm].");
 	mzdifftolerance->setDecimals(3);
 	mzdifftolerance->setRange(0, 10000);
 	mzdifftolerance->setSingleStep(1);
