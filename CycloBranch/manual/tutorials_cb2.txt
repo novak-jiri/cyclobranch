@@ -22,19 +22,14 @@
 
 \section tutorial1_cb2 Tutorial 1: Dereplication in MS1 data
 
-<p>The dereplication is the process of annotation of already known compounds (i.e. the database search). To perform the dereplication, click on <b>Search->Settings</b> in the main window of the application. 
+<p>The dereplication is the process of annotation of already known compounds (i.e. the database search). To perform the dereplication, click on <b>Search->Settings</b> in the main window of the application and configure the tool. 
 
 <p>
 \image html tutorial-2-1-mainwindow.png "Tutorial 1: Main window of the engine."
 \image latex tutorial-2-1-mainwindow.png "Tutorial 1: Main window of the engine." width=16cm
 </p>
 
-<p>The most important parameters in the settings dialog are:</p>
-
-<p>
-\image html tutorial-2-1-settings.png "Tutorial 1: Configuration for dereplication in MS1 data."
-\image latex tutorial-2-1-settings.png "Tutorial 1: Configuration for dereplication in MS1 data." width=16cm
-</p>
+<p>The most important parameters are:</p>
 
 <p><b>Mode</b> - select [Compare Peaklist(s) with Database - MS, LC-MS, MSI](@ref settings_mode)</p>
 
@@ -44,7 +39,7 @@ and the visualization must be enabled in the spectrum detail window).</p>
 
 <p><b>Charge</b> - the maximum charge of generated theoretical peaks. If the value is equal to 2, then the theoretical peaks of singly and doubly charged ions are generated. Use -1 for negative mode.</p>
 
-<p><b>FWHM</b> - see the peaks in your spectra and estimate the full width at half maximum (i.e. the width of a representative peak at half of his height; the value corresponds to m/z ratio of a peak divided by its resolution). 
+<p><b>FWHM</b> - see the profile peaks in your spectra and estimate the full width at half maximum (i.e. the width of a representative peak at half of his height; the value corresponds to m/z ratio of a peak divided by its resolution). 
 The theoretical peaks are split or merged using FWHM value prior they are matched with experimental peaks.</p>
 
 <p><b>Sequence/Compound Database File</b> - select a text file serving as a database. The proper text file can be prepared using  [Sequence/Compound Database Editor](@ref sequenceeditorinterface) or created using 
@@ -59,6 +54,11 @@ to keep the correct number of columns/tabulators to make the file readable by th
 the theoretical peaks of monoisotopic ions. It may be advantageous for a fast check of a dataset.</p>
 
 <p><b>Minimum Pattern Size</b> - define the minimum number of peaks which must be matched in an isotopic pattern to report a given compound. The feature <b>Generate Full Isotope Patterns</b> must be enabled.</p>
+
+<p>
+\image html tutorial-2-1-settings.png "Tutorial 1: Configuration for dereplication in MS1 data."
+\image latex tutorial-2-1-settings.png "Tutorial 1: Configuration for dereplication in MS1 data." width=16cm
+</p>
 
 <p>We recommend to save the configuration into an '.ini' file.</p>
 
@@ -80,7 +80,39 @@ the theoretical peaks of monoisotopic ions. It may be advantageous for a fast ch
 
 \section tutorial2_cb2 Tutorial 2: Dereplication in LC-MS data
 
-<p>Coming soon.</p>
+<p>Follow the instructions in Tutorial 1 and use the following extra parameter:</p>
+
+<p><b>Minimum Number of Spectra</b> - the minimum number of consecutive scans in which a compound must be matched to be reported.</p>
+
+<p>
+\image html tutorial-2-2-settings.png "Tutorial 2: Configuration for dereplication in LC-MS data."
+\image latex tutorial-2-2-settings.png "Tutorial 2: Configuration for dereplication in LC-MS data." width=16cm
+</p>
+
+<p>All MS1 scans included in the input file are listed in the output report. Double-click on any row to display the spectrum from the corresponding scan.</p>
+
+<p>
+\image html tutorial-2-2-result.png "Tutorial 2: Search process completed."
+\image latex tutorial-2-2-result.png "Tutorial 2: Search process completed." width=16cm
+</p>
+
+<p>In the main window, click on <b>Tools->Chromatogram</b> to see the chromatographic peaks of detected compounds and their retention times. Double-click on any chromatographic peak to open the corresponding mass spectrum.</p>
+
+<p>
+\image html tutorial-2-2-chromatogram.png "Tutorial 2: Chromatogram."
+\image latex tutorial-2-2-chromatogram.png "Tutorial 2: Chromatogram." width=16cm
+</p>
+
+<p>In the main window, click on <b>Tools->Summary Table of Matched Peaks</b> to see the list of all matched peaks in all the scans. Double-click on any row to open the corresponding mass spectrum. 
+The table can be filtered using any column e.g. <b>Name</b> or <b>Theoretical m/z</b>. Start typing into the text field and the names of identified compounds are automatically suggested.
+Use the arrows to browse the identified compounds individually.</p>
+
+<p>The table is interactively-connected with the chromatogram. What you see in the table is automatically sent to <b>Chromatogram</b> window. So, you can easily browse extracted ion chromatograms of all identified compounds.</p>
+
+<p>
+\image html tutorial-2-2-summarytable.png "Tutorial 2: Summary Table of Matched Peaks."
+\image latex tutorial-2-2-summarytable.png "Tutorial 2: Summary Table of Matched Peaks." width=16cm
+</p>
 
 <br/><hr>
 
