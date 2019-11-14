@@ -8,9 +8,9 @@
 <ul>
 <li> [Tutorial 1: Dereplication in MS1 data](@ref tutorial1_cb2)
 <li> [Tutorial 2: Dereplication in LC-MS data](@ref tutorial2_cb2)
-<li> [Tutorial 3: Identification of unknown compounds LC-MS data](@ref tutorial3_cb2)
+<li> [Tutorial 3: Identification of unknown compounds in LC-MS data](@ref tutorial3_cb2)
 <li> [Tutorial 4: Dereplication in MSI data and fusion with histology image](@ref tutorial4_cb2)
-<li> [Tutorial 5: Identification of unknown compounds MSI data](@ref tutorial5_cb2)
+<li> [Tutorial 5: Identification of unknown compounds in MSI data](@ref tutorial5_cb2)
 <li> [Tutorial 6: Annotate MS/MS spectrum of a metabolite](@ref tutorial6_cb2)
 </ul>
 </p>

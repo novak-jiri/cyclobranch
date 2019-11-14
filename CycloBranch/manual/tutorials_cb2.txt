@@ -8,9 +8,9 @@
 <ul>
 <li> [Tutorial 1: Dereplication in MS1 data](@ref tutorial1_cb2)
 <li> [Tutorial 2: Dereplication in LC-MS data](@ref tutorial2_cb2)
-<li> [Tutorial 3: Identification of unknown compounds LC-MS data](@ref tutorial3_cb2)
+<li> [Tutorial 3: Identification of unknown compounds in LC-MS data](@ref tutorial3_cb2)
 <li> [Tutorial 4: Dereplication in MSI data and fusion with histology image](@ref tutorial4_cb2)
-<li> [Tutorial 5: Identification of unknown compounds MSI data](@ref tutorial5_cb2)
+<li> [Tutorial 5: Identification of unknown compounds in MSI data](@ref tutorial5_cb2)
 <li> [Tutorial 6: Annotate MS/MS spectrum of a metabolite](@ref tutorial6_cb2)
 </ul>
 </p>
@@ -113,7 +113,7 @@ Use the arrows to browse the identified compounds individually.</p>
 
 <br/><hr>
 
-\section tutorial3_cb2 Tutorial 3: Identification of unknown compounds LC-MS data
+\section tutorial3_cb2 Tutorial 3: Identification of unknown compounds in LC-MS data
 
 <p>See the [Tutorial 1](@ref tutorial1_cb2) and [Tutorial 2](@ref tutorial2_cb2). In this example, any database of compounds is not used but the molecular formulas of compounds are generated from an input list
 of chemical elements e.g. H, C, O, N, S, and P. Because the search space grows exponentially with increasing m/z value and the number of input elements, carefully configure the following parameters 
@@ -158,8 +158,8 @@ Use e.g. 2 if a big value of <b>Minimum Threshold of Relative Intensity [%]</b> 
 <p><b>Isotope Intensity Tolerance</b> - the maximum tolerance of intensities of matched isotopes (e.g. 10%); see the definition of [Isotope Intensity Tolerance](@ref settings_intensitytolerance).</p>
 
 <p>
-\image html tutorial-2-3-settings.png "Tutorial 3: Configuration for identification of unknown compounds LC-MS data."
-\image latex tutorial-2-3-settings.png "Tutorial 3: Configuration for identification of unknown compounds LC-MS data." width=16cm
+\image html tutorial-2-3-settings.png "Tutorial 3: Configuration for identification of unknown compounds in LC-MS data."
+\image latex tutorial-2-3-settings.png "Tutorial 3: Configuration for identification of unknown compounds in LC-MS data." width=16cm
 </p>
 
 <p>Similarly to the [Tutorial 2](@ref tutorial2_cb2), the compounds can be browsed in the [Summary Table of Matched Peaks](@ref summarypeakstable) while their extracted ion chromatograms can be directly seen in the [Chromatogram](@ref chromatogram) window.
@@ -222,7 +222,7 @@ Optionally, adjust the transparency and order of any layer on the right panel. S
 
 <br/><hr>
 
-\section tutorial5_cb2 Tutorial 5: Identification of unknown compounds MSI data
+\section tutorial5_cb2 Tutorial 5: Identification of unknown compounds in MSI data
 
 <p>Coming soon.</p>
 
