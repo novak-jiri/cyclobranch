@@ -1,0 +1,3 @@
+other	Dimethylgliotoxin	C15H20N2O4S2	356.0864485208					
+other	TAFC	C39H60N6O15	852.4116652887					
+other	Desferrioxamine E	C27H48N6O9	600.3482771709					
