@@ -9,12 +9,9 @@
 <li> [Tutorial 1: Dereplication in MS1 data](@ref tutorial1_cb2)
 <li> [Tutorial 2: Dereplication in LC-MS data](@ref tutorial2_cb2)
 <li> [Tutorial 3: Identification of unknown compounds LC-MS data](@ref tutorial3_cb2)
-<li> [Tutorial 4: Dereplication in MSI data](@ref tutorial4_cb2)
+<li> [Tutorial 4: Dereplication in MSI data and fusion with histology image](@ref tutorial4_cb2)
 <li> [Tutorial 5: Identification of unknown compounds MSI data](@ref tutorial5_cb2)
-<li> [Tutorial 6: Fusion of MSI data with histology image](@ref tutorial6_cb2)
-<li> [Tutorial 7: Annotate MS/MS spectrum of a peptide - static list of neutral losses](@ref tutorial7_cb2)
-<li> [Tutorial 8: Annotate MS/MS spectrum of a peptide - dynamic list of neutral losses](@ref tutorial8_cb2)
-<li> [Tutorial 9: Annotate MS/MS spectrum of a metabolite](@ref tutorial9_cb2)
+<li> [Tutorial 6: Annotate MS/MS spectrum of a metabolite](@ref tutorial6_cb2)
 </ul>
 </p>
 
@@ -22,7 +19,7 @@
 
 \section tutorial1_cb2 Tutorial 1: Dereplication in MS1 data
 
-<p>The dereplication is the process of annotation of already known compounds (i.e. the database search). To perform the dereplication, click on <b>Search->Settings</b> in the main window of the application and configure the tool. 
+<p>The dereplication is the process of annotation of already known compounds (i.e. the database search). To perform the dereplication, click on [Search->Settings](@ref settings) in the main window of the application and configure the tool. 
 
 <p>
 \image html tutorial-2-1-mainwindow.png "Tutorial 1: Main window of the engine."
@@ -96,18 +93,18 @@ the theoretical peaks of monoisotopic ions. It may be advantageous for a fast ch
 \image latex tutorial-2-2-result.png "Tutorial 2: Search process completed." width=16cm
 </p>
 
-<p>In the main window, click on <b>Tools->Chromatogram</b> to see the chromatographic peaks of detected compounds and their retention times. Double-click on any chromatographic peak to open the corresponding mass spectrum.</p>
+<p>In the main window, click on [Tools->Chromatogram](@ref chromatogram) to see the chromatographic peaks of detected compounds and their retention times. Double-click on any chromatographic peak to open the corresponding mass spectrum.</p>
 
 <p>
 \image html tutorial-2-2-chromatogram.png "Tutorial 2: Chromatogram."
 \image latex tutorial-2-2-chromatogram.png "Tutorial 2: Chromatogram." width=16cm
 </p>
 
-<p>In the main window, click on <b>Tools->Summary Table of Matched Peaks</b> to see the list of all matched peaks in all the scans. Double-click on any row to open the corresponding mass spectrum. 
+<p>In the main window, click on [Tools->Summary Table of Matched Peaks](@ref summarypeakstable) to see the list of all matched peaks in all the scans. Double-click on any row to open the corresponding mass spectrum. 
 The table can be filtered using any column e.g. <b>Name</b> or <b>Theoretical m/z</b>. Start typing into the text field and the names of identified compounds are automatically suggested.
 Use the arrows to browse the identified compounds individually.</p>
 
-<p>The table is interactively-connected with the chromatogram. What you see in the table is automatically sent to <b>Chromatogram</b> window. So, you can easily browse extracted ion chromatograms of all identified compounds.</p>
+<p>The table is interactively-connected with the chromatogram. What you see in the table is automatically sent to [Chromatogram](@ref chromatogram) window. So, you can easily browse extracted ion chromatograms of all identified compounds.</p>
 
 <p>
 \image html tutorial-2-2-summarytable.png "Tutorial 2: Summary Table of Matched Peaks."
@@ -165,7 +162,7 @@ Use e.g. 2 if a big value of <b>Minimum Threshold of Relative Intensity [%]</b> 
 \image latex tutorial-2-3-settings.png "Tutorial 3: Configuration for identification of unknown compounds LC-MS data." width=16cm
 </p>
 
-<p>Similarly to the [Tutorial 2](@ref tutorial2_cb2), the compounds can be browsed in the <b>Summary Table of Matched Peaks</b> while their extracted ion chromatograms can be directly seen in the <b>Chromatogram</b> window.
+<p>Similarly to the [Tutorial 2](@ref tutorial2_cb2), the compounds can be browsed in the [Summary Table of Matched Peaks](@ref summarypeakstable) while their extracted ion chromatograms can be directly seen in the [Chromatogram](@ref chromatogram) window.
 The difference is that the formulas of compounds are automatically suggested instead of the names of compounds.</p>
 
 <p>
@@ -175,9 +172,53 @@ The difference is that the formulas of compounds are automatically suggested ins
 
 <br/><hr>
 
-\section tutorial4_cb2 Tutorial 4: Dereplication in MSI data
+\section tutorial4_cb2 Tutorial 4: Dereplication in MSI data and fusion with histology image
 
-<p>Coming soon.</p>
+<p>Follow the instructions in [Tutorial 1](@ref tutorial1_cb2) and [Tutorial 2](@ref tutorial2_cb2). Modify the following parameters:</p>
+
+<p><b>File</b> - select an input imzML file.</p>
+
+<p><b>Minimum Number of Spectra</b> - the minimum number of single-pixel mass spectra in which a compound must be matched to be reported.</p>
+
+<p>
+\image html tutorial-2-4-settings.png "Tutorial 4: Configuration for dereplication in MSI data."
+\image latex tutorial-2-4-settings.png "Tutorial 4: Configuration for dereplication in MSI data." width=16cm
+</p>
+
+<p>Every row in the output report includes coordinates [x, y] and corresponds to a single-pixel mass spectrum. Double-click on any row to display the spectrum from the corresponding pixel.</p>
+
+<p>
+\image html tutorial-2-4-result.png "Tutorial 4: Search process completed."
+\image latex tutorial-2-4-result.png "Tutorial 4: Search process completed." width=16cm
+</p>
+
+<p>In the main window, click on [Tools->CrossVis](@ref crossvis). In the [CrossVis](@ref crossvis) tool, click on <b>File->Open</b>, select <b>Optical Image</b>, and click <b>Ok</b>. Then select the image file which was used during the acquisition of your data.
+The optical image is automatically correlated with pixels (or squares) corresponding to the individual mass spectra. In some cases, the correlation of data may be vendor specific, see the details [here](@ref subsec_crossvisvendordetails).</p>
+
+<p>
+\image html tutorial-2-4-imagewindow.png "Tutorial 4: Fusion of optical image with identified compounds."
+\image latex tutorial-2-4-imagewindow.png "Tutorial 4: Fusion of optical image with identified compounds." width=16cm
+</p>
+
+<p>The color of every square represents the sum of absolute/relative intensities of all matched peaks in the correspoding mass spectrum by default. 
+However, the [CrossVis](@ref crossvis) tool is interactively-connected with [Summary Table of Matched Peaks](@ref summarypeakstable). To display a single compound or to browse spatial distributions of all identified compounds,
+open the [Tools->Summary Table of Matched Peaks](@ref summarypeakstable) and filter the list of all matched peaks by the name of a compound or by theoretical m/z ratio.
+Start typing into the text field and the names of identified compounds are automatically suggested. Use the arrows to browse the identified compounds individually.</p>
+
+<p>
+\image html tutorial-2-4-summarytable.png "Tutorial 4: Summary Table of Matched Peaks."
+\image latex tutorial-2-4-summarytable.png "Tutorial 4: Summary Table of Matched Peaks." width=16cm
+</p>
+
+<p>If you would like to make a fusion with another image (e.g. a histology image), click on <b>File->Open</b>, select <b>Histology Image</b>, and click <b>Ok</b>. Then select an image in *.jpg, *.jpeg, *.png, *.tif, *.tiff, *.bmp or *.gif file format.
+Click on <b>View->Show Selection</b> to see a bounding box around the opened histology image. Make sure that <b>Histology Image</b> layer is selected in the list of layers. The histology image must be correlated with optical image manually.
+To make the fusion, move the histology image by mouse to overlap the analyzed sample on the optical image. If needed, adjust the size and rotation angle of the histology image on the corresponding toolbar (the active toolbar is green).
+Optionally, adjust the transparency and order of any layer on the right panel. See more details [here](@ref crossvis).</p>
+
+<p>
+\image html crossvis-histology.png "Tutorial 4: fusion of histology image (white) with an optical image (black)."
+\image latex crossvis-histology.png "Tutorial 4: fusion of histology image (white) with an optical image (black)." width=16cm
+</p>
 
 <br/><hr>
 
@@ -187,25 +228,7 @@ The difference is that the formulas of compounds are automatically suggested ins
 
 <br/><hr>
 
-\section tutorial6_cb2 Tutorial 6: Fusion of MSI data with histology image
-
-<p>Coming soon.</p>
-
-<br/><hr>
-
-\section tutorial7_cb2 Tutorial 7: Annotate MS/MS spectrum of a peptide - static list of neutral losses
-
-<p>Coming soon.</p>
-
-<br/><hr>
-
-\section tutorial8_cb2 Tutorial 8: Annotate MS/MS spectrum of a peptide - dynamic list of neutral losses
-
-<p>Coming soon.</p>
-
-<br/><hr>
-
-\section tutorial9_cb2 Tutorial 9: Annotate MS/MS spectrum of a metabolite
+\section tutorial6_cb2 Tutorial 6: Annotate MS/MS spectrum of a metabolite
 
 <p>Coming soon.</p>
 

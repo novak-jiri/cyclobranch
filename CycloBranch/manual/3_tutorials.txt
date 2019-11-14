@@ -9,14 +9,14 @@
 <li> [Tutorial 1: Dereplication in MS1 data](@ref tutorial1_cb2)
 <li> [Tutorial 2: Dereplication in LC-MS data](@ref tutorial2_cb2)
 <li> [Tutorial 3: Identification of unknown compounds LC-MS data](@ref tutorial3_cb2)
-<li> [Tutorial 4: Dereplication in MSI data](@ref tutorial4_cb2)
+<li> [Tutorial 4: Dereplication in MSI data and fusion with histology image](@ref tutorial4_cb2)
 <li> [Tutorial 5: Identification of unknown compounds MSI data](@ref tutorial5_cb2)
-<li> [Tutorial 6: Fusion of MSI data with histology image](@ref tutorial6_cb2)
-<li> [Tutorial 7: Annotate MS/MS spectrum of a peptide - static list of neutral losses](@ref tutorial7_cb2)
-<li> [Tutorial 8: Annotate MS/MS spectrum of a peptide - dynamic list of neutral losses](@ref tutorial8_cb2)
-<li> [Tutorial 9: Annotate MS/MS spectrum of a metabolite](@ref tutorial9_cb2)
+<li> [Tutorial 6: Annotate MS/MS spectrum of a metabolite](@ref tutorial6_cb2)
 </ul>
 </p>
+
+<p>If you would like to annotate single MS/MS spectra of (non-)ribosomal peptides and siderophores, see the tutorials for CycloBranch (1.x). See also the extra pages for [linear](@ref lineardetail), [cyclic](@ref cyclicdetail), [branched](@ref brancheddetail), and [branch-cyclic](@ref branchcyclicdetail) peptides;
+the [building blocks editor](@ref blockseditor), [sequence/compound database editor](@ref sequenceeditor), [modifications editor](@ref modificationseditor), and [draw peptide tool](@ref drawpeptide).</p>
 
 <hr>
 

@@ -136,7 +136,7 @@ Draw a rectangle as shown in the following figure and then release the left mous
 You can click on the right mouse button during the rectangle drawing to cancel the selection.
 The size of the region can be adjusted and the region can be moved by mouse.</p>
 
-<p>The number of selected points and the minimum bounding region of the selection is reported under the image.  
+<p>The number of selected points and the minimum bounding region of the selection is reported under the image.
 The selection of X and Y intervals automatically filters rows in the [Summary Table of Matched Peaks](@ref summarypeakstable).
 If a compound was filtered by its name or m/z value in [Summary Table of Matched Peaks](@ref summarypeakstable), 
 the filtered text is shown. Both selection methods can be used together. 
