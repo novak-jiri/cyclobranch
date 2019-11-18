@@ -531,7 +531,7 @@ cParametersWidget::cParametersWidget(QWidget* parent) {
 	theoreticalspectragridlayout->addWidget(noratiocheck, 14, 1);
 
 	mzdifftolerance = new QDoubleSpinBox();
-	mzdifftolerance->setToolTip("Maximum m/z difference between an isotopic peak and the monoisotopic peak in an isotopic pattern (0 = disabled) [ppm].");
+	mzdifftolerance->setToolTip("The maximum m/z error of difference between an isotopic peak and the monoisotopic peak in an experimental and theoretical isotopic pattern (0 = disabled) [ppm].");
 	mzdifftolerance->setDecimals(3);
 	mzdifftolerance->setRange(0, 10000);
 	mzdifftolerance->setSingleStep(1);
@@ -542,7 +542,7 @@ cParametersWidget::cParametersWidget(QWidget* parent) {
 	theoreticalspectragridlayout->addWidget(mzdifftolerance, 15, 1);
 
 	intensitytolerance = new QDoubleSpinBox();
-	intensitytolerance->setToolTip("Maximum tolerance of intensities of matched isotopes (0 = disabled) [in % of relative intensity of monoisotopic peak].\nExample:\nIsotope Intensity Tolerance = 10%, Relative Intensity of Monoisotopic Peak = 100% => the tolerance of relative intensities of isotopes is 10%;\nIsotope Intensity Tolerance = 10%, Relative Intensity of Monoisotopic Peak = 50% => the tolerance of relative intensities of isotopes is 5%; etc.");
+	intensitytolerance->setToolTip("The maximum error tolerance of intensities of matched isotopes (0 = disabled) [in % of relative intensity of monoisotopic peak].\nExample:\nIsotope Intensity Tolerance = 10%, Relative Intensity of Monoisotopic Peak = 100% => the tolerance of relative intensities of isotopes is 10%;\nIsotope Intensity Tolerance = 10%, Relative Intensity of Monoisotopic Peak = 50% => the tolerance of relative intensities of isotopes is 5%; etc.");
 	intensitytolerance->setDecimals(3);
 	intensitytolerance->setRange(0, 100);
 	intensitytolerance->setSingleStep(1);
