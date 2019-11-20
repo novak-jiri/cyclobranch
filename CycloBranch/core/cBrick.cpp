@@ -336,7 +336,7 @@ string cBrick::getAcronymsWithReferencesAsHTMLString() {
 			if (!correctreference) {
 				rx = " in CSID: [0-9]+$";
 				if (regex_search(references[i], rx)) {
-					s += "<a href=\"http://www.ebi.ac.uk/pdbe-site/pdbemotif/smilesstats.jsp?smiles=" + references[i].substr(0, references[i].find(':') - 8) + "\">";
+					s += "<a href=\"https://www.ebi.ac.uk/pdbe-site/pdbemotif/smilesstats.jsp?smiles=" + references[i].substr(0, references[i].find(':') - 8) + "\">";
 					s += acronyms[i];
 					s += "</a>";
 					correctreference = true;
@@ -347,7 +347,7 @@ string cBrick::getAcronymsWithReferencesAsHTMLString() {
 			if (!correctreference) {
 				rx = " in CID: [0-9]+$";
 				if (regex_search(references[i], rx)) {
-					s += "<a href=\"http://www.ebi.ac.uk/pdbe-site/pdbemotif/smilesstats.jsp?smiles=" + references[i].substr(0, references[i].find(':') - 7) + "\">";
+					s += "<a href=\"https://www.ebi.ac.uk/pdbe-site/pdbemotif/smilesstats.jsp?smiles=" + references[i].substr(0, references[i].find(':') - 7) + "\">";
 					s += acronyms[i];
 					s += "</a>";
 					correctreference = true;
@@ -358,7 +358,7 @@ string cBrick::getAcronymsWithReferencesAsHTMLString() {
 			if (!correctreference) {
 				rx = " in: NOR";
 				if (regex_search(references[i], rx)) {
-					s += "<a href=\"http://www.ebi.ac.uk/pdbe-site/pdbemotif/smilesstats.jsp?smiles=" + references[i].substr(0, references[i].find(':') - 3) + "\">";
+					s += "<a href=\"https://www.ebi.ac.uk/pdbe-site/pdbemotif/smilesstats.jsp?smiles=" + references[i].substr(0, references[i].find(':') - 3) + "\">";
 					s += acronyms[i];
 					s += "</a>";
 					correctreference = true;

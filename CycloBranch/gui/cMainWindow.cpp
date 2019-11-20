@@ -1509,7 +1509,7 @@ void cMainWindow::exportToHTML() {
 			out << "</head>\n";
 			out << "<body style=\"font-family: Verdana, Arial; font-size: 10pt\">\n";
 
-			out << "<h1><a href=\"http://ms.biomed.cas.cz/cyclobranch/\">" << QString(title.c_str()) << "</a></h1>\n";
+			out << "<h1><a href=\"https://ms.biomed.cas.cz/cyclobranch/\">" << QString(title.c_str()) << "</a></h1>\n";
 
 			if (htmlexportdialog->checkboxparameters->isChecked()) {	
 				out << "<h2>Parameters</h2>\n";
@@ -2034,7 +2034,7 @@ void cMainWindow::resetFilter() {
 
 
 void cMainWindow::gotoNorine() {
-	QDesktopServices::openUrl(QUrl("http://bioinfo.lifl.fr/norine/"));
+	QDesktopServices::openUrl(QUrl("https://bioinfo.lifl.fr/norine/"));
 }
 
 

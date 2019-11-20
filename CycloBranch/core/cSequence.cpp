@@ -168,7 +168,7 @@ string cSequence::getNameWithReferenceAsHTMLString() {
 		if (!correctreference) {
 			rx = "^NOR[0-9]+$";
 			if (regex_search(reference, rx)) {
-				s += "<a href=\"http://bioinfo.lifl.fr/norine/result.jsp?ID=" + reference + "\">";
+				s += "<a href=\"https://bioinfo.lifl.fr/norine/result.jsp?ID=" + reference + "\">";
 				s += name;
 				s += "</a>";
 				correctreference = true;
@@ -190,7 +190,7 @@ string cSequence::getNameWithReferenceAsHTMLString() {
 		if (!correctreference) {
 			rx = "^C[0-9]{5}$";
 			if (regex_search(reference, rx)) {
-				s += "<a href=\"http://www.genome.jp/dbget-bin/www_bget?cpd:" + reference + "\">";
+				s += "<a href=\"https://www.genome.jp/dbget-bin/www_bget?cpd:" + reference + "\">";
 				s += name;
 				s += "</a>";
 				correctreference = true;
