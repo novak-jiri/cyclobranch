@@ -351,8 +351,6 @@ void cChromatogramWindowWidget::mouseDoubleClickEvent(QMouseEvent *event) {
 void cChromatogramWindowWidget::showEvent(QShowEvent *event) {
 	QGraphicsView::showEvent(event);
 
-	recalculateTICChromatogram();
-
 	if (firstshow) {
 		normalSize();
 		firstshow = false;

@@ -268,6 +268,11 @@ void cChromatogramWindow::closeEvent(QCloseEvent *event) {
 }
 
 
+void cChromatogramWindow::recalculateTICChromatogram() {
+	chromatogramwindowwidget->recalculateTICChromatogram();
+}
+
+
 void cChromatogramWindow::keyPressEvent(QKeyEvent *event) {
 	if ((event->key() == Qt::Key_Enter) || (event->key() == Qt::Key_Return)) {
 		if (minscanid->hasFocus() || maxscanid->hasFocus()) {

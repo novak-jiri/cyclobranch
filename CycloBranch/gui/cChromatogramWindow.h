@@ -53,6 +53,12 @@ public:
 	void closeEvent(QCloseEvent *event);
 
 
+	/**
+		\brief Recalculate TIC chromatogram.
+	*/
+	void recalculateTICChromatogram();
+
+
 private:
 
 	QWidget* parent;

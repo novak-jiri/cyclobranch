@@ -779,6 +779,7 @@ void cMainWindow::showImageWindow() {
 
 void cMainWindow::showChromatogramWindow() {
 	if (prepareSummaryTableOfMatchedPeaks()) {
+		chromatogramwindow->recalculateTICChromatogram();
 		chromatogramwindow->show();
 		chromatogramwindow->activateWindow();
 		if (chromatogramwindow->isMinimized()) {
