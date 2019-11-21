@@ -7,7 +7,7 @@ TARGET = CycloBranch
 QT += core gui widgets printsupport svg
 INCLUDEPATH += . core gui parallel /usr/local/opt/boost/include /usr/local/opt/xerces-c/include
 QMAKE_CXXFLAGS += -std=c++11 -DMACOSX -m64
-QMAKE_LIBS += -lboost_regex -lxerces-c
+QMAKE_LIBS += -lboost_regex -lboost_iostreams -lxerces-c
 QMAKE_LIBDIR = /usr/local/opt/boost/lib /usr/local/opt/xerces-c/lib
 OBJECTS_DIR = build/
 MOC_DIR = moc/
