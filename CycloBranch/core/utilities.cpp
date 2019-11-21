@@ -4,7 +4,7 @@
 
 
 QString appname = "CycloBranch";
-QString appversion = "v. 1.3.76 (64-bit)";
+QString appversion = "v. 2.0.0 (64-bit)";
 
 
 #if OS_TYPE == UNX
