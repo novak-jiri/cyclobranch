@@ -5,21 +5,19 @@ A tool for mass spectrometry data analysis.
 ## About
   * designed for identification of small molecules
   * open-source, cross-platform, and stand-alone
-  
   * supported types of spectra
     * conventional mass spectra (MS)
     * liquid-chromatography mass spectra (LC-MS)
     * imaging mass spectra (MSI)
     * tandem mass spectra (MS/MS)
-      
   * main features
     * MS, LC-MC, MSI
       * dereplication / database search
       * prediction of elemental compositions of unknown compounds
       * fine isotopic structure
     * MSI
-      * pixel-by-pixel analysis of imaging mass spectra (imzML) [2]
-      * fusion of imzML files with optical and histology images [3]     
+      * pixel-by-pixel analysis of imaging mass spectra (imzML)
+      * fusion of imzML files with optical and histology images
     * MS/MS
       * single spectra only
       * analysis based on custom databases of building blocks (amino acids)
@@ -29,7 +27,7 @@ A tool for mass spectrometry data analysis.
       * *de novo* sequencing
         * 19 proteinogenic amino acids (20 including isomers)
         * 287 NRP blocks (512 including isomers)
-    
+
 ## Supported file formats
   * mzML, imzML
     * profile or centroid spectra
@@ -60,8 +58,8 @@ https://ms.biomed.cas.cz/cyclobranch/
 ## References and More Information
   * *de novo* peptide sequencing of NRPs
     * Novak J. et al. CycloBranch: *De Novo* Sequencing of Nonribosomal Peptides from Accurate Product Ion Mass Spectra. *J. Am. Soc. Mass Spectrom.*, 26(10):1780-1786, 2015. DOI: [10.1007/s13361-015-1211-1](https://doi.org/10.1007/s13361-015-1211-1)
-  * dereplication in LC-MS and MSI data; *de novo* sequencing of siderophores
-    * Novak J. et al. Batch-processing of Imaging or Liquid-chromatography Mass Spectrometry Datasets and De Novo Sequencing of Polyketide Siderophores. *BBA - Proteins Proteom.*, 1865(7):768-775, 2017. DOI: [10.1016/j.bbapap.2016.12.003](https://doi.org/10.1016/j.bbapap.2016.12.003)
+  * dereplication in LC-MS and MSI datasets; *de novo* sequencing of siderophores
+    * Novak J. et al. Batch-processing of Imaging or Liquid-chromatography Mass Spectrometry Datasets and *De Novo* Sequencing of Polyketide Siderophores. *BBA - Proteins Proteom.*, 1865(7):768-775, 2017. DOI: [10.1016/j.bbapap.2016.12.003](https://doi.org/10.1016/j.bbapap.2016.12.003)
   * fusion of imzML files with histology images
     * Luptakova D. et al. Non-invasive and Invasive Diagnoses of Aspergillosis in a Rat Model by Mass Spectrometry. *Sci. Rep.*, 7:16523, 2017. DOI: [10.1038/s41598-017-16648-z](https://doi.org/10.1038/s41598-017-16648-z)
   * isotopic fine structure
