@@ -1,5 +1,10 @@
 #include "core/cMzML.h"
 
+#include <boost/iostreams/device/back_inserter.hpp>
+#include <boost/iostreams/copy.hpp>
+#include <boost/iostreams/filtering_stream.hpp>
+#include <boost/iostreams/filter/zlib.hpp>
+
 #include <xercesc/framework/LocalFileFormatTarget.hpp>
 
 #include "core/cPeaksList.h"
@@ -48,7 +53,18 @@ cMzML::~cMzML() {
 }
 
 
-int cMzML::parse(string& filename, vector<cPeaksList>& peaklists, eModeType mode, cMainThread* os, bool& terminatecomputation) {
+int cMzML::parse(string& filename, vector<cPeaksList>& peaklists, int profilespectrumid, eModeType mode, cMainThread* os, bool& terminatecomputation) {
+
+	ifstream f;
+	bool good;
+
+	f.open(filename.c_str());
+	good = f.good();
+	f.close();
+
+	if (!good) {
+		return 0;
+	}
 
 	parser->parse(filename.c_str());
 	document = parser->getDocument();
@@ -100,6 +116,8 @@ int cMzML::parse(string& filename, vector<cPeaksList>& peaklists, eModeType mode
 
 	string mgfname = filename.substr(0, (int)filename.size() - 4);
 	stringstream ss;
+
+	cPeaksList peaklist;
 	
 	// childrens of mzML
 	DOMNode* currentNode1 = root->getFirstChild();
@@ -132,6 +150,7 @@ int cMzML::parse(string& filename, vector<cPeaksList>& peaklists, eModeType mode
 									DOMElement* currentElement3 = dynamic_cast<xercesc::DOMElement*>(currentNode3);
 									if (compareElementTagName(currentElement3, "spectrum")) {
 
+										peaklist.clear();
 
 										string title = getAttribute(currentElement3, "id");
 										bool skipspectrum = false;
@@ -149,36 +168,90 @@ int cMzML::parse(string& filename, vector<cPeaksList>& peaklists, eModeType mode
 												if (compareElementTagName(currentElement4, "cvParam")) {
 
 
-														string accession = getAttribute(currentElement4, "accession");
+													string accession = getAttribute(currentElement4, "accession");
 
-														if (accession.compare("MS:1000128") == 0) {			
-															isprofilespectrum = true;
+													if (accession.compare("MS:1000128") == 0) {			
+														isprofilespectrum = true;
+													}
+
+													if (accession.compare("MS:1000511") == 0) {
+
+														int level = atoi(getAttribute(currentElement4, "value").c_str());
+
+														if ((level == 1) && ((mode == denovoengine) || (mode == singlecomparison) || (mode == databasesearch))) {
+															skipspectrum = true;
 														}
-
-														if (accession.compare("MS:1000511") == 0) {
-
-															int level = atoi(getAttribute(currentElement4, "value").c_str());
-
-															if ((level == 1) && (mode != dereplication)) {
-																skipspectrum = true;
-															}
 															
-															if ((level > 1) && (mode == dereplication)) {
-																skipspectrum = true;
-															}
-
+														if ((level > 1) && ((mode == dereplication) || (mode == compoundsearch))) {
+															skipspectrum = true;
 														}
+
+													}
 
 
 												}
 
+
+												if (!skipspectrum && compareElementTagName(currentElement4, "scanList")) {
+
+													// childrens of scanList
+													DOMNode* currentNode5 = currentNode4->getFirstChild();
+													while (currentNode5) {
+
+
+														if (currentNode5->getNodeType() == DOMNode::ELEMENT_NODE) {
+
+															DOMElement* currentElement5 = dynamic_cast<xercesc::DOMElement*>(currentNode5);
+															if (compareElementTagName(currentElement5, "scan")) {
+																																
+
+																// childrens of scan
+																DOMNode* currentNode6 = currentNode5->getFirstChild();
+																while (currentNode6) {
+
+
+																	if (currentNode6->getNodeType() == DOMNode::ELEMENT_NODE) {
+
+																		DOMElement* currentElement6 = dynamic_cast<xercesc::DOMElement*>(currentNode6);
+																		if (compareElementTagName(currentElement6, "cvParam")) {
+
+
+																			string accession = getAttribute(currentElement6, "accession");
+
+																			if (accession.compare("MS:1000016") == 0) {
+																				double rt = atof(getAttribute(currentElement6, "value").c_str());
+																				peaklist.setRetentionTime(rt);
+																			}
+
+
+																		}
+
+																	}
+
+
+																	currentNode6 = currentNode6->getNextSibling();
+
+
+																}
+
+
+															}
+
+														}
+
+
+														currentNode5 = currentNode5->getNextSibling();
+
+													}
+
+												}
+
+
 												if (!skipspectrum && compareElementTagName(currentElement4, "binaryDataArrayList")) {
 
 
-													cPeaksList peaklist;
 													bool peaklistdefined = false;
-
-													
+												
 													if (isprofilespectrum) {
 														profilespectra = true;
 													}
@@ -197,6 +270,7 @@ int cMzML::parse(string& filename, vector<cPeaksList>& peaklists, eModeType mode
 
 																// childrens of binaryDataArray
 																bool precision64 = false;
+																bool zlib = false;
 																bool mzratio = false;
 																bool intensity = false;
 
@@ -226,11 +300,7 @@ int cMzML::parse(string& filename, vector<cPeaksList>& peaklists, eModeType mode
 																			}
 
 																			if (accession.compare("MS:1000574") == 0) {
-																				// zlib compression detected
-																				if (mgfofstream.is_open()) {
-																					mgfofstream.close();
-																				}
-																				return -3;
+																				zlib = true;
 																			}
 
 																			
@@ -251,44 +321,62 @@ int cMzML::parse(string& filename, vector<cPeaksList>& peaklists, eModeType mode
 																					datasize = 8;
 																				}
 
-																				if (mzratio) {																					
-																					for (int ii = 0; ii < binarysize/datasize; ii++) {
+																				string datastring;
+																				datastring.resize(binarysize);
+																				for (int ii = 0; ii < binarysize; ii++) {
+																					datastring[ii] = decoded[ii];
+																				}
+
+																				if (zlib) {
+																					string compressed = datastring;
+																					datastring.clear();
+
+																					boost::iostreams::filtering_streambuf<boost::iostreams::input> in;
+																					in.push(boost::iostreams::zlib_decompressor());
+																					in.push(boost::make_iterator_range(compressed));
+																					boost::iostreams::copy(in, boost::iostreams::back_inserter(datastring));
+																				}
+
+																				int size = (int)datastring.size() / datasize;
+
+																				if (mzratio) {
+																					for (int ii = 0; ii < size; ii++) {
 																						if (precision64) {
-																							memcpy(&dblval, &decoded[ii*datasize], datasize);
+																							memcpy(&dblval, &(datastring.data())[ii*datasize], datasize);
 																						}
 																						else {
-																							memcpy(&fltval, &decoded[ii*datasize], datasize);
+																							memcpy(&fltval, &(datastring.data())[ii*datasize], datasize);
 																						}
 
 																						if (peaklistdefined) {
-																							peaklist[ii].mzratio = precision64?dblval:fltval;
+																							peaklist[ii].mzratio = precision64 ? dblval : fltval;
 																						}
 																						else {
 																							cPeak peak;
-																							peak.mzratio = precision64?dblval:fltval;
+																							peak.mzratio = precision64 ? dblval : fltval;
 																							peaklist.add(peak);
 																						}
 																					}
 																				}
 
 																				if (intensity) {
-																					for (int ii = 0; ii < binarysize/datasize; ii++) {
+																					for (int ii = 0; ii < size; ii++) {
 																						if (precision64) {
-																							memcpy(&dblval, &decoded[ii*datasize], datasize);
+																							memcpy(&dblval, &(datastring.data())[ii*datasize], datasize);
 																						}
 																						else {
-																							memcpy(&fltval, &decoded[ii*datasize], datasize);
+																							memcpy(&fltval, &(datastring.data())[ii*datasize], datasize);
 																						}
 
 																						if (peaklistdefined) {
-																							peaklist[ii].absoluteintensity = precision64?dblval:fltval;
+																							peaklist[ii].absoluteintensity = precision64 ? dblval : fltval;
 																						}
 																						else {
 																							cPeak peak;
-																							peak.absoluteintensity = precision64?dblval:fltval;
+																							peak.absoluteintensity = precision64 ? dblval : fltval;
 																							peaklist.add(peak);
 																						}
-																					}																					
+																					}
 																				}
 
 																				XMLPlatformUtils::fgMemoryManager->deallocate(decoded);
@@ -325,7 +413,12 @@ int cMzML::parse(string& filename, vector<cPeaksList>& peaklists, eModeType mode
 													if (profilespectra) {
 
 														if (count == 0) {
-															ss << mgfname << setw(10) << setfill('0') << 0 << ".mgf";
+															if (profilespectrumid == -1) {
+																ss << mgfname << setw(10) << setfill('0') << 0 << ".mgf";
+															}
+															else {
+																ss << mgfname << "profile." << to_string(profilespectrumid) << ".mgf";
+															}
 															mgfofstream.open(ss.str());
 														}
 														
@@ -338,32 +431,39 @@ int cMzML::parse(string& filename, vector<cPeaksList>& peaklists, eModeType mode
 															}
 														}
 
-														mgfofstream << "BEGIN IONS" << endl;
-														mgfofstream << "TITLE=" << title << endl;
-														mgfofstream << "SCAN=" << to_string(count + 1) << endl;
-														mgfofstream << "PEPMASS=1" << endl;
-														mgfofstream << "RTINSECONDS=1" << endl;
-														mgfofstream << "CHARGE=1+" << endl << endl;
+														if ((profilespectrumid == -1) || (profilespectrumid == count)) {
+															mgfofstream << "BEGIN IONS" << endl;
+															mgfofstream << "TITLE=" << title << endl;
+															mgfofstream << "SCANS=" << to_string(count + 1) << endl;
+															mgfofstream << "PEPMASS=1" << endl;
+															mgfofstream << "RTINSECONDS=" << to_string(peaklist.getRetentionTime()) << endl;
+															mgfofstream << "CHARGE=1+" << endl << endl;
 
-														peaksstring.clear();
-														for (int ii = 0; ii < peaklist.size(); ii++) {
-															sprintf_s(tempstring, "%f %f\n\0", peaklist[ii].mzratio, peaklist[ii].absoluteintensity);
-															peaksstring.append(tempstring);
-														}
-														mgfofstream << peaksstring;
-														mgfofstream << "END IONS" << endl << endl;
-
-														if (((count + 1) % 100 == 0) && (count > 0)) {
-															mgfofstream.close();
-															stringstream ss;
-															strip = (count + 1) / 100;
-															ss << mgfname << setw(10) << setfill('0') << strip << ".mgf";
-															mgfofstream.open(ss.str());
+															peaksstring.clear();
+															for (int ii = 0; ii < peaklist.size(); ii++) {
+																sprintf_s(tempstring, "%f %f\n\0", peaklist[ii].mzratio, peaklist[ii].absoluteintensity);
+																peaksstring.append(tempstring);
+															}
+															mgfofstream << peaksstring;
+															mgfofstream << "END IONS" << endl << endl;
 														}
 
-														cPeaksList emptypeaklist;
-														emptypeaklist.setTitle(title);
-														peaklists.push_back(emptypeaklist);
+														if (profilespectrumid == -1) {
+															if (((count + 1) % 100 == 0) && (count > 0)) {
+																mgfofstream.close();
+																stringstream ss;
+																strip = (count + 1) / 100;
+																ss << mgfname << setw(10) << setfill('0') << strip << ".mgf";
+																mgfofstream.open(ss.str());
+															}
+														}
+
+														if ((profilespectrumid == -1) || (profilespectrumid == count)) {
+															cPeaksList emptypeaklist;
+															emptypeaklist.setTitle(title);
+															peaklists.push_back(emptypeaklist);
+														}
+
 														count++;
 
 													}

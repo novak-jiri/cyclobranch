@@ -170,7 +170,7 @@ void cBranchedWidget::paint(QPainter& painter) {
 		if (i < backbonesize - 1) {
 			painter.setPen(QPen(Qt::black, 2, Qt::SolidLine));
 			painter.drawLine(leftmargin + horizontalstep/4 + horizontalstep*i + horizontalstep/2, topmargin + verticalstep*branchsize + 11, leftmargin + horizontalstep/4 + horizontalstep*(i + 1), topmargin + verticalstep*branchsize + 11);
-			if (theoreticalspectrum->getVisualCoverage().size() > 0) {
+			if (theoreticalspectrum->getTheoreticalPeaks()->size() > 0) {
 				painter.setPen(QPen(Qt::black, 2, Qt::DashLine));
 				painter.drawLine(leftmargin + horizontalstep*(i + 1), topmargin + verticalstep*branchsize - 10, leftmargin + horizontalstep*(i + 1), topmargin + verticalstep*branchsize + 30);	
 				painter.drawLine(leftmargin + horizontalstep/4 + horizontalstep/8 + horizontalstep*i + horizontalstep/2, topmargin + verticalstep*branchsize - 10, leftmargin + horizontalstep*(i + 1), topmargin + verticalstep*branchsize - 10);
@@ -193,7 +193,7 @@ void cBranchedWidget::paint(QPainter& painter) {
 
 		painter.setPen(QPen(Qt::black, 2, Qt::SolidLine));
 		painter.drawLine(leftmargin + horizontalstep/2 + horizontalstep*tpermutations[0].middlebranchstart, topmargin + verticalstep*i + 20, leftmargin + horizontalstep/2 + horizontalstep*tpermutations[0].middlebranchstart, topmargin + verticalstep*i + verticalstep);
-		if (theoreticalspectrum->getVisualCoverage().size() > 0) {
+		if (theoreticalspectrum->getTheoreticalPeaks()->size() > 0) {
 			painter.setPen(QPen(Qt::black, 2, Qt::DashLine));
 			painter.drawLine(leftmargin + horizontalstep/2 + horizontalstep*tpermutations[0].middlebranchstart - 20, topmargin + verticalstep*i + (verticalstep + 10)/2, leftmargin + horizontalstep/2 + horizontalstep*tpermutations[0].middlebranchstart + 20, topmargin + verticalstep*i + (verticalstep + 10)/2);	
 			painter.drawLine(leftmargin + horizontalstep/2 + horizontalstep*tpermutations[0].middlebranchstart - 20, topmargin + verticalstep*i + (verticalstep + 10)/2, leftmargin + horizontalstep/2 + horizontalstep*tpermutations[0].middlebranchstart - 20, topmargin + verticalstep*i + (verticalstep + 10)/2 + verticalstep/8);
@@ -201,302 +201,179 @@ void cBranchedWidget::paint(QPainter& painter) {
 		}
 	}
 
-	if (parameters && !hidelabels && (theoreticalspectrum->getVisualCoverage().size() > 0)) {
+	if (parameters && !hidelabels && theoreticalspectrum->getTheoreticalPeaks()) {
 	
 		unordered_set<cIonLabel, hash_cIonLabel> labels;
 		labels.clear();
 
-		int position;
-		string name;
-		int len = (int)theoreticalspectrum->getVisualCoverage()[0].series.size();
-		int coverageindex;
-		bool skipiontype, skipneutralloss;
+		cPeaksList* thpeaks = theoreticalspectrum->getTheoreticalPeaks();
+		string description;
+		size_t pos;
+		int rotid, serid;
+		for (int i = 0; i < thpeaks->size(); i++) {
 
-		for (int i = 0; i < 6; i++) {
+			if ((*thpeaks)[i].matched > 0) {
 
-			if ((visibletrotationid != -1) && (visibletrotationid != i)) {
-				continue;
-			}
+				description = (*thpeaks)[i].description;
+				description = description.substr(0, description.find(':'));
 
-			coverageindex = i * (int)parameters->ionsfortheoreticalspectra.size() * (parameters->numberofgeneratedneutrallosses + 1);
-
-			for (int j = 0; j < (int)parameters->ionsfortheoreticalspectra.size(); j++) {
-
-				skipiontype = false;
-				if ((visibleionseries.compare("") != 0) && (parameters->iondefinitions[parameters->ionsfortheoreticalspectra[j]].name.compare(visibleionseries) != 0)) {
-					skipiontype = true;
-				}
-			
-				for (int k = -1; k < (int)parameters->neutrallossesfortheoreticalspectra.size(); k++) {
-
-					skipneutralloss = false;
-					if (visibleneutralloss.compare("all") != 0) {
-						if ((k == -1) && (visibleneutralloss.compare("none") != 0)) {
-							skipneutralloss = true;
+				if (description.find('[') == string::npos) {
+					if (parameters->precursorcharge > 0) {
+						pos = description.find("+ ");
+						if (pos != string::npos) {
+							description = description.substr(pos + 2);
 						}
-						if ((k >= 0) && (parameters->neutrallossesdefinitions[parameters->neutrallossesfortheoreticalspectra[k]].summary.compare(visibleneutralloss) != 0)) {
-							skipneutralloss = true;
+						else {
+							continue;
+						}
+					}
+					else {
+						pos = description.find("- ");
+						if (pos != string::npos) {
+							description = description.substr(pos + 2);
+						}
+						else {
+							continue;
 						}
 					}
 
-					if (!skipiontype && !skipneutralloss) {
+					if (visibleionseries.empty() || (!visibleionseries.empty() && (parameters->iondefinitions[(*thpeaks)[i].iontype].name.compare(visibleionseries) == 0))) {
 
-						position = 0;
-						if (parameters->iondefinitions[parameters->ionsfortheoreticalspectra[j]].nterminal) {
-							for (int m = 0; m < len; m++) {
-								switch (i)
-								{
-								case 0:
-									if ((m < tpermutations[i].middlebranchstart) || (m >= tpermutations[i].middlebranchend)) {
-										if (theoreticalspectrum->getVisualCoverage()[coverageindex].series[m] > 0) {
-											name = to_string(i + 1) + "_" + parameters->iondefinitions[parameters->ionsfortheoreticalspectra[j]].name[0] + to_string(m + 1) + parameters->iondefinitions[parameters->ionsfortheoreticalspectra[j]].name.substr(1);
-											if (k >= 0) {
-												name += "-" + parameters->neutrallossesdefinitions[parameters->neutrallossesfortheoreticalspectra[k]].summary;
-											}
-											insertLabel(labels, leftmargin + horizontalstep / 4 + horizontalstep / 8 + horizontalstep * position + horizontalstep / 2, topmargin + verticalstep * branchsize - 35, name, false);
-										}
-										position++;
-									}
-									break;
-								case 1:
-									if (m < tpermutations[i].middlebranchstart) {
-										if (theoreticalspectrum->getVisualCoverage()[coverageindex].series[m] > 0) {
-											name = to_string(i + 1) + "_" + parameters->iondefinitions[parameters->ionsfortheoreticalspectra[j]].name[0] + to_string(m + 1) + parameters->iondefinitions[parameters->ionsfortheoreticalspectra[j]].name.substr(1);
-											if (k >= 0) {
-												name += "-" + parameters->neutrallossesdefinitions[parameters->neutrallossesfortheoreticalspectra[k]].summary;
-											}
-											insertLabel(labels, leftmargin + horizontalstep / 2 + horizontalstep * tpermutations[0].middlebranchstart + 25, topmargin + verticalstep * m + verticalstep / 2 - verticalstep / 8, name, false);
-										}
-									}
-									if (m >= tpermutations[i].middlebranchend) {
-										if (theoreticalspectrum->getVisualCoverage()[coverageindex].series[m] > 0) {
-											name = to_string(i + 1) + "_" + parameters->iondefinitions[parameters->ionsfortheoreticalspectra[j]].name[0] + to_string(m + 1) + parameters->iondefinitions[parameters->ionsfortheoreticalspectra[j]].name.substr(1);
-											if (k >= 0) {
-												name += "-" + parameters->neutrallossesdefinitions[parameters->neutrallossesfortheoreticalspectra[k]].summary;
-											}
-											insertLabel(labels, leftmargin + horizontalstep / 4 + horizontalstep / 8 + horizontalstep * (position + tpermutations[i].middlebranchend - tpermutations[i].middlebranchstart) + horizontalstep / 2, topmargin + verticalstep * branchsize - 35, name, false);
-										}
-										position++;
-									}
-									break;
-								case 2:
-									if ((m < tpermutations[i].middlebranchstart) || (m >= tpermutations[i].middlebranchend)) {
-										if (theoreticalspectrum->getVisualCoverage()[coverageindex].series[m] > 0) {
-											name = to_string(i + 1) + "_" + parameters->iondefinitions[parameters->ionsfortheoreticalspectra[j]].name[0] + to_string(m + 1) + parameters->iondefinitions[parameters->ionsfortheoreticalspectra[j]].name.substr(1);
-											if (k >= 0) {
-												name += "-" + parameters->neutrallossesdefinitions[parameters->neutrallossesfortheoreticalspectra[k]].summary;
-											}
-											insertLabel(labels, leftmargin + horizontalstep * (backbonesize - position - 2 + 1), topmargin + verticalstep * branchsize + 35, name, false);
-										}
-										position++;
-									}
-									break;
-								case 3:
-									if (m < tpermutations[i].middlebranchstart) {
-										if (theoreticalspectrum->getVisualCoverage()[coverageindex].series[m] > 0) {
-											name = to_string(i + 1) + "_" + parameters->iondefinitions[parameters->ionsfortheoreticalspectra[j]].name[0] + to_string(m + 1) + parameters->iondefinitions[parameters->ionsfortheoreticalspectra[j]].name.substr(1);
-											if (k >= 0) {
-												name += "-" + parameters->neutrallossesdefinitions[parameters->neutrallossesfortheoreticalspectra[k]].summary;
-											}
-											insertLabel(labels, leftmargin + horizontalstep / 4 + horizontalstep / 8 + horizontalstep * position + horizontalstep / 2, topmargin + verticalstep * branchsize - 35, name, false);
-										}
-										position++;
-									}
-									if (m >= tpermutations[i].middlebranchend) {
-										if (theoreticalspectrum->getVisualCoverage()[coverageindex].series[m] > 0) {
-											name = to_string(i + 1) + "_" + parameters->iondefinitions[parameters->ionsfortheoreticalspectra[j]].name[0] + to_string(m + 1) + parameters->iondefinitions[parameters->ionsfortheoreticalspectra[j]].name.substr(1);
-											if (k >= 0) {
-												name += "-" + parameters->neutrallossesdefinitions[parameters->neutrallossesfortheoreticalspectra[k]].summary;
-											}
-											insertLabel(labels, leftmargin + horizontalstep / 2 + horizontalstep * tpermutations[0].middlebranchstart - 25, topmargin + verticalstep * (branchsize - m - 2 + backbonesize) + verticalstep / 2, name, true);
-										}
-									}
-									break;
-								case 4:
-									if (m < tpermutations[i].middlebranchstart) {
-										if (theoreticalspectrum->getVisualCoverage()[coverageindex].series[m] > 0) {
-											name = to_string(i + 1) + "_" + parameters->iondefinitions[parameters->ionsfortheoreticalspectra[j]].name[0] + to_string(m + 1) + parameters->iondefinitions[parameters->ionsfortheoreticalspectra[j]].name.substr(1);
-											if (k >= 0) {
-												name += "-" + parameters->neutrallossesdefinitions[parameters->neutrallossesfortheoreticalspectra[k]].summary;
-											}
-											insertLabel(labels, leftmargin + horizontalstep / 2 + horizontalstep * tpermutations[0].middlebranchstart + 25, topmargin + verticalstep * m + verticalstep / 2 - verticalstep / 8, name, false);
-										}
-									}
-									if (m >= tpermutations[i].middlebranchend) {
-										if (theoreticalspectrum->getVisualCoverage()[coverageindex].series[m] > 0) {
-											name = to_string(i + 1) + "_" + parameters->iondefinitions[parameters->ionsfortheoreticalspectra[j]].name[0] + to_string(m + 1) + parameters->iondefinitions[parameters->ionsfortheoreticalspectra[j]].name.substr(1);
-											if (k >= 0) {
-												name += "-" + parameters->neutrallossesdefinitions[parameters->neutrallossesfortheoreticalspectra[k]].summary;
-											}
-											insertLabel(labels, leftmargin + horizontalstep * (backbonesize - tpermutations[i].middlebranchend + tpermutations[i].middlebranchstart - position - 2 + 1), topmargin + verticalstep * branchsize + 35, name, false);
-										}
-										position++;
-									}
-									break;
-								case 5:
-									if (m < tpermutations[i].middlebranchstart) {
-										if (theoreticalspectrum->getVisualCoverage()[coverageindex].series[m] > 0) {
-											name = to_string(i + 1) + "_" + parameters->iondefinitions[parameters->ionsfortheoreticalspectra[j]].name[0] + to_string(m + 1) + parameters->iondefinitions[parameters->ionsfortheoreticalspectra[j]].name.substr(1);
-											if (k >= 0) {
-												name += "-" + parameters->neutrallossesdefinitions[parameters->neutrallossesfortheoreticalspectra[k]].summary;
-											}
-											insertLabel(labels, leftmargin + horizontalstep * (backbonesize - position - 2 + 1), topmargin + verticalstep * branchsize + 35, name, false);
-										}
-										position++;
-									}
-									if (m >= tpermutations[i].middlebranchend) {
-										if (theoreticalspectrum->getVisualCoverage()[coverageindex].series[m] > 0) {
-											name = to_string(i + 1) + "_" + parameters->iondefinitions[parameters->ionsfortheoreticalspectra[j]].name[0] + to_string(m + 1) + parameters->iondefinitions[parameters->ionsfortheoreticalspectra[j]].name.substr(1);
-											if (k >= 0) {
-												name += "-" + parameters->neutrallossesdefinitions[parameters->neutrallossesfortheoreticalspectra[k]].summary;
-											}
-											insertLabel(labels, leftmargin + horizontalstep / 2 + horizontalstep * tpermutations[0].middlebranchstart - 25, topmargin + verticalstep * (branchsize - m - 2 + backbonesize) + verticalstep / 2, name, true);
-										}
-									}
-									break;
-								default:
-									break;
-								}
-							}
-						}
+						if ((visibleneutralloss.compare("all") == 0)
+							|| ((visibleneutralloss.compare("none") == 0) && (description.find(" -") == string::npos))
+							|| ((visibleneutralloss.compare("all") != 0) && (visibleneutralloss.compare("none") != 0) && (description.substr(description.find(" -") + 2).compare(visibleneutralloss) == 0))) {
 
-						position = 0;
-						if (parameters->iondefinitions[parameters->ionsfortheoreticalspectra[j]].cterminal) {
-							for (int m = len - 1; m >= 0; m--) {
-								switch (i)
-								{
-								case 0:
-									if ((m < tpermutations[i].middlebranchstart) || (m >= tpermutations[i].middlebranchend)) {
-										if (theoreticalspectrum->getVisualCoverage()[coverageindex].series[len - m - 1] > 0) {
-											name = to_string(i + 1) + "_" + parameters->iondefinitions[parameters->ionsfortheoreticalspectra[j]].name[0] + to_string(len - m) + parameters->iondefinitions[parameters->ionsfortheoreticalspectra[j]].name.substr(1);
-											if (k >= 0) {
-												name += "-" + parameters->neutrallossesdefinitions[parameters->neutrallossesfortheoreticalspectra[k]].summary;
-											}
-											insertLabel(labels, leftmargin + horizontalstep * (backbonesize - position - 1), topmargin + verticalstep * branchsize + 35, name, false);
-										}
-										position++;
-									}
-									break;
-								case 1:
-									if (m < tpermutations[i].middlebranchstart) {
-										if (theoreticalspectrum->getVisualCoverage()[coverageindex].series[len - m - 1] > 0) {
-											name = to_string(i + 1) + "_" + parameters->iondefinitions[parameters->ionsfortheoreticalspectra[j]].name[0] + to_string(len - m) + parameters->iondefinitions[parameters->ionsfortheoreticalspectra[j]].name.substr(1);
-											if (k >= 0) {
-												name += "-" + parameters->neutrallossesdefinitions[parameters->neutrallossesfortheoreticalspectra[k]].summary;
-											}
-											insertLabel(labels, leftmargin + horizontalstep / 2 + horizontalstep * tpermutations[0].middlebranchstart - 25, topmargin + verticalstep * m + verticalstep / 2, name, true);
-										}
-									}
-									if (m >= tpermutations[i].middlebranchend) {
-										if (theoreticalspectrum->getVisualCoverage()[coverageindex].series[len - m - 1] > 0) {
-											name = to_string(i + 1) + "_" + parameters->iondefinitions[parameters->ionsfortheoreticalspectra[j]].name[0] + to_string(len - m) + parameters->iondefinitions[parameters->ionsfortheoreticalspectra[j]].name.substr(1);
-											if (k >= 0) {
-												name += "-" + parameters->neutrallossesdefinitions[parameters->neutrallossesfortheoreticalspectra[k]].summary;
-											}
-											insertLabel(labels, leftmargin + horizontalstep * (backbonesize - position - 1), topmargin + verticalstep * branchsize + 35, name, false);
-										}
-										position++;
-									}
-									break;
-								case 2:
-									if ((m < tpermutations[i].middlebranchstart) || (m >= tpermutations[i].middlebranchend)) {
-										if (theoreticalspectrum->getVisualCoverage()[coverageindex].series[len - m - 1] > 0) {
-											name = to_string(i + 1) + "_" + parameters->iondefinitions[parameters->ionsfortheoreticalspectra[j]].name[0] + to_string(len - m) + parameters->iondefinitions[parameters->ionsfortheoreticalspectra[j]].name.substr(1);
-											if (k >= 0) {
-												name += "-" + parameters->neutrallossesdefinitions[parameters->neutrallossesfortheoreticalspectra[k]].summary;
-											}
-											insertLabel(labels, leftmargin + horizontalstep * position + horizontalstep / 2 + horizontalstep / 4 + horizontalstep / 8, topmargin + verticalstep * branchsize - 35, name, false);
-										}
-										position++;
-									}
-									break;
-								case 3:
-									if (m < tpermutations[i].middlebranchstart) {
-										if (theoreticalspectrum->getVisualCoverage()[coverageindex].series[len - m - 1] > 0) {
-											name = to_string(i + 1) + "_" + parameters->iondefinitions[parameters->ionsfortheoreticalspectra[j]].name[0] + to_string(len - m) + parameters->iondefinitions[parameters->ionsfortheoreticalspectra[j]].name.substr(1);
-											if (k >= 0) {
-												name += "-" + parameters->neutrallossesdefinitions[parameters->neutrallossesfortheoreticalspectra[k]].summary;
-											}
-											insertLabel(labels, leftmargin + horizontalstep * (backbonesize - position - tpermutations[i].middlebranchend + tpermutations[i].middlebranchstart - 1), topmargin + verticalstep * branchsize + 35, name, false);
-										}
-										position++;
-									}
-									if (m >= tpermutations[i].middlebranchend) {
-										if (theoreticalspectrum->getVisualCoverage()[coverageindex].series[len - m - 1] > 0) {
-											name = to_string(i + 1) + "_" + parameters->iondefinitions[parameters->ionsfortheoreticalspectra[j]].name[0] + to_string(len - m) + parameters->iondefinitions[parameters->ionsfortheoreticalspectra[j]].name.substr(1);
-											if (k >= 0) {
-												name += "-" + parameters->neutrallossesdefinitions[parameters->neutrallossesfortheoreticalspectra[k]].summary;
-											}
-											insertLabel(labels, leftmargin + horizontalstep / 2 + horizontalstep * tpermutations[0].middlebranchstart + 25, topmargin + verticalstep * (branchsize - m - 2 + backbonesize) + verticalstep / 2 - verticalstep / 8, name, false);
+							rotid = (*thpeaks)[i].rotationid;
+							if ((rotid >= 0) && ((visibletrotationid == -1) || (visibletrotationid == rotid))) {
+
+								serid = (*thpeaks)[i].seriesid;
+								if (serid >= 0) {
+
+									if (parameters->iondefinitions[(*thpeaks)[i].iontype].nterminal) {
+										switch (rotid) {
+											case 0:
+												if (serid < tpermutations[0].middlebranchstart) {
+													insertLabel(labels, leftmargin + horizontalstep / 4 + horizontalstep / 8 + horizontalstep * serid + horizontalstep / 2, topmargin + verticalstep * branchsize - 35, description, false);
+												}												
+												if (serid >= tpermutations[0].middlebranchend) {
+													insertLabel(labels, leftmargin + horizontalstep / 4 + horizontalstep / 8 + horizontalstep * (serid - branchsize) + horizontalstep / 2, topmargin + verticalstep * branchsize - 35, description, false);
+												}
+												break;
+											case 1:
+												if (serid < tpermutations[1].middlebranchstart) {
+													insertLabel(labels, leftmargin + horizontalstep / 2 + horizontalstep * tpermutations[0].middlebranchstart + 25, topmargin + verticalstep * serid + verticalstep / 2 - verticalstep / 8, description, false);
+												}
+												if (serid >= tpermutations[1].middlebranchend) {
+													insertLabel(labels, leftmargin + horizontalstep / 4 + horizontalstep / 8 + horizontalstep * (serid - branchsize) + horizontalstep / 2, topmargin + verticalstep * branchsize - 35, description, false);
+												}
+												break;
+											case 2:
+												if (serid < tpermutations[2].middlebranchstart) {
+													insertLabel(labels, leftmargin + horizontalstep * (backbonesize - serid - 1), topmargin + verticalstep * branchsize + 35, description, false);
+												}
+												if (serid >= tpermutations[2].middlebranchend) {
+													insertLabel(labels, leftmargin + horizontalstep * (backbonesize - serid + branchsize - 1), topmargin + verticalstep * branchsize + 35, description, false);
+												}
+												break;
+											case 3:
+												if (serid < tpermutations[3].middlebranchstart) {
+													insertLabel(labels, leftmargin + horizontalstep / 4 + horizontalstep / 8 + horizontalstep * serid + horizontalstep / 2, topmargin + verticalstep * branchsize - 35, description, false);
+												}
+												if (serid >= tpermutations[3].middlebranchend) {
+													insertLabel(labels, leftmargin + horizontalstep / 2 + horizontalstep * tpermutations[0].middlebranchstart - 25, topmargin + verticalstep * (branchsize - serid - 2 + backbonesize) + verticalstep / 2, description, true);
+												}
+												break;
+											case 4:
+												if (serid < tpermutations[4].middlebranchstart) {
+													insertLabel(labels, leftmargin + horizontalstep / 2 + horizontalstep * tpermutations[0].middlebranchstart + 25, topmargin + verticalstep * serid + verticalstep / 2 - verticalstep / 8, description, false);
+												}
+												if (serid >= tpermutations[4].middlebranchend) {
+													insertLabel(labels, leftmargin + horizontalstep * (backbonesize - serid + branchsize - 1), topmargin + verticalstep * branchsize + 35, description, false);
+												}
+												break;
+											case 5:
+												if (serid < tpermutations[5].middlebranchstart) {
+													insertLabel(labels, leftmargin + horizontalstep * (backbonesize - serid - 1), topmargin + verticalstep * branchsize + 35, description, false);
+												}
+												if (serid >= tpermutations[5].middlebranchend) {
+													insertLabel(labels, leftmargin + horizontalstep / 2 + horizontalstep * tpermutations[0].middlebranchstart - 25, topmargin + verticalstep * (branchsize - serid - 2 + backbonesize) + verticalstep / 2, description, true);
+												}
+												break;
+											default:
+												break;
 										}
 									}
-									break;
-								case 4:
-									if (m < tpermutations[i].middlebranchstart) {
-										if (theoreticalspectrum->getVisualCoverage()[coverageindex].series[len - m - 1] > 0) {
-											name = to_string(i + 1) + "_" + parameters->iondefinitions[parameters->ionsfortheoreticalspectra[j]].name[0] + to_string(len - m) + parameters->iondefinitions[parameters->ionsfortheoreticalspectra[j]].name.substr(1);
-											if (k >= 0) {
-												name += "-" + parameters->neutrallossesdefinitions[parameters->neutrallossesfortheoreticalspectra[k]].summary;
-											}
-											insertLabel(labels, leftmargin + horizontalstep / 2 + horizontalstep * tpermutations[0].middlebranchstart - 25, topmargin + verticalstep * m + verticalstep / 2, name, true);
+
+									if (parameters->iondefinitions[(*thpeaks)[i].iontype].cterminal) {
+										switch (rotid) {
+											case 0:
+												if (serid < tpermutations[2].middlebranchstart) {
+													insertLabel(labels, leftmargin + horizontalstep * (backbonesize - serid - 1), topmargin + verticalstep * branchsize + 35, description, false);
+												}
+												if (serid >= tpermutations[2].middlebranchend) {
+													insertLabel(labels, leftmargin + horizontalstep * (backbonesize - serid + branchsize - 1), topmargin + verticalstep * branchsize + 35, description, false);
+												}
+												break;
+											case 1:
+												if (serid < tpermutations[5].middlebranchstart) {
+													insertLabel(labels, leftmargin + horizontalstep * (backbonesize - serid - 1), topmargin + verticalstep * branchsize + 35, description, false);
+												}
+												if (serid >= tpermutations[5].middlebranchend) {
+													insertLabel(labels, leftmargin + horizontalstep / 2 + horizontalstep * tpermutations[0].middlebranchstart - 25, topmargin + verticalstep * (branchsize - serid - 2 + backbonesize) + verticalstep / 2, description, true);
+												}
+												break;
+											case 2:
+												if (serid < tpermutations[0].middlebranchstart) {
+													insertLabel(labels, leftmargin + horizontalstep * serid + horizontalstep / 2 + horizontalstep / 4 + horizontalstep / 8, topmargin + verticalstep * branchsize - 35, description, false);
+												}
+												if (serid >= tpermutations[0].middlebranchend) {
+													insertLabel(labels, leftmargin + horizontalstep * (serid - branchsize) + horizontalstep / 2 + horizontalstep / 4 + horizontalstep / 8, topmargin + verticalstep * branchsize - 35, description, false);
+												}
+												break;
+											case 3:
+												if (serid < tpermutations[4].middlebranchstart) {
+													insertLabel(labels, leftmargin + horizontalstep / 2 + horizontalstep * tpermutations[0].middlebranchstart + 25, topmargin + verticalstep * serid + verticalstep / 2 - verticalstep / 8, description, false);
+												}
+												if (serid >= tpermutations[4].middlebranchend) {
+													insertLabel(labels, leftmargin + horizontalstep * (backbonesize - serid + branchsize - 1), topmargin + verticalstep * branchsize + 35, description, false);
+												}
+												break;
+											case 4:
+												if (serid < tpermutations[3].middlebranchstart) {
+													insertLabel(labels, leftmargin + horizontalstep / 4 + horizontalstep / 8 + horizontalstep * serid + horizontalstep / 2, topmargin + verticalstep * branchsize - 35, description, false);
+												}
+												if (serid >= tpermutations[3].middlebranchend) {
+													insertLabel(labels, leftmargin + horizontalstep / 2 + horizontalstep * tpermutations[0].middlebranchstart - 25, topmargin + verticalstep * (branchsize - serid - 2 + backbonesize) + verticalstep / 2, description, true);
+												}
+												break;
+											case 5:
+												if (serid < tpermutations[1].middlebranchstart) {
+													insertLabel(labels, leftmargin + horizontalstep / 2 + horizontalstep * tpermutations[0].middlebranchstart + 25, topmargin + verticalstep * serid + verticalstep / 2 - verticalstep / 8, description, false);
+												}
+												if (serid >= tpermutations[1].middlebranchend) {
+													insertLabel(labels, leftmargin + horizontalstep / 4 + horizontalstep / 8 + horizontalstep * (serid - branchsize) + horizontalstep / 2, topmargin + verticalstep * branchsize - 35, description, false);
+												}
+												break;
+											default:
+												break;
 										}
 									}
-									if (m >= tpermutations[i].middlebranchend) {
-										if (theoreticalspectrum->getVisualCoverage()[coverageindex].series[len - m - 1] > 0) {
-											name = to_string(i + 1) + "_" + parameters->iondefinitions[parameters->ionsfortheoreticalspectra[j]].name[0] + to_string(len - m) + parameters->iondefinitions[parameters->ionsfortheoreticalspectra[j]].name.substr(1);
-											if (k >= 0) {
-												name += "-" + parameters->neutrallossesdefinitions[parameters->neutrallossesfortheoreticalspectra[k]].summary;
-											}
-											insertLabel(labels, leftmargin + horizontalstep * position + horizontalstep / 2 + horizontalstep / 4 + horizontalstep / 8, topmargin + verticalstep * branchsize - 35, name, false);
-										}
-										position++;
-									}
-									break;
-								case 5:
-									if (m < tpermutations[i].middlebranchstart) {
-										if (theoreticalspectrum->getVisualCoverage()[coverageindex].series[len - m - 1] > 0) {
-											name = to_string(i + 1) + "_" + parameters->iondefinitions[parameters->ionsfortheoreticalspectra[j]].name[0] + to_string(len - m) + parameters->iondefinitions[parameters->ionsfortheoreticalspectra[j]].name.substr(1);
-											if (k >= 0) {
-												name += "-" + parameters->neutrallossesdefinitions[parameters->neutrallossesfortheoreticalspectra[k]].summary;
-											}
-											insertLabel(labels, leftmargin + horizontalstep * (position + tpermutations[i].middlebranchend - tpermutations[i].middlebranchstart) + horizontalstep / 2 + horizontalstep / 4 + horizontalstep / 8, topmargin + verticalstep * branchsize - 35, name, false);
-										}
-										position++;
-									}
-									if (m >= tpermutations[i].middlebranchend) {
-										if (theoreticalspectrum->getVisualCoverage()[coverageindex].series[len - m - 1] > 0) {
-											name = to_string(i + 1) + "_" + parameters->iondefinitions[parameters->ionsfortheoreticalspectra[j]].name[0] + to_string(len - m) + parameters->iondefinitions[parameters->ionsfortheoreticalspectra[j]].name.substr(1);
-											if (k >= 0) {
-												name += "-" + parameters->neutrallossesdefinitions[parameters->neutrallossesfortheoreticalspectra[k]].summary;
-											}
-											insertLabel(labels, leftmargin + horizontalstep / 2 + horizontalstep * tpermutations[0].middlebranchstart + 25, topmargin + verticalstep * (branchsize - m - 2 + backbonesize) + verticalstep / 2 - verticalstep / 8, name, false);
-										}
-									}
-									break;
-								default:
-									break;
+
 								}
+
 							}
+
 						}
 
 					}
 
-					coverageindex++;
-
 				}
 
 			}
+
 		}
 
-		painter.setPen(QPen(Qt::red, 2, Qt::SolidLine));
-		for (auto it = labels.begin(); it != labels.end(); ++it) {
-			if (it->alignright) {
-				painter.drawText(it->x - fm.width(it->label.c_str()), it->y, fm.width(it->label.c_str()), 20, Qt::AlignLeft, it->label.c_str());
-			}
-			else {
-				painter.drawText(it->x, it->y, width(), 20, Qt::AlignLeft, it->label.c_str());
-			}
-		}
+		drawLabels(painter, labels, width());
 
 	}
 	

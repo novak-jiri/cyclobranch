@@ -59,9 +59,9 @@ struct splitSite {
 
 
 /**
-	\brief An auxiliary structure for visualisation of matched series of a cyclic peptide.
+	\brief An auxiliary structure for visualisation of matched series of fragment ions.
 */
-struct visualSeries {
+struct matchedSeries {
 
 	/**
 		\brief A vector of matched peaks in a series.
@@ -78,7 +78,7 @@ struct visualSeries {
 	/**
 		\brief The constructor.
 	*/
-	visualSeries() {
+	matchedSeries() {
 		series.clear();
 		name = "";
 	}
@@ -119,7 +119,7 @@ class cTheoreticalSpectrum {
 	string coveragebyseries;
 	bool valid;
 	double sumofrelativeintensities;
-	vector<visualSeries> visualcoverage;
+	vector<string> rotationslabels;
 	int validposition;
 	int reversevalidposition;
 	int seriescompleted;
@@ -134,9 +134,6 @@ class cTheoreticalSpectrum {
 	// search for matches of experimental and theoretical peaks
 	void searchForPeakPairs(cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks, double fragmentmasserrortolerance);
 
-	// search a m/z ratio in the experimental spectrum to decide whether its description should be generated
-	bool searchHint(double mzratio, cPeaksList& experimentalpeaks, double fragmentmasserrortolerance);
-
 	// compute additional scores
 	void computeStatistics(bool writedescription);
 
@@ -146,8 +143,17 @@ class cTheoreticalSpectrum {
 	// generate precursor ion and its variants
 	void generatePrecursorIon(vector<int>& intcomposition, cBricksDatabase& bricksdatabasewithcombinations, int& theoreticalpeaksrealsize, bool writedescription);
 
+	// generate precursor ion and its variants for other type
+	void generatePrecursorIonForOther(int& theoreticalpeaksrealsize, bool writedescription);
+
 	// generate scrambled sequences
 	void generateScrambledIons(cBricksDatabase& bricksdatabase, bool writedescription, int& theoreticalpeaksrealsize);
+
+	// update the list of losses
+	void updateListOfNeutralLosses(cBricksDatabase& bricksdatabase, cBrick& block, vector<int>& currentlosses, vector<double>& fragmentlossmass, vector<string>& fragmentlosssummary, vector< map<string, int> >& fragmentlossmap, bool writedescription, bool disablesummary);
+
+	// generate internal fragments
+	void generateInternalFragments(cBricksDatabase& bricksdatabase, cPeak& peak, int maxcharge, int& peaklistrealsize, vector<int>& intcomposition, int pos, map<string, int>& atoms, vector<int>& currentlosses, eFragmentIonType fragmentiontype, ePeptideType peptidetype, TRotationInfo* trotation, bool writedescription, bool disablesummary);
 
 	// select and normalize scrambled sequences
 	void selectAndNormalizeScrambledSequences(unordered_set<string>& scrambledsequences);
@@ -171,13 +177,19 @@ class cTheoreticalSpectrum {
 	void removeUnmatchedIsotopePatterns(cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks, cPeaksList& outputtheoreticalpeaks, bool storeunmatchedpeaks);
 
 	// remove unmatched features
-	void removeUnmatchedFeatures(cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks, int id);
-
-	// remove unmatched features
-	void removeUnmatchedFeaturesAndCompounds(cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks, int id);
+	int removeUnmatchedFeatures(bool lcms, cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks, vector< vector<int> >& hintsindex/*, int id*/);
 
 	// remove unmatched compounds
-	void removeUnmatchedCompounds(cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks);
+	int removeUnmatchedCompounds(cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks, int minimumiontypes);
+
+	// remove unmatched patterns in fine isotopic patterns
+	void removeUnmatchedPatternsFineSpectra(cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks);
+
+	// remove unmatched pattern by intensity ratio
+	void removeUnmatchedPatternsByIntensityRatio(cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks);
+
+	// remove unmatched pattern by m/z difference
+	void removeUnmatchedPatternsByMZDifference(cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks);
 
 	// calculate envelope scores
 	void calculateEnvelopeScores(cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks);
@@ -339,16 +351,39 @@ public:
 
 
 	/**
+		\brief Compare the theoretical spectrum of a metabolite with an experimental spectrum.
+		\param sortedpeaklist reference to an experimental peaklist
+		\param writedescription if true then string descriptions of peaks are filled
+		\param unmatchedpeaksinmatchedpatterns unmatched peaks in matched isotope patterns
+		\param isotopeformuladesctoid a map of isotope descriptions
+		\retval int number theoretical peaks generated
+	*/
+	int compareOther(cPeaksList& sortedpeaklist, bool writedescription, cPeaksList& unmatchedpeaksinmatchedpatterns, unordered_map<string, int>* isotopeformuladesctoid);
+
+
+	/**
 		\brief Generate a simple mass spectrum.
+		\param terminatecomputation reference to a variable determining that the computation must be stopped
 		\param writedescription if true then string descriptions of peaks are filled
 	*/ 
-	void generateMSSpectrum(bool writedescription);
+	void generateMSSpectrum(bool& terminatecomputation, bool writedescription);
 
 
 	/**
 		\brief Generate a simple mass spectrum with fine isotopic patterns.
+		\param terminatecomputation reference to a variable determining that the computation must be stopped
 	*/ 
-	void generateFineMSSpectrum();
+	void generateFineMSSpectrum(bool& terminatecomputation);
+
+
+	/**
+		\brief Get a map of search hints to identify features in LC-MS data.
+		\param id identifier of an experimental spectrum
+		\param tsfull theoretical spectrum
+		\param unmatchedpeaksinmatchedpatterns unmatched peaks in matched isotope patterns
+		\param hintsindex index of experimental spectra for every matched theoretical peak
+	*/
+	void getHintsIndex(int id, cTheoreticalSpectrum& tsfull, cPeaksList& unmatchedpeaksinmatchedpatterns, vector< vector<int> >& hintsindex);
 
 
 	/**
@@ -356,8 +391,9 @@ public:
 		\param id identifier of an experimental spectrum
 		\param tsfull theoretical spectrum with descriptions of peaks
 		\param unmatchedpeaksinmatchedpatterns unmatched peaks in matched isotope patterns
+		\param hintsindex index of experimental spectra for every matched theoretical peak
 	*/
-	void compareMSSpectrum(int id, cTheoreticalSpectrum& tsfull, cPeaksList& unmatchedpeaksinmatchedpatterns);
+	void compareMSSpectrum(int id, cTheoreticalSpectrum& tsfull, cPeaksList& unmatchedpeaksinmatchedpatterns, vector< vector<int> >& hintsindex);
 
 
 	/**
@@ -554,10 +590,10 @@ public:
 
 
 	/**
-		\brief Get a vector of fragment ion series for visualization.
-		\retval vector<visualSeries> vector of fragment ion series for visualisation
-	*/ 
-	vector<visualSeries>& getVisualCoverage();
+		\brief Get the labels of cyclic rotations.
+		\retval vector<string> a vector of labels
+	*/
+	vector<string>& getLabelsOfRotations();
 
 
 	/**

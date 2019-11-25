@@ -164,6 +164,8 @@ private:
 	QGraphicsRectItem* zoomrect;
 	QGraphicsSimpleTextItem* zoomsimpletextitem;
 
+	QGraphicsSimpleTextItem* cursorsimpletextitem;
+
 	cParameters* parameters;
 	cTheoreticalSpectrum* theoreticalspectrum;
 	cPeaksList* rawdatapeaklist;
@@ -173,6 +175,10 @@ private:
 
 	int origwidth;
 	int origheight;
+
+	bool calledbyresizeevent;
+	deque<int> oldwidth;
+	deque<int> oldheight;
 
 	string visibleionseriespart1;
 	string visibleionseriespart2;
@@ -214,6 +220,9 @@ private:
 	int getXPositionFromMZRatio(double mzratio, int w);
 
 
+	double getIntensityFromYPosition(int y, int h);
+
+
 	void redrawScene();
 
 
@@ -221,6 +230,9 @@ private:
 
 
 	void calculateMinMaxMZ();
+
+
+	double getMaximumIntensity();
 
 
 signals:

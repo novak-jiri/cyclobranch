@@ -139,10 +139,11 @@ void rechargeMap(int charge, map<string, int>& atoms) {
 }
 
 
-void cSummaryFormula::combineAtoms(cPeakListSeries& peaklistseries, cPeaksList& isotopeprofile, int depth, double mass, double intensity, int charge, string description, double minimumabsoluteintensity) {
-	if (depth < peaklistseries.size()) {
-		for (int i = 0; i < peaklistseries[depth].size(); i++) {
-			combineAtoms(peaklistseries, isotopeprofile, depth + 1, mass + peaklistseries[depth][i].mzratio, intensity * peaklistseries[depth][i].absoluteintensity, charge, description + peaklistseries[depth][i].description, minimumabsoluteintensity);
+void cSummaryFormula::combineAtoms(cPeakListSeries& peaklistseries, int peaklistseriessize, vector<int>& peaklistseriessizes, cPeaksList& isotopeprofile, vector<int>& depthvector, int depth, double mass, double intensity, int charge, double minimumabsoluteintensity) {
+	if (depth < peaklistseriessize) {
+		for (int i = 0; i < peaklistseriessizes[depth]; i++) {
+			depthvector[depth] = i;
+			combineAtoms(peaklistseries, peaklistseriessize, peaklistseriessizes, isotopeprofile, depthvector, depth + 1, mass + peaklistseries[depth][i].mzratio, intensity * peaklistseries[depth][i].absoluteintensity, charge, minimumabsoluteintensity);
 		}
 	}
 	else {
@@ -150,7 +151,9 @@ void cSummaryFormula::combineAtoms(cPeakListSeries& peaklistseries, cPeaksList& 
 			cPeak p;
 			p.mzratio = mass/(double)charge;
 			p.absoluteintensity = intensity;
-			p.description = description;
+			for (int i = 0; i < peaklistseriessize; i++) {
+				p.description += peaklistseries[i][depthvector[i]].description;
+			}
 			isotopeprofile.add(p);
 		}
 	}
@@ -216,7 +219,9 @@ void cSummaryFormula::getIsotopeSummary(string& description, cBricksDatabase& br
 		if (isotopesummary[i] != 0) {
 			description += bricks[i].getSummary();
 			if ((isotopesummary[i] != 1)) {
-				description += "<sub>" + to_string(isotopesummary[i]) + "</sub>";
+				//description += "<sub>";
+				description += to_string(isotopesummary[i]);
+				//description += "</sub>";
 			}
 			description += " ";
 		}
@@ -579,8 +584,19 @@ cPeaksList cSummaryFormula::getIsotopePattern(double fwhm, int charge, bool posi
 		peaklistseries.addPeakList(peaklist);
 	}
 
+	int peaklistseriessize = peaklistseries.size();
+
+	vector<int> peaklistseriessizes;
+	peaklistseriessizes.resize(peaklistseriessize);
+	for (int i = 0; i < peaklistseriessize; i++) {
+		peaklistseriessizes[i] = peaklistseries[i].size();
+	}
+
+	vector<int> depthvector;
+	depthvector.resize(peaklistseriessize);
+
 	cPeaksList isotopeprofile;
-	combineAtoms(peaklistseries, isotopeprofile, 0, 0, 1, charge, "", 0.00001);
+	combineAtoms(peaklistseries, peaklistseriessize, peaklistseriessizes, isotopeprofile, depthvector, 0, 0, 1, charge, 0.00001);
 	isotopeprofile.normalizeIntenzity();
 	isotopeprofile.cropRelativeIntenzity(0.1);
 

@@ -116,48 +116,52 @@ int cTheoreticalSpectrumList::parallelCompareAndStore(cCandidateSet& candidates,
 	int theoreticalpeaksrealsize = 0;
 	currentworstscore = 0;
 
-	stmp = parameters->sequencetag;
-	fixRegularExpression(stmp);
+	if (parameters->peptidetype != other) {
 
-	/*
-	pos = (int)stmp.find("(");
-	if (pos != string::npos) {
-		stmp.replace(pos, 1, "\\(");
-	}
-	pos = (int)stmp.find(")");
-	if (pos != string::npos) {
-		stmp.replace(pos, 1, "\\)");
-	}
-	*/
+		stmp = parameters->sequencetag;
+		fixRegularExpression(stmp);
 
-	try {
-		rxsequencetag = stmp;
-	}
-	catch (regex_error& e) {
-		*os << endl << endl << "Error: Bad Regular Expression in Peptide Sequence Tag." << endl << e.what() << endl;
-		return -1;
-	}
+		/*
+		pos = (int)stmp.find("(");
+		if (pos != string::npos) {
+			stmp.replace(pos, 1, "\\(");
+		}
+		pos = (int)stmp.find(")");
+		if (pos != string::npos) {
+			stmp.replace(pos, 1, "\\)");
+		}
+		*/
 
-	stmp = parameters->searchedsequence;
-	fixRegularExpression(stmp);
+		try {
+			rxsequencetag = stmp;
+		}
+		catch (regex_error& e) {
+			*os << endl << endl << "Error: Bad Regular Expression in Peptide Sequence Tag." << endl << e.what() << endl;
+			return -1;
+		}
 
-	/*
-	pos = (int)stmp.find("(");
-	if (pos != string::npos) {
-		stmp.replace(pos, 1, "\\(");
-	}
-	pos = (int)stmp.find(")");
-	if (pos != string::npos) {
-		stmp.replace(pos, 1, "\\)");
-	}
-	*/
+		stmp = parameters->searchedsequence;
+		fixRegularExpression(stmp);
 
-	try {
-		rxsearchedsequence = stmp;
-	}
-	catch (regex_error& e) {
-		*os << endl << endl << "Error: Bad Regular Expression in the field 'Searched Sequence'." << endl << e.what() << endl;
-		return -1;
+		/*
+		pos = (int)stmp.find("(");
+		if (pos != string::npos) {
+			stmp.replace(pos, 1, "\\(");
+		}
+		pos = (int)stmp.find(")");
+		if (pos != string::npos) {
+			stmp.replace(pos, 1, "\\)");
+		}
+		*/
+
+		try {
+			rxsearchedsequence = stmp;
+		}
+		catch (regex_error& e) {
+			*os << endl << endl << "Error: Bad Regular Expression in the field 'Searched Sequence'." << endl << e.what() << endl;
+			return -1;
+		}
+
 	}
 
 	if ((parameters->mode == denovoengine) || (parameters->mode == databasesearch)) {
@@ -289,6 +293,7 @@ int cTheoreticalSpectrumList::parallelCompareAndStore(cCandidateSet& candidates,
 				theoreticalpeaksrealsize = tsp.compareCyclicPolyketide(tmppeaklist, *bricksdb, true, rxsequencetag, rxsearchedsequence, unmatchedpeaksinmatchedpatterns, &isotopeformuladesctoid);
 				break;
 			case other:
+				theoreticalpeaksrealsize = tsp.compareOther(tmppeaklist, true, unmatchedpeaksinmatchedpatterns, &isotopeformuladesctoid);
 				break;
 			default:
 				break;
@@ -336,9 +341,11 @@ int cTheoreticalSpectrumList::parallelCompareAndStore(cCandidateSet& candidates,
 	string tmps;
 	for (int i = 0; i < (int)theoreticalspectra.size(); i++) {
 		theoreticalspectra[i].sortByMass();
-		theoreticalspectra[i].getCandidate().setRealPeptideName(*bricksdb, parameters->peptidetype);
-		theoreticalspectra[i].getCandidate().setAcronymPeptideNameWithHTMLReferences(*bricksdb, parameters->peptidetype);
-		theoreticalspectra[i].getCandidate().setAcronyms(*bricksdb);
+		if (parameters->peptidetype != other) {
+			theoreticalspectra[i].getCandidate().setRealPeptideName(*bricksdb, parameters->peptidetype);
+			theoreticalspectra[i].getCandidate().setAcronymPeptideNameWithHTMLReferences(*bricksdb, parameters->peptidetype);
+			theoreticalspectra[i].getCandidate().setAcronyms(*bricksdb);
+		}
 		if ((parameters->peptidetype == branched) || (parameters->peptidetype == branchcyclic)) {
 			theoreticalspectra[i].getCandidate().setBackboneAcronyms(*bricksdb);
 			theoreticalspectra[i].getCandidate().setBranchAcronyms(*bricksdb);

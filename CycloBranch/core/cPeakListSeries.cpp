@@ -106,7 +106,7 @@ int cPeakListSeries::loadFromProfileApexStream(string& filename, ifstream &strea
 
 			mgfofstream << "BEGIN IONS" << endl;
 			mgfofstream << "TITLE=" << title << endl;
-			mgfofstream << "SCAN=" << to_string(count + 1) << endl;
+			mgfofstream << "SCANS=" << to_string(count + 1) << endl;
 			mgfofstream << "PEPMASS=1" << endl;
 			mgfofstream << "RTINSECONDS=1" << endl;
 			mgfofstream << "CHARGE=1+" << endl << endl;
@@ -186,7 +186,7 @@ int cPeakListSeries::loadFromMZMLStream(string& mzmlfilename, ifstream &mzmlstre
 	*os << "Loading the mzML file, spectrum no. : ";
 	
 	cMzML mzml;
-	int resultcode = mzml.parse(mzmlfilename, peaklists, mode, os, terminatecomputation);
+	int resultcode = mzml.parse(mzmlfilename, peaklists, -1, mode, os, terminatecomputation);
 	if (resultcode != 0) {
 		peaklists.clear();
 		return resultcode;
@@ -199,7 +199,7 @@ int cPeakListSeries::loadFromMZMLStream(string& mzmlfilename, ifstream &mzmlstre
 		string mgfname = mzmlfilename.substr(0, (int)mzmlfilename.size() - 4);
 
 		*os << "ok" << endl;
-		if (mode == dereplication) {
+		if ((mode == dereplication) || (mode == compoundsearch)) {
 			*os << "Total number of MS spectra: ";
 		}
 		else {
@@ -253,7 +253,7 @@ int cPeakListSeries::loadFromMZMLStream(string& mzmlfilename, ifstream &mzmlstre
 	else {
 
 		*os << "ok" << endl;
-		if (mode == dereplication) {
+		if ((mode == dereplication) || (mode == compoundsearch)) {
 			*os << "Total number of MS spectra: ";
 		}
 		else {
@@ -312,7 +312,7 @@ int cPeakListSeries::loadFromIMZMLStream(string& imzmlfilename, ifstream &ibdstr
 		if (rawdata) {
 			mgfofstream << "BEGIN IONS" << endl;
 			mgfofstream << "TITLE=" << endl;
-			mgfofstream << "SCAN=" << to_string(i + 1) << endl;
+			mgfofstream << "SCANS=" << to_string(i + 1) << endl;
 			mgfofstream << "PEPMASS=1" << endl;
 			mgfofstream << "RTINSECONDS=1" << endl;
 			mgfofstream << "CHARGE=1+" << endl << endl;

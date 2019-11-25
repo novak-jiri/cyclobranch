@@ -105,9 +105,13 @@ private:
 	QToolBar* toolbarFilter;
 	QWidget* rowsfilterwidget;
 	QHBoxLayout* rowsfilterhbox;
-	QComboBox* rowsfiltercombobox;
-	QComboBox* rowsfiltercomparatorcombobox;
-	QLineEdit* rowsfilterline;
+	QComboBox* rowsfilteroperator;
+	QComboBox* rowsfiltercombobox1;
+	QComboBox* rowsfiltercomparatorcombobox1;
+	QLineEdit* rowsfilterline1;
+	QComboBox* rowsfiltercombobox2;
+	QComboBox* rowsfiltercomparatorcombobox2;
+	QLineEdit* rowsfilterline2;
 	QCheckBox* rowsfiltercasesensitive;
 	QCheckBox* rowsfilterwholeword;
 	QPushButton* rowsfilterbutton;
@@ -159,6 +163,8 @@ private slots:
 	bool saveDatabase();
 
 	bool saveDatabaseAs();
+
+	void saveDatabaseCheck();
 
 	void addRow();
 

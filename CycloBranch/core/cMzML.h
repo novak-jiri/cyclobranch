@@ -84,12 +84,13 @@ public:
 		\brief Parse a mzml file.
 		\param filename mzml filename
 		\param peaklists mzml filename
+		\param profilespectrumid id of a profile spectrum to be extracted, -1 = extract all profile spectra
 		\param mode program mode
 		\param os pointer to the main thread of the application (output stream)
 		\param terminatecomputation reference to a variable determining that the computation must be stopped
-		\retval 0 = success; -1 = aborted by user; -3 = zlib compression detected
+		\retval 0 = success; -1 = aborted by user
 	*/ 
-	int parse(string& filename, vector<cPeaksList>& peaklists, eModeType mode, cMainThread* os, bool& terminatecomputation);
+	int parse(string& filename, vector<cPeaksList>& peaklists, int profilespectrumid, eModeType mode, cMainThread* os, bool& terminatecomputation);
  
 
 	/**

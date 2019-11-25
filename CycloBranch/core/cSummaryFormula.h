@@ -62,7 +62,7 @@ class cSummaryFormula {
 
 	string formula;
 
-	void combineAtoms(cPeakListSeries& peaklistseries, cPeaksList& isotopeprofile, int depth, double mass, double intensity, int charge, string description, double minimumabsoluteintensity);
+	void combineAtoms(cPeakListSeries& peaklistseries, int peaklistseriessize, vector<int>& peaklistseriessizes, cPeaksList& isotopeprofile, vector<int>& depthvector, int depth, double mass, double intensity, int charge, double minimumabsoluteintensity);
 
 	double getIntensity(cBricksDatabase& bricksprobabilities, vector<int>& combarray, int mostintenseid, int mostintenseatomscount, int isotopecount);
 

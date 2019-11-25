@@ -34,9 +34,9 @@ struct cIonLabel {
 
 
 	/**
-		\brief Label of a ion.
+		\brief Set of labels to be merged.
 	*/ 
-	string label;
+	set<string> labelset;
 
 
 	/**
@@ -59,7 +59,7 @@ struct cIonLabel {
 	void clear() {
 		x = 0;
 		y = 0;
-		label = "";
+		labelset.clear();
 		alignright = false;
 	}
 
@@ -101,6 +101,15 @@ bool operator == (cIonLabel const& a, cIonLabel const& b);
 	\param alignright true when the description is aligned right
 */
 void insertLabel(unordered_set<cIonLabel, hash_cIonLabel>& labels, int x, int y, string& description, bool alignright);
+
+
+/**
+	\brief Draw labels of fragment ions.
+	\param painter reference to a painter
+	\param labels unordered set of labels
+	\param width widget width
+*/
+void drawLabels(QPainter& painter, unordered_set<cIonLabel, hash_cIonLabel>& labels, int width);
 
 
 /**

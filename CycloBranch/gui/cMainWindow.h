@@ -102,7 +102,7 @@ private:
 	QAction* actionModifications;
 	QAction *actionDrawPeptide;
 	QAction *actionNorine;
-	QAction *actionSmilesToMonomers;
+	QAction *actionBBDGNC;
 	QAction* actionShowIsomers;
 	QAction* actionGraph;
 	QAction* actionSummaryTableOfMatchedPeaks;
@@ -115,9 +115,13 @@ private:
 
 	QWidget* rowsfilterwidget;
 	QHBoxLayout* rowsfilterhbox;
-	QComboBox* rowsfiltercombobox;
-	QComboBox* rowsfiltercomparatorcombobox;
-	QLineEdit* rowsfilterline;
+	QComboBox* rowsfilteroperator;
+	QComboBox* rowsfiltercombobox1;
+	QComboBox* rowsfiltercomparatorcombobox1;
+	QLineEdit* rowsfilterline1;
+	QComboBox* rowsfiltercombobox2;
+	QComboBox* rowsfiltercomparatorcombobox2;
+	QLineEdit* rowsfilterline2;
 	QCheckBox* rowsfiltercasesensitive;
 	QCheckBox* rowsfilterwholeword;
 	QPushButton* rowsfilterbutton;
@@ -250,13 +254,17 @@ private slots:
 
 	void gotoNorine();
 
-	void gotoSmiles2Monomers();
+	void gotoBBDGNC();
 
 	void summaryPeaksTableCancelled();
 
 	void summaryPeaksTableRowDoubleClicked(int rowid, double experimentalmz);
 
 	void updateSummaryPeaksTableFilterSlot(int xmin, int xmax, int ymin, int ymax);
+
+	void chromatogramDoubleClicked(int scanid);
+
+	void imageWindowDoubleClicked(int spectrumid);
 
 	//void showContextMenu(const QPoint &pt);
 

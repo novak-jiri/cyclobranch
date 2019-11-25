@@ -178,471 +178,470 @@ int cDeNovoGraph::createGraph(bool& terminatecomputation) {
 	string negativeshiftsummary = (parameters->precursorcharge > 0)?"":"H-2+-2";
 
 	// insert system nodes
-	switch (parameters->peptidetype)
-	{
-	case cyclic:
-		node.clear();
-		node.setMZRatio(0);
-		node.setIntensity(0);
-		node.addIonAnnotation(b_ion);
-		graph.push_back(node);
+	switch (parameters->peptidetype) {
+		case cyclic:
+			node.clear();
+			node.setMZRatio(0);
+			node.setIntensity(0);
+			node.addIonAnnotation(b_ion);
+			graph.push_back(node);
 
-		node.clear();
-		node.setMZRatio(parameters->iondefinitions[b_ion].massdifference + negativeshift);
-		node.setIntensity(0);
-		node.addIonAnnotation(b_ion);
-		graph.push_back(node);
+			node.clear();
+			node.setMZRatio(parameters->iondefinitions[b_ion].massdifference + negativeshift);
+			node.setIntensity(0);
+			node.addIonAnnotation(b_ion);
+			graph.push_back(node);
 
-		edge.clear();
-		edge.composition = "0";
-		tmpformula.clear();
-		tmpformula.addFormula(parameters->iondefinitions[b_ion].summary);
-		tmpformula.addFormula(negativeshiftsummary);
-		edge.summary = tmpformula.getSummary();
-		edge.targetnode = 1;
-		edge.targetion = b_ion;
-		edge.massdifference = graph[edge.targetnode].getMZRatio();
-		graph[0].insertTempEdge(edge);
+			edge.clear();
+			edge.composition = "0";
+			tmpformula.clear();
+			tmpformula.addFormula(parameters->iondefinitions[b_ion].summary);
+			tmpformula.addFormula(negativeshiftsummary);
+			edge.summary = tmpformula.getSummary();
+			edge.targetnode = 1;
+			edge.targetion = b_ion;
+			edge.massdifference = graph[edge.targetnode].getMZRatio();
+			graph[0].insertTempEdge(edge);
 
-		lastsystemnode = (int)graph.size() - 1;
-		startnode = 1;
-		break;
-	case linear:
-	case branched:
-		node.clear();
-		node.setMZRatio(0);
-		node.setIntensity(0);
-		node.addIonAnnotation(b_ion);
-		node.addIonAnnotation(y_ion);
-		graph.push_back(node);
+			lastsystemnode = (int)graph.size() - 1;
+			startnode = 1;
+			break;
+		case linear:
+		case branched:
+			node.clear();
+			node.setMZRatio(0);
+			node.setIntensity(0);
+			node.addIonAnnotation(b_ion);
+			node.addIonAnnotation(y_ion);
+			graph.push_back(node);
 
-		node.clear();
-		node.setMZRatio(parameters->iondefinitions[b_ion].massdifference + negativeshift);
-		node.setIntensity(0);
-		node.addIonAnnotation(b_ion);
-		graph.push_back(node);
+			node.clear();
+			node.setMZRatio(parameters->iondefinitions[b_ion].massdifference + negativeshift);
+			node.setIntensity(0);
+			node.addIonAnnotation(b_ion);
+			graph.push_back(node);
 
-		node.clear();
-		node.setMZRatio(parameters->iondefinitions[y_ion].massdifference + negativeshift);
-		node.setIntensity(0);
-		node.addIonAnnotation(y_ion);
-		graph.push_back(node);
+			node.clear();
+			node.setMZRatio(parameters->iondefinitions[y_ion].massdifference + negativeshift);
+			node.setIntensity(0);
+			node.addIonAnnotation(y_ion);
+			graph.push_back(node);
 
-		edge.clear();
-		edge.composition = "0";
-		tmpformula.clear();
-		tmpformula.addFormula(parameters->iondefinitions[b_ion].summary);
-		tmpformula.addFormula(negativeshiftsummary);
-		edge.summary = tmpformula.getSummary();
-		edge.targetnode = 1;
-		edge.targetion = b_ion;
-		edge.massdifference = graph[edge.targetnode].getMZRatio();
-		graph[0].insertTempEdge(edge);
+			edge.clear();
+			edge.composition = "0";
+			tmpformula.clear();
+			tmpformula.addFormula(parameters->iondefinitions[b_ion].summary);
+			tmpformula.addFormula(negativeshiftsummary);
+			edge.summary = tmpformula.getSummary();
+			edge.targetnode = 1;
+			edge.targetion = b_ion;
+			edge.massdifference = graph[edge.targetnode].getMZRatio();
+			graph[0].insertTempEdge(edge);
 
-		edge.clear();
-		edge.composition = "0";
-		tmpformula.clear();
-		tmpformula.addFormula(parameters->iondefinitions[y_ion].summary);
-		tmpformula.addFormula(negativeshiftsummary);
-		edge.summary = tmpformula.getSummary();
-		edge.targetnode = 2;
-		edge.targetion = y_ion;
-		edge.massdifference = graph[edge.targetnode].getMZRatio();
-		graph[0].insertTempEdge(edge);
+			edge.clear();
+			edge.composition = "0";
+			tmpformula.clear();
+			tmpformula.addFormula(parameters->iondefinitions[y_ion].summary);
+			tmpformula.addFormula(negativeshiftsummary);
+			edge.summary = tmpformula.getSummary();
+			edge.targetnode = 2;
+			edge.targetion = y_ion;
+			edge.massdifference = graph[edge.targetnode].getMZRatio();
+			graph[0].insertTempEdge(edge);
 
-		targetnode = 2;
+			targetnode = 2;
 
-		for (i = 1; i < (int)parameters->searchedmodifications.size(); i++) {
+			for (i = 1; i < (int)parameters->searchedmodifications.size(); i++) {
 			
-			if (parameters->searchedmodifications[i].nterminal) {
-				node.clear();
-				node.setMZRatio(parameters->iondefinitions[b_ion].massdifference + parameters->searchedmodifications[i].massdifference + negativeshift);
-				node.setIntensity(0);
-				node.addIonAnnotation(b_ion);
-				graph.push_back(node);
+				if (parameters->searchedmodifications[i].nterminal) {
+					node.clear();
+					node.setMZRatio(parameters->iondefinitions[b_ion].massdifference + parameters->searchedmodifications[i].massdifference + negativeshift);
+					node.setIntensity(0);
+					node.addIonAnnotation(b_ion);
+					graph.push_back(node);
 
-				edge.clear();
-				edge.composition = "0";	
-				edge.startmodifID = i;
-				tmpformula.clear();
-				tmpformula.addFormula(parameters->iondefinitions[b_ion].summary);
-				tmpformula.addFormula(parameters->searchedmodifications[i].summary);
-				tmpformula.addFormula(negativeshiftsummary);
-				edge.summary = tmpformula.getSummary();
-				targetnode++;
-				edge.targetnode = targetnode;
-				edge.targetion = b_ion;
-				edge.massdifference = graph[edge.targetnode].getMZRatio();
+					edge.clear();
+					edge.composition = "0";	
+					edge.startmodifID = i;
+					tmpformula.clear();
+					tmpformula.addFormula(parameters->iondefinitions[b_ion].summary);
+					tmpformula.addFormula(parameters->searchedmodifications[i].summary);
+					tmpformula.addFormula(negativeshiftsummary);
+					edge.summary = tmpformula.getSummary();
+					targetnode++;
+					edge.targetnode = targetnode;
+					edge.targetion = b_ion;
+					edge.massdifference = graph[edge.targetnode].getMZRatio();
 				
-				graph[0].insertTempEdge(edge);
+					graph[0].insertTempEdge(edge);
+				}
+
+				if (parameters->searchedmodifications[i].cterminal) {
+					node.clear();
+					node.setMZRatio(parameters->iondefinitions[y_ion].massdifference + parameters->searchedmodifications[i].massdifference + negativeshift);
+					node.setIntensity(0);
+					node.addIonAnnotation(y_ion);
+					graph.push_back(node);
+
+					edge.clear();
+					edge.composition = "0";
+					edge.startmodifID = i;
+					tmpformula.clear();
+					tmpformula.addFormula(parameters->iondefinitions[y_ion].summary);
+					tmpformula.addFormula(parameters->searchedmodifications[i].summary);
+					tmpformula.addFormula(negativeshiftsummary);
+					edge.summary = tmpformula.getSummary();
+					targetnode++;
+					edge.targetnode = targetnode;
+					edge.targetion = y_ion;
+					edge.massdifference = graph[edge.targetnode].getMZRatio();
+
+					graph[0].insertTempEdge(edge);
+				}
+
 			}
 
-			if (parameters->searchedmodifications[i].cterminal) {
-				node.clear();
-				node.setMZRatio(parameters->iondefinitions[y_ion].massdifference + parameters->searchedmodifications[i].massdifference + negativeshift);
-				node.setIntensity(0);
-				node.addIonAnnotation(y_ion);
-				graph.push_back(node);
+			lastsystemnode = (int)graph.size() - 1;
+			startnode = 1;
+			break;
+		case branchcyclic:
+			node.clear();
+			node.setMZRatio(0);
+			node.setIntensity(0);
+			node.addIonAnnotation(b_ion);
+			//node.addIonAnnotation(y_ion);
+			graph.push_back(node);
 
-				edge.clear();
-				edge.composition = "0";
-				edge.startmodifID = i;
-				tmpformula.clear();
-				tmpformula.addFormula(parameters->iondefinitions[y_ion].summary);
-				tmpformula.addFormula(parameters->searchedmodifications[i].summary);
-				tmpformula.addFormula(negativeshiftsummary);
-				edge.summary = tmpformula.getSummary();
-				targetnode++;
-				edge.targetnode = targetnode;
-				edge.targetion = y_ion;
-				edge.massdifference = graph[edge.targetnode].getMZRatio();
+			node.clear();
+			node.setMZRatio(parameters->iondefinitions[b_ion].massdifference + negativeshift);
+			node.setIntensity(0);
+			node.addIonAnnotation(b_ion);
+			graph.push_back(node);
 
-				graph[0].insertTempEdge(edge);
-			}
+			//node.clear();
+			//node.setMZRatio(parameters->iondefinitions[y_ion].massdifference + negativeshift);
+			//node.setIntensity(0);
+			//node.addIonAnnotation(y_ion);
+			//graph.push_back(node);
 
-		}
+			edge.clear();
+			edge.composition = "0";
+			tmpformula.clear();
+			tmpformula.addFormula(parameters->iondefinitions[b_ion].summary);
+			tmpformula.addFormula(negativeshiftsummary);
+			edge.summary = tmpformula.getSummary();
+			edge.targetnode = 1;
+			edge.targetion = b_ion;
+			edge.massdifference = graph[edge.targetnode].getMZRatio();
+			graph[0].insertTempEdge(edge);
 
-		lastsystemnode = (int)graph.size() - 1;
-		startnode = 1;
-		break;
-	case branchcyclic:
-		node.clear();
-		node.setMZRatio(0);
-		node.setIntensity(0);
-		node.addIonAnnotation(b_ion);
-		//node.addIonAnnotation(y_ion);
-		graph.push_back(node);
+			//edge.clear();
+			//edge.composition = "0";
+			//tmpformula.clear();
+			//tmpformula.addFormula(parameters->iondefinitions[y_ion].summary);
+			//tmpformula.addFormula(negativeshiftsummary);
+			//edge.summary = tmpformula.getSummary();
+			//edge.targetnode = 2;
+			//edge.targetion = y_ion;
+			//edge.massdifference = graph[edge.targetnode].getMZRatio();
+			//graph[0].insertTempEdge(edge);
 
-		node.clear();
-		node.setMZRatio(parameters->iondefinitions[b_ion].massdifference + negativeshift);
-		node.setIntensity(0);
-		node.addIonAnnotation(b_ion);
-		graph.push_back(node);
-
-		//node.clear();
-		//node.setMZRatio(parameters->iondefinitions[y_ion].massdifference + negativeshift);
-		//node.setIntensity(0);
-		//node.addIonAnnotation(y_ion);
-		//graph.push_back(node);
-
-		edge.clear();
-		edge.composition = "0";
-		tmpformula.clear();
-		tmpformula.addFormula(parameters->iondefinitions[b_ion].summary);
-		tmpformula.addFormula(negativeshiftsummary);
-		edge.summary = tmpformula.getSummary();
-		edge.targetnode = 1;
-		edge.targetion = b_ion;
-		edge.massdifference = graph[edge.targetnode].getMZRatio();
-		graph[0].insertTempEdge(edge);
-
-		//edge.clear();
-		//edge.composition = "0";
-		//tmpformula.clear();
-		//tmpformula.addFormula(parameters->iondefinitions[y_ion].summary);
-		//tmpformula.addFormula(negativeshiftsummary);
-		//edge.summary = tmpformula.getSummary();
-		//edge.targetnode = 2;
-		//edge.targetion = y_ion;
-		//edge.massdifference = graph[edge.targetnode].getMZRatio();
-		//graph[0].insertTempEdge(edge);
-
-		/*
+			/*
 		
-		targetnode = 2;
+			targetnode = 2;
 
-		for (i = 1; i < (int)parameters->searchedmodifications.size(); i++) {
+			for (i = 1; i < (int)parameters->searchedmodifications.size(); i++) {
 
-			if (parameters->searchedmodifications[i].nterminal) {
-				node.clear();
-				node.setMZRatio(parameters->iondefinitions[b_ion].massdifference + parameters->searchedmodifications[i].massdifference + negativeshift);
-				node.setIntensity(0);
-				node.addIonAnnotation(b_ion);
-				graph.push_back(node);
+				if (parameters->searchedmodifications[i].nterminal) {
+					node.clear();
+					node.setMZRatio(parameters->iondefinitions[b_ion].massdifference + parameters->searchedmodifications[i].massdifference + negativeshift);
+					node.setIntensity(0);
+					node.addIonAnnotation(b_ion);
+					graph.push_back(node);
 
-				edge.clear();
-				edge.composition = "0";	
-				edge.startmodifID = i;
-				tmpformula.clear();
-				tmpformula.addFormula(parameters->iondefinitions[b_ion].summary);
-				tmpformula.addFormula(parameters->searchedmodifications[i].summary);
-				tmpformula.addFormula(negativeshiftsummary);
-				edge.summary = tmpformula.getSummary();
-				targetnode++;
-				edge.targetnode = targetnode;
-				edge.targetion = b_ion;
-				edge.massdifference = graph[edge.targetnode].getMZRatio();
+					edge.clear();
+					edge.composition = "0";	
+					edge.startmodifID = i;
+					tmpformula.clear();
+					tmpformula.addFormula(parameters->iondefinitions[b_ion].summary);
+					tmpformula.addFormula(parameters->searchedmodifications[i].summary);
+					tmpformula.addFormula(negativeshiftsummary);
+					edge.summary = tmpformula.getSummary();
+					targetnode++;
+					edge.targetnode = targetnode;
+					edge.targetion = b_ion;
+					edge.massdifference = graph[edge.targetnode].getMZRatio();
 				
-				graph[0].insertTempEdge(edge);
+					graph[0].insertTempEdge(edge);
+				}
+
+				if (parameters->searchedmodifications[i].cterminal) {
+					node.clear();
+					node.setMZRatio(parameters->iondefinitions[y_ion].massdifference + parameters->searchedmodifications[i].massdifference + negativeshift);
+					node.setIntensity(0);
+					node.addIonAnnotation(y_ion);
+					graph.push_back(node);
+
+					edge.clear();
+					edge.composition = "0";
+					edge.startmodifID = i;
+					tmpformula.clear();
+					tmpformula.addFormula(parameters->iondefinitions[y_ion].summary);
+					tmpformula.addFormula(parameters->searchedmodifications[i].summary);
+					tmpformula.addFormula(negativeshiftsummary);
+					edge.summary = tmpformula.getSummary();
+					targetnode++;
+					edge.targetnode = targetnode;
+					edge.targetion = y_ion;
+					edge.massdifference = graph[edge.targetnode].getMZRatio();
+
+					graph[0].insertTempEdge(edge);
+				}
+
 			}
+			*/
 
-			if (parameters->searchedmodifications[i].cterminal) {
-				node.clear();
-				node.setMZRatio(parameters->iondefinitions[y_ion].massdifference + parameters->searchedmodifications[i].massdifference + negativeshift);
-				node.setIntensity(0);
-				node.addIonAnnotation(y_ion);
-				graph.push_back(node);
+			lastsystemnode = (int)graph.size() - 1;
+			startnode = 1;
+			break;
+		case linearpolyketide:
+			node.clear();
+			node.setMZRatio(0);
+			node.setIntensity(0);
+			node.addIonAnnotation(l1h_ion);
+			node.addIonAnnotation(l2h_ion);
+			node.addIonAnnotation(l1oh_ion);
+			node.addIonAnnotation(l2oh_ion);
+			graph.push_back(node);
 
-				edge.clear();
-				edge.composition = "0";
-				edge.startmodifID = i;
-				tmpformula.clear();
-				tmpformula.addFormula(parameters->iondefinitions[y_ion].summary);
-				tmpformula.addFormula(parameters->searchedmodifications[i].summary);
-				tmpformula.addFormula(negativeshiftsummary);
-				edge.summary = tmpformula.getSummary();
-				targetnode++;
-				edge.targetnode = targetnode;
-				edge.targetion = y_ion;
-				edge.massdifference = graph[edge.targetnode].getMZRatio();
+			node.clear();
+			node.setMZRatio(parameters->iondefinitions[l1h_ion].massdifference + negativeshift);
+			node.setIntensity(0);
+			node.addIonAnnotation(l1h_ion);
+			graph.push_back(node);
 
-				graph[0].insertTempEdge(edge);
-			}
+			node.clear();
+			node.setMZRatio(parameters->iondefinitions[l2h_ion].massdifference + negativeshift);
+			node.setIntensity(0);
+			node.addIonAnnotation(l2h_ion);
+			graph.push_back(node);
 
-		}
-		*/
+			node.clear();
+			node.setMZRatio(parameters->iondefinitions[l1oh_ion].massdifference + negativeshift);
+			node.setIntensity(0);
+			node.addIonAnnotation(l1oh_ion);
+			graph.push_back(node);
 
-		lastsystemnode = (int)graph.size() - 1;
-		startnode = 1;
-		break;
-	case linearpolyketide:
-		node.clear();
-		node.setMZRatio(0);
-		node.setIntensity(0);
-		node.addIonAnnotation(l1h_ion);
-		node.addIonAnnotation(l2h_ion);
-		node.addIonAnnotation(l1oh_ion);
-		node.addIonAnnotation(l2oh_ion);
-		graph.push_back(node);
+			node.clear();
+			node.setMZRatio(parameters->iondefinitions[l2oh_ion].massdifference + negativeshift);
+			node.setIntensity(0);
+			node.addIonAnnotation(l2oh_ion);
+			graph.push_back(node);
 
-		node.clear();
-		node.setMZRatio(parameters->iondefinitions[l1h_ion].massdifference + negativeshift);
-		node.setIntensity(0);
-		node.addIonAnnotation(l1h_ion);
-		graph.push_back(node);
+			edge.clear();
+			edge.composition = "0";
+			tmpformula.clear();
+			tmpformula.addFormula(parameters->iondefinitions[l1h_ion].summary);
+			tmpformula.addFormula(negativeshiftsummary);
+			edge.summary = tmpformula.getSummary();
+			edge.targetnode = 1;
+			edge.targetion = l1h_ion;
+			edge.massdifference = graph[edge.targetnode].getMZRatio();
+			graph[0].insertTempEdge(edge);
 
-		node.clear();
-		node.setMZRatio(parameters->iondefinitions[l2h_ion].massdifference + negativeshift);
-		node.setIntensity(0);
-		node.addIonAnnotation(l2h_ion);
-		graph.push_back(node);
+			edge.clear();
+			edge.composition = "0";
+			tmpformula.clear();
+			tmpformula.addFormula(parameters->iondefinitions[l2h_ion].summary);
+			tmpformula.addFormula(negativeshiftsummary);
+			edge.summary = tmpformula.getSummary();
+			edge.targetnode = 2;
+			edge.targetion = l2h_ion;
+			edge.massdifference = graph[edge.targetnode].getMZRatio();
+			graph[0].insertTempEdge(edge);
 
-		node.clear();
-		node.setMZRatio(parameters->iondefinitions[l1oh_ion].massdifference + negativeshift);
-		node.setIntensity(0);
-		node.addIonAnnotation(l1oh_ion);
-		graph.push_back(node);
+			edge.clear();
+			edge.composition = "0";
+			tmpformula.clear();
+			tmpformula.addFormula(parameters->iondefinitions[l1oh_ion].summary);
+			tmpformula.addFormula(negativeshiftsummary);
+			edge.summary = tmpformula.getSummary();
+			edge.targetnode = 3;
+			edge.targetion = l1oh_ion;
+			edge.massdifference = graph[edge.targetnode].getMZRatio();
+			graph[0].insertTempEdge(edge);
 
-		node.clear();
-		node.setMZRatio(parameters->iondefinitions[l2oh_ion].massdifference + negativeshift);
-		node.setIntensity(0);
-		node.addIonAnnotation(l2oh_ion);
-		graph.push_back(node);
+			edge.clear();
+			edge.composition = "0";
+			tmpformula.clear();
+			tmpformula.addFormula(parameters->iondefinitions[l2oh_ion].summary);
+			tmpformula.addFormula(negativeshiftsummary);
+			edge.summary = tmpformula.getSummary();
+			edge.targetnode = 4;
+			edge.targetion = l2oh_ion;
+			edge.massdifference = graph[edge.targetnode].getMZRatio();
+			graph[0].insertTempEdge(edge);
 
-		edge.clear();
-		edge.composition = "0";
-		tmpformula.clear();
-		tmpformula.addFormula(parameters->iondefinitions[l1h_ion].summary);
-		tmpformula.addFormula(negativeshiftsummary);
-		edge.summary = tmpformula.getSummary();
-		edge.targetnode = 1;
-		edge.targetion = l1h_ion;
-		edge.massdifference = graph[edge.targetnode].getMZRatio();
-		graph[0].insertTempEdge(edge);
+			targetnode = 4;
 
-		edge.clear();
-		edge.composition = "0";
-		tmpformula.clear();
-		tmpformula.addFormula(parameters->iondefinitions[l2h_ion].summary);
-		tmpformula.addFormula(negativeshiftsummary);
-		edge.summary = tmpformula.getSummary();
-		edge.targetnode = 2;
-		edge.targetion = l2h_ion;
-		edge.massdifference = graph[edge.targetnode].getMZRatio();
-		graph[0].insertTempEdge(edge);
+			for (i = 1; i < (int)parameters->searchedmodifications.size(); i++) {	
 
-		edge.clear();
-		edge.composition = "0";
-		tmpformula.clear();
-		tmpformula.addFormula(parameters->iondefinitions[l1oh_ion].summary);
-		tmpformula.addFormula(negativeshiftsummary);
-		edge.summary = tmpformula.getSummary();
-		edge.targetnode = 3;
-		edge.targetion = l1oh_ion;
-		edge.massdifference = graph[edge.targetnode].getMZRatio();
-		graph[0].insertTempEdge(edge);
+				if (parameters->searchedmodifications[i].nterminal) {
+					node.clear();
+					node.setMZRatio(parameters->iondefinitions[l1h_ion].massdifference + parameters->searchedmodifications[i].massdifference + negativeshift);
+					node.setIntensity(0);
+					node.addIonAnnotation(l1h_ion);
+					graph.push_back(node);
 
-		edge.clear();
-		edge.composition = "0";
-		tmpformula.clear();
-		tmpformula.addFormula(parameters->iondefinitions[l2oh_ion].summary);
-		tmpformula.addFormula(negativeshiftsummary);
-		edge.summary = tmpformula.getSummary();
-		edge.targetnode = 4;
-		edge.targetion = l2oh_ion;
-		edge.massdifference = graph[edge.targetnode].getMZRatio();
-		graph[0].insertTempEdge(edge);
+					edge.clear();
+					edge.composition = "0";	
+					edge.startmodifID = i;
+					tmpformula.clear();
+					tmpformula.addFormula(parameters->iondefinitions[l1h_ion].summary);
+					tmpformula.addFormula(parameters->searchedmodifications[i].summary);
+					tmpformula.addFormula(negativeshiftsummary);
+					edge.summary = tmpformula.getSummary();
+					targetnode++;
+					edge.targetnode = targetnode;
+					edge.targetion = l1h_ion;
+					edge.massdifference = graph[edge.targetnode].getMZRatio();
 
-		targetnode = 4;
+					graph[0].insertTempEdge(edge);
 
-		for (i = 1; i < (int)parameters->searchedmodifications.size(); i++) {	
+					node.clear();
+					node.setMZRatio(parameters->iondefinitions[l2h_ion].massdifference + parameters->searchedmodifications[i].massdifference + negativeshift);
+					node.setIntensity(0);
+					node.addIonAnnotation(l2h_ion);
+					graph.push_back(node);
 
-			if (parameters->searchedmodifications[i].nterminal) {
-				node.clear();
-				node.setMZRatio(parameters->iondefinitions[l1h_ion].massdifference + parameters->searchedmodifications[i].massdifference + negativeshift);
-				node.setIntensity(0);
-				node.addIonAnnotation(l1h_ion);
-				graph.push_back(node);
+					edge.clear();
+					edge.composition = "0";
+					edge.startmodifID = i;
+					tmpformula.clear();
+					tmpformula.addFormula(parameters->iondefinitions[l2h_ion].summary);
+					tmpformula.addFormula(parameters->searchedmodifications[i].summary);
+					tmpformula.addFormula(negativeshiftsummary);
+					edge.summary = tmpformula.getSummary();
+					targetnode++;
+					edge.targetnode = targetnode;
+					edge.targetion = l2h_ion;
+					edge.massdifference = graph[edge.targetnode].getMZRatio();
 
-				edge.clear();
-				edge.composition = "0";	
-				edge.startmodifID = i;
-				tmpformula.clear();
-				tmpformula.addFormula(parameters->iondefinitions[l1h_ion].summary);
-				tmpformula.addFormula(parameters->searchedmodifications[i].summary);
-				tmpformula.addFormula(negativeshiftsummary);
-				edge.summary = tmpformula.getSummary();
-				targetnode++;
-				edge.targetnode = targetnode;
-				edge.targetion = l1h_ion;
-				edge.massdifference = graph[edge.targetnode].getMZRatio();
+					graph[0].insertTempEdge(edge);
+				}
 
-				graph[0].insertTempEdge(edge);
+				if (parameters->searchedmodifications[i].cterminal) {
+					node.clear();
+					node.setMZRatio(parameters->iondefinitions[l1oh_ion].massdifference + parameters->searchedmodifications[i].massdifference + negativeshift);
+					node.setIntensity(0);
+					node.addIonAnnotation(l1oh_ion);
+					graph.push_back(node);
 
-				node.clear();
-				node.setMZRatio(parameters->iondefinitions[l2h_ion].massdifference + parameters->searchedmodifications[i].massdifference + negativeshift);
-				node.setIntensity(0);
-				node.addIonAnnotation(l2h_ion);
-				graph.push_back(node);
+					edge.clear();
+					edge.composition = "0";
+					edge.startmodifID = i;
+					tmpformula.clear();
+					tmpformula.addFormula(parameters->iondefinitions[l1oh_ion].summary);
+					tmpformula.addFormula(parameters->searchedmodifications[i].summary);
+					tmpformula.addFormula(negativeshiftsummary);
+					edge.summary = tmpformula.getSummary();
+					targetnode++;
+					edge.targetnode = targetnode;
+					edge.targetion = l1oh_ion;
+					edge.massdifference = graph[edge.targetnode].getMZRatio();
 
-				edge.clear();
-				edge.composition = "0";
-				edge.startmodifID = i;
-				tmpformula.clear();
-				tmpformula.addFormula(parameters->iondefinitions[l2h_ion].summary);
-				tmpformula.addFormula(parameters->searchedmodifications[i].summary);
-				tmpformula.addFormula(negativeshiftsummary);
-				edge.summary = tmpformula.getSummary();
-				targetnode++;
-				edge.targetnode = targetnode;
-				edge.targetion = l2h_ion;
-				edge.massdifference = graph[edge.targetnode].getMZRatio();
+					graph[0].insertTempEdge(edge);
 
-				graph[0].insertTempEdge(edge);
-			}
+					node.clear();
+					node.setMZRatio(parameters->iondefinitions[l2oh_ion].massdifference + parameters->searchedmodifications[i].massdifference + negativeshift);
+					node.setIntensity(0);
+					node.addIonAnnotation(l2oh_ion);
+					graph.push_back(node);
 
-			if (parameters->searchedmodifications[i].cterminal) {
-				node.clear();
-				node.setMZRatio(parameters->iondefinitions[l1oh_ion].massdifference + parameters->searchedmodifications[i].massdifference + negativeshift);
-				node.setIntensity(0);
-				node.addIonAnnotation(l1oh_ion);
-				graph.push_back(node);
+					edge.clear();
+					edge.composition = "0";
+					edge.startmodifID = i;
+					tmpformula.clear();
+					tmpformula.addFormula(parameters->iondefinitions[l2oh_ion].summary);
+					tmpformula.addFormula(parameters->searchedmodifications[i].summary);
+					tmpformula.addFormula(negativeshiftsummary);
+					edge.summary = tmpformula.getSummary();
+					targetnode++;
+					edge.targetnode = targetnode;
+					edge.targetion = l2oh_ion;
+					edge.massdifference = graph[edge.targetnode].getMZRatio();
 
-				edge.clear();
-				edge.composition = "0";
-				edge.startmodifID = i;
-				tmpformula.clear();
-				tmpformula.addFormula(parameters->iondefinitions[l1oh_ion].summary);
-				tmpformula.addFormula(parameters->searchedmodifications[i].summary);
-				tmpformula.addFormula(negativeshiftsummary);
-				edge.summary = tmpformula.getSummary();
-				targetnode++;
-				edge.targetnode = targetnode;
-				edge.targetion = l1oh_ion;
-				edge.massdifference = graph[edge.targetnode].getMZRatio();
-
-				graph[0].insertTempEdge(edge);
-
-				node.clear();
-				node.setMZRatio(parameters->iondefinitions[l2oh_ion].massdifference + parameters->searchedmodifications[i].massdifference + negativeshift);
-				node.setIntensity(0);
-				node.addIonAnnotation(l2oh_ion);
-				graph.push_back(node);
-
-				edge.clear();
-				edge.composition = "0";
-				edge.startmodifID = i;
-				tmpformula.clear();
-				tmpformula.addFormula(parameters->iondefinitions[l2oh_ion].summary);
-				tmpformula.addFormula(parameters->searchedmodifications[i].summary);
-				tmpformula.addFormula(negativeshiftsummary);
-				edge.summary = tmpformula.getSummary();
-				targetnode++;
-				edge.targetnode = targetnode;
-				edge.targetion = l2oh_ion;
-				edge.massdifference = graph[edge.targetnode].getMZRatio();
-
-				graph[0].insertTempEdge(edge);
-			}
+					graph[0].insertTempEdge(edge);
+				}
 	
-		}
+			}
 
-		lastsystemnode = (int)graph.size() - 1;
-		startnode = 1;
-		break;
-	case cyclicpolyketide:
-		node.clear();
-		node.setMZRatio(0);
-		node.setIntensity(0);
-		//node.addIonAnnotation(l0h_ion);
-		node.addIonAnnotation(l1h_ion);
-		node.addIonAnnotation(l2h_ion);
-		graph.push_back(node);
+			lastsystemnode = (int)graph.size() - 1;
+			startnode = 1;
+			break;
+		case cyclicpolyketide:
+			node.clear();
+			node.setMZRatio(0);
+			node.setIntensity(0);
+			//node.addIonAnnotation(l0h_ion);
+			node.addIonAnnotation(l1h_ion);
+			node.addIonAnnotation(l2h_ion);
+			graph.push_back(node);
 
-		//node.clear();
-		//node.setMZRatio(parameters->iondefinitions[l0h_ion].massdifference + negativeshift);
-		//node.setIntensity(0);
-		//node.addIonAnnotation(l0h_ion);
-		//graph.push_back(node);
+			//node.clear();
+			//node.setMZRatio(parameters->iondefinitions[l0h_ion].massdifference + negativeshift);
+			//node.setIntensity(0);
+			//node.addIonAnnotation(l0h_ion);
+			//graph.push_back(node);
 
-		node.clear();
-		node.setMZRatio(parameters->iondefinitions[l1h_ion].massdifference + negativeshift);
-		node.setIntensity(0);
-		node.addIonAnnotation(l1h_ion);
-		graph.push_back(node);
+			node.clear();
+			node.setMZRatio(parameters->iondefinitions[l1h_ion].massdifference + negativeshift);
+			node.setIntensity(0);
+			node.addIonAnnotation(l1h_ion);
+			graph.push_back(node);
 
-		node.clear();
-		node.setMZRatio(parameters->iondefinitions[l2h_ion].massdifference + negativeshift);
-		node.setIntensity(0);
-		node.addIonAnnotation(l2h_ion);
-		graph.push_back(node);
+			node.clear();
+			node.setMZRatio(parameters->iondefinitions[l2h_ion].massdifference + negativeshift);
+			node.setIntensity(0);
+			node.addIonAnnotation(l2h_ion);
+			graph.push_back(node);
 
-		edge.clear();
-		edge.composition = "0";
-		tmpformula.clear();
-		tmpformula.addFormula(parameters->iondefinitions[l1h_ion].summary);
-		tmpformula.addFormula(negativeshiftsummary);
-		edge.summary = tmpformula.getSummary();
-		edge.targetnode = 1;
-		edge.targetion = l1h_ion;
-		edge.massdifference = graph[edge.targetnode].getMZRatio();
-		graph[0].insertTempEdge(edge);
+			edge.clear();
+			edge.composition = "0";
+			tmpformula.clear();
+			tmpformula.addFormula(parameters->iondefinitions[l1h_ion].summary);
+			tmpformula.addFormula(negativeshiftsummary);
+			edge.summary = tmpformula.getSummary();
+			edge.targetnode = 1;
+			edge.targetion = l1h_ion;
+			edge.massdifference = graph[edge.targetnode].getMZRatio();
+			graph[0].insertTempEdge(edge);
 
-		edge.clear();
-		edge.composition = "0";
-		tmpformula.clear();
-		tmpformula.addFormula(parameters->iondefinitions[l2h_ion].summary);
-		tmpformula.addFormula(negativeshiftsummary);
-		edge.summary = tmpformula.getSummary();
-		edge.targetnode = 2;
-		edge.targetion = l2h_ion;
-		edge.massdifference = graph[edge.targetnode].getMZRatio();
-		graph[0].insertTempEdge(edge);
+			edge.clear();
+			edge.composition = "0";
+			tmpformula.clear();
+			tmpformula.addFormula(parameters->iondefinitions[l2h_ion].summary);
+			tmpformula.addFormula(negativeshiftsummary);
+			edge.summary = tmpformula.getSummary();
+			edge.targetnode = 2;
+			edge.targetion = l2h_ion;
+			edge.massdifference = graph[edge.targetnode].getMZRatio();
+			graph[0].insertTempEdge(edge);
 
-		/*edge.clear();
-		edge.composition = "0";
-		edge.targetnode = 3;
-		graph[0].insertTempEdge(e);*/
+			/*edge.clear();
+			edge.composition = "0";
+			edge.targetnode = 3;
+			graph[0].insertTempEdge(e);*/
 
-		lastsystemnode = (int)graph.size() - 1;
-		startnode = 1;
-		break;
-	case other:
-		*os << "Invalid peptide type 'Other'." << endl;
-		return -1;
-	default:
-		*os << "Undefined peptide type." << endl;
-		return -1;
+			lastsystemnode = (int)graph.size() - 1;
+			startnode = 1;
+			break;
+		case other:
+			*os << "Invalid peptide type 'Other'." << endl;
+			return -1;
+		default:
+			*os << "Undefined peptide type." << endl;
+			return -1;
 	}
 
 	// sort(graph.begin() + startnode, graph.end(), compareNodes);

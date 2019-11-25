@@ -30,22 +30,45 @@ cModificationsWidget::cModificationsWidget(QWidget* parent) {
 	menuEdit = new QMenu(tr("&Edit"), this);
 	menuHelp = new QMenu(tr("&Help"), this);
 
-	rowsfiltercombobox = new QComboBox();
-	rowsfiltercombobox->setToolTip("Column to be Searched");
-	rowsfiltercombobox->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+	rowsfilteroperator = new QComboBox();
+	rowsfilteroperator->setToolTip("OR = any condition must be met; AND = all conditions must be met.");
+	rowsfilteroperator->addItem("OR");
+	rowsfilteroperator->addItem("AND");
+	rowsfilteroperator->setSizeAdjustPolicy(QComboBox::AdjustToContents);
 
-	rowsfiltercomparatorcombobox = new QComboBox();
-	rowsfiltercomparatorcombobox->setToolTip("Type of Comparison");
-	rowsfiltercomparatorcombobox->addItem("=");
-	rowsfiltercomparatorcombobox->addItem("<");
-	rowsfiltercomparatorcombobox->addItem("<=");
-	rowsfiltercomparatorcombobox->addItem(">");
-	rowsfiltercomparatorcombobox->addItem(">=");
-	rowsfiltercomparatorcombobox->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+	rowsfiltercombobox1 = new QComboBox();
+	rowsfiltercombobox1->setToolTip("Column to be Searched");
+	rowsfiltercombobox1->setSizeAdjustPolicy(QComboBox::AdjustToContents);
 
-	rowsfilterline = new QLineEdit();
-	rowsfilterline->setMinimumWidth(300);
-	rowsfilterline->setToolTip("Text to Find");
+	rowsfiltercomparatorcombobox1 = new QComboBox();
+	rowsfiltercomparatorcombobox1->setToolTip("Type of Comparison");
+	rowsfiltercomparatorcombobox1->addItem("=");
+	rowsfiltercomparatorcombobox1->addItem("<");
+	rowsfiltercomparatorcombobox1->addItem("<=");
+	rowsfiltercomparatorcombobox1->addItem(">");
+	rowsfiltercomparatorcombobox1->addItem(">=");
+	rowsfiltercomparatorcombobox1->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+
+	rowsfilterline1 = new QLineEdit();
+	rowsfilterline1->setMinimumWidth(150);
+	rowsfilterline1->setToolTip("Text to Find");
+
+	rowsfiltercombobox2 = new QComboBox();
+	rowsfiltercombobox2->setToolTip("Column to be Searched");
+	rowsfiltercombobox2->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+
+	rowsfiltercomparatorcombobox2 = new QComboBox();
+	rowsfiltercomparatorcombobox2->setToolTip("Type of Comparison");
+	rowsfiltercomparatorcombobox2->addItem("=");
+	rowsfiltercomparatorcombobox2->addItem("<");
+	rowsfiltercomparatorcombobox2->addItem("<=");
+	rowsfiltercomparatorcombobox2->addItem(">");
+	rowsfiltercomparatorcombobox2->addItem(">=");
+	rowsfiltercomparatorcombobox2->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+
+	rowsfilterline2 = new QLineEdit();
+	rowsfilterline2->setMinimumWidth(150);
+	rowsfilterline2->setToolTip("Text to Find");
 
 	rowsfiltercasesensitive = new QCheckBox();
 	rowsfiltercasesensitive->setToolTip("Case Sensitive");
@@ -63,11 +86,19 @@ cModificationsWidget::cModificationsWidget(QWidget* parent) {
 	rowsfilterclearbutton->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_R));
 
 	rowsfilterhbox = new QHBoxLayout();
-	rowsfilterhbox->addWidget(rowsfiltercombobox);
+	rowsfilterhbox->addWidget(rowsfiltercombobox1);
 	rowsfilterhbox->addSpacing(10);
-	rowsfilterhbox->addWidget(rowsfiltercomparatorcombobox);
+	rowsfilterhbox->addWidget(rowsfiltercomparatorcombobox1);
 	rowsfilterhbox->addSpacing(10);
-	rowsfilterhbox->addWidget(rowsfilterline);
+	rowsfilterhbox->addWidget(rowsfilterline1);
+	rowsfilterhbox->addSpacing(10);
+	rowsfilterhbox->addWidget(rowsfilteroperator);
+	rowsfilterhbox->addSpacing(10);
+	rowsfilterhbox->addWidget(rowsfiltercombobox2);
+	rowsfilterhbox->addSpacing(10);
+	rowsfilterhbox->addWidget(rowsfiltercomparatorcombobox2);
+	rowsfilterhbox->addSpacing(10);
+	rowsfilterhbox->addWidget(rowsfilterline2);
 	rowsfilterhbox->addSpacing(10);
 	rowsfilterhbox->addWidget(rowsfiltercasesensitive);
 	rowsfilterhbox->addSpacing(10);
@@ -85,7 +116,7 @@ cModificationsWidget::cModificationsWidget(QWidget* parent) {
 	proxymodel = new cModificationsProxyModel(this);
 	proxymodel->setSourceModel(databasemodel);
 	proxymodel->setDynamicSortFilter(false);
-	proxymodel->initialize(rowsfiltercombobox, rowsfiltercomparatorcombobox);
+	proxymodel->initialize(rowsfilteroperator, rowsfiltercombobox1, rowsfiltercomparatorcombobox1, rowsfilterline1, rowsfiltercombobox2, rowsfiltercomparatorcombobox2, rowsfilterline2);
 	database->setModel(proxymodel);
 	database->setSortingEnabled(true);
 
@@ -115,7 +146,7 @@ cModificationsWidget::cModificationsWidget(QWidget* parent) {
 	actionSaveDatabase->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_S));
 	actionSaveDatabase->setToolTip("Save Database... (Ctrl + S)");
 	toolbarFile->addAction(actionSaveDatabase);
-	connect(actionSaveDatabase, SIGNAL(triggered()), this, SLOT(saveDatabase()));
+	connect(actionSaveDatabase, SIGNAL(triggered()), this, SLOT(saveDatabaseCheck()));
 
 	actionSaveDatabaseAs = new QAction(QIcon(":/images/icons/86.png"), tr("Save &Database As..."), this);
 	actionSaveDatabaseAs->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_D));
@@ -168,6 +199,8 @@ cModificationsWidget::cModificationsWidget(QWidget* parent) {
 	actionHTMLDocumentation->setToolTip("Show HTML Documentation (F1)");
 	toolbarHelp->addAction(actionHTMLDocumentation);
 	connect(actionHTMLDocumentation, SIGNAL(triggered()), this, SLOT(showHTMLDocumentation()));
+
+	addToolBarBreak();
 	
 	toolbarFilter = addToolBar(tr("Filter"));
 	toolbarFilter->addWidget(rowsfilterwidget);
@@ -203,7 +236,7 @@ cModificationsWidget::cModificationsWidget(QWidget* parent) {
 
 	setCentralWidget(mainwidget);
 
-	resize(1280, 780);
+	resize(defaultwinsizex, defaultwinsizey);
 
 	databasefile = "";
 
@@ -226,9 +259,13 @@ cModificationsWidget::~cModificationsWidget() {
 	delete proxymodel;
 	delete database;
 
-	delete rowsfiltercombobox;
-	delete rowsfiltercomparatorcombobox;
-	delete rowsfilterline;
+	delete rowsfilteroperator;
+	delete rowsfiltercombobox1;
+	delete rowsfiltercomparatorcombobox1;
+	delete rowsfilterline1;
+	delete rowsfiltercombobox2;
+	delete rowsfiltercomparatorcombobox2;
+	delete rowsfilterline2;
 	delete rowsfiltercasesensitive;
 	delete rowsfilterwholeword;
 	delete rowsfilterbutton;
@@ -290,9 +327,11 @@ void cModificationsWidget::resetHeader() {
 	databasemodel->setHorizontalHeaderItem(5, new QStandardItem("C-terminal"));
 	database->setItemDelegateForColumn(5, new cCheckBoxDelegate());
 
-	rowsfiltercombobox->clear();
+	rowsfiltercombobox1->clear();
+	rowsfiltercombobox2->clear();
 	for (int i = 1; i < databasemodel->columnCount() - 2; i++) {
-		rowsfiltercombobox->addItem(databasemodel->horizontalHeaderItem(i)->text());
+		rowsfiltercombobox1->addItem(databasemodel->horizontalHeaderItem(i)->text());
+		rowsfiltercombobox2->addItem(databasemodel->horizontalHeaderItem(i)->text());
 	}
 
 	database->horizontalHeader()->setStretchLastSection(true);
@@ -358,13 +397,13 @@ void cModificationsWidget::setDataModified(bool datamodified) {
 
 void cModificationsWidget::keyPressEvent(QKeyEvent *event) {
 	if ((event->key() == Qt::Key_Enter) || (event->key() == Qt::Key_Return)) {
-		if (rowsfilterline->hasFocus()) {
+		if (rowsfilterline1->hasFocus() || rowsfilterline2->hasFocus()) {
 			filterRows();
 		}
     }
 
 	if ((event->modifiers() == Qt::ControlModifier) && (event->key() == Qt::Key_F)) {
-		rowsfilterline->setFocus();
+		rowsfilterline1->setFocus();
 	}
 
 	if ((event->modifiers() == Qt::ControlModifier) && (event->key() == Qt::Key_T)) {
@@ -592,6 +631,18 @@ bool cModificationsWidget::saveDatabaseAs() {
 }
 
 
+void cModificationsWidget::saveDatabaseCheck() {
+	QMessageBox::StandardButton reply;
+	reply = QMessageBox::question(this, appname, "Save changes ?", QMessageBox::Yes | QMessageBox::No);
+
+	if (reply == QMessageBox::No) {
+		return;
+	}
+
+	saveDatabase();
+}
+
+
 void cModificationsWidget::addRow() {
 	resetFilter();
 
@@ -654,12 +705,13 @@ void cModificationsWidget::filterRows() {
 	proxymodel->setWholeWord(rowsfilterwholeword->isChecked());
 	proxymodel->setFilterKeyColumn(-1);
 	proxymodel->setFilterCaseSensitivity(rowsfiltercasesensitive->isChecked()?Qt::CaseSensitive:Qt::CaseInsensitive);
-	proxymodel->setFilterFixedString(rowsfilterline->text());
+	proxymodel->setFilterFixedString("");
 }
 
 
 void cModificationsWidget::resetFilter() {
-	rowsfilterline->setText("");
+	rowsfilterline1->setText("");
+	rowsfilterline2->setText("");
 
 	database->horizontalHeader()->setSortIndicator(-1, Qt::AscendingOrder);
 	proxymodel->sort(-1);

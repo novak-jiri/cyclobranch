@@ -14,8 +14,8 @@ cNeutralLossesListWidget::cNeutralLossesListWidget(QObject* parent) {
 	hbox = new QHBoxLayout();
 
 	list = new QListWidget();
-	list->setMinimumHeight(180);
-	list->setMaximumHeight(180);
+	list->setMinimumHeight(175);
+	list->setMaximumHeight(175);
 	list->setSelectionMode(QAbstractItemView::MultiSelection);
 
 	selectallbutton = new QPushButton("Select All");
@@ -28,6 +28,8 @@ cNeutralLossesListWidget::cNeutralLossesListWidget(QObject* parent) {
 	removebutton->setToolTip("Remove selected items.");
 	defaultbutton = new QPushButton("Default");
 	defaultbutton->setToolTip("Set default items.");
+	hconbutton = new QPushButton("HCON");
+	hconbutton->setToolTip("Set the default chemical elements H, C, O, N, S, and P.");
 
 	vbox1->addWidget(list);
 	vbox1->addStretch(1);
@@ -37,6 +39,7 @@ cNeutralLossesListWidget::cNeutralLossesListWidget(QObject* parent) {
 	vbox2->addWidget(addbutton);
 	vbox2->addWidget(removebutton);
 	vbox2->addWidget(defaultbutton);
+	vbox2->addWidget(hconbutton);
 	vbox2->addStretch(1);
 
 	hbox->setMargin(0);
@@ -48,6 +51,7 @@ cNeutralLossesListWidget::cNeutralLossesListWidget(QObject* parent) {
 	connect(addbutton, SIGNAL(released()), this, SLOT(addEmptyItem()));
 	connect(removebutton, SIGNAL(released()), this, SLOT(removeItem()));
 	connect(defaultbutton, SIGNAL(released()), this, SLOT(setDefaultItems()));
+	connect(hconbutton, SIGNAL(released()), this, SLOT(setHCON()));
 
 	setLayout(hbox);
 
@@ -62,6 +66,7 @@ cNeutralLossesListWidget::~cNeutralLossesListWidget() {
 	delete addbutton;
 	delete removebutton;
 	delete defaultbutton;
+	delete hconbutton;
 	
 	delete vbox1;
 	delete vbox2;
@@ -132,5 +137,8 @@ void cNeutralLossesListWidget::setHCON() {
 	addItem("N");
 
 	selectAllItems();
+
+	addItem("S:1");
+	addItem("P:1");
 }
 

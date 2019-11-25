@@ -42,22 +42,45 @@ cBricksDatabaseWidget::cBricksDatabaseWidget(QWidget* parent) {
 	menuEdit = new QMenu(tr("&Edit"), this);
 	menuHelp = new QMenu(tr("&Help"), this);
 
-	rowsfiltercombobox = new QComboBox();
-	rowsfiltercombobox->setToolTip("Column to be Searched");
-	rowsfiltercombobox->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+	rowsfilteroperator = new QComboBox();
+	rowsfilteroperator->setToolTip("OR = any condition must be met; AND = all conditions must be met.");
+	rowsfilteroperator->addItem("OR");
+	rowsfilteroperator->addItem("AND");
+	rowsfilteroperator->setSizeAdjustPolicy(QComboBox::AdjustToContents);
 
-	rowsfiltercomparatorcombobox = new QComboBox();
-	rowsfiltercomparatorcombobox->setToolTip("Type of Comparison");
-	rowsfiltercomparatorcombobox->addItem("=");
-	rowsfiltercomparatorcombobox->addItem("<");
-	rowsfiltercomparatorcombobox->addItem("<=");
-	rowsfiltercomparatorcombobox->addItem(">");
-	rowsfiltercomparatorcombobox->addItem(">=");
-	rowsfiltercomparatorcombobox->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+	rowsfiltercombobox1 = new QComboBox();
+	rowsfiltercombobox1->setToolTip("Column to be Searched");
+	rowsfiltercombobox1->setSizeAdjustPolicy(QComboBox::AdjustToContents);
 
-	rowsfilterline = new QLineEdit();
-	rowsfilterline->setMinimumWidth(300);
-	rowsfilterline->setToolTip("Text to Find");
+	rowsfiltercomparatorcombobox1 = new QComboBox();
+	rowsfiltercomparatorcombobox1->setToolTip("Type of Comparison");
+	rowsfiltercomparatorcombobox1->addItem("=");
+	rowsfiltercomparatorcombobox1->addItem("<");
+	rowsfiltercomparatorcombobox1->addItem("<=");
+	rowsfiltercomparatorcombobox1->addItem(">");
+	rowsfiltercomparatorcombobox1->addItem(">=");
+	rowsfiltercomparatorcombobox1->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+
+	rowsfilterline1 = new QLineEdit();
+	rowsfilterline1->setMinimumWidth(150);
+	rowsfilterline1->setToolTip("Text to Find");
+
+	rowsfiltercombobox2 = new QComboBox();
+	rowsfiltercombobox2->setToolTip("Column to be Searched");
+	rowsfiltercombobox2->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+
+	rowsfiltercomparatorcombobox2 = new QComboBox();
+	rowsfiltercomparatorcombobox2->setToolTip("Type of Comparison");
+	rowsfiltercomparatorcombobox2->addItem("=");
+	rowsfiltercomparatorcombobox2->addItem("<");
+	rowsfiltercomparatorcombobox2->addItem("<=");
+	rowsfiltercomparatorcombobox2->addItem(">");
+	rowsfiltercomparatorcombobox2->addItem(">=");
+	rowsfiltercomparatorcombobox2->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+
+	rowsfilterline2 = new QLineEdit();
+	rowsfilterline2->setMinimumWidth(150);
+	rowsfilterline2->setToolTip("Text to Find");
 
 	rowsfiltercasesensitive = new QCheckBox();
 	rowsfiltercasesensitive->setToolTip("Case Sensitive");
@@ -75,11 +98,19 @@ cBricksDatabaseWidget::cBricksDatabaseWidget(QWidget* parent) {
 	rowsfilterclearbutton->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_R));
 
 	rowsfilterhbox = new QHBoxLayout();
-	rowsfilterhbox->addWidget(rowsfiltercombobox);
+	rowsfilterhbox->addWidget(rowsfiltercombobox1);
 	rowsfilterhbox->addSpacing(10);
-	rowsfilterhbox->addWidget(rowsfiltercomparatorcombobox);
+	rowsfilterhbox->addWidget(rowsfiltercomparatorcombobox1);
 	rowsfilterhbox->addSpacing(10);
-	rowsfilterhbox->addWidget(rowsfilterline);
+	rowsfilterhbox->addWidget(rowsfilterline1);
+	rowsfilterhbox->addSpacing(10);
+	rowsfilterhbox->addWidget(rowsfilteroperator);
+	rowsfilterhbox->addSpacing(10);
+	rowsfilterhbox->addWidget(rowsfiltercombobox2);
+	rowsfilterhbox->addSpacing(10);
+	rowsfilterhbox->addWidget(rowsfiltercomparatorcombobox2);
+	rowsfilterhbox->addSpacing(10);
+	rowsfilterhbox->addWidget(rowsfilterline2);
 	rowsfilterhbox->addSpacing(10);
 	rowsfilterhbox->addWidget(rowsfiltercasesensitive);
 	rowsfilterhbox->addSpacing(10);
@@ -97,7 +128,7 @@ cBricksDatabaseWidget::cBricksDatabaseWidget(QWidget* parent) {
 	proxymodel = new cBricksDatabaseProxyModel(this);
 	proxymodel->setSourceModel(databasemodel);
 	proxymodel->setDynamicSortFilter(false);
-	proxymodel->initialize(rowsfiltercombobox, rowsfiltercomparatorcombobox);
+	proxymodel->initialize(rowsfilteroperator, rowsfiltercombobox1, rowsfiltercomparatorcombobox1, rowsfilterline1, rowsfiltercombobox2, rowsfiltercomparatorcombobox2, rowsfilterline2);
 	database->setModel(proxymodel);
 	database->setSortingEnabled(true);
 
@@ -127,7 +158,7 @@ cBricksDatabaseWidget::cBricksDatabaseWidget(QWidget* parent) {
 	actionSaveDatabase->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_S));
 	actionSaveDatabase->setToolTip("Save Database... (Ctrl + S)");
 	toolbarFile->addAction(actionSaveDatabase);
-	connect(actionSaveDatabase, SIGNAL(triggered()), this, SLOT(saveDatabase()));
+	connect(actionSaveDatabase, SIGNAL(triggered()), this, SLOT(saveDatabaseCheck()));
 
 	actionSaveDatabaseAs = new QAction(QIcon(":/images/icons/86.png"), tr("Save &Database As..."), this);
 	actionSaveDatabaseAs->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_D));
@@ -180,6 +211,8 @@ cBricksDatabaseWidget::cBricksDatabaseWidget(QWidget* parent) {
 	actionHTMLDocumentation->setToolTip("Show HTML Documentation (F1)");
 	toolbarHelp->addAction(actionHTMLDocumentation);
 	connect(actionHTMLDocumentation, SIGNAL(triggered()), this, SLOT(showHTMLDocumentation()));
+
+	addToolBarBreak();
 	
 	toolbarFilter = addToolBar(tr("Filter"));
 	toolbarFilter->addWidget(rowsfilterwidget);
@@ -215,7 +248,7 @@ cBricksDatabaseWidget::cBricksDatabaseWidget(QWidget* parent) {
 
 	setCentralWidget(mainwidget);
 
-	resize(1280, 780);
+	resize(defaultwinsizex, defaultwinsizey);
 
 	databasefile = "";
 
@@ -238,9 +271,13 @@ cBricksDatabaseWidget::~cBricksDatabaseWidget() {
 	delete proxymodel;
 	delete database;
 
-	delete rowsfiltercombobox;
-	delete rowsfiltercomparatorcombobox;
-	delete rowsfilterline;
+	delete rowsfilteroperator;
+	delete rowsfiltercombobox1;
+	delete rowsfiltercomparatorcombobox1;
+	delete rowsfilterline1;
+	delete rowsfiltercombobox2;
+	delete rowsfiltercomparatorcombobox2;
+	delete rowsfilterline2;
 	delete rowsfiltercasesensitive;
 	delete rowsfilterwholeword;
 	delete rowsfilterbutton;
@@ -290,7 +327,7 @@ void cBricksDatabaseWidget::deleteTable() {
 
 
 void cBricksDatabaseWidget::resetHeader() {
-	databasemodel->setColumnCount(7);
+	databasemodel->setColumnCount(8);
 
 	databasemodel->setHorizontalHeaderItem(0, new QStandardItem());
 	database->setItemDelegateForColumn(0, new cCheckBoxDelegate());
@@ -298,13 +335,16 @@ void cBricksDatabaseWidget::resetHeader() {
 	databasemodel->setHorizontalHeaderItem(2, new QStandardItem("Acronym(s)"));
 	databasemodel->setHorizontalHeaderItem(3, new QStandardItem("Residue Summary"));
 	databasemodel->setHorizontalHeaderItem(4, new QStandardItem("Monoisotopic Residue Mass"));
-	databasemodel->setHorizontalHeaderItem(5, new QStandardItem("Reference(s)"));
-	databasemodel->setHorizontalHeaderItem(6, new QStandardItem("Preview"));
-	database->setItemDelegateForColumn(6, new cMultipleButtonDelegate());
+	databasemodel->setHorizontalHeaderItem(5, new QStandardItem("Neutral Loss(es)"));
+	databasemodel->setHorizontalHeaderItem(6, new QStandardItem("Reference(s)"));
+	databasemodel->setHorizontalHeaderItem(7, new QStandardItem("Preview"));
+	database->setItemDelegateForColumn(7, new cMultipleButtonDelegate());
 
-	rowsfiltercombobox->clear();
+	rowsfiltercombobox1->clear();
+	rowsfiltercombobox2->clear();
 	for (int i = 1; i < databasemodel->columnCount() - 1; i++) {
-		rowsfiltercombobox->addItem(databasemodel->horizontalHeaderItem(i)->text());
+		rowsfiltercombobox1->addItem(databasemodel->horizontalHeaderItem(i)->text());
+		rowsfiltercombobox2->addItem(databasemodel->horizontalHeaderItem(i)->text());
 	}
 
 	database->horizontalHeader()->setStretchLastSection(true);
@@ -313,7 +353,7 @@ void cBricksDatabaseWidget::resetHeader() {
 	}
 	database->setColumnWidth(1, 400);
 	database->setColumnWidth(2, 400);
-	database->setColumnWidth(5, 400);
+	database->setColumnWidth(6, 400);
 }
 
 
@@ -322,20 +362,52 @@ bool cBricksDatabaseWidget::checkTable() {
 	int checkslash;
 	for (int i = 0; i < databasemodel->rowCount(); i++) {
 		checkslash = numberOfOccurrences(databasemodel->item(i, 1)->text().toStdString(),'/');
-		if ((checkslash != numberOfOccurrences(databasemodel->item(i, 2)->text().toStdString(),'/')) || (checkslash != numberOfOccurrences(databasemodel->item(i, 5)->text().toStdString(),'/'))) {
+		if ((checkslash != numberOfOccurrences(databasemodel->item(i, 2)->text().toStdString(),'/')) || (checkslash != numberOfOccurrences(databasemodel->item(i, 6)->text().toStdString(), '/'))) {
 			QMessageBox msgBox;
 			QString errstr = "Syntax error in the row no. ";
 			errstr += to_string(i + 1).c_str();
-			errstr += ":\nThe number of '/' must be equal in the fields Name(s), Acronym(s) and Reference(s) !\n\nNote: The symbol '/' separates izomers of a building block.";
+			errstr += ":\nThe number of '/' must be equal in the fields Name(s), Acronym(s), Neutral Loss(es), and Reference(s) !\n\nNote: The symbol '/' separates izomers of a building block.";
 			msgBox.setText(errstr);
 			msgBox.exec();
 			return false;
 		}
 	}
 
-	// check summary formulas
+	cSummaryFormula formula;
+	string tmpstr;
+
+	// check molecular formulas
 	for (int i = 0; i < databasemodel->rowCount(); i++) {
-		if (!checkFormula(i, databasemodel->item(i, 3)->text().toStdString())) {
+		tmpstr = databasemodel->item(i, 3)->text().toStdString();
+		formula.setFormula(tmpstr);
+		if (!checkFormula(i, formula)) {
+			return false;
+		}
+		else {
+			if (databasemodel->item(i, 4)) {
+				databasemodel->item(i, 4)->setData(QVariant::fromValue(cropPrecisionToSixDecimalsByteArray(formula.getMass())), Qt::DisplayRole);
+			}
+		}
+	}
+
+	// check neutral losses
+	string lossstr;
+	size_t last, next;
+	for (int i = 0; i < databasemodel->rowCount(); i++) {
+		lossstr = databasemodel->item(i, 5)->text().toStdString();
+		last = 0;
+		next = 0;
+		while ((next = lossstr.find(";", last)) != string::npos) {
+			tmpstr = lossstr.substr(last, next - last);
+			formula.setFormula(tmpstr);
+			if (!checkFormula(i, formula)) {
+				return false;
+			}
+			last = next + 1;
+		}
+		tmpstr = lossstr.substr(last);
+		formula.setFormula(tmpstr);
+		if (!checkFormula(i, formula)) {
 			return false;
 		}
 	}
@@ -344,10 +416,8 @@ bool cBricksDatabaseWidget::checkTable() {
 }
 
 
-bool cBricksDatabaseWidget::checkFormula(int row, const string& summary) {
-	cSummaryFormula formula;
+bool cBricksDatabaseWidget::checkFormula(int row, cSummaryFormula& formula) {
 	string errmsg;
-	formula.setFormula(summary);
 	if (!formula.isValid(errmsg)) {
 		QMessageBox msgBox;
 		QString errstr = "Syntax error in the row no. ";
@@ -357,9 +427,6 @@ bool cBricksDatabaseWidget::checkFormula(int row, const string& summary) {
 		msgBox.setText(errstr);
 		msgBox.exec();
 		return false;
-	}
-	if (databasemodel->item(row, 4)) {
-		databasemodel->item(row, 4)->setData(QVariant::fromValue(cropPrecisionToSixDecimalsByteArray(formula.getMass())), Qt::DisplayRole);
 	}
 	return true;
 }
@@ -385,13 +452,13 @@ void cBricksDatabaseWidget::setDataModified(bool datamodified) {
 
 void cBricksDatabaseWidget::keyPressEvent(QKeyEvent *event) {
 	if ((event->key() == Qt::Key_Enter) || (event->key() == Qt::Key_Return)) {
-		if (rowsfilterline->hasFocus()) {
+		if (rowsfilterline1->hasFocus() || rowsfilterline2->hasFocus()) {
 			filterRows();
 		}
     }
 
 	if ((event->modifiers() == Qt::ControlModifier) && (event->key() == Qt::Key_F)) {
-		rowsfilterline->setFocus();
+		rowsfilterline1->setFocus();
 	}
 
 	if ((event->modifiers() == Qt::ControlModifier) && (event->key() == Qt::Key_T)) {
@@ -478,10 +545,13 @@ void cBricksDatabaseWidget::openDatabase() {
 				databasemodel->item(i, 4)->setData(QVariant::fromValue(cropPrecisionToSixDecimalsByteArray(bricks[i].getMass())), Qt::DisplayRole);
 				
 				databasemodel->setItem(i, 5, new QStandardItem());
-				databasemodel->item(i, 5)->setText(bricks[i].getReferencesAsString().c_str());
+				databasemodel->item(i, 5)->setText(bricks[i].getLosses().c_str());
+
+				databasemodel->setItem(i, 6, new QStandardItem());
+				databasemodel->item(i, 6)->setText(bricks[i].getReferencesAsString().c_str());
 				
-                databasemodel->setItem(i, 6, new QStandardItem());
-				databasemodel->item(i, 6)->setText(bricks[i].getAcronymsWithReferencesAsHTMLString().c_str());
+                databasemodel->setItem(i, 7, new QStandardItem());
+				databasemodel->item(i, 7)->setText(bricks[i].getAcronymsWithReferencesAsHTMLString().c_str());
 
 				progress.setValue(i);
 				if (progress.wasCanceled()) {
@@ -505,7 +575,7 @@ void cBricksDatabaseWidget::openDatabase() {
 			}
 			database->setColumnWidth(1, 400);
 			database->setColumnWidth(2, 400);
-			database->setColumnWidth(5, 400);
+			database->setColumnWidth(6, 400);
 
 			progress.setValue(bricks.size());
 
@@ -575,6 +645,10 @@ bool cBricksDatabaseWidget::saveDatabase() {
 					break;
 				case 5:
 					s = proxymodel->index(i, j).data(Qt::DisplayRole).toString().toStdString();
+					b.setLosses(removeWhiteSpacesExceptSpaces(s));
+					break;
+				case 6:
+					s = proxymodel->index(i, j).data(Qt::DisplayRole).toString().toStdString();
 					b.setReferences(removeWhiteSpacesExceptSpaces(s));
 					break;
 				default:
@@ -620,6 +694,18 @@ bool cBricksDatabaseWidget::saveDatabaseAs() {
 }
 
 
+void cBricksDatabaseWidget::saveDatabaseCheck() {
+	QMessageBox::StandardButton reply;
+	reply = QMessageBox::question(this, appname, "Save changes ?", QMessageBox::Yes | QMessageBox::No);
+
+	if (reply == QMessageBox::No) {
+		return;
+	}
+
+	saveDatabase();
+}
+
+
 void cBricksDatabaseWidget::addRow() {
 	resetFilter();
 
@@ -635,6 +721,7 @@ void cBricksDatabaseWidget::addRow() {
 	databasemodel->setItem(row, 4, new QStandardItem());
 	databasemodel->setItem(row, 5, new QStandardItem());
 	databasemodel->setItem(row, 6, new QStandardItem());
+	databasemodel->setItem(row, 7, new QStandardItem());
 
 	database->scrollToBottom();
 }
@@ -661,17 +748,24 @@ void cBricksDatabaseWidget::itemChanged(QStandardItem* item) {
 
 	// recalculate mass when formula is changed
 	if (item->column() == 3) {
-		checkFormula(item->row(), item->text().toStdString());
+		string tmpstr = item->text().toStdString();
+		cSummaryFormula formula;
+		formula.setFormula(tmpstr);
+		if (checkFormula(item->row(), formula)) {
+			if (databasemodel->item(item->row(), 4)) {
+				databasemodel->item(item->row(), 4)->setData(QVariant::fromValue(cropPrecisionToSixDecimalsByteArray(formula.getMass())), Qt::DisplayRole);
+			}
+		}
 	}
 
 	// update references preview
-	if (((item->column() == 2) || (item->column() == 5)) && databasemodel->item(item->row(), 6)) {
+	if (((item->column() == 2) || (item->column() == 6)) && databasemodel->item(item->row(), 7)) {
 		cBrick b;
 
 		b.setAcronyms(databasemodel->item(item->row(), 2)->text().toStdString());
-		b.setReferences(databasemodel->item(item->row(), 5)->text().toStdString());
+		b.setReferences(databasemodel->item(item->row(), 6)->text().toStdString());
 
-		databasemodel->item(item->row(), 6)->setText(b.getAcronymsWithReferencesAsHTMLString().c_str());
+		databasemodel->item(item->row(), 7)->setText(b.getAcronymsWithReferencesAsHTMLString().c_str());
 	}
 
 	if (item->column() > 0) {
@@ -689,12 +783,13 @@ void cBricksDatabaseWidget::filterRows() {
 	proxymodel->setWholeWord(rowsfilterwholeword->isChecked());
 	proxymodel->setFilterKeyColumn(-1);
 	proxymodel->setFilterCaseSensitivity(rowsfiltercasesensitive->isChecked()?Qt::CaseSensitive:Qt::CaseInsensitive);
-	proxymodel->setFilterFixedString(rowsfilterline->text());
+	proxymodel->setFilterFixedString("");
 }
 
 
 void cBricksDatabaseWidget::resetFilter() {
-	rowsfilterline->setText("");
+	rowsfilterline1->setText("");
+	rowsfilterline2->setText("");
 
 	database->horizontalHeader()->setSortIndicator(-1, Qt::AscendingOrder);
 	proxymodel->sort(-1);
@@ -779,10 +874,13 @@ void cBricksDatabaseWidget::importDatabase() {
 				databasemodel->item(i + originalrowcount, 4)->setData(QVariant::fromValue(cropPrecisionToSixDecimalsByteArray(importedbricks[i].getMass())), Qt::DisplayRole);
 				
 				databasemodel->setItem(i + originalrowcount, 5, new QStandardItem());
-				databasemodel->item(i + originalrowcount, 5)->setText(importedbricks[i].getReferencesAsString().c_str());
+				databasemodel->item(i + originalrowcount, 5)->setText(importedbricks[i].getLosses().c_str());
+
+				databasemodel->setItem(i + originalrowcount, 6, new QStandardItem());
+				databasemodel->item(i + originalrowcount, 6)->setText(importedbricks[i].getReferencesAsString().c_str());
 				
-                databasemodel->setItem(i + originalrowcount, 6, new QStandardItem());
-				databasemodel->item(i + originalrowcount, 6)->setText(importedbricks[i].getAcronymsWithReferencesAsHTMLString().c_str());
+                databasemodel->setItem(i + originalrowcount, 7, new QStandardItem());
+				databasemodel->item(i + originalrowcount, 7)->setText(importedbricks[i].getAcronymsWithReferencesAsHTMLString().c_str());
 
 				bricks.push_back(importedbricks[i]);
 
@@ -808,7 +906,7 @@ void cBricksDatabaseWidget::importDatabase() {
 			}
 			database->setColumnWidth(1, 400);
 			database->setColumnWidth(2, 400);
-			database->setColumnWidth(5, 400);
+			database->setColumnWidth(6, 400);
 
 			if (progress.wasCanceled()) {
 				setDataModified(false);

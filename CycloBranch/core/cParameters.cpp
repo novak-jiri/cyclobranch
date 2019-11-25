@@ -4,6 +4,79 @@
 #include "core/cSummaryFormula.h"
 
 
+void cParameters::fixIntensities(cPeaksList& centroidspectrum, cPeaksList& profilespectrum) {
+	if ((centroidspectrum.size() == 0) || (profilespectrum.size() == 0)) {
+		return;
+	}
+
+	double minval;
+	int mem_j = 0;
+
+	for (int i = 0; i < centroidspectrum.size(); i++) {
+		minval = fabs(centroidspectrum[i].mzratio - profilespectrum[mem_j].mzratio);
+		for (int j = mem_j + 1; j < profilespectrum.size(); j++) {
+			if ((fabs(centroidspectrum[i].mzratio - profilespectrum[j].mzratio)) < minval) {
+				minval = fabs(centroidspectrum[i].mzratio - profilespectrum[j].mzratio);
+				mem_j = j;
+			}
+			else {
+				break;
+			}
+		}
+		centroidspectrum[i].absoluteintensity = profilespectrum[mem_j].absoluteintensity;
+	}
+}
+
+
+bool cParameters::checkSeniorRules(vector<int>& combarray, vector<int>& valences, int maxcomponents) {
+	int totalvalence = 0;
+	int i, size;
+
+	i = 0;
+	size = (int)combarray.size();
+	while ((i < size) && (combarray[i] > 0)) {
+		totalvalence += valences[combarray[i] - 1];
+		i++;
+	}
+
+	// SENIOR rule 1 - the sum of valences must be even
+	// SENIOR rule 3 - the sum of valences >= 2 * (atomscount - maximum number of allowed components in the graph); edges - nodes + components >= 0
+	if ((totalvalence % 2 == 1) || (totalvalence < 2 * (i - maxcomponents))) {
+		return false;
+	}
+
+	return true;
+}
+
+
+/*double cParameters::getMassAndCounts(vector<int>& combarray, vector<int>& countsofelements, vector<double>& massesofelements) {
+	int i, size;
+
+	i = 0;
+	size = (int)countsofelements.size();
+	for (i = 0; i < size; i++) {
+		countsofelements[i] = 0;
+	}
+
+	i = 0;
+	size = (int)combarray.size();
+	while ((i < size) && (combarray[i] > 0)) {
+		countsofelements[combarray[i] - 1]++;
+		i++;
+	}
+
+	double mass = 0;
+	size = (int)countsofelements.size();
+	for (i = 0; i < size; i++) {
+		if (countsofelements[i] > 0) {
+			mass += massesofelements[i] * (double)(countsofelements[i]);
+		}
+	}
+
+	return mass;
+}*/
+
+
 cParameters::cParameters() {
 	clear();
 }
@@ -30,6 +103,7 @@ void cParameters::clear() {
 	minimumrelativeintensitythreshold = 1;
 	minimumabsoluteintensitythreshold = 0;
 	minimummz = 150;
+	maximummz = 0;
 	fwhm = 0.05;
 	bricksdatabasefilename = "";
 	bricksdatabase.clear();
@@ -41,15 +115,20 @@ void cParameters::clear() {
 	modificationsfilename = "";
 	searchedmodifications.clear();
 	maximumnumberofthreads = 1;
-	mode = denovoengine;
+	mode = dereplication;
 	scoretype = number_of_matched_peaks;
 	maximumcombinedlosses = 2;
 	//clearhitswithoutparent = false;
+	basicformulacheck = true;
+	advancedformulacheck = true;
+	noratiocheck = true;
+	mzdifftolerance = 0;
+	intensitytolerance = 0;
 	reportunmatchedtheoreticalpeaks = false;
 	generateisotopepattern = false;
 	minimumpatternsize = 1;
 	minimumfeaturesize = 1;
-	allionsmustbepresent = false;
+	minimumiontypes = 1;
 	cyclicnterminus = false;
 	cycliccterminus = false;
 	internalfragments = false;
@@ -116,6 +195,15 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 	string foldername;
 	string ibdfilename;
 	string mzmlname;
+
+	cPeaksList profilelist;
+	ifstream profilestream;
+	string profilemgfname;
+	string peaksfoldername;
+
+	int hrs, mins, secs;
+	QTime time;
+	bool good;
 
 	if (peaklistfilename.empty()) {
 		error = true;
@@ -193,83 +281,67 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 
 		if (!error) {
 
-			switch (peaklistfileformat) 
-			{
-			case txt:
-				peakliststream.open(peaklistfilename);
-				break;
-			case mgf:
-				peakliststream.open(peaklistfilename);
-				break;
-			case mzXML:
-				*os << "Converting the file " + peaklistfilename + " to mgf ... ";
+			switch (peaklistfileformat) {
+				case txt:
+					peakliststream.open(peaklistfilename);
+					break;
+				case mgf:
+					peakliststream.open(peaklistfilename);
+					break;
+				case mzXML:
+					*os << "Converting the file " + peaklistfilename + " to mzML ... ";
 				
-				#if OS_TYPE == UNX
-					s = installdir.toStdString() + "External/linux/any2mgf.sh " + peaklistfilename;
-					if (system(s.c_str()) != 0) {
-						error = true;
-						errormessage = "The file cannot be converted.\n";
-						errormessage += "Does the file '" + peaklistfilename + "' exist ?\n";
-						errormessage += "Is the directory with the file '" + peaklistfilename + "' writable ?\n";
-						errormessage += "Do you have FileConverter installed (OpenMS 2.x must be installed) ?\n";
-						errormessage += "Do you have 'any2mgf.sh' file located in '" + installdir.toStdString() + "External/linux' folder ?\n";
-						errormessage += "Is the file 'any2mgf.sh' executable (sudo chmod +x " + installdir.toStdString() + "External/linux/any2mgf.sh) ? \n";
-					}
-				#else
-					#if OS_TYPE == OSX
-						s = installdir.toStdString() + "External/macosx/any2mgf.sh " + peaklistfilename;
+					#if OS_TYPE == UNX
+						s = installdir.toStdString() + "External/linux/any2mzml.sh " + peaklistfilename;
 						if (system(s.c_str()) != 0) {
 							error = true;
 							errormessage = "The file cannot be converted.\n";
 							errormessage += "Does the file '" + peaklistfilename + "' exist ?\n";
 							errormessage += "Is the directory with the file '" + peaklistfilename + "' writable ?\n";
 							errormessage += "Do you have FileConverter installed (OpenMS 2.x must be installed) ?\n";
-							errormessage += "Do you have 'any2mgf.sh' file located in '" + installdir.toStdString() + "External/macosx' folder ?\n";
-							errormessage += "Is the file 'any2mgf.sh' executable ? \n";
+							errormessage += "Do you have 'any2mzml.sh' file located in '" + installdir.toStdString() + "External/linux' folder ?\n";
+							errormessage += "Is the file 'any2mzml.sh' executable (sudo chmod +x " + installdir.toStdString() + "External/linux/any2mzml.sh) ? \n";
 						}
-					#else		
-						s = "External\\windows\\any2mgf.bat \"" + peaklistfilename + "\"";
-						if (system(s.c_str()) != 0) {
-							error = true;
-							errormessage = "The file cannot be converted.\n";
-							errormessage += "Does the file '" + peaklistfilename + "' exist ?\n";
-							errormessage += "Is the directory with the file '" + peaklistfilename + "' writable ?\n";
-							errormessage += "Do you have FileConverter installed (OpenMS 2.x must be installed) ?\n";
-							errormessage += "Do you have a path to FileConverter in your PATH variable (e.g., 'C:/Program Files/OpenMS-2.3.0/bin') ?\n";
-							errormessage += "Do you have 'any2mgf.bat' file located in the '" + appname.toStdString() + "/External/windows' folder ?\n";
-						}
+					#else
+						#if OS_TYPE == OSX
+							s = installdir.toStdString() + "External/macosx/any2mzml.sh " + peaklistfilename;
+							if (system(s.c_str()) != 0) {
+								error = true;
+								errormessage = "The file cannot be converted.\n";
+								errormessage += "Does the file '" + peaklistfilename + "' exist ?\n";
+								errormessage += "Is the directory with the file '" + peaklistfilename + "' writable ?\n";
+								errormessage += "Do you have FileConverter installed (OpenMS 2.x must be installed) ?\n";
+								errormessage += "Do you have 'any2mzml.sh' file located in '" + installdir.toStdString() + "External/macosx' folder ?\n";
+								errormessage += "Is the file 'any2mzml.sh' executable ? \n";
+							}
+						#else		
+							s = "External\\windows\\any2mzml.bat \"" + peaklistfilename + "\"";
+							if (system(s.c_str()) != 0) {
+								error = true;
+								errormessage = "The file cannot be converted.\n";
+								errormessage += "Does the file '" + peaklistfilename + "' exist ?\n";
+								errormessage += "Is the directory with the file '" + peaklistfilename + "' writable ?\n";
+								errormessage += "Do you have FileConverter installed (OpenMS 2.x must be installed) ?\n";
+								errormessage += "Do you have a path to FileConverter in your PATH variable (e.g., 'C:/Program Files/OpenMS-2.3.0/bin') ?\n";
+								errormessage += "Do you have 'any2mzml.bat' file located in the '" + appname.toStdString() + "/External/windows' folder ?\n";
+							}
+						#endif
 					#endif
-				#endif
-
-				if (!error) {
-					*os << "ok" << endl << endl;
-					peakliststream.open(peaklistfilename + ".mgf");
-				}
-				break;
-			case baf:
-				#if OS_TYPE == WIN
-					*os << "Processing the file " + peaklistfilename + ":" << endl;
-
-					*os << "centroid spectra ... ";
-					s = "External\\windows\\baf2csv.bat \"" + peaklistfilename + "\"";
-					if (system(s.c_str()) != 0) {
-						error = true;
-						errormessage = "The file cannot be converted.\n";
-						errormessage += "Does the file '" + peaklistfilename + "' exist ?\n";
-						errormessage += "Do you have Bruker Daltonik's CompassXport installed ?\n";
-						errormessage += "Do you have path to the CompassXport.exe in your PATH variable ?\n";
-						errormessage += "Is the directory with the file '" + peaklistfilename + "' writable ?\n";
-						errormessage += "Do you have 'baf2csv.bat' file located in the 'External/windows' folder ?\n";
-					}
 
 					if (!error) {
-						*os << "ok" << endl;
-						peakliststream.open(peaklistfilename + ".csv");
+						*os << "ok" << endl << endl;
+						mzmlname = peaklistfilename + ".mzML";
+						peakliststream.open(mzmlname);
 					}
+					break;
+				case baf:
+					#if OS_TYPE == WIN
+						time.start();
 
-					if (useprofiledata && convertprofiledata) {
-						*os << "profile spectra ... ";
-						s = "External\\windows\\baf2profile.bat \"" + peaklistfilename + "\"";
+						*os << "Processing the file " + peaklistfilename + ":" << endl;
+
+						/*
+						s = "External\\windows\\baf2csv.bat \"" + peaklistfilename + "\"";
 						if (system(s.c_str()) != 0) {
 							error = true;
 							errormessage = "The file cannot be converted.\n";
@@ -277,113 +349,220 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 							errormessage += "Do you have Bruker Daltonik's CompassXport installed ?\n";
 							errormessage += "Do you have path to the CompassXport.exe in your PATH variable ?\n";
 							errormessage += "Is the directory with the file '" + peaklistfilename + "' writable ?\n";
-							errormessage += "Do you have 'baf2profile.bat' file located in the 'External/windows' folder ?\n";
+							errormessage += "Do you have 'baf2csv.bat' file located in the 'External/windows' folder ?\n";
 						}
 
 						if (!error) {
 							*os << "ok" << endl;
+							peakliststream.open(peaklistfilename + ".csv");
 						}
-					}
+						*/
 
-					*os << endl;
-				#endif
-				break;
-			case raw:
-				#if OS_TYPE == WIN
-					*os << "Converting the file " + peaklistfilename + " ... ";
-					s = "External\\windows\\raw2mzml.bat \"" + peaklistfilename + "\"";
-					if (system(s.c_str()) != 0) {
-						error = true;
-						errormessage = "The file cannot be converted.\n";
-						errormessage += "Is the file '" + peaklistfilename + "' opened elsewhere ?\n";
-						errormessage += "Does the file '" + peaklistfilename + "' exist ?\n";
-						errormessage += "Is the directory with the file '" + peaklistfilename + "' writable ?\n";
-						errormessage += "Do you have msconvert.exe installed (OpenMS 2.x including ProteoWizard must be installed) ?\n";
-						errormessage += "Do you have a path to msconvert.exe in your PATH variable (e.g., 'C:/Program Files/OpenMS-2.3.0/share/OpenMS/THIRDPARTY/pwiz-bin') ?\n";
-						errormessage += "Do you have 'raw2mzml.bat' file located in the '" + appname.toStdString() + "/External/windows' folder ?\n";
-					}
-
-					if (!error) {
-						*os << "ok" << endl << endl;
-						mzmlname = peaklistfilename.substr(0, peaklistfilename.rfind('.')) + ".mzML";
+						mzmlname = peaklistfilename + ".mzML";
 						peakliststream.open(mzmlname);
-					}
-				#endif
-				break;
-			case dat:
-				#if OS_TYPE == WIN
-					foldername = peaklistfilename.substr(0, peaklistfilename.rfind('/'));
-					*os << "Converting the raw data folder " + foldername + " ... ";
-					s = "External\\windows\\waters\\raw2mgf.exe \"" + foldername + "\"";
-					if (system(s.c_str()) != 0) {
-						error = true;
-						errormessage = "The raw data folder cannot be converted.\n";
-						errormessage += "Does the folder '" + foldername + "' exist ?\n";
-						errormessage += "Is the folder with the folder '" + foldername + "' writable ?\n";
-						errormessage += "Do you have 'raw2mgf.exe' file located in the 'External/windows/waters' folder ?\n";
-					}
+						good = peakliststream.good();
+						peakliststream.close();
 
-					if (!error) {
-						*os << "ok" << endl << endl;
-						string mgfname = foldername.substr(0, foldername.rfind('.')) + ".mgf";
-						peakliststream.open(mgfname);
-					}
-				#endif
-				break;
-			case mis:
-				#if OS_TYPE == WIN
-					foldername = peaklistfilename.substr(0, peaklistfilename.rfind('.'));
-					*os << "Converting flexImaging data folder " + foldername + " ... ";
-					s = "External\\windows\\mis2csv.bat \"" + foldername + "\"";
-					if (system(s.c_str()) != 0) {
-						error = true;
-						errormessage = "The folder cannot be converted.\n";
-						errormessage += "Does the folder '" + foldername + "' exist ?\n";
-						errormessage += "Do you have Bruker Daltonik's CompassXport installed ?\n";
-						errormessage += "Do you have path to the CompassXport.exe in your PATH variable ?\n";
-						errormessage += "Is the directory with the file '" + peaklistfilename + "' writable ?\n";
-						errormessage += "Do you have 'mis2csv.bat' file located in the 'External/windows' folder ?\n";
-					}
+						if (good) {
+							*os << "The previously converted centroid spectra were found." << endl;
+							*os << "The following file was used: " << mzmlname << endl;
+						}
+						else {
+							*os << "centroid spectra ... ";
 
-					if (!error) {
-						*os << "ok" << endl << endl;
-						peakliststream.open(foldername + ".baf.csv");
-						spotliststream.open(foldername + ".baf.txt");
-					}
-				#endif
-				break;
-			case ser:
-				#if OS_TYPE == WIN
-					foldername = peaklistfilename.substr(0, peaklistfilename.length() - 4);
-					*os << "Converting apex data folder " + foldername + " ... ";
-					s = "External\\windows\\ser2csv.bat \"" + foldername + "\"";
-					if (system(s.c_str()) != 0) {
-						error = true;
-						errormessage = "The folder cannot be converted.\n";
-						errormessage += "Does the folder '" + foldername + "' exist ?\n";
-						errormessage += "Do you have Bruker Daltonik's CompassXport installed ?\n";
-						errormessage += "Do you have path to the CompassXport.exe in your PATH variable ?\n";
-						errormessage += "Is the directory with the file '" + peaklistfilename + "' writable ?\n";
-						errormessage += "Do you have 'ser2csv.bat' file located in the 'External/windows' folder ?\n";
-					}
+							s = "External\\windows\\baf2mzml.bat \"" + peaklistfilename + "\"";
+							if (system(s.c_str()) != 0) {
+								error = true;
+								errormessage = "The file cannot be converted.\n";
+								errormessage += "Does the file '" + peaklistfilename + "' exist ?\n";
+								errormessage += "Do you have Bruker Daltonik's CompassXport installed ?\n";
+								errormessage += "Do you have path to the CompassXport.exe in your PATH variable ?\n";
+								errormessage += "Is the directory with the file '" + peaklistfilename + "' writable ?\n";
+								errormessage += "Do you have 'baf2mzml.bat' file located in the 'External/windows' folder ?\n";
+							}
+							if (!error) {
+								*os << "ok" << endl;
+							}
+						}
 
-					if (!error) {
-						*os << "ok" << endl << endl;
-						peakliststream.open(foldername + ".csv");
-						titleliststream.open(foldername + ".txt");
-					}
-				#endif
-				break;
-			case mzML:
-				peakliststream.open(peaklistfilename);
-				break;
-			case imzML:
-				ibdfilename = peaklistfilename.substr(0, (int)peaklistfilename.size() - 5);
-				ibdfilename += "ibd";
-				peakliststream.open(ibdfilename, std::ifstream::binary);
-				break;
-			default:
-				break;
+						if (!error) {
+							peakliststream.open(mzmlname);
+						}
+
+						if (!error && useprofiledata && convertprofiledata) {
+							*os << "profile spectra ... ";
+							s = "External\\windows\\baf2profile.bat \"" + peaklistfilename + "\"";
+							if (system(s.c_str()) != 0) {
+								error = true;
+								errormessage = "The file cannot be converted.\n";
+								errormessage += "Does the file '" + peaklistfilename + "' exist ?\n";
+								errormessage += "Do you have Bruker Daltonik's CompassXport installed ?\n";
+								errormessage += "Do you have path to the CompassXport.exe in your PATH variable ?\n";
+								errormessage += "Is the directory with the file '" + peaklistfilename + "' writable ?\n";
+								errormessage += "Do you have 'baf2profile.bat' file located in the 'External/windows' folder ?\n";
+							}
+
+							if (!error) {
+								*os << "ok" << endl;
+							}
+						}
+
+						*os << endl;
+
+						secs = time.elapsed() / 1000;
+						mins = (secs / 60) % 60;
+						hrs = (secs / 3600);
+						secs = secs % 60;
+
+						*os << "The data conversion took: " << to_string(hrs) << " hrs, " << to_string(mins) << " min, " << to_string(secs) << " sec." << endl << endl;
+					#endif
+					break;
+				case raw:
+					#if OS_TYPE == WIN
+						*os << "Converting the file " + peaklistfilename + " ... ";
+
+						s = "External\\windows\\raw2mzmlpeaks.bat \"" + peaklistfilename + "\"";
+						if (system(s.c_str()) != 0) {
+							error = true;
+							errormessage = "The file cannot be converted.\n";
+							errormessage += "Is the file '" + peaklistfilename + "' opened elsewhere ?\n";
+							errormessage += "Does the file '" + peaklistfilename + "' exist ?\n";
+							errormessage += "Is the directory with the file '" + peaklistfilename + "' writable ?\n";
+							errormessage += "Do you have msconvert.exe installed (OpenMS 2.x including ProteoWizard must be installed) ?\n";
+							errormessage += "Do you have a path to msconvert.exe in your PATH variable (e.g., 'C:/Program Files/OpenMS-2.3.0/share/OpenMS/THIRDPARTY/pwiz-bin') ?\n";
+							errormessage += "Do you have 'raw2mzmlpeaks.bat' file located in the '" + appname.toStdString() + "/External/windows' folder ?\n";
+						}
+
+						if (!error && useprofiledata) {
+							s = "External\\windows\\raw2mzml.bat \"" + peaklistfilename + "\"";
+							if (system(s.c_str()) != 0) {
+								error = true;
+								errormessage = "The file cannot be converted.\n";
+								errormessage += "Is the file '" + peaklistfilename + "' opened elsewhere ?\n";
+								errormessage += "Does the file '" + peaklistfilename + "' exist ?\n";
+								errormessage += "Is the directory with the file '" + peaklistfilename + "' writable ?\n";
+								errormessage += "Do you have msconvert.exe installed (OpenMS 2.x including ProteoWizard must be installed) ?\n";
+								errormessage += "Do you have a path to msconvert.exe in your PATH variable (e.g., 'C:/Program Files/OpenMS-2.3.0/share/OpenMS/THIRDPARTY/pwiz-bin') ?\n";
+								errormessage += "Do you have 'raw2mzml.bat' file located in the '" + appname.toStdString() + "/External/windows' folder ?\n";
+							}
+						}
+
+						if (!error) {
+							*os << "ok" << endl << endl;
+							mzmlname = peaklistfilename.substr(0, peaklistfilename.rfind('.')) + "_converted.mzML";
+							peakliststream.open(mzmlname);
+						}
+					#endif
+					break;
+				case dat:
+					#if OS_TYPE == WIN
+						foldername = peaklistfilename.substr(0, peaklistfilename.rfind('/'));
+						peaksfoldername = foldername.substr(0, foldername.size() - 4) + "_PEAKS.raw";
+
+						*os << "Generating centroid data folder from " + foldername + " ... ";
+						s = "External\\windows\\waters\\profile2peaks.exe \"" + foldername + "\"";
+						if (system(s.c_str()) != 0) {
+							error = true;
+							errormessage = "The raw data folder cannot be converted.\n";
+							errormessage += "Does the folder '" + foldername + "' exist ?\n";
+							errormessage += "Is the folder with the folder '" + foldername + "' writable ?\n";
+							errormessage += "Do you have 'profile2peaks.exe' file located in the 'External/windows/waters' folder ?\n";
+						}
+						else {
+							*os << "ok" << endl << endl;
+							*os << "Centroid data folder " + peaksfoldername + " successfully created." << endl << endl;
+						}
+
+						if (!error) {
+							*os << "Converting profile data " + foldername + " ... ";
+							s = "External\\windows\\waters\\raw2mgf.exe \"" + foldername + "\"";
+							if (system(s.c_str()) != 0) {
+								error = true;
+								errormessage = "The raw data folder cannot be converted.\n";
+								errormessage += "Does the folder '" + foldername + "' exist ?\n";
+								errormessage += "Is the folder with the folder '" + foldername + "' writable ?\n";
+								errormessage += "Do you have 'raw2mgf.exe' file located in the 'External/windows/waters' folder ?\n";
+							}
+							else {
+								*os << "ok" << endl << endl;
+							}
+						}
+
+						if (!error) {
+							*os << "Converting centroid data " + peaksfoldername + " ... ";
+							s = "External\\windows\\waters\\raw2mgf.exe \"" + peaksfoldername + "\"";
+							if (system(s.c_str()) != 0) {
+								error = true;
+								errormessage = "The raw data folder cannot be converted.\n";
+								errormessage += "Does the folder '" + peaksfoldername + "' exist ?\n";
+								errormessage += "Is the folder with the folder '" + peaksfoldername + "' writable ?\n";
+								errormessage += "Do you have 'raw2mgf.exe' file located in the 'External/windows/waters' folder ?\n";
+							}
+							else {
+								*os << "ok" << endl << endl;
+							}
+						}
+
+						if (!error) {
+							string mgfname = peaksfoldername.substr(0, peaksfoldername.rfind('.')) + ".mgf";
+							peakliststream.open(mgfname);
+						}
+					#endif
+					break;
+				case mis:
+					#if OS_TYPE == WIN
+						foldername = peaklistfilename.substr(0, peaklistfilename.rfind('.'));
+						*os << "Converting flexImaging data folder " + foldername + " ... ";
+						s = "External\\windows\\mis2csv.bat \"" + foldername + "\"";
+						if (system(s.c_str()) != 0) {
+							error = true;
+							errormessage = "The folder cannot be converted.\n";
+							errormessage += "Does the folder '" + foldername + "' exist ?\n";
+							errormessage += "Do you have Bruker Daltonik's CompassXport installed ?\n";
+							errormessage += "Do you have path to the CompassXport.exe in your PATH variable ?\n";
+							errormessage += "Is the directory with the file '" + peaklistfilename + "' writable ?\n";
+							errormessage += "Do you have 'mis2csv.bat' file located in the 'External/windows' folder ?\n";
+						}
+
+						if (!error) {
+							*os << "ok" << endl << endl;
+							peakliststream.open(foldername + ".baf.csv");
+							spotliststream.open(foldername + ".baf.txt");
+						}
+					#endif
+					break;
+				case ser:
+					#if OS_TYPE == WIN
+						foldername = peaklistfilename.substr(0, peaklistfilename.length() - 4);
+						*os << "Converting apex data folder " + foldername + " ... ";
+						s = "External\\windows\\ser2csv.bat \"" + foldername + "\"";
+						if (system(s.c_str()) != 0) {
+							error = true;
+							errormessage = "The folder cannot be converted.\n";
+							errormessage += "Does the folder '" + foldername + "' exist ?\n";
+							errormessage += "Do you have Bruker Daltonik's CompassXport installed ?\n";
+							errormessage += "Do you have path to the CompassXport.exe in your PATH variable ?\n";
+							errormessage += "Is the directory with the file '" + peaklistfilename + "' writable ?\n";
+							errormessage += "Do you have 'ser2csv.bat' file located in the 'External/windows' folder ?\n";
+						}
+
+						if (!error) {
+							*os << "ok" << endl << endl;
+							peakliststream.open(foldername + ".csv");
+							titleliststream.open(foldername + ".txt");
+						}
+					#endif
+					break;
+				case mzML:
+					peakliststream.open(peaklistfilename);
+					break;
+				case imzML:
+					ibdfilename = peaklistfilename.substr(0, (int)peaklistfilename.size() - 5);
+					ibdfilename += "ibd";
+					peakliststream.open(ibdfilename, std::ifstream::binary);
+					break;
+				default:
+					break;
 			}
 
 		}
@@ -404,7 +583,7 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 				}
 			}
 			else {
-				if (os && (peaklistfileformat != mzML) && (peaklistfileformat != imzML) && (peaklistfileformat != raw) && (peaklistfileformat != ser)) {
+				if (os && (peaklistfileformat != mzML) && (peaklistfileformat != mzXML) && (peaklistfileformat != imzML) && (peaklistfileformat != baf) && (peaklistfileformat != raw) && (peaklistfileformat != ser)) {
 					*os << "Loading the peaklist(s)... ";
 				}
 				switch (peaklistfileformat) {
@@ -412,12 +591,57 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 					peaklistseries.loadFromPlainTextStream(peakliststream);
 					break;
 				case mzXML:
+					errtype = peaklistseries.loadFromMZMLStream(mzmlname, peakliststream, fwhm, mode, os, terminatecomputation);
+					if (errtype == -1) {
+						error = true;
+						errormessage = "Aborted by user.\n";
+					}
+					if (errtype == -2) {
+						error = true;
+						#if OS_TYPE == UNX
+							errormessage = "Raw data cannot be converted.\n";
+							errormessage += "Does the file '" + mzmlname + "' exist ?\n";
+							errormessage += "Is the directory with the file '" + mzmlname + "' writable ?\n";
+							errormessage += "Do you have enough space on your hard drive ?\n";
+							errormessage += "Do you have OpenMS 2.x installed ?\n";
+							errormessage += "Do you have 'raw2peaks.sh' file located in '" + installdir.toStdString() + "External/linux' folder ?\n";
+							errormessage += "Is the file 'raw2peaks.sh' executable (sudo chmod +x " + installdir.toStdString() + "External/linux/raw2peaks.sh) ? \n";
+						#else
+							#if OS_TYPE == OSX
+								errormessage = "Raw data cannot be converted.\n";
+								errormessage += "Does the file '" + mzmlname + "' exist ?\n";
+								errormessage += "Is the directory with the file '" + mzmlname + "' writable ?\n";
+								errormessage += "Do you have enough space on your hard drive ?\n";
+								errormessage += "Do you have OpenMS 2.x installed ?\n";
+								errormessage += "Do you have 'raw2peaks.sh' file located in '" + installdir.toStdString() + "External/macosx' folder ?\n";
+								errormessage += "Is the file 'raw2peaks.sh' executable (sudo chmod +x " + installdir.toStdString() + "External/macosx/raw2peaks.sh) ? \n";
+							#else		
+								errormessage = "Raw data cannot be converted.\n";
+								errormessage += "Does the file '" + mzmlname + "' exist ?\n";
+								errormessage += "Is the directory with the file '" + mzmlname + "' writable ?\n";
+								errormessage += "Do you have enough space on your hard drive ?\n";
+								errormessage += "Do you have OpenMS 2.x installed ?\n";
+								errormessage += "Do you have a path to OpenMS binaries folder in your PATH variable (e.g., 'C:/Program Files/OpenMS-2.3.0/bin') ?\n";
+								errormessage += "Do you have 'raw2peaks.bat' file located in the '" + appname.toStdString() + "/External/windows' folder ?\n";
+							#endif
+						#endif
+					}
+					break;
 				case mgf:
 					peaklistseries.loadFromMGFStream(peakliststream);
 					break;
 				case baf:
+					/*
 					#if OS_TYPE == WIN
 						peaklistseries.loadFromBAFStream(peakliststream);
+					#endif
+					*/
+					#if OS_TYPE == WIN
+						errtype = peaklistseries.loadFromMZMLStream(mzmlname, peakliststream, fwhm, mode, os, terminatecomputation);
+						if (errtype == -1) {
+							error = true;
+							errormessage = "Aborted by user.\n";
+						}
 					#endif
 					break;
 				case raw:
@@ -437,15 +661,29 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 							errormessage += "Do you have a path to OpenMS binaries folder in your PATH variable (e.g., 'C:/Program Files/OpenMS-2.3.0/bin') ?\n";
 							errormessage += "Do you have 'raw2peaks.bat' file located in the '" + appname.toStdString() + "/External/windows' folder ?\n";
 						}
-						if (errtype == -3) {
-							error = true;
-							errormessage = "Failed to load the mzML file, zlib compression is not supported. The spectra must be stored in the mzML file with the attribute \"no compression\".\n";
-						}
 					#endif
 					break;
 				case dat:
 					#if OS_TYPE == WIN
 						peaklistseries.loadFromMGFStream(peakliststream);
+
+						profilemgfname = foldername.substr(0, foldername.rfind('.')) + ".mgf";
+						profilestream.open(profilemgfname);
+
+						for (int i = 0; i < peaklistseries.size(); i++) {
+							profilelist.clear();
+							profilelist.loadFromMGFStream(profilestream);
+
+							if (peaklistseries[i].getTitle().compare(profilelist.getTitle()) != 0) {
+								error = true;
+								errormessage = "The number of spectra in " + foldername + " and " + peaksfoldername + " is different.\n";
+								break;
+							}
+
+							fixIntensities(peaklistseries[i], profilelist);
+						}
+
+						profilestream.close();
 					#endif
 					break;
 				case mis:
@@ -511,10 +749,6 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 							#endif
 						#endif
 					}
-					if (errtype == -3) {
-						error = true;
-						errormessage = "Failed to load the mzML file, zlib compression is not supported. The spectra must be stored in the mzML file with the attribute \"no compression\".\n";
-					}
 					break;
 				case imzML:
 					errtype = peaklistseries.loadFromIMZMLStream(peaklistfilename, peakliststream, fwhm, defaultmaxx, defaultmaxy, defaultpixelsizex, defaultpixelsizey, vendor, os, terminatecomputation);
@@ -560,7 +794,7 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 				default:
 					break;
 				}
-				if (os && (peaklistfileformat != mzML) && (peaklistfileformat != imzML) && (peaklistfileformat != raw) && (peaklistfileformat != ser)) {
+				if (os && (peaklistfileformat != mzML) && (peaklistfileformat != mzXML) && (peaklistfileformat != imzML) && (peaklistfileformat != baf) && (peaklistfileformat != raw) && (peaklistfileformat != ser)) {
 					*os << "ok" << endl << endl;
 				}
 			}
@@ -571,7 +805,7 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 
 
 	// bricksdatabase check
-	if (!error && ((mode == denovoengine) || (mode == singlecomparison) || (mode == databasesearch))) {
+	if (!error && ((mode == denovoengine) || ((mode == singlecomparison) && (peptidetype != other)) || ((mode == databasesearch) && (peptidetype != other)))) {
 
 		bricksdatabasestream.open(bricksdatabasefilename);
 		if (!bricksdatabasestream.good()) {
@@ -622,7 +856,7 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 
 
 	// modifications check
-	if (!error && ((mode == denovoengine) || (mode == singlecomparison) || (mode == databasesearch))) {
+	if (!error && ((mode == denovoengine) || (mode == singlecomparison) || ((mode == databasesearch) && (peptidetype != other)))) {
 
 		searchedmodifications.clear();
 
@@ -734,7 +968,7 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 
 
 	// check theoretical fragments in positive/negative mode
-	if (!error && (mode == dereplication)) {
+	if (!error && ((mode == dereplication) || (mode == compoundsearch))) {
 		i = 0;
 		while (i < (int)ionsfortheoreticalspectra.size()) {
 			if (iondefinitions[ionsfortheoreticalspectra[i]].positive != (precursorcharge > 0)) {
@@ -747,11 +981,44 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 	}
 
 
-	// calculate combinations of neutral losses
+	// report errors and return
+	if (error) {
+		if (os) {
+			*os << endl << endl;
+			*os << "Error: " << errormessage.c_str() << endl;
+			*os << endl;
+			*os << endl;
+		}
+		return -1;
+	}
+
+
+	return 0;
+}
+
+
+int cParameters::prepareLossesAndCompounds(bool& terminatecomputation) {
+	bool error = false;
+	string errormessage = "";
+	int errtype;
+
+
+	// calculate combinations of neutral losses or generate compounds
+	neutrallossesdefinitions.clear();
+	neutrallossesfortheoreticalspectra.clear();
+	numberofgeneratedneutrallosses = 0;
 	if (!error) {
-		errtype = calculateNeutralLosses(terminatecomputation, errormessage);
-		if (errtype == -1) {
-			error = true;
+		if ((mode == denovoengine) || (mode == singlecomparison) || (mode == databasesearch) || (mode == dereplication)) {
+			errtype = calculateNeutralLosses(terminatecomputation, errormessage);
+			if (errtype == -1) {
+				error = true;
+			}
+		}
+		else if (mode == compoundsearch) {
+			errtype = generateCompounds(terminatecomputation, errormessage); // uses ionsfortheoreticalspectra
+			if (errtype == -1) {
+				error = true;
+			}
 		}
 	}
 
@@ -835,20 +1102,23 @@ string cParameters::printToString() {
 
 	s += "Mode: ";
 	switch ((eModeType)mode) {
-	case denovoengine:
-		s += "De Novo Search Engine";
-		break;
-	case singlecomparison:
-		s += "Compare Peaklist(s) with Spectrum of Searched Sequence";
-		break;
-	case databasesearch:
-		s += "Compare Peaklist with Database - MS/MS data";
-		break;
-	case dereplication:
-		s += "Compare Peaklist(s) with Database - MS or MSI data";
-		break;
-	default:
-		break;
+		case denovoengine:
+			s += "De Novo Search Engine - MS/MS";
+			break;
+		case singlecomparison:
+			s += "Compare Peaklist(s) with Spectrum of Searched Sequence - MS/MS";
+			break;
+		case databasesearch:
+			s += "Compare Peaklist with Database - MS/MS";
+			break;
+		case dereplication:
+			s += "Compare Peaklist(s) with Database - MS, LC-MS, MSI";
+			break;
+		case compoundsearch:
+			s += "Compound Search - MS, LC-MS, MSI";
+			break;
+		default:
+			break;
 	}
 	s += "\n";
 
@@ -897,6 +1167,7 @@ string cParameters::printToString() {
 	s += "Minimum Threshold of Relative Intensity: " + to_string(minimumrelativeintensitythreshold) + "\n";
 	s += "Minimum Threshold of Absolute Intensity: " + to_string(minimumabsoluteintensitythreshold) + "\n";
 	s += "Minimum m/z Ratio: " + to_string(minimummz) + "\n";
+	s += "Maximum m/z Ratio: " + to_string(maximummz) + "\n";
 	s += "FWHM: " + to_string(fwhm) + "\n";
 	s += "Building Blocks Database File: " + bricksdatabasefilename + "\n";
 	s += "Maximum Number of Combined Blocks (start, middle, end): " + to_string(maximumbricksincombinationbegin) + ", " + to_string(maximumbricksincombinationmiddle) + ", " + to_string(maximumbricksincombinationend) + "\n";
@@ -981,7 +1252,7 @@ string cParameters::printToString() {
 	}
 	s += "\n";
 
-	s += "Neutral Losses: ";
+	s += "Neutral Losses / Chemical Elements: ";
 	for (int i = 0; i < (int)originalneutrallossesfortheoreticalspectra.size(); i++) {
 		s += originalneutrallossesdefinitions[originalneutrallossesfortheoreticalspectra[i]].summary;
 		if (i < (int)originalneutrallossesfortheoreticalspectra.size() - 1) {
@@ -990,7 +1261,7 @@ string cParameters::printToString() {
 	}
 	s += "\n";
 
-	s += "Maximum Number of Combined Neutral Losses: " + to_string(maximumcombinedlosses) + "\n";
+	s += "Maximum Number of Combined Neutral Losses/Elements: " + to_string(maximumcombinedlosses) + "\n";
 
 	//s += "Remove Hits of Fragments without Hits of Parent Fragments: ";
 	//s += clearhitswithoutparent ? "on" : "off";
@@ -1004,18 +1275,33 @@ string cParameters::printToString() {
 	s += generateisotopepattern ? "on" : "off";
 	s += "\n";
 	
-	s += "Minimum Pattern Size: " + to_string(minimumpatternsize) + "\n";
+	s += "Minimum Number of Isotopic Peaks: " + to_string(minimumpatternsize) + "\n";
 
-	s += "Minimum Feature Size: " + to_string(minimumfeaturesize) + "\n";
+	s += "Minimum Number of Spectra: " + to_string(minimumfeaturesize) + "\n";
 
-	s += "All Ions Must be Annotated: ";
-	s += allionsmustbepresent ? "on" : "off";
+	s += "Minimum Number of Ion Types: " + to_string(minimumiontypes) + "\n";
+
+	s += "Basic Formula Check: ";
+	s += basicformulacheck ? "on" : "off";
 	s += "\n";
+
+	s += "Advanced Formula Check: ";
+	s += advancedformulacheck ? "on" : "off";
+	s += "\n";
+
+	s += "N/O Ratio Check: ";
+	s += noratiocheck ? "on" : "off";
+	s += "\n";
+
+	s += "Isotope m/z Tolerance: " + to_string(mzdifftolerance) + "\n";
+
+	s += "Isotope Intensity Tolerance: " + to_string(intensitytolerance) + "\n";
 
 	s += "Searched Sequence: " + originalsearchedsequence + "\n";
 	s += "N-terminal Modification: " + searchedsequenceNtermmodif + "\n";
 	s += "C-terminal Modification: " + searchedsequenceCtermmodif + "\n";
 	s += "Branch Modification: " + searchedsequenceTmodif + "\n";
+	s += "Formula: " + searchedsequenceformula + "\n";
 
 	s += "\n";
 
@@ -1051,20 +1337,23 @@ int cParameters::calculateNeutralLosses(bool& terminatecomputation, string& erro
 	cSummaryFormula tmpformula;
 	string tmpstring;
 	neutralLoss loss;
-	int i;
 
 	cBricksDatabase neutrallossesbrickdatabase;
 	cBrick tmpbrick;
+	string tmpstr;
+	vector<int> valences;
+	bool validvalences = false;
+
+	vector<int> limitsofelements;
+	vector<int> countsofelements;
+	vector<double> massesofelements;
+
 	int numberofbasicbricks = 0;
-	string compositionname;
-	vector<int> intcomposition;
+
+	double sumofmasses;
 
 	int compressionlimit = 100000;
 	bool compressformulas;
-
-	bool undefinedelement;
-	int valence;
-	int atomscount;
 
 	//int stringsizeest = 0;
 	//int mapsizeest = 0;
@@ -1075,13 +1364,20 @@ int cParameters::calculateNeutralLosses(bool& terminatecomputation, string& erro
 		*os << "Calculating combinations of neutral losses... " << endl;
 	}
 
-	for (i = 0; i < (int)originalneutrallossesfortheoreticalspectra.size(); i++) {
-		tmpformula.setFormula(originalneutrallossesdefinitions[originalneutrallossesfortheoreticalspectra[i]].summary, false);
+	for (int i = 0; i < (int)originalneutrallossesfortheoreticalspectra.size(); i++) {
+		tmpstr = originalneutrallossesdefinitions[originalneutrallossesfortheoreticalspectra[i]].summary;
+
+		if (tmpstr.rfind(':') != string::npos) {
+			tmpstr = tmpstr.substr(0, tmpstr.rfind(':'));
+		}
+
+		tmpformula.setFormula(tmpstr, false);
 
 		tmpbrick.clear();
+		tmpbrick.setName(originalneutrallossesdefinitions[originalneutrallossesfortheoreticalspectra[i]].summary);
 		tmpbrick.setComposition(to_string(numberofbasicbricks + 1), false);
 		tmpbrick.setMass(tmpformula.getMass());
-		tmpbrick.setSummary(originalneutrallossesdefinitions[originalneutrallossesfortheoreticalspectra[i]].summary);
+		tmpbrick.setSummary(tmpstr);
 		tmpbrick.createSummaryMap();
 
 		neutrallossesbrickdatabase.push_back(tmpbrick);
@@ -1091,75 +1387,168 @@ int cParameters::calculateNeutralLosses(bool& terminatecomputation, string& erro
 
 	neutrallossesbrickdatabase.sortbyMass();
 
+	for (int i = 0; i < neutrallossesbrickdatabase.size(); i++) {
+		countsofelements.push_back(0);
+		massesofelements.push_back(neutrallossesbrickdatabase[i].getMass());
+
+		tmpstr = neutrallossesbrickdatabase[i].getName();
+		if (tmpstr.rfind(':') != string::npos) {
+			tmpstr = tmpstr.substr(tmpstr.rfind(':') + 1);
+			limitsofelements.push_back(QVariant(tmpstr.c_str()).toInt());
+		}
+		else {
+			limitsofelements.push_back(0);
+		}
+
+		tmpstr = neutrallossesbrickdatabase[i].getSummary();
+
+		if (tmpstr.compare("H") == 0) {
+			valences.push_back(1);
+		}
+
+		if (tmpstr.compare("C") == 0) {
+			valences.push_back(4);
+		}
+
+		if (tmpstr.compare("O") == 0) {
+			valences.push_back(2);
+		}
+
+		if (tmpstr.compare("N") == 0) {
+			valences.push_back(3);
+		}
+
+		if (tmpstr.compare("S") == 0) {
+			valences.push_back(6);
+		}
+
+		if (tmpstr.compare("P") == 0) {
+			valences.push_back(5);
+		}
+
+		if (tmpstr.compare("Li") == 0) {
+			valences.push_back(1);
+		}
+
+		if (tmpstr.compare("Na") == 0) {
+			valences.push_back(1);
+		}
+
+		if (tmpstr.compare("K") == 0) {
+			valences.push_back(1);
+		}
+
+		if (tmpstr.compare("F") == 0) {
+			valences.push_back(1);
+		}
+
+		if (tmpstr.compare("Cl") == 0) {
+			valences.push_back(1);
+		}
+
+		if (tmpstr.compare("Br") == 0) {
+			valences.push_back(1);
+		}
+
+		if (tmpstr.compare("I") == 0) {
+			valences.push_back(1);
+		}
+
+		if (tmpstr.compare("Si") == 0) {
+			valences.push_back(4);
+		}
+	}
+
+	if (basicformulacheck && (neutrallossesbrickdatabase.size() > 0) && (neutrallossesbrickdatabase.size() == valences.size())) {
+		validvalences = true;
+
+		if (os) {
+			*os << "Filtering using Senior's rules has been enabled." << endl;
+		}
+	}
+
 	vector<int> combarray;
-	for (i = 0; i < maximumcombinedlosses; i++) {
+	for (int i = 0; i < maximumcombinedlosses; i++) {
 		combarray.push_back(0);
 	}
 
 	map<string, int> atoms;
-	map<int, int> counts;
 	vector<int> max_counts;
 	bool skipcombination;
 	bool bruteforce = false;
 
-	if (mode == singlecomparison) {
+	if ((mode == singlecomparison) || (mode == databasesearch)) {
 
-		bruteforce = true;
-		for (i = 0; i < neutrallossesbrickdatabase.size(); i++) {
-			if (neutrallossesbrickdatabase[i].getSummaryMap().size() == 1) {
-				auto it = neutrallossesbrickdatabase[i].getSummaryMap().begin();
-				if (it->second != 1) {
+		if ((peptidetype == other) && (neutrallossesbrickdatabase.size() > 0)) {
+
+			bruteforce = true;
+			for (int i = 0; i < neutrallossesbrickdatabase.size(); i++) {
+				if (neutrallossesbrickdatabase[i].getSummaryMap().size() == 1) {
+					auto it = neutrallossesbrickdatabase[i].getSummaryMap().begin();
+					if (it->second != 1) {
+						bruteforce = false;
+						break;
+					}
+				}
+				else {
 					bruteforce = false;
 					break;
 				}
 			}
-			else {
-				bruteforce = false;
-				break;
-			}
+
 		}
 
+	}
+
+	if (mode == singlecomparison) {
+			
 		// calculate molecular formula of searched sequence
 		if (bruteforce) {
 
 			*os << "Brute force fragmentation enabled. Maximum numbers of elements: " << endl;
 
-			string upperboundsequence = searchedsequence;
+			string formulastr;
+			if (peptidetype == other) {
+				formulastr = searchedsequenceformula;
+			}
+			else {
+				string upperboundsequence = searchedsequence;
 
-			if (!checkRegex(peptidetype, upperboundsequence, errormessage)) {
-				return -1;
+				//if (!checkRegex(peptidetype, upperboundsequence, errormessage)) {
+				//	return -1;
+				//}
+
+				//if (!bricksdatabase.replaceAcronymsByIDs(upperboundsequence, errormessage)) {
+				//	return -1;
+				//}
+
+				cSequence tmpsequence;
+				tmpsequence.setNTterminalModification(searchedsequenceNtermmodif);
+				tmpsequence.setCTterminalModification(searchedsequenceCtermmodif);
+				tmpsequence.setBranchModification(searchedsequenceTmodif);
+				tmpsequence.setPeptideType(peptidetype);
+
+				int startmodifid, endmodifid, middlemodifid;
+				if (!checkModifications(tmpsequence, startmodifid, endmodifid, middlemodifid, errormessage)) {
+					return -1;
+				}
+
+				int branchstart, branchend;
+				vector<string> v;
+				cCandidate c;
+				vector<nodeEdge> netmp;
+
+				parseBranch(peptidetype, upperboundsequence, v, branchstart, branchend);
+				// startmodifid, endmodifid and middlemodifid were filled up by checkModifications
+				c.setCandidate(v, netmp, fragmentIonTypeEnd, startmodifid, endmodifid, middlemodifid, branchstart, branchend);
+				cSummaryFormula formula = c.calculateSummaryFormulaFromBricks(*this, peptidetype, precursormass);
+
+				formulastr = formula.getSummary();
 			}
 
-			if (!bricksdatabase.replaceAcronymsByIDs(upperboundsequence, errormessage)) {
-				return -1;
-			}
-
-			cSequence tmpsequence;
-			tmpsequence.setNTterminalModification(searchedsequenceNtermmodif);
-			tmpsequence.setCTterminalModification(searchedsequenceCtermmodif);
-			tmpsequence.setBranchModification(searchedsequenceTmodif);
-			tmpsequence.setPeptideType(peptidetype);
-
-			int startmodifid, endmodifid, middlemodifid;
-			if (!checkModifications(tmpsequence, startmodifid, endmodifid, middlemodifid, errormessage)) {
-				return -1;
-			}
-
-			int branchstart, branchend;
-			vector<string> v;
-			cCandidate c;
-			vector<nodeEdge> netmp;
-
-			parseBranch(peptidetype, upperboundsequence, v, branchstart, branchend);
-			// startmodifid, endmodifid and middlemodifid were filled up by checkModifications
-			c.setCandidate(v, netmp, fragmentIonTypeEnd, startmodifid, endmodifid, middlemodifid, branchstart, branchend);
-			cSummaryFormula formula = c.calculateSummaryFormula(*this, peptidetype, precursormass);
-
-			string formulastr = formula.getSummary();
 			addStringFormulaToMap(formulastr, atoms);
 
-			string tmpstr;
-			for (i = 0; i < neutrallossesbrickdatabase.size(); i++) {
+			for (int i = 0; i < neutrallossesbrickdatabase.size(); i++) {
 				tmpstr = neutrallossesbrickdatabase[i].getSummary();
 				if (atoms.count(tmpstr) == 1) {
 					max_counts.push_back(atoms[tmpstr]);
@@ -1174,9 +1563,73 @@ int cParameters::calculateNeutralLosses(bool& terminatecomputation, string& erro
 
 	}
 
-	i = 0;
+	if ((mode == databasesearch) && (peptidetype == other)) {
+
+		if (bruteforce) {
+
+			*os << "Brute force fragmentation enabled. Maximum numbers of elements: " << endl;
+
+			for (int j = 0; j < neutrallossesbrickdatabase.size(); j++) {
+				max_counts.push_back(0);
+			}
+		
+			int i = 0;
+			while (i < sequencedatabase.size()) {
+				tmpformula.setFormula(sequencedatabase[i].getSummaryFormula());
+				tmpstr = "H+";
+				tmpformula.addFormula(tmpstr);
+				tmpstr = (precursorcharge > 0) ? "" : "H-2+-2";
+				tmpformula.addFormula(tmpstr);
+				tmpstr = precursoradduct.empty() ? "" : "H-1";
+				tmpformula.addFormula(tmpstr);
+				tmpstr = precursoradduct;
+				tmpformula.addFormula(tmpstr);
+
+				if (similaritysearch || isInPpmMassErrorTolerance(charge(uncharge(precursormass, precursorcharge), (precursorcharge > 0) ? 1 : -1), tmpformula.getMass(), precursormasserrortolerance)) {
+					atoms.clear();
+					tmpstr = tmpformula.getSummary();
+					tmpstr += (precursorcharge > 0) ? "H-1+-1" : "H+";
+					addStringFormulaToMap(tmpstr, atoms);
+
+					for (int j = 0; j < neutrallossesbrickdatabase.size(); j++) {
+						tmpstr = neutrallossesbrickdatabase[j].getSummary();
+						if ((atoms.count(tmpstr) == 1) && (atoms[tmpstr] > max_counts[j])) {
+							max_counts[j] = atoms[tmpstr];
+						}
+					}
+
+					i++;
+				}
+				else {
+					sequencedatabase.erase(i);
+				}
+			}
+
+			for (int j = 0; j < neutrallossesbrickdatabase.size(); j++) {
+				tmpstr = neutrallossesbrickdatabase[j].getSummary();
+				*os << tmpstr << ": " << max_counts[j] << endl;
+			}
+	
+		}
+	
+	}
+
+	// to do - change to unsigned long long
+	int ii = 0;
 	compressformulas = false;
-	while (neutrallossesbrickdatabase.nextCombination(combarray, numberofbasicbricks, maximumcombinedlosses, 0, uncharge(precursormass, precursorcharge) - minimummz)) {
+
+	if (bruteforce && (peptidetype == other) && ((mode == databasesearch) || (mode == singlecomparison))) {
+		compressionlimit = 0;
+		compressformulas = true;
+	}
+
+	double crop = uncharge(precursormass, precursorcharge) - minimummz;
+	if (mode == dereplication) {
+		crop = 0;
+	}
+
+	//while (neutrallossesbrickdatabase.nextCombination(combarray, numberofbasicbricks, maximumcombinedlosses, 0, uncharge(precursormass, precursorcharge) - minimummz)) {
+	while (neutrallossesbrickdatabase.nextCombinationFastLimited(combarray, countsofelements, limitsofelements, massesofelements, sumofmasses, numberofbasicbricks, maximumcombinedlosses, 0, crop)) {
 		if (terminatecomputation) {
 			neutrallossesdefinitions.clear();
 			neutrallossesfortheoreticalspectra.clear();
@@ -1186,23 +1639,9 @@ int cParameters::calculateNeutralLosses(bool& terminatecomputation, string& erro
 		}
 
 		if (bruteforce) {
-			counts.clear();
-			int cnt = 0;
-			for (int j = 0; j < maximumcombinedlosses; j++) {
-				if (combarray[j] == 0) {
-					break;
-				}
-				if (counts.count(combarray[j]) > 0) {
-					counts[combarray[j]]++;
-				}
-				else {
-					counts[combarray[j]] = 1;
-				}
-			}
-
 			skipcombination = false;
-			for (auto& it : counts) {
-				if (it.second > max_counts[it.first - 1]) {
+			for (int j = 0; j < numberofbasicbricks; j++) {
+				if (countsofelements[j] > max_counts[j]) {
 					skipcombination = true;
 					break;
 				}
@@ -1213,62 +1652,22 @@ int cParameters::calculateNeutralLosses(bool& terminatecomputation, string& erro
 			}
 		}
 
-		getNameOfCompositionFromIntVector(compositionname, combarray);
-
-		tmpbrick.clear();
-		tmpbrick.setComposition(compositionname, true);
-		tmpbrick.setMass(neutrallossesbrickdatabase.getMassOfComposition(combarray, numberofbasicbricks));
-
-		loss.clear();
-		loss.massdifference = -tmpbrick.getMass();
-
-		intcomposition.clear();
-		tmpbrick.explodeToIntComposition(intcomposition);
-		for (int j = 0; j < (int)intcomposition.size(); j++) {
-			loss.summary += neutrallossesbrickdatabase[intcomposition[j] - 1].getSummary();
-		}
-
-		tmpformula.clear();
-		tmpformula.addFormula(loss.summary, true);
-		tmpstring = tmpformula.getSummary();
-		addStringFormulaToMap(tmpstring, loss.summarymap);
-
-		undefinedelement = false;
-		for (auto it = loss.summarymap.begin(); it != loss.summarymap.end(); ++it) {
-			if ((it->first.compare("H") != 0) && (it->first.compare("C") != 0) && (it->first.compare("O") != 0) && (it->first.compare("N") != 0) && (it->first.compare("S") != 0)) {
-				undefinedelement = true;
-				break;
+		if (validvalences) {
+			if (!checkSeniorRules(combarray, valences, 10)) {
+				continue;
 			}
 		}
 
-		valence = 0;
-		atomscount = 0;
-		if (loss.summarymap.count("H") > 0) {
-			valence += -loss.summarymap["H"];
-			atomscount += -loss.summarymap["H"];
-		}
-		if (loss.summarymap.count("C") > 0) {
-			valence += -loss.summarymap["C"] * 4;
-			atomscount += -loss.summarymap["C"];
-		}
-		if (loss.summarymap.count("O") > 0) {
-			valence += -loss.summarymap["O"] * 2;
-			atomscount += -loss.summarymap["O"];
-		}
-		if (loss.summarymap.count("N") > 0) {
-			valence += -loss.summarymap["N"] * 3;
-			atomscount += -loss.summarymap["N"];
-		}
-		if (loss.summarymap.count("S") > 0) {
-			valence += -loss.summarymap["S"] * 6; /* the maximum valence state is used */
-			atomscount += -loss.summarymap["S"];
-		}
+		loss.clear();
+		loss.massdifference = -sumofmasses;
 
-		// SENIOR rule 1 - the sum of valences must be even
-		// SENIOR rule 3 - the sum of valences >= 2 * (atomscount - maximum number of allowed components in the graph); edges - nodes + components >= 0
-		if (!undefinedelement && ((valence % 2 == 1) || (valence < 2 * (atomscount - 10)))) {
-			//pruned++;
-			continue;
+		for (int j = 0; j < (int)combarray.size(); j++) {
+			if ((combarray[j] > 0) && (combarray[j] <= numberofbasicbricks)) {
+				loss.summary += neutrallossesbrickdatabase[combarray[j] - 1].getSummary();
+			}
+			else {
+				break;
+			}
 		}
 
 		if (compressformulas) {
@@ -1277,28 +1676,33 @@ int cParameters::calculateNeutralLosses(bool& terminatecomputation, string& erro
 			loss.summary = tmpformula.getSummary();
 		}
 
+		tmpformula.clear();
+		tmpformula.addFormula(loss.summary, true);
+		tmpstring = tmpformula.getSummary();
+		addStringFormulaToMap(tmpstring, loss.summarymap);
+
 		//stringsizeest += sizeof(string) + loss.summary.size();
 		//mapsizeest += sizeof(loss.summarymap) + loss.summarymap.size() * (sizeof(string) /* the length of string is 1 for HCONS */ + sizeof(int));
 		//doublesizeest += sizeof(double);
 
 		neutrallossesdefinitions.push_back(loss);
-		neutrallossesfortheoreticalspectra.push_back(i);
+		neutrallossesfortheoreticalspectra.push_back(ii);
 
-		i++;
+		ii++;
 
-		if (i == compressionlimit) {
+		if (ii == compressionlimit) {
 			compressformulas = true;
 		}
 
-		if (i % 100000 == 0) {
+		if (ii % 100000 == 0) {
 			if (os) {
-				*os << i << " ";
+				*os << ii << " ";
 			}
 
-			//cout << i << " " << pruned << " - " << stringsizeest << " " << mapsizeest << " " << doublesizeest << " " << stringsizeest + mapsizeest + doublesizeest << endl;
+			//cout << ii << " " << pruned << " - " << stringsizeest << " " << mapsizeest << " " << doublesizeest << " " << stringsizeest + mapsizeest + doublesizeest << endl;
 		}
 
-		if (i % 1000000 == 0) {
+		if (ii % 1000000 == 0) {
 			if (os) {
 				*os << endl;
 			}
@@ -1326,6 +1730,701 @@ int cParameters::calculateNeutralLosses(bool& terminatecomputation, string& erro
 				return -1;
 			}
 		}
+	}
+
+	return 0;
+}
+
+
+int cParameters::generateCompounds(bool& terminatecomputation, string& errormessage) {
+	sequencedatabase.clear();
+	unsigned long long compoundsgenerated = 0;
+	unsigned long long compoundsused = 0;
+	unsigned long long compoundslimit = 5000000;
+
+	errormessage = "";
+
+	if (maximumcombinedlosses == 0) {
+		return 0;
+	}
+
+	cSequence seq;
+	cSummaryFormula tmpformula;
+	int size;
+
+	cBricksDatabase elementsbrickdatabase;
+	cBrick tmpbrick;
+	string tmpstr, tmpstr2;
+	vector<int> valences;
+	bool validvalences = false;
+
+	vector<int> limitsofelements;
+	vector<int> countsofelements;
+	vector<double> massesofelements;
+	vector<string> namesofelements;
+	double elementsratio;
+
+	int numberofbasicbricks = 0;
+
+	double sumofmasses;
+	double tmpmzdifference;
+	bool alloutofmz;
+	int featureshint;
+	int compoundshint;
+	bool hintend;
+
+	double minadd = 0;
+	//double maxadd = 0;
+
+	int countH;
+	int countC;
+	int countO;
+	int countN;
+	int countS;
+	int countP;
+	int countF;
+	int countCl;
+	int countBr;
+	int countSi;
+
+	bool lcms = (peaklistseries.size() > 1) && !((peaklistfileformat == mis) || (peaklistfileformat == imzML));
+
+	if (os) {
+		*os << "Generating compounds... " << endl;
+	}
+
+	for (int i = 0; i < (int)originalneutrallossesfortheoreticalspectra.size(); i++) {
+		tmpstr = originalneutrallossesdefinitions[originalneutrallossesfortheoreticalspectra[i]].summary;
+
+		if (tmpstr.rfind(':') != string::npos) {
+			tmpstr = tmpstr.substr(0, tmpstr.rfind(':'));
+		}
+
+		tmpformula.setFormula(tmpstr, false);
+
+		tmpbrick.clear();
+		tmpbrick.setName(originalneutrallossesdefinitions[originalneutrallossesfortheoreticalspectra[i]].summary);
+		tmpbrick.setComposition(to_string(numberofbasicbricks + 1), false);
+		tmpbrick.setMass(tmpformula.getMass());
+		tmpbrick.setSummary(tmpstr);
+		tmpbrick.createSummaryMap();
+
+		if ((tmpbrick.getSummaryMap().size() != 1)) {
+			errormessage = "Bad input element: " + tmpstr + ". Only single elements can be used in this mode e.g. H, C, O, N, P, S.";
+			return -1;
+		}
+		else {
+			auto it = tmpbrick.getSummaryMap().begin();
+			if (it->second != 1) {
+				errormessage = "Bad input element: " + tmpstr + ". Only single elements can be used in this mode e.g. H, C, O, N, P, S.";
+				return -1;
+			}
+		}
+
+		elementsbrickdatabase.push_back(tmpbrick);
+
+		numberofbasicbricks++;
+	}
+
+	elementsbrickdatabase.sortbyMass();
+
+	int carbonpos = -1;
+	//bool enablelimitfilter = false;
+	for (int i = 0; i < elementsbrickdatabase.size(); i++) {
+		countsofelements.push_back(0);
+		massesofelements.push_back(elementsbrickdatabase[i].getMass());
+
+		tmpstr = elementsbrickdatabase[i].getName();
+		if (tmpstr.rfind(':') != string::npos) {
+			tmpstr = tmpstr.substr(tmpstr.rfind(':') + 1);
+			limitsofelements.push_back(QVariant(tmpstr.c_str()).toInt());
+			//enablelimitfilter = true;
+		}
+		else {
+			limitsofelements.push_back(0);
+		}
+
+		tmpstr = elementsbrickdatabase[i].getSummary();
+		namesofelements.push_back(tmpstr);
+
+		if (tmpstr.compare("C") == 0) {
+			carbonpos = i;
+		}
+
+		if (tmpstr.compare("H") == 0) {
+			valences.push_back(1);
+		}
+
+		if (tmpstr.compare("C") == 0) {
+			valences.push_back(4);
+		}
+
+		if (tmpstr.compare("O") == 0) {
+			valences.push_back(2);
+		}
+
+		if (tmpstr.compare("N") == 0) {
+			valences.push_back(3);
+		}
+
+		if (tmpstr.compare("S") == 0) {
+			valences.push_back(6);
+		}
+
+		if (tmpstr.compare("P") == 0) {
+			valences.push_back(5);
+		}
+
+		if (tmpstr.compare("Li") == 0) {
+			valences.push_back(1);
+		}
+
+		if (tmpstr.compare("Na") == 0) {
+			valences.push_back(1);
+		}
+
+		if (tmpstr.compare("K") == 0) {
+			valences.push_back(1);
+		}
+
+		if (tmpstr.compare("F") == 0) {
+			valences.push_back(1);
+		}
+
+		if (tmpstr.compare("Cl") == 0) {
+			valences.push_back(1);
+		}
+
+		if (tmpstr.compare("Br") == 0) {
+			valences.push_back(1);
+		}
+
+		if (tmpstr.compare("I") == 0) {
+			valences.push_back(1);
+		}
+
+		if (tmpstr.compare("Si") == 0) {
+			valences.push_back(4);
+		}
+	}
+
+	if (basicformulacheck && (elementsbrickdatabase.size() > 0) && (elementsbrickdatabase.size() == valences.size())) {
+		validvalences = true;
+	}
+
+	vector<int> combarray;
+	for (int i = 0; i < maximumcombinedlosses; i++) {
+		combarray.push_back(0);
+	}
+
+	if (ionsfortheoreticalspectra.size() > 0) {
+		minadd = iondefinitions[ionsfortheoreticalspectra[0]].massdifference;
+		//maxadd = iondefinitions[ionsfortheoreticalspectra[0]].massdifference;
+		for (int i = 1; i < (int)ionsfortheoreticalspectra.size(); i++) {
+			if (iondefinitions[ionsfortheoreticalspectra[i]].massdifference < minadd) {
+				minadd = iondefinitions[ionsfortheoreticalspectra[i]].massdifference;
+			}
+			//if (iondefinitions[ionsfortheoreticalspectra[i]].massdifference > maxadd) {
+			//	maxadd = iondefinitions[ionsfortheoreticalspectra[i]].massdifference;
+			//}
+		}
+	}
+
+	//bool skipcombination;
+	//while (elementsbrickdatabase.nextCombinationFast(combarray, countsofelements, massesofelements, sumofmasses, numberofbasicbricks, maximumcombinedlosses, 0, maximummz)) {
+	while (elementsbrickdatabase.nextCombinationFastLimited(combarray, countsofelements, limitsofelements, massesofelements, sumofmasses, numberofbasicbricks, maximumcombinedlosses, 0, maximummz - minadd)) {
+		if (terminatecomputation) {
+			sequencedatabase.clear();
+			errormessage = "Aborted by user.";
+			return -1;
+		}
+
+		/*if (enablelimitfilter) {
+			skipcombination = false;
+			size = (int)countsofelements.size();
+			for (int j = 0; j < size; j++) {
+				if ((limitsofelements[j] > 0) && (countsofelements[j] > limitsofelements[j])) {
+					skipcombination = true;
+					break;
+				}
+			}
+
+			if (skipcombination) {
+				continue;
+			}
+		}*/
+
+		if (validvalences) {
+			if (!checkSeniorRules(combarray, valences, 1)) {
+				continue;
+			}
+		}
+
+		//sumofmasses = getMassAndCounts(combarray, countsofelements, massesofelements);
+
+		alloutofmz = true;
+		for (auto& it : ionsfortheoreticalspectra) {
+			for (int j = 0; j < abs(precursorcharge); j++) {
+				tmpmzdifference = sumofmasses + iondefinitions[it].massdifference;
+				if (precursorcharge > 0) {
+					tmpmzdifference += j * (H - e);
+				}
+				else {
+					tmpmzdifference -= j * (H - e);
+				}
+				if (j > 0) {
+					tmpmzdifference /= (double)(j + 1);
+				}
+				if ((tmpmzdifference >= minimummz) && (tmpmzdifference <= maximummz)) {
+					alloutofmz = false;
+				}
+			}
+		}
+
+		if (alloutofmz) {
+			continue;
+		}
+
+		if (advancedformulacheck) {
+
+			countH = 0;
+			countC = 0;
+			countO = 0;
+			countN = 0;
+			countS = 0;
+			countP = 0;
+			countF = 0;
+			countCl = 0;
+			countBr = 0;
+			countSi = 0;
+
+			size = (int)countsofelements.size();
+			for (int j = 0; j < size; j++) {
+				if (countsofelements[j] > 0) {
+					if (namesofelements[j].compare("H") == 0) {
+						countH = countsofelements[j];
+						continue;
+					}
+					if (namesofelements[j].compare("C") == 0) {
+						countC = countsofelements[j];
+						continue;
+					}
+					if (namesofelements[j].compare("O") == 0) {
+						countO = countsofelements[j];
+						continue;
+					}
+					if (namesofelements[j].compare("N") == 0) {
+						countN = countsofelements[j];
+						continue;
+					}
+					if (namesofelements[j].compare("S") == 0) {
+						countS = countsofelements[j];
+						continue;
+					}
+					if (namesofelements[j].compare("P") == 0) {
+						countP = countsofelements[j];
+						continue;
+					}
+					if (namesofelements[j].compare("F") == 0) {
+						countF = countsofelements[j];
+						continue;
+					}
+					if (namesofelements[j].compare("Cl") == 0) {
+						countCl = countsofelements[j];
+						continue;
+					}
+					if (namesofelements[j].compare("Br") == 0) {
+						countBr = countsofelements[j];
+						continue;
+					}
+					if (namesofelements[j].compare("Si") == 0) {
+						countSi = countsofelements[j];
+						continue;
+					}
+				}
+			}
+
+			if ((countH == 0) || (countC == 0)) {
+				continue;
+			}
+
+			if (noratiocheck) {
+				if (countN > countO) {
+					continue;
+				}
+			}
+
+			if (sumofmasses < 500.0) {
+
+				if (countC > 39) {
+					continue;
+				}
+				if (countH > 72) {
+					continue;
+				}
+				if (countN > 20) {
+					continue;
+				}
+				if (countO > 20) {
+					continue;
+				}
+				if (countP > 9) {
+					continue;
+				}
+				if (countS > 10) {
+					continue;
+				}
+				if (countF > 16) {
+					continue;
+				}
+				if (countCl > 10) {
+					continue;
+				}
+				if (countBr > 5) {
+					continue;
+				}
+				if (countSi > 8) {
+					continue;
+				}
+
+			}
+			else if (sumofmasses < 1000.0) {
+
+				if (countC > 78) {
+					continue;
+				}
+				if (countH > 126) {
+					continue;
+				}
+				if (countN > 25) {
+					continue;
+				}
+				if (countO > 27) {
+					continue;
+				}
+				if (countP > 9) {
+					continue;
+				}
+				if (countS > 14) {
+					continue;
+				}
+				if (countF > 34) {
+					continue;
+				}
+				if (countCl > 12) {
+					continue;
+				}
+				if (countBr > 8) {
+					continue;
+				}
+				if (countSi > 14) {
+					continue;
+				}
+
+			}
+			else if (sumofmasses < 2000.0) {
+
+				if (countC > 156) {
+					continue;
+				}
+				if (countH > 236) {
+					continue;
+				}
+				if (countN > 32) {
+					continue;
+				}
+				if (countO > 63) {
+					continue;
+				}
+				if (countP > 9) {
+					continue;
+				}
+				if (countS > 14) {
+					continue;
+				}
+				if (countF > 48) {
+					continue;
+				}
+				if (countCl > 12) {
+					continue;
+				}
+				if (countBr > 10) {
+					continue;
+				}
+				if (countSi > 15) {
+					continue;
+				}
+
+			}
+			else if (sumofmasses < 3000.0) {
+
+				if (countC > 162) {
+					continue;
+				}
+				if (countH > 208) {
+					continue;
+				}
+				if (countN > 48) {
+					continue;
+				}
+				if (countO > 78) {
+					continue;
+				}
+				if (countP > 9) {
+					continue;
+				}
+				if (countS > 14) {
+					continue;
+				}
+				if (countF > 48) {
+					continue;
+				}
+				if (countCl > 12) {
+					continue;
+				}
+				if (countBr > 10) {
+					continue;
+				}
+				if (countSi > 15) {
+					continue;
+				}
+
+			}
+
+			if ((countH > 0) && (countC >= 0)) {
+				if (countC == 0) {
+					continue;
+				}
+				elementsratio = ((double)(countH)) / ((double)(countC));
+				if ((elementsratio < 0.2) || (elementsratio > 3.1)) {
+					continue;
+				}
+			}
+
+			if ((countN > 0) && (countC >= 0)) {
+				if (countC == 0) {
+					continue;
+				}
+				elementsratio = ((double)(countN)) / ((double)(countC));
+				if (elementsratio > 1.3) {
+					continue;
+				}
+			}
+
+			if ((countO > 0) && (countC >= 0)) {
+				if (countC == 0) {
+					continue;
+				}
+				elementsratio = ((double)(countO)) / ((double)(countC));
+				if (elementsratio > 1.2) {
+					continue;
+				}
+			}
+
+			if ((countP > 0) && (countC >= 0)) {
+				if (countC == 0) {
+					continue;
+				}
+				elementsratio = ((double)(countP)) / ((double)(countC));
+				if (elementsratio > 0.3) {
+					continue;
+				}
+			}
+
+			if ((countS > 0) && (countC >= 0)) {
+				if (countC == 0) {
+					continue;
+				}
+				elementsratio = ((double)(countS)) / ((double)(countC));
+				if (elementsratio > 0.8) {
+					continue;
+				}
+			}
+
+			if ((countF > 0) && (countC >= 0)) {
+				if (countC == 0) {
+					continue;
+				}
+				elementsratio = ((double)(countF)) / ((double)(countC));
+				if (elementsratio > 1.5) {
+					continue;
+				}
+			}
+
+			if ((countCl > 0) && (countC >= 0)) {
+				if (countC == 0) {
+					continue;
+				}
+				elementsratio = ((double)(countCl)) / ((double)(countC));
+				if (elementsratio > 0.8) {
+					continue;
+				}
+			}
+
+			if ((countBr > 0) && (countC >= 0)) {
+				if (countC == 0) {
+					continue;
+				}
+				elementsratio = ((double)(countBr)) / ((double)(countC));
+				if (elementsratio > 0.8) {
+					continue;
+				}
+			}
+
+			if ((countSi > 0) && (countC >= 0)) {
+				if (countC == 0) {
+					continue;
+				}
+				elementsratio = ((double)(countSi)) / ((double)(countC));
+				if (elementsratio > 0.5) {
+					continue;
+				}
+			}
+
+			if ((countN > 1) && (countO > 1) && (countP > 1) && (countS > 1)) {
+				if ((countN >= 10) || (countO >= 20) || (countP >= 4) || (countS >= 3)) {
+					continue;
+				}
+			}
+
+			if ((countN > 3) && (countO > 3) && (countP > 3)) {
+				if ((countN >= 11) || (countO >= 22) || (countP >= 6)) {
+					continue;
+				}
+			}
+
+			if ((countO > 1) && (countP > 1) && (countS > 1)) {
+				if ((countO >= 14) || (countP >= 3) || (countS >= 3)) {
+					continue;
+				}
+			}
+
+			if ((countP > 1) && (countS > 1) && (countN > 1)) {
+				if ((countP >= 3) || (countS >= 3) || (countN >= 4)) {
+					continue;
+				}
+			}
+
+			if ((countN > 6) && (countO > 6) && (countS > 6)) {
+				if ((countN >= 19) || (countO >= 14) || (countS >= 8)) {
+					continue;
+				}
+			}
+
+		}
+
+		compoundsgenerated++;
+
+		if (!reportunmatchedtheoreticalpeaks) {
+
+			compoundshint = 0;
+
+			for (auto& it : ionsfortheoreticalspectra) {
+
+				for (int j = 0; j < abs(precursorcharge); j++) {
+
+					tmpmzdifference = sumofmasses + iondefinitions[it].massdifference;
+					if (precursorcharge > 0) {
+						tmpmzdifference += j * (H - e);
+					}
+					else {
+						tmpmzdifference -= j * (H - e);
+					}
+					if (j > 0) {
+						tmpmzdifference /= (double)(j + 1);
+					}
+
+					featureshint = 0;
+
+					size = peaklistseries.size();
+					for (int k = 0; k < size; k++) {
+
+						if (searchHint(tmpmzdifference, peaklistseries[k], fragmentmasserrortolerance)) {
+							featureshint++;
+						}
+						else {
+							if (lcms) {
+								featureshint = 0;
+							}
+						}
+
+						hintend = false;
+						if (lcms || (peaklistfileformat == imzML) || (peaklistfileformat == mis)) {
+							if (featureshint >= minimumfeaturesize) {
+								compoundshint++;
+								hintend = true;
+							}
+						}
+						else {
+							if (featureshint > 0) {
+								compoundshint++;
+								hintend = true;
+							}
+						}
+
+						if (hintend) {
+							break;
+						}
+
+					}
+
+					if (compoundshint >= minimumiontypes) {
+						break;
+					}
+
+				}
+
+				if (compoundshint >= minimumiontypes) {
+					break;
+				}
+
+			}
+
+			if (compoundshint < minimumiontypes) {
+				continue;
+			}
+
+		}
+
+		tmpstr.clear();
+		tmpstr2.clear();
+		size = (int)countsofelements.size();
+		for (int j = 0; j < size; j++) {
+			if (countsofelements[j] > 0) {
+				if (j == carbonpos) {
+					tmpstr2 = namesofelements[j] + to_string(countsofelements[j]);
+				}
+				else {
+					tmpstr += namesofelements[j] + to_string(countsofelements[j]);
+				}
+			}
+		}
+		tmpstr = tmpstr2 + tmpstr;
+
+		seq.setName(tmpstr);
+		seq.setSummaryFormula(tmpstr);
+		if (compoundsused <= compoundslimit) {
+			sequencedatabase.push_back(seq);
+		}
+		compoundsused++;
+
+		if (compoundsused % 100000 == 0) {
+			if (os) {
+				*os << compoundsused << " ";
+			}
+		}
+
+		if (compoundsused % 1000000 == 0) {
+			if (os) {
+				*os << endl;
+			}
+		}
+	}
+
+	if (os) {
+		*os << "ok" << endl;
+		*os << "Number of generated compounds: " << compoundsgenerated << endl;
+		*os << "Number of used compounds: " << compoundsused << endl << endl;
 	}
 
 	return 0;
@@ -1361,6 +2460,7 @@ void cParameters::store(ofstream& os) {
 	os.write((char *)&minimumrelativeintensitythreshold, sizeof(double));
 	os.write((char *)&minimumabsoluteintensitythreshold, sizeof(unsigned));
 	os.write((char *)&minimummz, sizeof(double));
+	os.write((char *)&maximummz, sizeof(double));
 	os.write((char *)&fwhm, sizeof(double));
 
 	storeString(bricksdatabasefilename, os);
@@ -1388,7 +2488,12 @@ void cParameters::store(ofstream& os) {
 	os.write((char *)&generateisotopepattern, sizeof(bool));
 	os.write((char *)&minimumpatternsize, sizeof(int));
 	os.write((char *)&minimumfeaturesize, sizeof(int));
-	os.write((char *)&allionsmustbepresent, sizeof(bool));
+	os.write((char *)&minimumiontypes, sizeof(int));
+	os.write((char *)&basicformulacheck, sizeof(bool));
+	os.write((char *)&advancedformulacheck, sizeof(bool));
+	os.write((char *)&noratiocheck, sizeof(bool));
+	os.write((char *)&mzdifftolerance, sizeof(double));
+	os.write((char *)&intensitytolerance, sizeof(double));
 	os.write((char *)&cyclicnterminus, sizeof(bool));
 	os.write((char *)&cycliccterminus, sizeof(bool));
 	os.write((char *)&internalfragments, sizeof(bool));
@@ -1404,6 +2509,7 @@ void cParameters::store(ofstream& os) {
 	storeString(searchedsequenceNtermmodif, os);
 	storeString(searchedsequenceCtermmodif, os);
 	storeString(searchedsequenceTmodif, os);
+	storeString(searchedsequenceformula, os);
 
 	os.write((char *)&maximumnumberofcandidates, sizeof(int));
 	os.write((char *)&blindedges, sizeof(int));
@@ -1491,6 +2597,7 @@ void cParameters::load(ifstream& is) {
 	is.read((char *)&minimumrelativeintensitythreshold, sizeof(double));
 	is.read((char *)&minimumabsoluteintensitythreshold, sizeof(unsigned));
 	is.read((char *)&minimummz, sizeof(double));
+	is.read((char *)&maximummz, sizeof(double));
 	is.read((char *)&fwhm, sizeof(double));
 
 	loadString(bricksdatabasefilename, is);
@@ -1518,7 +2625,12 @@ void cParameters::load(ifstream& is) {
 	is.read((char *)&generateisotopepattern, sizeof(bool));
 	is.read((char *)&minimumpatternsize, sizeof(int));
 	is.read((char *)&minimumfeaturesize, sizeof(int));
-	is.read((char *)&allionsmustbepresent, sizeof(bool));
+	is.read((char *)&minimumiontypes, sizeof(int));
+	is.read((char *)&basicformulacheck, sizeof(bool));
+	is.read((char *)&advancedformulacheck, sizeof(bool));
+	is.read((char *)&noratiocheck, sizeof(bool));
+	is.read((char *)&mzdifftolerance, sizeof(double));
+	is.read((char *)&intensitytolerance, sizeof(double));
 	is.read((char *)&cyclicnterminus, sizeof(bool));
 	is.read((char *)&cycliccterminus, sizeof(bool));
 	is.read((char *)&internalfragments, sizeof(bool));
@@ -1534,6 +2646,7 @@ void cParameters::load(ifstream& is) {
 	loadString(searchedsequenceNtermmodif, is);
 	loadString(searchedsequenceCtermmodif, is);
 	loadString(searchedsequenceTmodif, is);
+	loadString(searchedsequenceformula, is);
 
 	is.read((char *)&maximumnumberofcandidates, sizeof(int));
 	is.read((char *)&blindedges, sizeof(int));

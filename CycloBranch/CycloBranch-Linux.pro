@@ -7,7 +7,7 @@ TARGET = CycloBranch
 QT += core gui widgets printsupport svg
 INCLUDEPATH += . core gui parallel
 QMAKE_CXXFLAGS += -std=c++11 -DLINUX -m64
-QMAKE_LIBS += -lboost_regex -lxerces-c
+QMAKE_LIBS += -lboost_regex -lboost_iostreams -lxerces-c
 OBJECTS_DIR = build/
 MOC_DIR = moc/
 

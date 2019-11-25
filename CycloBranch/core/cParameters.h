@@ -58,6 +58,13 @@ class cParameters {
 
 	cMainThread* os;
 
+	void fixIntensities(cPeaksList& centroidspectrum, cPeaksList& profilespectrum);
+
+	bool checkSeniorRules(vector<int>& combarray, vector<int>& valences, int maxcomponents);
+
+	//double getMassAndCounts(vector<int>& combarray, vector<int>& countsofelements, vector<double>& massesofelements);
+
+
 public:
 
 
@@ -164,9 +171,15 @@ public:
 
 
 	/**
-		\brief Minimum mz.
+		\brief Minimum m/z ratio.
     */
     double minimummz;
+
+
+	/**
+		\brief Maximum m/z ratio.
+	*/
+	double maximummz;
 
 
 	/**
@@ -278,9 +291,39 @@ public:
 
 
 	/**
-		\brief If true, all ions must be annotated in a spectrum for a compound to be reported.
+		\brief The minimum number of ion types which must be matched to report a given compound.
 	*/
-	bool allionsmustbepresent;
+	int minimumiontypes;
+
+
+	/**
+		\brief Apply Senior's filtering rules.
+	*/
+	bool basicformulacheck;
+
+
+	/**
+		\brief Advanced filtering rules are aplied if compounds are generated in MS mode.
+	*/
+	bool advancedformulacheck;
+
+
+	/**
+		\brief Check N/O ratio.
+	*/
+	bool noratiocheck;
+
+
+	/**
+		\brief Maximum m/z tolerance of matched isotopes.
+	*/
+	double mzdifftolerance;
+
+
+	/**
+		\brief Maximum tolerance of intensities of matched isotopes.
+	*/
+	double intensitytolerance;
 
 
 	/**
@@ -365,6 +408,12 @@ public:
 		\brief Terminal modification of a branch of searched branched peptide.
     */
 	string searchedsequenceTmodif;
+
+
+	/**
+		\brief Formula of searched sequence.
+	*/
+	string searchedsequenceformula;
 
 
 	/**
@@ -502,6 +551,14 @@ public:
 
 
 	/**
+		\brief Prepare neutral losses and compounds.
+		\param terminatecomputation reference to a variable determining that the computation must be stopped
+		\retval int -1 when an error occurred, 0 otherwise
+	*/
+	int prepareLossesAndCompounds(bool& terminatecomputation);
+
+
+	/**
 		\brief Check if the names of modifications used in a sequence are correct.
 		\param sequence an input sequence
 		\param startmodifid an output identifier of a start modification
@@ -540,6 +597,15 @@ public:
 		\retval int -1 when an error occurred, 0 otherwise
 	*/
 	int calculateNeutralLosses(bool& terminatecomputation, string& errormessage);
+
+
+	/**
+		\brief Generate compounds.
+		\param terminatecomputation reference to a variable determining that the computation must be stopped
+		\param errormessage an error message if failed
+		\retval int -1 when an error occurred, 0 otherwise
+	*/
+	int generateCompounds(bool& terminatecomputation, string& errormessage);
 
 
 	/**

@@ -33,6 +33,8 @@ void cBrick::clear() {
 	composition = "";
 	artificial = false;
 	residuelosstype = h2o_loss;
+	losses.clear();
+	lossids.clear();
 }
 
 
@@ -64,6 +66,16 @@ map<string, int>& cBrick::getSummaryMap() {
 
 vector<string>& cBrick::getAcronyms() {
 	return acronyms;
+}
+
+
+string& cBrick::getLosses() {
+	return losses;
+}
+
+
+vector<int>& cBrick::getLossIDs() {
+	return lossids;
 }
 
 
@@ -139,6 +151,16 @@ void cBrick::setAcronyms(const string& acronyms) {
 	if (s.compare("") != 0) {
 		this->acronyms.push_back(s);
 	}
+}
+
+
+void cBrick::setLosses(const string& str) {
+	losses = str;
+}
+
+
+void cBrick::setLossIDs(vector<int>& lossids) {
+	this->lossids = lossids;
 }
 
 
@@ -270,7 +292,7 @@ string cBrick::getAcronymsWithReferencesAsHTMLString() {
 			if (!correctreference) {
 				rx = "^CSID: [0-9]+$";
 				if (regex_search(references[i], rx)) {
-					s += "<a href=\"http://www.chemspider.com/Chemical-Structure." + references[i].substr(6) + ".html\">";
+					s += "<a href=\"https://www.chemspider.com/Chemical-Structure." + references[i].substr(6) + ".html\">";
 					s += acronyms[i];
 					s += "</a>";
 					correctreference = true;
@@ -281,8 +303,19 @@ string cBrick::getAcronymsWithReferencesAsHTMLString() {
 			if (!correctreference) {
 				rx = "^CID: [0-9]+$";
 				if (regex_search(references[i], rx)) {
-					s += "<a href=\"http://pubchem.ncbi.nlm.nih.gov/summary/summary.cgi?cid=" + references[i].substr(5) + "\">";
+					s += "<a href=\"https://pubchem.ncbi.nlm.nih.gov/summary/summary.cgi?cid=" + references[i].substr(5) + "\">";
 					s += acronyms[i];
+					s += "</a>";
+					correctreference = true;
+				}
+			}
+
+			// ChEBI
+			if (!correctreference) {
+				rx = "^CHEBI: [0-9]+$";
+				if (regex_search(references[i], rx)) {
+					s += "<a href=\"https://www.ebi.ac.uk/chebi/searchId.do?chebiId=CHEBI:" + references[i].substr(7) + "\">";
+					s += name;
 					s += "</a>";
 					correctreference = true;
 				}
@@ -292,7 +325,7 @@ string cBrick::getAcronymsWithReferencesAsHTMLString() {
 			if (!correctreference) {
 				rx = "^PDB: ([A-Z]|[0-9])+$";
 				if (regex_search(references[i], rx)) {
-					s += "<a href=\"http://www.ebi.ac.uk/pdbe-srv/pdbechem/chemicalCompound/show/" + references[i].substr(5) + "\">";
+					s += "<a href=\"https://www.ebi.ac.uk/pdbe-srv/pdbechem/chemicalCompound/show/" + references[i].substr(5) + "\">";
 					s += acronyms[i];
 					s += "</a>";
 					correctreference = true;
@@ -303,7 +336,7 @@ string cBrick::getAcronymsWithReferencesAsHTMLString() {
 			if (!correctreference) {
 				rx = " in CSID: [0-9]+$";
 				if (regex_search(references[i], rx)) {
-					s += "<a href=\"http://www.ebi.ac.uk/pdbe-site/pdbemotif/smilesstats.jsp?smiles=" + references[i].substr(0, references[i].find(':') - 8) + "\">";
+					s += "<a href=\"https://www.ebi.ac.uk/pdbe-site/pdbemotif/smilesstats.jsp?smiles=" + references[i].substr(0, references[i].find(':') - 8) + "\">";
 					s += acronyms[i];
 					s += "</a>";
 					correctreference = true;
@@ -314,7 +347,7 @@ string cBrick::getAcronymsWithReferencesAsHTMLString() {
 			if (!correctreference) {
 				rx = " in CID: [0-9]+$";
 				if (regex_search(references[i], rx)) {
-					s += "<a href=\"http://www.ebi.ac.uk/pdbe-site/pdbemotif/smilesstats.jsp?smiles=" + references[i].substr(0, references[i].find(':') - 7) + "\">";
+					s += "<a href=\"https://www.ebi.ac.uk/pdbe-site/pdbemotif/smilesstats.jsp?smiles=" + references[i].substr(0, references[i].find(':') - 7) + "\">";
 					s += acronyms[i];
 					s += "</a>";
 					correctreference = true;
@@ -325,7 +358,7 @@ string cBrick::getAcronymsWithReferencesAsHTMLString() {
 			if (!correctreference) {
 				rx = " in: NOR";
 				if (regex_search(references[i], rx)) {
-					s += "<a href=\"http://www.ebi.ac.uk/pdbe-site/pdbemotif/smilesstats.jsp?smiles=" + references[i].substr(0, references[i].find(':') - 3) + "\">";
+					s += "<a href=\"https://www.ebi.ac.uk/pdbe-site/pdbemotif/smilesstats.jsp?smiles=" + references[i].substr(0, references[i].find(':') - 3) + "\">";
 					s += acronyms[i];
 					s += "</a>";
 					correctreference = true;
@@ -379,6 +412,8 @@ void cBrick::store(ofstream& os) {
 	storeString(composition, os);
 	os.write((char *)&artificial, sizeof(bool));
 	os.write((char *)&residuelosstype, sizeof(eResidueLossType));
+	storeString(losses, os);
+	storeIntVector(lossids, os);
 }
 
 
@@ -392,5 +427,7 @@ void cBrick::load(ifstream& is) {
 	loadString(composition, is);
 	is.read((char *)&artificial, sizeof(bool));
 	is.read((char *)&residuelosstype, sizeof(eResidueLossType));
+	loadString(losses, is);
+	loadIntVector(lossids, is);
 }
 

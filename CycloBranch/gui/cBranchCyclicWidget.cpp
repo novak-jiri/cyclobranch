@@ -10,52 +10,61 @@
 
 
 void generateBranchLabelsDown(bool nterminal, int rotationid, unordered_set<cIonLabel, hash_cIonLabel>& labels, cParameters* parameters, cTheoreticalSpectrum* theoreticalspectrum, int centerx, int topmargin, int horizontalstep, int verticalstep, string visibleionseries, string visibleneutralloss, int visiblerotationid, int branchstart) {
-	string name;
-	int k;
-	int coverageindex = rotationid * (int)parameters->ionsfortheoreticalspectra.size() * (parameters->numberofgeneratedneutrallosses + 1);
-	bool skipiontype, skipneutralloss;
 
-	if ((visiblerotationid == -1) || (visiblerotationid == rotationid/6)) {
+	cPeaksList* thpeaks = theoreticalspectrum->getTheoreticalPeaks();
+	string description;
+	size_t pos;
+	int rotid, serid;
+	for (int i = 0; i < thpeaks->size(); i++) {
 
-		for (int i = 0; i < (int)parameters->ionsfortheoreticalspectra.size(); i++) {
+		if (((*thpeaks)[i].matched > 0) && ((*thpeaks)[i].rotationid == rotationid)) {
 
-			skipiontype = false;
-			if ((visibleionseries.compare("") != 0) && (parameters->iondefinitions[parameters->ionsfortheoreticalspectra[i]].name.compare(visibleionseries) != 0)) {
-				skipiontype = true;
-			}
+			description = (*thpeaks)[i].description;
+			description = description.substr(0, description.find(':'));
 
-			for (int j = -1; j < (int)parameters->neutrallossesfortheoreticalspectra.size(); j++) {
-
-				skipneutralloss = false;
-				if (visibleneutralloss.compare("all") != 0) {
-					if ((j == -1) && (visibleneutralloss.compare("none") != 0)) {
-						skipneutralloss = true;
+			if (description.find('[') == string::npos) {
+				if (parameters->precursorcharge > 0) {
+					pos = description.find("+ ");
+					if (pos != string::npos) {
+						description = description.substr(pos + 2);
 					}
-					if ((j >= 0) && (parameters->neutrallossesdefinitions[parameters->neutrallossesfortheoreticalspectra[j]].summary.compare(visibleneutralloss) != 0)) {
-						skipneutralloss = true;
+					else {
+						continue;
+					}
+				}
+				else {
+					pos = description.find("- ");
+					if (pos != string::npos) {
+						description = description.substr(pos + 2);
+					}
+					else {
+						continue;
 					}
 				}
 
-				if (!skipiontype && !skipneutralloss) {
+				if (visibleionseries.empty() || (!visibleionseries.empty() && (parameters->iondefinitions[(*thpeaks)[i].iontype].name.compare(visibleionseries) == 0))) {
 
-					if ((nterminal && parameters->iondefinitions[parameters->ionsfortheoreticalspectra[i]].nterminal) || (!nterminal && parameters->iondefinitions[parameters->ionsfortheoreticalspectra[i]].cterminal)) {
-						k = 0;
-						while (k < branchstart) {
-							if (theoreticalspectrum->getVisualCoverage()[coverageindex].series[k] > 0) {
-								name = theoreticalspectrum->getVisualCoverage()[coverageindex].name.substr(0, theoreticalspectrum->getVisualCoverage()[coverageindex].name.rfind('_') + 1);
-								name += parameters->iondefinitions[parameters->ionsfortheoreticalspectra[i]].name[0] + to_string(k + 1) + parameters->iondefinitions[parameters->ionsfortheoreticalspectra[i]].name.substr(1);
-								if (j >= 0) {
-									name += "-" + parameters->neutrallossesdefinitions[parameters->neutrallossesfortheoreticalspectra[j]].summary;
+					if ((visibleneutralloss.compare("all") == 0)
+						|| ((visibleneutralloss.compare("none") == 0) && (description.find(" -") == string::npos))
+						|| ((visibleneutralloss.compare("all") != 0) && (visibleneutralloss.compare("none") != 0) && (description.substr(description.find(" -") + 2).compare(visibleneutralloss) == 0))) {
+
+						rotid = (*thpeaks)[i].rotationid;
+						if ((rotid >= 0) && ((visiblerotationid == -1) || (visiblerotationid == rotid / 6))) {				
+
+							if ((nterminal && parameters->iondefinitions[(*thpeaks)[i].iontype].nterminal) || (!nterminal && parameters->iondefinitions[(*thpeaks)[i].iontype].cterminal)) {
+
+								serid = (*thpeaks)[i].seriesid;
+								if ((serid >= 0) && (serid < branchstart)) {
+									insertLabel(labels, centerx + 40, topmargin + verticalstep * serid + verticalstep / 2 - verticalstep / 8, description, false);
 								}
-								insertLabel(labels, centerx + 40, topmargin + verticalstep * k + verticalstep / 2 - verticalstep / 8, name, false);
+
 							}
-							k++;
+
 						}
+
 					}
 
 				}
-
-				coverageindex++;
 
 			}
 
@@ -66,55 +75,62 @@ void generateBranchLabelsDown(bool nterminal, int rotationid, unordered_set<cIon
 }
 
 
-void generateBranchLabelsUp(bool nterminal, int rotationid, unordered_set<cIonLabel, hash_cIonLabel>& labels, cParameters* parameters, cTheoreticalSpectrum* theoreticalspectrum, int centerx, int topmargin, int horizontalstep, int verticalstep, string visibleionseries, string visibleneutralloss, int visiblerotationid, int branchend) {
-	string name;
-	int k;
-	int count;
-	int coverageindex = rotationid * (int)parameters->ionsfortheoreticalspectra.size() * (parameters->numberofgeneratedneutrallosses + 1);
-	bool skipiontype, skipneutralloss;
+void generateBranchLabelsUp(bool nterminal, int rotationid, unordered_set<cIonLabel, hash_cIonLabel>& labels, cParameters* parameters, cTheoreticalSpectrum* theoreticalspectrum, int centerx, int topmargin, int horizontalstep, int verticalstep, string visibleionseries, string visibleneutralloss, int visiblerotationid, int branchend, int fragmentend) {
 
-	if ((visiblerotationid == -1) || (visiblerotationid == rotationid / 6)) {
+	cPeaksList* thpeaks = theoreticalspectrum->getTheoreticalPeaks();
+	string description;
+	size_t pos;
+	int rotid, serid;
+	for (int i = 0; i < thpeaks->size(); i++) {
 
-		for (int i = 0; i < (int)parameters->ionsfortheoreticalspectra.size(); i++) {
+		if (((*thpeaks)[i].matched > 0) && ((*thpeaks)[i].rotationid == rotationid)) {
 
-			skipiontype = false;
-			if ((visibleionseries.compare("") != 0) && (parameters->iondefinitions[parameters->ionsfortheoreticalspectra[i]].name.compare(visibleionseries) != 0)) {
-				skipiontype = true;
-			}
+			description = (*thpeaks)[i].description;
+			description = description.substr(0, description.find(':'));
 
-			for (int j = -1; j < (int)parameters->neutrallossesfortheoreticalspectra.size(); j++) {
-
-				skipneutralloss = false;
-				if (visibleneutralloss.compare("all") != 0) {
-					if ((j == -1) && (visibleneutralloss.compare("none") != 0)) {
-						skipneutralloss = true;
+			if (description.find('[') == string::npos) {
+				if (parameters->precursorcharge > 0) {
+					pos = description.find("+ ");
+					if (pos != string::npos) {
+						description = description.substr(pos + 2);
 					}
-					if ((j >= 0) && (parameters->neutrallossesdefinitions[parameters->neutrallossesfortheoreticalspectra[j]].summary.compare(visibleneutralloss) != 0)) {
-						skipneutralloss = true;
+					else {
+						continue;
+					}
+				}
+				else {
+					pos = description.find("- ");
+					if (pos != string::npos) {
+						description = description.substr(pos + 2);
+					}
+					else {
+						continue;
 					}
 				}
 
-				if (!skipiontype && !skipneutralloss) {
+				if (visibleionseries.empty() || (!visibleionseries.empty() && (parameters->iondefinitions[(*thpeaks)[i].iontype].name.compare(visibleionseries) == 0))) {
 
-					if ((nterminal && parameters->iondefinitions[parameters->ionsfortheoreticalspectra[i]].nterminal) || (!nterminal && parameters->iondefinitions[parameters->ionsfortheoreticalspectra[i]].cterminal)) {
-						k = 0;
-						count = (int)theoreticalspectrum->getVisualCoverage()[coverageindex].series.size() - branchend;
-						while (k < count) {
-							if (theoreticalspectrum->getVisualCoverage()[coverageindex].series[k + branchend] > 0) {
-								name = theoreticalspectrum->getVisualCoverage()[coverageindex].name.substr(0, theoreticalspectrum->getVisualCoverage()[coverageindex].name.rfind('_') + 1);
-								name += parameters->iondefinitions[parameters->ionsfortheoreticalspectra[i]].name[0] + to_string(k + branchend + 1) + parameters->iondefinitions[parameters->ionsfortheoreticalspectra[i]].name.substr(1);
-								if (j >= 0) {
-									name += "-" + parameters->neutrallossesdefinitions[parameters->neutrallossesfortheoreticalspectra[j]].summary;
+					if ((visibleneutralloss.compare("all") == 0)
+						|| ((visibleneutralloss.compare("none") == 0) && (description.find(" -") == string::npos))
+						|| ((visibleneutralloss.compare("all") != 0) && (visibleneutralloss.compare("none") != 0) && (description.substr(description.find(" -") + 2).compare(visibleneutralloss) == 0))) {
+
+						rotid = (*thpeaks)[i].rotationid;
+						if ((rotid >= 0) && ((visiblerotationid == -1) || (visiblerotationid == rotid / 6))) {
+
+							if ((nterminal && parameters->iondefinitions[(*thpeaks)[i].iontype].nterminal) || (!nterminal && parameters->iondefinitions[(*thpeaks)[i].iontype].cterminal)) {
+
+								serid = (*thpeaks)[i].seriesid;
+								if ((serid >= 0) && (serid >= branchend) && (serid < fragmentend)) {
+									insertLabel(labels, centerx - 40, topmargin + verticalstep * (fragmentend - serid - 1) + verticalstep / 2, description, true);
 								}
-								insertLabel(labels, centerx - 40, topmargin + verticalstep * (count - k - 1) + verticalstep / 2, name, true);
+
 							}
-							k++;
+
 						}
+
 					}
 
 				}
-
-				coverageindex++;
 
 			}
 
@@ -284,7 +300,7 @@ void cBranchCyclicWidget::paint(QPainter& painter) {
 	int linesize = 20;
 	int cornerlinesize = horizontalstep/8;
 
-	paintCircle(painter, backboneacronyms, centerx, centery, radius, angle, horizontalstep, linesize, cornerlinesize, theoreticalspectrum->getVisualCoverage().size() > 0, visiblerotationid, labels);
+	paintCircle(painter, backboneacronyms, centerx, centery, radius, angle, horizontalstep, linesize, cornerlinesize, theoreticalspectrum->getTheoreticalPeaks()->size() > 0, visiblerotationid, labels);
 
 
 	// paint the branch
@@ -297,7 +313,7 @@ void cBranchCyclicWidget::paint(QPainter& painter) {
 			painter.drawText(centerx - horizontalstep/3, topmargin + verticalstep*i, horizontalstep*2/3, 20, Qt::AlignCenter, branchacronyms[branchsize - i - 1].c_str());
 		}	
 
-		if (theoreticalspectrum->getVisualCoverage().size() > 0) {
+		if (theoreticalspectrum->getTheoreticalPeaks()->size() > 0) {
 			painter.drawText(centerx - horizontalstep/3, topmargin + verticalstep*i - 20, horizontalstep*2/3, 20, Qt::AlignLeft, to_string(backbonesize + branchsize - i).c_str());
 		}
 
@@ -307,7 +323,7 @@ void cBranchCyclicWidget::paint(QPainter& painter) {
 		painter.setPen(QPen(Qt::black, 2, Qt::SolidLine));
 		painter.drawLine(centerx, topmargin + verticalstep*i + 20, centerx, topmargin + verticalstep*i + verticalstep);
 
-		if (theoreticalspectrum->getVisualCoverage().size() > 0) {
+		if (theoreticalspectrum->getTheoreticalPeaks()->size() > 0) {
 			painter.setPen(QPen(Qt::black, 2, Qt::DashLine));
 			painter.drawLine(centerx - 20, topmargin + verticalstep*i + (verticalstep + 10)/2, centerx + 20, topmargin + verticalstep*i + (verticalstep + 10)/2);	
 			painter.drawLine(centerx - 20, topmargin + verticalstep*i + (verticalstep + 10)/2, centerx - 20, topmargin + verticalstep*i + (verticalstep + 10)/2 + verticalstep/8);
@@ -321,7 +337,7 @@ void cBranchCyclicWidget::paint(QPainter& painter) {
 	}
 
 
-	if (parameters && !hidelabels && (theoreticalspectrum->getVisualCoverage().size() > 0)) {
+	if (parameters && !hidelabels && (theoreticalspectrum->getTheoreticalPeaks()->size() > 0)) {
 
 		// get branch-cyclic rotations
 		vector<cCandidate> branchcyclicrotations;
@@ -335,13 +351,13 @@ void cBranchCyclicWidget::paint(QPainter& painter) {
 		}
 
 		int rotationid;
-		int half = (int)theoreticalspectrum->getVisualCoverage().size() / (int)parameters->ionsfortheoreticalspectra.size() / (parameters->numberofgeneratedneutrallosses + 1) / 2;
+		int half = backbonesize * 6;
 		for (int i = 0; i < half; i++) {
-		
+
 			if ((visibletrotationid != -1) && (visibletrotationid != i % 6)) {
 				continue;
 			}
-		
+	
 			if (i/6 == 0) {
 				rotationid = half/6;
 			}
@@ -349,36 +365,35 @@ void cBranchCyclicWidget::paint(QPainter& painter) {
 				rotationid = 2*half/6 - i/6;
 			}
 		
-			switch (i % 6)
-			{
-			case 0:
-				generateCyclicLabelsToRight(true, i, i/6, 0, backbonesize + branchsize - 1, backbonesize, labels, parameters, theoreticalspectrum, centerx, centery, radius, angle, linesize, cornerlinesize, visibleionseries, visibleneutralloss, visiblerotationid, trotationsofbranchcyclicrotations[i/6][0].middlebranchstart, trotationsofbranchcyclicrotations[i/6][0].middlebranchend);
-				break;
-			case 1:
-				generateBranchLabelsDown(true, i, labels, parameters, theoreticalspectrum, centerx, topmargin, horizontalstep, verticalstep, visibleionseries, visibleneutralloss, visiblerotationid, trotationsofbranchcyclicrotations[i/6][1].middlebranchstart);
-				generateCyclicLabelsToRight(true, i, -1, trotationsofbranchcyclicrotations[i/6][1].middlebranchend, backbonesize + branchsize - 1, backbonesize, labels, parameters, theoreticalspectrum, centerx, centery, radius, angle, linesize, cornerlinesize, visibleionseries, visibleneutralloss, visiblerotationid, trotationsofbranchcyclicrotations[i/6][1].middlebranchstart, trotationsofbranchcyclicrotations[i/6][1].middlebranchend);
-				break;
-			case 2:
-				generateCyclicLabelsToRight(true, rotationid*6 + 2, i/6, 0, backbonesize + branchsize - 1, backbonesize, labels, parameters, theoreticalspectrum, centerx, centery, radius, angle, linesize, cornerlinesize, visibleionseries, visibleneutralloss, visiblerotationid, trotationsofbranchcyclicrotations[rotationid][2].middlebranchstart, trotationsofbranchcyclicrotations[rotationid][2].middlebranchend);
-				break;
-			case 3:
-				generateCyclicLabelsToRight(true, i, i/6, 0, trotationsofbranchcyclicrotations[i/6][3].middlebranchstart, backbonesize, labels, parameters, theoreticalspectrum, centerx, centery, radius, angle, linesize, cornerlinesize, visibleionseries, visibleneutralloss, visiblerotationid, trotationsofbranchcyclicrotations[i/6][3].middlebranchstart, trotationsofbranchcyclicrotations[i/6][3].middlebranchend);
-				generateBranchLabelsUp(true, i, labels, parameters, theoreticalspectrum, centerx, topmargin, horizontalstep, verticalstep, visibleionseries, visibleneutralloss, visiblerotationid, trotationsofbranchcyclicrotations[i/6][3].middlebranchend);
-				generateBranchLabelsDown(false, i, labels, parameters, theoreticalspectrum, centerx, topmargin, horizontalstep, verticalstep, visibleionseries, visibleneutralloss, visiblerotationid, trotationsofbranchcyclicrotations[i/6][4].middlebranchstart);
-				generateCyclicLabelsToLeft(false, i, 0, trotationsofbranchcyclicrotations[i/6][4].middlebranchend, backbonesize + branchsize - 1, backbonesize, labels, parameters, theoreticalspectrum, centerx, centery, radius, angle, linesize, cornerlinesize, visibleionseries, visibleneutralloss, visiblerotationid, trotationsofbranchcyclicrotations[i/6][4].middlebranchstart, trotationsofbranchcyclicrotations[i/6][4].middlebranchend);
-				break;
-			case 4:
-				generateBranchLabelsDown(true, i, labels, parameters, theoreticalspectrum, centerx, topmargin, horizontalstep, verticalstep, visibleionseries, visibleneutralloss, visiblerotationid, trotationsofbranchcyclicrotations[i/6][4].middlebranchstart);
-				generateCyclicLabelsToLeft(true, i, 0, trotationsofbranchcyclicrotations[i/6][4].middlebranchend, backbonesize + branchsize - 1, backbonesize, labels, parameters, theoreticalspectrum, centerx, centery, radius, angle, linesize, cornerlinesize, visibleionseries, visibleneutralloss, visiblerotationid, trotationsofbranchcyclicrotations[i/6][4].middlebranchstart, trotationsofbranchcyclicrotations[i/6][4].middlebranchend);
-				break;
-			case 5:
-				generateCyclicLabelsToRight(true, rotationid*6 + 5, i/6, 0, trotationsofbranchcyclicrotations[rotationid][5].middlebranchstart, backbonesize, labels, parameters, theoreticalspectrum, centerx, centery, radius, angle, linesize, cornerlinesize, visibleionseries, visibleneutralloss, visiblerotationid, trotationsofbranchcyclicrotations[rotationid][5].middlebranchstart, trotationsofbranchcyclicrotations[rotationid][5].middlebranchend);
-				generateBranchLabelsUp(true, i, labels, parameters, theoreticalspectrum, centerx, topmargin, horizontalstep, verticalstep, visibleionseries, visibleneutralloss, visiblerotationid, trotationsofbranchcyclicrotations[i/6][5].middlebranchend);
-				generateBranchLabelsDown(false, i, labels, parameters, theoreticalspectrum, centerx, topmargin, horizontalstep, verticalstep, visibleionseries, visibleneutralloss, visiblerotationid, trotationsofbranchcyclicrotations[i/6][1].middlebranchstart);
-				generateCyclicLabelsToRight(false, i, -1, trotationsofbranchcyclicrotations[i/6][1].middlebranchend, backbonesize + branchsize - 1, backbonesize, labels, parameters, theoreticalspectrum, centerx, centery, radius, angle, linesize, cornerlinesize, visibleionseries, visibleneutralloss, visiblerotationid, trotationsofbranchcyclicrotations[i/6][1].middlebranchstart, trotationsofbranchcyclicrotations[i/6][1].middlebranchend);
-				break;
-			default:
-				break;
+			switch (i % 6) {
+				case 0:
+					generateCyclicLabelsToRight(true, i, i/6, 0, backbonesize + branchsize - 1, backbonesize, labels, parameters, theoreticalspectrum, centerx, centery, radius, angle, linesize, cornerlinesize, visibleionseries, visibleneutralloss, visiblerotationid, trotationsofbranchcyclicrotations[i/6][0].middlebranchstart, trotationsofbranchcyclicrotations[i/6][0].middlebranchend);
+					break;
+				case 1:
+					generateBranchLabelsDown(true, i, labels, parameters, theoreticalspectrum, centerx, topmargin, horizontalstep, verticalstep, visibleionseries, visibleneutralloss, visiblerotationid, trotationsofbranchcyclicrotations[i/6][1].middlebranchstart);
+					generateCyclicLabelsToRight(true, i, -1, trotationsofbranchcyclicrotations[i/6][1].middlebranchend, backbonesize + branchsize - 1, backbonesize, labels, parameters, theoreticalspectrum, centerx, centery, radius, angle, linesize, cornerlinesize, visibleionseries, visibleneutralloss, visiblerotationid, trotationsofbranchcyclicrotations[i/6][1].middlebranchstart, trotationsofbranchcyclicrotations[i/6][1].middlebranchend);
+					break;
+				case 2:
+					generateCyclicLabelsToRight(true, rotationid*6 + 2, i/6, 0, backbonesize + branchsize - 1, backbonesize, labels, parameters, theoreticalspectrum, centerx, centery, radius, angle, linesize, cornerlinesize, visibleionseries, visibleneutralloss, visiblerotationid, trotationsofbranchcyclicrotations[rotationid][2].middlebranchstart, trotationsofbranchcyclicrotations[rotationid][2].middlebranchend);
+					break;
+				case 3:
+					generateCyclicLabelsToRight(true, i, i/6, 0, trotationsofbranchcyclicrotations[i/6][3].middlebranchstart, backbonesize, labels, parameters, theoreticalspectrum, centerx, centery, radius, angle, linesize, cornerlinesize, visibleionseries, visibleneutralloss, visiblerotationid, trotationsofbranchcyclicrotations[i/6][3].middlebranchstart, trotationsofbranchcyclicrotations[i/6][3].middlebranchend);
+					generateBranchLabelsUp(true, i, labels, parameters, theoreticalspectrum, centerx, topmargin, horizontalstep, verticalstep, visibleionseries, visibleneutralloss, visiblerotationid, trotationsofbranchcyclicrotations[i/6][3].middlebranchend, backbonesize + branchsize - 1);
+					generateBranchLabelsDown(false, i, labels, parameters, theoreticalspectrum, centerx, topmargin, horizontalstep, verticalstep, visibleionseries, visibleneutralloss, visiblerotationid, trotationsofbranchcyclicrotations[i/6][4].middlebranchstart);
+					generateCyclicLabelsToLeft(false, i, 0, trotationsofbranchcyclicrotations[i/6][4].middlebranchend, backbonesize + branchsize - 1, backbonesize, labels, parameters, theoreticalspectrum, centerx, centery, radius, angle, linesize, cornerlinesize, visibleionseries, visibleneutralloss, visiblerotationid, trotationsofbranchcyclicrotations[i/6][4].middlebranchstart, trotationsofbranchcyclicrotations[i/6][4].middlebranchend);
+					break;
+				case 4:
+					generateBranchLabelsDown(true, i, labels, parameters, theoreticalspectrum, centerx, topmargin, horizontalstep, verticalstep, visibleionseries, visibleneutralloss, visiblerotationid, trotationsofbranchcyclicrotations[i/6][4].middlebranchstart);
+					generateCyclicLabelsToLeft(true, i, 0, trotationsofbranchcyclicrotations[i/6][4].middlebranchend, backbonesize + branchsize - 1, backbonesize, labels, parameters, theoreticalspectrum, centerx, centery, radius, angle, linesize, cornerlinesize, visibleionseries, visibleneutralloss, visiblerotationid, trotationsofbranchcyclicrotations[i/6][4].middlebranchstart, trotationsofbranchcyclicrotations[i/6][4].middlebranchend);
+					break;
+				case 5:
+					generateCyclicLabelsToRight(true, rotationid*6 + 5, i/6, 0, trotationsofbranchcyclicrotations[rotationid][5].middlebranchstart, backbonesize, labels, parameters, theoreticalspectrum, centerx, centery, radius, angle, linesize, cornerlinesize, visibleionseries, visibleneutralloss, visiblerotationid, trotationsofbranchcyclicrotations[rotationid][5].middlebranchstart, trotationsofbranchcyclicrotations[rotationid][5].middlebranchend);
+					generateBranchLabelsUp(true, i, labels, parameters, theoreticalspectrum, centerx, topmargin, horizontalstep, verticalstep, visibleionseries, visibleneutralloss, visiblerotationid, trotationsofbranchcyclicrotations[i/6][5].middlebranchend, backbonesize + branchsize - 1);
+					generateBranchLabelsDown(false, i, labels, parameters, theoreticalspectrum, centerx, topmargin, horizontalstep, verticalstep, visibleionseries, visibleneutralloss, visiblerotationid, trotationsofbranchcyclicrotations[i/6][1].middlebranchstart);
+					generateCyclicLabelsToRight(false, i, -1, trotationsofbranchcyclicrotations[i/6][1].middlebranchend, backbonesize + branchsize - 1, backbonesize, labels, parameters, theoreticalspectrum, centerx, centery, radius, angle, linesize, cornerlinesize, visibleionseries, visibleneutralloss, visiblerotationid, trotationsofbranchcyclicrotations[i/6][1].middlebranchstart, trotationsofbranchcyclicrotations[i/6][1].middlebranchend);
+					break;
+				default:
+					break;
 			}
 
 		}
@@ -396,49 +411,40 @@ void cBranchCyclicWidget::paint(QPainter& painter) {
 				rotationid = 2*half/6 - i/6;
 			}
 
-			switch (i % 6)
-			{
-			case 0:
-				generateCyclicLabelsToLeft(true, i, i/6, 0, backbonesize + branchsize - 1, backbonesize, labels, parameters, theoreticalspectrum, centerx, centery, radius, angle, linesize, cornerlinesize, visibleionseries, visibleneutralloss, visiblerotationid, trotationsofbranchcyclicrotations[i/6][0].middlebranchstart, trotationsofbranchcyclicrotations[i/6][0].middlebranchend);
-				break;
-			case 1:
-				generateBranchLabelsDown(true, i, labels, parameters, theoreticalspectrum, centerx, topmargin, horizontalstep, verticalstep, visibleionseries, visibleneutralloss, visiblerotationid, trotationsofbranchcyclicrotations[i/6][1].middlebranchstart);
-				generateCyclicLabelsToLeft(true, i, 0, trotationsofbranchcyclicrotations[i/6][1].middlebranchend, backbonesize + branchsize - 1, backbonesize, labels, parameters, theoreticalspectrum, centerx, centery, radius, angle, linesize, cornerlinesize, visibleionseries, visibleneutralloss, visiblerotationid, trotationsofbranchcyclicrotations[i/6][1].middlebranchstart, trotationsofbranchcyclicrotations[i/6][1].middlebranchend);
-				break;
-			case 2:
-				generateCyclicLabelsToLeft(true, rotationid*6 + 2, i/6, 0, backbonesize + branchsize - 1, backbonesize, labels, parameters, theoreticalspectrum, centerx, centery, radius, angle, linesize, cornerlinesize, visibleionseries, visibleneutralloss, visiblerotationid, trotationsofbranchcyclicrotations[rotationid][2].middlebranchstart, trotationsofbranchcyclicrotations[rotationid][2].middlebranchend);
-				break;
-			case 3:
-				generateCyclicLabelsToLeft(true, i, i/6, 0, trotationsofbranchcyclicrotations[i/6][3].middlebranchstart, backbonesize, labels, parameters, theoreticalspectrum, centerx, centery, radius, angle, linesize, cornerlinesize, visibleionseries, visibleneutralloss, visiblerotationid, trotationsofbranchcyclicrotations[i/6][3].middlebranchstart, trotationsofbranchcyclicrotations[i/6][3].middlebranchend);
-				generateBranchLabelsUp(true, i, labels, parameters, theoreticalspectrum, centerx, topmargin, horizontalstep, verticalstep, visibleionseries, visibleneutralloss, visiblerotationid, trotationsofbranchcyclicrotations[i/6][3].middlebranchend);
-				generateBranchLabelsDown(false, i, labels, parameters, theoreticalspectrum, centerx, topmargin, horizontalstep, verticalstep, visibleionseries, visibleneutralloss, visiblerotationid, trotationsofbranchcyclicrotations[i/6][4].middlebranchstart);
-				generateCyclicLabelsToRight(false, i, -1, trotationsofbranchcyclicrotations[i/6][4].middlebranchend, backbonesize + branchsize - 1, backbonesize, labels, parameters, theoreticalspectrum, centerx, centery, radius, angle, linesize, cornerlinesize, visibleionseries, visibleneutralloss, visiblerotationid, trotationsofbranchcyclicrotations[i/6][4].middlebranchstart, trotationsofbranchcyclicrotations[i/6][4].middlebranchend);
-				break;
-			case 4:
-				generateBranchLabelsDown(true, i, labels, parameters, theoreticalspectrum, centerx, topmargin, horizontalstep, verticalstep, visibleionseries, visibleneutralloss, visiblerotationid, trotationsofbranchcyclicrotations[i/6][4].middlebranchstart);
-				generateCyclicLabelsToRight(true, i, -1, trotationsofbranchcyclicrotations[i/6][4].middlebranchend, backbonesize + branchsize - 1, backbonesize, labels, parameters, theoreticalspectrum, centerx, centery, radius, angle, linesize, cornerlinesize, visibleionseries, visibleneutralloss, visiblerotationid, trotationsofbranchcyclicrotations[i/6][4].middlebranchstart, trotationsofbranchcyclicrotations[i/6][4].middlebranchend);
-				break;
-			case 5:
-				generateCyclicLabelsToLeft(true, rotationid*6 + 5, i/6, 0, trotationsofbranchcyclicrotations[rotationid][5].middlebranchstart, backbonesize, labels, parameters, theoreticalspectrum, centerx, centery, radius, angle, linesize, cornerlinesize, visibleionseries, visibleneutralloss, visiblerotationid, trotationsofbranchcyclicrotations[rotationid][5].middlebranchstart, trotationsofbranchcyclicrotations[rotationid][5].middlebranchend);
-				generateBranchLabelsUp(true, i, labels, parameters, theoreticalspectrum, centerx, topmargin, horizontalstep, verticalstep, visibleionseries, visibleneutralloss, visiblerotationid, trotationsofbranchcyclicrotations[i/6][5].middlebranchend);
-				generateBranchLabelsDown(false, i, labels, parameters, theoreticalspectrum, centerx, topmargin, horizontalstep, verticalstep, visibleionseries, visibleneutralloss, visiblerotationid, trotationsofbranchcyclicrotations[i/6][1].middlebranchstart);
-				generateCyclicLabelsToLeft(false, i, 0, trotationsofbranchcyclicrotations[i/6][1].middlebranchend, backbonesize + branchsize - 1, backbonesize, labels, parameters, theoreticalspectrum, centerx, centery, radius, angle, linesize, cornerlinesize, visibleionseries, visibleneutralloss, visiblerotationid, trotationsofbranchcyclicrotations[i/6][1].middlebranchstart, trotationsofbranchcyclicrotations[i/6][1].middlebranchend);
-				break;
-			default:
-				break;
+			switch (i % 6) {
+				case 0:
+					generateCyclicLabelsToLeft(true, i, i/6, 0, backbonesize + branchsize - 1, backbonesize, labels, parameters, theoreticalspectrum, centerx, centery, radius, angle, linesize, cornerlinesize, visibleionseries, visibleneutralloss, visiblerotationid, trotationsofbranchcyclicrotations[i/6][0].middlebranchstart, trotationsofbranchcyclicrotations[i/6][0].middlebranchend);
+					break;
+				case 1:
+					generateBranchLabelsDown(true, i, labels, parameters, theoreticalspectrum, centerx, topmargin, horizontalstep, verticalstep, visibleionseries, visibleneutralloss, visiblerotationid, trotationsofbranchcyclicrotations[i/6][1].middlebranchstart);
+					generateCyclicLabelsToLeft(true, i, 0, trotationsofbranchcyclicrotations[i/6][1].middlebranchend, backbonesize + branchsize - 1, backbonesize, labels, parameters, theoreticalspectrum, centerx, centery, radius, angle, linesize, cornerlinesize, visibleionseries, visibleneutralloss, visiblerotationid, trotationsofbranchcyclicrotations[i/6][1].middlebranchstart, trotationsofbranchcyclicrotations[i/6][1].middlebranchend);
+					break;
+				case 2:
+					generateCyclicLabelsToLeft(true, rotationid*6 + 2, i/6, 0, backbonesize + branchsize - 1, backbonesize, labels, parameters, theoreticalspectrum, centerx, centery, radius, angle, linesize, cornerlinesize, visibleionseries, visibleneutralloss, visiblerotationid, trotationsofbranchcyclicrotations[rotationid][2].middlebranchstart, trotationsofbranchcyclicrotations[rotationid][2].middlebranchend);
+					break;
+				case 3:
+					generateCyclicLabelsToLeft(true, i, i/6, 0, trotationsofbranchcyclicrotations[i/6][3].middlebranchstart, backbonesize, labels, parameters, theoreticalspectrum, centerx, centery, radius, angle, linesize, cornerlinesize, visibleionseries, visibleneutralloss, visiblerotationid, trotationsofbranchcyclicrotations[i/6][3].middlebranchstart, trotationsofbranchcyclicrotations[i/6][3].middlebranchend);
+					generateBranchLabelsUp(true, i, labels, parameters, theoreticalspectrum, centerx, topmargin, horizontalstep, verticalstep, visibleionseries, visibleneutralloss, visiblerotationid, trotationsofbranchcyclicrotations[i/6][3].middlebranchend, backbonesize + branchsize - 1);
+					generateBranchLabelsDown(false, i, labels, parameters, theoreticalspectrum, centerx, topmargin, horizontalstep, verticalstep, visibleionseries, visibleneutralloss, visiblerotationid, trotationsofbranchcyclicrotations[i/6][4].middlebranchstart);
+					generateCyclicLabelsToRight(false, i, -1, trotationsofbranchcyclicrotations[i/6][4].middlebranchend, backbonesize + branchsize - 1, backbonesize, labels, parameters, theoreticalspectrum, centerx, centery, radius, angle, linesize, cornerlinesize, visibleionseries, visibleneutralloss, visiblerotationid, trotationsofbranchcyclicrotations[i/6][4].middlebranchstart, trotationsofbranchcyclicrotations[i/6][4].middlebranchend);
+					break;
+				case 4:
+					generateBranchLabelsDown(true, i, labels, parameters, theoreticalspectrum, centerx, topmargin, horizontalstep, verticalstep, visibleionseries, visibleneutralloss, visiblerotationid, trotationsofbranchcyclicrotations[i/6][4].middlebranchstart);
+					generateCyclicLabelsToRight(true, i, -1, trotationsofbranchcyclicrotations[i/6][4].middlebranchend, backbonesize + branchsize - 1, backbonesize, labels, parameters, theoreticalspectrum, centerx, centery, radius, angle, linesize, cornerlinesize, visibleionseries, visibleneutralloss, visiblerotationid, trotationsofbranchcyclicrotations[i/6][4].middlebranchstart, trotationsofbranchcyclicrotations[i/6][4].middlebranchend);
+					break;
+				case 5:
+					generateCyclicLabelsToLeft(true, rotationid*6 + 5, i/6, 0, trotationsofbranchcyclicrotations[rotationid][5].middlebranchstart, backbonesize, labels, parameters, theoreticalspectrum, centerx, centery, radius, angle, linesize, cornerlinesize, visibleionseries, visibleneutralloss, visiblerotationid, trotationsofbranchcyclicrotations[rotationid][5].middlebranchstart, trotationsofbranchcyclicrotations[rotationid][5].middlebranchend);
+					generateBranchLabelsUp(true, i, labels, parameters, theoreticalspectrum, centerx, topmargin, horizontalstep, verticalstep, visibleionseries, visibleneutralloss, visiblerotationid, trotationsofbranchcyclicrotations[i/6][5].middlebranchend, backbonesize + branchsize - 1);
+					generateBranchLabelsDown(false, i, labels, parameters, theoreticalspectrum, centerx, topmargin, horizontalstep, verticalstep, visibleionseries, visibleneutralloss, visiblerotationid, trotationsofbranchcyclicrotations[i/6][1].middlebranchstart);
+					generateCyclicLabelsToLeft(false, i, 0, trotationsofbranchcyclicrotations[i/6][1].middlebranchend, backbonesize + branchsize - 1, backbonesize, labels, parameters, theoreticalspectrum, centerx, centery, radius, angle, linesize, cornerlinesize, visibleionseries, visibleneutralloss, visiblerotationid, trotationsofbranchcyclicrotations[i/6][1].middlebranchstart, trotationsofbranchcyclicrotations[i/6][1].middlebranchend);
+					break;
+				default:
+					break;
 			}
 
 		}
 
-		painter.setPen(QPen(Qt::red, 2, Qt::SolidLine));
-		for (auto it = labels.begin(); it != labels.end(); ++it) {
-			if (it->alignright) {
-				painter.drawText(it->x - fm.width(it->label.c_str()), it->y, fm.width(it->label.c_str()), 20, Qt::AlignLeft, it->label.c_str());
-			}
-			else {
-				painter.drawText(it->x, it->y, width(), 20, Qt::AlignLeft, it->label.c_str());
-			}
-		}
+		drawLabels(painter, labels, width());
 
 	}
 

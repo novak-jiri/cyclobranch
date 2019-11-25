@@ -115,6 +115,13 @@ protected:
 
 
 	/**
+		\brief Handle the mouse double click event.
+		\param event pointer to QMouseEvent
+	*/
+	void mouseDoubleClickEvent(QMouseEvent *event);
+
+
+	/**
 		\brief Handle the widget show event.
 		\param event pointer to QShowEvent
 	*/
@@ -133,6 +140,7 @@ private:
 	cTheoreticalSpectrumList* theoreticalspectrumlist;
 	cPeaksList ticchromatogram;
 	cPeaksList eicchromatogram;
+	vector<double> rtimes;
 
 	QWidget* parent;
 	QGraphicsScene* scene;
@@ -154,6 +162,9 @@ private:
 	int currentx;
 	int currenty;
 
+	double mintime;
+	double maxtime;
+
 	int minscan;
 	int maxscan;
 
@@ -165,6 +176,7 @@ private:
 	bool firstshow;
 	bool enablemouseselection;
 
+	bool retentiontime;
 	bool absoluteintensity;
 	bool hidetic;
 	bool hideeic;
@@ -187,14 +199,27 @@ private:
 
 signals:
 
+	/**
+		\brief The signal is emitted when the range of retention time has been changed.
+		\param mintime minimum retention time
+		\param maxtime maximum retention time
+	*/
+	void updateRetentionTimeInterval(double mintime, double maxtime);
+
 
 	/**
-		\brief The signal is emitted when the range of scans has been changed.
+		\brief The signal is emitted when the range of scan numbers has been changed.
 		\param minid minimum scan id
 		\param maxid maximum scan id
 	*/
 	void updateScanIDInterval(int minid, int maxid);
 
+
+	/**
+		\brief A chromatographic peak was double clicked.
+		\param scanid id of a scan
+	*/
+	void chromatogramWidgetDoubleClicked(int scanid);
 
 
 private slots:
@@ -209,7 +234,16 @@ private slots:
 	void normalSize();
 
 
+	void retentionTimeStateChanged(bool state);
+
+
 	void absoluteIntensityStateChanged(bool state);
+
+
+	void setRetentionTimeInterval(double mintime, double maxtime);
+
+
+	void resetRetentionTimeInterval();
 
 
 	void setScanIDInterval(int minid, int maxid);

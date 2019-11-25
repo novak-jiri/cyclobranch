@@ -6,9 +6,14 @@ cBricksDatabaseProxyModel::cBricksDatabaseProxyModel(QObject *parent) : QSortFil
 }
 
 
-void cBricksDatabaseProxyModel::initialize(QComboBox* rowsfiltercombobox, QComboBox* rowsfiltercomparatorcombobox) {
-	this->rowsfiltercombobox = rowsfiltercombobox;
-	this->rowsfiltercomparatorcombobox = rowsfiltercomparatorcombobox;
+void cBricksDatabaseProxyModel::initialize(QComboBox* rowsfilteroperator, QComboBox* rowsfiltercombobox1, QComboBox* rowsfiltercomparatorcombobox1, QLineEdit* rowsfilterline1, QComboBox* rowsfiltercombobox2, QComboBox* rowsfiltercomparatorcombobox2, QLineEdit* rowsfilterline2) {
+	filteroperator = rowsfilteroperator;
+	filtercombobox1 = rowsfiltercombobox1;
+	filtercomparatorcombobox1 = rowsfiltercomparatorcombobox1;
+	filterline1 = rowsfilterline1;
+	filtercombobox2 = rowsfiltercombobox2;
+	filtercomparatorcombobox2 = rowsfiltercomparatorcombobox2;
+	filterline2 = rowsfilterline2;
 }
 
 
@@ -18,121 +23,64 @@ void cBricksDatabaseProxyModel::setWholeWord(bool wholeword) {
 
 
 bool cBricksDatabaseProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const {
-	if (filterRegExp().isEmpty()) {
+	if (filterline1->text().isEmpty() && filterline2->text().isEmpty()) {
 		return true;
 	}
 
-	int col = rowsfiltercombobox->currentIndex() + 1;
+	int col1 = filtercombobox1->currentIndex() + 1;
+	int col2 = filtercombobox2->currentIndex() + 1;
 
-	if (sourceModel()->data(sourceModel()->index(sourceRow, col, sourceParent)).type() == QVariant::ByteArray) {
-		switch (rowsfiltercomparatorcombobox->currentIndex()) {
-		case 0:
-			if (sourceModel()->data(sourceModel()->index(sourceRow, col, sourceParent)).toDouble() == filterRegExp().pattern().toDouble()) {
-				return true;
-			}
-			break;
-		case 1:
-			if (sourceModel()->data(sourceModel()->index(sourceRow, col, sourceParent)).toDouble() < filterRegExp().pattern().toDouble()) {
-				return true;
-			}
-			break;
-		case 2:
-			if (sourceModel()->data(sourceModel()->index(sourceRow, col, sourceParent)).toDouble() <= filterRegExp().pattern().toDouble()) {
-				return true;
-			}
-			break;
-		case 3:
-			if (sourceModel()->data(sourceModel()->index(sourceRow, col, sourceParent)).toDouble() > filterRegExp().pattern().toDouble()) {
-				return true;
-			}
-			break;
-		case 4:
-			if (sourceModel()->data(sourceModel()->index(sourceRow, col, sourceParent)).toDouble() >= filterRegExp().pattern().toDouble()) {
-				return true;
-			}
-			break;
-		default:
-			break;
+	bool result1 = false;
+	bool result2 = false;
+
+	if (!filterline1->text().isEmpty()) {
+		if (sourceModel()->data(sourceModel()->index(sourceRow, col1, sourceParent)).type() == QVariant::ByteArray) {
+			result1 = proxyModelCheckDouble(sourceModel(), filtercomparatorcombobox1->currentIndex(), sourceRow, col1, filterline1->text(), sourceParent);
+		}
+
+		if (sourceModel()->data(sourceModel()->index(sourceRow, col1, sourceParent)).type() == QVariant::String) {
+			QString qstr = sourceModel()->data(sourceModel()->index(sourceRow, col1, sourceParent)).toString();
+			result1 = proxyModelCheckString(sourceModel(), filtercomparatorcombobox1->currentIndex(), sourceRow, col1, qstr, filterline1->text(), sourceParent, wholeword, filterCaseSensitivity());
+		}
+
+		if (sourceModel()->data(sourceModel()->index(sourceRow, col1, sourceParent)).type() == QVariant::Int) {
+			result1 = proxyModelCheckInt(sourceModel(), filtercomparatorcombobox1->currentIndex(), sourceRow, col1, filterline1->text(), sourceParent);
 		}
 	}
 
-	if (sourceModel()->data(sourceModel()->index(sourceRow, col, sourceParent)).type() == QVariant::String) {
-		switch (rowsfiltercomparatorcombobox->currentIndex()) {
-		case 0:
-			if (wholeword) {
-				if (sourceModel()->data(sourceModel()->index(sourceRow, col, sourceParent)).toString().compare(filterRegExp().pattern(), filterCaseSensitivity()) == 0) {
-					return true;
-				}
-			}
-			else {
-				if (sourceModel()->data(sourceModel()->index(sourceRow, col, sourceParent)).toString().contains(filterRegExp())) {
-					return true;
-				}
-			}
-			break;
-		case 1:
-			if (sourceModel()->data(sourceModel()->index(sourceRow, col, sourceParent)).toString().compare(filterRegExp().pattern(), filterCaseSensitivity()) < 0) {
-				return true;
-			}
-			break;
-		case 2:
-			if (sourceModel()->data(sourceModel()->index(sourceRow, col, sourceParent)).toString().compare(filterRegExp().pattern(), filterCaseSensitivity()) <= 0) {
-				return true;
-			}
-			break;
-		case 3:
-			if (sourceModel()->data(sourceModel()->index(sourceRow, col, sourceParent)).toString().compare(filterRegExp().pattern(), filterCaseSensitivity()) > 0) {
-				return true;
-			}
-			break;
-		case 4:
-			if (sourceModel()->data(sourceModel()->index(sourceRow, col, sourceParent)).toString().compare(filterRegExp().pattern(), filterCaseSensitivity()) >= 0) {
-				return true;
-			}
-			break;
-		default:
-			break;
+	if (!filterline2->text().isEmpty()) {
+		if (sourceModel()->data(sourceModel()->index(sourceRow, col2, sourceParent)).type() == QVariant::ByteArray) {
+			result2 = proxyModelCheckDouble(sourceModel(), filtercomparatorcombobox2->currentIndex(), sourceRow, col2, filterline2->text(), sourceParent);
+		}
+
+		if (sourceModel()->data(sourceModel()->index(sourceRow, col2, sourceParent)).type() == QVariant::String) {
+			QString qstr = sourceModel()->data(sourceModel()->index(sourceRow, col2, sourceParent)).toString();
+			result2 = proxyModelCheckString(sourceModel(), filtercomparatorcombobox2->currentIndex(), sourceRow, col2, qstr, filterline2->text(), sourceParent, wholeword, filterCaseSensitivity());
+		}
+
+		if (sourceModel()->data(sourceModel()->index(sourceRow, col2, sourceParent)).type() == QVariant::Int) {
+			result2 = proxyModelCheckInt(sourceModel(), filtercomparatorcombobox2->currentIndex(), sourceRow, col2, filterline2->text(), sourceParent);
 		}
 	}
 
-	if (sourceModel()->data(sourceModel()->index(sourceRow, col, sourceParent)).type() == QVariant::Int) {
-		switch (rowsfiltercomparatorcombobox->currentIndex()) {
-		case 0:
-			if (sourceModel()->data(sourceModel()->index(sourceRow, col, sourceParent)).toInt() == filterRegExp().pattern().toInt()) {
-				return true;
-			}
-			break;
-		case 1:
-			if (sourceModel()->data(sourceModel()->index(sourceRow, col, sourceParent)).toInt() < filterRegExp().pattern().toInt()) {
-				return true;
-			}
-			break;
-		case 2:
-			if (sourceModel()->data(sourceModel()->index(sourceRow, col, sourceParent)).toInt() <= filterRegExp().pattern().toInt()) {
-				return true;
-			}
-			break;
-		case 3:
-			if (sourceModel()->data(sourceModel()->index(sourceRow, col, sourceParent)).toInt() > filterRegExp().pattern().toInt()) {
-				return true;
-			}
-			break;
-		case 4:
-			if (sourceModel()->data(sourceModel()->index(sourceRow, col, sourceParent)).toInt() >= filterRegExp().pattern().toInt()) {
-				return true;
-			}
-			break;
-		default:
-			break;
-		}
+	if (!filterline1->text().isEmpty() && filterline2->text().isEmpty()) {
+		return result1;
 	}
 
-	return false;
+	if (filterline1->text().isEmpty() && !filterline2->text().isEmpty()) {
+		return result2;
+	}
+
+	if (filteroperator->currentIndex() == 0) {
+		return result1 || result2;
+	}
+
+	return result1 && result2;
 }
 
 
 bool cBricksDatabaseProxyModel::lessThan(const QModelIndex &left, const QModelIndex &right) const {
-	if (left.column() == 6) {
+	if (left.column() == 7) {
 		return false;
 	}
 

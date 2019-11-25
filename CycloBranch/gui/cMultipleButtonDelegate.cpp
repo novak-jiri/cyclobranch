@@ -42,7 +42,7 @@ void cMultipleButtonDelegate::paint(QPainter* painter, const QStyleOptionViewIte
 bool cMultipleButtonDelegate::editorEvent(QEvent* event, QAbstractItemModel* model, const QStyleOptionViewItem& option, const QModelIndex& index) {
 	if (event->type() == QEvent::MouseButtonRelease) {
 		QString acronyms = index.model()->index(index.row(), 2).data(Qt::DisplayRole).toString();
-		QString references = index.model()->index(index.row(), 6).data(Qt::DisplayRole).toString();
+		QString references = index.model()->index(index.row(), 7).data(Qt::DisplayRole).toString();
 
 		if (acronyms.isEmpty() || references.isEmpty()) {
 			return false;

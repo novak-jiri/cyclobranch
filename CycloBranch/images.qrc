@@ -50,5 +50,6 @@
         <file>images/icons/rectangle.png</file>
         <file>images/icons/chromatography.png</file>
         <file>images/icons/79.png</file>
+        <file>images/icons/12.png</file>
     </qresource>
 </RCC>

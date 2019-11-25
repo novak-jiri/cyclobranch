@@ -67,18 +67,61 @@ class cBricksDatabase {
 
 	vector<cBrick> bricks;
 
-public:
+	map<string, int> lossorders;
 
+	vector<double> lossmasses;
+	vector<string> losssummaries;
+	vector< map<string, int> > lossmaps;
+	
+	void addLossToMap(string& lossstr, vector<int>& lossids);
+
+	double getMassFromCombCounts(vector<int>& combcounts, vector<double>& combmasses);
+
+
+public:
+	
+	
 	/**
 		\brief Get next combination of bricks.
 		\param combarray reference to an input/output vector of integers
 		\param numberofbasicbricks initial number of bricks in a database
 		\param maximumbricksincombination maximum number of combined bricks
 		\param maximumcumulativemass maximum cummulative mass of combined bricks
+		\param neutralprecursormass neutral precursor mass
+		\retval bool true when a valid vector is stored in combarray, false when all valid vectors were already generated
+	*/
+	bool nextCombination(vector<int>& combarray, int numberofbasicbricks, int maximumbricksincombination, double maximumcumulativemass, double neutralprecursormass);
+
+
+	/**
+		\brief Get next combination of bricks.
+		\param combarray reference to an input/output vector of integers
+		\param combcounts reference to an input/output vector containing counts of elements in \a combarray
+		\param combmasses reference to an input vector containing masses of elements in \a combarray
+		\param mass sum of masses of blocks
+		\param numberofbasicbricks initial number of bricks in a database
+		\param maximumbricksincombination maximum number of combined bricks
+		\param maximumcumulativemass maximum cummulative mass of combined bricks
+		\param neutralprecursormass neutral precursor mass
+		\retval bool true when a valid vector is stored in combarray, false when all valid vectors were already generated
+	*/
+	bool nextCombinationFast(vector<int>& combarray, vector<int>& combcounts, vector<double>& combmasses, double& mass, int numberofbasicbricks, int maximumbricksincombination, double maximumcumulativemass, double neutralprecursormass);
+
+
+	/**
+		\brief Get next combination of bricks.
+		\param combarray reference to an input/output vector of integers
+		\param combcounts reference to an input/output vector containing counts of elements in \a combarray
+		\param comblimits reference to an input vector containing maximum allowed numbers of elements in \a combarray
+		\param combmasses reference to an input vector containing masses of elements in \a combarray
+		\param mass sum of masses of blocks
+		\param numberofbasicbricks initial number of bricks in a database
+		\param maximumbricksincombination maximum number of combined bricks
+		\param maximumcumulativemass maximum cummulative mass of combined bricks
 		\param neutralprecursormass neutral precursor mass 
 		\retval bool true when a valid vector is stored in combarray, false when all valid vectors were already generated
 	*/ 
-	bool nextCombination(vector<int>& combarray, int numberofbasicbricks, int maximumbricksincombination, double maximumcumulativemass, double neutralprecursormass);
+	bool nextCombinationFastLimited(vector<int>& combarray, vector<int>& combcounts, vector<int>& comblimits, vector<double>& combmasses, double& mass, int numberofbasicbricks, int maximumbricksincombination, double maximumcumulativemass, double neutralprecursormass);
 
 
 	/**
@@ -241,6 +284,29 @@ public:
 	*/ 
 	bool checkKetideBlocks(cBrick& brickseries, bool regularblocksorder);
 
+
+	/**
+		\brief Get the summary mass of neutral losses.
+		\param lossids a vector of ids of neutral losses
+		\retval double mass
+	*/
+	double getMassOfNeutralLosses(vector<int>& lossids);
+
+
+	/**
+		\brief Get the summary formula of neutral losses.
+		\param lossids a vector of ids of neutral losses
+		\retval string formula
+	*/
+	string getSummaryFormulaOfNeutralLosses(vector<int>& lossids);
+
+
+	/**
+		\brief Get the summary map of neutral losses.
+		\param lossids an input vector of ids of neutral losses
+		\param summarymap an output map of atoms
+	*/
+	void getMapOfNeutralLosses(vector<int>& lossids, map<string, int>& summarymap);
 
 };
 

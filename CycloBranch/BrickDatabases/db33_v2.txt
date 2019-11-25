@@ -1,33 +1,33 @@
-Glycine	Gly	C2H3NO	57.0214637236	CSID: 730
-DL-Alanine/D-Alanine/beta-Alanine/N-Methyl-Glycine	Ala/D-Ala/bAla/NMe-Gly	C3H5NO	71.0371137878	CSID: 582/CSID: 64234/CSID: 234/CSID: 1057
-Lactic acid/D-lactic acid	Lac/D-Lac	C3H4O2	72.0211293726	CSID: 592/CSID: 55423
-N-Methyl-L-alanine/N-methyl-beta-alanine/alpha-aminobutyric acid/D-alpha-aminobutyric acid/2-Methylalanine/methyl alaninate	NMe-Ala/NMe-bAla/Abu/D-Abu/Aib/D-3OMe-Ala	C4H7NO	85.0527638520	CSID: 4450824/CSID: 68396/PDB: ABA/PDB: DBB/CSID: 5891/CSID: 99878
-DL-Serine/D-Serine/isoserine	Ser/D-Ser/Iser	C3H5NO2	87.0320284099	CSID: 597/CSID: 64231/CSID: 10793
-DL-Proline/D-Proline/2-methylamino-2-dehydrobutyric acid/norcoronamic acid	Pro/D-Pro/2Dh-Mabu/norCMA	C5H7NO	97.0527638520	CSID: 594/CSID: 8640/CSID: 16743754/CSID: 28708240
-DL-Valine/D-Valine/Isovaline/D-Isovaline/Norvaline/D-Norvaline/2-methyl-3-aminobutanoic acid/N-dimethyl-Alanine/3-amino-pentanoic acid	Val/D-Val/Ival/D-Ival/Nva/D-Nva/Mab/NdMe-Ala/C5:0-NH2(3)	C5H9NO	99.0684139162	CSID: 1148/CSID: 64635/CSID: 85483/PDB: DIV/CSID: 801/CSID: 388660/CSID: 471786/CSID: 9962964/CSID: 11271826
-Succinic acid	Suc	C4H4O3	100.0160439947	CSID: 7634
-2-hydroxyisovaleric acid/D-2-hydroxyisovalerate	Hiv/D-Hiv	C5H8O2	100.0524295010	CSID: 90190/CID: 5289545
-Threonine/D-Threonine/allo-Threonine/D-allo-Threonine/Homoserine/D-Homoserine/N-Methyl-Serine/N-Methyl-D-Serine/4-amino-3-hydroxybutyric acid	Thr/D-Thr/aThr/D-aThr/Hse/D-Hse/NMe-Ser/D-NMe-Ser/OH-4Abu	C4H7NO2	101.0476784741	PDB: THR/PDB: DTH/PDB: ALO/CSID: 81824/CSID: 758/CSID: 2006329/CSID: 481791/PDB: DSE/CSID: 2064
-DL-Cysteine	Cys	C3H5NOS	103.0091844778	CSID: 574
-3-Methylproline/4-Methylproline/homoproline/D-homoproline/coronamic acid	3Me-Pro/4Me-Pro/Hpr/D-Hpr/CMA	C6H9NO	111.0684139162	CSID: 10610754/CSID: 312597/CSID: 826/CSID: 643442/CSID: 117751
-Leucine/D-Leucine/Isoleucine/D-Isoleucine/allo-Isoleucine/D-allo-Isoleucine/N-Methyl-L-valine/D-N-Methylvaline/3-Methylvaline/D-tert-Leu/2-methyl-3-aminopentanoic acid/D-N-methyl-norvaline	Leu/D-Leu/Ile/D-Ile/aIle/D-aIle/NMe-Val/D-NMe-Val/t-Leu/D-t-Leu/Map/D-NMe-Nva	C6H11NO	113.0840639804	CSID: 834/CSID: 388617/CSID: 769/CSID: 69017/CSID: 89698/CSID: 85019/CSID: 4225/CSID: 4225/CSID: 270637/CID: 6950340/CSID: 11643060/CSID: 10652938
-DL-Asparagine/D-Asparagine/N1-formyl-2.3-Diaminopropionic acid	Asn/D-Asn/NFo-Dpr	C4H6N2O2	114.0429274472	PDB: ASN/PDB: DSG/C(C(CN)NC=O)(=O)O in CSID: 8873525
-D-Leucic acid (2-hydroxy-4-methylpentanoic acid)/(R)-Leucic acid/3-hydroxyhexanoic acid/2-hydroxy-3-methyl-pentanoic acid/D-2-hydroxy-3-methyl-pentanoic acid	C5:0-Me(4)-OH(2)/4Me-D-Hva/C6:0-OH(3)/Hmp/D-Hmp	C6H10O2	114.0680795652	CSID: 83753/CSID: 388986/CSID: 133518/CSID: 144317/CSID: 144317
-DL-Ornithine/D-Ornithine	Orn/D-Orn	C5H10N2O	114.0793129535	CSID: 380/CSID: 64236
-DL-Aspartic acid/D-Aspartic acid/N-formyl-isoserine	Asp/D-Asp/NFo-Iser	C4H5NO3	115.0269430320	CSID: 411/CSID: 75697/C(C(C(=O)O)O)NC=O in CSID: 8503913
-N-Methyl-Leucine/D-N-methyl-Leucine/N-Methyl-Isoleucine/N-methyl-alloIsoleucine/D-N-methyl-alloIsoleucine/beta-methylisoleucine/homoisoleucine/alpha-ethylnorvaline/Dolavaline/2-methyl-3-aminohexadecanoic acid	NMe-Leu/D-NMe-Leu/NMe-Ile/NMe-aIle/D-NMe-aIle/bMe-Ile/Hil/Et-Nva/Dov/C6:0-Me(2)-NH2(3)	C7H13NO	127.0997140446	CSID: 493595/CSID: 493595/CSID: 487199/CCC(C)C(C(=O)O)NC in: NOR00428/CCC(C)C(C(=O)O)NC in: NOR00428/CSID: 19951406/CSID: 454232/CSID: 452678/CSID: 10731564/CSID: 21378848
-DL-Glutamine/D-Glutamine/N-methylasparagine/beta-methyl-asparagine/D-N2-methyl-asparagine/N1-acetyl-2.3-Diaminopropionic acid	Gln/D-Gln/NMe-Asn/bMe-Asn/D-N2Me-Asn/NAc-Dpr	C5H8N2O2	128.0585775114	PDB: GLN/PDB: DGN/CSID: 311563/CSID: 2284493/CSID: 288387/C(C(CN)NC(C)=O)(=O)O in CSID: 8570696
-DL-Lysine/D-Lysine/beta lysine/N-Hydroxy-histamine	Lys/D-Lys/bLys/N-OH-Hta	C6H12N2O	128.0949630177	CSID: 843/CSID: 51793/PDB: KBE/C1(CCCN1)CCNO in CSID: 4589228
-DL-Glutamic acid/D-Glutamic Acid/beta-methyl-aspartic acid/D-beta-methyl-aspartic acid/beta-methoxy-aspartic acid/O-acetyl-Serine	Glu/D-Glu/bMe-Asp/D-bMe-Asp/bOMe-Asp/Ac-Ser	C5H7NO3	129.0425930962	CSID: 591/PDB: DGL/PDB: 2AS/PDB: ACB/CSID: 92764/CSID: 184
-Methionine/N.S-dimethylcysteine	Met/diMe-Cys	C5H9NOS	131.0404846062	CSID: 853/CSID: 4450935
-DL-Histidine	His	C6H7N3O	137.0589118624	CSID: 752
-DL-Phenylalanine/D-Phenylalanine/beta-phenylalanine/D-beta-phenylalanine/N-methyl-phenylglycine	Phe/D-Phe/bPhe/D-bPhe/NMe-Ph-Gly	C9H9NO	147.0684139162	CSID: 969/CSID: 64639/CSID: 62403/CSID: 598357/CSID: 198596
-N-Acetylisoleucine/N-acetyl-Leucine/O-desmethyldolaproine	NAc-Ile/NAc-Leu/dDap	C8H13NO2	155.0946286667	CSID: 270615/CSID: 1918/C(C1CCCN1)(C(C(=O)O)C)O in CSID: 9938808
-DL-Arginine/D-Arginine/L-(+)-Arginine	Arg/D-Arg/L-Arg	C6H12N4O	156.1011110281	PDB: ARG/PDB: DAR/CSID: 6082
-3-hydroxy-4-methyloctanoic acid/3-hydroxy-nonanoic acid/3-hydroxy-isononanoic acid/3-hydroxy-6-methyloctanoic acid	C8:0-Me(4)-OH(3)/C9:0-OH(3)/iC9:0-OH(3)/aC9:0-OH(3)	C9H16O2	156.1150297578	CSID: 17247549/CSID: 33630/CID: 22472006/CSID: 10361823
-N6-formyl-HydroxyOrnithine/D-formyl-hydroxyOrnithine	Fo-OH-Orn/D-Fo-OH-Orn	C6H10N2O3	158.0691421977	PDB: FHO/PDB: FH7
-Tyrosine/D-Tyrosine/beta-tyrosine/Phenylserine/N-methyl-HydroxyPhenylGlycine	Tyr/D-Tyr/bTyr/Ph-Ser/NMe-Hpg	C9H9NO2	163.0633285383	CSID: 1121/CSID: 64252/CSID: 389285/CSID: 84951/CID: 15118056
-N-methyl-butenylthreonine/2-amino-8-oxo-decanoic acid	NMe-Bmt/C10:0-NH2(2)-oxo(8)	C10H17NO2	183.1259287951	CSID: 9944222/CSID: 16281719
-DL-Tryptophan/D-Tryptophan	Trp/D-Trp	C11H10N2O	186.0793129535	CSID: 1116/CSID: 8707
-3-hydroxy-13-methyltetradecanoic acid/3-hydroxy-pentadecanoic acid/3-hydroxy-isopentadecanoic acid/3-hydroxy-12-methyl-tetradecanoic acid	C14:0-Me(13)-OH(3)/C15:0-OH(3)/iC15:0-OH(3)/aC15:0-OH(3)	C15H28O2	240.2089301430	CSID: 9218624/CSID: 158374/CSID: 9218624/C(CC(CCCCCCCCC(CC)C)O)(O)=O in: NOR00211
-pyoverdin Pa A chromophore	ChrPaA	C13H11N3O3	257.0800412350	C1=C(C(=CC2=C1N3C(C(=C2)N)=NC(CC3)C(O)=O)O)O in CSID: 0
+Glycine	Gly	C2H3NO	57.0214640000		CSID: 730
+DL-Alanine/D-Alanine/beta-Alanine/N-Methyl-Glycine	Ala/D-Ala/bAla/NMe-Gly	C3H5NO	71.0371140000		CSID: 582/CSID: 64234/CSID: 234/CSID: 1057
+Lactic acid/D-lactic acid	Lac/D-Lac	C3H4O2	72.0211290000		CSID: 592/CSID: 55423
+N-Methyl-L-alanine/N-methyl-beta-alanine/alpha-aminobutyric acid/D-alpha-aminobutyric acid/2-Methylalanine/methyl alaninate	NMe-Ala/NMe-bAla/Abu/D-Abu/Aib/D-3OMe-Ala	C4H7NO	85.0527640000		CSID: 4450824/CSID: 68396/PDB: ABA/PDB: DBB/CSID: 5891/CSID: 99878
+DL-Serine/D-Serine/isoserine	Ser/D-Ser/Iser	C3H5NO2	87.0320280000		CSID: 597/CSID: 64231/CSID: 10793
+DL-Proline/D-Proline/2-methylamino-2-dehydrobutyric acid/norcoronamic acid	Pro/D-Pro/2Dh-Mabu/norCMA	C5H7NO	97.0527640000		CSID: 594/CSID: 8640/CSID: 16743754/CSID: 28708240
+DL-Valine/D-Valine/Isovaline/D-Isovaline/Norvaline/D-Norvaline/2-methyl-3-aminobutanoic acid/N-dimethyl-Alanine/3-amino-pentanoic acid	Val/D-Val/Ival/D-Ival/Nva/D-Nva/Mab/NdMe-Ala/C5:0-NH2(3)	C5H9NO	99.0684140000		CSID: 1148/CSID: 64635/CSID: 85483/PDB: DIV/CSID: 801/CSID: 388660/CSID: 471786/CSID: 9962964/CSID: 11271826
+Succinic acid	Suc	C4H4O3	100.0160440000		CSID: 7634
+2-hydroxyisovaleric acid/D-2-hydroxyisovalerate	Hiv/D-Hiv	C5H8O2	100.0524300000		CSID: 90190/CID: 5289545
+Threonine/D-Threonine/allo-Threonine/D-allo-Threonine/Homoserine/D-Homoserine/N-Methyl-Serine/N-Methyl-D-Serine/4-amino-3-hydroxybutyric acid	Thr/D-Thr/aThr/D-aThr/Hse/D-Hse/NMe-Ser/D-NMe-Ser/OH-4Abu	C4H7NO2	101.0476780000		PDB: THR/PDB: DTH/PDB: ALO/CSID: 81824/CSID: 758/CSID: 2006329/CSID: 481791/PDB: DSE/CSID: 2064
+DL-Cysteine	Cys	C3H5NOS	103.0091840000		CSID: 574
+3-Methylproline/4-Methylproline/homoproline/D-homoproline/coronamic acid	3Me-Pro/4Me-Pro/Hpr/D-Hpr/CMA	C6H9NO	111.0684140000		CSID: 10610754/CSID: 312597/CSID: 826/CSID: 643442/CSID: 117751
+Leucine/D-Leucine/Isoleucine/D-Isoleucine/allo-Isoleucine/D-allo-Isoleucine/N-Methyl-L-valine/D-N-Methylvaline/3-Methylvaline/D-tert-Leu/2-methyl-3-aminopentanoic acid/D-N-methyl-norvaline	Leu/D-Leu/Ile/D-Ile/aIle/D-aIle/NMe-Val/D-NMe-Val/t-Leu/D-t-Leu/Map/D-NMe-Nva	C6H11NO	113.0840640000		CSID: 834/CSID: 388617/CSID: 769/CSID: 69017/CSID: 89698/CSID: 85019/CSID: 4225/CSID: 4225/CSID: 270637/CID: 6950340/CSID: 11643060/CSID: 10652938
+DL-Asparagine/D-Asparagine/N1-formyl-2.3-Diaminopropionic acid	Asn/D-Asn/NFo-Dpr	C4H6N2O2	114.0429270000		PDB: ASN/PDB: DSG/C(C(CN)NC=O)(=O)O in CSID: 8873525
+D-Leucic acid (2-hydroxy-4-methylpentanoic acid)/(R)-Leucic acid/3-hydroxyhexanoic acid/2-hydroxy-3-methyl-pentanoic acid/D-2-hydroxy-3-methyl-pentanoic acid	C5:0-Me(4)-OH(2)/4Me-D-Hva/C6:0-OH(3)/Hmp/D-Hmp	C6H10O2	114.0680800000		CSID: 83753/CSID: 388986/CSID: 133518/CSID: 144317/CSID: 144317
+DL-Ornithine/D-Ornithine	Orn/D-Orn	C5H10N2O	114.0793130000		CSID: 380/CSID: 64236
+DL-Aspartic acid/D-Aspartic acid/N-formyl-isoserine	Asp/D-Asp/NFo-Iser	C4H5NO3	115.0269430000		CSID: 411/CSID: 75697/C(C(C(=O)O)O)NC=O in CSID: 8503913
+N-Methyl-Leucine/D-N-methyl-Leucine/N-Methyl-Isoleucine/N-methyl-alloIsoleucine/D-N-methyl-alloIsoleucine/beta-methylisoleucine/homoisoleucine/alpha-ethylnorvaline/Dolavaline/2-methyl-3-aminohexadecanoic acid	NMe-Leu/D-NMe-Leu/NMe-Ile/NMe-aIle/D-NMe-aIle/bMe-Ile/Hil/Et-Nva/Dov/C6:0-Me(2)-NH2(3)	C7H13NO	127.0997140000		CSID: 493595/CSID: 493595/CSID: 487199/CCC(C)C(C(=O)O)NC in: NOR00428/CCC(C)C(C(=O)O)NC in: NOR00428/CSID: 19951406/CSID: 454232/CSID: 452678/CSID: 10731564/CSID: 21378848
+DL-Glutamine/D-Glutamine/N-methylasparagine/beta-methyl-asparagine/D-N2-methyl-asparagine/N1-acetyl-2.3-Diaminopropionic acid	Gln/D-Gln/NMe-Asn/bMe-Asn/D-N2Me-Asn/NAc-Dpr	C5H8N2O2	128.0585780000		PDB: GLN/PDB: DGN/CSID: 311563/CSID: 2284493/CSID: 288387/C(C(CN)NC(C)=O)(=O)O in CSID: 8570696
+DL-Lysine/D-Lysine/beta lysine/N-Hydroxy-histamine	Lys/D-Lys/bLys/N-OH-Hta	C6H12N2O	128.0949630000		CSID: 843/CSID: 51793/PDB: KBE/C1(CCCN1)CCNO in CSID: 4589228
+DL-Glutamic acid/D-Glutamic Acid/beta-methyl-aspartic acid/D-beta-methyl-aspartic acid/beta-methoxy-aspartic acid/O-acetyl-Serine	Glu/D-Glu/bMe-Asp/D-bMe-Asp/bOMe-Asp/Ac-Ser	C5H7NO3	129.0425930000		CSID: 591/PDB: DGL/PDB: 2AS/PDB: ACB/CSID: 92764/CSID: 184
+Methionine/N.S-dimethylcysteine	Met/diMe-Cys	C5H9NOS	131.0404850000		CSID: 853/CSID: 4450935
+DL-Histidine	His	C6H7N3O	137.0589120000		CSID: 752
+DL-Phenylalanine/D-Phenylalanine/beta-phenylalanine/D-beta-phenylalanine/N-methyl-phenylglycine	Phe/D-Phe/bPhe/D-bPhe/NMe-Ph-Gly	C9H9NO	147.0684140000		CSID: 969/CSID: 64639/CSID: 62403/CSID: 598357/CSID: 198596
+N-Acetylisoleucine/N-acetyl-Leucine/O-desmethyldolaproine	NAc-Ile/NAc-Leu/dDap	C8H13NO2	155.0946290000		CSID: 270615/CSID: 1918/C(C1CCCN1)(C(C(=O)O)C)O in CSID: 9938808
+DL-Arginine/D-Arginine/L-(+)-Arginine	Arg/D-Arg/L-Arg	C6H12N4O	156.1011110000		PDB: ARG/PDB: DAR/CSID: 6082
+3-hydroxy-4-methyloctanoic acid/3-hydroxy-nonanoic acid/3-hydroxy-isononanoic acid/3-hydroxy-6-methyloctanoic acid	C8:0-Me(4)-OH(3)/C9:0-OH(3)/iC9:0-OH(3)/aC9:0-OH(3)	C9H16O2	156.1150300000		CSID: 17247549/CSID: 33630/CID: 22472006/CSID: 10361823
+N6-formyl-HydroxyOrnithine/D-formyl-hydroxyOrnithine	Fo-OH-Orn/D-Fo-OH-Orn	C6H10N2O3	158.0691420000		PDB: FHO/PDB: FH7
+Tyrosine/D-Tyrosine/beta-tyrosine/Phenylserine/N-methyl-HydroxyPhenylGlycine	Tyr/D-Tyr/bTyr/Ph-Ser/NMe-Hpg	C9H9NO2	163.0633290000		CSID: 1121/CSID: 64252/CSID: 389285/CSID: 84951/CID: 15118056
+N-methyl-butenylthreonine/2-amino-8-oxo-decanoic acid	NMe-Bmt/C10:0-NH2(2)-oxo(8)	C10H17NO2	183.1259290000		CSID: 9944222/CSID: 16281719
+DL-Tryptophan/D-Tryptophan	Trp/D-Trp	C11H10N2O	186.0793130000		CSID: 1116/CSID: 8707
+3-hydroxy-13-methyltetradecanoic acid/3-hydroxy-pentadecanoic acid/3-hydroxy-isopentadecanoic acid/3-hydroxy-12-methyl-tetradecanoic acid	C14:0-Me(13)-OH(3)/C15:0-OH(3)/iC15:0-OH(3)/aC15:0-OH(3)	C15H28O2	240.2089300000		CSID: 9218624/CSID: 158374/CSID: 9218624/C(CC(CCCCCCCCC(CC)C)O)(O)=O in: NOR00211
+pyoverdin Pa A chromophore	ChrPaA	C13H11N3O3	257.0800410000		C1=C(C(=CC2=C1N3C(C(=C2)N)=NC(CC3)C(O)=O)O)O in CSID: 0

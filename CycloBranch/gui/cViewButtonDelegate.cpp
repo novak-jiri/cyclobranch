@@ -23,7 +23,12 @@ void cViewButtonDelegate::paint(QPainter* painter, const QStyleOptionViewItem& o
 
 	QStyleOptionButton button;
 	button.rect = option.rect;
-	button.text = "view";
+	if (index.data(Qt::DisplayRole).toString().contains("https://www.ncbi.nlm.nih.gov/pccompound?term=")) {
+		button.text = "search";
+	}
+	else {
+		button.text = "view";
+	}
 	button.state = QStyle::State_Enabled;
 
 	QApplication::style()->drawControl(QStyle::CE_PushButton, &button, painter);

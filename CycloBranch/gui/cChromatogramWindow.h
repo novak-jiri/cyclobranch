@@ -53,6 +53,12 @@ public:
 	void closeEvent(QCloseEvent *event);
 
 
+	/**
+		\brief Recalculate TIC chromatogram.
+	*/
+	void recalculateTICChromatogram();
+
+
 private:
 
 	QWidget* parent;
@@ -71,18 +77,28 @@ private:
 	QAction* actionZoomIn;
 	QAction* actionZoomOut;
 	QAction* actionZoomReset;
+	QAction* actionMouseSelection;
+	QAction* actionRetentionTime;
 	QAction* actionAbsoluteIntensity;
 	QAction* actionHideTIC;
 	QAction* actionHideEIC;
 
-	QToolBar* toolbarScanID;
-	QAction* actionMouseSelection;
+	QToolBar* toolbarTime;
+
+	QWidget* widgetretentiontime;
+	QHBoxLayout* hboxretentiontime;
+	QLabel* labelretentiontime;
+	QDoubleSpinBox* minretentiontime;
+	QLabel* labelseparatorretentiontime;
+	QDoubleSpinBox* maxretentiontime;
+	QPushButton* setretentiontimeinterval;
+	QPushButton* resetretentiontimeinterval;
 
 	QWidget* widgetscanid;
 	QHBoxLayout* hboxscanid;
 	QLabel* labelscanid;
 	QSpinBox* minscanid;
-	QLabel* labelseparator;
+	QLabel* labelseparatorscanid;
 	QSpinBox* maxscanid;
 	QPushButton* setscanidinterval;
 	QPushButton* resetscanidinterval;
@@ -107,11 +123,26 @@ signals:
 
 
 	/**
-		\brief The signal is emitted when the range of scans has been changed.
+		\brief The signal is emitted when the range of retention time has been changed.
+		\param mintime minimum retention time
+		\param maxtime maximum retention time
+	*/
+	void emitRetentionTimeInterval(double mintime, double maxtime);
+
+
+	/**
+		\brief The signal is emitted when the range of scan numbers has been changed.
 		\param minid minimum scan id
 		\param maxid maximum scan id
 	*/
 	void emitScanIDInterval(int minid, int maxid);
+
+
+	/**
+		\brief The signal is emitted a chromatographic peak was double clicked.
+		\param scanid scan id
+	*/
+	void doubleClickedScanIDSignal(int scanid);
 
 
 private slots:
@@ -121,6 +152,12 @@ private slots:
 	
 
 	void closeWindow();
+
+
+	void updateRetentionTimeInterval(double mintime, double maxtime);
+
+
+	void setRetentionTimeInterval();
 
 
 	void updateScanIDInterval(int minid, int maxid);
@@ -134,6 +171,8 @@ private slots:
 
 	void showHTMLDocumentation();
 
+
+	void chromatogramDoubleClickedSlot(int scanid);
 
 };
 

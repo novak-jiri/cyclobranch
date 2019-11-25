@@ -1,44 +1,50 @@
 # CycloBranch
 
-An open-source, cross-platform and stand-alone tool for mass spectrometry data analysis.
+A tool for mass spectrometry data analysis.
 
-## Main features
+## About
   * designed for identification of small molecules
-  * *de novo* sequencing
-    * non-ribosomal peptides (NRPs) [1]
-    * siderophores (including metals) [2]
-    * supports linear, cyclic, branched, and branch-cyclic structures
-    * based on custom databases of building blocks
-      * 19 proteinogenic amino acids (20 including isomers)
-      * 287 NRP blocks (512 including isomers)
-  * dereplication / database search
+  * open-source, cross-platform, and stand-alone
+  * supported types of spectra
     * conventional mass spectra (MS)
-    * liquid-chromatography mass spectra (LC-MS) [2]
-      * batch-processing
+    * liquid-chromatography mass spectra (LC-MS)
     * imaging mass spectra (MSI)
-      * pixel-by-pixel analysis of imaging mass spectra (imzML) [2]
-      * fusion of imzML files with optical and histology images [3]
     * tandem mass spectra (MS/MS)
-      * single spectra analysis
-      * supports also a direct comparison of an experimental spectrum with a theoretical one
-    
+  * main features
+    * MS, LC-MC, MSI
+      * dereplication / database search
+      * prediction of elemental compositions of unknown compounds
+      * fine isotopic structure
+    * MSI
+      * pixel-by-pixel analysis of imaging mass spectra (imzML)
+      * fusion of imzML files with optical and histology images
+    * MS/MS
+      * single spectra only
+      * analysis based on custom databases of building blocks (amino acids)
+      * linear, cyclic, branched, and branch-cyclic non-ribosomal peptides (NRPs) and siderophores
+      * direct comparison of experimental spectrum with theoretical spectrum
+      * database search
+      * *de novo* sequencing
+        * 19 proteinogenic amino acids (20 including isomers)
+        * 287 NRP blocks (512 including isomers)
+
 ## Supported file formats
   * mzML, imzML
     * profile or centroid spectra
-    * profile spectra require [OpenMS 2.x](https://sourceforge.net/projects/open-ms/files/OpenMS/OpenMS-2.3/) installed 
+    * profile spectra require [OpenMS 2.x](https://sourceforge.net/projects/open-ms/files/OpenMS/OpenMS-2.4/) installed 
   * mzXML
     * centroid spectra
-    * requires [OpenMS 2.x](https://sourceforge.net/projects/open-ms/files/OpenMS/OpenMS-2.3/) installed
+    * requires [OpenMS 2.x](https://sourceforge.net/projects/open-ms/files/OpenMS/OpenMS-2.4/) installed
   * baf (Bruker)
-    * profile spectra
+    * profile and centroid spectra
     * requires [CompassXport 3.0](http://www.bruker.com/service/support-upgrades/software-downloads/mass-spectrometry.html) installed
     * Windows only
   * raw (Thermo)
     * profile or centroid spectra
-    * requires [OpenMS 2.x](https://sourceforge.net/projects/open-ms/files/OpenMS/OpenMS-2.3/) including ProteoWizard installed
+    * requires [OpenMS 2.x](https://sourceforge.net/projects/open-ms/files/OpenMS/OpenMS-2.4/) including ProteoWizard installed
     * Windows only
   * raw (Waters)
-    * centroid spectra
+    * profile and centroid spectra
     * Windows only
   * mgf (Mascot Generic File format)
     * centroid spectra
@@ -47,10 +53,16 @@ An open-source, cross-platform and stand-alone tool for mass spectrometry data a
     * tab separated mass-to-charge ratio and intensity on each line; multiple peaklists separated by an empty line
   
 ## Homepage
-http://ms.biomed.cas.cz/cyclobranch/
+https://ms.biomed.cas.cz/cyclobranch/
   
-## Publications
-  * [1] *J. Am. Soc. Mass Spectrom.* (2015), 26(10):1780-1786. DOI: [10.1007/s13361-015-1211-1](https://doi.org/10.1007/s13361-015-1211-1)
-  * [2] *BBA - Proteins Proteom.* (2017), 1865(7):768-775. DOI: [10.1016/j.bbapap.2016.12.003](https://doi.org/10.1016/j.bbapap.2016.12.003)
-  * [3] *Sci. Rep.* (2017), 7:16523. DOI: [10.1038/s41598-017-16648-z](https://doi.org/10.1038/s41598-017-16648-z)
-  * [4] *J. Mass Spectrom.* (2018), 53(11):1097-1103. DOI: [10.1002/jms.4285](https://doi.org/10.1002/jms.4285)
+## References and More Information
+  * *de novo* peptide sequencing of NRPs
+    * Novak J. et al. CycloBranch: *De Novo* Sequencing of Nonribosomal Peptides from Accurate Product Ion Mass Spectra. *J. Am. Soc. Mass Spectrom.*, 26(10):1780-1786, 2015. DOI: [10.1007/s13361-015-1211-1](https://doi.org/10.1007/s13361-015-1211-1)
+  * dereplication in LC-MS and MSI datasets; *de novo* sequencing of siderophores
+    * Novak J. et al. Batch-processing of Imaging or Liquid-chromatography Mass Spectrometry Datasets and *De Novo* Sequencing of Polyketide Siderophores. *BBA - Proteins Proteom.*, 1865(7):768-775, 2017. DOI: [10.1016/j.bbapap.2016.12.003](https://doi.org/10.1016/j.bbapap.2016.12.003)
+  * fusion of imzML files with histology images
+    * Luptakova D. et al. Non-invasive and Invasive Diagnoses of Aspergillosis in a Rat Model by Mass Spectrometry. *Sci. Rep.*, 7:16523, 2017. DOI: [10.1038/s41598-017-16648-z](https://doi.org/10.1038/s41598-017-16648-z)
+  * isotopic fine structure
+    * Novak J. et al. CycloBranch: An open tool for fine isotope structures in conventional and product ion mass spectra. *J. Mass Spectrom.* 53(11):1097-1103, 2018. DOI: [10.1002/jms.4285](https://doi.org/10.1002/jms.4285)
+  * configuration of the tool for different use cases
+    * Pluhacek T. et al. Analysis of Microbial Siderophores by Mass Spectrometry. In Sanjoy K. Bhattacharya (ed.), *Metabolomics: Methods and Protocols*, Methods in Molecular Biology, 1996:131-153, Springer, 2019. DOI: [10.1007/978-1-4939-9488-5_12](https://doi.org/10.1007/978-1-4939-9488-5_12)

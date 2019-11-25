@@ -4,7 +4,7 @@
 
 
 QString appname = "CycloBranch";
-QString appversion = "v. 1.3.7 (64-bit)";
+QString appversion = "v. 2.0.0 (64-bit)";
 
 
 #if OS_TYPE == UNX
@@ -14,6 +14,44 @@ QString appversion = "v. 1.3.7 (64-bit)";
 #if OS_TYPE == OSX
 	QString installdir = "";
 #endif
+
+
+void storeIntVector(vector<int>& v, ofstream& os) {
+	int size = (int)v.size();
+	os.write((char *)&size, sizeof(int));
+	for (int i = 0; i < (int)v.size(); i++) {
+		os.write((char *)&(v[i]), sizeof(int));
+	}
+}
+
+
+void loadIntVector(vector<int>& v, ifstream& is) {
+	int size;
+	is.read((char *)&size, sizeof(int));
+	v.resize(size);
+	for (int i = 0; i < (int)v.size(); i++) {
+		is.read((char *)&(v[i]), sizeof(int));
+	}
+}
+
+
+void storeDoubleVector(vector<double>& v, ofstream& os) {
+	int size = (int)v.size();
+	os.write((char *)&size, sizeof(int));
+	for (int i = 0; i < (int)v.size(); i++) {
+		os.write((char *)&(v[i]), sizeof(double));
+	}
+}
+
+
+void loadDoubleVector(vector<double>& v, ifstream& is) {
+	int size;
+	is.read((char *)&size, sizeof(int));
+	v.resize(size);
+	for (int i = 0; i < (int)v.size(); i++) {
+		is.read((char *)&(v[i]), sizeof(double));
+	}
+}
 
 
 void storeString(string& s, ofstream& os) {
@@ -78,6 +116,25 @@ void loadStringIntMap(map<string, int>& map, ifstream& is) {
 }
 
 
+void storeStringIntMapVector(vector< map<string, int> >& vector, ofstream& os) {
+	int size = (int)vector.size();
+	os.write((char *)&size, sizeof(int));
+	for (int i = 0; i < (int)vector.size(); i++) {
+		storeStringIntMap(vector[i], os);
+	}
+}
+
+
+void loadStringIntMapVector(vector< map<string, int> >& vector, ifstream& is) {
+	int size;
+	is.read((char *)&size, sizeof(int));
+	vector.resize(size);
+	for (int i = 0; i < (int)vector.size(); i++) {
+		loadStringIntMap(vector[i], is);
+	}
+}
+
+
 void storeIntStringMap(map<int, string>& map, ofstream& os) {
 	int size = (int)map.size();
 	os.write((char *)&size, sizeof(int));
@@ -113,6 +170,11 @@ void convertStringIntUnorderedMapToStringVector(unordered_map<string, int>& map,
 }
 
 
+bool isWhiteSpace(char c) {
+	return isspace(c);
+}
+
+
 bool isWhiteSpaceExceptSpace(char c) {
 	return isspace(c) && (c != ' ');
 }
@@ -134,26 +196,25 @@ bool checkRegex(ePeptideType peptidetype, string& sequence, string& errormessage
 
 	regex rx;
 	// [^\\[\\]]+ is used instead of .+ to prevent from a too complex regex error
-	switch (peptidetype)
-	{
-	case linear:
-	case linearpolyketide:
-		rx = "^\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])*$";
-		break;
-	case cyclic:
-	case cyclicpolyketide:
-		rx = "^\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])+$";
-		break;
-	case branched:
-		rx = "^\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])*\\\\\\(\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])+\\\\\\)\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])*$";
-		break;
-	case branchcyclic:
-		rx = "(^(\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])*)?\\\\\\(\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])+\\\\\\)\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])*$|^\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])*\\\\\\(\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])+\\\\\\)(\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])*)?$)";
-		break;
-	case other:
-	default:
-		rx = ".*";
-		break;
+	switch (peptidetype) {
+		case linear:
+		case linearpolyketide:
+			rx = "^\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])*$";
+			break;
+		case cyclic:
+		case cyclicpolyketide:
+			rx = "^\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])+$";
+			break;
+		case branched:
+			rx = "^\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])*\\\\\\(\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])+\\\\\\)\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])*$";
+			break;
+		case branchcyclic:
+			rx = "(^(\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])*)?\\\\\\(\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])+\\\\\\)\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])*$|^\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])*\\\\\\(\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])+\\\\\\)(\\[[^\\[\\]]+\\](-\\[[^\\[\\]]+\\])*)?$)";
+			break;
+		case other:
+		default:
+			rx = ".*";
+			break;
 	}
 
 	try {
@@ -168,6 +229,12 @@ bool checkRegex(ePeptideType peptidetype, string& sequence, string& errormessage
 	}
 
 	return true;
+}
+
+
+bool checkFile(string filename) {
+	ifstream f(filename.c_str());
+	return f.good();
 }
 
 
@@ -259,31 +326,23 @@ ePeptideType getPeptideTypeFromString(string& s) {
 
 
 string getStringFromPeptideType(ePeptideType peptidetype) {
-	switch (peptidetype)
-	{
-	case linear:
-		return "linear";
-		break;
-	case cyclic:
-		return "cyclic";
-		break;
-	case branched:
-		return "branched";
-		break;
-	case branchcyclic:
-		return "branch-cyclic";
-		break;
-	case linearpolyketide:
-		return "linear-polyketide";
-		break;
-	case cyclicpolyketide:
-		return "cyclic-polyketide";
-		break;
-	case other:
-		return "other";
-		break;
-	default:
-		break;
+	switch (peptidetype) {
+		case linear:
+			return "linear";
+		case cyclic:
+			return "cyclic";
+		case branched:
+			return "branched";
+		case branchcyclic:
+			return "branch-cyclic";
+		case linearpolyketide:
+			return "linear-polyketide";
+		case cyclicpolyketide:
+			return "cyclic-polyketide";
+		case other:
+			return "other";
+		default:
+			break;
 	}
 
 	return "other";
@@ -409,5 +468,114 @@ void stripIsomersFromStringVector(vector<string>& acronyms) {
 			acronyms[i] = acronyms[i].substr(0, pos);
 		}
 	}
+}
+
+
+bool proxyModelCheckInt(QAbstractItemModel* model, int index, int row, int column, QString str, const QModelIndex& parent) {
+	switch (index) {
+		case 0:
+			if (model->data(model->index(row, column, parent)).toInt() == str.toInt()) {
+				return true;
+			}
+			break;
+		case 1:
+			if (model->data(model->index(row, column, parent)).toInt() < str.toInt()) {
+				return true;
+			}
+			break;
+		case 2:
+			if (model->data(model->index(row, column, parent)).toInt() <= str.toInt()) {
+				return true;
+			}
+			break;
+		case 3:
+			if (model->data(model->index(row, column, parent)).toInt() > str.toInt()) {
+				return true;
+			}
+			break;
+		case 4:
+			if (model->data(model->index(row, column, parent)).toInt() >= str.toInt()) {
+				return true;
+			}
+			break;
+		default:
+			break;
+	}
+	return false;
+}
+
+
+bool proxyModelCheckDouble(QAbstractItemModel* model, int index, int row, int column, QString str, const QModelIndex& parent) {
+	switch (index) {
+		case 0:
+			if (model->data(model->index(row, column, parent)).toDouble() == str.toDouble()) {
+				return true;
+			}
+			break;
+		case 1:
+			if (model->data(model->index(row, column, parent)).toDouble() < str.toDouble()) {
+				return true;
+			}
+			break;
+		case 2:
+			if (model->data(model->index(row, column, parent)).toDouble() <= str.toDouble()) {
+				return true;
+			}
+			break;
+		case 3:
+			if (model->data(model->index(row, column, parent)).toDouble() > str.toDouble()) {
+				return true;
+			}
+			break;
+		case 4:
+			if (model->data(model->index(row, column, parent)).toDouble() >= str.toDouble()) {
+				return true;
+			}
+			break;
+		default:
+			break;
+	}
+	return false;
+}
+
+
+bool proxyModelCheckString(QAbstractItemModel* model, int index, int row, int column, QString& itemstr, QString str, const QModelIndex& parent, bool wholeword, Qt::CaseSensitivity casesensitive) {
+	string tmpstr = itemstr.toStdString();
+	QString qstr = stripHTML(tmpstr).c_str();
+	switch (index) {
+		case 0:
+			if (wholeword) {
+				if (qstr.compare(str, casesensitive) == 0) {
+					return true;
+				}
+			}
+			else {
+				return qstr.contains(str, casesensitive);
+			}
+			break;
+		case 1:
+			if (qstr.compare(str, casesensitive) < 0) {
+				return true;
+			}
+			break;
+		case 2:
+			if (qstr.compare(str, casesensitive) <= 0) {
+				return true;
+			}
+			break;
+		case 3:
+			if (qstr.compare(str, casesensitive) > 0) {
+				return true;
+			}
+			break;
+		case 4:
+			if (qstr.compare(str, casesensitive) >= 0) {
+				return true;
+			}
+			break;
+		default:
+			break;
+	}
+	return false;
 }
 

@@ -117,8 +117,16 @@ string& cSequence::getBranchModification() {
 
 
 string cSequence::getNameWithReferenceAsHTMLString() {
-	regex rx;	
+	// performance improvement - quick return without regex_search
 	string s = "";
+	if (reference.empty()) {
+		s += "<a href=\"https://www.ncbi.nlm.nih.gov/pccompound?term=" + name + "\">";
+		s += name;
+		s += "</a>";
+		return s;
+	}
+
+	regex rx;	
 	bool correctreference = false;
 
 	try {
@@ -127,7 +135,7 @@ string cSequence::getNameWithReferenceAsHTMLString() {
 		if (!correctreference) {
 			rx = "^CSID: [0-9]+$";
 			if (regex_search(reference, rx)) {
-				s += "<a href=\"http://www.chemspider.com/Chemical-Structure." + reference.substr(6) + ".html\">";
+				s += "<a href=\"https://www.chemspider.com/Chemical-Structure." + reference.substr(6) + ".html\">";
 				s += name;
 				s += "</a>";
 				correctreference = true;
@@ -138,7 +146,18 @@ string cSequence::getNameWithReferenceAsHTMLString() {
 		if (!correctreference) {
 			rx = "^CID: [0-9]+$";
 			if (regex_search(reference, rx)) {
-				s += "<a href=\"http://pubchem.ncbi.nlm.nih.gov/summary/summary.cgi?cid=" + reference.substr(5) + "\">";
+				s += "<a href=\"https://pubchem.ncbi.nlm.nih.gov/summary/summary.cgi?cid=" + reference.substr(5) + "\">";
+				s += name;
+				s += "</a>";
+				correctreference = true;
+			}
+		}
+
+		// ChEBI
+		if (!correctreference) {
+			rx = "^CHEBI: [0-9]+$";
+			if (regex_search(reference, rx)) {
+				s += "<a href=\"https://www.ebi.ac.uk/chebi/searchId.do?chebiId=CHEBI:" + reference.substr(7) + "\">";
 				s += name;
 				s += "</a>";
 				correctreference = true;
@@ -149,7 +168,7 @@ string cSequence::getNameWithReferenceAsHTMLString() {
 		if (!correctreference) {
 			rx = "^NOR[0-9]+$";
 			if (regex_search(reference, rx)) {
-				s += "<a href=\"http://bioinfo.lifl.fr/norine/result.jsp?ID=" + reference + "\">";
+				s += "<a href=\"https://bioinfo.lifl.fr/norine/result.jsp?ID=" + reference + "\">";
 				s += name;
 				s += "</a>";
 				correctreference = true;
@@ -160,7 +179,7 @@ string cSequence::getNameWithReferenceAsHTMLString() {
 		if (!correctreference) {
 			rx = "^LM([A-Z]|[0-9])+$";
 			if (regex_search(reference, rx)) {
-				s += "<a href=\"http://www.lipidmaps.org/data/LMSDRecord.php?LMID=" + reference + "\">";
+				s += "<a href=\"https://www.lipidmaps.org/data/LMSDRecord.php?LMID=" + reference + "\">";
 				s += name;
 				s += "</a>";
 				correctreference = true;
@@ -171,7 +190,7 @@ string cSequence::getNameWithReferenceAsHTMLString() {
 		if (!correctreference) {
 			rx = "^C[0-9]{5}$";
 			if (regex_search(reference, rx)) {
-				s += "<a href=\"http://www.genome.jp/dbget-bin/www_bget?cpd:" + reference + "\">";
+				s += "<a href=\"https://www.genome.jp/dbget-bin/www_bget?cpd:" + reference + "\">";
 				s += name;
 				s += "</a>";
 				correctreference = true;
@@ -200,6 +219,28 @@ string cSequence::getNameWithReferenceAsHTMLString() {
 			}
 		}
 
+		// Siderophore Base (undocumented)
+		if (!correctreference) {
+			rx = "^SB: [0-9]+$";
+			if (regex_search(reference, rx)) {
+				s += "<a href=\"http://bertrandsamuel.free.fr/siderophore_base/siderophore.php?id=" + reference.substr(4) + "\">";
+				s += name;
+				s += "</a>";
+				correctreference = true;
+			}
+		}
+
+		// MIBIG (undocumented)
+		if (!correctreference) {
+			rx = "^MIBIG: BGC[0-9]+$";
+			if (regex_search(reference, rx)) {
+				s += "<a href=\"https://mibig.secondarymetabolites.org/repository/" + reference.substr(7) + "\">";
+				s += name;
+				s += "</a>";
+				correctreference = true;
+			}
+		}
+
 		// DOI
 		if (!correctreference) {
 			rx = "^DOI: ";
@@ -217,7 +258,9 @@ string cSequence::getNameWithReferenceAsHTMLString() {
 	}
 
 	if (!correctreference) {
-		s = name;
+		s += "<a href=\"https://www.ncbi.nlm.nih.gov/pccompound?term=" + name + "\">";
+		s += name;
+		s += "</a>";
 	}
 
 	return s;

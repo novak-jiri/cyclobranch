@@ -16,6 +16,7 @@ cChromatogramWindow::cChromatogramWindow(cTheoreticalSpectrumList& theoreticalsp
 	menuHelp = new QMenu(tr("&Help"), this);
 
 	chromatogramwindowwidget = new cChromatogramWindowWidget(theoreticalspectrumlist, this);
+	connect(chromatogramwindowwidget, SIGNAL(chromatogramWidgetDoubleClicked(int)), this, SLOT(chromatogramDoubleClickedSlot(int)));
 
 
 	toolbarFile = addToolBar(tr("File"));
@@ -55,6 +56,23 @@ cChromatogramWindow::cChromatogramWindow(cTheoreticalSpectrumList& theoreticalsp
 
 	toolbarView->addSeparator();
 
+	actionMouseSelection = new QAction(QIcon(":/images/icons/64.png"), tr("Mouse Selection Tool"), this);
+	actionMouseSelection->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_T));
+	actionMouseSelection->setToolTip("Mouse Selection Tool (Ctrl + T)");
+	actionMouseSelection->setCheckable(true);
+	actionMouseSelection->setChecked(true);
+	actionMouseSelection->setEnabled(true);
+	toolbarView->addAction(actionMouseSelection);
+	connect(actionMouseSelection, SIGNAL(toggled(bool)), chromatogramwindowwidget, SLOT(enableMouseSelectionTool(bool)));
+
+	actionRetentionTime = new QAction(QIcon(":/images/icons/12.png"), tr("Retention Ti&me"), this);
+	actionRetentionTime->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_M));
+	actionRetentionTime->setToolTip("Retention Time (Ctrl + M)");
+	actionRetentionTime->setCheckable(true);
+	actionRetentionTime->setChecked(true);
+	toolbarView->addAction(actionRetentionTime);
+	connect(actionRetentionTime, SIGNAL(toggled(bool)), chromatogramwindowwidget, SLOT(retentionTimeStateChanged(bool)));
+
 	actionAbsoluteIntensity = new QAction(QIcon(":/images/icons/11.png"), tr("&Absolute Intensity"), this);
 	actionAbsoluteIntensity->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_I));
 	actionAbsoluteIntensity->setToolTip("Absolute Intensity (Ctrl + I)");
@@ -89,24 +107,70 @@ cChromatogramWindow::cChromatogramWindow(cTheoreticalSpectrumList& theoreticalsp
 	connect(actionHTMLDocumentation, SIGNAL(triggered()), this, SLOT(showHTMLDocumentation()));
 
 
+	toolbarTime = addToolBar(tr("Time and Spectrum ID"));
+
+	labelretentiontime = new QLabel(tr("Time: "));
+
+	minretentiontime = new QDoubleSpinBox();
+	minretentiontime->setToolTip("Minimum time");
+	minretentiontime->setDecimals(6);
+	minretentiontime->setRange(0, 10000000);
+	minretentiontime->setSingleStep(1);
+
+	labelseparatorretentiontime = new QLabel(tr("-"));
+
+	maxretentiontime = new QDoubleSpinBox();
+	maxretentiontime->setToolTip("Maximum time");
+	maxretentiontime->setDecimals(6);
+	maxretentiontime->setRange(0, 10000000);
+	maxretentiontime->setSingleStep(1);
+
+	setretentiontimeinterval = new QPushButton("Set Time");
+	setretentiontimeinterval->setMinimumWidth(75);
+	connect(setretentiontimeinterval, SIGNAL(released()), this, SLOT(setRetentionTimeInterval()));
+	connect(this, SIGNAL(emitRetentionTimeInterval(double, double)), chromatogramwindowwidget, SLOT(setRetentionTimeInterval(double, double)));
+
+	resetretentiontimeinterval = new QPushButton("Reset Time");
+	resetretentiontimeinterval->setMinimumWidth(75);
+	connect(resetretentiontimeinterval, SIGNAL(released()), chromatogramwindowwidget, SLOT(resetRetentionTimeInterval()));
+	connect(chromatogramwindowwidget, SIGNAL(updateRetentionTimeInterval(double, double)), this, SLOT(updateRetentionTimeInterval(double, double)));
+
+	hboxretentiontime = new QHBoxLayout();
+	hboxretentiontime->addWidget(labelretentiontime);
+	hboxretentiontime->addWidget(minretentiontime);
+	hboxretentiontime->addWidget(labelseparatorretentiontime);
+	hboxretentiontime->addWidget(maxretentiontime);
+	hboxretentiontime->addSpacing(5);
+	hboxretentiontime->addWidget(setretentiontimeinterval);
+	hboxretentiontime->addSpacing(5);
+	hboxretentiontime->addWidget(resetretentiontimeinterval);
+
+	widgetretentiontime = new QWidget();
+	widgetretentiontime->setLayout(hboxretentiontime);
+
+	toolbarTime->addWidget(widgetretentiontime);
+	toolbarTime->addSeparator();
+
 	labelscanid = new QLabel(tr("Spectrum ID: "));
 
 	minscanid = new QSpinBox();
+	minscanid->setToolTip("Minimum spectrum ID");
 	minscanid->setRange(1, 1000000);
 	minscanid->setSingleStep(1);
 
-	labelseparator = new QLabel(tr("-"));
+	labelseparatorscanid = new QLabel(tr("-"));
 
 	maxscanid = new QSpinBox();
+	maxscanid->setToolTip("Maximum spectrum ID");
 	maxscanid->setRange(1, 1000000);
 	maxscanid->setSingleStep(1);
 
-	setscanidinterval = new QPushButton("Set");
+	setscanidinterval = new QPushButton("Set ID");
 	setscanidinterval->setMinimumWidth(75);
 	connect(setscanidinterval, SIGNAL(released()), this, SLOT(setScanIDInterval()));
 	connect(this, SIGNAL(emitScanIDInterval(int, int)), chromatogramwindowwidget, SLOT(setScanIDInterval(int, int)));
 
-	resetscanidinterval = new QPushButton("Reset");
+	resetscanidinterval = new QPushButton("Reset ID");
 	resetscanidinterval->setMinimumWidth(75);
 	connect(resetscanidinterval, SIGNAL(released()), chromatogramwindowwidget, SLOT(resetScanIDInterval()));
 	connect(chromatogramwindowwidget, SIGNAL(updateScanIDInterval(int, int)), this, SLOT(updateScanIDInterval(int, int)));
@@ -114,7 +178,7 @@ cChromatogramWindow::cChromatogramWindow(cTheoreticalSpectrumList& theoreticalsp
 	hboxscanid = new QHBoxLayout();
 	hboxscanid->addWidget(labelscanid);
 	hboxscanid->addWidget(minscanid);
-	hboxscanid->addWidget(labelseparator);
+	hboxscanid->addWidget(labelseparatorscanid);
 	hboxscanid->addWidget(maxscanid);
 	hboxscanid->addSpacing(5);
 	hboxscanid->addWidget(setscanidinterval);
@@ -124,18 +188,7 @@ cChromatogramWindow::cChromatogramWindow(cTheoreticalSpectrumList& theoreticalsp
 	widgetscanid = new QWidget();
 	widgetscanid->setLayout(hboxscanid);
 
-	toolbarScanID = addToolBar(tr("Spectrum ID"));
-
-	actionMouseSelection = new QAction(QIcon(":/images/icons/64.png"), tr("Mouse Spectrum ID Selection Tool"), this);
-	actionMouseSelection->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_T));
-	actionMouseSelection->setToolTip("Mouse Spectrum ID Selection Tool (Ctrl + T)");
-	actionMouseSelection->setCheckable(true);
-	actionMouseSelection->setChecked(true);
-	actionMouseSelection->setEnabled(true);
-	toolbarScanID->addAction(actionMouseSelection);
-	connect(actionMouseSelection, SIGNAL(toggled(bool)), chromatogramwindowwidget, SLOT(enableMouseSelectionTool(bool)));
-
-	toolbarScanID->addWidget(widgetscanid);
+	toolbarTime->addWidget(widgetscanid);
 
 
 	menuFile->addAction(actionExportImage);
@@ -146,6 +199,8 @@ cChromatogramWindow::cChromatogramWindow(cTheoreticalSpectrumList& theoreticalsp
 	menuView->addAction(actionZoomOut);
 	menuView->addAction(actionZoomReset);
 	menuView->addSeparator();
+	menuView->addAction(actionMouseSelection);
+	menuView->addAction(actionRetentionTime);
 	menuView->addAction(actionAbsoluteIntensity);
 	menuView->addSeparator();
 	menuView->addAction(actionHideTIC);
@@ -162,17 +217,25 @@ cChromatogramWindow::cChromatogramWindow(cTheoreticalSpectrumList& theoreticalsp
 	setCentralWidget(chromatogramwindowwidget);
 	centralWidget()->setContentsMargins(0, 0, 0, 0);
 
-	resize(1280, 780);
-
+	resize(defaultwinsizex, defaultwinsizey);
 }
 
 
 cChromatogramWindow::~cChromatogramWindow() {
 	delete chromatogramwindowwidget;
 
+	delete labelretentiontime;
+	delete minretentiontime;
+	delete labelseparatorretentiontime;
+	delete maxretentiontime;
+	delete setretentiontimeinterval;
+	delete resetretentiontimeinterval;
+	delete hboxretentiontime;
+	delete widgetretentiontime;
+
 	delete labelscanid;
 	delete minscanid;
-	delete labelseparator;
+	delete labelseparatorscanid;
 	delete maxscanid;
 	delete setscanidinterval;
 	delete resetscanidinterval;
@@ -184,11 +247,12 @@ cChromatogramWindow::~cChromatogramWindow() {
 	delete actionZoomIn;
 	delete actionZoomOut;
 	delete actionZoomReset;
+	delete actionMouseSelection;
+	delete actionRetentionTime;
 	delete actionAbsoluteIntensity;
 	delete actionHideTIC;
 	delete actionHideEIC;
 	delete actionHTMLDocumentation;
-	delete actionMouseSelection;
 
 	delete menuFile;
 	delete menuView;
@@ -204,9 +268,19 @@ void cChromatogramWindow::closeEvent(QCloseEvent *event) {
 }
 
 
+void cChromatogramWindow::recalculateTICChromatogram() {
+	chromatogramwindowwidget->recalculateTICChromatogram();
+}
+
+
 void cChromatogramWindow::keyPressEvent(QKeyEvent *event) {
 	if ((event->key() == Qt::Key_Enter) || (event->key() == Qt::Key_Return)) {
-		setScanIDInterval();
+		if (minscanid->hasFocus() || maxscanid->hasFocus()) {
+			setScanIDInterval();
+		}
+		if (minretentiontime->hasFocus() || maxretentiontime->hasFocus()) {
+			setRetentionTimeInterval();
+		}
 	}
 
 	event->accept();
@@ -264,6 +338,17 @@ void cChromatogramWindow::closeWindow() {
 }
 
 
+void cChromatogramWindow::updateRetentionTimeInterval(double mintime, double maxtime) {
+	this->minretentiontime->setValue(mintime);
+	this->maxretentiontime->setValue(maxtime);
+}
+
+
+void cChromatogramWindow::setRetentionTimeInterval() {
+	emit emitRetentionTimeInterval(minretentiontime->value(), maxretentiontime->value());
+}
+
+
 void cChromatogramWindow::updateScanIDInterval(int minid, int maxid) {
 	this->minscanid->setValue(minid);
 	this->maxscanid->setValue(maxid);
@@ -286,5 +371,10 @@ void cChromatogramWindow::showHTMLDocumentation() {
 	#else
 		QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo(installdir + "docs/html/chromatogram.html").absoluteFilePath()));
 	#endif
+}
+
+
+void cChromatogramWindow::chromatogramDoubleClickedSlot(int scanid) {
+	emit doubleClickedScanIDSignal(scanid);
 }
 

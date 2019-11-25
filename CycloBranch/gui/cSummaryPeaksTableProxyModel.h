@@ -11,6 +11,7 @@
 #include <QVariant>
 #include <QSortFilterProxyModel>
 #include <QComboBox>
+#include <QLineEdit>
 #include "core/cParameters.h"
 
 
@@ -26,9 +27,15 @@ private:
 	eModeType mode;
 	ePeakListFileFormat peaklistfileformat;
 	bool generateisotopepattern;
-	QComboBox* rowsfiltercombobox;
-	QComboBox* rowsfiltercomparatorcombobox;
+	QComboBox* filteroperator;
+	QComboBox* filtercombobox1;
+	QComboBox* filtercomparatorcombobox1;
+	QLineEdit* filterline1;
+	QComboBox* filtercombobox2;
+	QComboBox* filtercomparatorcombobox2;
+	QLineEdit* filterline2;
 	bool wholeword;
+
 
 public:
 
@@ -68,10 +75,15 @@ public:
 		\param mode program mode
 		\param peaklistfileformat peaklist format
 		\param generateisotopepattern true if full isotope patterns are generated; false otherwise
-		\param rowsfiltercombobox reference to the combobox with selection of columns
-		\param rowsfiltercomparatorcombobox reference to the combobox with selection of comparator
-	*/ 
-	void initialize(eModeType mode, ePeakListFileFormat peaklistfileformat, bool generateisotopepattern, QComboBox* rowsfiltercombobox, QComboBox* rowsfiltercomparatorcombobox);
+		\param rowsfilteroperator reference to the combobox with operator selection
+		\param rowsfiltercombobox1 reference to the combobox with selection of columns
+		\param rowsfiltercomparatorcombobox1 reference to the combobox with selection of comparator
+		\param rowsfilterline1 reference to a text field
+		\param rowsfiltercombobox2 reference to the combobox with selection of columns
+		\param rowsfiltercomparatorcombobox2 reference to the combobox with selection of comparator
+		\param rowsfilterline2 reference to a text field
+	*/
+	void initialize(eModeType mode, ePeakListFileFormat peaklistfileformat, bool generateisotopepattern, QComboBox* rowsfilteroperator, QComboBox* rowsfiltercombobox1, QComboBox* rowsfiltercomparatorcombobox1, QLineEdit* rowsfilterline1, QComboBox* rowsfiltercombobox2, QComboBox* rowsfiltercomparatorcombobox2, QLineEdit* rowsfilterline2);
 
 
 	/**

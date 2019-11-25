@@ -162,8 +162,11 @@ private:
 	QDoubleSpinBox* minimumrelativeintensitythreshold;
 	QLabel* minimumabsoluteintensitythresholdlabel;
 	QSpinBox* minimumabsoluteintensitythreshold;
-	QLabel* minimummzlabel;
+	QLabel* mzratiolabel;
 	QDoubleSpinBox* minimummz;
+	QDoubleSpinBox* maximummz;
+	QHBoxLayout* mzratiolayout;
+	QWidget* mzratiowidget;
 	QLabel* fwhmlabel;
 	QDoubleSpinBox* fwhm;
 
@@ -233,8 +236,18 @@ private:
 	QSpinBox* minimumpatternsize;
 	QLabel* minimumfeaturesizelabel;
 	QSpinBox* minimumfeaturesize;
-	QLabel* allionsmustbepresentlabel;
-	QCheckBox* allionsmustbepresent;
+	QLabel* minimumiontypeslabel;
+	QSpinBox* minimumiontypes;
+	QLabel* basicformulachecklabel;
+	QCheckBox* basicformulacheck;
+	QLabel* advancedformulachecklabel;
+	QCheckBox* advancedformulacheck;
+	QLabel* noratiochecklabel;
+	QCheckBox* noratiocheck;
+	QLabel* mzdifftolerancelabel;
+	QDoubleSpinBox* mzdifftolerance;
+	QLabel* intensitytolerancelabel;
+	QDoubleSpinBox* intensitytolerance;
 
 	QGroupBox* searchedsequencegroupbox;
 	QGridLayout* searchedsequencegridlayout;
@@ -243,19 +256,22 @@ private:
 	QPushButton* searchedsequencebutton;
 	QHBoxLayout* searchedsequencelayout;
 	QWidget* searchedsequencewidget;
-	QLabel* searchedsequenceNtermmodiflabel;
+	QLabel* searchedsequencemodiflabel;
 	QLineEdit* searchedsequenceNtermmodif;
-	QLabel* searchedsequenceCtermmodiflabel;
 	QLineEdit* searchedsequenceCtermmodif;
-	QLabel* searchedsequenceTmodiflabel;
 	QLineEdit* searchedsequenceTmodif;
+	QHBoxLayout* searchedsequencemodiflayout;
+	QWidget* searchedsequencemodifwidget;
+	QLabel* searchedsequenceformulalabel;
+	QLineEdit* searchedsequenceformula;
 
 	QString lastdirloadsettings;
 	QString lastdirsavesettings;
-	QString lastdirselectpeaklist;
-	QString lastdirselectbricksdatabase;
-	QString lastdirselectmodifications;
-	QString lastdirselectsequencedatabase;
+
+	QString defaultdirselectpeaklist;
+	QString defaultdirselectbricksdatabase;
+	QString defaultdirselectmodifications;
+	QString defaultdirselectsequencedatabase;
 
 
 protected:

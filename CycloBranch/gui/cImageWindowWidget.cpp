@@ -13,9 +13,13 @@ cImageWindowWidget::cImageWindowWidget() {
 	setScene(scene);
 
 	coordinates.clear();
-	columnname = "";
-	comparatorname = "";
-	filteredstring = "";
+	operatortype = 0;
+	columnname1 = "";
+	comparatorname1 = "";
+	filterstring1 = "";
+	columnname2 = "";
+	comparatorname2 = "";
+	filterstring2 = "";
 	casesensitive = false;
 	wholeword = false;
 
@@ -137,11 +141,15 @@ QImage cImageWindowWidget::getImage() {
 }
 
 
-void cImageWindowWidget::setFilterOptions(vector<cCoordinates>& coordinates, string& columnname, string& comparatorname, string& filteredstring, bool casesensitive, bool wholeword) {
+void cImageWindowWidget::setFilterOptions(vector<cCoordinates>& coordinates, bool operatortype, string& columnname1, string& comparatorname1, string& filterstring1, string& columnname2, string& comparatorname2, string& filterstring2, bool casesensitive, bool wholeword) {
 	this->coordinates = coordinates;
-	this->columnname = columnname;
-	this->comparatorname = comparatorname;
-	this->filteredstring = filteredstring;
+	this->operatortype = operatortype;
+	this->columnname1 = columnname1;
+	this->comparatorname1 = comparatorname1;
+	this->filterstring1 = filterstring1;
+	this->columnname2 = columnname2;
+	this->comparatorname2 = comparatorname2;
+	this->filterstring2 = filterstring2;
 	this->casesensitive = casesensitive;
 	this->wholeword = wholeword;
 	redrawScene();
@@ -561,6 +569,56 @@ void cImageWindowWidget::mouseReleaseEvent(QMouseEvent *event) {
 }
 
 
+void cImageWindowWidget::mouseDoubleClickEvent(QMouseEvent *event) {
+	QGraphicsView::mouseDoubleClickEvent(event);
+	int x, y, spectrumid;
+
+	if (event->button() == Qt::LeftButton) {
+		QPointF p = mapToScene(event->x(), event->y());
+		pressedx = (int)p.x();
+		pressedy = (int)p.y();
+
+		currentx = pressedx;
+		currenty = pressedy;
+
+		if (vendor == bruker) {
+			x = currentx * (maxx + 1) / max(1, currentwidth) - leftshift;
+			y = currenty * (maxy + 1) / max(1, currentheight) - topshift;
+		}
+		else {
+			x = currentx * maxx / max(1, currentwidth) - leftshift + 1;
+			y = currenty * maxy / max(1, currentheight) - topshift + 1;
+		}
+
+		if ((currentx > 0) && (currenty > 0) && (currentx < currentwidth) && (currenty < currentheight)) {
+				
+			spectrumid = -1;
+			for (auto& it : coordinates) {
+				if ((it.x == x) && (it.y == y)) {
+					spectrumid = it.id;
+					break;
+				}
+			}
+
+			if (spectrumid != -1) {
+				emit imageWidgetDoubleClicked(spectrumid - 1);
+			}
+		}
+
+		pressedx = -1;
+		pressedy = -1;
+
+		setCursor(Qt::ArrowCursor);
+		cursoractivity = cursoractivity_none;
+
+		redrawScene();
+
+	}
+
+	event->accept();
+}
+
+
 void cImageWindowWidget::resizeEvent(QResizeEvent *event) {
 	QGraphicsView::resizeEvent(event);
 	redrawScene();
@@ -598,7 +656,21 @@ void cImageWindowWidget::redrawScene() {
 	QRectF rect_scene = mapToScene(rect_viewport).boundingRect();
 
 	QPixmap scaledpixmap = layersvector[layer_optical_image].pixmap->copy(rect_scene.x() / currentscale, rect_scene.y() / currentscale, rect_scene.width() / currentscale + 1, rect_scene.height() / currentscale + 1);
+
+	if (scaledpixmap.isNull()) {
+		return;
+	}
+
+	if (scaledpixmap.width() * currentscale * scaledpixmap.height() * currentscale > 100000000) {
+		// too many pixels
+		return;
+	}
+
 	scaledpixmap = scaledpixmap.scaledToHeight(scaledpixmap.height()*currentscale);
+
+	if (scaledpixmap.isNull()) {
+		return;
+	}
 
 	currentwidth = layersvector[layer_optical_image].pixmap->width()*currentscale;
 	currentheight = layersvector[layer_optical_image].pixmap->height()*currentscale;
@@ -678,7 +750,9 @@ void cImageWindowWidget::redrawScene() {
 			coord.mzratio = 0;
 			coord.relativeintensity += coordinates[i].relativeintensity;
 			coord.absoluteintensity += coordinates[i].absoluteintensity;
-			coord.name += "\n" + coordinates[i].name;
+			if (coord.name.find(coordinates[i].name) == string::npos) {
+				coord.name += "\n" + coordinates[i].name;
+			}
 			reduced_coordinates.erase(it);
 			reduced_coordinates.insert(coord);
 
@@ -861,8 +935,25 @@ void cImageWindowWidget::redrawScene() {
 		}
 
 		qstr = "Number of Points Selected: " + QString::number(reduced_coordinates.size());
-		if (!filteredstring.empty()) {
-			qstr += " (filtered by column: \"" + QString(columnname.c_str()) + "\", comparator: \"" + QString(comparatorname.c_str()) + "\", text: \"" + QString(filteredstring.c_str()) + "\", case sensitive: " + QString((casesensitive) ? "yes" : "no") + ", whole words only: " + QString((wholeword) ? "yes" : "no") + ")";
+		if (!filterstring1.empty() || !filterstring2.empty()) {
+			qstr += " (";
+		}
+		if (!filterstring1.empty()) {
+			qstr += "column: \"" + QString(columnname1.c_str()) + "\", comparator: \"" + QString(comparatorname1.c_str()) + "\", text: \"" + QString(filterstring1.c_str()) + "\"";
+		}
+		if (!filterstring1.empty() && !filterstring2.empty()) {
+			if (operatortype == 0) {
+				qstr += " or ";
+			}
+			else {
+				qstr += " and ";
+			}
+		}
+		if (!filterstring2.empty()) {
+			qstr += "column: \"" + QString(columnname2.c_str()) + "\", comparator: \"" + QString(comparatorname2.c_str()) + "\", text: \"" + QString(filterstring2.c_str()) + "\"";
+		}
+		if (!filterstring1.empty() || !filterstring2.empty()) {
+			qstr += ", case sensitive: " + QString((casesensitive) ? "yes" : "no") + ", whole words only: " + QString((wholeword) ? "yes" : "no") + ")";
 		}
 		qstr += "\n";
 		qstr += "Minimum Bounding Region:\nX: " + QString::number(xmin) + "-" + QString::number(xmax) + "; Y: " + QString::number(ymin) + "-" + QString::number(ymax) + "\n";
@@ -1905,7 +1996,15 @@ void cImageWindowWidget::setRulerValue(double value) {
 
 	if ((horizontalshift != horizontalScrollBar()->value()) || (verticalshift != verticalScrollBar()->value())) {
 		horizontalScrollBar()->setValue(horizontalshift);
+		if (horizontalshift != horizontalScrollBar()->value()) {
+			// if horizontalshift > maximum value, setValue was ignored
+			redrawScene();
+		}
 		verticalScrollBar()->setValue(verticalshift);
+		if (verticalshift != verticalScrollBar()->value()) {
+			// if verticalshift > maximum value, setValue was ignored
+			redrawScene();
+		}
 	}
 	else {
 		redrawScene();

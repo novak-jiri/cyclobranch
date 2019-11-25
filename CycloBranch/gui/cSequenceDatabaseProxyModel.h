@@ -9,9 +9,10 @@
 
 #include <QString>
 #include <QVariant>
-#include <QSortFilterProxyModel>
 #include <QComboBox>
-#include "core/cFragmentIons.h"
+#include <QSortFilterProxyModel>
+#include <QLineEdit>
+#include "core/utilities.h"
 
 
 /**
@@ -23,8 +24,13 @@ class cSequenceDatabaseProxyModel : public QSortFilterProxyModel {
 
 private:
 
-	QComboBox* rowsfiltercombobox;
-	QComboBox* rowsfiltercomparatorcombobox;
+	QComboBox* filteroperator;
+	QComboBox* filtercombobox1;
+	QComboBox* filtercomparatorcombobox1;
+	QLineEdit* filterline1;
+	QComboBox* filtercombobox2;
+	QComboBox* filtercomparatorcombobox2;
+	QLineEdit* filterline2;
 	bool wholeword;
 
 public:
@@ -39,10 +45,15 @@ public:
 
 	/**
 		\brief Initialize the model.
-		\param rowsfiltercombobox reference to the combobox with selection of columns
-		\param rowsfiltercomparatorcombobox reference to the combobox with selection of comparator
+		\param rowsfilteroperator reference to the combobox with operator selection
+		\param rowsfiltercombobox1 reference to the combobox with selection of columns
+		\param rowsfiltercomparatorcombobox1 reference to the combobox with selection of comparator
+		\param rowsfilterline1 reference to a text field
+		\param rowsfiltercombobox2 reference to the combobox with selection of columns
+		\param rowsfiltercomparatorcombobox2 reference to the combobox with selection of comparator
+		\param rowsfilterline2 reference to a text field
 	*/
-	void initialize(QComboBox* rowsfiltercombobox, QComboBox* rowsfiltercomparatorcombobox);
+	void initialize(QComboBox* rowsfilteroperator, QComboBox* rowsfiltercombobox1, QComboBox* rowsfiltercomparatorcombobox1, QLineEdit* rowsfilterline1, QComboBox* rowsfiltercombobox2, QComboBox* rowsfiltercomparatorcombobox2, QLineEdit* rowsfilterline2);
 
 
 	/**

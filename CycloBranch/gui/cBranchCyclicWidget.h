@@ -54,8 +54,9 @@ void generateBranchLabelsDown(bool nterminal, int rotationid, unordered_set<cIon
 	\param visibleneutralloss name of a neutral loss to be visualized
 	\param visiblerotationid id of a rotation whose fragment ions are visualized
 	\param branchend end position of a branch
+	\param fragmentend last fragment to draw
 */ 
-void generateBranchLabelsUp(bool nterminal, int rotationid, unordered_set<cIonLabel, hash_cIonLabel>& labels, cParameters* parameters, cTheoreticalSpectrum* theoreticalspectrum, int centerx, int topmargin, int horizontalstep, int verticalstep, string visibleionseries, string visibleneutralloss, int visiblerotationid, int branchend);
+void generateBranchLabelsUp(bool nterminal, int rotationid, unordered_set<cIonLabel, hash_cIonLabel>& labels, cParameters* parameters, cTheoreticalSpectrum* theoreticalspectrum, int centerx, int topmargin, int horizontalstep, int verticalstep, string visibleionseries, string visibleneutralloss, int visiblerotationid, int branchend, int fragmentend);
 
 
 /**

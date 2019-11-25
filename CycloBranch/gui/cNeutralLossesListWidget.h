@@ -65,6 +65,7 @@ private:
 	QPushButton* addbutton;
 	QPushButton* removebutton;
 	QPushButton* defaultbutton;
+	QPushButton* hconbutton;
 	
 	QHBoxLayout* hbox;
 	QVBoxLayout* vbox1;

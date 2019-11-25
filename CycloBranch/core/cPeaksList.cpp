@@ -18,6 +18,28 @@ double ppmError(double experimentalmass, double theoreticalmass) {
 }
 
 
+bool searchHint(double mzratio, cPeaksList& experimentalpeaks, double fragmentmasserrortolerance) {
+	int left, right, middle;
+	int experimentalpeakssize = experimentalpeaks.size();
+
+	left = 0;
+	right = experimentalpeakssize - 1;
+	while (left <= right) {
+		middle = (left + right) / 2;
+		if (isInPpmMassErrorTolerance(experimentalpeaks[middle].mzratio, mzratio, fragmentmasserrortolerance)) {
+			return true;
+		}
+		if (mzratio < experimentalpeaks[middle].mzratio) {
+			right = middle - 1;
+		}
+		else {
+			left = middle + 1;
+		}
+	}
+	return false;
+}
+
+
 cPeaksList::cPeaksList() {
 	clear();
 }
@@ -30,6 +52,7 @@ cPeaksList::cPeaksList(const cPeaksList& peakslist) {
 
 cPeaksList& cPeaksList::operator=(const cPeaksList& peakslist) {
 	peaks = peakslist.peaks;
+	rt = peakslist.rt;
 	x = peakslist.x;
 	y = peakslist.y;
 	title = peakslist.title;
@@ -39,6 +62,7 @@ cPeaksList& cPeaksList::operator=(const cPeaksList& peakslist) {
 
 void cPeaksList::clear() {
 	peaks.clear();
+	rt = 0;
 	x = 0;
 	y = 0;
 	title = "";
@@ -203,7 +227,7 @@ void cPeaksList::storeToIBDStream(ofstream &ibdstream, bool use_64bit_float_mz_p
 
 
 void cPeaksList::loadFromMGFStream(ifstream &stream) {
-	string s;
+	string s, tmps;
 	cPeak p;
 	size_t pos;
 
@@ -221,6 +245,17 @@ void cPeaksList::loadFromMGFStream(ifstream &stream) {
 		}
 		if (s.substr(0, 6).compare("TITLE=") == 0) {
 			title = s.substr(6);
+		}
+		if (s.substr(0, 11).compare("RTINSECONDS") == 0) {
+			pos = s.find('=');
+			if (pos != string::npos) {
+				tmps = s.substr(pos + 1);
+				pos = tmps.find('-');
+				if (pos != string::npos) {
+					tmps = tmps.substr(0, pos);
+				}
+				rt = atof(tmps.c_str());
+			}
 		}
 	}
 
@@ -729,6 +764,17 @@ double cPeaksList::getMaximumAbsoluteIntensity() {
 }
 
 
+void cPeaksList::setRetentionTime(double rt) {
+	this->rt = rt;
+}
+
+
+
+double cPeaksList::getRetentionTime() {
+	return rt;
+}
+
+
 void cPeaksList::setCoordinates(int x, int y) {
 	this->x = x;
 	this->y = y;
@@ -755,6 +801,8 @@ void cPeaksList::store(ofstream& os) {
 		peaks[i].store(os);
 	}
 
+	os.write((char *)&rt, sizeof(double));
+
 	os.write((char *)&x, sizeof(int));
 	os.write((char *)&y, sizeof(int));
 
@@ -771,6 +819,8 @@ void cPeaksList::load(ifstream& is) {
 	for (int i = 0; i < (int)peaks.size(); i++) {
 		peaks[i].load(is);
 	}
+
+	is.read((char *)&rt, sizeof(double));
 
 	is.read((char *)&x, sizeof(int));
 	is.read((char *)&y, sizeof(int));

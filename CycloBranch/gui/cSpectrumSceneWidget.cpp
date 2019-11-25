@@ -1,4 +1,5 @@
 #include "gui/cSpectrumSceneWidget.h"
+#include "gui/cSpectrumDetailWidget.h"
 
 #include <QTextEdit>
 #include <QVBoxLayout>
@@ -25,6 +26,9 @@ cSpectrumSceneWidget::cSpectrumSceneWidget(QWidget* parent) {
 	rawdatapeaklist = 0;
 	origwidth = 0;
 	origheight = 0;
+	calledbyresizeevent = false;
+	oldwidth.clear();
+	oldheight.clear();
 	currentscale = 1;
 	absoluteintensity = false;
 	rawdatastate = false;
@@ -64,6 +68,9 @@ cSpectrumSceneWidget::cSpectrumSceneWidget(QWidget* parent) {
 	zoomsimpletextitem = new QGraphicsSimpleTextItem();
 	zoomgroup->addToGroup(zoomsimpletextitem);
 	scene->addItem(zoomgroup);
+	
+	cursorsimpletextitem = new QGraphicsSimpleTextItem();
+	scene->addItem(cursorsimpletextitem);
 }
 
 
@@ -77,7 +84,7 @@ void cSpectrumSceneWidget::initialize(cParameters* parameters, cTheoreticalSpect
 	this->theoreticalspectrum = theoreticalspectrum;
 
 	if (parameters && parameters->useprofiledata) {
-		if ((parameters->peaklistfileformat == baf) || ((parameters->mode == dereplication) && (parameters->peaklistfileformat == imzML))) {
+		if ((parameters->peaklistfileformat == baf) || (parameters->peaklistfileformat == dat) || (parameters->peaklistfileformat == mzML) || (parameters->peaklistfileformat == raw) || (((parameters->mode == dereplication) || (parameters->mode == compoundsearch)) && (parameters->peaklistfileformat == imzML))) {
 			if ((rowid > 0) && (rowid <= rawdata->size())) {
 				this->rawdatapeaklist = &((*rawdata)[rowid - 1]);
 			}
@@ -198,6 +205,7 @@ void cSpectrumSceneWidget::hidePeakLabels(bool state) {
 
 void cSpectrumSceneWidget::wheelEvent(QWheelEvent *event) {
 	double part, newmin, newmax;
+
 	if (event->delta() > 0) {
 		part = fabs(maxmzratio - minmzratio) / 10.0;
 		newmin = minmzratio + part;
@@ -214,8 +222,9 @@ void cSpectrumSceneWidget::wheelEvent(QWheelEvent *event) {
 		maxmzratio = newmax;
 		emit updateMZInterval(minmzratio, maxmzratio);
 		redrawScene();
+		viewport()->update();
 	}
-
+	
 	event->accept();
 }
 
@@ -223,8 +232,25 @@ void cSpectrumSceneWidget::wheelEvent(QWheelEvent *event) {
 void cSpectrumSceneWidget::mouseMoveEvent(QMouseEvent *event) {
 	QGraphicsView::mouseMoveEvent(event);
 
+	QPointF p = mapToScene(event->x(), event->y());
+
+	QPointF curpos;
+	curpos.setX(p.x() + 15);
+	curpos.setY(p.y() - 2);
+
+	double mz = getMZRatioFromXPosition((int)p.x(), origwidth);
+	double intensity = getIntensityFromYPosition((int)p.y(), origheight);
+	QString curtext = "m/z: " + QString::number(mz) + ", int: " + QString::number(intensity);
+	if (!absoluteintensity) {
+		curtext += " %";
+	}
+
+	cursorsimpletextitem->setPos(curpos);
+	cursorsimpletextitem->setText(curtext);
+
 	if ((pressedx != -1) && (pressedy != -1)) {
-		QPointF p = mapToScene(event->x(), event->y());
+		cursorsimpletextitem->setVisible(false);
+
 		currentx = (int)p.x();
 		currenty = (int)p.y();
 
@@ -240,6 +266,14 @@ void cSpectrumSceneWidget::mouseMoveEvent(QMouseEvent *event) {
 			pressedy = currenty;
 
 			redrawScene();
+		}
+	}
+	else {
+		if (((int)p.x() >= leftmargin) && ((int)p.x() <= origwidth - rightmargin) && ((int)p.y() >= topmargin) && ((int)p.y() <= origheight - bottommargin)) {
+			cursorsimpletextitem->setVisible(true);
+		}
+		else {
+			cursorsimpletextitem->setVisible(false);
 		}
 	}
 
@@ -268,12 +302,37 @@ void cSpectrumSceneWidget::mouseReleaseEvent(QMouseEvent *event) {
 		redrawScene();
 	}
 
+	QPointF p = mapToScene(event->x(), event->y());
+
+	QPointF curpos;
+	curpos.setX(p.x() + 15);
+	curpos.setY(p.y() - 2);
+
+	double mz = getMZRatioFromXPosition((int)p.x(), origwidth);
+	double intensity = getIntensityFromYPosition((int)p.y(), origheight);
+	QString curtext = "m/z: " + QString::number(mz) + ", int: " + QString::number(intensity);
+	if (!absoluteintensity) {
+		curtext += " %";
+	}
+
+	cursorsimpletextitem->setPos(curpos);
+	cursorsimpletextitem->setText(curtext);
+
+	if (((int)p.x() >= leftmargin) && ((int)p.x() <= origwidth - rightmargin) && ((int)p.y() >= topmargin) && ((int)p.y() <= origheight - bottommargin)) {
+		cursorsimpletextitem->setVisible(true);
+	}
+	else {
+		cursorsimpletextitem->setVisible(false);
+	}
+
 	event->accept();
 }
 
 
 void cSpectrumSceneWidget::mousePressEvent(QMouseEvent *event) {
 	QGraphicsView::mousePressEvent(event);
+
+	cursorsimpletextitem->setVisible(false);
 
 	if (event->button() == Qt::LeftButton) {
 		QPointF p = mapToScene(event->x(), event->y());
@@ -330,12 +389,14 @@ void cSpectrumSceneWidget::resizeEvent(QResizeEvent *event) {
 	origwidth = (origwidth / 10) * 10;
 	origheight = (origheight / 10) * 10;
 
+	calledbyresizeevent = true;
+
 	redrawScene();	
 }
 
 
 double cSpectrumSceneWidget::getMZRatioFromXPosition(int x, int w) {
-	double mz = (double)(x - leftmargin)/(double)(w - leftmargin - rightmargin)*(maxmzratio - minmzratio) + minmzratio;
+	double mz = (double)(x - leftmargin) / (double)(w - leftmargin - rightmargin) * (maxmzratio - minmzratio) + minmzratio;
 	return max(0.0, mz);
 }
 
@@ -345,6 +406,14 @@ int cSpectrumSceneWidget::getXPositionFromMZRatio(double mzratio, int w) {
 	val /= maxmzratio - minmzratio;
 	val *= double(w - leftmargin - rightmargin);
 	return (int)val + leftmargin;
+}
+
+
+double cSpectrumSceneWidget::getIntensityFromYPosition(int y, int h) {
+	double maximumintensity = getMaximumIntensity();
+	double intensity = (double)(y - topmargin) / (double)(h - topmargin - bottommargin) * maximumintensity;
+	intensity = maximumintensity - intensity;
+	return max(0.0, intensity);
 }
 
 
@@ -377,45 +446,19 @@ void cSpectrumSceneWidget::redrawScene() {
 
 	QFont myFont("Arial", 8);
 	QFontMetrics fm(myFont);
-	
-	
-	// maximum intensity in the interval <minmzratio, maxmzratio>
-	double maxintensity = 0;
-	double rawdatamaxintensity = 0;
-
-	if (parameters->useprofiledata && ((parameters->peaklistfileformat == baf) || ((parameters->mode == dereplication) && (parameters->peaklistfileformat == imzML))) && rawdatastate && (rawdatapeaklist->size() > 0)) {
-		if (absoluteintensity) {
-			maxintensity = theoreticalspectrum->getExperimentalSpectrum().getMaximumAbsoluteIntensityFromMZInterval(minmzratio, maxmzratio, false, false, other, false);
-		}
-		else {
-			maxintensity = theoreticalspectrum->getExperimentalSpectrum().getMaximumRelativeIntensityFromMZInterval(minmzratio, maxmzratio, false, false, other, false);
-		}
-				
-		if (absoluteintensity) {
-			rawdatamaxintensity = rawdatapeaklist->getMaximumAbsoluteIntensityFromMZInterval(minmzratio, maxmzratio, false, false, other, false);
-		}
-		else {
-			rawdatamaxintensity = rawdatapeaklist->getMaximumRelativeIntensityFromMZInterval(minmzratio, maxmzratio, false, false, other, false);
-		}
 		
-		if (maxintensity == 0) {
-			maxintensity = rawdatamaxintensity;
-		}
-	}
-	else {
-		if (absoluteintensity) {
-			maxintensity = theoreticalspectrum->getExperimentalSpectrum().getMaximumAbsoluteIntensityFromMZInterval(minmzratio, maxmzratio, hidematched, hideunmatched, parameters->peptidetype, hidescrambled);
-		}
-		else {
-			maxintensity = theoreticalspectrum->getExperimentalSpectrum().getMaximumRelativeIntensityFromMZInterval(minmzratio, maxmzratio, hidematched, hideunmatched, parameters->peptidetype, hidescrambled);
-		}
-	}
-
+	double maxintensity = getMaximumIntensity();
 
 	scene->removeItem(zoomgroup);
+	scene->removeItem(cursorsimpletextitem);
+
 	scene->clear();
+
 	zoomgroup->setVisible(false);
 	scene->addItem(zoomgroup);
+
+	cursorsimpletextitem->setVisible(false);
+	scene->addItem(cursorsimpletextitem);
 
 
 	// x axis
@@ -524,7 +567,7 @@ void cSpectrumSceneWidget::redrawScene() {
 		}
 
 		// hide scrambled peaks
-		if ((parameters->mode != dereplication) && (parameters->peptidetype == cyclic) && hidescrambled && theoreticalspectrum->getExperimentalSpectrum()[i].scrambled) {
+		if (((parameters->mode == denovoengine) || (parameters->mode == singlecomparison) || (parameters->mode == databasesearch)) && (parameters->peptidetype == cyclic) && hidescrambled && theoreticalspectrum->getExperimentalSpectrum()[i].scrambled) {
 			continue;
 		}
 
@@ -537,7 +580,7 @@ void cSpectrumSceneWidget::redrawScene() {
 				visiblepeaks[visiblepeakscount].description += "@";
 			}
 
-			if (parameters->mode == dereplication) {
+			if ((parameters->mode == dereplication) || (parameters->mode == compoundsearch)) {
 				visiblepeaks[visiblepeakscount].description += parameters->peakidtodesc[thpeaks[*it].descriptionid].substr(0, parameters->peakidtodesc[thpeaks[*it].descriptionid].rfind(':'));
 			}
 			else {
@@ -576,6 +619,7 @@ void cSpectrumSceneWidget::redrawScene() {
 	bool popit;
 	string tmpvisibleneutralloss;
 	size_t tmpposition;
+	set<string> localneutrallosses = ((cSpectrumDetailWidget *)parent)->getLocalNeutralLosses();
 	for (int i = 0; i < (int)visiblepeaks.size(); i++) {
 
 		x = getXPositionFromMZRatio(visiblepeaks[i].mzratio, w);
@@ -599,7 +643,7 @@ void cSpectrumSceneWidget::redrawScene() {
 
 			popit = false;
 
-			if (parameters->mode != dereplication) {
+			if ((parameters->mode == denovoengine) || (parameters->mode == singlecomparison) || (parameters->mode == databasesearch)) {
 
 				if (visibleionseriespart1.compare("") != 0) {
 					tmppos = hits.back().find(visibleionseriespart1);
@@ -632,8 +676,8 @@ void cSpectrumSceneWidget::redrawScene() {
 
 				if (visibleneutralloss.compare("all") != 0) {
 					if (visibleneutralloss.compare("none") == 0) {
-						for (int j = 0; j < (int)parameters->neutrallossesfortheoreticalspectra.size(); j++) {
-							tmpvisibleneutralloss = "-" + parameters->neutrallossesdefinitions[parameters->neutrallossesfortheoreticalspectra[j]].summary;
+						for (auto& it : localneutrallosses) {
+							tmpvisibleneutralloss = " -" + it;
 							tmpposition = hits.back().find(tmpvisibleneutralloss);
 							if (tmpposition != string::npos) {
 								tmpstr = hits.back().substr(tmpposition + tmpvisibleneutralloss.size());
@@ -645,7 +689,7 @@ void cSpectrumSceneWidget::redrawScene() {
 						}
 					}
 					else {
-						tmpvisibleneutralloss = "-" + visibleneutralloss;
+						tmpvisibleneutralloss = " -" + visibleneutralloss;
 						tmpposition = hits.back().find(tmpvisibleneutralloss);
 						if (tmpposition == string::npos) {
 							popit = true;
@@ -694,7 +738,7 @@ void cSpectrumSceneWidget::redrawScene() {
 
 			popit = false;
 
-			if (parameters->mode != dereplication) {
+			if ((parameters->mode == denovoengine) || (parameters->mode == singlecomparison) || (parameters->mode == databasesearch)) {
 
 				if (visibleionseriespart1.compare("") != 0) {
 					tmppos = hits.back().find(visibleionseriespart1);
@@ -727,8 +771,8 @@ void cSpectrumSceneWidget::redrawScene() {
 
 				if (visibleneutralloss.compare("all") != 0) {
 					if (visibleneutralloss.compare("none") == 0) {
-						for (int j = 0; j < (int)parameters->neutrallossesfortheoreticalspectra.size(); j++) {
-							tmpvisibleneutralloss = "-" + parameters->neutrallossesdefinitions[parameters->neutrallossesfortheoreticalspectra[j]].summary;
+						for (auto& it : localneutrallosses) {
+							tmpvisibleneutralloss = " -" + it;
 							tmpposition = hits.back().find(tmpvisibleneutralloss);
 							if (tmpposition != string::npos) {
 								tmpstr = hits.back().substr(tmpposition + tmpvisibleneutralloss.size());
@@ -740,7 +784,7 @@ void cSpectrumSceneWidget::redrawScene() {
 						}
 					}
 					else {
-						tmpvisibleneutralloss = "-" + visibleneutralloss;
+						tmpvisibleneutralloss = " -" + visibleneutralloss;
 						tmpposition = hits.back().find(tmpvisibleneutralloss);
 						if (tmpposition == string::npos) {
 							popit = true;
@@ -797,7 +841,7 @@ void cSpectrumSceneWidget::redrawScene() {
 				text = scene->addText("");
 				text->setDefaultTextColor(QColor(Qt::red));
 				text->setFont(myFont);
-				if (parameters->mode == dereplication) {
+				if ((parameters->mode == dereplication) || (parameters->mode == compoundsearch)) {
 					text->setTextInteractionFlags(Qt::TextBrowserInteraction);
 					text->setOpenExternalLinks(true);
 				}
@@ -846,7 +890,7 @@ void cSpectrumSceneWidget::redrawScene() {
 
 
 	// raw data (intersections with other objects are not tested)
-	if ((maxintensity > 0) && parameters->useprofiledata && ((parameters->peaklistfileformat == baf) || ((parameters->mode == dereplication) && (parameters->peaklistfileformat == imzML))) && rawdatastate && (rawdatapeaklist->size() > 0)) {
+	if ((maxintensity > 0) && parameters->useprofiledata && ((parameters->peaklistfileformat == baf) || (parameters->peaklistfileformat == dat) || (parameters->peaklistfileformat == mzML) || (parameters->peaklistfileformat == raw) || (((parameters->mode == dereplication) || (parameters->mode == compoundsearch)) && (parameters->peaklistfileformat == imzML))) && rawdatastate && (rawdatapeaklist->size() > 0)) {
 
 		QPainterPath rpath;
 		int rx, ry, lastrx, lastry;
@@ -888,9 +932,50 @@ void cSpectrumSceneWidget::redrawScene() {
 
 
 	scene->removeItem(zoomgroup);
+	scene->removeItem(cursorsimpletextitem);
+
+	if (calledbyresizeevent) {
+		oldwidth.push_back(origwidth);
+		oldheight.push_back(origheight);
+	}
+	else {
+		oldwidth.clear();
+		oldheight.clear();
+	}
+
+	bool blocksignal = false;
+	// detection of cyclic calls redrawScene<->resizeEvent
+	if ((oldwidth.size() == 4) && (oldheight.size() == 4)) {
+		if ((oldwidth[3] == oldwidth[1]) && (oldheight[3] == oldheight[1]) && (oldwidth[2] == oldwidth[0]) && (oldheight[2] == oldheight[0])) {
+			blocksignal = true;
+		}
+	}
+	
+	if (blocksignal) {
+		scene->blockSignals(true);
+	}
+	
 	scene->setSceneRect(scene->itemsBoundingRect());
+	
+	if (blocksignal) {
+		scene->blockSignals(false);
+	}
+
 	zoomgroup->setVisible(false);
 	scene->addItem(zoomgroup);
+
+	cursorsimpletextitem->setVisible(false);
+	scene->addItem(cursorsimpletextitem);
+
+	while (oldwidth.size() > 3) {
+		oldwidth.pop_front();
+	}
+
+	while (oldheight.size() > 3) {
+		oldheight.pop_front();
+	}
+
+	calledbyresizeevent = false;
 
 }
 
@@ -972,6 +1057,43 @@ void cSpectrumSceneWidget::calculateMinMaxMZ() {
 }
 
 
+double cSpectrumSceneWidget::getMaximumIntensity() {
+	double maxintensity = 0;
+	double rawdatamaxintensity = 0;
+
+	// get the maximum intensity in the interval <minmzratio, maxmzratio>
+	if (parameters->useprofiledata && ((parameters->peaklistfileformat == baf) || (parameters->peaklistfileformat == dat) || (parameters->peaklistfileformat == mzML) || (parameters->peaklistfileformat == raw) || (((parameters->mode == dereplication) || (parameters->mode == compoundsearch)) && (parameters->peaklistfileformat == imzML))) && rawdatastate && (rawdatapeaklist->size() > 0)) {
+		if (absoluteintensity) {
+			maxintensity = theoreticalspectrum->getExperimentalSpectrum().getMaximumAbsoluteIntensityFromMZInterval(minmzratio, maxmzratio, false, false, other, false);
+		}
+		else {
+			maxintensity = theoreticalspectrum->getExperimentalSpectrum().getMaximumRelativeIntensityFromMZInterval(minmzratio, maxmzratio, false, false, other, false);
+		}
+
+		if (absoluteintensity) {
+			rawdatamaxintensity = rawdatapeaklist->getMaximumAbsoluteIntensityFromMZInterval(minmzratio, maxmzratio, false, false, other, false);
+		}
+		else {
+			rawdatamaxintensity = rawdatapeaklist->getMaximumRelativeIntensityFromMZInterval(minmzratio, maxmzratio, false, false, other, false);
+		}
+
+		if (maxintensity == 0) {
+			maxintensity = rawdatamaxintensity;
+		}
+	}
+	else {
+		if (absoluteintensity) {
+			maxintensity = theoreticalspectrum->getExperimentalSpectrum().getMaximumAbsoluteIntensityFromMZInterval(minmzratio, maxmzratio, hidematched, hideunmatched, parameters->peptidetype, hidescrambled);
+		}
+		else {
+			maxintensity = theoreticalspectrum->getExperimentalSpectrum().getMaximumRelativeIntensityFromMZInterval(minmzratio, maxmzratio, hidematched, hideunmatched, parameters->peptidetype, hidescrambled);
+		}
+	}
+
+	return maxintensity;
+}
+
+
 void cSpectrumSceneWidget::zoomIn() {
 	if (currentscale < 32) {
 		currentscale += factor;
@@ -1023,6 +1145,7 @@ void cSpectrumSceneWidget::setMZInterval(double minmz, double maxmz) {
 	emit updateMZInterval(minmzratio, maxmzratio);
 
 	redrawScene();
+	viewport()->update();
 }
 
 
