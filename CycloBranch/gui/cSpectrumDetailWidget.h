@@ -22,6 +22,7 @@
 #include <QHeaderView>
 #include <QProgressDialog>
 #include <QTextStream>
+#include "core/cGlobalPreferences.h"
 #include "core/cTheoreticalSpectrum.h"
 #include "gui/cLinearWidget.h"
 #include "gui/cCyclicWidget.h"
@@ -119,11 +120,12 @@ public:
 	/**
 		\brief Initialize the widget.
 		\param rowid id of a row
+		\param globalpreferences global preferences of the application
 		\param parameters a pointer to parameters
 		\param theoreticalspectrum a reference to a theoretical spectrum
 		\param parent pointer to a parent widget
 	*/ 
-	void initialize(int rowid, cParameters* parameters, cTheoreticalSpectrum& theoreticalspectrum, QWidget* parent);
+	void initialize(int rowid, cGlobalPreferences* globalpreferences, cParameters* parameters, cTheoreticalSpectrum& theoreticalspectrum, QWidget* parent);
 
 
 	/**
@@ -303,6 +305,7 @@ private:
 
 	set<string> localneutralosses;
 
+	cGlobalPreferences* globalpreferences;
 	cParameters* parameters;
 
 	cPeakListSeries* rawdata;

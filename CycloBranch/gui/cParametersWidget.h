@@ -18,6 +18,7 @@
 #include <QPushButton>
 
 #include "core/utilities.h"
+#include "core/cGlobalPreferences.h"
 #include "core/cSummaryFormula.h"
 #include "core/cParameters.h"
 #include "gui/cFragmentIonsListWidget.h"
@@ -58,9 +59,10 @@ public:
 
 	/**
 		\brief The constructor.
+		\param globalpreferences global preferences of the application
 		\param parent pointer to a parent widget
 	*/ 
-	cParametersWidget(QWidget* parent = (QWidget *)0);
+	cParametersWidget(cGlobalPreferences* globalpreferences, QWidget* parent = (QWidget *)0);
 
 
 	/**
@@ -106,10 +108,18 @@ public:
 	void setTag(int peptidetypeindex, QString tag);
 
 
+	/**
+		\brief Apply new global preferences.
+		\param globalpreferences global preferences of the application
+	*/
+	void applyGlobalPreferences(cGlobalPreferences* globalpreferences);
+
+
 private:
 
 	QWidget* parent;
 
+	cGlobalPreferences* globalpreferences;
 	cParameters parameters;
 
 	QVBoxLayout* vlayout1;

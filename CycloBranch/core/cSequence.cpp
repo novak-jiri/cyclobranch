@@ -120,7 +120,7 @@ string cSequence::getNameWithReferenceAsHTMLString() {
 	// performance improvement - quick return without regex_search
 	string s = "";
 	if (reference.empty()) {
-		s += "<a href=\"https://www.ncbi.nlm.nih.gov/pccompound?term=" + name + "\">";
+		s += "<a href=\"https://pubchem.ncbi.nlm.nih.gov/#query=" + name + "\">";
 		s += name;
 		s += "</a>";
 		return s;
@@ -258,7 +258,7 @@ string cSequence::getNameWithReferenceAsHTMLString() {
 	}
 
 	if (!correctreference) {
-		s += "<a href=\"https://www.ncbi.nlm.nih.gov/pccompound?term=" + name + "\">";
+		s += "<a href=\"https://pubchem.ncbi.nlm.nih.gov/#query=" + name + "\">";
 		s += name;
 		s += "</a>";
 	}

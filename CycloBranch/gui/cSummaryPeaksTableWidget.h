@@ -24,6 +24,7 @@
 #include <QCompleter>
 #include <map>
 #include "core/utilities.h"
+#include "core/cGlobalPreferences.h"
 #include "gui/cViewButtonDelegate.h"
 #include "gui/cSummaryPeaksTableProxyModel.h"
 #include "gui/cMainWindowProxyModel.h"
@@ -34,6 +35,7 @@ using namespace std;
 
 // forward declaration
 class cParameters;
+class cTheoreticalSpectrum;
 class cTheoreticalSpectrumList;
 class QHBoxLayout;
 class QVBoxLayout;
@@ -243,9 +245,10 @@ public:
 
 	/**
 		\brief The constructor.
+		\param globalpreferences global preferences of the application
 		\param parent pointer to a parent widget
 	*/ 
-	cSummaryPeaksTableWidget(QWidget* parent = (QWidget *)0);
+	cSummaryPeaksTableWidget(cGlobalPreferences* globalpreferences, QWidget* parent = (QWidget *)0);
 
 
 	/**
@@ -289,9 +292,18 @@ public:
 	void updateFilterBySelectedRegion(int xmin, int xmax, int ymin, int ymax);
 
 
+	/**
+		\brief Apply new global preferences.
+		\param globalpreferences global preferences of the application
+	*/
+	void applyGlobalPreferences(cGlobalPreferences* globalpreferences);
+
+
 private:
 
 	QString title;
+
+	cGlobalPreferences* globalpreferences;
 
 	cParameters* parameters;
 	QWidget* parent;
@@ -344,10 +356,12 @@ private:
 	QString lastdirexporttocsv;
 	QString lastdirexportstatisticstocsv;
 
-	vector<cCoordinates> coordinates;
+	vector<cCoordinateInfo> origcoordinateinfo;
 	cPeaksList origeicchromatogram;
 
-	void addEICPeak(cPeaksList& eicchromatogram, cPeaksList& experimentalspectrum);
+	void addEICPeak(cPeaksList& eicchromatogram, cTheoreticalSpectrum& theoreticalspectrum, cPeaksList& experimentalspectrum);
+	
+	void addCoordinateInfo(int spectrumindex, vector<cCoordinateInfo>& coordinateinfo, cTheoreticalSpectrum& theoreticalspectrum, cPeaksList& experimentalspectrum);
 
 
 protected:
@@ -420,8 +434,8 @@ signals:
 
 	
 	/**
-		\brief Send the vector of coordinates to image window.
-		\param coordinates a vector of coordinates x and y
+		\brief Send the vector of aggregated informations about coordinates to image window.
+		\param coordinateinfo a vector of aggregated informations about coordinates
 		\param operatortype the type of operator (0 = or; 1 = and)
 		\param columnname1 name of column which was compared
 		\param comparatorname1 name of used comparator
@@ -432,7 +446,7 @@ signals:
 		\param casesensitive true if the string was used as a casesensitive, false otherwise
 		\param wholeword true if whole words only are compared, false otherwise
 	*/ 
-	void sendFilterOptionsToImageWindow(vector<cCoordinates> coordinates, bool operatortype, string columnname1, string comparatorname1, string filterstring1, string columnname2, string comparatorname2, string filterstring2, bool casesensitive, bool wholeword);
+	void sendFilterOptionsToImageWindow(vector<cCoordinateInfo> coordinateinfo, bool operatortype, string columnname1, string comparatorname1, string filterstring1, string columnname2, string comparatorname2, string filterstring2, bool casesensitive, bool wholeword);
 
 
 	/**

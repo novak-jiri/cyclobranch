@@ -38,11 +38,14 @@ cMainWindow::cMainWindow() {
 	actionSaveResults = new QAction(QIcon(":/images/icons/22.png"), tr("&Save Results..."), this);
 	actionSaveResults->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_S));
 
-	actionExportToCsv = new QAction(QIcon(":/images/icons/62.png"), tr("Export to &CSV"), this);
+	actionExportToCsv = new QAction(QIcon(":/images/icons/csv.png"), tr("Export to &CSV"), this);
 	actionExportToCsv->setShortcut(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_C));
 	
 	actionExportToHTML = new QAction(QIcon(":/images/icons/77.png"), tr("Export to &HTML"), this);
 	actionExportToHTML->setShortcut(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_H));
+
+	actionPreferences = new QAction(QIcon(":/images/icons/preferences.png"), tr("&Preferences"), this);
+	actionPreferences->setShortcut(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_P));
 
 	actionQuit = new QAction(QIcon(":/images/icons/33.png"), tr("&Quit"), this);
 	actionQuit->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_Q));
@@ -69,22 +72,22 @@ cMainWindow::cMainWindow() {
 	actionDrawPeptide = new QAction(QIcon(":/images/icons/96.png"), tr("Draw &Peptide"), this);
 	actionDrawPeptide->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_P));
 
-	actionSummaryTableOfMatchedPeaks = new QAction(QIcon(":/images/icons/43.png"), tr("S&ummary Table of Matched Peaks"), this);
+	actionSummaryTableOfMatchedPeaks = new QAction(QIcon(":/images/icons/table.png"), tr("S&ummary Table of Matched Peaks"), this);
 	actionSummaryTableOfMatchedPeaks->setShortcut(QKeySequence(Qt::Key_F9));
 
 	actionChromatogramWindow = new QAction(QIcon(":/images/icons/chromatography.png"), tr("C&hromatogram"), this);
 	actionChromatogramWindow->setShortcut(QKeySequence(Qt::Key_F10));
 	actionChromatogramWindow->setDisabled(true);
 
-	actionImageWindow = new QAction(QIcon(":/images/icons/23.png"), tr("&CrossVis"), this);
+	actionImageWindow = new QAction(QIcon(":/images/icons/image.png"), tr("&CrossVis"), this);
 	actionImageWindow->setShortcut(QKeySequence(Qt::Key_F11));
 	actionImageWindow->setDisabled(true);
 
-	actionNorine = new QAction(QIcon(":/images/icons/25.png"), tr("&Norine"), this);
-	actionNorine->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_1));
+	actionBookMark1 = new QAction(QIcon(":/images/icons/25.png"), tr("&Norine"), this);
+	actionBookMark1->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_1));
 
-	actionBBDGNC = new QAction(QIcon(":/images/icons/5.png"), tr("Gene&rate Blocks and Sequences using BBDGNC"), this);
-	actionBBDGNC->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_2));
+	actionBookMark2 = new QAction(QIcon(":/images/icons/5.png"), tr("Gene&rate Blocks and Sequences using BBDGNC"), this);
+	actionBookMark2->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_2));
 
 	actionShowIsomers = new QAction(QIcon(":/images/icons/95.png"), tr("Show &Isomers"), this);
 	actionShowIsomers->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_I));
@@ -112,6 +115,7 @@ cMainWindow::cMainWindow() {
 	toolbarFile->addAction(actionSaveResults);
 	toolbarFile->addAction(actionExportToCsv);
 	toolbarFile->addAction(actionExportToHTML);
+	toolbarFile->addAction(actionPreferences);
 	toolbarFile->addAction(actionQuit);
 
 	toolbarSearch = addToolBar(tr("Search"));
@@ -128,8 +132,8 @@ cMainWindow::cMainWindow() {
 	toolbarTools->addAction(actionChromatogramWindow);
 	toolbarTools->addAction(actionImageWindow);
 	toolbarTools->addSeparator();
-	toolbarTools->addAction(actionNorine);
-	toolbarTools->addAction(actionBBDGNC);
+	toolbarTools->addAction(actionBookMark1);
+	toolbarTools->addAction(actionBookMark2);
 
 	toolbarView = addToolBar(tr("View"));
 	toolbarView->addAction(actionShowIsomers);
@@ -238,20 +242,24 @@ cMainWindow::cMainWindow() {
 	about = new cAboutWidget(this);
 
 	graph = new cGraphWidget();
-	bricksdatabasewidget = new cBricksDatabaseWidget();
-	sequencedatabasewidget = new cSequenceDatabaseWidget(this);
-	modificationswidget = new cModificationsWidget();
+
+	globalpreferences.loadSettings();
+	bricksdatabasewidget = new cBricksDatabaseWidget(&globalpreferences);
+	sequencedatabasewidget = new cSequenceDatabaseWidget(&globalpreferences, this);
+	modificationswidget = new cModificationsWidget(&globalpreferences);
 	drawpeptidewidget = new cDrawPeptideWidget(this);
-	summarytableofmatchedpeaks = new cSummaryPeaksTableWidget(this);
-	imagewindow = new cImageWindow(this);
-	chromatogramwindow = new cChromatogramWindow(theoreticalspectrumlist, this);
-	parameterswidget = new cParametersWidget(this);
+	summarytableofmatchedpeaks = new cSummaryPeaksTableWidget(&globalpreferences, this);
+	imagewindow = new cImageWindow(&globalpreferences, this);
+	chromatogramwindow = new cChromatogramWindow(&globalpreferences, theoreticalspectrumlist, this);
+	parameterswidget = new cParametersWidget(&globalpreferences, this);
 	htmlexportdialog = new cHTMLExportDialog(this);
-	
+	preferencesdialog = new cPreferencesDialog(globalpreferences, this);
+
 	connect(actionOpenResults, SIGNAL(triggered()), this, SLOT(openResultsFile()));
 	connect(actionSaveResults, SIGNAL(triggered()), this, SLOT(saveResultsFile()));
 	connect(actionExportToCsv, SIGNAL(triggered()), this, SLOT(exportToCsv()));
 	connect(actionExportToHTML, SIGNAL(triggered()), this, SLOT(exportToHTML()));
+	connect(actionPreferences, SIGNAL(triggered()), this, SLOT(showPreferences()));
 	connect(actionQuit, SIGNAL(triggered()), this, SLOT(quitApplication()));
 	connect(actionRun, SIGNAL(triggered()), this, SLOT(run()));
 	connect(actionStop, SIGNAL(triggered()), this, SLOT(stop()));
@@ -260,8 +268,8 @@ cMainWindow::cMainWindow() {
 	connect(actionSequenceDatabase, SIGNAL(triggered()), this, SLOT(showSequenceDatabase()));
 	connect(actionModifications, SIGNAL(triggered()), this, SLOT(showModifications()));
 	connect(actionDrawPeptide, SIGNAL(triggered()), this, SLOT(showDrawPeptideWidget()));
-	connect(actionNorine, SIGNAL(triggered()), this, SLOT(gotoNorine()));
-	connect(actionBBDGNC, SIGNAL(triggered()), this, SLOT(gotoBBDGNC()));
+	connect(actionBookMark1, SIGNAL(triggered()), this, SLOT(gotoBookMark1()));
+	connect(actionBookMark2, SIGNAL(triggered()), this, SLOT(gotoBookMark2()));
 	connect(actionShowIsomers, SIGNAL(triggered()), this, SLOT(showIsomersStateChanged()));
 	connect(actionGraph, SIGNAL(triggered()), this, SLOT(showGraph()));
 	connect(actionSummaryTableOfMatchedPeaks, SIGNAL(triggered()), this, SLOT(showSummaryTableOfMatchedPeaks()));
@@ -277,7 +285,7 @@ cMainWindow::cMainWindow() {
 
 	connect(summarytableofmatchedpeaks, SIGNAL(tableCancelled()), this, SLOT(summaryPeaksTableCancelled()));
 	connect(summarytableofmatchedpeaks, SIGNAL(summaryPeaksTableRowDoubleClicked(int, double)), this, SLOT(summaryPeaksTableRowDoubleClicked(int, double)));
-	connect(summarytableofmatchedpeaks, SIGNAL(sendFilterOptionsToImageWindow(vector<cCoordinates>, bool, string, string, string, string, string, string, bool, bool)), imagewindow, SLOT(setFilterOptionsSlot(vector<cCoordinates>, bool, string, string, string, string, string, string, bool, bool)));
+	connect(summarytableofmatchedpeaks, SIGNAL(sendFilterOptionsToImageWindow(vector<cCoordinateInfo>, bool, string, string, string, string, string, string, bool, bool)), imagewindow, SLOT(setFilterOptionsSlot(vector<cCoordinateInfo>, bool, string, string, string, string, string, string, bool, bool)));
 	connect(summarytableofmatchedpeaks, SIGNAL(sendFilterOptionsToChromatogram(cPeaksList)), chromatogramwindow, SLOT(setFilterOptionsSlot(cPeaksList)));
 	connect(summarytableofmatchedpeaks, SIGNAL(resetRegion()), imagewindow, SLOT(clearSelection()));
 
@@ -289,6 +297,8 @@ cMainWindow::cMainWindow() {
 	menuFile->addSeparator();
 	menuFile->addAction(actionExportToCsv);
 	menuFile->addAction(actionExportToHTML);
+	menuFile->addSeparator();
+	menuFile->addAction(actionPreferences);
 	menuFile->addSeparator();
 	menuFile->addAction(actionQuit);
 
@@ -307,8 +317,8 @@ cMainWindow::cMainWindow() {
 	menuTools->addAction(actionChromatogramWindow);
 	menuTools->addAction(actionImageWindow);
 	menuTools->addSeparator();
-	menuTools->addAction(actionNorine);
-	menuTools->addAction(actionBBDGNC);
+	menuTools->addAction(actionBookMark1);
+	menuTools->addAction(actionBookMark2);
 
 	menuView->addAction(actionShowIsomers);
 	menuView->addSeparator();
@@ -371,14 +381,11 @@ cMainWindow::cMainWindow() {
 	profilemz64precision = false;
 	profileintensity64precision = false;
 
-	resultsbasecolumncount = 9;
+	resultsbasecolumncount = 10;
 	resultsspecificcolumncount = 0;
 	searchspecificcolumncount = 0;
 
-	lastdirexporttocsv = "./";
-	lastdirexporttohtml = "./";
-	lastdirsaveresults = "./";
-	lastdiropenresults = "./";
+	applyGlobalPreferences();
 
 	summarytableisprepared = false;
 
@@ -421,11 +428,13 @@ cMainWindow::~cMainWindow() {
 	delete chromatogramwindow;
 	delete parameterswidget;
 	delete htmlexportdialog;
+	delete preferencesdialog;
 
 	delete actionOpenResults;
 	delete actionSaveResults;
 	delete actionExportToCsv;
 	delete actionExportToHTML;
+	delete actionPreferences;
 	delete actionQuit;
 	delete actionProperties;
 	delete actionRun;
@@ -433,8 +442,8 @@ cMainWindow::~cMainWindow() {
 	delete actionSequenceDatabase;
 	delete actionModifications;
 	delete actionDrawPeptide;
-	delete actionNorine;
-	delete actionBBDGNC;
+	delete actionBookMark1;
+	delete actionBookMark2;
 	delete actionShowIsomers;
 	delete actionGraph;
 	delete actionSummaryTableOfMatchedPeaks;
@@ -608,11 +617,14 @@ void cMainWindow::reportSpectrum(int row, cTheoreticalSpectrum& theoreticalspect
 		resultsmodel->setItem(row, 8 + searchspecificcolumncount + resultsspecificcolumncount, new QStandardItem());
 		resultsmodel->item(row, 8 + searchspecificcolumncount + resultsspecificcolumncount)->setData(QVariant::fromValue(cropPrecisionToSixDecimalsByteArray(theoreticalspectrum.getSumOfRelativeIntensities())), Qt::DisplayRole);
 
+		resultsmodel->setItem(row, 9 + searchspecificcolumncount + resultsspecificcolumncount, new QStandardItem());
+		resultsmodel->item(row, 9 + searchspecificcolumncount + resultsspecificcolumncount)->setData(QVariant::fromValue(cropPrecisionToSixDecimalsByteArray(theoreticalspectrum.getWeightedRatioOfMatchedPeaks() * 100)), Qt::DisplayRole);
+		
 		int index = resultsbasecolumncount + searchspecificcolumncount + resultsspecificcolumncount;
-		for (int i = 0; i < (int)parameters.ionsfortheoreticalspectra.size(); i++) {
+		for (int i = 0; i < (int)parameters.ionsfortheoreticalspectraMS2.size(); i++) {
 			for (int j = -1; j < (int)parameters.neutrallossesfortheoreticalspectra.size(); j++) {
 				resultsmodel->setItem(row, index, new QStandardItem());
-				resultsmodel->item(row, index)->setData(QVariant::fromValue(theoreticalspectrum.getNumberOfMatchedPeaks(parameters.ionsfortheoreticalspectra[i], (j == -1) ? -1 : parameters.neutrallossesfortheoreticalspectra[j])), Qt::DisplayRole);
+				resultsmodel->item(row, index)->setData(QVariant::fromValue(theoreticalspectrum.getNumberOfMatchedPeaks(parameters.ionsfortheoreticalspectraMS2[i], (j == -1) ? -1 : parameters.neutrallossesfortheoreticalspectra[j])), Qt::DisplayRole);
 
 				index++;
 			}
@@ -658,6 +670,10 @@ void cMainWindow::reportSpectrum(int row, cTheoreticalSpectrum& theoreticalspect
 		resultsmodel->item(row, mscol)->setData(QVariant::fromValue(cropPrecisionToSixDecimalsByteArray(theoreticalspectrum.getSumOfRelativeIntensities())), Qt::DisplayRole);
 		mscol++;
 
+		resultsmodel->setItem(row, mscol, new QStandardItem());
+		resultsmodel->item(row, mscol)->setData(QVariant::fromValue(cropPrecisionToSixDecimalsByteArray(theoreticalspectrum.getWeightedRatioOfMatchedPeaks() * 100)), Qt::DisplayRole);
+		mscol++;
+
 		if ((parameters.peaklistfileformat == mis) || (parameters.peaklistfileformat == imzML)) {
 			resultsmodel->setItem(row, mscol, new QStandardItem());
 			resultsmodel->item(row, mscol)->setData(QVariant::fromValue(theoreticalspectrum.getExperimentalSpectrum().getCoordinateX()), Qt::DisplayRole);
@@ -669,7 +685,7 @@ void cMainWindow::reportSpectrum(int row, cTheoreticalSpectrum& theoreticalspect
 	}
 
 
-	spectradetails[row].initialize(row + 1, &parameters, theoreticalspectrum, this);
+	spectradetails[row].initialize(row + 1, &globalpreferences, &parameters, theoreticalspectrum, this);
 }
 
 
@@ -976,6 +992,7 @@ void cMainWindow::enableButtonsHandlingResults(bool enable) {
 	actionSaveResults->setEnabled(enable);
 	actionExportToCsv->setEnabled(enable);
 	actionExportToHTML->setEnabled(enable);
+	actionPreferences->setEnabled(enable);
 	rowsfilterwidget->setEnabled(enable);
 	actionSummaryTableOfMatchedPeaks->setEnabled(enable);
 	
@@ -1049,7 +1066,7 @@ void cMainWindow::reportSpectra() {
 
 	if ((parameters.mode == denovoengine) || (parameters.mode == singlecomparison) || (parameters.mode == databasesearch)) { 
 
-		resultsmodel->setColumnCount(resultsbasecolumncount + searchspecificcolumncount + resultsspecificcolumncount + ((int)parameters.ionsfortheoreticalspectra.size() * ((int)parameters.neutrallossesfortheoreticalspectra.size() + 1)));
+		resultsmodel->setColumnCount(resultsbasecolumncount + searchspecificcolumncount + resultsspecificcolumncount + ((int)parameters.ionsfortheoreticalspectraMS2.size() * ((int)parameters.neutrallossesfortheoreticalspectra.size() + 1)));
 
 		if ((parameters.peptidetype == cyclic) && parameters.enablescrambling) {
 			resultsmodel->setColumnCount(resultsmodel->columnCount() + 1);
@@ -1161,12 +1178,16 @@ void cMainWindow::reportSpectra() {
 		resultsmodel->horizontalHeaderItem(8 + searchspecificcolumncount + resultsspecificcolumncount)->setText("Sum of Relative Intensities");
 		results->setItemDelegateForColumn(8 + searchspecificcolumncount + resultsspecificcolumncount, new QItemDelegate());
 
+		resultsmodel->setHorizontalHeaderItem(9 + searchspecificcolumncount + resultsspecificcolumncount, new QStandardItem());
+		resultsmodel->horizontalHeaderItem(9 + searchspecificcolumncount + resultsspecificcolumncount)->setText("Weighted Ratio of Matched Peaks [%]");
+		results->setItemDelegateForColumn(9 + searchspecificcolumncount + resultsspecificcolumncount, new QItemDelegate());
+
 		string name;
 		int index = resultsbasecolumncount + searchspecificcolumncount + resultsspecificcolumncount;
-		for (int i = 0; i < (int)parameters.ionsfortheoreticalspectra.size(); i++) {
+		for (int i = 0; i < (int)parameters.ionsfortheoreticalspectraMS2.size(); i++) {
 			for (int j = -1; j < (int)parameters.neutrallossesfortheoreticalspectra.size(); j++) {
 				resultsmodel->setHorizontalHeaderItem(index, new QStandardItem());
-				name = parameters.iondefinitions[(eFragmentIonType)parameters.ionsfortheoreticalspectra[i]].name;
+				name = parameters.iondefinitions[(eFragmentIonType)parameters.ionsfortheoreticalspectraMS2[i]].name;
 				if (j >= 0) {
 					name += "-" + parameters.neutrallossesdefinitions[parameters.neutrallossesfortheoreticalspectra[j]].summary;
 				}
@@ -1188,10 +1209,10 @@ void cMainWindow::reportSpectra() {
 
 	if ((parameters.mode == dereplication) || (parameters.mode == compoundsearch)) {
 		if ((parameters.peaklistfileformat == mis) || (parameters.peaklistfileformat == imzML)) {
-			resultsmodel->setColumnCount(8);
+			resultsmodel->setColumnCount(9);
 		}
 		else {
-			resultsmodel->setColumnCount(7);
+			resultsmodel->setColumnCount(8);
 		}
 
 		int mscol = 0;
@@ -1230,6 +1251,11 @@ void cMainWindow::reportSpectra() {
 
 		resultsmodel->setHorizontalHeaderItem(mscol, new QStandardItem());
 		resultsmodel->horizontalHeaderItem(mscol)->setText("Sum of Relative Intensities");
+		results->setItemDelegateForColumn(mscol, new QItemDelegate());
+		mscol++;
+
+		resultsmodel->setHorizontalHeaderItem(mscol, new QStandardItem());
+		resultsmodel->horizontalHeaderItem(mscol)->setText("Weighted Ratio of Matched Peaks [%]");
 		results->setItemDelegateForColumn(mscol, new QItemDelegate());
 		mscol++;
 
@@ -1383,6 +1409,22 @@ void cMainWindow::deleteResults() {
 	resultsmodel->clear();
 	resultsmodel->setColumnCount(0);
 	resultsmodel->setRowCount(0);
+}
+
+
+void cMainWindow::applyGlobalPreferences() {
+	if (lastdirexporttocsv.right(4).compare(".csv", Qt::CaseInsensitive) != 0) {
+		lastdirexporttocsv = globalpreferences.exportcsvdefaultdir;
+	}
+	if ((lastdirexporttohtml.right(4).compare(".htm", Qt::CaseInsensitive) != 0) && (lastdirexporttohtml.right(5).compare(".html", Qt::CaseInsensitive) != 0)) {
+		lastdirexporttohtml = globalpreferences.exporthtmldefaultdir;
+	}
+	if (lastdiropenresults.right(4).compare(".res", Qt::CaseInsensitive) != 0) {
+		lastdiropenresults = globalpreferences.resultsdefaultdir;
+	}
+	if (lastdirsaveresults.right(4).compare(".res", Qt::CaseInsensitive) != 0) {
+		lastdirsaveresults = globalpreferences.resultsdefaultdir;
+	}
 }
 
 
@@ -1747,6 +1789,28 @@ void cMainWindow::exportToHTML() {
 }
 
 
+void cMainWindow::showPreferences() {
+	if (preferencesdialog->exec() != QDialog::Accepted) {
+		preferencesdialog->resetPreferences(globalpreferences);
+		return;
+	}
+
+	preferencesdialog->setPreferences(globalpreferences);
+
+	parameterswidget->applyGlobalPreferences(&globalpreferences);
+	summarytableofmatchedpeaks->applyGlobalPreferences(&globalpreferences);
+	chromatogramwindow->applyGlobalPreferences(&globalpreferences);
+	imagewindow->applyGlobalPreferences(&globalpreferences);
+	bricksdatabasewidget->applyGlobalPreferences(&globalpreferences);
+	sequencedatabasewidget->applyGlobalPreferences(&globalpreferences);
+	modificationswidget->applyGlobalPreferences(&globalpreferences);
+	
+	applyGlobalPreferences();
+
+	globalpreferences.saveSettings();
+}
+
+
 void cMainWindow::showHTMLDocumentation() {
 	#if OS_TYPE == WIN
 		QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo("docs/html/userguide.html").absoluteFilePath()));
@@ -2033,13 +2097,13 @@ void cMainWindow::resetFilter() {
 }
 
 
-void cMainWindow::gotoNorine() {
-	QDesktopServices::openUrl(QUrl("https://bioinfo.lifl.fr/norine/"));
+void cMainWindow::gotoBookMark1() {
+	QDesktopServices::openUrl(QUrl(globalpreferences.bookmarkurl1));
 }
 
 
-void cMainWindow::gotoBBDGNC() {
-	QDesktopServices::openUrl(QUrl("https://ms.biomed.cas.cz/bbdgnc/"));
+void cMainWindow::gotoBookMark2() {
+	QDesktopServices::openUrl(QUrl(globalpreferences.bookmarkurl2));
 }
 
 

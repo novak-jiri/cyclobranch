@@ -25,7 +25,8 @@
 #include <QLabel>
 
 
-cParametersWidget::cParametersWidget(QWidget* parent) {
+cParametersWidget::cParametersWidget(cGlobalPreferences* globalpreferences, QWidget* parent) {
+	this->globalpreferences = globalpreferences;
 	this->parent = parent;
 
 	int leftdefaultwidth = 400;
@@ -418,6 +419,7 @@ cParametersWidget::cParametersWidget(QWidget* parent) {
 	scoretype->addItem(tr("Number of b-ions"));
 	scoretype->addItem(tr("Number of y-ions"));
 	scoretype->addItem(tr("Number of b-ions and y-ions"));
+	scoretype->addItem(tr("Weighted Ratio of Matched Peaks"));
 	scoretype->setFixedWidth(rightdefaultwidth);
 	scoretypelabel = new QLabel("Score Type:");
 	theoreticalspectragridlayout->addWidget(scoretypelabel, 1, 0);
@@ -666,24 +668,8 @@ cParametersWidget::cParametersWidget(QWidget* parent) {
 
 	restoreParameters();
 
-	#if OS_TYPE == WIN
-		lastdirloadsettings = "./Settings/";
-		lastdirsavesettings = "./Settings/";
+	applyGlobalPreferences(globalpreferences);
 
-		defaultdirselectpeaklist = "./PeakLists/";
-		defaultdirselectbricksdatabase = "./BrickDatabases/";
-		defaultdirselectmodifications = "./Modifications/";
-		defaultdirselectsequencedatabase = "./SequenceDatabases/";
-	#else
-		lastdirloadsettings = installdir + "Settings/";
-		lastdirsavesettings = installdir + "Settings/";
-
-		defaultdirselectpeaklist = installdir + "PeakLists/";
-		defaultdirselectbricksdatabase = installdir + "BrickDatabases/";
-		defaultdirselectmodifications = installdir + "Modifications/";
-		defaultdirselectsequencedatabase = installdir + "SequenceDatabases/";
-	#endif
-	
 	mode->setCurrentIndex(dereplication);
 }
 
@@ -884,6 +870,27 @@ void cParametersWidget::setTag(int peptidetypeindex, QString tag) {
 }
 
 
+void cParametersWidget::applyGlobalPreferences(cGlobalPreferences* globalpreferences) {
+	if (globalpreferences) {
+		if (lastdirloadsettings.right(4).compare(".ini", Qt::CaseInsensitive) != 0) {
+			lastdirloadsettings = globalpreferences->settingsdefaultdir;
+		}
+		if (lastdirsavesettings.right(4).compare(".ini", Qt::CaseInsensitive) != 0) {
+			lastdirsavesettings = globalpreferences->settingsdefaultdir;
+		}
+
+		defaultdirselectpeaklist = globalpreferences->peaklistsdefaultdir;
+		defaultdirselectbricksdatabase = globalpreferences->blocksdefaultdir;
+		defaultdirselectmodifications = globalpreferences->modificationsdefaultdir;
+		defaultdirselectsequencedatabase = globalpreferences->sequencesdefaultdir;
+
+		if (((eModeType)mode->currentIndex() == dereplication) || ((eModeType)mode->currentIndex() == compoundsearch)) {
+			resetFragmentIonTypes();
+		}
+	}
+}
+
+
 void cParametersWidget::keyPressEvent(QKeyEvent *event) {
     if (event->key() == Qt::Key_Escape) {
 		restoreParameters();
@@ -977,9 +984,30 @@ void cParametersWidget::loadSettings() {
 		hitsreported->setValue(settings.value("hitsreported", 100).toInt());
 		sequencetag->setText(settings.value("sequencetag", "").toString());
 		
-		for (i = 0; i < iontypes->getList()->count(); i++) {
-			qloadstring = ("fragmentiontype_" + to_string(i)).c_str();
-			settings.value(qloadstring, 0).toInt() == 0 ? iontypes->getList()->item(i)->setSelected(false) : iontypes->getList()->item(i)->setSelected(true);
+		if (((eModeType)mode->currentIndex() == dereplication) || ((eModeType)mode->currentIndex() == compoundsearch)) {
+			for (i = 0; i < iontypes->getList()->count(); i++) {
+				iontypes->getList()->item(i)->setSelected(false);
+			}
+
+			i = 0;
+			qloadstring = ("iontype_" + to_string(i)).c_str();
+			while (settings.value(qloadstring, "XXX").toString().compare("XXX") != 0) {
+				for (int j = 0; j < iontypes->getList()->count(); j++) {
+					if (iontypes->getList()->item(j)->text().compare(settings.value(qloadstring).toString()) == 0) {
+						iontypes->getList()->item(j)->setSelected(true);
+						break;
+					}
+				}
+
+				i++;
+				qloadstring = ("iontype_" + to_string(i)).c_str();
+			}
+		}
+		else {
+			for (i = 0; i < iontypes->getList()->count(); i++) {
+				qloadstring = ("fragmentiontype_" + to_string(i)).c_str();
+				settings.value(qloadstring, 0).toInt() == 0 ? iontypes->getList()->item(i)->setSelected(false) : iontypes->getList()->item(i)->setSelected(true);
+			}
 		}
 
 		neutrallosstypes->getList()->clear();
@@ -1068,9 +1096,21 @@ void cParametersWidget::saveSettings() {
 	settings.setValue("hitsreported", hitsreported->value());
 	settings.setValue("sequencetag", sequencetag->text());
 
-	for (int i = 0; i < iontypes->getList()->count(); i++) {
-		qsavestring = ("fragmentiontype_" + to_string(i)).c_str();
-		iontypes->getList()->item(i)->isSelected() ? settings.setValue(qsavestring, 1) : settings.setValue(qsavestring, 0);
+	if (((eModeType)mode->currentIndex() == dereplication) || ((eModeType)mode->currentIndex() == compoundsearch)) {
+		int cnt = 0;
+		for (int i = 0; i < iontypes->getList()->count(); i++) {
+			if (iontypes->getList()->item(i)->isSelected()) {
+				qsavestring = ("iontype_" + to_string(cnt)).c_str();
+				settings.setValue(qsavestring, iontypes->getList()->item(i)->text());
+				cnt++;
+			}
+		}
+	}
+	else {
+		for (int i = 0; i < iontypes->getList()->count(); i++) {
+			qsavestring = ("fragmentiontype_" + to_string(i)).c_str();
+			iontypes->getList()->item(i)->isSelected() ? settings.setValue(qsavestring, 1) : settings.setValue(qsavestring, 0);
+		}
 	}
 
 	for (int i = 0; i < neutrallosstypes->getList()->count(); i++) {
@@ -1185,42 +1225,62 @@ bool cParametersWidget::updateParameters() {
 	string errmsg;
 
 	if (peaklistline->text().toStdString().compare("") == 0) {
-		errstr = "A peaklist must be specified!";
+		errstr = "A peaklist must be specified !";
 		msgBox.setText(errstr);
 		msgBox.exec();
 		return false;
 	}
 
 	if ((brickdatabaseline->text().toStdString().compare("") == 0) && (((eModeType)mode->currentIndex() == denovoengine) || (((eModeType)mode->currentIndex() == databasesearch) && ((ePeptideType)peptidetype->currentIndex() != other)) || (((eModeType)mode->currentIndex() == singlecomparison) && ((ePeptideType)peptidetype->currentIndex() != other)))) {
-		errstr = "A database of building blocks must be specified!";
+		errstr = "A database of building blocks must be specified !";
 		msgBox.setText(errstr);
 		msgBox.exec();
 		return false;
 	}
 
 	if ((sequencedatabaseline->text().toStdString().compare("") == 0) && (((eModeType)mode->currentIndex() == databasesearch) || ((eModeType)mode->currentIndex() == dereplication))) {
-		errstr = "A sequence database must be specified!";
+		errstr = "A sequence database must be specified !";
 		msgBox.setText(errstr);
 		msgBox.exec();
 		return false;
 	}
 
+	if (((eModeType)mode->currentIndex() == databasesearch) || ((eModeType)mode->currentIndex() == dereplication)) {
+		int notselected = 0;
+
+		for (int i = 0; i < iontypes->getList()->count(); i++) {
+			if (iontypes->getList()->item(i)->isSelected()) {
+				break;
+			}
+			else {
+				notselected++;
+			}
+		}
+
+		if (iontypes->getList()->count() == notselected) {
+			errstr = "A ion type must be selected (e.g., [M+H]+) !";
+			msgBox.setText(errstr);
+			msgBox.exec();
+			return false;
+		}
+	}
+
 	if ((precursormass->value() == 0) && (((eModeType)mode->currentIndex() == denovoengine) || ((eModeType)mode->currentIndex() == singlecomparison) || ((eModeType)mode->currentIndex() == databasesearch))) {
-		errstr = "The precursor m/z ratio cannot be zero!";
+		errstr = "The precursor m/z ratio cannot be zero !";
 		msgBox.setText(errstr);
 		msgBox.exec();
 		return false;
 	}
 
 	if (precursorcharge->value() == 0) {
-		errstr = "The charge cannot be zero!";
+		errstr = "The charge cannot be zero !";
 		msgBox.setText(errstr);
 		msgBox.exec();
 		return false;
 	}
 
 	if (((eModeType)mode->currentIndex() == compoundsearch) && (maximummz->value() <= minimummz->value())) {
-		errstr = "The maximum m/z ratio must be bigger than the minimum m/z ratio!";
+		errstr = "The maximum m/z ratio must be bigger than the minimum m/z ratio !";
 		msgBox.setText(errstr);
 		msgBox.exec();
 		return false;
@@ -1228,7 +1288,7 @@ bool cParametersWidget::updateParameters() {
 
 	if ((eModeType)mode->currentIndex() == denovoengine) {
 		if ((ePeptideType)peptidetype->currentIndex() == other) {
-			errstr = "The peptide type 'Other' cannot be used in this mode!";
+			errstr = "The peptide type 'Other' cannot be used in this mode !";
 			msgBox.setText(errstr);
 			msgBox.exec();
 			return false;
@@ -1238,7 +1298,7 @@ bool cParametersWidget::updateParameters() {
 	if ((eModeType)mode->currentIndex() == singlecomparison) {
 		if ((ePeptideType)peptidetype->currentIndex() == other) {
 			if (searchedsequenceformula->text().isEmpty()) {
-				errstr = "The field 'Formula' is empty!";
+				errstr = "The field 'Formula' is empty !";
 				msgBox.setText(errstr);
 				msgBox.exec();
 				return false;
@@ -1247,7 +1307,7 @@ bool cParametersWidget::updateParameters() {
 			tmpstring = searchedsequenceformula->text().toStdString();
 			tmpformula.setFormula(tmpstring, false);
 			if (!tmpformula.isValid(errmsg)) {
-				errstr = "The field 'Formula' is not valid!\n\n";
+				errstr = "The field 'Formula' is not valid !\n\n";
 				errstr += errmsg.c_str();
 				msgBox.setText(errstr);
 				msgBox.exec();
@@ -1322,13 +1382,19 @@ bool cParametersWidget::updateParameters() {
 	parameters.sequencetag = sequencetag->text().toStdString();
 	parameters.originalsequencetag = parameters.sequencetag;
 
-	parameters.ionsfortheoreticalspectra.clear();
-	
-	int start = -1;
+	parameters.ionsfortheoreticalspectraMS1.clear();
+	parameters.ionsfortheoreticalspectraMS2.clear();
+
 	if (((eModeType)mode->currentIndex() == dereplication) || ((eModeType)mode->currentIndex() == compoundsearch)) {
-		start = ms_Hplus;
+		for (int i = 0; i < iontypes->getList()->count(); i++) {
+			if (iontypes->getList()->item(i)->isSelected()) {
+				parameters.ionsfortheoreticalspectraMS1.push_back(globalpreferences->customions[i]);
+			}
+		}
 	}
 	else {
+		int start = -1;
+
 		switch ((ePeptideType)peptidetype->currentIndex()) {
 			case linear:
 			case branched:
@@ -1347,12 +1413,12 @@ bool cParametersWidget::updateParameters() {
 			default:
 				break;
 		}
-	}
 
-	if (start != -1) {
-		for (int i = 0; i < iontypes->getList()->count(); i++) {
-			if (iontypes->getList()->item(i)->isSelected()) {
-				parameters.ionsfortheoreticalspectra.push_back((eFragmentIonType)(i + start));
+		if (start != -1) {
+			for (int i = 0; i < iontypes->getList()->count(); i++) {
+				if (iontypes->getList()->item(i)->isSelected()) {
+					parameters.ionsfortheoreticalspectraMS2.push_back((eFragmentIonType)(i + start));
+				}
 			}
 		}
 	}
@@ -1443,11 +1509,23 @@ void cParametersWidget::restoreParameters() {
 	hitsreported->setValue(parameters.hitsreported);
 	sequencetag->setText(parameters.sequencetag.c_str());
 
-	int start = -1;
+	for (int i = 0; i < iontypes->getList()->count(); i++) {
+		iontypes->getList()->item(i)->setSelected(false);
+	}
+
 	if ((parameters.mode == dereplication) || (parameters.mode == compoundsearch)) {
-		start = ms_Hplus;
+		for (int i = 0; i < (int)parameters.ionsfortheoreticalspectraMS1.size(); i++) {
+			for (int j = 0; j < iontypes->getList()->count(); j++) {
+				if (iontypes->getList()->item(j)->text().toStdString().compare(parameters.ionsfortheoreticalspectraMS1[i].name) == 0) {
+					iontypes->getList()->item(j)->setSelected(true);
+					break;
+				}
+			}			
+		}
 	}
 	else {
+		int start = -1;
+
 		switch (parameters.peptidetype) {
 			case linear:
 			case branched:
@@ -1466,13 +1544,14 @@ void cParametersWidget::restoreParameters() {
 			default:
 				break;
 		}
-	}
 
-	if (start != -1) {
-		for (int i = 0; i < (int)parameters.ionsfortheoreticalspectra.size(); i++) {
-			iontypes->getList()->item(parameters.ionsfortheoreticalspectra[i] - start)->setSelected(true);
+		if (start != -1) {
+			for (int i = 0; i < (int)parameters.ionsfortheoreticalspectraMS2.size(); i++) {
+				iontypes->getList()->item(parameters.ionsfortheoreticalspectraMS2[i] - start)->setSelected(true);
+			}
 		}
 	}
+
 
 	neutrallosstypes->getList()->clear();
 	for (int i = 0; i < (int)parameters.originalneutrallossesdefinitions.size(); i++) {
@@ -1969,14 +2048,19 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 
 
 void cParametersWidget::resetFragmentIonTypes() {
+
 	iontypes->getList()->clear();
-	eFragmentIonType start, end;
 	
 	if (((eModeType)mode->currentIndex() == dereplication) || ((eModeType)mode->currentIndex() == compoundsearch)) {
-		start = ms_Hplus;
-		end = ms_MGa4H;
+		if (globalpreferences) {
+			for (int i = 0; i < (int)globalpreferences->customions.size(); i++) {
+				iontypes->getList()->addItem(globalpreferences->customions[i].name.c_str());
+			}
+		}
 	}
 	else {
+		eFragmentIonType start, end;
+
 		switch ((ePeptideType)peptidetype->currentIndex()) {
 			case linear:
 			case branched:
@@ -2004,45 +2088,38 @@ void cParametersWidget::resetFragmentIonTypes() {
 			default:
 				break;
 		}
-	}
 
-	for (int i = (int)start; i <= (int)end; i++) {
+		for (int i = (int)start; i <= (int)end; i++) {
 
-		iontypes->getList()->addItem(tr(parameters.iondefinitions[(eFragmentIonType)i].name.c_str()));
+			iontypes->getList()->addItem(tr(parameters.iondefinitions[(eFragmentIonType)i].name.c_str()));
 
-		if (((eModeType)mode->currentIndex() == dereplication) || ((eModeType)mode->currentIndex() == compoundsearch)) {
-			if ((eFragmentIonType)i == ms_Hplus) {
-				iontypes->getList()->item(i-start)->setSelected(true);
-			}
-		}
-		else {
 			switch ((ePeptideType)peptidetype->currentIndex()) {
 				case linear:
 				case branched:
 					if (((eFragmentIonType)i == b_ion) || ((eFragmentIonType)i == y_ion)) {
-						iontypes->getList()->item(i-start)->setSelected(true);
+						iontypes->getList()->item(i - start)->setSelected(true);
 					}
 					break;
 				case cyclic:
 					if ((eFragmentIonType)i == b_ion) {
-						iontypes->getList()->item(i-start)->setSelected(true);
+						iontypes->getList()->item(i - start)->setSelected(true);
 					}
 					break;
 				case branchcyclic:
 					if (((eFragmentIonType)i == b_ion) || ((eFragmentIonType)i == y_ion)) {
-						iontypes->getList()->item(i-start)->setSelected(true);
+						iontypes->getList()->item(i - start)->setSelected(true);
 					}
 					break;
 				case linearpolyketide:
 					if (((eFragmentIonType)i == l1h_ion) || ((eFragmentIonType)i == l2h_ion) || ((eFragmentIonType)i == r1h_ion) || ((eFragmentIonType)i == r2h_ion) ||
 						((eFragmentIonType)i == l1oh_ion) || ((eFragmentIonType)i == l2oh_ion) || ((eFragmentIonType)i == r1oh_ion) || ((eFragmentIonType)i == r2oh_ion)
 						) {
-						iontypes->getList()->item(i-start)->setSelected(true);
+						iontypes->getList()->item(i - start)->setSelected(true);
 					}
 					break;
 				case cyclicpolyketide:
 					if (/*((eFragmentIonType)i == l0h_ion) ||*/ ((eFragmentIonType)i == l1h_ion) || ((eFragmentIonType)i == l2h_ion)) {
-						iontypes->getList()->item(i-start)->setSelected(true);
+						iontypes->getList()->item(i - start)->setSelected(true);
 					}
 					break;
 				case other:
@@ -2051,7 +2128,6 @@ void cParametersWidget::resetFragmentIonTypes() {
 					break;
 			}
 		}
-
 	}
 
 }

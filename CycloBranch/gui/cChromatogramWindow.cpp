@@ -2,7 +2,8 @@
 #include "gui/cEventFilter.h"
 
 
-cChromatogramWindow::cChromatogramWindow(cTheoreticalSpectrumList& theoreticalspectrumlist, QWidget* parent) {
+cChromatogramWindow::cChromatogramWindow(cGlobalPreferences* globalpreferences, cTheoreticalSpectrumList& theoreticalspectrumlist, QWidget* parent) {
+	this->globalpreferences = globalpreferences;
 	this->theoreticalspectrumlist = &theoreticalspectrumlist;
 	this->parent = parent;
 
@@ -96,6 +97,13 @@ cChromatogramWindow::cChromatogramWindow(cTheoreticalSpectrumList& theoreticalsp
 	actionHideEIC->setCheckable(true);
 	toolbarView->addAction(actionHideEIC);
 	connect(actionHideEIC, SIGNAL(toggled(bool)), chromatogramwindowwidget, SLOT(hideEIC(bool)));
+
+	actionHideLabels = new QAction(QIcon(":/images/icons/79.png"), tr("Hide &Labels"), this);
+	actionHideLabels->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_L));
+	actionHideLabels->setToolTip("Hide Labels (Ctrl + L)");
+	actionHideLabels->setCheckable(true);
+	toolbarView->addAction(actionHideLabels);
+	connect(actionHideLabels, SIGNAL(toggled(bool)), chromatogramwindowwidget, SLOT(hideLabels(bool)));
 
 
 	toolbarHelp = addToolBar(tr("Help"));
@@ -205,6 +213,7 @@ cChromatogramWindow::cChromatogramWindow(cTheoreticalSpectrumList& theoreticalsp
 	menuView->addSeparator();
 	menuView->addAction(actionHideTIC);
 	menuView->addAction(actionHideEIC);
+	menuView->addAction(actionHideLabels);
 
 	menuHelp->addAction(actionHTMLDocumentation);
 
@@ -216,6 +225,8 @@ cChromatogramWindow::cChromatogramWindow(cTheoreticalSpectrumList& theoreticalsp
 
 	setCentralWidget(chromatogramwindowwidget);
 	centralWidget()->setContentsMargins(0, 0, 0, 0);
+
+	applyGlobalPreferences(globalpreferences);
 
 	resize(defaultwinsizex, defaultwinsizey);
 }
@@ -252,6 +263,7 @@ cChromatogramWindow::~cChromatogramWindow() {
 	delete actionAbsoluteIntensity;
 	delete actionHideTIC;
 	delete actionHideEIC;
+	delete actionHideLabels;
 	delete actionHTMLDocumentation;
 
 	delete menuFile;
@@ -273,6 +285,21 @@ void cChromatogramWindow::recalculateTICChromatogram() {
 }
 
 
+void cChromatogramWindow::applyGlobalPreferences(cGlobalPreferences* globalpreferences) {
+	if (globalpreferences) {
+		#if OS_TYPE == WIN
+			if ((lastdirexportimage.right(4).compare(".pdf", Qt::CaseInsensitive) != 0) && (lastdirexportimage.right(3).compare(".ps", Qt::CaseInsensitive) != 0) && (lastdirexportimage.right(4).compare(".png", Qt::CaseInsensitive) != 0) && (lastdirexportimage.right(4).compare(".svg", Qt::CaseInsensitive) != 0)) {
+				lastdirexportimage = globalpreferences->exportimagedefaultdir;
+			}
+		#else
+			if ((lastdirexportimage.right(4).compare(".pdf", Qt::CaseInsensitive) != 0) && (lastdirexportimage.right(4).compare(".png", Qt::CaseInsensitive) != 0) && (lastdirexportimage.right(4).compare(".svg", Qt::CaseInsensitive) != 0)) {
+				lastdirexportimage = globalpreferences->exportimagedefaultdir;
+			}
+		#endif
+	}
+}
+
+
 void cChromatogramWindow::keyPressEvent(QKeyEvent *event) {
 	if ((event->key() == Qt::Key_Enter) || (event->key() == Qt::Key_Return)) {
 		if (minscanid->hasFocus() || maxscanid->hasFocus()) {
@@ -288,12 +315,14 @@ void cChromatogramWindow::keyPressEvent(QKeyEvent *event) {
 
 
 void cChromatogramWindow::exportImage() {
-#if OS_TYPE == WIN
-	QString filename = QFileDialog::getSaveFileName(this, tr("Export Image..."), "./", "PDF Files (*.pdf);; PS Files (*.ps);; PNG Files (*.png);; SVG Files (*.svg)");
-#else
-	QString filename = QFileDialog::getSaveFileName(this, tr("Export Image..."), "./", "PDF Files (*.pdf);; PNG Files (*.png);; SVG Files (*.svg)");
-#endif
+	#if OS_TYPE == WIN
+		QString filename = QFileDialog::getSaveFileName(this, tr("Export Image..."), lastdirexportimage, "PDF Files (*.pdf);; PS Files (*.ps);; PNG Files (*.png);; SVG Files (*.svg)");
+	#else
+		QString filename = QFileDialog::getSaveFileName(this, tr("Export Image..."), lastdirexportimage, "PDF Files (*.pdf);; PNG Files (*.png);; SVG Files (*.svg)");
+	#endif
 	if (!filename.isEmpty()) {
+		lastdirexportimage = filename;
+
 		regex rx;
 		bool selected = false;
 
@@ -303,13 +332,13 @@ void cChromatogramWindow::exportImage() {
 			selected = true;
 		}
 
-#if OS_TYPE == WIN
+	#if OS_TYPE == WIN
 		rx = ".+\\.ps$";
 		if (!selected && (regex_search(filename.toStdString(), rx))) {
 			chromatogramwindowwidget->exportToPDF(filename, true);
 			selected = true;
 		}
-#endif
+	#endif
 
 		rx = ".+\\.png$";
 		if (!selected && (regex_search(filename.toStdString(), rx))) {

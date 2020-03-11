@@ -10,6 +10,7 @@
 #include <iostream>
 #include <fstream>
 #include "core/utilities.h"
+#include "core/cGlobalPreferences.h"
 #include "core/cPeakListSeries.h"
 #include "core/cBricksDatabase.h"
 #include "core/cSequenceDatabase.h"
@@ -47,7 +48,8 @@ enum eScoreType {
 	sum_of_relative_intensities = 1,
 	number_of_b_ions = 2,
 	number_of_y_ions = 3,
-	number_of_b_and_y_ions = 4
+	number_of_b_and_y_ions = 4,
+	weighted_ratio_of_matched_peaks = 5
 };
 
 
@@ -443,7 +445,7 @@ public:
 	/**
 		\brief A vector of searched N-terminal and C-terminal modifications.
     */
-    vector<fragmentDescription> searchedmodifications;
+    vector<cFragmentIonType> searchedmodifications;
 
 
 	/**
@@ -453,9 +455,15 @@ public:
 
 
 	/**
-		\brief A vector of ion types generated in theoretical spectra.
+		\brief A vector of ion types generated in theoretical conventional mass spectra.
 	*/
-	vector<eFragmentIonType> ionsfortheoreticalspectra;
+	vector<cIonType> ionsfortheoreticalspectraMS1;
+
+
+	/**
+		\brief A vector of ion types generated in theoretical fragment ion spectra.
+	*/
+	vector<eFragmentIonType> ionsfortheoreticalspectraMS2;
 
 
 	/**

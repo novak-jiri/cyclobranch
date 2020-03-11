@@ -28,7 +28,8 @@ int numberOfOccurrences(const string& s, char c) {
 }
 
 
-cBricksDatabaseWidget::cBricksDatabaseWidget(QWidget* parent) {
+cBricksDatabaseWidget::cBricksDatabaseWidget(cGlobalPreferences* globalpreferences, QWidget* parent) {
+	this->globalpreferences = globalpreferences;
 	this->parent = parent;
 
 	editorname = "Building Blocks Editor";
@@ -252,11 +253,7 @@ cBricksDatabaseWidget::cBricksDatabaseWidget(QWidget* parent) {
 
 	databasefile = "";
 
-	#if OS_TYPE == WIN
-		lastdir = "./BrickDatabases/";
-	#else
-		lastdir = installdir + "BrickDatabases/";
-	#endif
+	applyGlobalPreferences(globalpreferences);
 	
 	bricks.clear();
 
@@ -311,6 +308,15 @@ cBricksDatabaseWidget::~cBricksDatabaseWidget() {
 void cBricksDatabaseWidget::closeEvent(QCloseEvent *event) {
 	closeWindow();
 	event->accept();
+}
+
+
+void cBricksDatabaseWidget::applyGlobalPreferences(cGlobalPreferences* globalpreferences) {
+	if (globalpreferences) {
+		if (lastdir.right(4).compare(".txt", Qt::CaseInsensitive) != 0) {
+			lastdir = globalpreferences->blocksdefaultdir;
+		}
+	}
 }
 
 

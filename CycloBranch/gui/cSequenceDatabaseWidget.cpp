@@ -18,7 +18,8 @@
 #include <QMenu>
 
 
-cSequenceDatabaseWidget::cSequenceDatabaseWidget(QWidget* parent) {
+cSequenceDatabaseWidget::cSequenceDatabaseWidget(cGlobalPreferences* globalpreferences, QWidget* parent) {
+	this->globalpreferences = globalpreferences;
 	this->parent = parent;
 
 	editorname = "Sequence/Compound Database Editor";
@@ -245,11 +246,7 @@ cSequenceDatabaseWidget::cSequenceDatabaseWidget(QWidget* parent) {
 
 	databasefile = "";
 
-	#if OS_TYPE == WIN
-		lastdir = "./SequenceDatabases/";
-	#else
-		lastdir = installdir + "SequenceDatabases/";
-	#endif
+	applyGlobalPreferences(globalpreferences);
 
 	sequences.clear();
 
@@ -318,6 +315,15 @@ void cSequenceDatabaseWidget::importSequence(int peptidetypeindex, QString seque
 	database->setColumnWidth(1, 150);
 	database->setColumnWidth(2, 400);
 	database->setColumnWidth(5, 400);
+}
+
+
+void cSequenceDatabaseWidget::applyGlobalPreferences(cGlobalPreferences* globalpreferences) {
+	if (globalpreferences) {
+		if (lastdir.right(4).compare(".txt", Qt::CaseInsensitive) != 0) {
+			lastdir = globalpreferences->sequencesdefaultdir;
+		}
+	}
 }
 
 

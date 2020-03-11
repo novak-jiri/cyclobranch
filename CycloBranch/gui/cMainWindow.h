@@ -33,6 +33,7 @@
 #include "gui/cImageWindow.h"
 #include "gui/cChromatogramWindow.h"
 #include "gui/cMainWindowProxyModel.h"
+#include "gui/cPreferencesDialog.h"
 
 
 // forward declaration
@@ -93,6 +94,7 @@ private:
 	QAction* actionSaveResults;
 	QAction* actionExportToCsv;
 	QAction* actionExportToHTML;
+	QAction* actionPreferences;
 	QAction* actionQuit;
 	QAction* actionRun;
 	QAction* actionStop;
@@ -101,8 +103,8 @@ private:
 	QAction* actionSequenceDatabase;
 	QAction* actionModifications;
 	QAction *actionDrawPeptide;
-	QAction *actionNorine;
-	QAction *actionBBDGNC;
+	QAction *actionBookMark1;
+	QAction *actionBookMark2;
 	QAction* actionShowIsomers;
 	QAction* actionGraph;
 	QAction* actionSummaryTableOfMatchedPeaks;
@@ -134,6 +136,7 @@ private:
 	cTheoreticalSpectrumList theoreticalspectrumlist;
 	vector<cSpectrumDetailWidget> spectradetails;
 
+	cGlobalPreferences globalpreferences;
 	cParameters parameters;
 
 	cPeakListSeries rawdata;
@@ -155,6 +158,7 @@ private:
 	cChromatogramWindow* chromatogramwindow;
 	cParametersWidget* parameterswidget;
 	cHTMLExportDialog* htmlexportdialog;
+	cPreferencesDialog* preferencesdialog;
 
 	int resultsbasecolumncount;
 	int resultsspecificcolumncount;
@@ -162,6 +166,7 @@ private:
 
 	QString lastdirexporttocsv;
 	QString lastdirexporttohtml;
+
 	QString lastdirsaveresults;
 	QString lastdiropenresults;
 
@@ -176,6 +181,8 @@ private:
 	void reportSpectrum(int row, cTheoreticalSpectrum& theoreticalspectrum, bool reportisomers);
 
 	void deleteResults();
+
+	void applyGlobalPreferences();
 
 	
 private slots:
@@ -232,6 +239,8 @@ private slots:
 
 	void exportToHTML();
 
+	void showPreferences();
+
 	void showHTMLDocumentation();
 
 	void showPDFManual();
@@ -252,9 +261,9 @@ private slots:
 
 	void resetFilter();
 
-	void gotoNorine();
+	void gotoBookMark1();
 
-	void gotoBBDGNC();
+	void gotoBookMark2();
 
 	void summaryPeaksTableCancelled();
 

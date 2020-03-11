@@ -55,7 +55,7 @@ cSpectrumDetailWidget& cSpectrumDetailWidget::operator=(const cSpectrumDetailWid
 	theoreticalspectrum = new cTheoreticalSpectrum();
 
 	if (parameters && sd.theoreticalspectrum) {
-		initialize(rowid, parameters, *sd.theoreticalspectrum, sd.parent);
+		initialize(rowid, globalpreferences, parameters, *sd.theoreticalspectrum, sd.parent);
 	}
 
 	if (parameters && sd.preparedToShow) {
@@ -68,11 +68,12 @@ cSpectrumDetailWidget& cSpectrumDetailWidget::operator=(const cSpectrumDetailWid
 }
 
 
-void cSpectrumDetailWidget::initialize(int rowid, cParameters* parameters, cTheoreticalSpectrum& theoreticalspectrum, QWidget* parent) {
+void cSpectrumDetailWidget::initialize(int rowid, cGlobalPreferences* globalpreferences, cParameters* parameters, cTheoreticalSpectrum& theoreticalspectrum, QWidget* parent) {
 	this->rowid = rowid;
-	this->parent = parent;
+	this->globalpreferences = globalpreferences;
 	this->parameters = parameters;
 	*this->theoreticalspectrum = theoreticalspectrum;
+	this->parent = parent;
 }
 
 
@@ -324,7 +325,7 @@ string cSpectrumDetailWidget::getPeaksTableAsHTMLString(bool unmatchedtheoretica
 					tmp2 += 3;
 
 					celltext = peak->description.substr(tmp1, rangle - tmp1 + 1).c_str();
-					if (celltext.contains("https://www.ncbi.nlm.nih.gov/pccompound?term=")) {
+					if (celltext.contains("https://pubchem.ncbi.nlm.nih.gov/#query=")) {
 						celltext += "search";
 					}
 					else {
@@ -511,7 +512,7 @@ string cSpectrumDetailWidget::getPartialPeaksTableAsHTMLString(int id, bool expo
 					tmp2 += 3;
 
 					celltext = peak->description.substr(tmp1, rangle - tmp1 + 1).c_str();
-					if (celltext.contains("https://www.ncbi.nlm.nih.gov/pccompound?term=")) {
+					if (celltext.contains("https://pubchem.ncbi.nlm.nih.gov/#query=")) {
 						celltext += "search";
 					}
 					else {
@@ -760,7 +761,7 @@ void cSpectrumDetailWidget::prepareToShow(QAction* actionShowIsomers, cPeakListS
 
 		toolbarFile = addToolBar(tr("File"));
 
-		actionExportTable = new QAction(QIcon(":/images/icons/62.png"), tr("&Export Table to CSV"), this);
+		actionExportTable = new QAction(QIcon(":/images/icons/csv.png"), tr("&Export Table to CSV"), this);
 		actionExportTable->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_E));
 		actionExportTable->setToolTip("Export Table to CSV (Ctrl + E)");
 		toolbarFile->addAction(actionExportTable);
@@ -1012,8 +1013,8 @@ void cSpectrumDetailWidget::prepareToShow(QAction* actionShowIsomers, cPeakListS
 			toolbarIonSeries->addWidget(ionserieswidget);
 
 			ionseriescombobox->addItem(tr("all"));
-			for (int i = 0; i < (int)parameters->ionsfortheoreticalspectra.size(); i++) {
-				ionseriescombobox->addItem(tr(parameters->iondefinitions[parameters->ionsfortheoreticalspectra[i]].name.c_str()));
+			for (int i = 0; i < (int)parameters->ionsfortheoreticalspectraMS2.size(); i++) {
+				ionseriescombobox->addItem(tr(parameters->iondefinitions[parameters->ionsfortheoreticalspectraMS2[i]].name.c_str()));
 			}
 
 			connect(ionseriescombobox, SIGNAL(currentIndexChanged(QString)), spectrumscene, SLOT(ionSeriesChanged(QString)));
@@ -1833,10 +1834,15 @@ void cSpectrumDetailWidget::setMZInterval() {
 
 
 void cSpectrumDetailWidget::exportSpectrum() {
+	QString currentdir = "./";
+	if (globalpreferences) {
+		currentdir = globalpreferences->exportimagedefaultdir;
+	}
+
 	#if OS_TYPE == WIN
-		QString filename = QFileDialog::getSaveFileName(this, tr("Export Spectrum..."), "./", "PDF Files (*.pdf);; PS Files (*.ps);; PNG Files (*.png);; SVG Files (*.svg)");
+		QString filename = QFileDialog::getSaveFileName(this, tr("Export Spectrum..."), currentdir, "PDF Files (*.pdf);; PS Files (*.ps);; PNG Files (*.png);; SVG Files (*.svg)");
 	#else
-		QString filename = QFileDialog::getSaveFileName(this, tr("Export Spectrum..."), "./", "PDF Files (*.pdf);; PNG Files (*.png);; SVG Files (*.svg)");
+		QString filename = QFileDialog::getSaveFileName(this, tr("Export Spectrum..."), currentdir, "PDF Files (*.pdf);; PNG Files (*.png);; SVG Files (*.svg)");
 	#endif
 	if (!filename.isEmpty()) {
 		regex rx;
@@ -1879,10 +1885,15 @@ void cSpectrumDetailWidget::exportSpectrum() {
 
 
 void cSpectrumDetailWidget::exportPeptide() {
+	QString currentdir = "./";
+	if (globalpreferences) {
+		currentdir = globalpreferences->exportimagedefaultdir;
+	}
+
 	#if OS_TYPE == WIN
-		QString filename = QFileDialog::getSaveFileName(this, tr("Export Peptide..."), "./", "PDF Files (*.pdf);; PS Files (*.ps);; PNG Files (*.png);; SVG Files (*.svg)");
+		QString filename = QFileDialog::getSaveFileName(this, tr("Export Peptide..."), currentdir, "PDF Files (*.pdf);; PS Files (*.ps);; PNG Files (*.png);; SVG Files (*.svg)");
 	#else
-		QString filename = QFileDialog::getSaveFileName(this, tr("Export Peptide..."), "./", "PDF Files (*.pdf);; PNG Files (*.png);; SVG Files (*.svg)");
+		QString filename = QFileDialog::getSaveFileName(this, tr("Export Peptide..."), currentdir, "PDF Files (*.pdf);; PNG Files (*.png);; SVG Files (*.svg)");
 	#endif
 	if (!filename.isEmpty() && parameters) {
 		regex rx;
@@ -2031,7 +2042,12 @@ void cSpectrumDetailWidget::openExportImageDialog() {
 
 
 void cSpectrumDetailWidget::exportTableToCSV() {
-	QString filename = QFileDialog::getSaveFileName(this, tr("Export Table to CSV..."), "./", "Files (*.csv)");
+	QString currentdir = "./";
+	if (globalpreferences) {
+		currentdir = globalpreferences->exportcsvdefaultdir;
+	}
+
+	QString filename = QFileDialog::getSaveFileName(this, tr("Export Table to CSV..."), currentdir, "Files (*.csv)");
 	
 	if (!filename.isEmpty()) {
 
@@ -2814,17 +2830,30 @@ void cSpectrumDetailWidget::closeWindow() {
 
 
 void cSpectrumDetailWidget::tableDoubleClicked(const QModelIndex& index) {
+	QStandardItem* item;
+	double value;
+
+	int theoreticalmzcolumn = 1;
+
 	int experimentalmzcolumn = 2;
 	if (parameters->generateisotopepattern) {
 		experimentalmzcolumn = 3;
 	}
 	
-	QStandardItem* item = peakstablemodel->item(proxymodel->mapToSource(index).row(), experimentalmzcolumn);
-	double value;
+	item = peakstablemodel->item(proxymodel->mapToSource(index).row(), experimentalmzcolumn);
 	if (item) {
 		value = item->data(Qt::DisplayRole).toDouble();
 		if (value > 0) {
-			emit emitMZInterval(value - 5.0, value + 5.0);
+			emit emitMZInterval(max(0.0, value - 5.0), value + 5.0);
+			return;
+		}
+	}
+
+	item = peakstablemodel->item(proxymodel->mapToSource(index).row(), theoreticalmzcolumn);
+	if (item) {
+		value = item->data(Qt::DisplayRole).toDouble();
+		if (value > 0) {
+			emit emitMZInterval(max(0.0, value - 5.0), value + 5.0);
 		}
 	}
 }

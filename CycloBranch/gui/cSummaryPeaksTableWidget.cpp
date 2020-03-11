@@ -22,13 +22,14 @@
 #include <QApplication>
 
 
-cSummaryPeaksTableWidget::cSummaryPeaksTableWidget(QWidget* parent) {
+cSummaryPeaksTableWidget::cSummaryPeaksTableWidget(cGlobalPreferences* globalpreferences, QWidget* parent) {
 	title = "Summary Table of Matched Peaks";
 
+	this->globalpreferences = globalpreferences;
 	this->parent = parent;
 
 	setWindowTitle(title);
-	setWindowIcon(QIcon(":/images/icons/43.png"));
+	setWindowIcon(QIcon(":/images/icons/table.png"));
 
 	menuBar = new QMenuBar(this);
 	menuBar->setNativeMenuBar(false);
@@ -163,7 +164,7 @@ cSummaryPeaksTableWidget::cSummaryPeaksTableWidget(QWidget* parent) {
 
 	toolbarFile = addToolBar(tr("File"));
 				
-	actionExportCSV = new QAction(QIcon(":/images/icons/62.png"), tr("&Export to CSV"), this);
+	actionExportCSV = new QAction(QIcon(":/images/icons/csv.png"), tr("&Export to CSV"), this);
 	actionExportCSV->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_E));
 	actionExportCSV->setToolTip("Export to CSV (Ctrl + E)");
 	toolbarFile->addAction(actionExportCSV);
@@ -222,10 +223,7 @@ cSummaryPeaksTableWidget::cSummaryPeaksTableWidget(QWidget* parent) {
 
 	resize(defaultwinsizex, defaultwinsizey);
 
-	lastdirexporttocsv = "./";
-	lastdirexportstatisticstocsv = "./";
-
-	coordinates.clear();
+	applyGlobalPreferences(globalpreferences);
 }
 
 
@@ -323,8 +321,6 @@ bool cSummaryPeaksTableWidget::prepareToShow(QStandardItemModel* resultsstandard
 	resetFilter();
 	deleteTable();
 	proxymodel->initialize(parameters->mode, parameters->peaklistfileformat, parameters->generateisotopepattern, rowsfilteroperator, rowsfiltercombobox1, rowsfiltercomparatorcombobox1, rowsfilterline1, rowsfiltercombobox2, rowsfiltercomparatorcombobox2, rowsfilterline2);
-
-	coordinates.clear();
 
 	// prepare the header
 	if ((parameters->mode == dereplication) || (parameters->mode == compoundsearch)) {
@@ -536,7 +532,7 @@ bool cSummaryPeaksTableWidget::prepareToShow(QStandardItemModel* resultsstandard
 	int currentrow;
 
 	cPeaksList eicchromatogram;
-	eicchromatogram.clear();
+	vector<cCoordinateInfo> coordinateinfo;
 
 	QBrush brush;
 	brush.setColor(QColor(0, 0, 0));
@@ -558,7 +554,11 @@ bool cSummaryPeaksTableWidget::prepareToShow(QStandardItemModel* resultsstandard
 		spectrumindex = resultsstandardmodel->item(i, 1)->data(Qt::DisplayRole).toInt() - 1;
 
 		if (((parameters->mode == dereplication) || (parameters->mode == compoundsearch)) && (parameters->peaklistfileformat != mis) && (parameters->peaklistfileformat != imzML)) {
-			addEICPeak(eicchromatogram, (*spectralist)[spectrumindex].getExperimentalSpectrum());
+			addEICPeak(eicchromatogram, (*spectralist)[spectrumindex], (*spectralist)[spectrumindex].getExperimentalSpectrum());
+		}
+
+		if (((parameters->mode == dereplication) || (parameters->mode == compoundsearch)) && ((parameters->peaklistfileformat == mis) || (parameters->peaklistfileformat == imzML))) {
+			addCoordinateInfo(spectrumindex, coordinateinfo, (*spectralist)[spectrumindex], (*spectralist)[spectrumindex].getExperimentalSpectrum());
 		}
 
 		if ((*spectralist)[spectrumindex].getNumberOfMatchedPeaks() == 0) {
@@ -606,8 +606,6 @@ bool cSummaryPeaksTableWidget::prepareToShow(QStandardItemModel* resultsstandard
 					databasemodel->item(currentrow, currentcolumn)->setForeground(brush);
 					databasemodel->item(currentrow, currentcolumn)->setData(QVariant::fromValue((*spectralist)[spectrumindex].getExperimentalSpectrum().getCoordinateY()), Qt::DisplayRole);
 					currentcolumn++;
-
-					coordinates.push_back(cCoordinates((*spectralist)[spectrumindex].getExperimentalSpectrum().getCoordinateX(), (*spectralist)[spectrumindex].getExperimentalSpectrum().getCoordinateY(), spectrumindex + 1, cropPrecisionToSixDecimals(peak->matchedmz), cropPrecisionToSixDecimals(peak->matchedrelativeintensity), peak->matchedabsoluteintensity));
 				}
 				else {
 					databasemodel->setItem(currentrow, currentcolumn, new QStandardItem());
@@ -699,16 +697,6 @@ bool cSummaryPeaksTableWidget::prepareToShow(QStandardItemModel* resultsstandard
 					databasemodel->item(currentrow, currentcolumn)->setText(stmp.c_str());
 
 					completernameset.insert(stmp.c_str());
-
-					if ((parameters->peaklistfileformat == mis) || (parameters->peaklistfileformat == imzML)) {
-						coordinates.back().name = databasemodel->item(currentrow, iontypecol)->text().toStdString() + " ";
-						if (databasemodel->item(currentrow, currentcolumn)->text().length() > 40) {
-							coordinates.back().name += databasemodel->item(currentrow, currentcolumn)->text().toStdString().substr(0, 37) + "...";
-						}
-						else {
-							coordinates.back().name += databasemodel->item(currentrow, currentcolumn)->text().toStdString();
-						}
-					}
 					currentcolumn++;
 
 					tmp = (int)peak->description.find('<');
@@ -725,15 +713,6 @@ bool cSummaryPeaksTableWidget::prepareToShow(QStandardItemModel* resultsstandard
 					databasemodel->setItem(currentrow, currentcolumn, new QStandardItem());
 					databasemodel->item(currentrow, currentcolumn)->setForeground(brush);
 					databasemodel->item(currentrow, currentcolumn)->setText(peak->description.substr(secondspace + 1, peak->description.rfind('(') - secondspace - 2).c_str());
-					if ((parameters->peaklistfileformat == mis) || (parameters->peaklistfileformat == imzML)) {
-						coordinates.back().name = databasemodel->item(currentrow, iontypecol)->text().toStdString() + " ";
-						if (databasemodel->item(currentrow, currentcolumn)->text().length() > 40) {
-							coordinates.back().name += databasemodel->item(currentrow, currentcolumn)->text().toStdString().substr(0, 37) + "...";
-						}
-						else {
-							coordinates.back().name += databasemodel->item(currentrow, currentcolumn)->text().toStdString();
-						}
-					}
 					currentcolumn++;
 
 					databasemodel->setItem(currentrow, currentcolumn, new QStandardItem());
@@ -789,8 +768,9 @@ bool cSummaryPeaksTableWidget::prepareToShow(QStandardItemModel* resultsstandard
 
 		if ((parameters->mode == dereplication) || (parameters->mode == compoundsearch)) {
 			if ((parameters->peaklistfileformat == mis) || (parameters->peaklistfileformat == imzML)) {
+				origcoordinateinfo = coordinateinfo;
 				emit resetRegion();
-				emit sendFilterOptionsToImageWindow(coordinates, (bool)rowsfilteroperator->currentIndex(), rowsfiltercombobox1->currentText().toStdString(), rowsfiltercomparatorcombobox1->currentText().toStdString(), rowsfilterline1->text().toStdString(), rowsfiltercombobox2->currentText().toStdString(), rowsfiltercomparatorcombobox2->currentText().toStdString(), rowsfilterline2->text().toStdString(), rowsfiltercasesensitive->isChecked(), rowsfilterwholeword->isChecked());
+				emit sendFilterOptionsToImageWindow(coordinateinfo, (bool)rowsfilteroperator->currentIndex(), rowsfiltercombobox1->currentText().toStdString(), rowsfiltercomparatorcombobox1->currentText().toStdString(), rowsfilterline1->text().toStdString(), rowsfiltercombobox2->currentText().toStdString(), rowsfiltercomparatorcombobox2->currentText().toStdString(), rowsfilterline2->text().toStdString(), rowsfiltercasesensitive->isChecked(), rowsfilterwholeword->isChecked());
 
 				if (parameters->generateisotopepattern) {
 					database->setColumnWidth(12, min(400, database->columnWidth(12)));
@@ -858,21 +838,126 @@ void cSummaryPeaksTableWidget::updateFilterBySelectedRegion(int xmin, int xmax, 
 }
 
 
-void cSummaryPeaksTableWidget::addEICPeak(cPeaksList& eicchromatogram, cPeaksList& experimentalspectrum) {
-	unsigned long long intensity = 0;
-	cPeak peak;
-
-	int size = experimentalspectrum.size();
-	for (int i = 0; i < size; i++) {
-		if (experimentalspectrum[i].matched == 0) {
-			continue;
+void cSummaryPeaksTableWidget::applyGlobalPreferences(cGlobalPreferences* globalpreferences) {
+	if (globalpreferences) {
+		if (lastdirexporttocsv.right(4).compare(".csv", Qt::CaseInsensitive) != 0) {
+			lastdirexporttocsv = globalpreferences->exportcsvdefaultdir;
 		}
-		intensity += experimentalspectrum[i].absoluteintensity;
+		if (lastdirexportstatisticstocsv.right(4).compare(".csv", Qt::CaseInsensitive) != 0) {
+			lastdirexportstatisticstocsv = globalpreferences->exportcsvdefaultdir;
+		}
 	}
-	peak.clear();
+}
+
+
+void cSummaryPeaksTableWidget::addEICPeak(cPeaksList& eicchromatogram, cTheoreticalSpectrum& theoreticalspectrum, cPeaksList& experimentalspectrum) {
+	double intensity = 0;
+	int size;
+
+	set<string> matchedcompounds;
+	string matcheditem;
+	size_t pos;
+
+	size = experimentalspectrum.size();
+	for (int i = 0; i < size; i++) {
+		if (experimentalspectrum[i].matched > 0) {
+			intensity += experimentalspectrum[i].absoluteintensity;
+		}
+	}
+
+	size = theoreticalspectrum.getNumberOfPeaks();
+	for (int i = 0; i < size; i++) {
+		if (theoreticalspectrum[i].matched > 0) {
+			matcheditem.clear();
+
+			pos = parameters->peakidtodesc[theoreticalspectrum[i].descriptionid].find("</a>");
+			if (pos != string::npos) {
+				matcheditem = parameters->peakidtodesc[theoreticalspectrum[i].descriptionid].substr(0, pos + 4);
+			}
+
+			if (!matcheditem.empty()) {
+				matchedcompounds.insert(matcheditem);
+			}
+		}
+	}
+
+	matcheditem.clear();
+	for (auto& it : matchedcompounds) {
+		matcheditem += it;
+		matcheditem += "<br/>";
+	}
+
+	cPeak peak;
 	peak.mzratio = (double)(eicchromatogram.size() + 1);
 	peak.absoluteintensity = intensity;
+	peak.description = matcheditem;
 	eicchromatogram.add(peak);
+}
+
+
+void cSummaryPeaksTableWidget::addCoordinateInfo(int spectrumindex, vector<cCoordinateInfo>& coordinateinfo, cTheoreticalSpectrum& theoreticalspectrum, cPeaksList& experimentalspectrum) {
+	cCoordinateInfo item;
+	int size;
+
+	set<string> matchedcompounds;
+	string matcheditem, tmpstr;
+	size_t pos1, pos2;
+
+	size = experimentalspectrum.size();
+	for (int i = 0; i < size; i++) {
+		if (experimentalspectrum[i].matched > 0) {
+			item.relativeintensity += experimentalspectrum[i].relativeintensity;
+			item.absoluteintensity += experimentalspectrum[i].absoluteintensity;
+		}
+	}
+
+	size = theoreticalspectrum.getNumberOfPeaks();
+	for (int i = 0; i < size; i++) {
+		if (theoreticalspectrum[i].matched > 0) {
+			matcheditem.clear();
+
+			pos1 = parameters->peakidtodesc[theoreticalspectrum[i].descriptionid].find('<');
+			if (pos1 != string::npos) {
+				matcheditem = parameters->peakidtodesc[theoreticalspectrum[i].descriptionid].substr(0, pos1 - 1);
+
+				pos1 = parameters->peakidtodesc[theoreticalspectrum[i].descriptionid].rfind("</a>");
+				pos2 = parameters->peakidtodesc[theoreticalspectrum[i].descriptionid].find('>');
+				if ((pos1 != string::npos) && (pos2 != string::npos)) {
+					tmpstr = parameters->peakidtodesc[theoreticalspectrum[i].descriptionid].substr(pos2 + 1, pos1 - pos2 - 1);
+					if (tmpstr.size() > 40) {
+						matcheditem += tmpstr.substr(0, 37) + "...";
+					}
+					else {
+						matcheditem += tmpstr;
+					}
+				}
+				else {
+					matcheditem.clear();
+				}
+			}
+
+			if (!matcheditem.empty()) {
+				matchedcompounds.insert(matcheditem);
+			}
+		}
+	}
+
+	matcheditem.clear();
+	for (auto& it : matchedcompounds) {
+		if (!matcheditem.empty()) {
+			matcheditem += "\n";
+		}
+		matcheditem += it;
+	}
+
+	item.id = spectrumindex + 1;
+	item.x = experimentalspectrum.getCoordinateX();
+	item.y = experimentalspectrum.getCoordinateY();
+	item.description = matcheditem;
+
+	if (item.absoluteintensity > 0) {
+		coordinateinfo.push_back(item);
+	}
 }
 
 
@@ -943,7 +1028,7 @@ void cSummaryPeaksTableWidget::filterRows() {
 	Qt::CaseSensitivity casesensitive = rowsfiltercasesensitive->isChecked()?Qt::CaseSensitive:Qt::CaseInsensitive;
 	QString str = "";
 	int i, id, x, y;
-	int iontypecol, mzcol, relintcol, absintcol, namecol;
+	int iontypecol, mzcol, relintcol, absintcol, namecol, referencecol;
 
 	cPeaksList eicchromatogram;
 	eicchromatogram.clear();
@@ -965,17 +1050,25 @@ void cSummaryPeaksTableWidget::filterRows() {
 			}
 		}
 		else {
+			iontypecol = 2;
 			if (parameters->generateisotopepattern) {
+				mzcol = 5;
 				absintcol = 7;
+				namecol = 12;
+				referencecol = 13;
 			}
 			else {
+				mzcol = 4;
 				absintcol = 6;
+				namecol = 9;
+				referencecol = 10;
 			}
 
 			eicchromatogram = origeicchromatogram;
 			for (i = 0; i < eicchromatogram.size(); i++) {
 				eicchromatogram[i].absoluteintensity = 0;
 				eicchromatogram[i].relativeintensity = 0;
+				eicchromatogram[i].description = "";
 			}
 		}
 	}
@@ -994,7 +1087,11 @@ void cSummaryPeaksTableWidget::filterRows() {
 	proxymodel->setFilterFixedString(str);
 
 	// prepare data for visualization
-	coordinates.clear();
+	vector<cCoordinateInfo> coordinateinfo;
+	map<int, cCoordinateInfo> coordinatemap;
+	map<int, set<string> > experimentalmz;
+	string tmpdescription;
+
 	if ((parameters->mode == dereplication) || (parameters->mode == compoundsearch)) {
 		if ((parameters->peaklistfileformat == mis) || (parameters->peaklistfileformat == imzML)) {
 			int proxymodelrowcount = proxymodel->rowCount();
@@ -1003,21 +1100,40 @@ void cSummaryPeaksTableWidget::filterRows() {
 				y = databasemodel->itemFromIndex(proxymodel->mapToSource(proxymodel->index(i, 2)))->data(Qt::DisplayRole).toInt();
 
 				if (((proxymodel->xmin == -1) && (proxymodel->xmax == -1) && (proxymodel->ymin == -1) && (proxymodel->ymax == -1)) || ((x >= proxymodel->xmin) && (x <= proxymodel->xmax) && (y >= proxymodel->ymin) && (y <= proxymodel->ymax))) {
-					coordinates.push_back(cCoordinates(
-						x,
-						y,
-						databasemodel->itemFromIndex(proxymodel->mapToSource(proxymodel->index(i, 0)))->text().toInt(),
-						databasemodel->itemFromIndex(proxymodel->mapToSource(proxymodel->index(i, mzcol)))->data(Qt::DisplayRole).toDouble(),
-						databasemodel->itemFromIndex(proxymodel->mapToSource(proxymodel->index(i, relintcol)))->data(Qt::DisplayRole).toDouble(),
-						databasemodel->itemFromIndex(proxymodel->mapToSource(proxymodel->index(i, absintcol)))->data(Qt::DisplayRole).toDouble()
-					));
-					coordinates.back().name = databasemodel->itemFromIndex(proxymodel->mapToSource(proxymodel->index(i, iontypecol)))->text().toStdString() + " ";
+
+					id = databasemodel->itemFromIndex(proxymodel->mapToSource(proxymodel->index(i, 0)))->data(Qt::DisplayRole).toInt(); // ok
+
+					tmpdescription = databasemodel->itemFromIndex(proxymodel->mapToSource(proxymodel->index(i, mzcol)))->data(Qt::DisplayRole).toString().toStdString();
+					if (experimentalmz[id].count(tmpdescription) == 0) {
+						if (coordinatemap.count(id) == 1) {
+							coordinatemap[id].relativeintensity += databasemodel->itemFromIndex(proxymodel->mapToSource(proxymodel->index(i, relintcol)))->data(Qt::DisplayRole).toDouble();
+							coordinatemap[id].absoluteintensity += databasemodel->itemFromIndex(proxymodel->mapToSource(proxymodel->index(i, absintcol)))->data(Qt::DisplayRole).toDouble();
+						}
+						else {
+							coordinatemap[id].id = id;
+							coordinatemap[id].x = x;
+							coordinatemap[id].y = y;
+							coordinatemap[id].relativeintensity = databasemodel->itemFromIndex(proxymodel->mapToSource(proxymodel->index(i, relintcol)))->data(Qt::DisplayRole).toDouble();
+							coordinatemap[id].absoluteintensity = databasemodel->itemFromIndex(proxymodel->mapToSource(proxymodel->index(i, absintcol)))->data(Qt::DisplayRole).toDouble();
+						}
+						experimentalmz[id].insert(tmpdescription);
+					}
+
+					tmpdescription = databasemodel->itemFromIndex(proxymodel->mapToSource(proxymodel->index(i, iontypecol)))->text().toStdString() + " ";
 					if (databasemodel->itemFromIndex(proxymodel->mapToSource(proxymodel->index(i, namecol)))->text().length() > 40) {
-						coordinates.back().name += databasemodel->itemFromIndex(proxymodel->mapToSource(proxymodel->index(i, namecol)))->text().toStdString().substr(0, 37) + "...";
+						tmpdescription += databasemodel->itemFromIndex(proxymodel->mapToSource(proxymodel->index(i, namecol)))->text().toStdString().substr(0, 37) + "...";
 					}
 					else {
-						coordinates.back().name += databasemodel->itemFromIndex(proxymodel->mapToSource(proxymodel->index(i, namecol)))->text().toStdString();
+						tmpdescription += databasemodel->itemFromIndex(proxymodel->mapToSource(proxymodel->index(i, namecol)))->text().toStdString();
 					}
+
+					if (coordinatemap[id].description.find(tmpdescription) == string::npos) {
+						if (!coordinatemap[id].description.empty()) {
+							coordinatemap[id].description += "\n";
+						}
+						coordinatemap[id].description += tmpdescription;
+					}
+
 				}
 
 				progress.setValue(i);
@@ -1027,12 +1143,37 @@ void cSummaryPeaksTableWidget::filterRows() {
 					break;
 				}
 			}
+
+			if (!progress.wasCanceled()) {
+				for (auto& it : coordinatemap) {
+					if (it.second.absoluteintensity > 0) {
+						coordinateinfo.push_back(it.second);
+					}
+				}
+			}
 		}
 		else {
 			int proxymodelrowcount = proxymodel->rowCount();
 			for (i = 0; i < proxymodelrowcount; i++) {
-				id = databasemodel->itemFromIndex(proxymodel->mapToSource(proxymodel->index(i, 0)))->data(Qt::DisplayRole).toInt() - 1;
-				eicchromatogram[id].absoluteintensity += databasemodel->itemFromIndex(proxymodel->mapToSource(proxymodel->index(i, absintcol)))->data(Qt::DisplayRole).toDouble();
+				id = databasemodel->itemFromIndex(proxymodel->mapToSource(proxymodel->index(i, 0)))->data(Qt::DisplayRole).toInt() - 1; // ok
+
+				tmpdescription = databasemodel->itemFromIndex(proxymodel->mapToSource(proxymodel->index(i, mzcol)))->data(Qt::DisplayRole).toString().toStdString();
+				if (experimentalmz[id].count(tmpdescription) == 0) {
+					eicchromatogram[id].absoluteintensity += databasemodel->itemFromIndex(proxymodel->mapToSource(proxymodel->index(i, absintcol)))->data(Qt::DisplayRole).toDouble();
+					experimentalmz[id].insert(tmpdescription);
+				}
+
+				tmpdescription = databasemodel->itemFromIndex(proxymodel->mapToSource(proxymodel->index(i, iontypecol)))->text().toStdString();
+				tmpdescription += " <a href=\"";
+				tmpdescription += databasemodel->itemFromIndex(proxymodel->mapToSource(proxymodel->index(i, referencecol)))->text().toStdString();
+				tmpdescription += "\">";
+				tmpdescription += databasemodel->itemFromIndex(proxymodel->mapToSource(proxymodel->index(i, namecol)))->text().toStdString();
+				tmpdescription += "</a>";
+
+				if (eicchromatogram[id].description.find(tmpdescription) == string::npos) {
+					eicchromatogram[id].description += tmpdescription;
+					eicchromatogram[id].description += "<br/>";
+				}
 
 				progress.setValue(i);
 
@@ -1046,7 +1187,7 @@ void cSummaryPeaksTableWidget::filterRows() {
 
 	if (((parameters->mode == dereplication) || (parameters->mode == compoundsearch)) && !progress.wasCanceled()) {
 		if ((parameters->peaklistfileformat == mis) || (parameters->peaklistfileformat == imzML)) {
-			emit sendFilterOptionsToImageWindow(coordinates, (bool)rowsfilteroperator->currentIndex(), rowsfiltercombobox1->currentText().toStdString(), rowsfiltercomparatorcombobox1->currentText().toStdString(), rowsfilterline1->text().toStdString(), rowsfiltercombobox2->currentText().toStdString(), rowsfiltercomparatorcombobox2->currentText().toStdString(), rowsfilterline2->text().toStdString(), rowsfiltercasesensitive->isChecked(), rowsfilterwholeword->isChecked());
+			emit sendFilterOptionsToImageWindow(coordinateinfo, (bool)rowsfilteroperator->currentIndex(), rowsfiltercombobox1->currentText().toStdString(), rowsfiltercomparatorcombobox1->currentText().toStdString(), rowsfilterline1->text().toStdString(), rowsfiltercombobox2->currentText().toStdString(), rowsfiltercomparatorcombobox2->currentText().toStdString(), rowsfilterline2->text().toStdString(), rowsfiltercasesensitive->isChecked(), rowsfilterwholeword->isChecked());
 		}
 		else {
 			eicchromatogram.normalizeIntenzity();
@@ -1064,70 +1205,20 @@ void cSummaryPeaksTableWidget::resetFilter() {
 	rowsfilterline1->setText("");
 	rowsfilterline2->setText("");
 
-	int rowcount = databasemodel->rowCount();
-	int i, x, y;
-	int iontypecol, mzcol, relintcol, absintcol, namecol;
-
-	cPeaksList eicchromatogram;
-	eicchromatogram.clear();
-
 	if ((parameters->mode == dereplication) || (parameters->mode == compoundsearch)) {
 		if ((parameters->peaklistfileformat == mis) || (parameters->peaklistfileformat == imzML)) {
-			iontypecol = 3;
-			if (parameters->generateisotopepattern) {
-				mzcol = 6;
-				relintcol = 7;
-				absintcol = 8;
-				namecol = 13;
-			}
-			else {
-				mzcol = 5;
-				relintcol = 6;
-				absintcol = 7;
-				namecol = 10;
-			}
-		}
-	}
-
-	QProgressDialog progress("Updating...", 0, 0, rowcount, this);
-	progress.setMinimumWidth(250);
-	cEventFilter filter;
-	progress.installEventFilter(&filter);
-	progress.setMinimumDuration(0);
-	progress.setWindowModality(Qt::ApplicationModal);
-
-	coordinates.clear();
-	if ((parameters->mode == dereplication) || (parameters->mode == compoundsearch)) {
-		if ((parameters->peaklistfileformat == mis) || (parameters->peaklistfileformat == imzML)) {
-			for (i = 0; i < rowcount; i++) {
-				x = databasemodel->item(i, 1)->data(Qt::DisplayRole).toInt();
-				y = databasemodel->item(i, 2)->data(Qt::DisplayRole).toInt();
-
-				if (((proxymodel->xmin == -1) && (proxymodel->xmax == -1) && (proxymodel->ymin == -1) && (proxymodel->ymax == -1)) || ((x >= proxymodel->xmin) && (x <= proxymodel->xmax) && (y >= proxymodel->ymin) && (y <= proxymodel->ymax))) {
-					coordinates.push_back(cCoordinates(
-						x, 
-						y, 
-						databasemodel->item(i, 0)->text().toInt(), 
-						databasemodel->item(i, mzcol)->data(Qt::DisplayRole).toDouble(), 
-						databasemodel->item(i, relintcol)->data(Qt::DisplayRole).toDouble(), 
-						databasemodel->item(i, absintcol)->data(Qt::DisplayRole).toDouble()
-					));
-					coordinates.back().name = databasemodel->item(i, iontypecol)->text().toStdString() + " ";
-					if (databasemodel->item(i, namecol)->text().length() > 40) {
-						coordinates.back().name += databasemodel->item(i, namecol)->text().toStdString().substr(0, 37) + "...";
-					}
-					else {
-						coordinates.back().name += databasemodel->item(i, namecol)->text().toStdString();
-					}
+			vector<cCoordinateInfo> coordinateinfo;
+			
+			for (auto& it : origcoordinateinfo) {
+				if (((proxymodel->xmin == -1) && (proxymodel->xmax == -1) && (proxymodel->ymin == -1) && (proxymodel->ymax == -1)) || ((it.x >= proxymodel->xmin) && (it.x <= proxymodel->xmax) && (it.y >= proxymodel->ymin) && (it.y <= proxymodel->ymax))) {
+					coordinateinfo.push_back(it);
 				}
-
-				progress.setValue(i);
 			}
-			emit sendFilterOptionsToImageWindow(coordinates, (bool)rowsfilteroperator->currentIndex(), rowsfiltercombobox1->currentText().toStdString(), rowsfiltercomparatorcombobox1->currentText().toStdString(), rowsfilterline1->text().toStdString(), rowsfiltercombobox2->currentText().toStdString(), rowsfiltercomparatorcombobox2->currentText().toStdString(), rowsfilterline2->text().toStdString(), rowsfiltercasesensitive->isChecked(), rowsfilterwholeword->isChecked());
+
+			emit sendFilterOptionsToImageWindow(coordinateinfo, (bool)rowsfilteroperator->currentIndex(), rowsfiltercombobox1->currentText().toStdString(), rowsfiltercomparatorcombobox1->currentText().toStdString(), rowsfilterline1->text().toStdString(), rowsfiltercombobox2->currentText().toStdString(), rowsfiltercomparatorcombobox2->currentText().toStdString(), rowsfilterline2->text().toStdString(), rowsfiltercasesensitive->isChecked(), rowsfilterwholeword->isChecked());
 		}
 		else {
-			eicchromatogram = origeicchromatogram;
-			emit sendFilterOptionsToChromatogram(eicchromatogram);
+			emit sendFilterOptionsToChromatogram(origeicchromatogram);
 		}
 	}
 
@@ -1137,8 +1228,6 @@ void cSummaryPeaksTableWidget::resetFilter() {
 	proxymodel->setWholeWord(false);
 	proxymodel->setFilterKeyColumn(-1);
 	proxymodel->setFilterFixedString("");
-
-	progress.setValue(rowcount);
 }
 
 

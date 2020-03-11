@@ -12,7 +12,7 @@ cImageWindowWidget::cImageWindowWidget() {
 	scene = new QGraphicsScene(this);
 	setScene(scene);
 
-	coordinates.clear();
+	coordinateinfo.clear();
 	operatortype = 0;
 	columnname1 = "";
 	comparatorname1 = "";
@@ -141,8 +141,8 @@ QImage cImageWindowWidget::getImage() {
 }
 
 
-void cImageWindowWidget::setFilterOptions(vector<cCoordinates>& coordinates, bool operatortype, string& columnname1, string& comparatorname1, string& filterstring1, string& columnname2, string& comparatorname2, string& filterstring2, bool casesensitive, bool wholeword) {
-	this->coordinates = coordinates;
+void cImageWindowWidget::setFilterOptions(vector<cCoordinateInfo>& coordinateinfo, bool operatortype, string& columnname1, string& comparatorname1, string& filterstring1, string& columnname2, string& comparatorname2, string& filterstring2, bool casesensitive, bool wholeword) {
+	this->coordinateinfo = coordinateinfo;
 	this->operatortype = operatortype;
 	this->columnname1 = columnname1;
 	this->comparatorname1 = comparatorname1;
@@ -593,7 +593,7 @@ void cImageWindowWidget::mouseDoubleClickEvent(QMouseEvent *event) {
 		if ((currentx > 0) && (currenty > 0) && (currentx < currentwidth) && (currenty < currentheight)) {
 				
 			spectrumid = -1;
-			for (auto& it : coordinates) {
+			for (auto& it : coordinateinfo) {
 				if ((it.x == x) && (it.y == y)) {
 					spectrumid = it.id;
 					break;
@@ -742,31 +742,11 @@ void cImageWindowWidget::redrawScene() {
 		}
 	}
 
-	unordered_set<cCoordinates, hash_cCoordinates> reduced_coordinates;
-	for (int i = 0; i < (int)coordinates.size(); i++) {
-		if (reduced_coordinates.count(coordinates[i]) == 1) {
-			auto it = reduced_coordinates.find(coordinates[i]);
-			cCoordinates coord = *it;
-			coord.mzratio = 0;
-			coord.relativeintensity += coordinates[i].relativeintensity;
-			coord.absoluteintensity += coordinates[i].absoluteintensity;
-			if (coord.name.find(coordinates[i].name) == string::npos) {
-				coord.name += "\n" + coordinates[i].name;
-			}
-			reduced_coordinates.erase(it);
-			reduced_coordinates.insert(coord);
-
-		}
-		else {
-			reduced_coordinates.insert(coordinates[i]);
-		}
-	}
-
 	double minimumintensity = DBL_MAX;
 	double maximumintensity = 0;
 	double averageintensity = 0;
 	vector<double> medianvector;
-	for (auto it = reduced_coordinates.begin(); it != reduced_coordinates.end(); ++it) {
+	for (auto it = coordinateinfo.begin(); it != coordinateinfo.end(); ++it) {
 		if (!absoluteintensity) {
 			if (it->relativeintensity < minimumintensity) {
 				minimumintensity = it->relativeintensity;
@@ -789,8 +769,8 @@ void cImageWindowWidget::redrawScene() {
 		}
 	}
 
-	if (reduced_coordinates.size() > 0) {
-		averageintensity /= (double)reduced_coordinates.size();
+	if (coordinateinfo.size() > 0) {
+		averageintensity /= (double)coordinateinfo.size();
 	}
 
 	double medianintensity = median(medianvector);
@@ -805,9 +785,9 @@ void cImageWindowWidget::redrawScene() {
 			double hue_max = 1;
 			qreal x, y, w, h;
 
-			for (auto it = reduced_coordinates.begin(); it != reduced_coordinates.end(); ++it) {
+			for (auto it = coordinateinfo.begin(); it != coordinateinfo.end(); ++it) {
 
-				if (it == reduced_coordinates.begin()) {
+				if (it == coordinateinfo.begin()) {
 					xmin = it->x;
 					xmax = it->x;
 					ymin = it->y;
@@ -863,15 +843,9 @@ void cImageWindowWidget::redrawScene() {
 				}
 				rectitem->setBrush(QBrush(color));
 
-				string tooltip;
-				if (it->mzratio == 0) {
-					tooltip = it->name + "\nID: " + to_string(it->id) + "\nX: " + to_string(it->x) + "\nY: " + to_string(it->y) + "\nsum of rel. intensities: " + to_string(it->relativeintensity) + "%\nsum of abs. intensities: " + QVariant(cropDecimalsByteArray(it->absoluteintensity)).toString().toStdString();
-				}
-				else {
-					tooltip = it->name + "\nID: " + to_string(it->id) + "\nX: " + to_string(it->x) + "\nY: " + to_string(it->y) + "\nm/z: " + to_string(it->mzratio) + "\nrel. intensity: " + to_string(it->relativeintensity) + "%\nabs. intensity: " + QVariant(cropDecimalsByteArray(it->absoluteintensity)).toString().toStdString();
-				}
-
+				string tooltip = it->description + "\nID: " + to_string(it->id) + "\nX: " + to_string(it->x) + "\nY: " + to_string(it->y) + "\nsum of rel. intensities: " + to_string(it->relativeintensity) + "%\nsum of abs. intensities: " + QVariant(cropDecimalsByteArray(it->absoluteintensity)).toString().toStdString();
 				rectitem->setToolTip(tooltip.c_str());
+
 				rectitem->setZValue(layersvector[layer_compounds].zvalue);
 				scene->addItem(rectitem);
 			}
@@ -934,7 +908,7 @@ void cImageWindowWidget::redrawScene() {
 
 		}
 
-		qstr = "Number of Points Selected: " + QString::number(reduced_coordinates.size());
+		qstr = "Number of Points Selected: " + QString::number(coordinateinfo.size());
 		if (!filterstring1.empty() || !filterstring2.empty()) {
 			qstr += " (";
 		}
@@ -1080,6 +1054,8 @@ void cImageWindowWidget::drawMicroscopyImage(eLayerType layer, QRectF& rect_scen
 	transform.scale(layersvector[layer].fliphorizontally ? -1 : 1, layersvector[layer].flipvertically ? -1 : 1);
 	transform.rotate(layersvector[layer].angle);
 	transform.translate(-(qreal)microscopyorigcenterx, -(qreal)microscopyorigcentery);
+
+	// to do - potential bug
 	scaledmicroscopypixmap = scaledmicroscopypixmap.transformed(transform);
 
 	int microscopynewcenterx = scaledmicroscopypixmap.rect().center().x();

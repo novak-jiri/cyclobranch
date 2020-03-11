@@ -33,6 +33,7 @@ cChromatogramWindowWidget::cChromatogramWindowWidget(cTheoreticalSpectrumList& t
 	absoluteintensity = true;
 	hidetic = false;
 	hideeic = false;
+	hidelabels = false;
 
 	scene = new QGraphicsScene(this);
 
@@ -78,9 +79,9 @@ void cChromatogramWindowWidget::exportToPDF(QString filename, bool postscript) {
 	if (!painter.begin(&printer)) {
 		QMessageBox msgBox;
 		QString errstr = "The file cannot be created.";
-#if OS_TYPE == UNX
-		errstr += "\nDo you have a properly configured print server (sudo apt-get install cups-pdf) ?";
-#endif
+		#if OS_TYPE == UNX
+			errstr += "\nDo you have a properly configured print server (sudo apt-get install cups-pdf) ?";
+		#endif
 		msgBox.setText(errstr);
 		msgBox.exec();
 		return;
@@ -389,6 +390,7 @@ int cChromatogramWindowWidget::getXPositionFromScanID(int scanid, int w) {
 void cChromatogramWindowWidget::redrawScene() {
 
 	QGraphicsSimpleTextItem* simpletext;
+	QGraphicsTextItem* text;
 	QGraphicsLineItem* line;
 	qreal tx, ty;
 	int x;
@@ -693,20 +695,67 @@ void cChromatogramWindowWidget::redrawScene() {
 
 			if (printintensity) {
 
+				QList<QGraphicsItem *> hiddenitems;
+				qreal tx, ty, tw, th, sumh;
+
+				vector<string> hits;
+				string tmplong;
+				string tmpshort;
+				size_t pos;
+				
+				hits.clear();
+
+				if (!hidelabels) {
+					tmplong = eicchromatogram[i].description.c_str();
+					pos = tmplong.find("<br/>");
+					while (pos != string::npos) {
+						tmpshort = tmplong.substr(0, pos - 1);
+						hits.push_back(tmpshort);
+						tmplong = tmplong.substr(pos + 5);
+						pos = tmplong.find("<br/>");
+					}
+					if (tmplong.size() > 0) {
+						hits.push_back(tmplong);
+					}
+					sort(hits.rbegin(), hits.rend());
+				}
+
 				if (retentiontime) {
-					simpletext = scene->addSimpleText(QString::number(rtimes[i]) + " ", myFont);
+					tmpshort = QString::number(rtimes[i]).toStdString();
 				}
 				else {
-					simpletext = scene->addSimpleText(QString::number((int)eicchromatogram[i].mzratio) + " ", myFont);
+					tmpshort = QString::number((int)eicchromatogram[i].mzratio).toStdString();
 				}
-				tx = x - 2;
-				ty = h - bottommargin - std::max((int)y, 2) - simpletext->boundingRect().height() - 1 - 4;
-				simpletext->setPos(tx, ty);
-				simpletext->setBrush(Qt::red);
-				simpletext->setZValue(1);
 
-				if (scene->collidingItems(simpletext, Qt::IntersectsItemBoundingRect).size() > 0) {
-					scene->removeItem(simpletext);
+				hits.push_back(tmpshort);
+
+				hiddenitems.clear();
+				sumh = 0;
+				for (vector<string>::reverse_iterator rit = hits.rbegin(); rit != hits.rend(); ++rit) {
+					text = scene->addText("");
+					text->setDefaultTextColor(QColor(Qt::red));
+					text->setFont(myFont);
+					text->setTextInteractionFlags(Qt::TextBrowserInteraction);
+					text->setOpenExternalLinks(true);
+					text->setHtml(rit->c_str());
+
+					tw = text->boundingRect().width();
+					th = text->boundingRect().height();
+					sumh += th + 1;
+					tx = x - 2 - 4;
+					ty = h - bottommargin - std::max((int)y, 2) - sumh - 4;
+					text->setPos(tx, ty);
+					text->setZValue(2);
+
+					hiddenitems.append(text);
+
+					if (scene->items(tx, ty, tw, th, Qt::IntersectsItemBoundingRect, Qt::AscendingOrder).size() > 1) {
+						for (int k = 0; k < (int)hiddenitems.size(); k++) {
+							scene->removeItem(hiddenitems[k]);
+						}
+						break;
+					}
+
 				}
 
 			}
@@ -952,6 +1001,12 @@ void cChromatogramWindowWidget::hideTIC(bool state) {
 
 void cChromatogramWindowWidget::hideEIC(bool state) {
 	hideeic = state;
+	redrawScene();
+}
+
+
+void cChromatogramWindowWidget::hideLabels(bool state) {
+	hidelabels = state;
 	redrawScene();
 }
 

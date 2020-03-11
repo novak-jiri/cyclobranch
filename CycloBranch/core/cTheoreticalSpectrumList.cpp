@@ -400,6 +400,9 @@ double cTheoreticalSpectrumList::updatekNNList(cTheoreticalSpectrum& theoretical
 		case number_of_b_and_y_ions:
 			comparatorfunction = &compareYBandAllIonsDesc;
 			break;
+		case weighted_ratio_of_matched_peaks:
+			comparatorfunction = &compareWeightedRatioDesc;
+			break;
 		default:
 			break;
 	}
@@ -426,6 +429,9 @@ double cTheoreticalSpectrumList::updatekNNList(cTheoreticalSpectrum& theoretical
 				break;
 			case number_of_b_and_y_ions:
 				currentscore = it1->getNumberOfMatchedPeaksYB();
+				break;
+			case weighted_ratio_of_matched_peaks:
+				currentscore = it1->getWeightedRatioOfMatchedPeaks();
 				break;
 			default:
 				break;
@@ -462,6 +468,9 @@ double cTheoreticalSpectrumList::updatekNNList(cTheoreticalSpectrum& theoretical
 			case number_of_b_and_y_ions:
 				currentworstscore = prev(spectrumbuffer.end())->getNumberOfMatchedPeaksYB();
 				break;
+			case weighted_ratio_of_matched_peaks:
+				currentworstscore = prev(spectrumbuffer.end())->getWeightedRatioOfMatchedPeaks();
+				break;
 			default:
 				break;
 		}
@@ -488,6 +497,9 @@ void cTheoreticalSpectrumList::sortAndFitSize() {
 			break;
 		case number_of_b_and_y_ions:
 			sort(theoreticalspectra.begin(), theoreticalspectra.end(), compareYBandAllIonsDesc);
+			break;
+		case weighted_ratio_of_matched_peaks:
+			sort(theoreticalspectra.begin(), theoreticalspectra.end(), compareWeightedRatioDesc);
 			break;
 		default:
 			break;

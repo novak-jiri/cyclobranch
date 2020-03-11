@@ -20,6 +20,7 @@
 #include <QComboBox>
 #include <fstream>
 #include "core/utilities.h"
+#include "core/cGlobalPreferences.h"
 #include "core/cBricksDatabase.h"
 #include "gui/cBricksDatabaseProxyModel.h"
 #include "gui/cMultipleButtonDelegate.h"
@@ -56,9 +57,10 @@ public:
 
 	/**
 		\brief The constructor.
+		\param globalpreferences global preferences of the application
 		\param parent pointer to a parent widget
 	*/ 
-	cBricksDatabaseWidget(QWidget* parent = (QWidget *)0);
+	cBricksDatabaseWidget(cGlobalPreferences* globalpreferences, QWidget* parent = (QWidget *)0);
 
 
 	/**
@@ -74,11 +76,20 @@ public:
 	void closeEvent(QCloseEvent *event);
 
 
+	/**
+		\brief Apply new global preferences.
+		\param globalpreferences global preferences of the application
+	*/
+	void applyGlobalPreferences(cGlobalPreferences* globalpreferences);
+
+
 private:
 
 	QString editorname;
 
 	QWidget* parent;
+
+	cGlobalPreferences* globalpreferences;
 
 	QMenuBar* menuBar;
 	QMenu* menuFile;

@@ -115,6 +115,7 @@ class cTheoreticalSpectrum {
 	map<eFragmentIonType, map<int, int> > matchedions;
 	int peakstested;
 	double experimentalpeaksmatchedratio;
+	double weightedpeaksratio;
 	int unmatchedexperimentalpeakscount;
 	string coveragebyseries;
 	bool valid;
@@ -220,6 +221,13 @@ class cTheoreticalSpectrum {
 
 	// fill annotations of experimental peaks and remove unmatched theoretical peaks
 	void fillExperimentalAnnotationsAndRemoveUnmatchedTheoreticalPeaks(int& theoreticalpeaksrealsize, ePeptideType peptidetype, cPeaksList& unmatchedpeaksinmatchedpatterns, bool reportunmatchedtheoreticalpeaks, bool writedescription);
+
+	// check the existence of an isotope
+	bool checkIsotope(string& elementstring, string& isotopestring, double isotopemass1, double isotopemass2, double intensityratio, cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks, int start, int stop, int maximumintensityid, double maximumexperimentalintensity);
+
+	// get intensity multiplier
+	double getIntensityMultiplier(cPeaksList& theoreticalpeaks, int peakid, string& elementstring, size_t startpos);
+
 
 public:
 
@@ -456,6 +464,13 @@ public:
 
 
 	/**
+		\brief Get weighted ratio of matched peaks.
+		\retval double weighted ratio of matched peaks
+	*/
+	double getWeightedRatioOfMatchedPeaks() const;
+
+
+	/**
 		\brief Generate a N-terminal fragment ion series.
 		\param maxcharge a charge of precursor ion
 		\param peaklistrealsize real size of the peak list
@@ -473,7 +488,7 @@ public:
 		\param leftresiduelosstype a residue type of the leftmost building block
 		\param hasfirstblockartificial true when the first block is artificial, false otherwise
 	*/ 
-	void generateNTerminalFragmentIons(int maxcharge, int& peaklistrealsize, vector<int>& intcomposition, eFragmentIonType fragmentiontype, int neutrallosstype, cBricksDatabase& bricksdatabase, bool writedescription, int rotationid, vector<splitSite>& splittingsites, vector<fragmentDescription>& searchedmodifications, ePeptideType peptidetype, bool regularblocksorder, TRotationInfo* trotation = 0, eResidueLossType leftresiduelosstype = h2o_loss, bool hasfirstblockartificial = false);
+	void generateNTerminalFragmentIons(int maxcharge, int& peaklistrealsize, vector<int>& intcomposition, eFragmentIonType fragmentiontype, int neutrallosstype, cBricksDatabase& bricksdatabase, bool writedescription, int rotationid, vector<splitSite>& splittingsites, vector<cFragmentIonType>& searchedmodifications, ePeptideType peptidetype, bool regularblocksorder, TRotationInfo* trotation = 0, eResidueLossType leftresiduelosstype = h2o_loss, bool hasfirstblockartificial = false);
 	
 
 	/**
@@ -494,7 +509,7 @@ public:
 		\param rightresiduelosstype a residue type of the rightmost building block
 		\param haslastblockartificial true when the last block is artificial, false otherwise
 	*/ 
-	void generateCTerminalFragmentIons(int maxcharge, int& peaklistrealsize, vector<int>& intcomposition, eFragmentIonType fragmentiontype, int neutrallosstype, cBricksDatabase& bricksdatabase, bool writedescription, int rotationid, vector<splitSite>& splittingsites, vector<fragmentDescription>& searchedmodifications, ePeptideType peptidetype, bool regularblocksorder, TRotationInfo* trotation = 0, eResidueLossType rightresiduelosstype = h2o_loss, bool haslastblockartificial = false);
+	void generateCTerminalFragmentIons(int maxcharge, int& peaklistrealsize, vector<int>& intcomposition, eFragmentIonType fragmentiontype, int neutrallosstype, cBricksDatabase& bricksdatabase, bool writedescription, int rotationid, vector<splitSite>& splittingsites, vector<cFragmentIonType>& searchedmodifications, ePeptideType peptidetype, bool regularblocksorder, TRotationInfo* trotation = 0, eResidueLossType rightresiduelosstype = h2o_loss, bool haslastblockartificial = false);
 
 
 	/**

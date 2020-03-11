@@ -16,7 +16,8 @@
 #include <QMenu>
 
 
-cModificationsWidget::cModificationsWidget(QWidget* parent) {
+cModificationsWidget::cModificationsWidget(cGlobalPreferences* globalpreferences, QWidget* parent) {
+	this->globalpreferences = globalpreferences;
 	this->parent = parent;
 
 	editorname = "Modifications Editor";
@@ -240,11 +241,7 @@ cModificationsWidget::cModificationsWidget(QWidget* parent) {
 
 	databasefile = "";
 
-	#if OS_TYPE == WIN
-		lastdir = "./Modifications/";
-	#else
-		lastdir = installdir + "Modifications/";
-	#endif
+	applyGlobalPreferences(globalpreferences);
 	
 	modifications.clear();
 
@@ -299,6 +296,15 @@ cModificationsWidget::~cModificationsWidget() {
 void cModificationsWidget::closeEvent(QCloseEvent *event) {
 	closeWindow();
 	event->accept();
+}
+
+
+void cModificationsWidget::applyGlobalPreferences(cGlobalPreferences* globalpreferences) {
+	if (globalpreferences) {
+		if (lastdir.right(4).compare(".txt", Qt::CaseInsensitive) != 0) {
+			lastdir = globalpreferences->modificationsdefaultdir;
+		}
+	}
 }
 
 
@@ -559,7 +565,7 @@ bool cModificationsWidget::saveDatabase() {
 		progress.setMinimumDuration(0);
 		progress.setWindowModality(Qt::ApplicationModal);
 
-		fragmentDescription modification;
+		cFragmentIonType modification;
 		modifications.clear();
 
 		for (int i = 0; i < proxymodel->rowCount(); i++) {
@@ -762,7 +768,7 @@ void cModificationsWidget::importDatabase() {
 		else {
 			resetFilter();
 
-			vector<fragmentDescription> importedmodifications;
+			vector<cFragmentIonType> importedmodifications;
 			loadModificationsFromPlainTextStream(inputstream, importedmodifications, errormessage, true);
 
 			QProgressDialog progress("Importing the Database of Modifications...", "Cancel", 0, (int)importedmodifications.size(), this);

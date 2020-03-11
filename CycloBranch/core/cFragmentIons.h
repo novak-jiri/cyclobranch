@@ -963,81 +963,6 @@ enum eFragmentIonType {
 	linear_polyketide_precursor_ion_h_oh,
 	linear_polyketide_precursor_ion_oh_oh,
 	cyclic_polyketide_precursor_ion,
-	ms_Hplus,
-	ms_Naplus,
-	ms_Kplus,
-	ms_Hminus,
-	ms_Naminus,
-	ms_Kminus,
-	ms_MFe2H,
-	ms_MFe3HNa,
-	ms_MFe3HK,
-	ms_2MFe2H,
-	ms_2MFe3HNa,
-	ms_2MFe3HK,
-	ms_3MFe2H,
-	ms_3MFe3HNa,
-	ms_3MFe3HK,
-	ms_3M2Fe5H,
-	ms_3M2Fe6HNa,
-	ms_3M2Fe6HK,
-	ms_MFe4H,
-	ms_2MFe4H,
-	ms_3MFe4H,
-	ms_3M2Fe7H,
-	ms_NH4plus,
-	ms_Clminus,
-	ms_plus,
-	ms_minus,
-	ms_liplus,
-	ms_MMgH,
-	ms_MMg2HNa,
-	ms_MMg2HK,
-	ms_MMg3H,
-	ms_MAl2H,
-	ms_MAl3HNa,
-	ms_MAl3HK,
-	ms_MAl4H,
-	ms_MSi3H,
-	ms_MSi4HNa,
-	ms_MSi4HK,
-	ms_MSi5H,
-	ms_MCaH,
-	ms_MCa2HNa,
-	ms_MCa2HK,
-	ms_MCa3H,
-	ms_MSc2H,
-	ms_MSc3HNa,
-	ms_MSc3HK,
-	ms_MSc4H,
-	ms_MCr2H,
-	ms_MCr3HNa,
-	ms_MCr3HK,
-	ms_MCr4H,
-	ms_MMnH,
-	ms_MMn2HNa,
-	ms_MMn2HK,
-	ms_MMn3H,
-	ms_MCoH,
-	ms_MCo2HNa,
-	ms_MCo2HK,
-	ms_MCo3H,
-	ms_MNiH,
-	ms_MNi2HNa,
-	ms_MNi2HK,
-	ms_MNi3H,
-	ms_MCuH,
-	ms_MCu2HNa,
-	ms_MCu2HK,
-	ms_MCu3H,
-	ms_MZnH,
-	ms_MZn2HNa,
-	ms_MZn2HK,
-	ms_MZn3H,
-	ms_MGa2H,
-	ms_MGa3HNa,
-	ms_MGa3HK,
-	ms_MGa4H,
 	fragmentIonTypeEnd
 };
 
@@ -1049,9 +974,9 @@ Q_DECLARE_METATYPE(vector<eFragmentIonType>);
 
 
 /**
-	\brief The structure for a detailed definition of a fragment ion type.
+	\brief The struct for definition of a fragment ion type.
 */
-struct fragmentDescription {
+struct cFragmentIonType {
 
 	/**
 		\brief Name of the fragment.
@@ -1060,13 +985,13 @@ struct fragmentDescription {
 
 
 	/**
-		\brief Summary formula of the fragment.
+		\brief Formula of the fragment.
 	*/ 
 	string summary;
 
 
 	/**
-		\brief A map of atoms corresponding to the summary formula.
+		\brief A map of atoms corresponding to the formula.
 	*/
 	map<string, int> summarymap;
 
@@ -1090,21 +1015,15 @@ struct fragmentDescription {
 
 
 	/**
-		\brief True when the fragment is charged positively; false when the fragment is charged negatively.
+		\brief Charge of the fragment.
 	*/ 
 	bool positive;
 
 
 	/**
-		\brief The multiplier (n) of M in [nM + H]+.
-	*/ 
-	int multiplier;
-
-
-	/**
 		\brief The default constructor.
 	*/ 
-	fragmentDescription() {
+	cFragmentIonType() {
 		clear();
 	}
 
@@ -1120,7 +1039,6 @@ struct fragmentDescription {
 		nterminal = false;
 		cterminal = false;
 		positive = true;
-		multiplier = 1;
 	}
 
 
@@ -1141,9 +1059,9 @@ struct fragmentDescription {
 
 
 /**
-	\brief Register vector<fragmentDescription> by Qt.
+	\brief Register vector<cFragmentIonType> by Qt.
 */
-Q_DECLARE_METATYPE(vector<fragmentDescription>);
+Q_DECLARE_METATYPE(vector<cFragmentIonType>);
 
 
 /**
@@ -1151,7 +1069,7 @@ Q_DECLARE_METATYPE(vector<fragmentDescription>);
 */
 class cFragmentIons {
 
-	map<eFragmentIonType,fragmentDescription> fragmentions;
+	map<eFragmentIonType, cFragmentIonType> fragmentions;
 
 public:
 
@@ -1174,9 +1092,9 @@ public:
 	/**
 		\brief Overloaded operator [].
 		\param iontype type of fragment ion
-		\retval fragmentDescription reference to a structure with detailed information about the fragment ion
+		\retval cFragmentIonType reference to a structure with detailed information about the fragment ion
 	*/ 
-	fragmentDescription &operator[](eFragmentIonType iontype);
+	cFragmentIonType &operator[](eFragmentIonType iontype);
 
 
 	/**
@@ -1349,7 +1267,7 @@ extern cDefaultNeutralLosses defaultneutrallosses;
 	\param ignoreerrors if true errors are ignored
 	\retval int 0 when modifications were successfully loaded, -1 when an error occurred (\a errormessage is filled up)
 */ 
-int loadModificationsFromPlainTextStream(ifstream &stream, vector<fragmentDescription>& modifications, string& errormessage, bool ignoreerrors);
+int loadModificationsFromPlainTextStream(ifstream &stream, vector<cFragmentIonType>& modifications, string& errormessage, bool ignoreerrors);
 
 
 /**
@@ -1357,7 +1275,7 @@ int loadModificationsFromPlainTextStream(ifstream &stream, vector<fragmentDescri
 	\param stream reference to an output file stream
 	\param modifications reference to a vector of modifications which will be stored
 */ 
-void storeModificationsToPlainTextStream(ofstream &stream, vector<fragmentDescription>& modifications);
+void storeModificationsToPlainTextStream(ofstream &stream, vector<cFragmentIonType>& modifications);
 
 
 #endif

@@ -70,6 +70,15 @@ bool compareNumberOfMatchedPeaksDesc(const cTheoreticalSpectrum& a, const cTheor
 
 
 /**
+	\brief Compare scores of two theoretical spectra (weighted ratio of matched peaks).
+	\param a first theoretical spectrum
+	\param b second theoretical spectrum
+	\retval bool true if the score of \a a is greater than the score of \a b
+*/
+bool compareWeightedRatioDesc(const cTheoreticalSpectrum& a, const cTheoreticalSpectrum& b);
+
+
+/**
 	\brief The class representing a thread for comparison of a theoretical spectrum with a peak list.
 */
 class cSpectrumComparatorThread : public QObject, public QRunnable {

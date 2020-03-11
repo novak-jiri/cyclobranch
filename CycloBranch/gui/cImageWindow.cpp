@@ -12,11 +12,12 @@
 #include <QMenu>
 
 
-cImageWindow::cImageWindow(QWidget* parent) {
+cImageWindow::cImageWindow(cGlobalPreferences* globalpreferences, QWidget* parent) {
+	this->globalpreferences = globalpreferences;
 	this->parent = parent;
 
 	setWindowTitle("CrossVis");
-	setWindowIcon(QIcon(":/images/icons/23.png"));
+	setWindowIcon(QIcon(":/images/icons/image.png"));
 
 	menuBar = new QMenuBar(this);
 	menuBar->setNativeMenuBar(false);
@@ -511,7 +512,7 @@ cImageWindow::cImageWindow(QWidget* parent) {
 
 	resize(defaultwinsizex, defaultwinsizey);
 
-	lastimagedir = "./";
+	applyGlobalPreferences(globalpreferences);
 	
 	defaultmaxx = 1;
 	defaultmaxy = 1;
@@ -697,6 +698,42 @@ void cImageWindow::addLayer(QString name) {
 }
 
 
+void cImageWindow::applyGlobalPreferences(cGlobalPreferences* globalpreferences) {
+	if (globalpreferences) {
+		if ((lastdiropticalimage.right(4).compare(".jpg", Qt::CaseInsensitive) != 0) &&
+			(lastdiropticalimage.right(5).compare(".jpeg", Qt::CaseInsensitive) != 0) &&
+			(lastdiropticalimage.right(4).compare(".png", Qt::CaseInsensitive) != 0) &&
+			(lastdiropticalimage.right(4).compare(".tif", Qt::CaseInsensitive) != 0) &&
+			(lastdiropticalimage.right(5).compare(".tiff", Qt::CaseInsensitive) != 0) &&
+			(lastdiropticalimage.right(4).compare(".bmp", Qt::CaseInsensitive) != 0) &&
+			(lastdiropticalimage.right(4).compare(".gif", Qt::CaseInsensitive) != 0)) {
+			lastdiropticalimage = globalpreferences->openopticalimagedir;
+		}
+		if ((lastdirhistologyimage.right(4).compare(".jpg", Qt::CaseInsensitive) != 0) &&
+			(lastdirhistologyimage.right(5).compare(".jpeg", Qt::CaseInsensitive) != 0) &&
+			(lastdirhistologyimage.right(4).compare(".png", Qt::CaseInsensitive) != 0) &&
+			(lastdirhistologyimage.right(4).compare(".tif", Qt::CaseInsensitive) != 0) &&
+			(lastdirhistologyimage.right(5).compare(".tiff", Qt::CaseInsensitive) != 0) &&
+			(lastdirhistologyimage.right(4).compare(".bmp", Qt::CaseInsensitive) != 0) &&
+			(lastdirhistologyimage.right(4).compare(".gif", Qt::CaseInsensitive) != 0)) {
+			lastdirhistologyimage = globalpreferences->openhistologyimagedir;
+		}
+		if ((lastdirmicroscopyimage.right(4).compare(".jpg", Qt::CaseInsensitive) != 0) &&
+			(lastdirmicroscopyimage.right(5).compare(".jpeg", Qt::CaseInsensitive) != 0) &&
+			(lastdirmicroscopyimage.right(4).compare(".png", Qt::CaseInsensitive) != 0) &&
+			(lastdirmicroscopyimage.right(4).compare(".tif", Qt::CaseInsensitive) != 0) &&
+			(lastdirmicroscopyimage.right(5).compare(".tiff", Qt::CaseInsensitive) != 0) &&
+			(lastdirmicroscopyimage.right(4).compare(".bmp", Qt::CaseInsensitive) != 0) &&
+			(lastdirmicroscopyimage.right(4).compare(".gif", Qt::CaseInsensitive) != 0)) {
+			lastdirmicroscopyimage = globalpreferences->openmicroscopyimagedir;
+		}
+		if (lastdirexportimage.right(4).compare(".png", Qt::CaseInsensitive) != 0) {
+			lastdirexportimage = globalpreferences->exportimagedefaultdir;
+		}
+	}
+}
+
+
 void cImageWindow::colorSpinBoxes(int layerid) {
 
 	if ((eLayerType)layerid == layer_compounds) {
@@ -858,10 +895,10 @@ void cImageWindow::imageTypeSelected(const QString &s) {
 
 
 void cImageWindow::openOpticalImage() {
-	QString filename = QFileDialog::getOpenFileName(this, tr("Open Optical Image ..."), lastimagedir, tr("Image Files (*.jpg *.jpeg *.png *.tif *.tiff *.bmp *.gif)"));
+	QString filename = QFileDialog::getOpenFileName(this, tr("Open Optical Image ..."), lastdiropticalimage, tr("Image Files (*.jpg *.jpeg *.png *.tif *.tiff *.bmp *.gif)"));
 
 	if (!filename.isEmpty()) {
-		lastimagedir = filename;
+		lastdiropticalimage = filename;
 
 		image->load(filename);
 
@@ -882,10 +919,10 @@ void cImageWindow::openOpticalImage() {
 
 
 void cImageWindow::openHistologyImage() {
-	QString filename = QFileDialog::getOpenFileName(this, tr("Open Histology Image ..."), lastimagedir, tr("Image Files (*.jpg *.jpeg *.png *.tif *.tiff *.bmp *.gif)"));
+	QString filename = QFileDialog::getOpenFileName(this, tr("Open Histology Image ..."), lastdirhistologyimage, tr("Image Files (*.jpg *.jpeg *.png *.tif *.tiff *.bmp *.gif)"));
 
 	if (!filename.isEmpty()) {
-		lastimagedir = filename;
+		lastdirhistologyimage = filename;
 
 		histologyimage->load(filename);
 		imagewindowwidget->setHistologyImage(histologyimage);
@@ -1013,10 +1050,10 @@ void cImageWindow::openMicroscopyImage(eLayerType layer, const QString &layernam
 	QString title = "Open " + layername + " ...";
 	QString filename;
 
-	filename = QFileDialog::getOpenFileName(this, tr(title.toStdString().c_str()), lastimagedir, tr("Image Files (*.jpg *.jpeg *.png *.tif *.tiff *.bmp *.gif)"));
+	filename = QFileDialog::getOpenFileName(this, tr(title.toStdString().c_str()), lastdirmicroscopyimage, tr("Image Files (*.jpg *.jpeg *.png *.tif *.tiff *.bmp *.gif)"));
 
 	if (!filename.isEmpty()) {
-		lastimagedir = filename;
+		lastdirmicroscopyimage = filename;
 
 		int microscopycountx, microscopycounty;
 		double microscopypixelwidth, microscopypixelheight, stagex, stagey;
@@ -1065,17 +1102,17 @@ void cImageWindow::openMicroscopyImage(eLayerType layer, const QString &layernam
 
 
 void cImageWindow::saveImage() {
-	QString filename = QFileDialog::getSaveFileName(this, tr("Save Image ..."), "./", "PNG Files (*.png)");
+	QString filename = QFileDialog::getSaveFileName(this, tr("Save Image ..."), lastdirexportimage, "PNG Files (*.png)");
 
 	if (!filename.isEmpty()) {
-		lastimagedir = filename;
+		lastdirexportimage = filename;
 		imagewindowwidget->getImage().save(filename, "PNG");
 	}
 }
 
 
-void cImageWindow::setFilterOptionsSlot(vector<cCoordinates> coordinates, bool operatortype, string columnname1, string comparatorname1, string filterstring1, string columnname2, string comparatorname2, string filterstring2, bool casesensitive, bool wholeword) {
-	imagewindowwidget->setFilterOptions(coordinates, operatortype, columnname1, comparatorname1, filterstring1, columnname2, comparatorname2, filterstring2, casesensitive, wholeword);
+void cImageWindow::setFilterOptionsSlot(vector<cCoordinateInfo> coordinateinfo, bool operatortype, string columnname1, string comparatorname1, string filterstring1, string columnname2, string comparatorname2, string filterstring2, bool casesensitive, bool wholeword) {
+	imagewindowwidget->setFilterOptions(coordinateinfo, operatortype, columnname1, comparatorname1, filterstring1, columnname2, comparatorname2, filterstring2, casesensitive, wholeword);
 }
 
 

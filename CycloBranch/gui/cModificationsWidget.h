@@ -20,6 +20,7 @@
 #include <QComboBox>
 #include <fstream>
 #include "core/utilities.h"
+#include "core/cGlobalPreferences.h"
 #include "core/cFragmentIons.h"
 #include "core/cSummaryFormula.h"
 #include "gui/cModificationsProxyModel.h"
@@ -47,9 +48,10 @@ public:
 
 	/**
 		\brief The constructor.
+		\param globalpreferences global preferences of the application
 		\param parent pointer to a parent widget
 	*/ 
-	cModificationsWidget(QWidget* parent = (QWidget *)0);
+	cModificationsWidget(cGlobalPreferences* globalpreferences, QWidget* parent = (QWidget *)0);
 
 
 	/**
@@ -65,11 +67,20 @@ public:
 	void closeEvent(QCloseEvent *event);
 
 
+	/**
+		\brief Apply new global preferences.
+		\param globalpreferences global preferences of the application
+	*/
+	void applyGlobalPreferences(cGlobalPreferences* globalpreferences);
+
+
 private:
 
 	QString editorname;
 
 	QWidget* parent;
+
+	cGlobalPreferences* globalpreferences;
 
 	QMenuBar* menuBar;
 	QMenu* menuFile;
@@ -118,7 +129,7 @@ private:
 	QString lastdir;
 	ifstream inputstream;
 	ofstream outputstream;
-	vector<fragmentDescription> modifications;
+	vector<cFragmentIonType> modifications;
 
 	bool datamodified;
 

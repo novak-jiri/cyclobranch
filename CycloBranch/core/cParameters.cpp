@@ -149,7 +149,8 @@ void cParameters::clear() {
 	sequencedatabasefilename = "";
 
 	fragmentionsfordenovograph.clear();
-	ionsfortheoreticalspectra.clear();
+	ionsfortheoreticalspectraMS1.clear();
+	ionsfortheoreticalspectraMS2.clear();
 
 	neutrallossesdefinitions.clear();
 	neutralLoss loss;
@@ -882,10 +883,10 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 			modificationsstream.close();
 		}
 
-		fragmentDescription fd;
-		fd.nterminal = true;
-		fd.cterminal = true;
-		searchedmodifications.insert(searchedmodifications.begin(), fd);
+		cFragmentIonType fiontype;
+		fiontype.nterminal = true;
+		fiontype.cterminal = true;
+		searchedmodifications.insert(searchedmodifications.begin(), fiontype);
 
 	}
 
@@ -970,9 +971,9 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 	// check theoretical fragments in positive/negative mode
 	if (!error && ((mode == dereplication) || (mode == compoundsearch))) {
 		i = 0;
-		while (i < (int)ionsfortheoreticalspectra.size()) {
-			if (iondefinitions[ionsfortheoreticalspectra[i]].positive != (precursorcharge > 0)) {
-				ionsfortheoreticalspectra.erase(ionsfortheoreticalspectra.begin() + i);
+		while (i < (int)ionsfortheoreticalspectraMS1.size()) {
+			if (ionsfortheoreticalspectraMS1[i].positive != (precursorcharge > 0)) {
+				ionsfortheoreticalspectraMS1.erase(ionsfortheoreticalspectraMS1.begin() + i);
 			}
 			else {
 				i++;
@@ -1015,7 +1016,7 @@ int cParameters::prepareLossesAndCompounds(bool& terminatecomputation) {
 			}
 		}
 		else if (mode == compoundsearch) {
-			errtype = generateCompounds(terminatecomputation, errormessage); // uses ionsfortheoreticalspectra
+			errtype = generateCompounds(terminatecomputation, errormessage); // uses ionsfortheoreticalspectraMS1
 			if (errtype == -1) {
 				error = true;
 			}
@@ -1234,6 +1235,9 @@ string cParameters::printToString() {
 		case number_of_b_and_y_ions:
 			s += "Number of b-ions and y-ions";
 			break;
+		case weighted_ratio_of_matched_peaks:
+			s += "Weighted Ratio of Matched Peaks";
+			break;
 		default:
 			s += "undefined";
 			break;
@@ -1244,10 +1248,20 @@ string cParameters::printToString() {
 	s += "Peptide Sequence Tag: " + originalsequencetag + "\n";
 
 	s += "Ion Types: ";
-	for (int i = 0; i < (int)ionsfortheoreticalspectra.size(); i++) {
-		s += iondefinitions[ionsfortheoreticalspectra[i]].name;
-		if (i < (int)ionsfortheoreticalspectra.size() - 1) {
-			s += ", ";
+	if ((mode == dereplication) || (mode == compoundsearch)) {
+		for (int i = 0; i < (int)ionsfortheoreticalspectraMS1.size(); i++) {
+			s += ionsfortheoreticalspectraMS1[i].name;
+			if (i < (int)ionsfortheoreticalspectraMS1.size() - 1) {
+				s += ", ";
+			}
+		}
+	}
+	else {
+		for (int i = 0; i < (int)ionsfortheoreticalspectraMS2.size(); i++) {
+			s += iondefinitions[ionsfortheoreticalspectraMS2[i]].name;
+			if (i < (int)ionsfortheoreticalspectraMS2.size() - 1) {
+				s += ", ";
+			}
 		}
 	}
 	s += "\n";
@@ -1917,15 +1931,15 @@ int cParameters::generateCompounds(bool& terminatecomputation, string& errormess
 		combarray.push_back(0);
 	}
 
-	if (ionsfortheoreticalspectra.size() > 0) {
-		minadd = iondefinitions[ionsfortheoreticalspectra[0]].massdifference;
-		//maxadd = iondefinitions[ionsfortheoreticalspectra[0]].massdifference;
-		for (int i = 1; i < (int)ionsfortheoreticalspectra.size(); i++) {
-			if (iondefinitions[ionsfortheoreticalspectra[i]].massdifference < minadd) {
-				minadd = iondefinitions[ionsfortheoreticalspectra[i]].massdifference;
+	if (ionsfortheoreticalspectraMS1.size() > 0) {
+		minadd = ionsfortheoreticalspectraMS1[0].massdifference;
+		//maxadd = ionsfortheoreticalspectraMS1[0].massdifference;
+		for (int i = 1; i < (int)ionsfortheoreticalspectraMS1.size(); i++) {
+			if (ionsfortheoreticalspectraMS1[i].massdifference < minadd) {
+				minadd = ionsfortheoreticalspectraMS1[i].massdifference;
 			}
-			//if (iondefinitions[ionsfortheoreticalspectra[i]].massdifference > maxadd) {
-			//	maxadd = iondefinitions[ionsfortheoreticalspectra[i]].massdifference;
+			//if (ionsfortheoreticalspectraMS1[i].massdifference > maxadd) {
+			//	maxadd = ionsfortheoreticalspectraMS1[i].massdifference;
 			//}
 		}
 	}
@@ -1963,9 +1977,9 @@ int cParameters::generateCompounds(bool& terminatecomputation, string& errormess
 		//sumofmasses = getMassAndCounts(combarray, countsofelements, massesofelements);
 
 		alloutofmz = true;
-		for (auto& it : ionsfortheoreticalspectra) {
+		for (auto& it : ionsfortheoreticalspectraMS1) {
 			for (int j = 0; j < abs(precursorcharge); j++) {
-				tmpmzdifference = sumofmasses + iondefinitions[it].massdifference;
+				tmpmzdifference = sumofmasses + it.massdifference;
 				if (precursorcharge > 0) {
 					tmpmzdifference += j * (H - e);
 				}
@@ -2319,11 +2333,11 @@ int cParameters::generateCompounds(bool& terminatecomputation, string& errormess
 
 			compoundshint = 0;
 
-			for (auto& it : ionsfortheoreticalspectra) {
+			for (auto& it : ionsfortheoreticalspectraMS1) {
 
 				for (int j = 0; j < abs(precursorcharge); j++) {
 
-					tmpmzdifference = sumofmasses + iondefinitions[it].massdifference;
+					tmpmzdifference = sumofmasses + it.massdifference;
 					if (precursorcharge > 0) {
 						tmpmzdifference += j * (H - e);
 					}
@@ -2523,10 +2537,16 @@ void cParameters::store(ofstream& os) {
 		os.write((char *)&fragmentionsfordenovograph[i], sizeof(eFragmentIonType));
 	}
 
-	size = (int)ionsfortheoreticalspectra.size();
+	size = (int)ionsfortheoreticalspectraMS1.size();
 	os.write((char *)&size, sizeof(int));
-	for (int i = 0; i < (int)ionsfortheoreticalspectra.size(); i++) {
-		os.write((char *)&ionsfortheoreticalspectra[i], sizeof(eFragmentIonType));
+	for (int i = 0; i < (int)ionsfortheoreticalspectraMS1.size(); i++) {
+		os.write((char *)&ionsfortheoreticalspectraMS1[i], sizeof(cIonType));
+	}
+
+	size = (int)ionsfortheoreticalspectraMS2.size();
+	os.write((char *)&size, sizeof(int));
+	for (int i = 0; i < (int)ionsfortheoreticalspectraMS2.size(); i++) {
+		os.write((char *)&ionsfortheoreticalspectraMS2[i], sizeof(eFragmentIonType));
 	}
 
 	size = (int)neutrallossesdefinitions.size();
@@ -2661,9 +2681,15 @@ void cParameters::load(ifstream& is) {
 	}
 
 	is.read((char *)&size, sizeof(int));
-	ionsfortheoreticalspectra.resize(size);
-	for (int i = 0; i < (int)ionsfortheoreticalspectra.size(); i++) {
-		is.read((char *)&ionsfortheoreticalspectra[i], sizeof(eFragmentIonType));
+	ionsfortheoreticalspectraMS1.resize(size);
+	for (int i = 0; i < (int)ionsfortheoreticalspectraMS1.size(); i++) {
+		is.read((char *)&ionsfortheoreticalspectraMS1[i], sizeof(cIonType));
+	}
+
+	is.read((char *)&size, sizeof(int));
+	ionsfortheoreticalspectraMS2.resize(size);
+	for (int i = 0; i < (int)ionsfortheoreticalspectraMS2.size(); i++) {
+		is.read((char *)&ionsfortheoreticalspectraMS2[i], sizeof(eFragmentIonType));
 	}
 
 	is.read((char *)&size, sizeof(int));

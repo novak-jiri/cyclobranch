@@ -21,6 +21,7 @@
 #include <QInputDialog>
 #include <QMessageBox>
 #include "core/utilities.h"
+#include "core/cGlobalPreferences.h"
 #include "gui/cImageWindowWidget.h"
 
 
@@ -156,9 +157,10 @@ public:
 
 	/**
 		\brief The constructor.
+		\param globalpreferences global preferences of the application
 		\param parent pointer to a parent widget
 	*/ 
-	cImageWindow(QWidget* parent = (QWidget *)0);
+	cImageWindow(cGlobalPreferences* globalpreferences, QWidget* parent = (QWidget *)0);
 
 
 	/**
@@ -192,8 +194,16 @@ public:
 	void addLayer(QString name);
 
 
-private:
+	/**
+		\brief Apply new global preferences.
+		\param globalpreferences global preferences of the application
+	*/
+	void applyGlobalPreferences(cGlobalPreferences* globalpreferences);
 
+
+private:
+	
+	cGlobalPreferences* globalpreferences;
 	QWidget* parent;
 
 	QMenuBar* menuBar;
@@ -297,7 +307,10 @@ private:
 	int layerscount;
 	int activelayer;
 
-	QString lastimagedir;
+	QString lastdiropticalimage;
+	QString lastdirhistologyimage;
+	QString lastdirmicroscopyimage;
+	QString lastdirexportimage;
 
 	int defaultmaxx;
 	int defaultmaxy;
@@ -342,7 +355,7 @@ private slots:
 	void saveImage();
 
 
-	void setFilterOptionsSlot(vector<cCoordinates> coordinates, bool operatortype, string columnname1, string comparatorname1, string filterstring1, string columnname2, string comparatorname2, string filterstring2, bool casesensitive, bool wholeword);
+	void setFilterOptionsSlot(vector<cCoordinateInfo> coordinates, bool operatortype, string columnname1, string comparatorname1, string filterstring1, string columnname2, string comparatorname2, string filterstring2, bool casesensitive, bool wholeword);
 
 
 	void setMaxButtonReleased();

@@ -22,6 +22,7 @@ HEADERS += core/cBrick.h \
            core/cDeNovoGraph.h \
            core/cDeNovoGraphNode.h \
            core/cFragmentIons.h \
+           core/cGlobalPreferences.h \
            core/cImzML.h \
            core/cIsotopePatternCache.h \
            core/cMzML.h \
@@ -64,6 +65,12 @@ HEADERS += core/cBrick.h \
            gui/cMultipleButtonDelegate.h \
            gui/cNeutralLossesListWidget.h \
            gui/cParametersWidget.h \
+           gui/cPreferencesDialog.h \
+           gui/cPreferencesIonTypeDialog.h \
+           gui/cPreferencesTabDataProcessing.h \
+           gui/cPreferencesTabDirectories.h \
+           gui/cPreferencesTabIonTypes.h \
+           gui/cPreferencesTabURLs.h \
            gui/cSequenceDatabaseProxyModel.h \
            gui/cSequenceDatabaseWidget.h \
            gui/cSpectrumDetailProxyModel.h \
@@ -81,6 +88,7 @@ SOURCES += core/cBrick.cpp \
            core/cDeNovoGraph.cpp \
            core/cDeNovoGraphNode.cpp \
            core/cFragmentIons.cpp \
+           core/cGlobalPreferences.cpp \
            core/cImzML.cpp \
            core/cIsotopePatternCache.cpp \
            core/cMzML.cpp \
@@ -123,6 +131,12 @@ SOURCES += core/cBrick.cpp \
            gui/cMultipleButtonDelegate.cpp \
            gui/cNeutralLossesListWidget.cpp \
            gui/cParametersWidget.cpp \
+           gui/cPreferencesDialog.cpp \
+           gui/cPreferencesIonTypeDialog.cpp \
+           gui/cPreferencesTabDataProcessing.cpp \
+           gui/cPreferencesTabDirectories.cpp \
+           gui/cPreferencesTabIonTypes.cpp \
+           gui/cPreferencesTabURLs.cpp \
            gui/cSequenceDatabaseProxyModel.cpp \
            gui/cSequenceDatabaseWidget.cpp \
            gui/cSpectrumDetailProxyModel.cpp \

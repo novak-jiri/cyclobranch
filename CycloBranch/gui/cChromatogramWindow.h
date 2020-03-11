@@ -19,6 +19,7 @@
 #include <QLabel>
 #include <QPushButton>
 #include "core/utilities.h"
+#include "core/cGlobalPreferences.h"
 #include "gui/cChromatogramWindowWidget.h"
 
 
@@ -34,10 +35,11 @@ public:
 
 	/**
 		\brief The constructor.
+		\param globalpreferences global preferences of the application
 		\param theoreticalspectrumlist list of spectra
 		\param parent pointer to a parent widget
 	*/ 
-	cChromatogramWindow(cTheoreticalSpectrumList& theoreticalspectrumlist, QWidget* parent = (QWidget *)0);
+	cChromatogramWindow(cGlobalPreferences* globalpreferences, cTheoreticalSpectrumList& theoreticalspectrumlist, QWidget* parent = (QWidget *)0);
 
 
 	/**
@@ -59,10 +61,18 @@ public:
 	void recalculateTICChromatogram();
 
 
+	/**
+		\brief Apply new global preferences.
+		\param globalpreferences global preferences of the application
+	*/
+	void applyGlobalPreferences(cGlobalPreferences* globalpreferences);
+
+
 private:
 
-	QWidget* parent;
+	cGlobalPreferences* globalpreferences;
 	cTheoreticalSpectrumList* theoreticalspectrumlist;
+	QWidget* parent;
 
 	QMenuBar* menuBar;
 	QMenu* menuFile;
@@ -82,6 +92,7 @@ private:
 	QAction* actionAbsoluteIntensity;
 	QAction* actionHideTIC;
 	QAction* actionHideEIC;
+	QAction* actionHideLabels;
 
 	QToolBar* toolbarTime;
 
@@ -107,6 +118,8 @@ private:
 	QAction* actionHTMLDocumentation;
 
 	cChromatogramWindowWidget* chromatogramwindowwidget;
+
+	QString lastdirexportimage;
 
 
 protected:

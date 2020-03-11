@@ -180,6 +180,7 @@ private:
 	bool absoluteintensity;
 	bool hidetic;
 	bool hideeic;
+	bool hidelabels;
 
 
 	int getScanIDFromXPosition(int x, int w);
@@ -259,6 +260,9 @@ private slots:
 
 
 	void hideEIC(bool state);
+
+
+	void hideLabels(bool state);
 		
 };
 

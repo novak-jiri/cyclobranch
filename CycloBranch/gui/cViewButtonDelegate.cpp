@@ -23,7 +23,7 @@ void cViewButtonDelegate::paint(QPainter* painter, const QStyleOptionViewItem& o
 
 	QStyleOptionButton button;
 	button.rect = option.rect;
-	if (index.data(Qt::DisplayRole).toString().contains("https://www.ncbi.nlm.nih.gov/pccompound?term=")) {
+	if (index.data(Qt::DisplayRole).toString().contains("https://pubchem.ncbi.nlm.nih.gov/#query=")) {
 		button.text = "search";
 	}
 	else {

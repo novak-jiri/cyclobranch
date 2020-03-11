@@ -162,6 +162,28 @@ bool compareNumberOfMatchedPeaksDesc(const cTheoreticalSpectrum& a, const cTheor
 }
 
 
+bool compareWeightedRatioDesc(const cTheoreticalSpectrum& a, const cTheoreticalSpectrum& b) {
+	if (a.getWeightedRatioOfMatchedPeaks() > b.getWeightedRatioOfMatchedPeaks()) {
+		return true;
+	}
+	if (a.getWeightedRatioOfMatchedPeaks() < b.getWeightedRatioOfMatchedPeaks()) {
+		return false;
+	}
+
+	if (a.getPathId() < b.getPathId()) {
+		return true;
+	}
+	if (a.getPathId() > b.getPathId()) {
+		return false;
+	}
+
+	vector<nodeEdge> v1 = ((cTheoreticalSpectrum&)a).getCandidate().getPath();
+	vector<nodeEdge> v2 = ((cTheoreticalSpectrum&)b).getCandidate().getPath();
+
+	return comparePaths(v1, v2);
+}
+
+
 void cSpectrumComparatorThread::initialize(cCandidate& candidate, cPeaksList& peaklist, cBricksDatabase* bricksdatabasewithcombinations, cTheoreticalSpectrumList* theoreticalspectrumlist, cParameters* parameters, regex* rxsequencetag, regex* rxsearchedsequence, double currentworstscore, bool* terminatecomputation) {
 	this->candidate = candidate;
 	this->peaklist = peaklist;
@@ -261,6 +283,9 @@ void cSpectrumComparatorThread::run() {
 				break;			
 			case number_of_b_and_y_ions:
 				score = tsp.getNumberOfMatchedPeaksYB();
+				break;
+			case weighted_ratio_of_matched_peaks:
+				score = tsp.getWeightedRatioOfMatchedPeaks();
 				break;
 			default:
 				break;

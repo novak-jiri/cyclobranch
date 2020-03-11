@@ -20,6 +20,7 @@
 #include <QComboBox>
 #include <fstream>
 #include "core/utilities.h"
+#include "core/cGlobalPreferences.h"
 #include "core/cSequenceDatabase.h"
 #include "gui/cSequenceDatabaseProxyModel.h"
 #include "gui/cViewButtonDelegate.h"
@@ -48,9 +49,10 @@ public:
 
 	/**
 		\brief The constructor.
+		\param globalpreferences global preferences of the application
 		\param parent pointer to a parent widget
 	*/ 
-	cSequenceDatabaseWidget(QWidget* parent = (QWidget *)0);
+	cSequenceDatabaseWidget(cGlobalPreferences* globalpreferences, QWidget* parent = (QWidget *)0);
 
 
 	/**
@@ -74,11 +76,20 @@ public:
 	void importSequence(int peptidetypeindex, QString sequence);
 
 
+	/**
+		\brief Apply new global preferences.
+		\param globalpreferences global preferences of the application
+	*/
+	void applyGlobalPreferences(cGlobalPreferences* globalpreferences);
+
+
 private:
 
 	QString editorname;
 
 	QWidget* parent;
+
+	cGlobalPreferences* globalpreferences;
 
 	QMenuBar* menuBar;
 	QMenu* menuFile;

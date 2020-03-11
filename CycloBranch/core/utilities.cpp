@@ -4,7 +4,7 @@
 
 
 QString appname = "CycloBranch";
-QString appversion = "v. 2.0.0 (64-bit)";
+QString appversion = "v. 2.0.8 (64-bit)";
 
 
 #if OS_TYPE == UNX
@@ -371,11 +371,6 @@ QByteArray cropPrecisionToSixDecimalsByteArray(double value) {
 	sprintf_s(buffer, "%.6f\0", value);
 	QByteArray bytearray = buffer;
 	return bytearray;
-}
-
-
-bool operator == (cCoordinates const& a, cCoordinates const& b) {
-	return ((a.x == b.x) && (a.y == b.y) && (a.id == b.id));
 }
 
 

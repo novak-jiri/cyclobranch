@@ -248,7 +248,7 @@ public:
 
 	/**
 		\brief Set options which was used to filter the points.
-		\param coordinates a vector of coordinates
+		\param coordinateinfo a vector of coordinates
 		\param operatortype the type of operator (0 = or; 1 = and)
 		\param columnname1 name of column which was compared
 		\param comparatorname1 name of used comparator
@@ -259,7 +259,7 @@ public:
 		\param casesensitive true if the string was used as a casesensitive, false otherwise
 		\param wholeword true if whole words only are compared, false otherwise
 	*/
-	void setFilterOptions(vector<cCoordinates>& coordinates, bool operatortype, string& columnname1, string& comparatorname1, string& filterstring1, string& columnname2, string& comparatorname2, string& filterstring2, bool casesensitive, bool wholeword);
+	void setFilterOptions(vector<cCoordinateInfo>& coordinateinfo, bool operatortype, string& columnname1, string& comparatorname1, string& filterstring1, string& columnname2, string& comparatorname2, string& filterstring2, bool casesensitive, bool wholeword);
 
 
 	/**
@@ -440,7 +440,7 @@ private:
 	QWidget* parent;
 	QGraphicsScene* scene;
 
-	vector<cCoordinates> coordinates;
+	vector<cCoordinateInfo> coordinateinfo;
 	bool operatortype;
 	string columnname1;
 	string comparatorname1;

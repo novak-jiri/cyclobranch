@@ -341,9 +341,15 @@ QByteArray cropPrecisionToSixDecimalsByteArray(double value);
 
 
 /**
-	\brief Store coordinates x and y.
+	\brief Store aggregated information about a coordinate.
 */
-struct cCoordinates {
+struct cCoordinateInfo {
+
+	/**
+		\brief scan id
+	*/
+	int id;
+
 
 	/**
 		\brief x coordinate
@@ -355,18 +361,6 @@ struct cCoordinates {
 		\brief y coordinate
 	*/
 	int y;
-
-
-	/**
-		\brief scan id
-	*/ 
-	int id;
-
-
-	/**
-		\brief m/z ratio
-	*/ 
-	double mzratio;
 
 
 	/**
@@ -382,93 +376,30 @@ struct cCoordinates {
 
 
 	/**
-		\brief name of compound
+		\brief description
 	*/ 
-	string name;
+	string description;
 
 
 	/**
 		\brief The constructor.
 	*/ 
-	cCoordinates() {
+	cCoordinateInfo() {
+		id = 0;
 		x = 0;
 		y = 0;
-		id = 0;
-		mzratio = 0;
 		relativeintensity = 0;
 		absoluteintensity = 0;
-		name = "";
-	}
-
-
-	/**
-		\brief The constructor.
-		\param x coordinate x
-		\param y coordinate y
-		\param id scan id
-		\param mzratio m/z ratio
-		\param relativeintensity relativeintensity
-		\param absoluteintensity absoluteintensity
-		\param name the name of item
-	*/ 
-	cCoordinates(int x, int y, int id, double mzratio, double relativeintensity, double absoluteintensity, string name = "") {
-		set(x, y, id, mzratio, relativeintensity, absoluteintensity, name);
-	}
-
-
-	/**
-		\brief Set the coordinates.
-		\param x coordinate x
-		\param y coordinate y
-		\param id scan id
-		\param mzratio m/z ratio
-		\param relativeintensity relativeintensity
-		\param absoluteintensity absoluteintensity
-		\param name the name of item
-	*/ 
-	void set(int x, int y, int id, double mzratio, double relativeintensity, double absoluteintensity, string name = "") {
-		this->x = x;
-		this->y = y;
-		this->id = id;
-		this->mzratio = mzratio;
-		this->relativeintensity = relativeintensity;
-		this->absoluteintensity = absoluteintensity;
-		this->name = name;
+		description = "";
 	}
 
 };
 
 
 /**
-	\brief Register vector<cCoordinates> by Qt.
+	\brief Register vector<cCoordinateInfo> by Qt.
 */
-Q_DECLARE_METATYPE(vector<cCoordinates>);
-
-
-/**
-	\brief The structure defining a hash function of cCoordinates.
-*/
-struct hash_cCoordinates {
-
-	/**
-		\brief Hash cCoordinates.
-		\param coordinates cCoordinates
-		\retval size_t hashed cCoordinates
-	*/
-	size_t operator()(const cCoordinates& coordinates) const {
-		return std::hash<int>()(coordinates.x) ^ std::hash<int>()(coordinates.y) ^ std::hash<int>()(coordinates.id);
-	}
-
-};
-
-
-/**
-	\brief Overloaded operator ==.
-	\param a first candidate
-	\param b second candidate
-	\retval bool true when cCoordinates are equal
-*/
-bool operator == (cCoordinates const& a, cCoordinates const& b);
+Q_DECLARE_METATYPE(vector<cCoordinateInfo>);
 
 
 /**

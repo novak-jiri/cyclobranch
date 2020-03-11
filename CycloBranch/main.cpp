@@ -29,10 +29,10 @@ int main(int argc, char** argv) {
 	qRegisterMetaType<cParameters>("cParameters");
 	qRegisterMetaType<vector<eFragmentIonType> >("vector<eFragmentIonType>");
 	qRegisterMetaType<ePeptideType>("ePeptideType");
-	qRegisterMetaType<vector<fragmentDescription> >("vector<fragmentDescription>");
+	qRegisterMetaType<vector<cFragmentIonType> >("vector<cFragmentIonType>");
 	qRegisterMetaType<string>("string");
 	qRegisterMetaType<cFragmentIons>("cFragmentIons");
-	qRegisterMetaType<vector<cCoordinates> >("vector<cCoordinates>");
+	qRegisterMetaType<vector<cCoordinateInfo> >("vector<cCoordinateInfo>");
 	qRegisterMetaType<cPeaksList>("cPeaksList");
 
 	QPixmap pixmap(":/images/splash.png");
