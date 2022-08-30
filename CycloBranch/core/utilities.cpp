@@ -4,7 +4,9 @@
 
 
 QString appname = "CycloBranch";
-QString appversion = "v. 2.0.8 (64-bit)";
+QString appversion = "v. 2.1.21 (64-bit)";
+
+QString lastcompatibleappversion = "v. 2.0.8 (64-bit)";
 
 
 #if OS_TYPE == UNX
@@ -238,6 +240,58 @@ bool checkFile(string filename) {
 }
 
 
+bool compareDoubles(double& first, double& second, double epsilon) {
+	if (fabs(first - second) < epsilon) {
+		return true;
+	}
+	return false;
+
+	//if (first == second) {
+	//	return true;
+	//}
+	//return false;
+}
+
+
+bool compareStringVectors(vector<string>& first, vector<string>& second) {
+	if (first.size() != second.size()) {
+		return false;
+	}
+
+	size_t size = first.size();
+	for (size_t i = 0; i < size; i++) {
+		if (first[i].compare(second[i]) != 0) {
+			return false;
+		}
+	}
+
+	return true;
+}
+
+
+bool compareMapsIntDouble(map<int, double>& first, map<int, double>& second, double epsilon) {
+	if (first.size() != second.size()) {
+		return false;
+	}
+	for (auto& it : first) {
+		if (second.count(it.first) == 1) {
+			if (!compareDoubles(it.second, second[it.first], epsilon)) {
+				return false;
+			}
+		}
+		else {
+			return false;
+		}
+	}
+	return true;
+
+	//if (first == second) {
+	//	return true;
+	//}
+	//return false;
+}
+
+
 void parseBranch(ePeptideType peptidetype, string& composition, vector<string>& vectorcomposition, int& branchstart, int& branchend) {
 	string s = composition;
 	cBrick b;
@@ -374,10 +428,19 @@ QByteArray cropPrecisionToSixDecimalsByteArray(double value) {
 }
 
 
+string getShortFileName(string filename) {
+	size_t pos = filename.rfind('/');
+	if (pos != string::npos) {
+		filename = filename.substr(pos + 1);
+	}
+	return filename;
+}
+
+
 double fact(int value) {
-	double result = 1;
+	double result = 1.0;
 	while (value > 1) {
-		result *= value;
+		result *= (double)value;
 		value--;
 	}
 	return result;
@@ -572,5 +635,120 @@ bool proxyModelCheckString(QAbstractItemModel* model, int index, int row, int co
 			break;
 	}
 	return false;
+}
+
+
+bool isCompatibleVersion(int fileversionpart1, int fileversionpart2, int fileversionpart3, int lastcompatiblepart1, int lastcompatiblepart2, int lastcompatiblepart3) {
+	bool compatible = true;
+	if (lastcompatiblepart3 < fileversionpart3) {
+		compatible = true;
+	}
+	if (lastcompatiblepart3 > fileversionpart3) {
+		compatible = false;
+	}
+	if (lastcompatiblepart2 < fileversionpart2) {
+		compatible = true;
+	}
+	if (lastcompatiblepart2 > fileversionpart2) {
+		compatible = false;
+	}
+	if (lastcompatiblepart1 < fileversionpart1) {
+		compatible = true;
+	}
+	if (lastcompatiblepart1 > fileversionpart1) {
+		compatible = false;
+	}
+	return compatible;
+}
+
+
+string fixLabelCharge(string& str, int sourcecharge, int targetcharge) {
+	string newlabel = str.substr(0, str.size() - 1);
+
+	if (abs(sourcecharge) == targetcharge) {
+		return newlabel;
+	}
+
+	size_t size = str.size();
+	bool positive = true;
+	int number = 0;
+	string origstr = "";
+
+	for (int i = 0; i < size; i++) {
+		if (newlabel[i] == '+') {
+			positive = true;
+			number = 0;
+			origstr = "+";
+			continue;
+		}
+		if (newlabel[i] == '-') {
+			positive = false;
+			number = 0;
+			origstr = "-";
+			continue;
+		}
+		if (newlabel[i] == 'H') {
+			if (i + 1 < size) {
+				if ((newlabel[i + 1] == ']') || (newlabel[i + 1] == '+') || (newlabel[i + 1] == '-')) {
+					if (number == 0) {
+						number = 1;
+					}
+					origstr += 'H';
+					break;
+				}
+			}
+		}
+		if ((newlabel[i] >= '0') && (newlabel[i] <= '9')) {
+			number *= 10;
+			number += newlabel[i] - '0';
+			origstr += newlabel[i];
+		}
+	}
+
+	if (!positive) {
+		number = -number;
+	}
+
+	if (sourcecharge < 0) {
+		targetcharge = -targetcharge;
+	}
+
+	int newnumber = number + targetcharge - sourcecharge;
+
+	string newstr;
+	if (newnumber == 0) {
+		newstr = "";
+	}
+	else if (newnumber == 1) {
+		newstr = "+H";
+	}
+	else if (newnumber == -1) {
+		newstr = "-H";
+	}
+	else {
+		if (newnumber > 0) {
+			newstr += "+";
+		}
+		newstr += to_string(newnumber);
+		newstr += "H";
+	}
+
+	size_t pos;
+
+	if (number == 0) {
+		pos = newlabel.find(']');
+		if (pos != string::npos) {
+			newstr += "]";
+			newlabel.replace(pos, 1, newstr);
+		}
+	}
+	else {
+		pos = newlabel.find(origstr);
+		if (pos != string::npos) {
+			newlabel.replace(pos, origstr.size(), newstr);
+		}
+	}
+
+	return newlabel;
 }
 

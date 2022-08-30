@@ -140,8 +140,9 @@ public:
 	/**
 		\brief Load the series of peaklists from a .mgf file.
 		\param stream source stream
+		\param timeunit rt unit
 	*/ 
-	void loadFromMGFStream(ifstream &stream);
+	void loadFromMGFStream(ifstream &stream, int timeunit);
 
 
 	/**
@@ -161,8 +162,11 @@ public:
 	/**
 		\brief Load the structure from an input stream.
 		\param is an input stream
-	*/ 
-	void load(ifstream& is);
+		\param fileversionpart1 first number of .res the file version
+		\param fileversionpart2 second number of .res the file version
+		\param fileversionpart3 third number of .res the file version
+	*/
+	void load(ifstream& is, int fileversionpart1, int fileversionpart2, int fileversionpart3);
 
 };
 

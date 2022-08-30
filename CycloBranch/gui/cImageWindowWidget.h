@@ -16,25 +16,9 @@
 
 
 /**
-	\brief Layer types.
+	\brief The number of layers.
 */
-enum eLayerType {
-	layer_compounds = 0,
-	layer_optical_image,
-	layer_histology_image,
-	layer_microscopy_navigation_image,
-	layer_microscopy_image_1,
-	layer_microscopy_image_2,
-	layer_microscopy_image_3,
-	layer_microscopy_image_4,
-	layer_microscopy_image_5,
-	layer_microscopy_image_6,
-	layer_microscopy_image_7,
-	layer_microscopy_image_8,
-	layer_microscopy_image_9,
-	layer_microscopy_image_10,
-	layer_end
-};
+const int numberoflayers = 204;
 
 
 /**
@@ -137,6 +121,12 @@ struct layerInfo {
 
 
 	/**
+		\brief Navigation layer.
+	*/
+	int navigationlayer;
+
+
+	/**
 		\brief Pixmap.
 	*/
 	QPixmap* pixmap;
@@ -146,20 +136,8 @@ struct layerInfo {
 		\brief The constructor.
 	*/
 	layerInfo() {
-		checked = true;
-		alpha = 100;
-		zvalue = 0;
-		ispixmapdefined = false;
-		fliphorizontally = false;
-		flipvertically = false;
-		x = 0;
-		y = 0;
-		width = 0;
-		height = 0;
-		angle = 0;
-		lastx = 0;
-		lasty = 0;
 		pixmap = new QPixmap();
+		clear();
 	}
 
 
@@ -180,8 +158,33 @@ struct layerInfo {
 		angle = layer.angle;
 		lastx = layer.lastx;
 		lasty = layer.lasty;
+		navigationlayer = layer.navigationlayer;
 		pixmap = new QPixmap();
 		*pixmap = *layer.pixmap;
+	}
+
+
+	/**
+		\brief Clear the structure.
+	*/
+	void clear() {
+		checked = true;
+		alpha = 100;
+		zvalue = 0;
+		ispixmapdefined = false;
+		fliphorizontally = false;
+		flipvertically = false;
+		x = 0;
+		y = 0;
+		width = 0;
+		height = 0;
+		angle = 0;
+		lastx = 0;
+		lasty = 0;
+		navigationlayer = 3;
+
+		delete pixmap;
+		pixmap = new QPixmap();
 	}
 
 
@@ -236,7 +239,7 @@ public:
 		\param layer a microscopy layer
 		\param microscopyimage a microscopy image
 	*/
-	void setMicroscopyImage(eLayerType layer, QImage* microscopyimage);
+	void setMicroscopyImage(int layer, QImage* microscopyimage);
 
 
 	/**
@@ -299,20 +302,22 @@ public:
 	/**
 		\brief Set the position of a microscopy image.
 		\param layer a microscopy layer
+		\param flipx flip horizontally
+		\param flipy flip vertically
 		\param x x offset [um]
 		\param y y offset [um]
 		\param width width [um]
 		\param height height [um]
 		\param angle angle
 	*/
-	void setMicroscopyPosition(eLayerType layer, double x, double y, double width, double height, double angle);
+	void setMicroscopyPosition(int layer, bool flipx, bool flipy, double x, double y, double width, double height, double angle);
 
 
 	/**
 		\brief Go to the position of a microscopy image.
 		\param layer a microscopy layer
 	*/
-	void goToMicroscopyPosition(eLayerType layer);
+	void goToMicroscopyPosition(int layer);
 
 
 	/**
@@ -329,6 +334,33 @@ public:
 		\brief Redraw widget.
 	*/
 	void redraw();
+
+
+	/**
+		\brief Clear the vector of layers.
+	*/
+	void clearLayers();
+
+
+	/**
+		\brief Clear a layer.
+	*/
+	void clearLayer(int layer);
+
+
+	/**
+		\brief Set the flag to keep aspect ratio.
+		\param state if true, the aspect ratio is kept
+	*/
+	void setKeepAspectRatio(bool state);
+
+
+	/**
+		\brief Set navigation layer.
+		\param layer current layer
+		\param navigation navigation layer
+	*/
+	void setNavigationLayer(int layer, int navigation);
 
 
 protected:
@@ -412,13 +444,15 @@ signals:
 
 	/**
 		\brief The signal is emitted when the microscopy position was changed.
+		\param flipx flip horizontally
+		\param flipy flip vertically
 		\param x x coordinate [um]
 		\param y y coordinate [um]
 		\param width width [um]
 		\param height height [um]
 		\param angle angle
 	*/
-	void updateMicroscopyPosition(double x, double y, double width, double height, double angle);
+	void updateMicroscopyPosition(bool flipx, bool flipy, double x, double y, double width, double height, double angle);
 
 
 	/**
@@ -489,6 +523,7 @@ private:
 	int currentheight;
 
 	bool showselection;
+	bool keepaspectratio;
 
 	qreal microscopynavigationcenterx;
 	qreal microscopynavigationcentery;
@@ -501,7 +536,7 @@ private:
 	
 	void redrawScene();
 
-	void drawMicroscopyImage(eLayerType layer, QRectF& rect_scene, int currentwidth, int currentheight);
+	void drawMicroscopyImage(int layer, QRectF& rect_scene, int currentwidth, int currentheight);
 
 	void updateSelectionGroup();
 
@@ -538,7 +573,7 @@ private slots:
 	void colorScaleStateChanged(bool state);
 
 
-	void changeLayer(int layerid, bool checked, int alpha, int zvalue);
+	void changeLayer(int layerid, bool checked, int alpha, int zvalue, bool redraw);
 
 	
 	void changeActiveLayer(int layerid);

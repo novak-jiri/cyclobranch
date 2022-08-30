@@ -117,6 +117,8 @@ public:
 
 private:
 
+	bool hideunusedparameters;
+
 	QWidget* parent;
 
 	cGlobalPreferences* globalpreferences;
@@ -177,8 +179,19 @@ private:
 	QDoubleSpinBox* maximummz;
 	QHBoxLayout* mzratiolayout;
 	QWidget* mzratiowidget;
+	QLabel* rtlabel;
+	QDoubleSpinBox* minimumrt;
+	QDoubleSpinBox* maximumrt;
+	QHBoxLayout* rtlayout;
+	QWidget* rtwidget;
 	QLabel* fwhmlabel;
 	QDoubleSpinBox* fwhm;
+
+	QLabel* ratio54Fe56Felabel;
+	QDoubleSpinBox* minratio54Fe56Fe;
+	QDoubleSpinBox* maxratio54Fe56Fe;
+	QHBoxLayout* ratio54Fe56Felayout;
+	QWidget* ratio54Fe56Fewidget;
 
 	QGroupBox* brickdatabasegroupbox;
 	QGridLayout* brickdatabasegridlayout;
@@ -237,6 +250,10 @@ private:
 	cNeutralLossesListWidget* neutrallosstypes;
 	QLabel* maximumcombinedlosseslabel;
 	QSpinBox* maximumcombinedlosses;
+	QLabel* elementstypeslabel;
+	cNeutralLossesListWidget* elementstypes;
+	QLabel* maximumcombinedelementslabel;
+	QSpinBox* maximumcombinedelements;
 	//QCheckBox* clearhitswithoutparent;
 	QLabel* reportunmatchedtheoreticalpeakslabel;
 	QCheckBox* reportunmatchedtheoreticalpeaks;
@@ -254,6 +271,15 @@ private:
 	QCheckBox* advancedformulacheck;
 	QLabel* noratiochecklabel;
 	QCheckBox* noratiocheck;
+	QLabel* calculatefdrslabel;
+	QCheckBox* calculatefdrs;
+
+	QLabel* minimumannotationintensitylabel;
+	QDoubleSpinBox* minimumannotationintensityrelative;
+	QSpinBox* minimumannotationintensityabsolute;
+	QHBoxLayout* minimumannotationintensitylayout;
+	QWidget* minimumannotationintensitywidget;
+
 	QLabel* mzdifftolerancelabel;
 	QDoubleSpinBox* mzdifftolerance;
 	QLabel* intensitytolerancelabel;

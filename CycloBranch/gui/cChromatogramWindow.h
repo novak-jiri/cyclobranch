@@ -18,6 +18,7 @@
 #include <QFileDialog>
 #include <QLabel>
 #include <QPushButton>
+#include <QComboBox>
 #include "core/utilities.h"
 #include "core/cGlobalPreferences.h"
 #include "gui/cChromatogramWindowWidget.h"
@@ -36,18 +37,18 @@ public:
 	/**
 		\brief The constructor.
 		\param globalpreferences global preferences of the application
-		\param theoreticalspectrumlist list of spectra
+		\param listoftheoreticalspectra lists of theoretical spectra
 		\param parent pointer to a parent widget
-	*/ 
-	cChromatogramWindow(cGlobalPreferences* globalpreferences, cTheoreticalSpectrumList& theoreticalspectrumlist, QWidget* parent = (QWidget *)0);
+	*/
+	cChromatogramWindow(cGlobalPreferences* globalpreferences, cTheoreticalSpectrumList& listoftheoreticalspectra, QWidget* parent = (QWidget *)0);
 
 
 	/**
 		\brief The destructor.
-	*/ 
+	*/
 	~cChromatogramWindow();
 
-	
+
 	/**
 		\brief Handle the window close event.
 		\param event pointer to QCloseEvent
@@ -57,8 +58,23 @@ public:
 
 	/**
 		\brief Recalculate TIC chromatogram.
+		\param activefileid id of an active file
 	*/
-	void recalculateTICChromatogram();
+	void recalculateTICChromatogram(int activefileid);
+
+
+	/**
+		\brief Enable/disable absolute intensity mode.
+		\param enabled if true the absolute intensity is used, if false the relative intensity is used
+	*/
+	void setAbsoluteIntensityEnabled(bool enabled);
+
+
+	/**
+		\brief Set chromatographic peak shape value.
+		\param peakshape 0 = Gaussian, 1 = ex-Gaussian (tailing), 2 = ex-Gaussian (fronting)
+	*/
+	void setPeakShape(int peakshape);
 
 
 	/**
@@ -71,7 +87,7 @@ public:
 private:
 
 	cGlobalPreferences* globalpreferences;
-	cTheoreticalSpectrumList* theoreticalspectrumlist;
+	cTheoreticalSpectrumList* listoftheoreticalspectra;
 	QWidget* parent;
 
 	QMenuBar* menuBar;
@@ -90,9 +106,15 @@ private:
 	QAction* actionMouseSelection;
 	QAction* actionRetentionTime;
 	QAction* actionAbsoluteIntensity;
+	QAction* actionRawData;
 	QAction* actionHideTIC;
 	QAction* actionHideEIC;
 	QAction* actionHideLabels;
+
+	QWidget* peakshapewidget;
+	QHBoxLayout* peakshapehboxlayout;
+	QLabel* peakshapelabel;
+	QComboBox* comboboxpeakshape;
 
 	QToolBar* toolbarTime;
 
@@ -128,7 +150,7 @@ protected:
 	/**
 		\brief Handle a key press event.
 		\param event pointer to QKeyEvent
-	*/ 
+	*/
 	void keyPressEvent(QKeyEvent *event);
 
 
@@ -162,7 +184,7 @@ private slots:
 
 
 	void exportImage();
-	
+
 
 	void closeWindow();
 

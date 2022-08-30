@@ -28,6 +28,9 @@ class cSequenceDatabase {
 
 	vector<cSequence> sequences;
 
+	void parseRT(bool keeprt);
+
+
 public:
 
 
@@ -40,15 +43,17 @@ public:
 	/**
 		\brief Load the database of sequences from a plain text stream.
 		\param stream reference to an input file stream
+		\param keeprt keep retention time as a part of the compound name
 	*/ 
-	void loadFromPlainTextStream(ifstream &stream);
+	void loadFromPlainTextStream(ifstream &stream, bool keeprt);
 
 
 	/**
 		\brief Store the database of sequences into a plain text stream.
 		\param stream reference to an output file stream
-	*/ 
-	void storeToPlainTextStream(ofstream &stream);
+		\param keeprt keep retention time as a part of the compound name
+	*/
+	void storeToPlainTextStream(ofstream &stream, bool keeprt);
 
 
 	/**
@@ -96,8 +101,18 @@ public:
 	/**
 		\brief Load the structure from an input stream.
 		\param is an input stream
+		\param fileversionpart1 first number of .res the file version
+		\param fileversionpart2 second number of .res the file version
+		\param fileversionpart3 third number of .res the file version
 	*/ 
-	void load(ifstream& is);
+	void load(ifstream& is, int fileversionpart1, int fileversionpart2, int fileversionpart3);
+
+
+	/**
+		\brief Attach decoys.
+		\param terminatecomputation reference to a variable determining that the computation must be stopped
+	*/
+	void attachDecoys(bool& terminatecomputation);
 
 };
 

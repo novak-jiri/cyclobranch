@@ -8,6 +8,7 @@
 #define _CABOUTWIDGET_H
 
 #include <QWidget>
+#include <QFileInfo>
 
 
 // forward declaration

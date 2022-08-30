@@ -1,11 +1,11 @@
 /**
-	\file cSpectrumComparatorThread.h
-	\brief The thread for comparison of a theoretical spectrum with a peak list.
+	\file cSpectrumComparatorThreadMS2.h
+	\brief The thread for comparison of a theoretical spectrum with a peak list (MS2 level).
 */
 
 
-#ifndef _CSPECTRUMCOMPARATORTHREAD_H
-#define _CSPECTRUMCOMPARATORTHREAD_H
+#ifndef _CSPECTRUMCOMPARATORTHREADMS2_H
+#define _CSPECTRUMCOMPARATORTHREADMS2_H
 
 #include <QRunnable>
 #include <QObject>
@@ -79,9 +79,9 @@ bool compareWeightedRatioDesc(const cTheoreticalSpectrum& a, const cTheoreticalS
 
 
 /**
-	\brief The class representing a thread for comparison of a theoretical spectrum with a peak list.
+	\brief The class representing a thread for comparison of a theoretical spectrum with a peak list (MS2 level).
 */
-class cSpectrumComparatorThread : public QObject, public QRunnable {
+class cSpectrumComparatorThreadMS2 : public QObject, public QRunnable {
 
 	Q_OBJECT
 	

@@ -15,6 +15,8 @@ void cSequence::clear() {
 	name = "";
 	summary.clear();
 	reference = "";
+	rtmin = 0;
+	rtmax = 0;
 	decoy = false;
 }
 
@@ -28,11 +30,13 @@ void cSequence::store(ofstream& os) {
 	storeString(name, os);
 	summary.store(os);
 	storeString(reference, os);
+	os.write((char *)&rtmin, sizeof(double));
+	os.write((char *)&rtmax, sizeof(double));
 	os.write((char *)&decoy, sizeof(bool));
 }
 
 
-void cSequence::load(ifstream& is) {
+void cSequence::load(ifstream& is, int fileversionpart1, int fileversionpart2, int fileversionpart3) {
 	is.read((char *)&peptidetype, sizeof(ePeptideType));
 	loadString(sequence, is);
 	loadString(nterminalmodification, is);
@@ -41,6 +45,14 @@ void cSequence::load(ifstream& is) {
 	loadString(name, is);
 	summary.load(is);
 	loadString(reference, is);
+	if (isCompatibleVersion(fileversionpart1, fileversionpart2, fileversionpart3, 2, 1, 2)) {
+		is.read((char *)&rtmin, sizeof(double));
+		is.read((char *)&rtmax, sizeof(double));
+	}
+	else {
+		rtmin = 0;
+		rtmax = 0;
+	}
 	is.read((char *)&decoy, sizeof(bool));
 }
 
@@ -57,6 +69,16 @@ string& cSequence::getSequence() {
 
 string& cSequence::getName() {
 	return name;
+}
+
+
+double cSequence::getMinimumRetentionTime() {
+	return rtmin;
+}
+
+
+double cSequence::getMaximumRetentionTime() {
+	return rtmax;
 }
 
 
@@ -77,6 +99,12 @@ void cSequence::setSequence(const string& sequence) {
 
 void cSequence::setName(const string& name) {
 	this->name = name;
+}
+
+
+void cSequence::setRetentionTime(double rtmin, double rtmax) {
+	this->rtmin = rtmin;
+	this->rtmax = rtmax;
 }
 
 
@@ -158,6 +186,28 @@ string cSequence::getNameWithReferenceAsHTMLString() {
 			rx = "^CHEBI: [0-9]+$";
 			if (regex_search(reference, rx)) {
 				s += "<a href=\"https://www.ebi.ac.uk/chebi/searchId.do?chebiId=CHEBI:" + reference.substr(7) + "\">";
+				s += name;
+				s += "</a>";
+				correctreference = true;
+			}
+		}
+
+		// NP Atlas
+		if (!correctreference) {
+			rx = "^NPA[0-9]+$";
+			if (regex_search(reference, rx)) {
+				s += "<a href=\"https://www.npatlas.org/explore/compounds/" + reference + "\">";
+				s += name;
+				s += "</a>";
+				correctreference = true;
+			}
+		}
+
+		// COCONUT
+		if (!correctreference) {
+			rx = "^CNP[0-9]+$";
+			if (regex_search(reference, rx)) {
+				s += "<a href=\"https://coconut.naturalproducts.net/compound/coconut_id/" + reference + "\">";
 				s += name;
 				s += "</a>";
 				correctreference = true;

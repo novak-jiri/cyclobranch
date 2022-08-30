@@ -48,9 +48,6 @@ class cBrick;
 #endif
 
 
-#define MICROSCOPY_IMAGES
-
-
 using namespace std;
 using namespace boost;
 
@@ -59,6 +56,12 @@ using namespace boost;
 	\brief The pi value.
 */
 const double pi = 3.141592653589793;
+
+
+/**
+	\brief The e constant.
+*/
+const double econst = 2.718281828459045;
 
 
 /**
@@ -119,6 +122,12 @@ extern QString appname;
 	\brief The version of the application.
 */
 extern QString appversion;
+
+
+/**
+	\brief Last compatible version of the application.
+*/
+extern QString lastcompatibleappversion;
 
 
 /**
@@ -290,6 +299,35 @@ bool checkFile(string filename);
 
 
 /**
+	\brief Check if two doubles are equal.
+	\param first first value
+	\param second second value
+	\param epsilon epsilon value for comparison
+	\retval bool true if the values are equal
+*/
+bool compareDoubles(double& first, double& second, double epsilon = 0.0000001f);
+
+
+/**
+	\brief Check if two vectors of strings are equal.
+	\param first first vector
+	\param second second vector
+	\retval bool true if the vectors are equal
+*/
+bool compareStringVectors(vector<string>& first, vector<string>& second);
+
+
+/**
+	\brief Check if two maps of doubles are equal.
+	\param first first map
+	\param second second map
+	\param epsilon epsilon value for double comparison
+	\retval bool true if the maps are equal
+*/
+bool compareMapsIntDouble(map<int, double>& first, map<int, double>& second, double epsilon = 0.0000001f);
+
+
+/**
 	\brief Parse a position of a branch from a peptide sequence.
 	\param peptidetype peptide type
 	\param composition a peptide sequence where all blocks "[blockX]-[blockY]" were replaced by ids "1-2"; but "\(" and "\)" are still included
@@ -338,6 +376,14 @@ QByteArray cropDecimalsByteArray(double value);
 	\retval QByteArray a value with the limited precision
 */
 QByteArray cropPrecisionToSixDecimalsByteArray(double value);
+
+
+/**
+	\brief Get a short filename from a string.
+	\param filename long filename
+	\retval string short filename
+*/
+string getShortFileName(string filename);
 
 
 /**
@@ -506,6 +552,29 @@ bool proxyModelCheckDouble(QAbstractItemModel* model, int index, int row, int co
 	\retval bool true if the item is valid
 */
 bool proxyModelCheckString(QAbstractItemModel* model, int index, int row, int column, QString& itemstr, QString str, const QModelIndex& parent, bool wholeword, Qt::CaseSensitivity casesensitive);
+
+
+/**
+	\brief Check the compatibility of CycloBranch version.
+	\param fileversionpart1 tested version (part 1)
+	\param fileversionpart2 tested version (part 2)
+	\param fileversionpart3 tested version (part 3)
+	\param lastcompatiblepart1 last compatible version (part 1)
+	\param lastcompatiblepart2 last compatible version (part 2)
+	\param lastcompatiblepart3 last compatible version (part 3)
+	\retval bool true if the versions are compatible
+*/
+bool isCompatibleVersion(int fileversionpart1, int fileversionpart2, int fileversionpart3, int lastcompatiblepart1, int lastcompatiblepart2, int lastcompatiblepart3);
+
+
+/**
+	\brief Fix the name of a multiply charged ion in MS mode.
+	\param str original ion name
+	\param sourcecharge source charge
+	\param targetcharge target charge
+	\retval string fixed name
+*/
+string fixLabelCharge(string& str, int sourcecharge, int targetcharge);
 
 
 #endif

@@ -29,6 +29,7 @@ cMainWindow::cMainWindow() {
 	menuFile = new QMenu(tr("&File"), this);
 	menuSearch = new QMenu(tr("&Search"), this);
 	menuTools = new QMenu(tr("&Tools"), this);
+	menuBookmarks = new QMenu(tr("&Bookmarks"), this);
 	menuView = new QMenu(tr("&View"), this);
 	menuHelp = new QMenu(tr("&Help"), this);
 
@@ -73,21 +74,54 @@ cMainWindow::cMainWindow() {
 	actionDrawPeptide->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_P));
 
 	actionSummaryTableOfMatchedPeaks = new QAction(QIcon(":/images/icons/table.png"), tr("S&ummary Table of Matched Peaks"), this);
-	actionSummaryTableOfMatchedPeaks->setShortcut(QKeySequence(Qt::Key_F9));
+	actionSummaryTableOfMatchedPeaks->setShortcut(QKeySequence(Qt::Key_F8));
+
+	actionMultipleDatasets = new QAction(QIcon(":/images/icons/features.png"), tr("&Annotated Features Overview"), this);
+	actionMultipleDatasets->setShortcut(QKeySequence(Qt::SHIFT + Qt::Key_F8));
 
 	actionChromatogramWindow = new QAction(QIcon(":/images/icons/chromatography.png"), tr("C&hromatogram"), this);
-	actionChromatogramWindow->setShortcut(QKeySequence(Qt::Key_F10));
+	actionChromatogramWindow->setShortcut(QKeySequence(Qt::Key_F9));
 	actionChromatogramWindow->setDisabled(true);
 
-	actionImageWindow = new QAction(QIcon(":/images/icons/image.png"), tr("&CrossVis"), this);
-	actionImageWindow->setShortcut(QKeySequence(Qt::Key_F11));
+	actionImageWindow = new QAction(QIcon(":/images/icons/image_edit.png"), tr("Image &Fusion"), this);
+	actionImageWindow->setShortcut(QKeySequence(Qt::Key_F10));
 	actionImageWindow->setDisabled(true);
 
-	actionBookMark1 = new QAction(QIcon(":/images/icons/25.png"), tr("&Norine"), this);
+	actionPatternSimulatorWindow = new QAction(QIcon(":/images/icons/pattern.png"), tr("&Simulate Isotopic Pattern"), this);
+	actionPatternSimulatorWindow->setShortcut(QKeySequence(Qt::Key_F11));
+
+	actionFormulaPredictor = new QAction(QIcon(":/images/icons/formula.png"), tr("Calculate Molecula&r Formula"), this);
+	actionFormulaPredictor->setShortcut(QKeySequence(Qt::Key_F12));
+
+	actionBookMark1 = new QAction("", this);
 	actionBookMark1->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_1));
 
-	actionBookMark2 = new QAction(QIcon(":/images/icons/5.png"), tr("Gene&rate Blocks and Sequences using BBDGNC"), this);
+	actionBookMark2 = new QAction("", this);
 	actionBookMark2->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_2));
+
+	actionBookMark3 = new QAction("", this);
+	actionBookMark3->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_3));
+
+	actionBookMark4 = new QAction("", this);
+	actionBookMark4->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_4));
+
+	actionBookMark5 = new QAction("", this);
+	actionBookMark5->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_5));
+
+	actionBookMark6 = new QAction("", this);
+	actionBookMark6->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_6));
+
+	actionBookMark7 = new QAction("", this);
+	actionBookMark7->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_7));
+
+	actionBookMark8 = new QAction("", this);
+	actionBookMark8->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_8));
+
+	actionBookMark9 = new QAction("", this);
+	actionBookMark9->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_9));
+
+	actionBookMark10 = new QAction("", this);
+	actionBookMark10->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_0));
 
 	actionShowIsomers = new QAction(QIcon(":/images/icons/95.png"), tr("Show &Isomers"), this);
 	actionShowIsomers->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_I));
@@ -129,11 +163,11 @@ cMainWindow::cMainWindow() {
 	toolbarTools->addAction(actionModifications);
 	toolbarTools->addAction(actionDrawPeptide);
 	toolbarTools->addAction(actionSummaryTableOfMatchedPeaks);
+	toolbarTools->addAction(actionMultipleDatasets);
 	toolbarTools->addAction(actionChromatogramWindow);
 	toolbarTools->addAction(actionImageWindow);
-	toolbarTools->addSeparator();
-	toolbarTools->addAction(actionBookMark1);
-	toolbarTools->addAction(actionBookMark2);
+	toolbarTools->addAction(actionPatternSimulatorWindow);
+	toolbarTools->addAction(actionFormulaPredictor);
 
 	toolbarView = addToolBar(tr("View"));
 	toolbarView->addAction(actionShowIsomers);
@@ -144,6 +178,42 @@ cMainWindow::cMainWindow() {
 	toolbarHelp->addAction(actionHTMLDocumentation);
 	toolbarHelp->addAction(actionPDFManual);
 	toolbarHelp->addAction(actionAbout);
+
+	addToolBarBreak();
+
+	toolbarBookmarks = addToolBar(tr("Bookmarks"));
+	toolbarBookmarks->addAction(actionBookMark1);
+	toolbarBookmarks->addAction(actionBookMark2);
+	toolbarBookmarks->addAction(actionBookMark3);
+	toolbarBookmarks->addAction(actionBookMark4);
+	toolbarBookmarks->addAction(actionBookMark5);
+	toolbarBookmarks->addAction(actionBookMark6);
+	toolbarBookmarks->addAction(actionBookMark7);
+	toolbarBookmarks->addAction(actionBookMark8);
+	toolbarBookmarks->addAction(actionBookMark9);
+	toolbarBookmarks->addAction(actionBookMark10);
+
+	inputfiltercombobox = new QComboBox();
+	inputfiltercombobox->setToolTip("Select the input file.");
+	inputfiltercombobox->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+
+	inputfilterbutton = new QPushButton("Select");
+	inputfilterbutton->setToolTip("Select the input file.");
+	inputfilterbutton->setMinimumWidth(75);
+
+	inputfilterhbox = new QHBoxLayout();
+	inputfilterhbox->addWidget(inputfiltercombobox);
+	inputfilterhbox->addSpacing(10);
+	inputfilterhbox->addWidget(inputfilterbutton);
+
+	inputfilterwidget = new QWidget();
+	inputfilterwidget->setLayout(inputfilterhbox);
+
+	addToolBarBreak();
+
+	toolbarInputFilter = addToolBar(tr("Input"));
+	toolbarInputFilter->addWidget(inputfilterwidget);
+	toolbarInputFilter->setVisible(false);
 
 	rowsfilteroperator = new QComboBox();
 	rowsfilteroperator->setToolTip("OR = any condition must be met; AND = all conditions must be met.");
@@ -227,8 +297,9 @@ cMainWindow::cMainWindow() {
 	rowsfilterwidget->setLayout(rowsfilterhbox);
 
 	addToolBarBreak();
-	toolbarFilter = addToolBar(tr("Filter"));
-	toolbarFilter->addWidget(rowsfilterwidget);
+
+	toolbarRowsFilter = addToolBar(tr("Filter"));
+	toolbarRowsFilter->addWidget(rowsfilterwidget);
 
 	results = new QTableView(this);
 	resultsmodel = new QStandardItemModel(0, 0, this);
@@ -250,10 +321,13 @@ cMainWindow::cMainWindow() {
 	drawpeptidewidget = new cDrawPeptideWidget(this);
 	summarytableofmatchedpeaks = new cSummaryPeaksTableWidget(&globalpreferences, this);
 	imagewindow = new cImageWindow(&globalpreferences, this);
-	chromatogramwindow = new cChromatogramWindow(&globalpreferences, theoreticalspectrumlist, this);
+	chromatogramwindow = new cChromatogramWindow(&globalpreferences, listoftheoreticalspectra, this);
 	parameterswidget = new cParametersWidget(&globalpreferences, this);
 	htmlexportdialog = new cHTMLExportDialog(this);
 	preferencesdialog = new cPreferencesDialog(globalpreferences, this);
+	multipledatasetswidget = new cMultipleDatasetsTableWidget(&globalpreferences, this);
+	patternsimulatorwidget = new cPatternSimulatorWidget(&globalpreferences, this);
+	formulapredictor = new cFormulaPredictor(&globalpreferences, this);
 
 	connect(actionOpenResults, SIGNAL(triggered()), this, SLOT(openResultsFile()));
 	connect(actionSaveResults, SIGNAL(triggered()), this, SLOT(saveResultsFile()));
@@ -270,24 +344,41 @@ cMainWindow::cMainWindow() {
 	connect(actionDrawPeptide, SIGNAL(triggered()), this, SLOT(showDrawPeptideWidget()));
 	connect(actionBookMark1, SIGNAL(triggered()), this, SLOT(gotoBookMark1()));
 	connect(actionBookMark2, SIGNAL(triggered()), this, SLOT(gotoBookMark2()));
+	connect(actionBookMark3, SIGNAL(triggered()), this, SLOT(gotoBookMark3()));
+	connect(actionBookMark4, SIGNAL(triggered()), this, SLOT(gotoBookMark4()));
+	connect(actionBookMark5, SIGNAL(triggered()), this, SLOT(gotoBookMark5()));
+	connect(actionBookMark6, SIGNAL(triggered()), this, SLOT(gotoBookMark6()));
+	connect(actionBookMark7, SIGNAL(triggered()), this, SLOT(gotoBookMark7()));
+	connect(actionBookMark8, SIGNAL(triggered()), this, SLOT(gotoBookMark8()));
+	connect(actionBookMark9, SIGNAL(triggered()), this, SLOT(gotoBookMark9()));
+	connect(actionBookMark10, SIGNAL(triggered()), this, SLOT(gotoBookMark10()));
 	connect(actionShowIsomers, SIGNAL(triggered()), this, SLOT(showIsomersStateChanged()));
 	connect(actionGraph, SIGNAL(triggered()), this, SLOT(showGraph()));
 	connect(actionSummaryTableOfMatchedPeaks, SIGNAL(triggered()), this, SLOT(showSummaryTableOfMatchedPeaks()));
-	connect(actionImageWindow, SIGNAL(triggered()), this, SLOT(showImageWindow()));
+	connect(actionMultipleDatasets, SIGNAL(triggered()), this, SLOT(showMultipleDatasetsOverview()));
 	connect(actionChromatogramWindow, SIGNAL(triggered()), this, SLOT(showChromatogramWindow()));
+	connect(actionImageWindow, SIGNAL(triggered()), this, SLOT(showImageWindow()));
+	connect(actionPatternSimulatorWindow, SIGNAL(triggered()), this, SLOT(showPatternSimulatorWindow()));
+	connect(actionFormulaPredictor, SIGNAL(triggered()), this, SLOT(showFormulaPredictor()));
 	connect(actionLog, SIGNAL(triggered()), this, SLOT(showHideLog()));
 	connect(actionHTMLDocumentation, SIGNAL(triggered()), this, SLOT(showHTMLDocumentation()));
 	connect(actionPDFManual, SIGNAL(triggered()), this, SLOT(showPDFManual()));
 	connect(actionAbout, SIGNAL(triggered()), this, SLOT(showAbout()));
+
+	connect(inputfilterbutton, SIGNAL(released()), this, SLOT(inputFilterButtonReleased()));
 
 	connect(rowsfilterbutton, SIGNAL(released()), this, SLOT(filterResults()));
 	connect(rowsfilterclearbutton, SIGNAL(released()), this, SLOT(resetFilter()));
 
 	connect(summarytableofmatchedpeaks, SIGNAL(tableCancelled()), this, SLOT(summaryPeaksTableCancelled()));
 	connect(summarytableofmatchedpeaks, SIGNAL(summaryPeaksTableRowDoubleClicked(int, double)), this, SLOT(summaryPeaksTableRowDoubleClicked(int, double)));
+	connect(multipledatasetswidget, SIGNAL(tableCancelled()), this, SLOT(multipleDatasetsTableCancelled()));
+	connect(multipledatasetswidget, SIGNAL(multipleDatasetsTableRowClicked(int, int, int, int, int, string, string, string)), this, SLOT(multipleDatasetsTableRowClicked(int, int, int, int, int, string, string, string)));
 	connect(summarytableofmatchedpeaks, SIGNAL(sendFilterOptionsToImageWindow(vector<cCoordinateInfo>, bool, string, string, string, string, string, string, bool, bool)), imagewindow, SLOT(setFilterOptionsSlot(vector<cCoordinateInfo>, bool, string, string, string, string, string, string, bool, bool)));
 	connect(summarytableofmatchedpeaks, SIGNAL(sendFilterOptionsToChromatogram(cPeaksList)), chromatogramwindow, SLOT(setFilterOptionsSlot(cPeaksList)));
 	connect(summarytableofmatchedpeaks, SIGNAL(resetRegion()), imagewindow, SLOT(clearSelection()));
+
+	connect(multipledatasetswidget, SIGNAL(filterSummaryTable()), this, SLOT(filterSummaryTableIfPrepared()));
 
 	connect(chromatogramwindow, SIGNAL(doubleClickedScanIDSignal(int)), this, SLOT(chromatogramDoubleClicked(int)));
 	connect(imagewindow, SIGNAL(doubleClickedSpectrumIDSignal(int)), this, SLOT(imageWindowDoubleClicked(int)));
@@ -314,11 +405,23 @@ cMainWindow::cMainWindow() {
 	menuTools->addAction(actionDrawPeptide);
 	menuTools->addSeparator();
 	menuTools->addAction(actionSummaryTableOfMatchedPeaks);
+	menuTools->addAction(actionMultipleDatasets);
 	menuTools->addAction(actionChromatogramWindow);
 	menuTools->addAction(actionImageWindow);
 	menuTools->addSeparator();
-	menuTools->addAction(actionBookMark1);
-	menuTools->addAction(actionBookMark2);
+	menuTools->addAction(actionPatternSimulatorWindow);
+	menuTools->addAction(actionFormulaPredictor);
+
+	menuBookmarks->addAction(actionBookMark1);
+	menuBookmarks->addAction(actionBookMark2);
+	menuBookmarks->addAction(actionBookMark3);
+	menuBookmarks->addAction(actionBookMark4);
+	menuBookmarks->addAction(actionBookMark5);
+	menuBookmarks->addAction(actionBookMark6);
+	menuBookmarks->addAction(actionBookMark7);
+	menuBookmarks->addAction(actionBookMark8);
+	menuBookmarks->addAction(actionBookMark9);
+	menuBookmarks->addAction(actionBookMark10);
 
 	menuView->addAction(actionShowIsomers);
 	menuView->addSeparator();
@@ -333,6 +436,7 @@ cMainWindow::cMainWindow() {
 	menuBar->addMenu(menuFile);
 	menuBar->addMenu(menuSearch);
 	menuBar->addMenu(menuTools);
+	menuBar->addMenu(menuBookmarks);
 	menuBar->addMenu(menuView);
 	menuBar->addMenu(menuHelp);
 
@@ -362,6 +466,15 @@ cMainWindow::cMainWindow() {
 	chromatogramwindow->hide();
 	parameterswidget->hide();
 
+	multipledatasetswidget->hide();
+	multipledatasetswidget->getPubChemSearchWidget()->hide();
+	multipledatasetswidget->getPubChemSearchWidget()->setHTML("");
+	multipledatasetswidget->getDefineCalibrationWidget()->hide();
+	multipledatasetswidget->getCalibrationChartWidget()->hide();
+	
+	patternsimulatorwidget->hide();
+	formulapredictor->hide();
+
 	splitter->setOrientation(Qt::Vertical);
 	splitter->addWidget(results);
 	splitter->addWidget(logWindow);
@@ -371,7 +484,8 @@ cMainWindow::cMainWindow() {
 
 	resize(defaultwinsizex, defaultwinsizey);
 
-	theoreticalspectrumlist.clear();
+	listoftheoreticalspectra.clear();
+	eicchromatograms.clear();
 	spectradetails.clear();
 
 	parameters.clear();
@@ -388,6 +502,21 @@ cMainWindow::cMainWindow() {
 	applyGlobalPreferences();
 
 	summarytableisprepared = false;
+	multipledatasetsisprepared = false;
+
+	lastactivedetail = -1;
+
+	othernormalgeometry = QRect();
+	otherismaximized = false;
+	otherprofilespectrum = false;
+	otherabsoluteintensity = false;
+	othermatchedpeaks = false;
+	otherunmatchedpeaks = false;
+	otherscrambledpeaks = false;
+	otherlabelspeaks = false;
+	othermzselection = true;
+
+	activefileid = 0;
 
 	quitapp = false;
 }
@@ -395,6 +524,11 @@ cMainWindow::cMainWindow() {
 
 cMainWindow::~cMainWindow() {
 	deleteResults();
+
+	delete inputfiltercombobox;
+	delete inputfilterbutton;
+	delete inputfilterhbox;
+	delete inputfilterwidget;
 
 	delete rowsfilteroperator;
 	delete rowsfiltercombobox1;
@@ -424,11 +558,14 @@ cMainWindow::~cMainWindow() {
 	delete modificationswidget;
 	delete drawpeptidewidget;
 	delete summarytableofmatchedpeaks;
-	delete imagewindow;
 	delete chromatogramwindow;
+	delete imagewindow;
 	delete parameterswidget;
 	delete htmlexportdialog;
 	delete preferencesdialog;
+	delete multipledatasetswidget;
+	delete patternsimulatorwidget;
+	delete formulapredictor;
 
 	delete actionOpenResults;
 	delete actionSaveResults;
@@ -444,11 +581,22 @@ cMainWindow::~cMainWindow() {
 	delete actionDrawPeptide;
 	delete actionBookMark1;
 	delete actionBookMark2;
+	delete actionBookMark3;
+	delete actionBookMark4;
+	delete actionBookMark5;
+	delete actionBookMark6;
+	delete actionBookMark7;
+	delete actionBookMark8;
+	delete actionBookMark9;
+	delete actionBookMark10;
 	delete actionShowIsomers;
 	delete actionGraph;
 	delete actionSummaryTableOfMatchedPeaks;
-	delete actionImageWindow;
+	delete actionMultipleDatasets;
 	delete actionChromatogramWindow;
+	delete actionImageWindow;
+	delete actionPatternSimulatorWindow;
+	delete actionFormulaPredictor;
 	delete actionLog;
 	delete actionHTMLDocumentation;
 	delete actionPDFManual;
@@ -457,6 +605,7 @@ cMainWindow::~cMainWindow() {
 	delete menuFile;
 	delete menuSearch;
 	delete menuTools;
+	delete menuBookmarks;
 	delete menuView;
 	delete menuHelp;
 
@@ -528,7 +677,7 @@ void cMainWindow::closeEvent(QCloseEvent *event) {
 
 void cMainWindow::preparePeptideSequence(int row, string& peptidesequence, bool reportisomers) {
 	int spectrumindex = resultsmodel->item(row, 1)->data(Qt::DisplayRole).toInt() - 1;
-	peptidesequence = theoreticalspectrumlist[spectrumindex].getCandidate().getAcronymPeptideNameWithHTMLReferences();
+	peptidesequence = listoftheoreticalspectra.get(activefileid, spectrumindex).getCandidate().getAcronymPeptideNameWithHTMLReferences();
 	peptidesequence = stripHTML(peptidesequence);
 
 	if (!reportisomers) {
@@ -648,7 +797,7 @@ void cMainWindow::reportSpectrum(int row, cTheoreticalSpectrum& theoreticalspect
 	if ((parameters.mode == dereplication) || (parameters.mode == compoundsearch)) {
 		int mscol = 2;
 
-		if ((parameters.peaklistfileformat != mis) && (parameters.peaklistfileformat != imzML)) {
+		if ((parameters.peaklistfileformats[activefileid] != mis) && (parameters.peaklistfileformats[activefileid] != imzML)) {
 			resultsmodel->setItem(row, mscol, new QStandardItem());
 			resultsmodel->item(row, mscol)->setData(QVariant::fromValue(cropPrecisionToSixDecimalsByteArray(theoreticalspectrum.getExperimentalSpectrum().getRetentionTime())), Qt::DisplayRole);
 			mscol++;
@@ -674,7 +823,7 @@ void cMainWindow::reportSpectrum(int row, cTheoreticalSpectrum& theoreticalspect
 		resultsmodel->item(row, mscol)->setData(QVariant::fromValue(cropPrecisionToSixDecimalsByteArray(theoreticalspectrum.getWeightedRatioOfMatchedPeaks() * 100)), Qt::DisplayRole);
 		mscol++;
 
-		if ((parameters.peaklistfileformat == mis) || (parameters.peaklistfileformat == imzML)) {
+		if ((parameters.peaklistfileformats[activefileid] == mis) || (parameters.peaklistfileformats[activefileid] == imzML)) {
 			resultsmodel->setItem(row, mscol, new QStandardItem());
 			resultsmodel->item(row, mscol)->setData(QVariant::fromValue(theoreticalspectrum.getExperimentalSpectrum().getCoordinateX()), Qt::DisplayRole);
 			mscol++;
@@ -685,7 +834,9 @@ void cMainWindow::reportSpectrum(int row, cTheoreticalSpectrum& theoreticalspect
 	}
 
 
-	spectradetails[row].initialize(row + 1, &globalpreferences, &parameters, theoreticalspectrum, this);
+	spectradetails[row].initialize(row + 1, activefileid, &globalpreferences, &parameters, theoreticalspectrum, this);
+
+	connect(&spectradetails[row], SIGNAL(lastActiveDetail(int)), this, SLOT(lastActiveDetailSlot(int)));
 }
 
 
@@ -759,7 +910,7 @@ bool cMainWindow::prepareSummaryTableOfMatchedPeaks() {
 
 	if (!summarytableisprepared) {
 		rowsfilterwidget->setEnabled(false);
-		summarytableisprepared = summarytableofmatchedpeaks->prepareToShow(resultsmodel, resultsproxymodel, &parameters, &theoreticalspectrumlist, actionShowIsomers->isChecked());
+		summarytableisprepared = summarytableofmatchedpeaks->prepareToShow(resultsmodel, resultsproxymodel, &parameters, &listoftheoreticalspectra, activefileid, actionShowIsomers->isChecked());
 		rowsfilterwidget->setEnabled(true);
 	}
 
@@ -783,7 +934,7 @@ void cMainWindow::showSummaryTableOfMatchedPeaks() {
 
 void cMainWindow::showImageWindow() {
 	if (prepareSummaryTableOfMatchedPeaks()) {
-		imagewindow->setDefaultMaxXY(parameters.defaultmaxx, parameters.defaultmaxy, parameters.defaultpixelsizex, parameters.defaultpixelsizey, parameters.vendor);
+		imagewindow->setDefaultValues(parameters.peaklistfilenames[activefileid], parameters.defaultmaxx, parameters.defaultmaxy, parameters.defaultpixelsizex, parameters.defaultpixelsizey, parameters.vendor);
 		imagewindow->show();
 		imagewindow->activateWindow();
 		if (imagewindow->isMinimized()) {
@@ -795,7 +946,7 @@ void cMainWindow::showImageWindow() {
 
 void cMainWindow::showChromatogramWindow() {
 	if (prepareSummaryTableOfMatchedPeaks()) {
-		chromatogramwindow->recalculateTICChromatogram();
+		chromatogramwindow->recalculateTICChromatogram(activefileid);
 		chromatogramwindow->show();
 		chromatogramwindow->activateWindow();
 		if (chromatogramwindow->isMinimized()) {
@@ -823,6 +974,40 @@ void cMainWindow::showProperties() {
 }
 
 
+void cMainWindow::showMultipleDatasetsOverview() {
+	if (!multipledatasetsisprepared) {
+		multipledatasetswidget->resetStandard();
+		multipledatasetsisprepared = multipledatasetswidget->prepareToShow(&parameters, &listoftheoreticalspectra, activefileid);
+		multipledatasetswidget->updateListofStandards();
+	}
+	if (multipledatasetsisprepared) {
+		multipledatasetswidget->show();
+		multipledatasetswidget->activateWindow();
+		if (multipledatasetswidget->isMinimized()) {
+			multipledatasetswidget->showNormal();
+		}
+	}
+}
+
+
+void cMainWindow::showPatternSimulatorWindow() {
+	patternsimulatorwidget->show();
+	patternsimulatorwidget->activateWindow();
+	if (patternsimulatorwidget->isMinimized()) {
+		patternsimulatorwidget->showNormal();
+	}
+}
+
+
+void cMainWindow::showFormulaPredictor() {
+	formulapredictor->show();
+	formulapredictor->activateWindow();
+	if (formulapredictor->isMinimized()) {
+		formulapredictor->showNormal();
+	}
+}
+
+
 void cMainWindow::run() {
 	enableRunButtonAndSettings(false);
 	enableStopButton(true);
@@ -834,7 +1019,8 @@ void cMainWindow::run() {
 
 	deleteResults();
 	
-	theoreticalspectrumlist.clear();
+	listoftheoreticalspectra.clear();
+	eicchromatograms.clear();
 	spectradetails.clear();
 
 	parameters.clear();
@@ -849,10 +1035,10 @@ void cMainWindow::run() {
 	regex rx;
 	rx = "\\.[iI][mM][zZ][mM][lL]$";
 	localparameters.profiledatafilename = "";
-	if (regex_search(localparameters.peaklistfilename, rx)) {
-		localparameters.profiledatafilename = localparameters.peaklistfilename;
+	if (regex_search(localparameters.peaklistfilenames[0], rx)) {
+		localparameters.profiledatafilename = localparameters.peaklistfilenames[0];
 
-		string convertedimzml = localparameters.peaklistfilename.substr(0, (int)localparameters.peaklistfilename.size() - 6);
+		string convertedimzml = localparameters.peaklistfilenames[0].substr(0, (int)localparameters.peaklistfilenames[0].size() - 6);
 		string convertedibd = convertedimzml;
 		convertedimzml += "_converted_fwhm_";
 		convertedimzml += to_string(localparameters.fwhm);
@@ -864,13 +1050,13 @@ void cMainWindow::run() {
 		if (QFile::exists(convertedimzml.c_str()) && QFile::exists(convertedibd.c_str())) {
 			QMessageBox::StandardButton reply;
 			string s = "The converted imzML file '" + convertedimzml.substr(convertedimzml.rfind('/') + 1) + "' has been found.\n\nDo you want to proceed with this file instead of the original imzML file '";
-			s += localparameters.peaklistfilename.substr(localparameters.peaklistfilename.rfind('/') + 1) + "' ?";
+			s += localparameters.peaklistfilenames[0].substr(localparameters.peaklistfilenames[0].rfind('/') + 1) + "' ?";
 			s += "\n\nClick 'Yes' to proceed the converted file.\nClick 'No' to convert the original file again. Note: The conversion may be time-consuming.";
 
 			reply = QMessageBox::question(this, "Do you want to proceed the converted file ?", s.c_str(), QMessageBox::Yes|QMessageBox::No);
 
 			if (reply == QMessageBox::Yes) {
-				localparameters.peaklistfilename = convertedimzml;
+				localparameters.peaklistfilenames[0] = convertedimzml;
 			}
 		}
 	}
@@ -900,41 +1086,65 @@ void cMainWindow::run() {
 
 	#if OS_TYPE == WIN
 		if (localparameters.useprofiledata) {
-			rx = "\\.[bB][aA][fF]$";
-			if (regex_search(localparameters.peaklistfilename, rx)) {
-				int i = 1;
-				string profiledata = localparameters.peaklistfilename + ".profile.1.csv";
-				while (QFile::exists(profiledata.c_str())) {
-					i++;
-					profiledata = localparameters.peaklistfilename + ".profile." + to_string(i) + ".csv";
-				}
-				i--;
 
-				localparameters.convertprofiledata = true;
-				if (i > 0) {
-					QMessageBox::StandardButton reply;
-					string s = "The file '" + localparameters.peaklistfilename.substr(localparameters.peaklistfilename.rfind('/') + 1) + ".profile.1.csv'";
-					if (i > 1) {
-						s += " and " + to_string(i - 1) + " other files containing profile spectra have been found.";
+			rx = "\\.[bB][aA][fF]$";
+			if (regex_search(localparameters.peaklistfilenames[0], rx)) {
+
+				if (globalpreferences.profilebafprocessingmethod == 0) {
+					if (localparameters.peaklistfilenames.size() == 1) {
+						int i = 1;
+						string profiledata = localparameters.peaklistfilenames[0] + ".profile.1.csv";
+						while (QFile::exists(profiledata.c_str())) {
+							i++;
+							profiledata = localparameters.peaklistfilenames[0] + ".profile." + to_string(i) + ".csv";
+						}
+						i--;
+
+						localparameters.convertprofiledata = true;
+						if (i > 0) {
+							QMessageBox::StandardButton reply;
+							string s = "The file '" + localparameters.peaklistfilenames[0].substr(localparameters.peaklistfilenames[0].rfind('/') + 1) + ".profile.1.csv'";
+							if (i > 1) {
+								s += " and " + to_string(i - 1) + " other files containing profile spectra have been found.";
+							}
+							else {
+								s += " containing a profile spectrum has been found.";
+							}
+
+							s += "\n\nDo you want to proceed the existing file(s) ?";
+							s += "\n\nClick 'Yes' to proceed the existing file(s).\nClick 'No' to convert the profile data again. Note: The conversion of many profile spectra may be time-consuming.";
+
+							reply = QMessageBox::question(this, "Do you want to proceed the existing file(s) ?", s.c_str(), QMessageBox::Yes | QMessageBox::No);
+
+							if (reply == QMessageBox::Yes) {
+								localparameters.convertprofiledata = false;
+							}
+						}
 					}
 					else {
-						s += " containing a profile spectrum has been found.";
-					}
-
-					s += "\n\nDo you want to proceed the existing file(s) ?";
-					s += "\n\nClick 'Yes' to proceed the existing file(s).\nClick 'No' to convert the profile data again. Note: The conversion of many profile spectra may be time-consuming.";
-
-					reply = QMessageBox::question(this, "Do you want to proceed the existing file(s) ?", s.c_str(), QMessageBox::Yes | QMessageBox::No);
-
-					if (reply == QMessageBox::Yes) {
 						localparameters.convertprofiledata = false;
+
+						QMessageBox msgBox;
+						QString errstr = "You tried to convert the profile spectra from multiple *.baf files using CompassXport. ";
+						errstr += "This feature may be time-consuming and it will be disabled. ";
+						errstr += "If you would like to see the profile spectra, go to 'Preferences->Data Processing' and select CompassXtract as a profile data converter or use only one input *.baf file.";
+						msgBox.setText(errstr);
+						msgBox.exec();
 					}
 				}
+
+				if (globalpreferences.profilebafprocessingmethod == 1) {
+					localparameters.convertprofiledata = false;
+				}
+
 			}
+
 		}
+
+		localparameters.linebafprocessing = globalpreferences.linebafprocessingmethod;
 	#endif
 
-	cMainThread* thread = new cMainThread(localparameters, theoreticalspectrumlist, true, false);
+	cMainThread* thread = new cMainThread(localparameters, listoftheoreticalspectra, true, false);
 	connect(thread, SIGNAL(message(QString)), this, SLOT(updateLog(QString)));
 	connect(thread, SIGNAL(enableRunButtonAndSettings(bool)), this, SLOT(enableRunButtonAndSettings(bool)));
 	connect(thread, SIGNAL(enableStopButton(bool)), this, SLOT(enableStopButton(bool)));
@@ -946,9 +1156,33 @@ void cMainWindow::run() {
 
 	summarytableofmatchedpeaks->deleteTable();
 	summarytableofmatchedpeaks->hide();
+	summarytableofmatchedpeaks->getPubChemSearchWidget()->setHTML("");
 	summarytableisprepared = false;
+
+	lastactivedetail = -1;
+
+	othernormalgeometry = QRect();
+	otherismaximized = false;
+	otherprofilespectrum = false;
+	otherabsoluteintensity = false;
+	othermatchedpeaks = false;
+	otherunmatchedpeaks = false;
+	otherscrambledpeaks = false;
+	otherlabelspeaks = false;
+	othermzselection = true;
+
+	activefileid = 0;
+
 	imagewindow->hide();
 	chromatogramwindow->hide();
+
+	multipledatasetswidget->deleteTable();
+	multipledatasetswidget->hide();
+	multipledatasetswidget->getPubChemSearchWidget()->hide();
+	multipledatasetswidget->getPubChemSearchWidget()->setHTML("");
+	multipledatasetswidget->getDefineCalibrationWidget()->hide();
+	multipledatasetswidget->getCalibrationChartWidget()->hide();
+	multipledatasetsisprepared = false;
 
 	thread->start();
 }
@@ -995,11 +1229,12 @@ void cMainWindow::enableButtonsHandlingResults(bool enable) {
 	actionPreferences->setEnabled(enable);
 	rowsfilterwidget->setEnabled(enable);
 	actionSummaryTableOfMatchedPeaks->setEnabled(enable);
+	actionMultipleDatasets->setEnabled(enable);
 	
 	if (enable) {
 		if ((parameters.mode == dereplication) || (parameters.mode == compoundsearch)) {
 			actionShowIsomers->setEnabled(false);
-			if ((parameters.peaklistfileformat == mis) || (parameters.peaklistfileformat == imzML)) {
+			if ((parameters.peaklistfileformats[0] == mis) || (parameters.peaklistfileformats[0] == imzML)) {
 				actionImageWindow->setEnabled(true);
 				actionChromatogramWindow->setEnabled(false);
 			}
@@ -1208,7 +1443,7 @@ void cMainWindow::reportSpectra() {
 
 
 	if ((parameters.mode == dereplication) || (parameters.mode == compoundsearch)) {
-		if ((parameters.peaklistfileformat == mis) || (parameters.peaklistfileformat == imzML)) {
+		if ((parameters.peaklistfileformats[activefileid] == mis) || (parameters.peaklistfileformats[activefileid] == imzML)) {
 			resultsmodel->setColumnCount(9);
 		}
 		else {
@@ -1227,7 +1462,7 @@ void cMainWindow::reportSpectra() {
 		results->setItemDelegateForColumn(mscol, new QItemDelegate());
 		mscol++;
 
-		if ((parameters.peaklistfileformat != mis) && (parameters.peaklistfileformat != imzML)) {
+		if ((parameters.peaklistfileformats[activefileid] != mis) && (parameters.peaklistfileformats[activefileid] != imzML)) {
 			resultsmodel->setHorizontalHeaderItem(mscol, new QStandardItem());
 			resultsmodel->horizontalHeaderItem(mscol)->setText("Time");
 			results->setItemDelegateForColumn(mscol, new QItemDelegate());
@@ -1259,7 +1494,7 @@ void cMainWindow::reportSpectra() {
 		results->setItemDelegateForColumn(mscol, new QItemDelegate());
 		mscol++;
 
-		if ((parameters.peaklistfileformat == mis) || (parameters.peaklistfileformat == imzML)) {
+		if ((parameters.peaklistfileformats[activefileid] == mis) || (parameters.peaklistfileformats[activefileid] == imzML)) {
 			resultsmodel->setHorizontalHeaderItem(mscol, new QStandardItem());
 			resultsmodel->horizontalHeaderItem(mscol)->setText("Coordinate X");
 			results->setItemDelegateForColumn(mscol, new QItemDelegate());
@@ -1280,22 +1515,28 @@ void cMainWindow::reportSpectra() {
 
 	results->resizeColumnsToContents();
 
+	if (listoftheoreticalspectra.size() == 0) {
+		listoftheoreticalspectra.resize(1);
+		listoftheoreticalspectra.clear(0);
+		activefileid = 0;
+	}
+
 	if (parameters.useprofiledata) {
 
-		if (parameters.peaklistfileformat == baf) {
-			rawdata.resize(theoreticalspectrumlist.size());
+		if (parameters.peaklistfileformats[activefileid] == baf) {
+			rawdata.resize(listoftheoreticalspectra.size(activefileid));
 		}
 
-		if (parameters.peaklistfileformat == dat) {
-			rawdata.resize(theoreticalspectrumlist.size());
+		if (parameters.peaklistfileformats[activefileid] == dat) {
+			rawdata.resize(listoftheoreticalspectra.size(activefileid));
 		}
 
-		if ((parameters.peaklistfileformat == mzML) || (parameters.peaklistfileformat == raw)) {
-			rawdata.resize(theoreticalspectrumlist.size());
+		if ((parameters.peaklistfileformats[activefileid] == mzML) || (parameters.peaklistfileformats[activefileid] == raw)) {
+			rawdata.resize(listoftheoreticalspectra.size(activefileid));
 		}
 
-		if ((parameters.peaklistfileformat == imzML) && ((parameters.mode == dereplication) || (parameters.mode == compoundsearch))) {
-			rawdata.resize(theoreticalspectrumlist.size());
+		if ((parameters.peaklistfileformats[activefileid] == imzML) && ((parameters.mode == dereplication) || (parameters.mode == compoundsearch))) {
+			rawdata.resize(listoftheoreticalspectra.size(activefileid));
 			imzmlprofilemetadata.clear();
 			profilemz64precision = false;
 			profileintensity64precision = false;
@@ -1317,24 +1558,25 @@ void cMainWindow::reportSpectra() {
 		}
 
 	}
-	
-	QProgressDialog progress("Preparing the report...", /*"Cancel"*/0, 0, theoreticalspectrumlist.size(), this);
+
+	QProgressDialog progress("Preparing the report...", /*"Cancel"*/0, 0, listoftheoreticalspectra.size(activefileid), this);
 	progress.setMinimumWidth(250);
 	cEventFilter filter;
 	progress.installEventFilter(&filter);
 	progress.setMinimumDuration(0);
 	progress.setWindowModality(Qt::ApplicationModal);
+	progress.setValue(0);
 
 	results->setModel(0);
 	resultsproxymodel->setSourceModel(0);
 	results->setSortingEnabled(false);
 	
 	spectradetails.clear();
-	spectradetails.resize(theoreticalspectrumlist.size());
-	resultsmodel->setRowCount(theoreticalspectrumlist.size());
+	spectradetails.resize(listoftheoreticalspectra.size(activefileid));
+	resultsmodel->setRowCount(listoftheoreticalspectra.size(activefileid));
 	bool reportisomers = actionShowIsomers->isChecked();
-	for (int i = 0; i < theoreticalspectrumlist.size(); i++) {
-		reportSpectrum(i, theoreticalspectrumlist[i], reportisomers);
+	for (int i = 0; i < listoftheoreticalspectra.size(activefileid); i++) {
+		reportSpectrum(i, listoftheoreticalspectra.get(activefileid, i), reportisomers);
 		progress.setValue(i);
 		//if (progress.wasCanceled()) {
 		//	break;
@@ -1350,8 +1592,37 @@ void cMainWindow::reportSpectra() {
 		results->resizeColumnToContents(i);
 	}
 
-	progress.setValue(theoreticalspectrumlist.size());
+	if (parameters.peaklistseriesvector.size() > 1) {
+		toolbarInputFilter->setVisible(true);
+	}
+	else {
+		toolbarInputFilter->setVisible(false);
+	}
 
+	inputfiltercombobox->clear();
+	for (int i = 0; i < parameters.peaklistseriesvector.size(); i++) {
+		inputfiltercombobox->addItem(parameters.peaklistfilenames[i].c_str());
+	}
+	inputfiltercombobox->setCurrentIndex(activefileid);
+
+	//eicchromatograms.clear();
+	//if ((parameters.mode == dereplication) || (parameters.mode == compoundsearch)) {
+	//	if ((parameters.peaklistfileformats[activefileid] != mis) && (parameters.peaklistfileformats[activefileid] != imzML)) {
+	//		int sizei = listoftheoreticalspectra.size();
+	//		int sizej;
+	//		eicchromatograms.resize(sizei);
+	//		for (int i = 0; i < sizei; i++) {
+	//			eicchromatograms[i].clear();
+	//			sizej = listoftheoreticalspectra.size(i);
+	//			for (int j = 0; j < sizej; j++) {
+	//				addEICPeak(&parameters, eicchromatograms[i], listoftheoreticalspectra.get(i, j), listoftheoreticalspectra.get(i, j).getExperimentalSpectrum());
+	//			}
+	//			eicchromatograms[i].normalizeIntenzity();
+	//		}
+	//	}	
+	//}
+
+	progress.setValue(listoftheoreticalspectra.size(activefileid));
 }
 
 
@@ -1373,12 +1644,13 @@ void cMainWindow::showIsomersStateChanged() {
 		bool reportisomers = actionShowIsomers->isChecked();
 		string peptidesequence;
 
-		QProgressDialog progress("Updating the report...", 0, 0, theoreticalspectrumlist.size(), this);
+		QProgressDialog progress("Updating the report...", 0, 0, listoftheoreticalspectra.size(activefileid), this);
 		progress.setMinimumWidth(250);
 		cEventFilter filter;
 		progress.installEventFilter(&filter);
 		progress.setMinimumDuration(0);
 		progress.setWindowModality(Qt::ApplicationModal);
+		progress.setValue(0);
 
 		for (int i = 0; i < resultsmodel->rowCount(); i++) {
 			preparePeptideSequence(i, peptidesequence, reportisomers);
@@ -1393,7 +1665,7 @@ void cMainWindow::showIsomersStateChanged() {
 
 		graph->updateView(reportisomers);
 
-		progress.setValue(theoreticalspectrumlist.size());
+		progress.setValue(listoftheoreticalspectra.size(activefileid));
 
 	}
 
@@ -1416,14 +1688,194 @@ void cMainWindow::applyGlobalPreferences() {
 	if (lastdirexporttocsv.right(4).compare(".csv", Qt::CaseInsensitive) != 0) {
 		lastdirexporttocsv = globalpreferences.exportcsvdefaultdir;
 	}
+
 	if ((lastdirexporttohtml.right(4).compare(".htm", Qt::CaseInsensitive) != 0) && (lastdirexporttohtml.right(5).compare(".html", Qt::CaseInsensitive) != 0)) {
 		lastdirexporttohtml = globalpreferences.exporthtmldefaultdir;
 	}
+
 	if (lastdiropenresults.right(4).compare(".res", Qt::CaseInsensitive) != 0) {
 		lastdiropenresults = globalpreferences.resultsdefaultdir;
 	}
+
 	if (lastdirsaveresults.right(4).compare(".res", Qt::CaseInsensitive) != 0) {
 		lastdirsaveresults = globalpreferences.resultsdefaultdir;
+	}
+
+	actionBookMark1->setText(globalpreferences.bookmarkname1);
+	if (globalpreferences.bookmarkname1.isEmpty() || globalpreferences.bookmarkurl1.isEmpty()) {
+		actionBookMark1->setEnabled(false);
+		actionBookMark1->setVisible(false);
+	}
+	else {
+		actionBookMark1->setEnabled(true);
+		actionBookMark1->setVisible(true);
+	}
+
+	actionBookMark2->setText(globalpreferences.bookmarkname2);
+	if (globalpreferences.bookmarkname2.isEmpty() || globalpreferences.bookmarkurl2.isEmpty()) {
+		actionBookMark2->setEnabled(false);
+		actionBookMark2->setVisible(false);
+	}
+	else {
+		actionBookMark2->setEnabled(true);
+		actionBookMark2->setVisible(true);
+	}
+
+	actionBookMark3->setText(globalpreferences.bookmarkname3);
+	if (globalpreferences.bookmarkname3.isEmpty() || globalpreferences.bookmarkurl3.isEmpty()) {
+		actionBookMark3->setEnabled(false);
+		actionBookMark3->setVisible(false);
+	}
+	else {
+		actionBookMark3->setEnabled(true);
+		actionBookMark3->setVisible(true);
+	}
+
+	actionBookMark4->setText(globalpreferences.bookmarkname4);
+	if (globalpreferences.bookmarkname4.isEmpty() || globalpreferences.bookmarkurl4.isEmpty()) {
+		actionBookMark4->setEnabled(false);
+		actionBookMark4->setVisible(false);
+	}
+	else {
+		actionBookMark4->setEnabled(true);
+		actionBookMark4->setVisible(true);
+	}
+
+	actionBookMark5->setText(globalpreferences.bookmarkname5);
+	if (globalpreferences.bookmarkname5.isEmpty() || globalpreferences.bookmarkurl5.isEmpty()) {
+		actionBookMark5->setEnabled(false);
+		actionBookMark5->setVisible(false);
+	}
+	else {
+		actionBookMark5->setEnabled(true);
+		actionBookMark5->setVisible(true);
+	}
+
+	actionBookMark6->setText(globalpreferences.bookmarkname6);
+	if (globalpreferences.bookmarkname6.isEmpty() || globalpreferences.bookmarkurl6.isEmpty()) {
+		actionBookMark6->setEnabled(false);
+		actionBookMark6->setVisible(false);
+	}
+	else {
+		actionBookMark6->setEnabled(true);
+		actionBookMark6->setVisible(true);
+	}
+
+	actionBookMark7->setText(globalpreferences.bookmarkname7);
+	if (globalpreferences.bookmarkname7.isEmpty() || globalpreferences.bookmarkurl7.isEmpty()) {
+		actionBookMark7->setEnabled(false);
+		actionBookMark7->setVisible(false);
+	}
+	else {
+		actionBookMark7->setEnabled(true);
+		actionBookMark7->setVisible(true);
+	}
+
+	actionBookMark8->setText(globalpreferences.bookmarkname8);
+	if (globalpreferences.bookmarkname8.isEmpty() || globalpreferences.bookmarkurl8.isEmpty()) {
+		actionBookMark8->setEnabled(false);
+		actionBookMark8->setVisible(false);
+	}
+	else {
+		actionBookMark8->setEnabled(true);
+		actionBookMark8->setVisible(true);
+	}
+
+	actionBookMark9->setText(globalpreferences.bookmarkname9);
+	if (globalpreferences.bookmarkname9.isEmpty() || globalpreferences.bookmarkurl9.isEmpty()) {
+		actionBookMark9->setEnabled(false);
+		actionBookMark9->setVisible(false);
+	}
+	else {
+		actionBookMark9->setEnabled(true);
+		actionBookMark9->setVisible(true);
+	}
+
+	actionBookMark10->setText(globalpreferences.bookmarkname10);
+	if (globalpreferences.bookmarkname10.isEmpty() || globalpreferences.bookmarkurl10.isEmpty()) {
+		actionBookMark10->setEnabled(false);
+		actionBookMark10->setVisible(false);
+	}
+	else {
+		actionBookMark10->setEnabled(true);
+		actionBookMark10->setVisible(true);
+	}
+
+	if (globalpreferences.viewbookmarks) {
+		toolbarBookmarks->setVisible(true);
+	}
+	else {
+		toolbarBookmarks->setVisible(false);
+	}
+}
+
+
+void cMainWindow::openDetail(int rowid) {
+	int last = lastactivedetail;
+
+	QRect geometry;
+	bool usedefaultsize = true;
+	bool ishidden = spectradetails[rowid].isHidden();
+
+	if ((last != -1) /*&& (last != rowid)*/) {
+		if (last == -2) {
+			geometry = othernormalgeometry;
+		}
+		else {
+			geometry = spectradetails[last].normalGeometry();
+		}
+
+		if (ishidden) {
+			spectradetails[rowid].move(geometry.x(), geometry.y());
+			spectradetails[rowid].setGeometry(geometry);
+		}
+
+		usedefaultsize = false;
+	}
+
+	spectradetails[rowid].prepareToShow(actionShowIsomers, &rawdata, &imzmlprofilemetadata, profilemz64precision, profileintensity64precision, usedefaultsize);
+
+	spectradetails[rowid].show();
+	spectradetails[rowid].activateWindow();
+	if (spectradetails[rowid].isMinimized()) {
+		spectradetails[rowid].showNormal();
+	}
+
+	if ((last != -1) /*&& (last != rowid)*/) {
+		if (ishidden) {
+			spectradetails[rowid].setGeometry(geometry);
+		}
+
+		if (last == -2) {
+			if (otherismaximized) {
+				spectradetails[rowid].showMaximized();
+			}
+			else {
+				spectradetails[rowid].showNormal();
+			}
+			spectradetails[rowid].setProfileSpectrumEnabled(otherprofilespectrum);
+			spectradetails[rowid].setAbsoluteIntensityEnabled(otherabsoluteintensity);
+			spectradetails[rowid].setHideMatchedPeaksEnabled(othermatchedpeaks);
+			spectradetails[rowid].setHideUnmatchedPeaksEnabled(otherunmatchedpeaks);
+			spectradetails[rowid].setHideScrambledPeaksEnabled(otherscrambledpeaks);
+			spectradetails[rowid].setHidePeakLabelsEnabled(otherlabelspeaks);
+			spectradetails[rowid].setMouseMzSelectionEnabled(othermzselection);
+		}
+		else {
+			if (spectradetails[last].isMaximized()) {
+				spectradetails[rowid].showMaximized();
+			}
+			else {
+				spectradetails[rowid].showNormal();
+			}
+			spectradetails[rowid].setProfileSpectrumEnabled(spectradetails[last].hasProfileSpectrumEnabled());
+			spectradetails[rowid].setAbsoluteIntensityEnabled(spectradetails[last].hasAbsoluteIntensityEnabled());
+			spectradetails[rowid].setHideMatchedPeaksEnabled(spectradetails[last].hasHideMatchedPeaksEnabled());
+			spectradetails[rowid].setHideUnmatchedPeaksEnabled(spectradetails[last].hasHideUnmatchedPeaksEnabled());
+			spectradetails[rowid].setHideScrambledPeaksEnabled(spectradetails[last].hasHideScrambledPeaksEnabled());
+			spectradetails[rowid].setHidePeakLabelsEnabled(spectradetails[last].hasHidePeakLabelsEnabled());
+			spectradetails[rowid].setMouseMzSelectionEnabled(spectradetails[last].hasMouseMzSelectionEnabled());
+		}
 	}
 }
 
@@ -1431,13 +1883,7 @@ void cMainWindow::applyGlobalPreferences() {
 void cMainWindow::rowDoubleClicked(const QModelIndex& item) {
 	int row = resultsproxymodel->mapToSource(item).row();
 	int rowid = resultsmodel->item(row, 1)->data(Qt::DisplayRole).toInt() - 1;
-
-	spectradetails[rowid].prepareToShow(actionShowIsomers, &rawdata, &imzmlprofilemetadata, profilemz64precision, profileintensity64precision);
-	spectradetails[rowid].show();
-	spectradetails[rowid].activateWindow();
-	if (spectradetails[rowid].isMinimized()) {
-		spectradetails[rowid].showNormal();
-	}
+	openDetail(rowid);
 }
 
 
@@ -1458,6 +1904,7 @@ void cMainWindow::exportToCsv() {
 		progress.installEventFilter(&filter);
 		progress.setMinimumDuration(0);
 		progress.setWindowModality(Qt::ApplicationModal);
+		progress.setValue(0);
 		
 		bool removefile = false;
 		QFile file(filename);
@@ -1522,6 +1969,7 @@ void cMainWindow::exportToHTML() {
 		progress.installEventFilter(&filter);
 		progress.setMinimumDuration(0);
 		progress.setWindowModality(Qt::ApplicationModal);
+		progress.setValue(0);
 
 		bool removefile = false;
 		QFile file(filename);
@@ -1619,9 +2067,14 @@ void cMainWindow::exportToHTML() {
 				int columncount;
 				string tdwidth;
 				if ((parameters.mode == dereplication) || (parameters.mode == compoundsearch)) {
-					if ((parameters.peaklistfileformat == mis) || (parameters.peaklistfileformat == imzML)) {
+					if ((parameters.peaklistfileformats[activefileid] == mis) || (parameters.peaklistfileformats[activefileid] == imzML)) {
 						if (parameters.generateisotopepattern) {
-							columncount = 15;
+							if (parameters.calculatefdrs) {
+								columncount = 15;
+							}
+							else {
+								columncount = 13;
+							}
 						}
 						else {
 							columncount = 12;
@@ -1629,7 +2082,12 @@ void cMainWindow::exportToHTML() {
 					}
 					else {
 						if (parameters.generateisotopepattern) {
-							columncount = 14;
+							if (parameters.calculatefdrs) {
+								columncount = 14;
+							}
+							else {
+								columncount = 12;
+							}
 						}
 						else {
 							columncount = 11;
@@ -1658,7 +2116,7 @@ void cMainWindow::exportToHTML() {
 				out << "<th width=\"" << tdwidth.c_str() << "%\"><b>ID</b></th>";
 
 				if ((parameters.mode == dereplication) || (parameters.mode == compoundsearch)) {
-					if ((parameters.peaklistfileformat == mis) || (parameters.peaklistfileformat == imzML)) {
+					if ((parameters.peaklistfileformats[activefileid] == mis) || (parameters.peaklistfileformats[activefileid] == imzML)) {
 						out << "<th width=\"" << tdwidth.c_str() << "%\"><b>Coordinate X</b></th>";
 						out << "<th width=\"" << tdwidth.c_str() << "%\"><b>Coordinate Y</b></th>";
 					}
@@ -1693,7 +2151,7 @@ void cMainWindow::exportToHTML() {
 				out << "<th width=\"" << tdwidth.c_str() << "%\"><b>Error [ppm]</b></th>";
 
 				if ((parameters.mode == dereplication) || (parameters.mode == compoundsearch)) {
-					if (parameters.generateisotopepattern) {
+					if (parameters.generateisotopepattern && parameters.calculatefdrs) {
 						out << "<th width=\"" << tdwidth.c_str() << "%\"><b>Score</b></th>";
 						out << "<th width=\"" << tdwidth.c_str() << "%\"><b>FDR</b></th>";
 					}
@@ -1804,6 +2262,9 @@ void cMainWindow::showPreferences() {
 	bricksdatabasewidget->applyGlobalPreferences(&globalpreferences);
 	sequencedatabasewidget->applyGlobalPreferences(&globalpreferences);
 	modificationswidget->applyGlobalPreferences(&globalpreferences);
+	multipledatasetswidget->applyGlobalPreferences(&globalpreferences);
+	patternsimulatorwidget->applyGlobalPreferences(&globalpreferences);
+	formulapredictor->applyGlobalPreferences();
 	
 	applyGlobalPreferences();
 
@@ -1842,12 +2303,18 @@ void cMainWindow::saveResultsFile() {
 	if (!filename.isEmpty()) {
 		lastdirsaveresults = filename;
 
-		QProgressDialog progress("Saving the report...", "Cancel", 0, theoreticalspectrumlist.size(), this);
+		int savesize = 0;
+		for (int h = 0; h < listoftheoreticalspectra.size(); h++) {
+			savesize += listoftheoreticalspectra.size(h);
+		}
+
+		QProgressDialog progress("Saving the report...", "Cancel", 0, savesize, this);
 		progress.setMinimumWidth(250);
 		cEventFilter filter;
 		progress.installEventFilter(&filter);
 		progress.setMinimumDuration(0);
 		progress.setWindowModality(Qt::ApplicationModal);
+		progress.setValue(0);
 		
 		bool removefile = false;
 		ofstream outfile;
@@ -1873,17 +2340,33 @@ void cMainWindow::saveResultsFile() {
 			// store parameters
 			parameters.store(outfile);
 
+			// store an auxiliary value for progress dialog
+			outfile.write((char *)&savesize, sizeof(int));
+
 			// store theoretical spectra
-			size = theoreticalspectrumlist.size();
+			int progresscount = 0;
+			size = listoftheoreticalspectra.size();
 			outfile.write((char *)&size, sizeof(int));
-			for (int i = 0; i < theoreticalspectrumlist.size(); i++) {
-				theoreticalspectrumlist[i].store(outfile);
-				progress.setValue(i);
-				if (progress.wasCanceled()) {
-					removefile = true;
-					break;
+			for (int h = 0; h < listoftheoreticalspectra.size(); h++) {
+				size = listoftheoreticalspectra.size(h);
+				outfile.write((char *)&size, sizeof(int));
+				for (int i = 0; i < listoftheoreticalspectra.size(h); i++) {
+					listoftheoreticalspectra.get(h, i).store(outfile);
+					progress.setValue(progresscount);
+					progresscount++;
+					if (progress.wasCanceled()) {
+						removefile = true;
+						break;
+					}
 				}
 			}
+
+			// store results from PubChem
+			summarytableofmatchedpeaks->getPubChemSearchWidget()->store(outfile);
+			multipledatasetswidget->getPubChemSearchWidget()->store(outfile);
+
+			// store calibration data
+			multipledatasetswidget->getDefineCalibrationWidget()->store(outfile);
 
 			// close file
 			outfile.close();
@@ -1893,7 +2376,7 @@ void cMainWindow::saveResultsFile() {
 			}
 		}
 	
-		progress.setValue(theoreticalspectrumlist.size());
+		progress.setValue(savesize);
 
 	}
 
@@ -1901,13 +2384,8 @@ void cMainWindow::saveResultsFile() {
 
 
 void cMainWindow::openResultsFile() {
-	
-	#if OS_TYPE == WIN
-		string filetypes = appname.toStdString() + " " + appversion.toStdString() + " Results Files (*.res)";
-	#else
-		string filetypes = "Results Files (*.res)";
-	#endif
-	
+	string filetypes = "Results Files (*.res)";
+
 	QString filename = QFileDialog::getOpenFileName(this, tr("Open Results..."), lastdiropenresults, tr(filetypes.c_str()));
 	
 	if (!filename.isEmpty()) {
@@ -1925,12 +2403,85 @@ void cMainWindow::openResultsFile() {
 			infile.read((char *)&size, sizeof(int));
 			s.resize(size);
 			infile.read(&s[0], s.size());
-			QString appinfo = appname + " " + appversion;
-			if (appinfo.toStdString().compare(s) != 0) {
+
+
+			string fileversion = s;
+			fileversion = fileversion.substr(fileversion.find('.') + 2);
+			fileversion = fileversion.substr(0, fileversion.rfind('(') - 1);
+
+			int fileversionpart1 = QString(fileversion.substr(0, fileversion.find('.')).c_str()).toInt();
+
+			fileversion = fileversion.substr(fileversion.find('.') + 1);
+			int fileversionpart2 = QString(fileversion.substr(0, fileversion.find('.')).c_str()).toInt();
+
+			fileversion = fileversion.substr(fileversion.find('.') + 1);
+			int fileversionpart3 = QString(fileversion.c_str()).toInt();
+
+
+			string lastcompatible = lastcompatibleappversion.toStdString();
+			lastcompatible = lastcompatible.substr(lastcompatible.find('.') + 2);
+			lastcompatible = lastcompatible.substr(0, lastcompatible.rfind('(') - 1);
+
+			int lastcompatiblepart1 = QString(lastcompatible.substr(0, lastcompatible.find('.')).c_str()).toInt();
+
+			lastcompatible = lastcompatible.substr(lastcompatible.find('.') + 1);
+			int lastcompatiblepart2 = QString(lastcompatible.substr(0, lastcompatible.find('.')).c_str()).toInt();
+
+			lastcompatible = lastcompatible.substr(lastcompatible.find('.') + 1);
+			int lastcompatiblepart3 = QString(lastcompatible.c_str()).toInt();
+
+
+			string currentversion = appversion.toStdString();
+			currentversion = currentversion.substr(currentversion.find('.') + 2);
+			currentversion = currentversion.substr(0, currentversion.rfind('(') - 1);
+
+			int currentversionpart1 = QString(currentversion.substr(0, currentversion.find('.')).c_str()).toInt();
+
+			currentversion = currentversion.substr(currentversion.find('.') + 1);
+			int currentversionpart2 = QString(currentversion.substr(0, currentversion.find('.')).c_str()).toInt();
+
+			currentversion = currentversion.substr(currentversion.find('.') + 1);
+			int currentversionpart3 = QString(currentversion.c_str()).toInt();
+
+
+			if (!isCompatibleVersion(fileversionpart1, fileversionpart2, fileversionpart3, lastcompatiblepart1, lastcompatiblepart2, lastcompatiblepart3)) {
 				QMessageBox msgBox;
-				QString errstr = "The results file cannot be opened because it was created in the different version of " + appname + " (";
+				QString errstr = "The results file cannot be opened. The file was created in ";
 				errstr += s.c_str();
-				errstr += ").";
+				errstr += " but the minimum required version is " + appname + " " + lastcompatibleappversion + ".";
+				msgBox.setText(errstr);
+				msgBox.exec();
+
+				infile.close();
+				return;
+			}
+
+
+			bool oldversion = false;
+			if (currentversionpart3 < fileversionpart3) {
+				oldversion = true;
+			}
+			if (currentversionpart3 > fileversionpart3) {
+				oldversion = false;
+			}
+			if (currentversionpart2 < fileversionpart2) {
+				oldversion = true;
+			}
+			if (currentversionpart2 > fileversionpart2) {
+				oldversion = false;
+			}
+			if (currentversionpart1 < fileversionpart1) {
+				oldversion = true;
+			}
+			if (currentversionpart1 > fileversionpart1) {
+				oldversion = false;
+			}
+
+			if (oldversion) {
+				QMessageBox msgBox;
+				QString errstr = "The results file cannot be opened. The file was created in ";
+				errstr += s.c_str();
+				errstr += " but your current version is only " + appname + " " + appversion + ".";
 				msgBox.setText(errstr);
 				msgBox.exec();
 
@@ -1946,9 +2497,32 @@ void cMainWindow::openResultsFile() {
 
 			imagewindow->hide();
 			chromatogramwindow->hide();
+
+			multipledatasetswidget->deleteTable();
+			multipledatasetswidget->hide();
+			multipledatasetswidget->getPubChemSearchWidget()->hide();
+			multipledatasetswidget->getPubChemSearchWidget()->setHTML("");
+			multipledatasetswidget->getDefineCalibrationWidget()->hide();
+			multipledatasetswidget->getCalibrationChartWidget()->hide();
+			multipledatasetsisprepared = false;
 			
-			theoreticalspectrumlist.clear();
+			listoftheoreticalspectra.clear();
+			eicchromatograms.clear();
 			spectradetails.clear();
+
+			lastactivedetail = -1;
+
+			othernormalgeometry = QRect();
+			otherismaximized = false;
+			otherprofilespectrum = false;
+			otherabsoluteintensity = false;
+			othermatchedpeaks = false;
+			otherunmatchedpeaks = false;
+			otherscrambledpeaks = false;
+			otherlabelspeaks = false;
+			othermzselection = true;
+
+			activefileid = 0;
 
 			parameters.clear();
 
@@ -1970,12 +2544,12 @@ void cMainWindow::openResultsFile() {
 			sb->setValue(sb->maximum());
 
 			// load parameters
-			parameters.load(infile);
+			parameters.load(infile, fileversionpart1, fileversionpart2, fileversionpart3);
 			parameterswidget->setAndRestoreParameters(parameters);
 
 			if ((parameters.mode == dereplication) || (parameters.mode == compoundsearch)) {
 				actionShowIsomers->setEnabled(false);
-				if ((parameters.peaklistfileformat == mis) || (parameters.peaklistfileformat == imzML)) {
+				if ((parameters.peaklistfileformats[activefileid] == mis) || (parameters.peaklistfileformats[activefileid] == imzML)) {
 					actionImageWindow->setEnabled(true);
 					actionChromatogramWindow->setEnabled(false);
 				}
@@ -1990,25 +2564,68 @@ void cMainWindow::openResultsFile() {
 				actionChromatogramWindow->setEnabled(false);
 			}
 
-			// load theoretical spectra
-			infile.read((char *)&size, sizeof(int));
+			int loadsize;
 
-			QProgressDialog progress("Loading the report...", 0, 0, size, this);
+			// load theoretical spectra
+			infile.read((char *)&loadsize, sizeof(int));
+
+			QProgressDialog progress("Loading the report...", 0, 0, loadsize, this);
 			progress.setMinimumWidth(250);
 			cEventFilter filter;
 			progress.installEventFilter(&filter);
 			progress.setMinimumDuration(0);
 			progress.setWindowModality(Qt::ApplicationModal);
+			progress.setValue(0);
 
-			for (int i = 0; i < size; i++) {
-				theoreticalspectrum.load(infile);
-				theoreticalspectrumlist.add(theoreticalspectrum);
-				progress.setValue(i);
+			if (isCompatibleVersion(fileversionpart1, fileversionpart2, fileversionpart3, 2, 1, 0)) {
+				int progresscount = 0;
+				infile.read((char *)&size, sizeof(int));
+				listoftheoreticalspectra.resize(size);
+
+				for (int h = 0; h < listoftheoreticalspectra.size(); h++) {
+					infile.read((char *)&size, sizeof(int));
+					for (int i = 0; i < size; i++) {
+						theoreticalspectrum.load(infile, fileversionpart1, fileversionpart2, fileversionpart3);
+						listoftheoreticalspectra.add(h, theoreticalspectrum);
+						progress.setValue(progresscount);
+						progresscount++;
+					}
+				}
+			}
+			else {
+				listoftheoreticalspectra.resize(1);
+				for (int i = 0; i < loadsize; i++) {
+					theoreticalspectrum.load(infile, fileversionpart1, fileversionpart2, fileversionpart3);
+					listoftheoreticalspectra.add(0, theoreticalspectrum);
+					progress.setValue(i);
+				}
 			}
 
-			progress.setValue(size);
+			progress.setValue(loadsize);
 
 			reportSpectra();
+
+			// load results from PubChem
+			if (isCompatibleVersion(fileversionpart1, fileversionpart2, fileversionpart3, 2, 0, 22)) {
+				summarytableofmatchedpeaks->getPubChemSearchWidget()->load(infile);
+			}
+			else {
+				summarytableofmatchedpeaks->getPubChemSearchWidget()->setHTML("");
+			}
+
+			if (isCompatibleVersion(fileversionpart1, fileversionpart2, fileversionpart3, 2, 1, 6)) {
+				multipledatasetswidget->getPubChemSearchWidget()->load(infile);
+			}
+			else {
+				multipledatasetswidget->getPubChemSearchWidget()->setHTML("");
+			}
+
+			if (isCompatibleVersion(fileversionpart1, fileversionpart2, fileversionpart3, 2, 1, 14)) {
+				multipledatasetswidget->getDefineCalibrationWidget()->load(infile, fileversionpart1, fileversionpart2, fileversionpart3);
+			}
+			else {
+				// nothing to do
+			}
 
 			// close file
 			infile.close();
@@ -2097,6 +2714,11 @@ void cMainWindow::resetFilter() {
 }
 
 
+void cMainWindow::lastActiveDetailSlot(int rowid) {
+	lastactivedetail = rowid - 1;
+}
+
+
 void cMainWindow::gotoBookMark1() {
 	QDesktopServices::openUrl(QUrl(globalpreferences.bookmarkurl1));
 }
@@ -2107,19 +2729,118 @@ void cMainWindow::gotoBookMark2() {
 }
 
 
+void cMainWindow::gotoBookMark3() {
+	QDesktopServices::openUrl(QUrl(globalpreferences.bookmarkurl3));
+}
+
+
+void cMainWindow::gotoBookMark4() {
+	QDesktopServices::openUrl(QUrl(globalpreferences.bookmarkurl4));
+}
+
+
+void cMainWindow::gotoBookMark5() {
+	QDesktopServices::openUrl(QUrl(globalpreferences.bookmarkurl5));
+}
+
+
+void cMainWindow::gotoBookMark6() {
+	QDesktopServices::openUrl(QUrl(globalpreferences.bookmarkurl6));
+}
+
+
+void cMainWindow::gotoBookMark7() {
+	QDesktopServices::openUrl(QUrl(globalpreferences.bookmarkurl7));
+}
+
+
+void cMainWindow::gotoBookMark8() {
+	QDesktopServices::openUrl(QUrl(globalpreferences.bookmarkurl8));
+}
+
+
+void cMainWindow::gotoBookMark9() {
+	QDesktopServices::openUrl(QUrl(globalpreferences.bookmarkurl9));
+}
+
+
+void cMainWindow::gotoBookMark10() {
+	QDesktopServices::openUrl(QUrl(globalpreferences.bookmarkurl10));
+}
+
+
 void cMainWindow::summaryPeaksTableCancelled() {
 	summarytableisprepared = false;
 }
 
 
+void cMainWindow::multipleDatasetsTableCancelled() {
+	multipledatasetsisprepared = false;
+}
+
+
 void cMainWindow::summaryPeaksTableRowDoubleClicked(int rowid, double experimentalmz) {
-	spectradetails[rowid].prepareToShow(actionShowIsomers, &rawdata, &imzmlprofilemetadata, profilemz64precision, profileintensity64precision);
-	spectradetails[rowid].show();
-	spectradetails[rowid].activateWindow();
-	if (spectradetails[rowid].isMinimized()) {
-		spectradetails[rowid].showNormal();
-	}
+	openDetail(rowid);
 	spectradetails[rowid].zoomToPeak(experimentalmz);
+}
+
+
+void cMainWindow::multipleDatasetsTableRowClicked(int datasetid, int spectrumid, int peakid, int datatypeview, int peakshape, string name, string iontype, string mzstr) {
+	bool ctrlpressed = false;
+	if (QGuiApplication::keyboardModifiers().testFlag(Qt::ControlModifier)) {
+		ctrlpressed = true;
+	}
+
+	bool activatetable = true;
+	int last = lastactivedetail;
+	
+	if (last == -1) {
+		activatetable = false;
+	}
+
+	if (datasetid != activefileid) {
+		inputfiltercombobox->setCurrentIndex(datasetid);
+		inputFilterButtonReleased();
+	}
+
+	if (prepareSummaryTableOfMatchedPeaks()) {
+		summarytableofmatchedpeaks->filterCompound(name, iontype, datatypeview, mzstr);
+
+		if ((parameters.mode == dereplication) || (parameters.mode == compoundsearch)) {
+			if ((parameters.peaklistfileformats[activefileid] == mis) || (parameters.peaklistfileformats[activefileid] == imzML)) {
+				if (imagewindow->isHidden()) {
+					showImageWindow();
+					activatetable = false;
+				}
+			}
+			else {
+				if (chromatogramwindow->isHidden()) {
+					showChromatogramWindow();
+					activatetable = false;
+				}
+
+				//if (datatypeview == 0) {
+				//	chromatogramwindow->setAbsoluteIntensityEnabled(false);
+				//}
+				//else {
+				//	chromatogramwindow->setAbsoluteIntensityEnabled(true);
+				//}
+
+				chromatogramwindow->setAbsoluteIntensityEnabled(true);
+
+				chromatogramwindow->setPeakShape(peakshape);
+			}
+		}
+	}
+
+	if (ctrlpressed) {
+		openDetail(spectrumid);
+		spectradetails[spectrumid].zoomToPeak(listoftheoreticalspectra.get(datasetid, spectrumid)[peakid].matchedmz);
+	}
+
+	if (activatetable) {
+		multipledatasetswidget->activateWindow();
+	}
 }
 
 
@@ -2130,24 +2851,60 @@ void cMainWindow::updateSummaryPeaksTableFilterSlot(int xmin, int xmax, int ymin
 
 void cMainWindow::chromatogramDoubleClicked(int scanid) {
 	if ((scanid >= 0) && (scanid < spectradetails.size())) {
-		spectradetails[scanid].prepareToShow(actionShowIsomers, &rawdata, &imzmlprofilemetadata, profilemz64precision, profileintensity64precision);
-		spectradetails[scanid].show();
-		spectradetails[scanid].activateWindow();
-		if (spectradetails[scanid].isMinimized()) {
-			spectradetails[scanid].showNormal();
-		}
+		openDetail(scanid);
 	}
 }
 
 
 void cMainWindow::imageWindowDoubleClicked(int spectrumid) {
 	if ((spectrumid >= 0) && (spectrumid < spectradetails.size())) {
-		spectradetails[spectrumid].prepareToShow(actionShowIsomers, &rawdata, &imzmlprofilemetadata, profilemz64precision, profileintensity64precision);
-		spectradetails[spectrumid].show();
-		spectradetails[spectrumid].activateWindow();
-		if (spectradetails[spectrumid].isMinimized()) {
-			spectradetails[spectrumid].showNormal();
+		openDetail(spectrumid);
+	}
+}
+
+
+void cMainWindow::inputFilterButtonReleased() {
+	if (inputfiltercombobox->count() > 0) {
+		if (lastactivedetail >= 0) {
+			othernormalgeometry = spectradetails[lastactivedetail].normalGeometry();
+			otherismaximized = spectradetails[lastactivedetail].isMaximized();
+			otherprofilespectrum = spectradetails[lastactivedetail].hasProfileSpectrumEnabled();
+			otherabsoluteintensity = spectradetails[lastactivedetail].hasAbsoluteIntensityEnabled();
+			othermatchedpeaks = spectradetails[lastactivedetail].hasHideMatchedPeaksEnabled();
+			otherunmatchedpeaks = spectradetails[lastactivedetail].hasHideUnmatchedPeaksEnabled();
+			otherscrambledpeaks = spectradetails[lastactivedetail].hasHideScrambledPeaksEnabled();
+			otherlabelspeaks = spectradetails[lastactivedetail].hasHidePeakLabelsEnabled();
+			othermzselection = spectradetails[lastactivedetail].hasMouseMzSelectionEnabled();
+			lastactivedetail = -2;
 		}
+
+		summarytableofmatchedpeaks->deleteTable();
+		summarytableisprepared = false;
+
+		spectradetails.clear();
+
+		rawdata.clear();
+
+		activefileid = inputfiltercombobox->currentIndex();
+
+		reportSpectra();
+
+		resetFilter();
+
+		if (chromatogramwindow->isVisible() || imagewindow->isVisible() || summarytableofmatchedpeaks->isVisible()) {
+			if (prepareSummaryTableOfMatchedPeaks()) {
+				if (chromatogramwindow->isVisible()) {
+					chromatogramwindow->recalculateTICChromatogram(activefileid);
+				}
+			}
+		}
+	}
+}
+
+
+void cMainWindow::filterSummaryTableIfPrepared() {
+	if (summarytableisprepared) {
+		summarytableofmatchedpeaks->filterTablerows();
 	}
 }
 

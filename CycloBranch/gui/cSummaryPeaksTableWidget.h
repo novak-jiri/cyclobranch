@@ -7,6 +7,7 @@
 #ifndef _CSUMMARYPEAKSTABLEWIDGET_H
 #define _CSUMMARYPEAKSTABLEWIDGET_H
 
+#include <map>
 #include <QWidget>
 #include <QDesktopServices>
 #include <QUrl>
@@ -22,15 +23,15 @@
 #include <QComboBox>
 #include <QStringListModel>
 #include <QCompleter>
-#include <map>
+
 #include "core/utilities.h"
 #include "core/cGlobalPreferences.h"
 #include "gui/cViewButtonDelegate.h"
 #include "gui/cSummaryPeaksTableProxyModel.h"
 #include "gui/cMainWindowProxyModel.h"
 #include "gui/cHTMLDelegate.h"
-
-using namespace std;
+#include "gui/cPubChemSearchWidget.h"
+#include "gui/cEventFilter.h"
 
 
 // forward declaration
@@ -234,6 +235,16 @@ struct cSummaryTableKeyMSMS_comp {
 
 
 /**
+	\brief Add a peak to an extracted ion chromatogram.
+	\param parameters application parameters
+	\param eicchromatogram EIC chromatogram
+	\param theoreticalspectrum theoretical spectrum
+	\param experimentalspectrum experimental spectrum
+*/
+void addEICPeak(cParameters* parameters, cPeaksList& eicchromatogram, cTheoreticalSpectrum& theoreticalspectrum, cPeaksList& experimentalspectrum);
+
+
+/**
 	\brief Summary table of matched peaks.
 */
 class cSummaryPeaksTableWidget : public QMainWindow
@@ -269,11 +280,12 @@ public:
 		\param resultsstandardmodel standard model of the tableview in the main application window 
 		\param resultsproxymodel proxy model of the tableview in the main application window 
 		\param parameters parameters of the application
-		\param spectralist list of spectra
+		\param listoftheoreticalspectra lists of theoretical spectra
+		\param activefileid id of the active file
 		\param showisomers true if isomers of blocks are reported; false otherwise
 		\retval bool true if the table was successfully prepared, false otherwise
 	*/ 
-	bool prepareToShow(QStandardItemModel* resultsstandardmodel, cMainWindowProxyModel* resultsproxymodel, cParameters* parameters, cTheoreticalSpectrumList* spectralist, bool showisomers);
+	bool prepareToShow(QStandardItemModel* resultsstandardmodel, cMainWindowProxyModel* resultsproxymodel, cParameters* parameters, cTheoreticalSpectrumList* listoftheoreticalspectra, int activefileid, bool showisomers);
 
 
 	/**
@@ -299,6 +311,29 @@ public:
 	void applyGlobalPreferences(cGlobalPreferences* globalpreferences);
 
 
+	/**
+		\brief Get the reference to cPubChemSearchWidget.
+		\retval cPubChemSearchWidget reference to cPubChemSearchWidget
+	*/
+	cPubChemSearchWidget* getPubChemSearchWidget();
+
+
+	/**
+		\brief Filter table rows.
+	*/
+	void filterTablerows();
+
+
+	/**
+		\brief Filter a specific compound.
+		\param name compound name
+		\param iontype ion type
+		\param datatypeview type of data shown
+		\param mzstr theoretical m/z value converted to a string
+	*/
+	void filterCompound(string name, string iontype, int datatypeview, string mzstr);
+
+
 private:
 
 	QString title;
@@ -308,14 +343,21 @@ private:
 	cParameters* parameters;
 	QWidget* parent;
 
+	cPubChemSearchWidget* pubchemsearchwidget;
+
 	QMenuBar* menuBar;
 	QMenu* menuFile;
+	//QMenu* menuSearch;
 	QMenu* menuHelp;
 
 	QToolBar* toolbarFile;
 	QAction* actionExportCSV;
+	QAction* actionExportDatabase;
 	QAction* actionExportStatistics;
 	QAction* actionCloseWindow;
+
+	//QToolBar* toolbarSearch;
+	//QAction* actionSearchPubChem;
 
 	QToolBar* toolbarHelp;
 	QAction* actionHTMLDocumentation;
@@ -354,13 +396,16 @@ private:
 	QWidget* mainwidget;
 
 	QString lastdirexporttocsv;
+	QString lastdirexportdatabase;
 	QString lastdirexportstatisticstocsv;
+
+	vector<double> rtimes;
 
 	vector<cCoordinateInfo> origcoordinateinfo;
 	cPeaksList origeicchromatogram;
 
-	void addEICPeak(cPeaksList& eicchromatogram, cTheoreticalSpectrum& theoreticalspectrum, cPeaksList& experimentalspectrum);
-	
+	int activefileid;
+
 	void addCoordinateInfo(int spectrumindex, vector<cCoordinateInfo>& coordinateinfo, cTheoreticalSpectrum& theoreticalspectrum, cPeaksList& experimentalspectrum);
 
 
@@ -388,6 +433,9 @@ private slots:
 	void exportToCsv();
 
 
+	void exportToDatabase();
+
+
 	void exportStatistics();
 
 
@@ -409,6 +457,8 @@ private slots:
 	void rowsFilterRight2Slot();
 
 
+	void searchPubChem();
+
 
 signals:
 
@@ -428,7 +478,7 @@ signals:
 
 
 	/**
-		\brief Reset the region in imagw window.
+		\brief Reset the region in image window.
 	*/ 
 	void resetRegion();
 
@@ -459,3 +509,4 @@ signals:
 };
 
 #endif
+

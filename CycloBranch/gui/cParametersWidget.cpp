@@ -24,13 +24,21 @@
 #include <QScrollArea>
 #include <QLabel>
 
+// C++17 begin
+#if OS_TYPE == WIN
+	#include <filesystem>
+#endif
+// C++17 end
+
 
 cParametersWidget::cParametersWidget(cGlobalPreferences* globalpreferences, QWidget* parent) {
+	hideunusedparameters = true;
+
 	this->globalpreferences = globalpreferences;
 	this->parent = parent;
 
-	int leftdefaultwidth = 400;
-	int rightdefaultwidth = 400;
+	int leftdefaultwidth = 420;
+	int rightdefaultwidth = 420;
 	int searchedsequencedefaultwidth = 510;
 	int checkboxfieldwidth = 80;
 
@@ -120,11 +128,11 @@ cParametersWidget::cParametersWidget(cGlobalPreferences* globalpreferences, QWid
 	useprofiledata->setToolTip("Use profile data (if applicable).");
 	peaklistbutton = new QPushButton("Select");
 	#if OS_TYPE != WIN
-		peaklistline->setToolTip("Select a file. Supported file formats:\ntxt (peaklists),\nmgf (peaklists),\nmzML (profile spectra or peaklists),\nmzXML (peaklists),\nimzML (profile spectra or peaklists).");
-		peaklistbutton->setToolTip("Select a file. Supported file formats:\ntxt (peaklists),\nmgf (peaklists),\nmzML (profile spectra or peaklists),\nmzXML (peaklists),\nimzML (profile spectra or peaklists).");
+		peaklistline->setToolTip("Select input file(s). Supported file formats:\ntxt (peaklists),\nmgf (peaklists),\nmzML (profile spectra or peaklists),\nmzXML (peaklists),\nimzML (profile spectra or peaklists).");
+		peaklistbutton->setToolTip("Select input file(s). Supported file formats:\ntxt (peaklists),\nmgf (peaklists),\nmzML (profile spectra or peaklists),\nmzXML (peaklists),\nimzML (profile spectra or peaklists).");
 	#else
-		peaklistline->setToolTip("Select a file. Supported file formats:\ntxt (peaklists),\nmgf (peaklists),\nmzML (profile spectra or peaklists),\nmzXML (peaklists),\nimzML (profile spectra or peaklists),\nbaf (profile spectra),\nraw (profile spectra or peaklists),\ndat (peaklists),\nmis (deprecated),\nser (deprecated).");
-		peaklistbutton->setToolTip("Select a file. Supported file formats:\ntxt (peaklists),\nmgf (peaklists),\nmzML (profile spectra or peaklists),\nmzXML (peaklists),\nimzML (profile spectra or peaklists),\nbaf (profile spectra),\nraw (profile spectra or peaklists),\ndat (peaklists),\nmis (deprecated),\nser (deprecated).");
+		peaklistline->setToolTip("Select input file(s). Supported file formats:\ntxt (peaklists),\nmgf (peaklists),\nmzML (profile spectra or peaklists),\nmzXML (peaklists),\nimzML (profile spectra or peaklists),\nbaf (profile spectra),\nraw (profile spectra or peaklists),\ndat (peaklists),\nmis (deprecated),\nser (deprecated).");
+		peaklistbutton->setToolTip("Select input file(s). Supported file formats:\ntxt (peaklists),\nmgf (peaklists),\nmzML (profile spectra or peaklists),\nmzXML (peaklists),\nimzML (profile spectra or peaklists),\nbaf (profile spectra),\nraw (profile spectra or peaklists),\ndat (peaklists),\nmis (deprecated),\nser (deprecated).");
 	#endif
 	peaklistbutton->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_P));
 	peaklistlayout = new QHBoxLayout();
@@ -241,6 +249,31 @@ cParametersWidget::cParametersWidget(cGlobalPreferences* globalpreferences, QWid
 	experimentalspectragridlayout->addWidget(mzratiolabel, 10, 0);
 	experimentalspectragridlayout->addWidget(mzratiowidget, 10, 1);
 
+	minimumrt = new QDoubleSpinBox();
+	minimumrt->setToolTip("Enter the minimum retention time (0 = disabled). Units depend on your input file. Seconds or minutes can be used.");
+	minimumrt->setDecimals(3);
+	minimumrt->setRange(0, 100000);
+	minimumrt->setSingleStep(1);
+	minimumrt->setPrefix("minimum: ");
+
+	maximumrt = new QDoubleSpinBox();
+	maximumrt->setToolTip("Enter the maximum retention time (0 = disabled). Units depend on your input file. Seconds or minutes can be used.");
+	maximumrt->setDecimals(3);
+	maximumrt->setRange(0, 100000);
+	maximumrt->setSingleStep(1);
+	maximumrt->setPrefix("maximum: ");
+
+	rtlayout = new QHBoxLayout();
+	rtlayout->addWidget(minimumrt);
+	rtlayout->addWidget(maximumrt);
+	rtlayout->setMargin(0);
+	rtwidget = new QWidget();
+	rtwidget->setLayout(rtlayout);
+	rtwidget->setFixedWidth(leftdefaultwidth);
+	rtlabel = new QLabel("Retention Time:");
+	experimentalspectragridlayout->addWidget(rtlabel, 11, 0);
+	experimentalspectragridlayout->addWidget(rtwidget, 11, 1);
+
 	fwhm = new QDoubleSpinBox();
 	fwhm->setToolTip("Full width at half maximum. The value is used if the profile spectra are converted into peaklists (mzML and imzML) and if the full isotope patterns of compounds are generated.");
 	fwhm->setDecimals(6);
@@ -249,8 +282,35 @@ cParametersWidget::cParametersWidget(cGlobalPreferences* globalpreferences, QWid
 	fwhm->setSuffix(" Da");
 	fwhm->setFixedWidth(leftdefaultwidth);
 	fwhmlabel = new QLabel("FWHM:");
-	experimentalspectragridlayout->addWidget(fwhmlabel, 11, 0);
-	experimentalspectragridlayout->addWidget(fwhm, 11, 1);
+	experimentalspectragridlayout->addWidget(fwhmlabel, 12, 0);
+	experimentalspectragridlayout->addWidget(fwhm, 12, 1);
+
+	minratio54Fe56Fe = new QDoubleSpinBox();
+	minratio54Fe56Fe->setToolTip("Enter the minimum intensity ratio of 54Fe/56Fe.");
+	minratio54Fe56Fe->setDecimals(3);
+	minratio54Fe56Fe->setRange(0, 1);
+	minratio54Fe56Fe->setSingleStep(0.01);
+	minratio54Fe56Fe->setValue(0.01);
+	minratio54Fe56Fe->setPrefix("minimum: ");
+
+	maxratio54Fe56Fe = new QDoubleSpinBox();
+	maxratio54Fe56Fe->setToolTip("Enter the maximum intensity ratio of 54Fe/56Fe.");
+	maxratio54Fe56Fe->setDecimals(3);
+	maxratio54Fe56Fe->setRange(0, 1);
+	maxratio54Fe56Fe->setSingleStep(0.01);
+	maxratio54Fe56Fe->setValue(0.1);
+	maxratio54Fe56Fe->setPrefix("maximum: ");
+
+	ratio54Fe56Felayout = new QHBoxLayout();
+	ratio54Fe56Felayout->addWidget(minratio54Fe56Fe);
+	ratio54Fe56Felayout->addWidget(maxratio54Fe56Fe);
+	ratio54Fe56Felayout->setMargin(0);
+	ratio54Fe56Fewidget = new QWidget();
+	ratio54Fe56Fewidget->setLayout(ratio54Fe56Felayout);
+	ratio54Fe56Fewidget->setFixedWidth(leftdefaultwidth);
+	ratio54Fe56Felabel = new QLabel("54Fe/56Fe Ratio:");
+	experimentalspectragridlayout->addWidget(ratio54Fe56Felabel, 13, 0);
+	experimentalspectragridlayout->addWidget(ratio54Fe56Fewidget, 13, 1);
 
 	experimentalspectragroupbox = new QGroupBox("Experimental Spectrum/Spectra");
 	experimentalspectragroupbox->setLayout(experimentalspectragridlayout);
@@ -449,21 +509,37 @@ cParametersWidget::cParametersWidget(cGlobalPreferences* globalpreferences, QWid
 	theoreticalspectragridlayout->addWidget(iontypeslabel, 4, 0);
 	theoreticalspectragridlayout->addWidget(iontypes, 4, 1);
 
-	neutrallosstypes = new cNeutralLossesListWidget(this);
-	neutrallosstypes->setToolTip("Define and select the types of neutral losses or chemical elements which will be used when generating theoretical spectra.");
+	neutrallosstypes = new cNeutralLossesListWidget(true, true, this);
+	neutrallosstypes->setToolTip("Define and select the types of neutral losses.");
 	neutrallosstypes->setFixedWidth(rightdefaultwidth);
-	neutrallosstypeslabel = new QLabel("Neutral Losses / Chemical Elements:");
+	neutrallosstypeslabel = new QLabel("Neutral Losses:");
 	theoreticalspectragridlayout->addWidget(neutrallosstypeslabel, 5, 0);
 	theoreticalspectragridlayout->addWidget(neutrallosstypes, 5, 1);
 
 	maximumcombinedlosses = new QSpinBox();
-	maximumcombinedlosses->setToolTip("Maximum number of combined neutral losses or chemical elements.");
+	maximumcombinedlosses->setToolTip("Maximum number of combined neutral losses.");
 	maximumcombinedlosses->setRange(0, 10000);
 	maximumcombinedlosses->setSingleStep(1);
 	maximumcombinedlosses->setFixedWidth(rightdefaultwidth);
-	maximumcombinedlosseslabel = new QLabel("Maximum Number of Combined Losses/Elements:");
+	maximumcombinedlosseslabel = new QLabel("Maximum Number of Combined Losses:");
 	theoreticalspectragridlayout->addWidget(maximumcombinedlosseslabel, 6, 0);
 	theoreticalspectragridlayout->addWidget(maximumcombinedlosses, 6, 1);
+
+	elementstypes = new cNeutralLossesListWidget(false, true, this);
+	elementstypes->setToolTip("Define and select chemical elements.");
+	elementstypes->setFixedWidth(rightdefaultwidth);
+	elementstypeslabel = new QLabel("Chemical Elements:");
+	theoreticalspectragridlayout->addWidget(elementstypeslabel, 7, 0);
+	theoreticalspectragridlayout->addWidget(elementstypes, 7, 1);
+
+	maximumcombinedelements = new QSpinBox();
+	maximumcombinedelements->setToolTip("Maximum number of combined chemical elements.");
+	maximumcombinedelements->setRange(0, 10000);
+	maximumcombinedelements->setSingleStep(1);
+	maximumcombinedelements->setFixedWidth(rightdefaultwidth);
+	maximumcombinedelementslabel = new QLabel("Maximum Number of Combined Elements:");
+	theoreticalspectragridlayout->addWidget(maximumcombinedelementslabel, 8, 0);
+	theoreticalspectragridlayout->addWidget(maximumcombinedelements, 8, 1);
 
 	//clearhitswithoutparent = new QCheckBox();
 	//clearhitswithoutparent->setToolTip("If checked, a peak is not matched if the corresponding parent peak is not matched (e.g., a dehydrated b-ion is not matched if corresponding b-ion is not matched).");
@@ -473,16 +549,16 @@ cParametersWidget::cParametersWidget(cGlobalPreferences* globalpreferences, QWid
 	reportunmatchedtheoreticalpeaks->setToolTip("If checked, all unmatched theoretical peaks are reported.\nIf unchecked, unmatched theoretical peaks are reported only if a corresponding isotope pattern has been matched.\nThis feature may spend a lot of main memory, keep it disabled if possible.");
 	reportunmatchedtheoreticalpeaks->setFixedWidth(rightdefaultwidth);
 	reportunmatchedtheoreticalpeakslabel = new QLabel("Report Unmatched Theoretical Peaks:");
-	theoreticalspectragridlayout->addWidget(reportunmatchedtheoreticalpeakslabel, 7, 0);
-	theoreticalspectragridlayout->addWidget(reportunmatchedtheoreticalpeaks, 7, 1);
+	theoreticalspectragridlayout->addWidget(reportunmatchedtheoreticalpeakslabel, 9, 0);
+	theoreticalspectragridlayout->addWidget(reportunmatchedtheoreticalpeaks, 9, 1);
 
 	generateisotopepattern = new QCheckBox();
 	generateisotopepattern->setChecked(true);
 	generateisotopepattern->setToolTip("The full isotope patterns of compounds are generated in theoretical spectra.\nThe FWHM value is used for this purpose. If checked, the deisotoping is disabled automatically.");
 	generateisotopepattern->setFixedWidth(rightdefaultwidth);
 	generateisotopepatternlabel = new QLabel("Generate Full Isotope Patterns:");
-	theoreticalspectragridlayout->addWidget(generateisotopepatternlabel, 8, 0);
-	theoreticalspectragridlayout->addWidget(generateisotopepattern, 8, 1);
+	theoreticalspectragridlayout->addWidget(generateisotopepatternlabel, 10, 0);
+	theoreticalspectragridlayout->addWidget(generateisotopepattern, 10, 1);
 
 	minimumpatternsize = new QSpinBox();
 	minimumpatternsize->setToolTip("The minimum number of peaks which must be annotated in an isotopic pattern. The option \"Generate Full Isotope Patterns\" must be enabled.");
@@ -490,8 +566,8 @@ cParametersWidget::cParametersWidget(cGlobalPreferences* globalpreferences, QWid
 	minimumpatternsize->setSingleStep(1);
 	minimumpatternsize->setFixedWidth(rightdefaultwidth);
 	minimumpatternsizelabel = new QLabel("Minimum Number of Isotopic Peaks:");
-	theoreticalspectragridlayout->addWidget(minimumpatternsizelabel, 9, 0);
-	theoreticalspectragridlayout->addWidget(minimumpatternsize, 9, 1);
+	theoreticalspectragridlayout->addWidget(minimumpatternsizelabel, 11, 0);
+	theoreticalspectragridlayout->addWidget(minimumpatternsize, 11, 1);
 
 	minimumfeaturesize = new QSpinBox();
 	minimumfeaturesize->setToolTip("The minimum number of spectra in which a compound must be identified to be reported.\nLC-MS data = the minimum number of consecutive scans;\nMSI data = the minimum number of pixels.");
@@ -499,8 +575,8 @@ cParametersWidget::cParametersWidget(cGlobalPreferences* globalpreferences, QWid
 	minimumfeaturesize->setSingleStep(1);
 	minimumfeaturesize->setFixedWidth(rightdefaultwidth);
 	minimumfeaturesizelabel = new QLabel("Minimum Number of Spectra:");
-	theoreticalspectragridlayout->addWidget(minimumfeaturesizelabel, 10, 0);
-	theoreticalspectragridlayout->addWidget(minimumfeaturesize, 10, 1);
+	theoreticalspectragridlayout->addWidget(minimumfeaturesizelabel, 12, 0);
+	theoreticalspectragridlayout->addWidget(minimumfeaturesize, 12, 1);
 
 	minimumiontypes = new QSpinBox();
 	minimumiontypes->setToolTip("The minimum number of ion types which must be matched to report a given compound.");
@@ -508,51 +584,83 @@ cParametersWidget::cParametersWidget(cGlobalPreferences* globalpreferences, QWid
 	minimumiontypes->setSingleStep(1);
 	minimumiontypes->setFixedWidth(rightdefaultwidth);
 	minimumiontypeslabel = new QLabel("Minimum Number of Ion Types:");
-	theoreticalspectragridlayout->addWidget(minimumiontypeslabel, 11, 0);
-	theoreticalspectragridlayout->addWidget(minimumiontypes, 11, 1);
+	theoreticalspectragridlayout->addWidget(minimumiontypeslabel, 13, 0);
+	theoreticalspectragridlayout->addWidget(minimumiontypes, 13, 1);
 
 	basicformulacheck = new QCheckBox();
 	basicformulacheck->setToolTip("Apply Senior's filtering rules.");
 	basicformulacheck->setFixedWidth(rightdefaultwidth);
 	basicformulachecklabel = new QLabel("Basic Formula Check:");
-	theoreticalspectragridlayout->addWidget(basicformulachecklabel, 12, 0);
-	theoreticalspectragridlayout->addWidget(basicformulacheck, 12, 1);
+	theoreticalspectragridlayout->addWidget(basicformulachecklabel, 14, 0);
+	theoreticalspectragridlayout->addWidget(basicformulacheck, 14, 1);
 
 	advancedformulacheck = new QCheckBox();
 	advancedformulacheck->setToolTip("Apply advanced filtering rules if molecular formulas of compounds are generated.");
 	advancedformulacheck->setFixedWidth(rightdefaultwidth);
 	advancedformulachecklabel = new QLabel("Advanced Formula Check:");
-	theoreticalspectragridlayout->addWidget(advancedformulachecklabel, 13, 0);
-	theoreticalspectragridlayout->addWidget(advancedformulacheck, 13, 1);
+	theoreticalspectragridlayout->addWidget(advancedformulachecklabel, 15, 0);
+	theoreticalspectragridlayout->addWidget(advancedformulacheck, 15, 1);
 
 	noratiocheck = new QCheckBox();
 	noratiocheck->setToolTip("Check if the number of nitrogen atoms is less or equal to the number of oxygen atoms.");
 	noratiocheck->setFixedWidth(rightdefaultwidth);
 	noratiochecklabel = new QLabel("N/O Ratio Check:");
-	theoreticalspectragridlayout->addWidget(noratiochecklabel, 14, 0);
-	theoreticalspectragridlayout->addWidget(noratiocheck, 14, 1);
+	theoreticalspectragridlayout->addWidget(noratiochecklabel, 16, 0);
+	theoreticalspectragridlayout->addWidget(noratiocheck, 16, 1);
+
+	calculatefdrs = new QCheckBox();
+	calculatefdrs->setToolTip("Calculate false discovery rates (experimental feature).");
+	calculatefdrs->setFixedWidth(rightdefaultwidth);
+	calculatefdrslabel = new QLabel("Calculate FDRs:");
+	theoreticalspectragridlayout->addWidget(calculatefdrslabel, 17, 0);
+	theoreticalspectragridlayout->addWidget(calculatefdrs, 17, 1);
+
+	minimumannotationintensityrelative = new QDoubleSpinBox();
+	minimumannotationintensityrelative->setToolTip("Enter the minimum relative intensity of the most intense peak in an isotopic pattern. Isotopic patterns with relative intensities below this value will be kept in the spectrum but not annotated.");
+	minimumannotationintensityrelative->setDecimals(3);
+	minimumannotationintensityrelative->setRange(0, 100);
+	minimumannotationintensityrelative->setSingleStep(1);
+	minimumannotationintensityrelative->setPrefix("relative: ");
+	minimumannotationintensityrelative->setSuffix(" %");
+
+	minimumannotationintensityabsolute = new QSpinBox();
+	minimumannotationintensityabsolute->setToolTip("Enter the minimum absolute intensity of the most intense peak in an isotopic pattern. Isotopic patterns with absolute intensities below this value will be kept in the spectrum but not annotated.");
+	minimumannotationintensityabsolute->setRange(0, INT32_MAX);
+	minimumannotationintensityabsolute->setSingleStep(100);
+	minimumannotationintensityabsolute->setPrefix("absolute: ");
+
+	minimumannotationintensitylayout = new QHBoxLayout();
+	minimumannotationintensitylayout->addWidget(minimumannotationintensityrelative);
+	minimumannotationintensitylayout->addWidget(minimumannotationintensityabsolute);
+	minimumannotationintensitylayout->setMargin(0);
+	minimumannotationintensitywidget = new QWidget();
+	minimumannotationintensitywidget->setLayout(minimumannotationintensitylayout);
+	minimumannotationintensitywidget->setFixedWidth(rightdefaultwidth);
+	minimumannotationintensitylabel = new QLabel("Minimum Intensity of Highest Peak in Isotopic Pattern:");
+	theoreticalspectragridlayout->addWidget(minimumannotationintensitylabel, 18, 0);
+	theoreticalspectragridlayout->addWidget(minimumannotationintensitywidget, 18, 1);
 
 	mzdifftolerance = new QDoubleSpinBox();
-	mzdifftolerance->setToolTip("The maximum m/z error of difference between an isotopic peak and the monoisotopic peak in an experimental and theoretical isotopic pattern (0 = disabled) [ppm].");
+	mzdifftolerance->setToolTip("The maximum m/z error of difference between an isotopic peak and the most intense peak in an experimental and theoretical isotopic pattern (0 = disabled) [ppm].");
 	mzdifftolerance->setDecimals(3);
 	mzdifftolerance->setRange(0, 10000);
 	mzdifftolerance->setSingleStep(1);
 	mzdifftolerance->setSuffix(" ppm");
 	mzdifftolerance->setFixedWidth(rightdefaultwidth);
 	mzdifftolerancelabel = new QLabel("Isotope m/z Tolerance:");
-	theoreticalspectragridlayout->addWidget(mzdifftolerancelabel, 15, 0);
-	theoreticalspectragridlayout->addWidget(mzdifftolerance, 15, 1);
+	theoreticalspectragridlayout->addWidget(mzdifftolerancelabel, 19, 0);
+	theoreticalspectragridlayout->addWidget(mzdifftolerance, 19, 1);
 
 	intensitytolerance = new QDoubleSpinBox();
-	intensitytolerance->setToolTip("The maximum error tolerance of intensities of matched isotopes (0 = disabled) [in % of relative intensity of monoisotopic peak].\nExample:\nIsotope Intensity Tolerance = 10%, Relative Intensity of Monoisotopic Peak = 100% => the tolerance of relative intensities of isotopes is 10%;\nIsotope Intensity Tolerance = 10%, Relative Intensity of Monoisotopic Peak = 50% => the tolerance of relative intensities of isotopes is 5%; etc.");
+	intensitytolerance->setToolTip("The maximum error tolerance of intensities of matched isotopes (0 = disabled) [in % of relative intensity of the most intense peak].\nExample:\nIsotope Intensity Tolerance = 10%, Relative Intensity of the Most Intense Peak = 100% => the tolerance of relative intensities of isotopes is 10%;\nIsotope Intensity Tolerance = 10%, Relative Intensity of the Most Intense Peak = 50% => the tolerance of relative intensities of isotopes is 5%; etc.");
 	intensitytolerance->setDecimals(3);
 	intensitytolerance->setRange(0, 100);
 	intensitytolerance->setSingleStep(1);
 	intensitytolerance->setSuffix(" %");
 	intensitytolerance->setFixedWidth(rightdefaultwidth);
 	intensitytolerancelabel = new QLabel("Isotope Intensity Tolerance:");
-	theoreticalspectragridlayout->addWidget(intensitytolerancelabel, 16, 0);
-	theoreticalspectragridlayout->addWidget(intensitytolerance, 16, 1);
+	theoreticalspectragridlayout->addWidget(intensitytolerancelabel, 20, 0);
+	theoreticalspectragridlayout->addWidget(intensitytolerance, 20, 1);
 
 	theoreticalspectragroupbox = new QGroupBox("Theoretical Spectrum/Spectra");
 	theoreticalspectragroupbox->setLayout(theoreticalspectragridlayout);
@@ -618,10 +726,16 @@ cParametersWidget::cParametersWidget(cGlobalPreferences* globalpreferences, QWid
 	vlayout1->addWidget(experimentalspectragroupbox);
 	vlayout1->addWidget(brickdatabasegroupbox);
 	vlayout1->addWidget(miscgroupbox);
+	if (hideunusedparameters) {
+		vlayout1->addStretch(1);
+	}
 
 	vlayout2 = new QVBoxLayout();
 	vlayout2->addWidget(theoreticalspectragroupbox);
 	vlayout2->addWidget(searchedsequencegroupbox);
+	if (hideunusedparameters) {
+		vlayout2->addStretch(1);
+	}
 
 	hlayout = new QHBoxLayout();
 	hlayout->setContentsMargins(0, 0, 0, 0);
@@ -717,8 +831,18 @@ cParametersWidget::~cParametersWidget() {
 	delete maximummz;
 	delete mzratiolayout;
 	delete mzratiowidget;
+	delete rtlabel;
+	delete minimumrt;
+	delete maximumrt;
+	delete rtlayout;
+	delete rtwidget;
 	delete fwhmlabel;
 	delete fwhm;
+	delete ratio54Fe56Felabel;
+	delete minratio54Fe56Fe;
+	delete maxratio54Fe56Fe;
+	delete ratio54Fe56Felayout;
+	delete ratio54Fe56Fewidget;
 	delete experimentalspectragridlayout;
 	delete experimentalspectragroupbox;
 
@@ -777,6 +901,10 @@ cParametersWidget::~cParametersWidget() {
 	delete neutrallosstypes;
 	delete maximumcombinedlosseslabel;
 	delete maximumcombinedlosses;
+	delete elementstypeslabel;
+	delete elementstypes;
+	delete maximumcombinedelementslabel;
+	delete maximumcombinedelements;
 	//delete clearhitswithoutparent;
 	delete reportunmatchedtheoreticalpeakslabel;
 	delete reportunmatchedtheoreticalpeaks;
@@ -794,6 +922,13 @@ cParametersWidget::~cParametersWidget() {
 	delete advancedformulacheck;
 	delete noratiochecklabel;
 	delete noratiocheck;
+	delete calculatefdrslabel;
+	delete calculatefdrs;
+	delete minimumannotationintensitylabel;
+	delete minimumannotationintensityrelative;
+	delete minimumannotationintensityabsolute;
+	delete minimumannotationintensitylayout;
+	delete minimumannotationintensitywidget;
 	delete mzdifftolerancelabel;
 	delete mzdifftolerance;
 	delete intensitytolerancelabel;
@@ -837,7 +972,7 @@ void cParametersWidget::setAndRestoreParameters(cParameters& parameters) {
 
 	this->parameters = parameters;
 	this->parameters.bricksdatabase.clear();
-	this->parameters.peaklistseries.clear();
+	this->parameters.peaklistseriesvector.clear();
 	this->parameters.fragmentionsfordenovograph.clear();
 	this->parameters.sequencetag = this->parameters.originalsequencetag;
 	this->parameters.searchedsequence = this->parameters.originalsearchedsequence;
@@ -959,7 +1094,11 @@ void cParametersWidget::loadSettings() {
 		minimumabsoluteintensitythreshold->setValue(settings.value("minimumabsoluteintensitythreshold", 0).toUInt());
 		minimummz->setValue(settings.value("minimummz", 150).toDouble());
 		maximummz->setValue(settings.value("maximummz", 0).toDouble());
+		minimumrt->setValue(settings.value("minimumrt", 0).toDouble());
+		maximumrt->setValue(settings.value("maximumrt", 0).toDouble());
 		fwhm->setValue(settings.value("fwhm", 0.05).toDouble());
+		minratio54Fe56Fe->setValue(settings.value("minratio54Fe56Fe", 0.01).toDouble());
+		maxratio54Fe56Fe->setValue(settings.value("maxratio54Fe56Fe", 0.1).toDouble());
 
 		brickdatabaseline->setText(settings.value("brickdatabase", "").toString());
 		maximumbricksincombinationbegin->setValue(settings.value("maximumbricksincombinationbegin", 1).toInt());
@@ -1024,6 +1163,39 @@ void cParametersWidget::loadSettings() {
 		}
 
 		maximumcombinedlosses->setValue(settings.value("maximumcombinedlosses", 2).toInt());
+
+		elementstypes->getList()->clear();
+		i = 0;
+		qloadstring = ("elementsformula_" + to_string(i)).c_str();
+		while (settings.value(qloadstring, "XXX").toString().compare("XXX") != 0) {
+			elementstypes->addItem(settings.value(qloadstring).toString());
+
+			qloadstring = ("elementstype_" + to_string(i)).c_str();
+			settings.value(qloadstring, 0).toInt() == 0 ? elementstypes->getList()->item(i)->setSelected(false) : elementstypes->getList()->item(i)->setSelected(true);
+
+			i++;
+			qloadstring = ("elementsformula_" + to_string(i)).c_str();
+		}
+
+		maximumcombinedelements->setValue(settings.value("maximumcombinedelements", 200).toInt());
+
+		if ((eModeType)mode->currentIndex() == compoundsearch) {
+			if (!settings.contains("maximumcombinedelements")) {
+				elementstypes->getList()->clear();
+				for (int i = 0; i < neutrallosstypes->getList()->count(); i++) {
+					elementstypes->getList()->addItem(neutrallosstypes->getList()->item(i)->text());
+					if (neutrallosstypes->getList()->item(i)->isSelected()) {
+						elementstypes->getList()->item(i)->setSelected(true);
+					}
+				}
+
+				maximumcombinedelements->setValue(maximumcombinedlosses->value());
+
+				neutrallosstypes->getList()->clear();
+				maximumcombinedlosses->setValue(0);
+			}
+		}
+
 		//settings.value("clearhitswithoutparent", 0).toInt() == 0 ? clearhitswithoutparent->setChecked(false) : clearhitswithoutparent->setChecked(true);
 		settings.value("reportunmatchedtheoreticalpeaks", 0).toInt() == 0 ? reportunmatchedtheoreticalpeaks->setChecked(false) : reportunmatchedtheoreticalpeaks->setChecked(true);
 		settings.value("generateisotopepattern", 0).toInt() == 0 ? generateisotopepattern->setChecked(false) : generateisotopepattern->setChecked(true);
@@ -1033,6 +1205,11 @@ void cParametersWidget::loadSettings() {
 		settings.value("basicformulacheck", 1).toInt() == 0 ? basicformulacheck->setChecked(false) : basicformulacheck->setChecked(true);
 		settings.value("advancedformulacheck", 1).toInt() == 0 ? advancedformulacheck->setChecked(false) : advancedformulacheck->setChecked(true);
 		settings.value("noratiocheck", 1).toInt() == 0 ? noratiocheck->setChecked(false) : noratiocheck->setChecked(true);
+		settings.value("calculatefdrs", 1).toInt() == 0 ? calculatefdrs->setChecked(false) : calculatefdrs->setChecked(true);
+
+		minimumannotationintensityrelative->setValue(settings.value("minimumannotationintensityrelative", 0).toDouble());
+		minimumannotationintensityabsolute->setValue(settings.value("minimumannotationintensityabsolute", 0).toUInt());
+
 		mzdifftolerance->setValue(settings.value("mzdifftolerance", 0).toDouble());
 		intensitytolerance->setValue(settings.value("intensitytolerance", 0).toDouble());
 
@@ -1074,7 +1251,11 @@ void cParametersWidget::saveSettings() {
 	settings.setValue("minimumabsoluteintensitythreshold", minimumabsoluteintensitythreshold->value());
 	settings.setValue("minimummz", minimummz->value());
 	settings.setValue("maximummz", maximummz->value());
+	settings.setValue("minimumrt", minimumrt->value());
+	settings.setValue("maximumrt", maximumrt->value());
 	settings.setValue("fwhm", fwhm->value());
+	settings.setValue("minratio54Fe56Fe", minratio54Fe56Fe->value());
+	settings.setValue("maxratio54Fe56Fe", maxratio54Fe56Fe->value());
 
 	settings.setValue("brickdatabase", brickdatabaseline->text());
 	settings.setValue("maximumbricksincombinationbegin", maximumbricksincombinationbegin->value());
@@ -1122,6 +1303,17 @@ void cParametersWidget::saveSettings() {
 	}
 
 	settings.setValue("maximumcombinedlosses", maximumcombinedlosses->value());
+
+	for (int i = 0; i < elementstypes->getList()->count(); i++) {
+		qsavestring = ("elementstype_" + to_string(i)).c_str();
+		elementstypes->getList()->item(i)->isSelected() ? settings.setValue(qsavestring, 1) : settings.setValue(qsavestring, 0);
+
+		qsavestring = ("elementsformula_" + to_string(i)).c_str();
+		settings.setValue(qsavestring, elementstypes->getList()->item(i)->text());
+	}
+
+	settings.setValue("maximumcombinedelements", maximumcombinedelements->value());
+
 	//clearhitswithoutparent->isChecked() ? settings.setValue("clearhitswithoutparent", 1) : settings.setValue("clearhitswithoutparent", 0);
 	reportunmatchedtheoreticalpeaks->isChecked() ? settings.setValue("reportunmatchedtheoreticalpeaks", 1) : settings.setValue("reportunmatchedtheoreticalpeaks", 0);
 	generateisotopepattern->isChecked() ? settings.setValue("generateisotopepattern", 1) : settings.setValue("generateisotopepattern", 0);
@@ -1131,6 +1323,11 @@ void cParametersWidget::saveSettings() {
 	basicformulacheck->isChecked() ? settings.setValue("basicformulacheck", 1) : settings.setValue("basicformulacheck", 0);
 	advancedformulacheck->isChecked() ? settings.setValue("advancedformulacheck", 1) : settings.setValue("advancedformulacheck", 0);
 	noratiocheck->isChecked() ? settings.setValue("noratiocheck", 1) : settings.setValue("noratiocheck", 0);
+	calculatefdrs->isChecked() ? settings.setValue("calculatefdrs", 1) : settings.setValue("calculatefdrs", 0);
+
+	settings.setValue("minimumannotationintensityrelative", minimumannotationintensityrelative->value());
+	settings.setValue("minimumannotationintensityabsolute", minimumannotationintensityabsolute->value());
+
 	settings.setValue("mzdifftolerance", mzdifftolerance->value());
 	settings.setValue("intensitytolerance", intensitytolerance->value());
 
@@ -1158,18 +1355,24 @@ void cParametersWidget::saveSettingsAs() {
 
 void cParametersWidget::peaklistButtonReleased() {
 	QString currentdir = peaklistline->text();
+
+	size_t pos = currentdir.toStdString().find(';');
+	if (pos != string::npos) {
+		currentdir = currentdir.toStdString().substr(0, pos).c_str();
+	}
+
 	if (!checkFile(currentdir.toStdString())) {
 		currentdir = defaultdirselectpeaklist;
 	}
 
 	#if OS_TYPE != WIN
-		QString filename = QFileDialog::getOpenFileName(this, tr("Select Peaklist..."), currentdir, tr("Peak Lists (*.txt *.mgf *.mzML *.mzXML *.imzML)"));
+		QStringList filenames = QFileDialog::getOpenFileNames(this, tr("Select Peaklist(s)..."), currentdir, tr("Peaklists (*.txt *.mgf *.mzML *.mzXML *.imzML)"));
 	#else
-		QString filename = QFileDialog::getOpenFileName(this, tr("Select Peaklist..."), currentdir, tr("Peak Lists (*.txt *.mgf *.mzML *.mzXML *.imzML *.baf *.raw *.dat *.mis ser)"));
+		QStringList filenames = QFileDialog::getOpenFileNames(this, tr("Select Peaklist(s)..."), currentdir, tr("Peaklists (*.txt *.mgf *.mzML *.mzXML *.imzML *.baf *.raw *.dat *.mis ser)"));
 	#endif
 
-	if (!filename.isEmpty()) {
-		peaklistline->setText(filename);
+	if (!filenames.isEmpty()) {
+		peaklistline->setText(filenames.join(";"));
 	}
 }
 
@@ -1224,11 +1427,99 @@ bool cParametersWidget::updateParameters() {
 	string tmpstring;
 	string errmsg;
 
-	if (peaklistline->text().toStdString().compare("") == 0) {
+	QStringList multiplefiles = peaklistline->text().split(";");
+
+	if ((peaklistline->text().toStdString().compare("") == 0) || (multiplefiles.size() == 0)) {
 		errstr = "A peaklist must be specified !";
 		msgBox.setText(errstr);
 		msgBox.exec();
 		return false;
+	}
+
+	// C++17 begin
+	#if OS_TYPE == WIN
+		QStringList tmpmultiplefiles;
+
+		regex tmprx;
+		string tmppath;
+
+		for (auto& it : multiplefiles) {
+			QFileInfo fileinfo(it);
+			if (fileinfo.exists()) {
+				if (fileinfo.isDir()) {
+					for (auto& p : filesystem::recursive_directory_iterator(it.toStdString())) {
+						tmppath = filesystem::absolute(p.path()).string();
+						replace(tmppath.begin(), tmppath.end(), '\\', '/');
+
+						tmprx = "\\.[bB][aA][fF]$";
+						if (regex_search(tmppath, tmprx)) {
+							tmpmultiplefiles.push_back(tmppath.c_str());
+						}
+
+						tmprx = "PEAKS.[rR][aA][wW]\\/\\_[fF][uU][nN][cC]001.[dD][aA][tT]$";
+						if (!regex_search(tmppath, tmprx)) {
+							tmprx = "\\_[fF][uU][nN][cC]001.[dD][aA][tT]$";
+							if (regex_search(tmppath, tmprx)) {
+								tmpmultiplefiles.push_back(tmppath.c_str());
+							}
+						}
+					}
+				}
+				else {
+					tmpmultiplefiles.push_back(it);
+				}
+			}
+			else {
+				errstr = "The path '" + it + "' does not exist !";
+				msgBox.setText(errstr);
+				msgBox.exec();
+				return false;
+			}
+		}
+
+		multiplefiles = tmpmultiplefiles;
+	#endif
+	// C++17 end
+
+	int msi = 0;
+	regex rx;
+	for (auto& it : multiplefiles) {
+		#if OS_TYPE == WIN
+			rx = "\\.[mM][iI][sS]$";
+			// flexImaging File
+			if (regex_search(it.toStdString(), rx)) {
+				msi++;
+			}
+		#endif
+
+		rx = "\\.[iI][mM][zZ][mM][lL]$";
+		// imzML File
+		if (regex_search(it.toStdString(), rx)) {
+			msi++;
+		}
+	}
+
+	if ((msi == multiplefiles.size()) && (multiplefiles.size() > 1)) {
+		errstr = "Please, select only one mass spectrometry imaging input file !";
+		msgBox.setText(errstr);
+		msgBox.exec();
+		return false;
+	}
+
+	if ((msi > 0) && (msi < multiplefiles.size()) && (multiplefiles.size() > 1)) {
+		errstr = "Please, do not mix conventional/LC-MS input files with mass spectrometry imaging files !";
+		msgBox.setText(errstr);
+		msgBox.exec();
+		return false;
+	}
+
+	if (((eModeType)mode->currentIndex() == denovoengine) || ((eModeType)mode->currentIndex() == databasesearch) || ((eModeType)mode->currentIndex() == singlecomparison)) {
+		if (multiplefiles.size() > 1) {
+			errstr = "Multiple files cannot be selected in this mode !";
+			msgBox.setText(errstr);
+			msgBox.exec();
+			return false;
+		}
 	}
 
 	if ((brickdatabaseline->text().toStdString().compare("") == 0) && (((eModeType)mode->currentIndex() == denovoengine) || (((eModeType)mode->currentIndex() == databasesearch) && ((ePeptideType)peptidetype->currentIndex() != other)) || (((eModeType)mode->currentIndex() == singlecomparison) && ((ePeptideType)peptidetype->currentIndex() != other)))) {
@@ -1286,6 +1577,47 @@ bool cParametersWidget::updateParameters() {
 		return false;
 	}
 
+	if (((eModeType)mode->currentIndex() == compoundsearch) || ((eModeType)mode->currentIndex() == dereplication)) {
+		if ((minimumrt->value() != 0) && (maximumrt->value() != 0)) {
+			if (maximumrt->value() <= minimumrt->value()) {	
+				regex rx;
+				bool lcms;
+
+				for (auto& it : multiplefiles) {
+					lcms = true;
+
+					rx = "\\.[iI][mM][zZ][mM][lL]$";
+					// imzML File
+					if (regex_search(it.toStdString(), rx)) {
+						lcms = false;
+					}
+
+					#if OS_TYPE == WIN
+						rx = "\\.[mM][iI][sS]$";
+						// flexImaging File
+						if (regex_search(it.toStdString(), rx)) {
+							lcms = false;
+						}
+					#endif
+
+					if (lcms) {
+						errstr = "The maximum retention time must be bigger than the minimum retention time !";
+						msgBox.setText(errstr);
+						msgBox.exec();
+						return false;
+					}
+				}
+			}
+		}
+
+		if (minratio54Fe56Fe->value() >= maxratio54Fe56Fe->value()) {
+			errstr = "The minimum ratio 54Fe/56Fe must be lower than the maximum ratio of 54Fe/56Fe !";
+			msgBox.setText(errstr);
+			msgBox.exec();
+			return false;
+		}
+	}
+
 	if ((eModeType)mode->currentIndex() == denovoengine) {
 		if ((ePeptideType)peptidetype->currentIndex() == other) {
 			errstr = "The peptide type 'Other' cannot be used in this mode !";
@@ -1325,20 +1657,66 @@ bool cParametersWidget::updateParameters() {
 	}
 	*/
 
-	for (int i = 0; i < neutrallosstypes->getList()->count(); i++) {
-		tmpstring = neutrallosstypes->getList()->item(i)->text().toStdString();
-		
-		if (tmpstring.rfind(':') != string::npos) {
-			tmpstring = tmpstring.substr(0, tmpstring.rfind(':'));
-		}		
-
-		tmpformula.setFormula(tmpstring, false);
-		if (!tmpformula.isValid(errmsg)) {
-			errstr = "A molecular formula of a neutral loss is not valid!\n\n";
-			errstr += errmsg.c_str();
+	if ((eModeType)mode->currentIndex() == compoundsearch) {
+		if (elementstypes->getList()->count() == 0) {
+			errstr = "The list of chemical elements is empty!";
 			msgBox.setText(errstr);
 			msgBox.exec();
 			return false;
+		}
+
+		if (maximumcombinedelements->value() == 0) {
+			errstr = "The maximum number of combined elements is zero (use e.g. 150 or 200)!";
+			msgBox.setText(errstr);
+			msgBox.exec();
+			return false;
+		}
+
+		bool somethingselected = false;
+		for (int i = 0; i < elementstypes->getList()->count(); i++) {
+			tmpstring = elementstypes->getList()->item(i)->text().toStdString();
+
+			if (tmpstring.rfind(':') != string::npos) {
+				tmpstring = tmpstring.substr(0, tmpstring.rfind(':'));
+			}
+
+			tmpformula.setFormula(tmpstring, false);
+			if (!tmpformula.isValid(errmsg)) {
+				errstr = "A formula in the list of elements is not valid!\n\n";
+				errstr += errmsg.c_str();
+				msgBox.setText(errstr);
+				msgBox.exec();
+				return false;
+			}
+
+			if (elementstypes->getList()->item(i)->isSelected()) {
+				somethingselected = true;
+			}
+		}
+
+		if (!somethingselected) {
+			errstr = "Please, select some chemical elements!";
+			msgBox.setText(errstr);
+			msgBox.exec();
+			return false;
+		}
+	}
+	else {
+		for (int i = 0; i < neutrallosstypes->getList()->count(); i++) {
+			tmpstring = neutrallosstypes->getList()->item(i)->text().toStdString();
+
+			if (tmpstring.rfind(':') != string::npos) {
+				tmpstring = tmpstring.substr(0, tmpstring.rfind(':'));
+			}
+
+			tmpformula.setFormula(tmpstring, false);
+			if (!tmpformula.isValid(errmsg)) {
+				errstr = "A molecular formula of a neutral loss is not valid!\n\n";
+				errstr += errmsg.c_str();
+				msgBox.setText(errstr);
+				msgBox.exec();
+				return false;
+			}
 		}
 	}
 
@@ -1346,7 +1724,14 @@ bool cParametersWidget::updateParameters() {
 	parameters.maximumnumberofthreads = maximumnumberofthreads->value();
 
 	parameters.peptidetype = (ePeptideType)peptidetype->currentIndex();
-	parameters.peaklistfilename = peaklistline->text().toStdString();
+
+	parameters.peaklistfilenames.clear();
+	for (auto& it : multiplefiles) {
+		parameters.peaklistfilenames.push_back(it.toStdString());
+	}
+
+	parameters.originalpeaklistfilenames = peaklistline->text().toStdString();
+
 	parameters.useprofiledata = useprofiledata->isChecked();
 	parameters.scannumber = scannumber->value();
 	parameters.precursormass = precursormass->value();
@@ -1358,7 +1743,11 @@ bool cParametersWidget::updateParameters() {
 	parameters.minimumabsoluteintensitythreshold = minimumabsoluteintensitythreshold->value();
 	parameters.minimummz = minimummz->value();
 	parameters.maximummz = maximummz->value();
+	parameters.minimumrt = minimumrt->value();
+	parameters.maximumrt = maximumrt->value();
 	parameters.fwhm = fwhm->value();
+	parameters.minratio54Fe56Fe = minratio54Fe56Fe->value();
+	parameters.maxratio54Fe56Fe = maxratio54Fe56Fe->value();
 
 	parameters.bricksdatabasefilename = brickdatabaseline->text().toStdString();
 	parameters.maximumbricksincombinationbegin = maximumbricksincombinationbegin->value();
@@ -1436,6 +1825,21 @@ bool cParametersWidget::updateParameters() {
 	}
 
 	parameters.maximumcombinedlosses = maximumcombinedlosses->value();
+
+	parameters.originalelementsdefinitions.clear();
+	parameters.originalelementsfortheoreticalspectra.clear();
+	neutralLoss element;
+	for (int i = 0; i < elementstypes->getList()->count(); i++) {
+		element.clear();
+		element.summary = elementstypes->getList()->item(i)->text().toStdString();
+		parameters.originalelementsdefinitions.push_back(element);
+		if (elementstypes->getList()->item(i)->isSelected()) {
+			parameters.originalelementsfortheoreticalspectra.push_back(i);
+		}
+	}
+
+	parameters.maximumcombinedelements = maximumcombinedelements->value();
+
 	//parameters.clearhitswithoutparent = clearhitswithoutparent->isChecked();
 	parameters.reportunmatchedtheoreticalpeaks = reportunmatchedtheoreticalpeaks->isChecked();
 	parameters.generateisotopepattern = generateisotopepattern->isChecked();
@@ -1445,6 +1849,11 @@ bool cParametersWidget::updateParameters() {
 	parameters.basicformulacheck = basicformulacheck->isChecked();
 	parameters.advancedformulacheck = advancedformulacheck->isChecked();
 	parameters.noratiocheck = noratiocheck->isChecked();
+	parameters.calculatefdrs = calculatefdrs->isChecked();
+
+	parameters.minimumannotationintensityrelative = minimumannotationintensityrelative->value();
+	parameters.minimumannotationintensityabsolute = minimumannotationintensityabsolute->value();
+
 	parameters.mzdifftolerance = mzdifftolerance->value();
 	parameters.intensitytolerance = intensitytolerance->value();
 
@@ -1475,7 +1884,20 @@ void cParametersWidget::restoreParameters() {
 	maximumnumberofthreads->setValue(parameters.maximumnumberofthreads);
 
 	peptidetype->setCurrentIndex(parameters.peptidetype);
-	peaklistline->setText(parameters.peaklistfilename.c_str());
+
+	//if (parameters.peaklistfilenames.size() > 0) {
+	//	QStringList strlist;
+	//	for (auto& it : parameters.peaklistfilenames) {
+	//		strlist << it.c_str();
+	//	}
+	//	peaklistline->setText(strlist.join(";"));
+	//}
+	//else {
+	//	peaklistline->setText("");
+	//}
+
+	peaklistline->setText(parameters.originalpeaklistfilenames.c_str());
+
 	useprofiledata->setChecked(parameters.useprofiledata);
 	scannumber->setValue(parameters.scannumber);
 	precursormass->setValue(parameters.precursormass);
@@ -1487,7 +1909,11 @@ void cParametersWidget::restoreParameters() {
 	minimumabsoluteintensitythreshold->setValue(parameters.minimumabsoluteintensitythreshold);
 	minimummz->setValue(parameters.minimummz);
 	maximummz->setValue(parameters.maximummz);
+	minimumrt->setValue(parameters.minimumrt);
+	maximumrt->setValue(parameters.maximumrt);
 	fwhm->setValue(parameters.fwhm);
+	minratio54Fe56Fe->setValue(parameters.minratio54Fe56Fe);
+	maxratio54Fe56Fe->setValue(parameters.maxratio54Fe56Fe);
 
 	brickdatabaseline->setText(parameters.bricksdatabasefilename.c_str());
 	maximumbricksincombinationbegin->setValue(parameters.maximumbricksincombinationbegin);
@@ -1552,7 +1978,6 @@ void cParametersWidget::restoreParameters() {
 		}
 	}
 
-
 	neutrallosstypes->getList()->clear();
 	for (int i = 0; i < (int)parameters.originalneutrallossesdefinitions.size(); i++) {
 		neutrallosstypes->addItem(parameters.originalneutrallossesdefinitions[i].summary.c_str());
@@ -1563,6 +1988,18 @@ void cParametersWidget::restoreParameters() {
 	}
 
 	maximumcombinedlosses->setValue(parameters.maximumcombinedlosses);
+
+	elementstypes->getList()->clear();
+	for (int i = 0; i < (int)parameters.originalelementsdefinitions.size(); i++) {
+		elementstypes->addItem(parameters.originalelementsdefinitions[i].summary.c_str());
+	}
+
+	for (int i = 0; i < (int)parameters.originalelementsfortheoreticalspectra.size(); i++) {
+		elementstypes->getList()->item(parameters.originalelementsfortheoreticalspectra[i])->setSelected(true);
+	}
+
+	maximumcombinedelements->setValue(parameters.maximumcombinedelements);
+
 	//clearhitswithoutparent->setChecked(parameters.clearhitswithoutparent);
 	reportunmatchedtheoreticalpeaks->setChecked(parameters.reportunmatchedtheoreticalpeaks);
 	generateisotopepattern->setChecked(parameters.generateisotopepattern);
@@ -1572,6 +2009,11 @@ void cParametersWidget::restoreParameters() {
 	basicformulacheck->setChecked(parameters.basicformulacheck);
 	advancedformulacheck->setChecked(parameters.advancedformulacheck);
 	noratiocheck->setChecked(parameters.noratiocheck);
+	calculatefdrs->setChecked(parameters.calculatefdrs);
+
+	minimumannotationintensityrelative->setValue(parameters.minimumannotationintensityrelative);
+	minimumannotationintensityabsolute->setValue(parameters.minimumannotationintensityabsolute);
+
 	mzdifftolerance->setValue(parameters.mzdifftolerance);
 	intensitytolerance->setValue(parameters.intensitytolerance);
 
@@ -1594,6 +2036,9 @@ void cParametersWidget::restoreParameters() {
 
 
 void cParametersWidget::updateSettingsWhenPeptideTypeChanged(int index) {
+	if (((eModeType)mode->currentIndex() == dereplication) || ((eModeType)mode->currentIndex() == compoundsearch)) {
+		return;
+	}
 
 	if (!(((eModeType)mode->currentIndex() != oldmodetype) 
 		&& (((eModeType)mode->currentIndex() == denovoengine) || ((eModeType)mode->currentIndex() == singlecomparison) || ((eModeType)mode->currentIndex() == databasesearch))
@@ -1781,7 +2226,6 @@ void cParametersWidget::updateSettingsWhenPeptideTypeChanged(int index) {
 
 
 void cParametersWidget::updateSettingsWhenModeChanged(int index) {
-
 	switch ((eModeType)index) {
 		case denovoengine:
 			peptidetype->setDisabled(false);
@@ -1791,7 +2235,11 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 			precursorcharge->setDisabled(false);
 			precursormasserrortolerance->setDisabled(false);
 			maximummz->setDisabled(true);
+			minimumrt->setDisabled(true);
+			maximumrt->setDisabled(true);
 			fwhm->setDisabled(false);
+			minratio54Fe56Fe->setDisabled(true);
+			maxratio54Fe56Fe->setDisabled(true);
 			brickdatabaseline->setDisabled(false);
 			brickdatabasebutton->setDisabled(false);
 			maximumbricksincombinationbegin->setDisabled(false);
@@ -1811,10 +2259,15 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 			iontypes->setDisabled(false);
 			neutrallosstypes->setDisabled(false);
 			maximumcombinedlosses->setDisabled(false);
+			elementstypes->setDisabled(true);
+			maximumcombinedelements->setDisabled(true);
 			//clearhitswithoutparent->setDisabled(false);
 			basicformulacheck->setDisabled(false);
 			advancedformulacheck->setDisabled(true);
 			noratiocheck->setDisabled(true);
+			calculatefdrs->setDisabled(true);
+			minimumannotationintensityrelative->setDisabled(true);
+			minimumannotationintensityabsolute->setDisabled(true);
 			mzdifftolerance->setDisabled(true);
 			intensitytolerance->setDisabled(true);
 			reportunmatchedtheoreticalpeaks->setDisabled(false);
@@ -1826,6 +2279,102 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 			searchedsequencebutton->setDisabled(false);
 
 			updateSettingsWhenPeptideTypeChanged(peptidetype->currentIndex());
+
+			if (hideunusedparameters) {
+
+				maximumnumberofthreadslabel->setHidden(false);
+				maximumnumberofthreads->setHidden(false);
+
+				peptidetypelabel->setHidden(false);
+				peptidetype->setHidden(false);
+
+				scannumberlabel->setHidden(false);
+				scannumber->setHidden(false);
+
+				precursormasslabel->setHidden(false);
+				precursormass->setHidden(false);
+
+				precursoradductlabel->setHidden(false);
+				precursoradduct->setHidden(false);
+
+				precursormasserrortolerancelabel->setHidden(false);
+				precursormasserrortolerance->setHidden(false);
+
+				rtlabel->setHidden(true);
+				minimumrt->setHidden(true);
+				maximumrt->setHidden(true);
+
+				ratio54Fe56Felabel->setHidden(true);
+				minratio54Fe56Fe->setHidden(true);
+				maxratio54Fe56Fe->setHidden(true);
+
+				maximumbricksincombinatiolabel->setHidden(false);
+				maximumbricksincombinationbegin->setHidden(false);
+				maximumbricksincombinationmiddle->setHidden(false);
+				maximumbricksincombinationend->setHidden(false);
+
+				blindedgeslabel->setHidden(false);
+				blindedges->setHidden(false);
+
+				maximumcumulativemasslabel->setHidden(false);
+				maximumcumulativemass->setHidden(false);
+
+				sequencedatabaselabel->setHidden(true);
+				sequencedatabaseline->setHidden(true);
+				sequencedatabasebutton->setHidden(true);
+
+				scoretypelabel->setHidden(false);
+				scoretype->setHidden(false);
+
+				hitsreportedlabel->setHidden(false);
+				hitsreported->setHidden(false);
+
+				sequencetaglabel->setHidden(false);
+				sequencetag->setHidden(false);
+
+				neutrallosstypeslabel->setHidden(false);
+				neutrallosstypes->setHidden(false);
+
+				maximumcombinedlosseslabel->setHidden(false);
+				maximumcombinedlosses->setHidden(false);
+
+				elementstypeslabel->setHidden(true);
+				elementstypes->setHidden(true);
+
+				maximumcombinedelementslabel->setHidden(true);
+				maximumcombinedelements->setHidden(true);
+
+				minimumfeaturesizelabel->setHidden(true);
+				minimumfeaturesize->setHidden(true);
+
+				minimumiontypeslabel->setHidden(true);
+				minimumiontypes->setHidden(true);
+
+				advancedformulachecklabel->setHidden(true);
+				advancedformulacheck->setHidden(true);
+
+				noratiochecklabel->setHidden(true);
+				noratiocheck->setHidden(true);
+
+				calculatefdrslabel->setHidden(true);
+				calculatefdrs->setHidden(true);
+
+				minimumannotationintensitylabel->setHidden(true);
+				minimumannotationintensityrelative->setHidden(true);
+				minimumannotationintensityabsolute->setHidden(true);
+
+				mzdifftolerancelabel->setHidden(true);
+				mzdifftolerance->setHidden(true);
+
+				intensitytolerancelabel->setHidden(true);
+				intensitytolerance->setHidden(true);
+
+				brickdatabasegroupbox->setHidden(false);
+				miscgroupbox->setHidden(false);
+				searchedsequencegroupbox->setHidden(false);
+
+			}
+
 			break;
 		case singlecomparison:
 			peptidetype->setDisabled(false);
@@ -1835,7 +2384,11 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 			precursorcharge->setDisabled(false);
 			precursormasserrortolerance->setDisabled(false);
 			maximummz->setDisabled(true);
+			minimumrt->setDisabled(true);
+			maximumrt->setDisabled(true);
 			fwhm->setDisabled(false);
+			minratio54Fe56Fe->setDisabled(true);
+			maxratio54Fe56Fe->setDisabled(true);
 			brickdatabaseline->setDisabled(false);
 			brickdatabasebutton->setDisabled(false);
 			maximumbricksincombinationbegin->setDisabled(true);
@@ -1855,10 +2408,15 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 			iontypes->setDisabled(false);
 			neutrallosstypes->setDisabled(false);
 			maximumcombinedlosses->setDisabled(false);
+			elementstypes->setDisabled(true);
+			maximumcombinedelements->setDisabled(true);
 			//clearhitswithoutparent->setDisabled(false);
 			basicformulacheck->setDisabled(false);
 			advancedformulacheck->setDisabled(true);
 			noratiocheck->setDisabled(true);
+			calculatefdrs->setDisabled(true);
+			minimumannotationintensityrelative->setDisabled(true);
+			minimumannotationintensityabsolute->setDisabled(true);
 			mzdifftolerance->setDisabled(true);
 			intensitytolerance->setDisabled(true);
 			reportunmatchedtheoreticalpeaks->setDisabled(false);
@@ -1870,6 +2428,102 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 			searchedsequencebutton->setDisabled(false);
 
 			updateSettingsWhenPeptideTypeChanged(peptidetype->currentIndex());
+
+			if (hideunusedparameters) {
+
+				maximumnumberofthreadslabel->setHidden(true);
+				maximumnumberofthreads->setHidden(true);
+
+				peptidetypelabel->setHidden(false);
+				peptidetype->setHidden(false);
+
+				scannumberlabel->setHidden(true);
+				scannumber->setHidden(true);
+
+				precursormasslabel->setHidden(false);
+				precursormass->setHidden(false);
+
+				precursoradductlabel->setHidden(false);
+				precursoradduct->setHidden(false);
+
+				precursormasserrortolerancelabel->setHidden(false);
+				precursormasserrortolerance->setHidden(false);
+
+				rtlabel->setHidden(true);
+				minimumrt->setHidden(true);
+				maximumrt->setHidden(true);
+
+				ratio54Fe56Felabel->setHidden(true);
+				minratio54Fe56Fe->setHidden(true);
+				maxratio54Fe56Fe->setHidden(true);
+
+				maximumbricksincombinatiolabel->setHidden(true);
+				maximumbricksincombinationbegin->setHidden(true);
+				maximumbricksincombinationmiddle->setHidden(true);
+				maximumbricksincombinationend->setHidden(true);
+
+				blindedgeslabel->setHidden(true);
+				blindedges->setHidden(true);
+
+				maximumcumulativemasslabel->setHidden(true);
+				maximumcumulativemass->setHidden(true);
+
+				sequencedatabaselabel->setHidden(true);
+				sequencedatabaseline->setHidden(true);
+				sequencedatabasebutton->setHidden(true);
+
+				scoretypelabel->setHidden(true);
+				scoretype->setHidden(true);
+
+				hitsreportedlabel->setHidden(true);
+				hitsreported->setHidden(true);
+
+				sequencetaglabel->setHidden(true);
+				sequencetag->setHidden(true);
+
+				neutrallosstypeslabel->setHidden(false);
+				neutrallosstypes->setHidden(false);
+
+				maximumcombinedlosseslabel->setHidden(false);
+				maximumcombinedlosses->setHidden(false);
+
+				elementstypeslabel->setHidden(true);
+				elementstypes->setHidden(true);
+
+				maximumcombinedelementslabel->setHidden(true);
+				maximumcombinedelements->setHidden(true);
+
+				minimumfeaturesizelabel->setHidden(true);
+				minimumfeaturesize->setHidden(true);
+
+				minimumiontypeslabel->setHidden(true);
+				minimumiontypes->setHidden(true);
+
+				advancedformulachecklabel->setHidden(true);
+				advancedformulacheck->setHidden(true);
+
+				noratiochecklabel->setHidden(true);
+				noratiocheck->setHidden(true);
+
+				calculatefdrslabel->setHidden(true);
+				calculatefdrs->setHidden(true);
+
+				minimumannotationintensitylabel->setHidden(true);
+				minimumannotationintensityrelative->setHidden(true);
+				minimumannotationintensityabsolute->setHidden(true);
+
+				mzdifftolerancelabel->setHidden(true);
+				mzdifftolerance->setHidden(true);
+
+				intensitytolerancelabel->setHidden(true);
+				intensitytolerance->setHidden(true);
+
+				brickdatabasegroupbox->setHidden(false);
+				miscgroupbox->setHidden(false);
+				searchedsequencegroupbox->setHidden(false);
+
+			}
+
 			break;
 		case databasesearch:
 			peptidetype->setDisabled(false);
@@ -1879,7 +2533,11 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 			precursorcharge->setDisabled(false);
 			precursormasserrortolerance->setDisabled(false);
 			maximummz->setDisabled(true);
+			minimumrt->setDisabled(true);
+			maximumrt->setDisabled(true);
 			fwhm->setDisabled(false);
+			minratio54Fe56Fe->setDisabled(true);
+			maxratio54Fe56Fe->setDisabled(true);
 			brickdatabaseline->setDisabled(false);
 			brickdatabasebutton->setDisabled(false);
 			maximumbricksincombinationbegin->setDisabled(true);
@@ -1899,10 +2557,15 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 			iontypes->setDisabled(false);
 			neutrallosstypes->setDisabled(false);
 			maximumcombinedlosses->setDisabled(false);
+			elementstypes->setDisabled(true);
+			maximumcombinedelements->setDisabled(true);
 			//clearhitswithoutparent->setDisabled(false);
 			basicformulacheck->setDisabled(false);
 			advancedformulacheck->setDisabled(true);
 			noratiocheck->setDisabled(true);
+			calculatefdrs->setDisabled(true);
+			minimumannotationintensityrelative->setDisabled(true);
+			minimumannotationintensityabsolute->setDisabled(true);
 			mzdifftolerance->setDisabled(true);
 			intensitytolerance->setDisabled(true);
 			reportunmatchedtheoreticalpeaks->setDisabled(false);
@@ -1914,6 +2577,102 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 			searchedsequencebutton->setDisabled(false);
 
 			updateSettingsWhenPeptideTypeChanged(peptidetype->currentIndex());
+
+			if (hideunusedparameters) {
+
+				maximumnumberofthreadslabel->setHidden(false);
+				maximumnumberofthreads->setHidden(false);
+
+				peptidetypelabel->setHidden(false);
+				peptidetype->setHidden(false);
+
+				scannumberlabel->setHidden(false);
+				scannumber->setHidden(false);
+
+				precursormasslabel->setHidden(false);
+				precursormass->setHidden(false);
+
+				precursoradductlabel->setHidden(false);
+				precursoradduct->setHidden(false);
+
+				precursormasserrortolerancelabel->setHidden(false);
+				precursormasserrortolerance->setHidden(false);
+
+				rtlabel->setHidden(true);
+				minimumrt->setHidden(true);
+				maximumrt->setHidden(true);
+
+				ratio54Fe56Felabel->setHidden(true);
+				minratio54Fe56Fe->setHidden(true);
+				maxratio54Fe56Fe->setHidden(true);
+
+				maximumbricksincombinatiolabel->setHidden(true);
+				maximumbricksincombinationbegin->setHidden(true);
+				maximumbricksincombinationmiddle->setHidden(true);
+				maximumbricksincombinationend->setHidden(true);
+
+				blindedgeslabel->setHidden(true);
+				blindedges->setHidden(true);
+
+				maximumcumulativemasslabel->setHidden(true);
+				maximumcumulativemass->setHidden(true);
+
+				sequencedatabaselabel->setHidden(false);
+				sequencedatabaseline->setHidden(false);
+				sequencedatabasebutton->setHidden(false);
+
+				scoretypelabel->setHidden(false);
+				scoretype->setHidden(false);
+
+				hitsreportedlabel->setHidden(false);
+				hitsreported->setHidden(false);
+
+				sequencetaglabel->setHidden(false);
+				sequencetag->setHidden(false);
+
+				neutrallosstypeslabel->setHidden(false);
+				neutrallosstypes->setHidden(false);
+
+				maximumcombinedlosseslabel->setHidden(false);
+				maximumcombinedlosses->setHidden(false);
+
+				elementstypeslabel->setHidden(true);
+				elementstypes->setHidden(true);
+
+				maximumcombinedelementslabel->setHidden(true);
+				maximumcombinedelements->setHidden(true);
+
+				minimumfeaturesizelabel->setHidden(true);
+				minimumfeaturesize->setHidden(true);
+
+				minimumiontypeslabel->setHidden(true);
+				minimumiontypes->setHidden(true);
+
+				advancedformulachecklabel->setHidden(true);
+				advancedformulacheck->setHidden(true);
+
+				noratiochecklabel->setHidden(true);
+				noratiocheck->setHidden(true);
+
+				calculatefdrslabel->setHidden(true);
+				calculatefdrs->setHidden(true);
+
+				minimumannotationintensitylabel->setHidden(true);
+				minimumannotationintensityrelative->setHidden(true);
+				minimumannotationintensityabsolute->setHidden(true);
+
+				mzdifftolerancelabel->setHidden(true);
+				mzdifftolerance->setHidden(true);
+
+				intensitytolerancelabel->setHidden(true);
+				intensitytolerance->setHidden(true);
+
+				brickdatabasegroupbox->setHidden(false);
+				miscgroupbox->setHidden(false);
+				searchedsequencegroupbox->setHidden(false);
+
+			}
+
 			break;
 		case dereplication:
 			peptidetype->setDisabled(true);
@@ -1923,7 +2682,11 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 			precursorcharge->setDisabled(false);
 			precursormasserrortolerance->setDisabled(true);
 			maximummz->setDisabled(false);
+			minimumrt->setDisabled(false);
+			maximumrt->setDisabled(false);
 			fwhm->setDisabled(false);
+			minratio54Fe56Fe->setDisabled(false);
+			maxratio54Fe56Fe->setDisabled(false);
 			brickdatabaseline->setDisabled(true);
 			brickdatabasebutton->setDisabled(true);
 			maximumbricksincombinationbegin->setDisabled(true);
@@ -1936,17 +2699,22 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 			similaritysearch->setDisabled(true);
 			sequencedatabaseline->setDisabled(false);
 			sequencedatabasebutton->setDisabled(false);
-			maximumnumberofthreads->setDisabled(true);
+			maximumnumberofthreads->setDisabled(false);
 			scoretype->setDisabled(true);
 			hitsreported->setDisabled(true);
 			sequencetag->setDisabled(true);
 			iontypes->setDisabled(false);
 			neutrallosstypes->setDisabled(false);
 			maximumcombinedlosses->setDisabled(false);
+			elementstypes->setDisabled(true);
+			maximumcombinedelements->setDisabled(true);
 			//clearhitswithoutparent->setDisabled(true);
 			basicformulacheck->setDisabled(false);
 			advancedformulacheck->setDisabled(true);
 			noratiocheck->setDisabled(true);
+			calculatefdrs->setDisabled(false);
+			minimumannotationintensityrelative->setDisabled(false);
+			minimumannotationintensityabsolute->setDisabled(false);
 			mzdifftolerance->setDisabled(false);
 			intensitytolerance->setDisabled(false);
 			reportunmatchedtheoreticalpeaks->setDisabled(false);
@@ -1976,6 +2744,102 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 			searchedsequenceCtermmodif->setDisabled(true);
 			searchedsequenceTmodif->setDisabled(true);
 			searchedsequenceformula->setDisabled(true);
+
+			if (hideunusedparameters) {
+
+				maximumnumberofthreadslabel->setHidden(false);
+				maximumnumberofthreads->setHidden(false);
+
+				peptidetypelabel->setHidden(true);
+				peptidetype->setHidden(true);
+
+				scannumberlabel->setHidden(true);
+				scannumber->setHidden(true);
+
+				precursormasslabel->setHidden(true);
+				precursormass->setHidden(true);
+
+				precursoradductlabel->setHidden(true);
+				precursoradduct->setHidden(true);
+
+				precursormasserrortolerancelabel->setHidden(true);
+				precursormasserrortolerance->setHidden(true);
+
+				rtlabel->setHidden(false);
+				minimumrt->setHidden(false);
+				maximumrt->setHidden(false);
+
+				ratio54Fe56Felabel->setHidden(false);
+				minratio54Fe56Fe->setHidden(false);
+				maxratio54Fe56Fe->setHidden(false);
+
+				maximumbricksincombinatiolabel->setHidden(true);
+				maximumbricksincombinationbegin->setHidden(true);
+				maximumbricksincombinationmiddle->setHidden(true);
+				maximumbricksincombinationend->setHidden(true);
+
+				blindedgeslabel->setHidden(true);
+				blindedges->setHidden(true);
+
+				maximumcumulativemasslabel->setHidden(true);
+				maximumcumulativemass->setHidden(true);
+
+				sequencedatabaselabel->setHidden(false);
+				sequencedatabaseline->setHidden(false);
+				sequencedatabasebutton->setHidden(false);
+
+				scoretypelabel->setHidden(true);
+				scoretype->setHidden(true);
+
+				hitsreportedlabel->setHidden(true);
+				hitsreported->setHidden(true);
+
+				sequencetaglabel->setHidden(true);
+				sequencetag->setHidden(true);
+
+				neutrallosstypeslabel->setHidden(false);
+				neutrallosstypes->setHidden(false);
+
+				maximumcombinedlosseslabel->setHidden(false);
+				maximumcombinedlosses->setHidden(false);
+
+				elementstypeslabel->setHidden(true);
+				elementstypes->setHidden(true);
+
+				maximumcombinedelementslabel->setHidden(true);
+				maximumcombinedelements->setHidden(true);
+
+				minimumfeaturesizelabel->setHidden(false);
+				minimumfeaturesize->setHidden(false);
+
+				minimumiontypeslabel->setHidden(false);
+				minimumiontypes->setHidden(false);
+
+				advancedformulachecklabel->setHidden(true);
+				advancedformulacheck->setHidden(true);
+
+				noratiochecklabel->setHidden(true);
+				noratiocheck->setHidden(true);
+
+				calculatefdrslabel->setHidden(false);
+				calculatefdrs->setHidden(false);
+
+				minimumannotationintensitylabel->setHidden(false);
+				minimumannotationintensityrelative->setHidden(false);
+				minimumannotationintensityabsolute->setHidden(false);
+
+				mzdifftolerancelabel->setHidden(false);
+				mzdifftolerance->setHidden(false);
+
+				intensitytolerancelabel->setHidden(false);
+				intensitytolerance->setHidden(false);
+
+				brickdatabasegroupbox->setHidden(true);
+				miscgroupbox->setHidden(true);
+				searchedsequencegroupbox->setHidden(true);
+
+			}
+
 			break;
 		case compoundsearch:
 			peptidetype->setDisabled(true);
@@ -1985,7 +2849,11 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 			precursorcharge->setDisabled(false);
 			precursormasserrortolerance->setDisabled(true);
 			maximummz->setDisabled(false);
+			minimumrt->setDisabled(false);
+			maximumrt->setDisabled(false);
 			fwhm->setDisabled(false);
+			minratio54Fe56Fe->setDisabled(false);
+			maxratio54Fe56Fe->setDisabled(false);
 			brickdatabaseline->setDisabled(true);
 			brickdatabasebutton->setDisabled(true);
 			maximumbricksincombinationbegin->setDisabled(true);
@@ -1998,17 +2866,22 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 			similaritysearch->setDisabled(true);
 			sequencedatabaseline->setDisabled(true);
 			sequencedatabasebutton->setDisabled(true);
-			maximumnumberofthreads->setDisabled(true);
+			maximumnumberofthreads->setDisabled(false);
 			scoretype->setDisabled(true);
 			hitsreported->setDisabled(true);
 			sequencetag->setDisabled(true);
 			iontypes->setDisabled(false);
-			neutrallosstypes->setDisabled(false);
-			maximumcombinedlosses->setDisabled(false);
+			neutrallosstypes->setDisabled(true);
+			maximumcombinedlosses->setDisabled(true);
+			elementstypes->setDisabled(false);
+			maximumcombinedelements->setDisabled(false);
 			//clearhitswithoutparent->setDisabled(true);
 			basicformulacheck->setDisabled(false);
 			advancedformulacheck->setDisabled(false);
 			noratiocheck->setDisabled(false);
+			calculatefdrs->setDisabled(false);
+			minimumannotationintensityrelative->setDisabled(false);
+			minimumannotationintensityabsolute->setDisabled(false);
 			mzdifftolerance->setDisabled(false);
 			intensitytolerance->setDisabled(false);
 			reportunmatchedtheoreticalpeaks->setDisabled(false);
@@ -2038,6 +2911,102 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 			searchedsequenceCtermmodif->setDisabled(true);
 			searchedsequenceTmodif->setDisabled(true);
 			searchedsequenceformula->setDisabled(true);
+
+			if (hideunusedparameters) {
+
+				maximumnumberofthreadslabel->setHidden(false);
+				maximumnumberofthreads->setHidden(false);
+
+				peptidetypelabel->setHidden(true);
+				peptidetype->setHidden(true);
+
+				scannumberlabel->setHidden(true);
+				scannumber->setHidden(true);
+
+				precursormasslabel->setHidden(true);
+				precursormass->setHidden(true);
+
+				precursoradductlabel->setHidden(true);
+				precursoradduct->setHidden(true);
+
+				precursormasserrortolerancelabel->setHidden(true);
+				precursormasserrortolerance->setHidden(true);
+
+				rtlabel->setHidden(false);
+				minimumrt->setHidden(false);
+				maximumrt->setHidden(false);
+
+				ratio54Fe56Felabel->setHidden(false);
+				minratio54Fe56Fe->setHidden(false);
+				maxratio54Fe56Fe->setHidden(false);
+
+				maximumbricksincombinatiolabel->setHidden(true);
+				maximumbricksincombinationbegin->setHidden(true);
+				maximumbricksincombinationmiddle->setHidden(true);
+				maximumbricksincombinationend->setHidden(true);
+
+				blindedgeslabel->setHidden(true);
+				blindedges->setHidden(true);
+
+				maximumcumulativemasslabel->setHidden(true);
+				maximumcumulativemass->setHidden(true);
+
+				sequencedatabaselabel->setHidden(true);
+				sequencedatabaseline->setHidden(true);
+				sequencedatabasebutton->setHidden(true);
+
+				scoretypelabel->setHidden(true);
+				scoretype->setHidden(true);
+
+				hitsreportedlabel->setHidden(true);
+				hitsreported->setHidden(true);
+
+				sequencetaglabel->setHidden(true);
+				sequencetag->setHidden(true);
+
+				neutrallosstypeslabel->setHidden(true);
+				neutrallosstypes->setHidden(true);
+
+				maximumcombinedlosseslabel->setHidden(true);
+				maximumcombinedlosses->setHidden(true);
+
+				elementstypeslabel->setHidden(false);
+				elementstypes->setHidden(false);
+
+				maximumcombinedelementslabel->setHidden(false);
+				maximumcombinedelements->setHidden(false);
+
+				minimumfeaturesizelabel->setHidden(false);
+				minimumfeaturesize->setHidden(false);
+
+				minimumiontypeslabel->setHidden(false);
+				minimumiontypes->setHidden(false);
+
+				advancedformulachecklabel->setHidden(false);
+				advancedformulacheck->setHidden(false);
+
+				noratiochecklabel->setHidden(false);
+				noratiocheck->setHidden(false);
+
+				calculatefdrslabel->setHidden(false);
+				calculatefdrs->setHidden(false);
+
+				minimumannotationintensitylabel->setHidden(false);
+				minimumannotationintensityrelative->setHidden(false);
+				minimumannotationintensityabsolute->setHidden(false);
+
+				mzdifftolerancelabel->setHidden(false);
+				mzdifftolerance->setHidden(false);
+
+				intensitytolerancelabel->setHidden(false);
+				intensitytolerance->setHidden(false);
+
+				brickdatabasegroupbox->setHidden(true);
+				miscgroupbox->setHidden(true);
+				searchedsequencegroupbox->setHidden(true);
+
+			}
+
 			break;
 		default:
 			break;
@@ -2055,6 +3024,9 @@ void cParametersWidget::resetFragmentIonTypes() {
 		if (globalpreferences) {
 			for (int i = 0; i < (int)globalpreferences->customions.size(); i++) {
 				iontypes->getList()->addItem(globalpreferences->customions[i].name.c_str());
+				if (globalpreferences->customions[i].name.compare("[M+H]+") == 0) {
+					iontypes->getList()->item(i)->setSelected(true);
+				}
 			}
 		}
 	}

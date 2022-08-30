@@ -33,6 +33,8 @@ class cSequence {
 	string name;
 	cSummaryFormula summary;
 	string reference;
+	double rtmin;
+	double rtmax;
 	bool decoy;
 
 public:
@@ -60,8 +62,11 @@ public:
 	/**
 		\brief Load the structure from an input stream.
 		\param is an input stream
+		\param fileversionpart1 first number of .res the file version
+		\param fileversionpart2 second number of .res the file version
+		\param fileversionpart3 third number of .res the file version
 	*/ 
-	void load(ifstream& is);
+	void load(ifstream& is, int fileversionpart1, int fileversionpart2, int fileversionpart3);
 
 
 	/**
@@ -83,6 +88,20 @@ public:
 		\retval string name
 	*/ 
 	string& getName();
+
+
+	/**
+		\brief Get minimum retention time.
+		\retval double minimum retention time
+	*/
+	double getMinimumRetentionTime();
+
+
+	/**
+		\brief Get maximum retention time.
+		\retval double maximum retention time
+	*/
+	double getMaximumRetentionTime();
 
 
 	/**
@@ -111,6 +130,14 @@ public:
 		\param name name
 	*/ 
 	void setName(const string& name);
+
+
+	/**
+		\brief Set retention time.
+		\param rtmin minimum retention time
+		\param rtmax maximum retention time
+	*/
+	void setRetentionTime(double rtmin, double rtmax);
 
 
 	/**

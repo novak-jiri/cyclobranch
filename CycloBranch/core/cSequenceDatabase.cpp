@@ -4,12 +4,63 @@
 #include "gui/cMainThread.h"
 
 
+void cSequenceDatabase::parseRT(bool keeprt) {
+	double rtmin, rtmax, rttmp;
+	string s;
+	string tmp;
+	size_t pos;
+
+	for (auto& it : sequences) {
+		s = it.getName();
+		pos = s.find("@RT");
+		if (pos != string::npos) {
+			s = s.substr(pos + 3);
+
+			tmp = s;
+			s.clear();
+			for (auto& it2 : tmp) {
+				if (!isspace(it2)) {
+					s.push_back(it2);
+				}
+			}
+			
+			sscanf_s(s.c_str(), "%lf-%lf", &rtmin, &rtmax);
+
+			if (rtmin > rtmax) {
+				rttmp = rtmin;
+				rtmin = rtmax;
+				rtmax = rttmp;
+			}
+
+			s = it.getName();
+			s = s.substr(0, pos);
+
+			if (keeprt) {
+				std::ostringstream out;
+				out.precision(2);
+				out << std::fixed << s;
+				out << "@RT";
+				out << rtmin;
+				out << "-";
+				out << rtmax;
+
+				s = out.str();
+			}
+
+			it.setName(s);
+
+			it.setRetentionTime(rtmin, rtmax);
+		}
+	}
+}
+
+
 cSequenceDatabase::cSequenceDatabase() {
 	clear();
 }
 
 
-void cSequenceDatabase::loadFromPlainTextStream(ifstream &stream) {
+void cSequenceDatabase::loadFromPlainTextStream(ifstream &stream, bool keeprt) {
 	string s, type;
 	cSequence sequence;
 	size_t pos;
@@ -117,10 +168,13 @@ void cSequenceDatabase::loadFromPlainTextStream(ifstream &stream) {
 		sequences.push_back(sequence);
 	}
 
+	parseRT(keeprt);
 }
 
 
-void cSequenceDatabase::storeToPlainTextStream(ofstream &stream) {
+void cSequenceDatabase::storeToPlainTextStream(ofstream &stream, bool keeprt) {
+	parseRT(keeprt);
+
 	cSummaryFormula formula;
 	for (int i = 0; i < (int)sequences.size(); i++) {
 		stream << getStringFromPeptideType(sequences[i].getPeptideType()) << "\t";
@@ -176,14 +230,35 @@ void cSequenceDatabase::store(ofstream& os) {
 }
 
 
-void cSequenceDatabase::load(ifstream& is) {
+void cSequenceDatabase::load(ifstream& is, int fileversionpart1, int fileversionpart2, int fileversionpart3) {
 	int size;
 
 	is.read((char *)&size, sizeof(int));
 	sequences.resize(size);
 
 	for (int i = 0; i < (int)sequences.size(); i++) {
-		sequences[i].load(is);
+		sequences[i].load(is, fileversionpart1, fileversionpart2, fileversionpart3);
+	}
+}
+
+
+void cSequenceDatabase::attachDecoys(bool& terminatecomputation) {
+	cSequence sequence;
+	string summary;
+
+	int seqdbsize = (int)sequences.size();
+	sequence.setPeptideType(other);
+	sequence.setDecoy(true);
+
+	for (int i = 0; i < seqdbsize; i++) {
+		if (terminatecomputation) {
+			sequences.clear();
+			return;
+		}
+
+		summary = sequences[i].getSummaryFormula() + "H";
+		sequence.setSummaryFormula(summary);
+		sequences.push_back(sequence);
 	}
 }
 

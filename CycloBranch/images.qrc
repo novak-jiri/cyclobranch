@@ -29,8 +29,6 @@
         <file>images/icons/95.png</file>
         <file>images/icons/65.png</file>
         <file>images/icons/56.png</file>
-        <file>images/icons/5.png</file>
-        <file>images/icons/25.png</file>
         <file>images/icons/63.png</file>
         <file>images/icons/13.png</file>
         <file>images/icons/14.png</file>
@@ -49,8 +47,17 @@
         <file>images/icons/12.png</file>
         <file>images/icons/preferences.png</file>
         <file>images/icons/table.png</file>
-        <file>images/icons/image.png</file>
         <file>images/icons/csv.png</file>
         <file>images/icons/66.png</file>
+        <file>images/icons/image_edit.png</file>
+        <file>images/icons/image_open.png</file>
+        <file>images/icons/clear.png</file>
+        <file>images/icons/import.png</file>
+        <file>images/icons/db_export.png</file>
+        <file>images/icons/db_delete.png</file>
+        <file>images/icons/search.png</file>
+        <file>images/icons/pattern.png</file>
+        <file>images/icons/formula.png</file>
+        <file>images/icons/features.png</file>
     </qresource>
 </RCC>

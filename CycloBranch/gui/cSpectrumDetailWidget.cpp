@@ -19,6 +19,7 @@
 #include <QProgressDialog>
 #include <QClipboard>
 #include <QApplication>
+#include <QProcess>
 
 
 cSpectrumDetailWidget::cSpectrumDetailWidget() {
@@ -34,6 +35,8 @@ cSpectrumDetailWidget::cSpectrumDetailWidget() {
 	preparedToShow = false;
 	localneutralosses.clear();
 	theoreticalspectrum = new cTheoreticalSpectrum();
+
+	activefileid = 0;
 }
 
 
@@ -55,11 +58,11 @@ cSpectrumDetailWidget& cSpectrumDetailWidget::operator=(const cSpectrumDetailWid
 	theoreticalspectrum = new cTheoreticalSpectrum();
 
 	if (parameters && sd.theoreticalspectrum) {
-		initialize(rowid, globalpreferences, parameters, *sd.theoreticalspectrum, sd.parent);
+		initialize(sd.rowid, sd.activefileid, globalpreferences, parameters, *sd.theoreticalspectrum, sd.parent);
 	}
 
 	if (parameters && sd.preparedToShow) {
-		prepareToShow(actionShowIsomers, rawdata,  imzmlprofilemetadata, profilemz64precision, profileintensity64precision);
+		prepareToShow(actionShowIsomers, rawdata,  imzmlprofilemetadata, profilemz64precision, profileintensity64precision, true);
 	}
 
 	setWindowTitle(sd.windowTitle());
@@ -68,8 +71,9 @@ cSpectrumDetailWidget& cSpectrumDetailWidget::operator=(const cSpectrumDetailWid
 }
 
 
-void cSpectrumDetailWidget::initialize(int rowid, cGlobalPreferences* globalpreferences, cParameters* parameters, cTheoreticalSpectrum& theoreticalspectrum, QWidget* parent) {
+void cSpectrumDetailWidget::initialize(int rowid, int activefileid, cGlobalPreferences* globalpreferences, cParameters* parameters, cTheoreticalSpectrum& theoreticalspectrum, QWidget* parent) {
 	this->rowid = rowid;
+	this->activefileid = activefileid;
 	this->globalpreferences = globalpreferences;
 	this->parameters = parameters;
 	*this->theoreticalspectrum = theoreticalspectrum;
@@ -186,7 +190,12 @@ string cSpectrumDetailWidget::getPeaksTableAsHTMLString(bool unmatchedtheoretica
 
 		if ((parameters->mode == dereplication) || (parameters->mode == compoundsearch)) {
 			if (parameters->generateisotopepattern) {
-				columncount = 12;
+				if (parameters->calculatefdrs) {
+					columncount = 12;
+				}
+				else {
+					columncount = 10;
+				}
 			}
 			else {
 				columncount = 9;
@@ -227,7 +236,7 @@ string cSpectrumDetailWidget::getPeaksTableAsHTMLString(bool unmatchedtheoretica
 		s += "<th width=\"" + tdwidth + "%\"><b>Error [ppm]</b></th>";
 
 		if ((parameters->mode == dereplication) || (parameters->mode == compoundsearch)) {
-			if (parameters->generateisotopepattern) {
+			if (parameters->generateisotopepattern && parameters->calculatefdrs) {
 				s += "<th width=\"" + tdwidth + "%\"><b>Score</b></th>";
 				s += "<th width=\"" + tdwidth + "%\"><b>FDR</b></th>";
 			}
@@ -297,7 +306,7 @@ string cSpectrumDetailWidget::getPeaksTableAsHTMLString(bool unmatchedtheoretica
 				s += printHTMLTableCell(QVariant(cropDecimalsByteArray(peak->matchedabsoluteintensity)).toString().toStdString(), isred);
 				s += printHTMLTableCell(to_string(cropPrecisionToSixDecimals(peak->matchedppm)), isred);
 				if ((parameters->mode == dereplication) || (parameters->mode == compoundsearch)) {
-					if (parameters->generateisotopepattern) {
+					if (parameters->generateisotopepattern && parameters->calculatefdrs) {
 						s += printHTMLTableCell(to_string(cropPrecisionToSixDecimals(theoreticalspectrum->getTargetPatternScore(peak->groupid))), isred);
 						s += printHTMLTableCell(to_string(cropPrecisionToSixDecimals(theoreticalspectrum->getTargetPatternFDR(peak->groupid))), isred);
 					}
@@ -306,7 +315,7 @@ string cSpectrumDetailWidget::getPeaksTableAsHTMLString(bool unmatchedtheoretica
 			else {
 				s += "<td></td><td></td><td></td><td></td>";
 				if ((parameters->mode == dereplication) || (parameters->mode == compoundsearch)) {
-					if (parameters->generateisotopepattern) {
+					if (parameters->generateisotopepattern && parameters->calculatefdrs) {
 						s += "<td></td><td></td>";
 					}
 				}
@@ -382,7 +391,7 @@ string cSpectrumDetailWidget::getPeaksTableAsHTMLString(bool unmatchedtheoretica
 				s += "<td></td><td></td><td></td>";
 				if ((parameters->mode == dereplication) || (parameters->mode == compoundsearch)) {
 					s += "<td></td>";
-					if (parameters->generateisotopepattern) {
+					if (parameters->generateisotopepattern && parameters->calculatefdrs) {
 						s += "<td></td><td></td>";
 					}
 				}
@@ -453,7 +462,7 @@ string cSpectrumDetailWidget::getPartialPeaksTableAsHTMLString(int id, bool expo
 			s += printHTMLTableCell(to_string(id + 1), isred);
 		
 			if ((parameters->mode == dereplication) || (parameters->mode == compoundsearch)) {
-				if ((parameters->peaklistfileformat == mis) || (parameters->peaklistfileformat == imzML)) {
+				if ((parameters->peaklistfileformats[activefileid] == mis) || (parameters->peaklistfileformats[activefileid] == imzML)) {
 					s += printHTMLTableCell(to_string(theoreticalspectrum->getExperimentalSpectrum().getCoordinateX()), isred);
 					s += printHTMLTableCell(to_string(theoreticalspectrum->getExperimentalSpectrum().getCoordinateY()), isred);
 				}
@@ -484,7 +493,7 @@ string cSpectrumDetailWidget::getPartialPeaksTableAsHTMLString(int id, bool expo
 				s += printHTMLTableCell(QVariant(cropDecimalsByteArray(peak->matchedabsoluteintensity)).toString().toStdString(), isred);
 				s += printHTMLTableCell(to_string(cropPrecisionToSixDecimals(peak->matchedppm)), isred);
 				if ((parameters->mode == dereplication) || (parameters->mode == compoundsearch)) {
-					if (parameters->generateisotopepattern) {
+					if (parameters->generateisotopepattern && parameters->calculatefdrs) {
 						s += printHTMLTableCell(to_string(cropPrecisionToSixDecimals(theoreticalspectrum->getTargetPatternScore(peak->groupid))), isred);
 						s += printHTMLTableCell(to_string(cropPrecisionToSixDecimals(theoreticalspectrum->getTargetPatternFDR(peak->groupid))), isred);
 					}
@@ -493,7 +502,7 @@ string cSpectrumDetailWidget::getPartialPeaksTableAsHTMLString(int id, bool expo
 			else {
 				s += "<td></td><td></td><td></td><td></td>";
 				if ((parameters->mode == dereplication) || (parameters->mode == compoundsearch)) {
-					if (parameters->generateisotopepattern) {
+					if (parameters->generateisotopepattern && parameters->calculatefdrs) {
 						s += "<td></td><td></td>";
 					}
 				}
@@ -678,7 +687,7 @@ void cSpectrumDetailWidget::closeEvent(QCloseEvent *event) {
 }
 
 
-void cSpectrumDetailWidget::prepareToShow(QAction* actionShowIsomers, cPeakListSeries* rawdata, vector<cImzMLItem>* imzmlprofilemetadata, bool profilemz64precision, bool profileintensity64precision) {
+void cSpectrumDetailWidget::prepareToShow(QAction* actionShowIsomers, cPeakListSeries* rawdata, vector<cImzMLItem>* imzmlprofilemetadata, bool profilemz64precision, bool profileintensity64precision, bool usedefaultsize) {
 
 	if (!preparedToShow) {
 
@@ -686,7 +695,7 @@ void cSpectrumDetailWidget::prepareToShow(QAction* actionShowIsomers, cPeakListS
 			if ((parameters->mode == dereplication) || (parameters->mode == compoundsearch)) {
 				string title = "Experimental Spectrum No. " + to_string(rowid);
 				if (theoreticalspectrum) {
-					if ((parameters->peaklistfileformat == mis) || (parameters->peaklistfileformat == imzML)) {
+					if ((parameters->peaklistfileformats[activefileid] == mis) || (parameters->peaklistfileformats[activefileid] == imzML)) {
 						title += " - X: " + to_string(theoreticalspectrum->getExperimentalSpectrum().getCoordinateX());
 						title += " Y: " + to_string(theoreticalspectrum->getExperimentalSpectrum().getCoordinateY());
 					}
@@ -1206,7 +1215,11 @@ void cSpectrumDetailWidget::prepareToShow(QAction* actionShowIsomers, cPeakListS
 
 		setMenuBar(menuBar);
 
-		resize(defaultwinsizex, defaultwinsizey);
+		if (usedefaultsize) {
+			resize(defaultwinsizex, defaultwinsizey);
+		}
+
+		QRect geometry = normalGeometry();
 
 		if (parameters && theoreticalspectrum) {
 
@@ -1245,9 +1258,9 @@ void cSpectrumDetailWidget::prepareToShow(QAction* actionShowIsomers, cPeakListS
 			
 			}
 
-			spectrumscene->initialize(parameters, theoreticalspectrum, rawdata, rowid);
-			
-			preparePeaksTable();
+			spectrumscene->initialize(parameters, theoreticalspectrum, rawdata, rowid, activefileid);
+
+			preparePeaksTable(geometry);
 
 			if ((parameters->mode == denovoengine) || (parameters->mode == singlecomparison) || (parameters->mode == databasesearch)) {
 				if (localneutralosses.size() > 0) {
@@ -1398,6 +1411,76 @@ set<string>& cSpectrumDetailWidget::getLocalNeutralLosses() {
 }
 
 
+void cSpectrumDetailWidget::setProfileSpectrumEnabled(bool enable) {
+	actionRawData->setChecked(enable);
+}
+
+
+bool cSpectrumDetailWidget::hasProfileSpectrumEnabled() {
+	return actionRawData->isChecked();
+}
+
+
+void cSpectrumDetailWidget::setAbsoluteIntensityEnabled(bool enable) {
+	actionAbsoluteIntensity->setChecked(enable);
+}
+
+
+bool cSpectrumDetailWidget::hasAbsoluteIntensityEnabled() {
+	return actionAbsoluteIntensity->isChecked();
+}
+
+
+void cSpectrumDetailWidget::setHideMatchedPeaksEnabled(bool enable) {
+	actionHideMatched->setChecked(enable);
+}
+
+
+bool cSpectrumDetailWidget::hasHideMatchedPeaksEnabled() {
+	return actionHideMatched->isChecked();
+}
+
+
+void cSpectrumDetailWidget::setHideUnmatchedPeaksEnabled(bool enable) {
+	actionHideUnmatched->setChecked(enable);
+}
+
+
+bool cSpectrumDetailWidget::hasHideUnmatchedPeaksEnabled() {
+	return actionHideUnmatched->isChecked();
+}
+
+
+void cSpectrumDetailWidget::setHideScrambledPeaksEnabled(bool enable) {
+	actionHideScrambled->setChecked(enable);
+}
+
+
+bool cSpectrumDetailWidget::hasHideScrambledPeaksEnabled() {
+	return actionHideScrambled->isChecked();
+}
+
+
+void cSpectrumDetailWidget::setHidePeakLabelsEnabled(bool enable) {
+	actionHideLabels->setChecked(enable);
+}
+
+
+bool cSpectrumDetailWidget::hasHidePeakLabelsEnabled() {
+	return actionHideLabels->isChecked();
+}
+
+
+void cSpectrumDetailWidget::setMouseMzSelectionEnabled(bool enable) {
+	actionMouseMzSelection->setChecked(enable);
+}
+
+
+bool cSpectrumDetailWidget::hasMouseMzSelectionEnabled() {
+	return actionMouseMzSelection->isChecked();
+}
+
+
 void cSpectrumDetailWidget::keyPressEvent(QKeyEvent *event) {
 	if ((event->key() == Qt::Key_Enter) || (event->key() == Qt::Key_Return)) {
 		setMZInterval();
@@ -1435,8 +1518,12 @@ void cSpectrumDetailWidget::keyPressEvent(QKeyEvent *event) {
 }
 
 
-void cSpectrumDetailWidget::preparePeaksTable() {
+void cSpectrumDetailWidget::moveEvent(QMoveEvent *event) {
+	emit lastActiveDetail(rowid);
+}
 
+
+void cSpectrumDetailWidget::preparePeaksTable(QRect geometry) {
 	peakstable->setEditTriggers(QAbstractItemView::NoEditTriggers);
 	peakstable->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
 	peakstable->horizontalHeader()->setSectionsMovable(true);
@@ -1444,7 +1531,12 @@ void cSpectrumDetailWidget::preparePeaksTable() {
 
 	if ((parameters->mode == dereplication) || (parameters->mode == compoundsearch)) {
 		if (parameters->generateisotopepattern) {
-			peakstablemodel->setColumnCount(12);
+			if (parameters->calculatefdrs) {
+				peakstablemodel->setColumnCount(12);
+			}
+			else {
+				peakstablemodel->setColumnCount(10);
+			}
 		}
 		else {
 			peakstablemodel->setColumnCount(9);
@@ -1499,7 +1591,7 @@ void cSpectrumDetailWidget::preparePeaksTable() {
 
 	if ((parameters->mode == dereplication) || (parameters->mode == compoundsearch)) {
 
-		if (parameters->generateisotopepattern) {
+		if (parameters->generateisotopepattern && parameters->calculatefdrs) {
 			peakstablemodel->horizontalHeaderItem(currentcolumn)->setText("Score");
 			currentcolumn++;
 
@@ -1546,12 +1638,21 @@ void cSpectrumDetailWidget::preparePeaksTable() {
 	
 	peakstablemodel->setRowCount(thpeakscount + theoreticalspectrum->getUnmatchedExperimentalPeaksCount());
 
-	QProgressDialog progress("Preparing the peaklist...", /*"Cancel"*/0, 0, thpeakscount + theoreticalspectrum->getUnmatchedExperimentalPeaksCount(), parent);
+	QProgressDialog progress("Preparing the peaklist...", /*"Cancel"*/0, 0, thpeakscount + theoreticalspectrum->getUnmatchedExperimentalPeaksCount(), this);
 	progress.setMinimumWidth(250);
 	cEventFilter filter;
 	progress.installEventFilter(&filter);
 	progress.setMinimumDuration(0);
 	progress.setWindowModality(Qt::ApplicationModal);
+
+	progress.move(geometry.x(), geometry.y());
+
+	QRect progressgeometry;
+	progressgeometry.setRect(geometry.x() + geometry.width() / 2 - progress.width() / 2, geometry.y() + geometry.height() / 2 - progress.height() / 2, progress.width(), progress.height());
+
+	progress.setGeometry(progressgeometry);
+
+	progress.setValue(0);
 
 	peakstable->setModel(0);
 	proxymodel->setSourceModel(0);
@@ -1638,7 +1739,7 @@ void cSpectrumDetailWidget::preparePeaksTable() {
 			currentcolumn++;
 
 			if ((parameters->mode == dereplication) || (parameters->mode == compoundsearch)) {
-				if (parameters->generateisotopepattern) {
+				if (parameters->generateisotopepattern && parameters->calculatefdrs) {
 					peakstablemodel->setItem(i, currentcolumn, new QStandardItem());
 					peakstablemodel->item(i, currentcolumn)->setForeground(brush);
 					peakstablemodel->item(i, currentcolumn)->setData(QVariant::fromValue(cropPrecisionToSixDecimalsByteArray(theoreticalspectrum->getTargetPatternScore(peak->groupid))), Qt::DisplayRole);
@@ -1654,7 +1755,7 @@ void cSpectrumDetailWidget::preparePeaksTable() {
 		else {
 			currentcolumn += 4;
 			if ((parameters->mode == dereplication) || (parameters->mode == compoundsearch)) {
-				if (parameters->generateisotopepattern) {
+				if (parameters->generateisotopepattern && parameters->calculatefdrs) {
 					currentcolumn += 2;
 				}
 			}
@@ -1782,7 +1883,12 @@ void cSpectrumDetailWidget::preparePeaksTable() {
 
 	if ((parameters->mode == dereplication) || (parameters->mode == compoundsearch)) {
 		if (parameters->generateisotopepattern) {
-			peakstable->setColumnWidth(9, min(400, peakstable->columnWidth(9)));
+			if (parameters->calculatefdrs) {
+				peakstable->setColumnWidth(9, min(400, peakstable->columnWidth(9)));
+			}
+			else {
+				peakstable->setColumnWidth(7, min(400, peakstable->columnWidth(7)));
+			}
 		}
 		else {
 			peakstable->setColumnWidth(6, min(400, peakstable->columnWidth(6)));
@@ -2057,6 +2163,7 @@ void cSpectrumDetailWidget::exportTableToCSV() {
 		progress.installEventFilter(&filter);
 		progress.setMinimumDuration(0);
 		progress.setWindowModality(Qt::ApplicationModal);
+		progress.setValue(0);
 		
 		bool removefile = false;
 		QFile file(filename);
@@ -2273,13 +2380,13 @@ void cSpectrumDetailWidget::rawDataStateChanged(bool state) {
 	progress.installEventFilter(&filter);
 	progress.setMinimumDuration(0);
 	progress.setWindowModality(Qt::ApplicationModal);
-	progress.setValue(1);
+	progress.setValue(0);
 
 	if (parameters && theoreticalspectrum && parameters->useprofiledata) {
 
 		progress.setValue(10);
 
-		if (parameters->peaklistfileformat == baf) {
+		if (parameters->peaklistfileformats[activefileid] == baf) {
 
 			if ((parameters->mode == denovoengine) || (parameters->mode == databasesearch)) {
 				fileid = parameters->scannumber;
@@ -2291,17 +2398,50 @@ void cSpectrumDetailWidget::rawDataStateChanged(bool state) {
 
 			if ((targetid >= 0) && (targetid < rawdata->size())) {
 				if (state) {
-					peakliststream.open(parameters->peaklistfilename + ".profile." + to_string(fileid) + ".csv");
-					while (peakliststream.good() && !(strstr(s.c_str(), "M/Z"))) {
-						getline(peakliststream, s);
-					}
-
-					(*rawdata)[targetid].clear();
-					(*rawdata)[targetid].loadFromBAFStream(peakliststream);
-
-					peakliststream.close();
 
 					progress.setValue(33);
+
+					if (globalpreferences) {
+
+						string datafile = parameters->peaklistfilenames[activefileid] + ".profile." + to_string(fileid) + ".csv";
+
+						#if OS_TYPE == WIN
+							if (globalpreferences->profilebafprocessingmethod == 1) {
+								if (!QFile(datafile.c_str()).exists()) {
+									//string s = "External\\windows\\profilespectrumreader.exe \"" + parameters->peaklistfilenames[activefileid] + "\" " + to_string(fileid);
+									//system(s.c_str());
+
+									QString command = "External\\windows\\profilespectrumreader.exe";
+									QString param1 = parameters->peaklistfilenames[activefileid].c_str();
+									QString param2 = to_string(fileid).c_str();
+
+									QStringList params;
+									params << param1;
+									params << param2;
+
+									QProcess convert;
+									convert.start(command, params);
+									convert.waitForFinished(-1);
+								}
+							}
+						#endif
+
+						if (QFile(datafile.c_str()).exists()) {
+							peakliststream.open(datafile);
+
+							while (peakliststream.good() && !(strstr(s.c_str(), "M/Z"))) {
+								getline(peakliststream, s);
+							}
+
+							(*rawdata)[targetid].clear();
+							(*rawdata)[targetid].loadFromBAFStream(peakliststream);
+
+							peakliststream.close();
+						}
+
+					}
+
+					progress.setValue(66);
 
 					(*rawdata)[targetid].sortbyMass();
 					(*rawdata)[targetid].normalizeIntenzityByValue(theoreticalspectrum->getExperimentalSpectrum().getMaximumAbsoluteIntensity() * 100.0 / theoreticalspectrum->getExperimentalSpectrum().getMaximumRelativeIntensity());
@@ -2311,7 +2451,7 @@ void cSpectrumDetailWidget::rawDataStateChanged(bool state) {
 						(*rawdata)[targetid].cropMaximumMZRatio(charge(uncharge(parameters->precursormass, parameters->precursorcharge) + maxmzoverhead, (parameters->precursorcharge > 0) ? 1 : -1), parameters->precursormasserrortolerance);
 					}
 					
-					progress.setValue(66);
+					progress.setValue(99);
 				}
 				else {
 					(*rawdata)[targetid].clear();
@@ -2322,23 +2462,23 @@ void cSpectrumDetailWidget::rawDataStateChanged(bool state) {
 
 		}
 
-		if (parameters->peaklistfileformat == dat) {
+		if (parameters->peaklistfileformats[activefileid] == dat) {
 
 			targetid = rowid - 1;
 
 			if ((targetid >= 0) && (targetid < rawdata->size())) {
 				if (state) {
-					string mgfname = parameters->peaklistfilename.substr(0, parameters->peaklistfilename.rfind('/'));
+					string mgfname = parameters->peaklistfilenames[activefileid].substr(0, parameters->peaklistfilenames[activefileid].rfind('/'));
 					mgfname = mgfname.substr(0, mgfname.size() - 4);
 					mgfname += ".mgf";
 
 					peakliststream.open(mgfname);
 
 					(*rawdata)[targetid].clear();
-					(*rawdata)[targetid].loadFromMGFStream(peakliststream);
+					(*rawdata)[targetid].loadFromMGFStream(peakliststream, 1);
 					while (peakliststream.good() && (theoreticalspectrum->getExperimentalSpectrum().getTitle().compare((*rawdata)[targetid].getTitle()) != 0)) {
 						(*rawdata)[targetid].clear();
-						(*rawdata)[targetid].loadFromMGFStream(peakliststream);
+						(*rawdata)[targetid].loadFromMGFStream(peakliststream, 1);
 					}
 
 					if ((theoreticalspectrum->getExperimentalSpectrum().getTitle().compare((*rawdata)[targetid].getTitle()) != 0)) {
@@ -2368,7 +2508,7 @@ void cSpectrumDetailWidget::rawDataStateChanged(bool state) {
 
 		}
 
-		if (parameters->peaklistfileformat == raw) {
+		if (parameters->peaklistfileformats[activefileid] == raw) {
 
 			if ((parameters->mode == denovoengine) || (parameters->mode == databasesearch)) {
 				fileid = parameters->scannumber - 1;
@@ -2385,7 +2525,7 @@ void cSpectrumDetailWidget::rawDataStateChanged(bool state) {
 
 					bool terminatecomputation = false;
 
-					string basename = parameters->peaklistfilename.substr(0, (int)parameters->peaklistfilename.size() - 3);
+					string basename = parameters->peaklistfilenames[activefileid].substr(0, (int)parameters->peaklistfilenames[activefileid].size() - 3);
 					string mzmlname = basename + "mzML";
 					
 					int resultcode = mzml.parse(mzmlname, peaklists, fileid, parameters->mode, 0 /* ok */, terminatecomputation /* ok */);
@@ -2398,7 +2538,7 @@ void cSpectrumDetailWidget::rawDataStateChanged(bool state) {
 						ifstream mgfifstream;
 						mgfifstream.open(mgfname);
 						(*rawdata)[targetid].clear();
-						(*rawdata)[targetid].loadFromMGFStream(mgfifstream);
+						(*rawdata)[targetid].loadFromMGFStream(mgfifstream, 1);
 						mgfifstream.close();
 
 						QFile::remove(mgfname.c_str());
@@ -2420,7 +2560,7 @@ void cSpectrumDetailWidget::rawDataStateChanged(bool state) {
 
 		}
 
-		if (parameters->peaklistfileformat == mzML) {
+		if (parameters->peaklistfileformats[activefileid] == mzML) {
 
 			if ((parameters->mode == denovoengine) || (parameters->mode == databasesearch)) {
 				fileid = parameters->scannumber - 1;
@@ -2437,7 +2577,7 @@ void cSpectrumDetailWidget::rawDataStateChanged(bool state) {
 
 					bool terminatecomputation = false;
 
-					string basename = parameters->peaklistfilename.substr(0, (int)parameters->peaklistfilename.size() - 4);
+					string basename = parameters->peaklistfilenames[activefileid].substr(0, (int)parameters->peaklistfilenames[activefileid].size() - 4);
 					string mzmlname = basename + "mzML";
 
 					int resultcode = mzml.parse(mzmlname, peaklists, fileid, parameters->mode, 0 /* ok */, terminatecomputation /* ok */);
@@ -2474,7 +2614,7 @@ void cSpectrumDetailWidget::rawDataStateChanged(bool state) {
 								ifstream mgfifstream;
 								mgfifstream.open(mgfname);
 								(*rawdata)[targetid].clear();
-								(*rawdata)[targetid].loadFromMGFStream(mgfifstream);
+								(*rawdata)[targetid].loadFromMGFStream(mgfifstream, 1);
 								mgfifstream.close();
 
 								QFile::remove(mgfname.c_str());
@@ -2496,7 +2636,7 @@ void cSpectrumDetailWidget::rawDataStateChanged(bool state) {
 
 		}
 
-		if ((parameters->peaklistfileformat == imzML) && ((parameters->mode == dereplication) || (parameters->mode == compoundsearch)) && (imzmlprofilemetadata->size() > 0)) {
+		if ((parameters->peaklistfileformats[activefileid] == imzML) && ((parameters->mode == dereplication) || (parameters->mode == compoundsearch)) && (imzmlprofilemetadata->size() > 0)) {
 			targetid = rowid - 1;
 
 			if ((targetid >= 0) && (targetid < rawdata->size())) {
@@ -2571,7 +2711,7 @@ void cSpectrumDetailWidget::rawDataStateChanged(bool state) {
 							QFile::remove(mzmlname.c_str());
 
 							mgfifstream.open(mgfname);
-							(*rawdata)[targetid].loadFromMGFStream(mgfifstream);
+							(*rawdata)[targetid].loadFromMGFStream(mgfifstream, 1);
 							mgfifstream.close();
 
 							QFile::remove(mgfname.c_str());

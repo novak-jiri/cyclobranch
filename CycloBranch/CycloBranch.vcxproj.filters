@@ -140,15 +140,6 @@
     <ClCompile Include="core\cCandidateSet.cpp">
       <Filter>Source Files\core</Filter>
     </ClCompile>
-    <ClCompile Include="parallel\cSpectrumComparatorThread.cpp">
-      <Filter>Source Files\parallel</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_cSpectrumComparatorThread.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_cSpectrumComparatorThread.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
     <ClCompile Include="GeneratedFiles\Debug\moc_cGraphReaderThread.cpp">
       <Filter>Generated Files\Debug</Filter>
     </ClCompile>
@@ -521,6 +512,168 @@
     <ClCompile Include="GeneratedFiles\Release\moc_cPreferencesIonTypeDialog.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_cImageWindowImportDialog.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_cImageWindowImportDialog.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_cImageWindowTabElectron.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_cImageWindowTabElectron.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_cImageWindowTabOptical.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_cImageWindowTabOptical.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="gui\cImageWindowImportDialog.cpp">
+      <Filter>Source Files\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="gui\cImageWindowTabElectron.cpp">
+      <Filter>Source Files\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="gui\cImageWindowTabOptical.cpp">
+      <Filter>Source Files\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_cSpectrumComparatorThreadMS1.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_cSpectrumComparatorThreadMS1.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_cSpectrumComparatorThreadMS2.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_cSpectrumComparatorThreadMS2.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="parallel\cSpectrumComparatorThreadMS1.cpp">
+      <Filter>Source Files\parallel</Filter>
+    </ClCompile>
+    <ClCompile Include="parallel\cSpectrumComparatorThreadMS2.cpp">
+      <Filter>Source Files\parallel</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_cSpectrumAnalyzerThreadMS1.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_cSpectrumAnalyzerThreadMS1.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="parallel\cSpectrumAnalyzerThreadMS1.cpp">
+      <Filter>Source Files\parallel</Filter>
+    </ClCompile>
+    <ClCompile Include="parallel\cSpectrumGeneratorThreadMS1.cpp">
+      <Filter>Source Files\parallel</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_cSpectrumGeneratorThreadMS1.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_cSpectrumGeneratorThreadMS1.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_cPubChemSearchWidget.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_cPubChemSearchWidget.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="gui\cPubChemSearchWidget.cpp">
+      <Filter>Source Files\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="gui\cPatternSimulatorSceneWidget.cpp">
+      <Filter>Source Files\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_cPatternSimulatorSceneWidget.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_cPatternSimulatorSceneWidget.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_cPatternSimulatorWidget.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_cPatternSimulatorWidget.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="gui\cPatternSimulatorWidget.cpp">
+      <Filter>Source Files\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_cFormulaPredictor.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_cFormulaPredictor.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="gui\cFormulaPredictor.cpp">
+      <Filter>Source Files\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_cFormulaPredictorThread.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_cFormulaPredictorThread.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="parallel\cFormulaPredictorThread.cpp">
+      <Filter>Source Files\parallel</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_cMultipleDatasetsTableWidget.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_cMultipleDatasetsTableWidget.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="gui\cMultipleDatasetsTableWidget.cpp">
+      <Filter>Source Files\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="gui\cMultipleDatasetsTableProxyModel.cpp">
+      <Filter>Source Files\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_cMultipleDatasetsTableProxyModel.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_cMultipleDatasetsTableProxyModel.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_cDefineCalibrationWidget.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_cDefineCalibrationWidget.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="gui\cDefineCalibrationWidget.cpp">
+      <Filter>Source Files\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_cCalibrationChart.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_cCalibrationChart.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="gui\cCalibrationChart.cpp">
+      <Filter>Source Files\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_cCalibrationChartScene.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_cCalibrationChartScene.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="gui\cCalibrationChartScene.cpp">
+      <Filter>Source Files\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_cCalibrationChartProxyModel.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_cCalibrationChartProxyModel.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="gui\cCalibrationChartProxyModel.cpp">
+      <Filter>Source Files\gui</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="gui\cAboutWidget.h">
@@ -543,9 +696,6 @@
     </CustomBuild>
     <CustomBuild Include="gui\cSpectrumDetailWidget.h">
       <Filter>Header Files\gui</Filter>
-    </CustomBuild>
-    <CustomBuild Include="parallel\cSpectrumComparatorThread.h">
-      <Filter>Header Files\parallel</Filter>
     </CustomBuild>
     <CustomBuild Include="parallel\cGraphReaderThread.h">
       <Filter>Header Files\parallel</Filter>
@@ -665,6 +815,60 @@
       <Filter>Header Files\gui</Filter>
     </CustomBuild>
     <CustomBuild Include="gui\cPreferencesIonTypeDialog.h">
+      <Filter>Header Files\gui</Filter>
+    </CustomBuild>
+    <CustomBuild Include="gui\cImageWindowImportDialog.h">
+      <Filter>Header Files\gui</Filter>
+    </CustomBuild>
+    <CustomBuild Include="gui\cImageWindowTabElectron.h">
+      <Filter>Header Files\gui</Filter>
+    </CustomBuild>
+    <CustomBuild Include="gui\cImageWindowTabOptical.h">
+      <Filter>Header Files\gui</Filter>
+    </CustomBuild>
+    <CustomBuild Include="parallel\cSpectrumComparatorThreadMS1.h">
+      <Filter>Header Files\parallel</Filter>
+    </CustomBuild>
+    <CustomBuild Include="parallel\cSpectrumComparatorThreadMS2.h">
+      <Filter>Header Files\parallel</Filter>
+    </CustomBuild>
+    <CustomBuild Include="parallel\cSpectrumAnalyzerThreadMS1.h">
+      <Filter>Header Files\parallel</Filter>
+    </CustomBuild>
+    <CustomBuild Include="parallel\cSpectrumGeneratorThreadMS1.h">
+      <Filter>Header Files\parallel</Filter>
+    </CustomBuild>
+    <CustomBuild Include="gui\cPubChemSearchWidget.h">
+      <Filter>Header Files\gui</Filter>
+    </CustomBuild>
+    <CustomBuild Include="gui\cPatternSimulatorSceneWidget.h">
+      <Filter>Header Files\gui</Filter>
+    </CustomBuild>
+    <CustomBuild Include="gui\cPatternSimulatorWidget.h">
+      <Filter>Header Files\gui</Filter>
+    </CustomBuild>
+    <CustomBuild Include="gui\cFormulaPredictor.h">
+      <Filter>Header Files\gui</Filter>
+    </CustomBuild>
+    <CustomBuild Include="parallel\cFormulaPredictorThread.h">
+      <Filter>Header Files\parallel</Filter>
+    </CustomBuild>
+    <CustomBuild Include="gui\cMultipleDatasetsTableWidget.h">
+      <Filter>Header Files\gui</Filter>
+    </CustomBuild>
+    <CustomBuild Include="gui\cMultipleDatasetsTableProxyModel.h">
+      <Filter>Header Files\gui</Filter>
+    </CustomBuild>
+    <CustomBuild Include="gui\cDefineCalibrationWidget.h">
+      <Filter>Header Files\gui</Filter>
+    </CustomBuild>
+    <CustomBuild Include="gui\cCalibrationChart.h">
+      <Filter>Header Files\gui</Filter>
+    </CustomBuild>
+    <CustomBuild Include="gui\cCalibrationChartScene.h">
+      <Filter>Header Files\gui</Filter>
+    </CustomBuild>
+    <CustomBuild Include="gui\cCalibrationChartProxyModel.h">
       <Filter>Header Files\gui</Filter>
     </CustomBuild>
   </ItemGroup>

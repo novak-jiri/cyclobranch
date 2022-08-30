@@ -178,10 +178,19 @@ class cTheoreticalSpectrum {
 	void removeUnmatchedIsotopePatterns(cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks, cPeaksList& outputtheoreticalpeaks, bool storeunmatchedpeaks);
 
 	// remove unmatched features
-	int removeUnmatchedFeatures(bool lcms, cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks, vector< vector<int> >& hintsindex/*, int id*/);
+	int removeUnmatchedFeatures(bool lcms, int peaklistseriesvectorid, cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks, vector< vector<int> >& hintsindex/*, int id*/);
 
 	// remove unmatched compounds
 	int removeUnmatchedCompounds(cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks, int minimumiontypes);
+
+	// remove compounds outside RT range
+	void removeCompoundsOutsideRTRange(cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks);
+
+	// remove peaks under annotation threshold
+	void removePeaksUnderAnnotationThreshold(cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks);
+
+	// remove isotopic patterns under annotation threshold
+	void removePatternsUnderAnnotationThreshold(cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks);
 
 	// remove unmatched patterns in fine isotopic patterns
 	void removeUnmatchedPatternsFineSpectra(cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks);
@@ -223,7 +232,7 @@ class cTheoreticalSpectrum {
 	void fillExperimentalAnnotationsAndRemoveUnmatchedTheoreticalPeaks(int& theoreticalpeaksrealsize, ePeptideType peptidetype, cPeaksList& unmatchedpeaksinmatchedpatterns, bool reportunmatchedtheoreticalpeaks, bool writedescription);
 
 	// check the existence of an isotope
-	bool checkIsotope(string& elementstring, string& isotopestring, double isotopemass1, double isotopemass2, double intensityratio, cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks, int start, int stop, int maximumintensityid, double maximumexperimentalintensity);
+	bool checkIsotope(string& elementstring, string& isotopestring, double isotopemass1, double isotopemass2, double minintensityratio, double maxintensityratio, cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks, int start, int stop, int maximumintensityid, double maximumexperimentalintensity);
 
 	// get intensity multiplier
 	double getIntensityMultiplier(cPeaksList& theoreticalpeaks, int peakid, string& elementstring, size_t startpos);
@@ -371,37 +380,47 @@ public:
 
 	/**
 		\brief Generate a simple mass spectrum.
+		\param sequencestart index of the first item to be processed
+		\param sequencestop index of the last item to be processed (excluding the last item)
 		\param terminatecomputation reference to a variable determining that the computation must be stopped
 		\param writedescription if true then string descriptions of peaks are filled
 	*/ 
-	void generateMSSpectrum(bool& terminatecomputation, bool writedescription);
+	void generateMSSpectrum(int sequencestart, int sequencestop, bool& terminatecomputation, bool writedescription);
 
 
 	/**
 		\brief Generate a simple mass spectrum with fine isotopic patterns.
+		\param sequencestart index of the first item to be processed
+		\param sequencestop index of the last item to be processed (excluding the last item)
 		\param terminatecomputation reference to a variable determining that the computation must be stopped
 	*/ 
-	void generateFineMSSpectrum(bool& terminatecomputation);
+	void generateFineMSSpectrum(int sequencestart, int sequencestop, bool& terminatecomputation);
 
 
 	/**
 		\brief Get a map of search hints to identify features in LC-MS data.
 		\param id identifier of an experimental spectrum
+		\param peaklistseriesvectorid id of a peaklistseriesvector
 		\param tsfull theoretical spectrum
 		\param unmatchedpeaksinmatchedpatterns unmatched peaks in matched isotope patterns
 		\param hintsindex index of experimental spectra for every matched theoretical peak
+		\param lcmsrt true if LC-MS data are processed and retention time is available
+		\param skipcomparison if true, the peak comparison is skipped
 	*/
-	void getHintsIndex(int id, cTheoreticalSpectrum& tsfull, cPeaksList& unmatchedpeaksinmatchedpatterns, vector< vector<int> >& hintsindex);
+	void getHintsIndex(int id, int peaklistseriesvectorid, cTheoreticalSpectrum& tsfull, cPeaksList& unmatchedpeaksinmatchedpatterns, vector< vector<int> >& hintsindex, bool lcmsrt, bool skipcomparison);
 
 
 	/**
 		\brief Compare theoretical peaks with an experimental spectrum.
 		\param id identifier of an experimental spectrum
+		\param peaklistseriesvectorid id of a peaklistseriesvector
 		\param tsfull theoretical spectrum with descriptions of peaks
 		\param unmatchedpeaksinmatchedpatterns unmatched peaks in matched isotope patterns
 		\param hintsindex index of experimental spectra for every matched theoretical peak
+		\param lcmsrt true if LC-MS data are processed and retention time is available
+		\param skipcomparison if true, the peak comparison is skipped
 	*/
-	void compareMSSpectrum(int id, cTheoreticalSpectrum& tsfull, cPeaksList& unmatchedpeaksinmatchedpatterns, vector< vector<int> >& hintsindex);
+	void compareMSSpectrum(int id, int peaklistseriesvectorid, cTheoreticalSpectrum& tsfull, cPeaksList& unmatchedpeaksinmatchedpatterns, vector< vector<int> >& hintsindex, bool lcmsrt, bool skipcomparison);
 
 
 	/**
@@ -695,8 +714,26 @@ public:
 	/**
 		\brief Load the structure from an input stream.
 		\param is an input stream
-	*/ 
-	void load(ifstream& is);
+		\param fileversionpart1 first number of .res the file version
+		\param fileversionpart2 second number of .res the file version
+		\param fileversionpart3 third number of .res the file version
+	*/
+	void load(ifstream& is, int fileversionpart1, int fileversionpart2, int fileversionpart3);
+
+
+	/**
+		\brief Check if the object equals to another object.
+		\param secondtheoreticalspectrum object for comparison
+		\retval bool true if the objects are equals
+	*/
+	bool equals(cTheoreticalSpectrum& secondtheoreticalspectrum);
+
+
+	/**
+		\brief Attach another spectrum.
+		\param secondtheoreticalspectrum spectrum to be attached
+	*/
+	void attach(cTheoreticalSpectrum& secondtheoreticalspectrum);
 
 };
 

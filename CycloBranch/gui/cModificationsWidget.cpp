@@ -14,6 +14,8 @@
 #include <QLineEdit>
 #include <QMenuBar>
 #include <QMenu>
+#include <QClipboard>
+#include <QApplication>
 
 
 cModificationsWidget::cModificationsWidget(cGlobalPreferences* globalpreferences, QWidget* parent) {
@@ -420,6 +422,34 @@ void cModificationsWidget::keyPressEvent(QKeyEvent *event) {
 		rowsfilterwholeword->setChecked(!rowsfilterwholeword->isChecked());
 	}
 
+	if ((event->modifiers() == Qt::ControlModifier) && (event->key() == Qt::Key_C)) {
+		QModelIndexList selectedindexes = database->selectionModel()->selectedIndexes();
+		QStandardItem* item;
+
+		QString selectedtext;
+		string itemtext;
+
+		int selectedcount = selectedindexes.count();
+		for (int i = 0; i < selectedcount; i++) {
+			if (i > 0) {
+				if (proxymodel->mapToSource(selectedindexes[i - 1]).row() != proxymodel->mapToSource(selectedindexes[i]).row()) {
+					selectedtext += "\n";
+				}
+				else {
+					selectedtext += "\t";
+				}
+			}
+
+			item = databasemodel->itemFromIndex(proxymodel->mapToSource(selectedindexes[i]));
+			if (item) {
+				itemtext = item->text().toStdString();
+				selectedtext += stripHTML(itemtext).c_str();
+			}
+		}
+		selectedtext += "\n";
+		QApplication::clipboard()->setText(selectedtext);
+	}
+
 	event->accept();
 }
 
@@ -472,6 +502,7 @@ void cModificationsWidget::openDatabase() {
 			progress.installEventFilter(&filter);
 			progress.setMinimumDuration(0);
 			progress.setWindowModality(Qt::ApplicationModal);
+			progress.setValue(0);
 
 			database->setModel(0);
 			proxymodel->setSourceModel(0);
@@ -564,6 +595,7 @@ bool cModificationsWidget::saveDatabase() {
 		progress.installEventFilter(&filter);
 		progress.setMinimumDuration(0);
 		progress.setWindowModality(Qt::ApplicationModal);
+		progress.setValue(0);
 
 		cFragmentIonType modification;
 		modifications.clear();
@@ -777,6 +809,7 @@ void cModificationsWidget::importDatabase() {
 			progress.installEventFilter(&filter);
 			progress.setMinimumDuration(0);
 			progress.setWindowModality(Qt::ApplicationModal);
+			progress.setValue(0);
 
 			database->setModel(0);
 			proxymodel->setSourceModel(0);

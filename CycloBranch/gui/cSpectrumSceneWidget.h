@@ -55,8 +55,9 @@ public:
 		\param theoreticalspectrum a pointer to a theoretical spectrum
 		\param rawdata a pointer to a structure handling raw data
 		\param rowid id of a row
+		\param activefileid id of an active file
 	*/ 
-	void initialize(cParameters* parameters, cTheoreticalSpectrum* theoreticalspectrum, cPeakListSeries* rawdata, int rowid);
+	void initialize(cParameters* parameters, cTheoreticalSpectrum* theoreticalspectrum, cPeakListSeries* rawdata, int rowid, int activefileid);
 
 
 	/**
@@ -212,6 +213,8 @@ private:
 	bool enablemousemzselection;
 
 	double maxmzoverhead;
+
+	int activefileid;
 
 
 	double getMZRatioFromXPosition(int x, int w);

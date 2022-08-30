@@ -62,7 +62,7 @@ class cSummaryFormula {
 
 	string formula;
 
-	void combineAtoms(cPeakListSeries& peaklistseries, int peaklistseriessize, vector<int>& peaklistseriessizes, cPeaksList& isotopeprofile, vector<int>& depthvector, int depth, double mass, double intensity, int charge, double minimumabsoluteintensity);
+	void combineAtoms(cPeakListSeries& peaklistseries, int peaklistseriessize, vector<int>& peaklistseriessizes, cPeaksList& isotopeprofile, vector<int>& depthvector, int depth, double mass, double intensity, double charge, double minimumabsoluteintensity, double& localmaximumintensity, double minimumrelativeintensity);
 
 	double getIntensity(cBricksDatabase& bricksprobabilities, vector<int>& combarray, int mostintenseid, int mostintenseatomscount, int isotopecount);
 
@@ -180,10 +180,11 @@ public:
 		\param fwhm FWHM
 		\param charge charge
 		\param positive true if the charge is positive charge, false if the charge is negative
+		\param maxchangedatoms maximum number of atoms of an element which are replaced with isotopic variants
 		\param writedescription if true then string descriptions of peaks are filled
 		\retval cPeaksList isotopic pattern of the formula
 	*/
-	cPeaksList getIsotopePattern(double fwhm, int charge, bool positive, bool writedescription);
+	cPeaksList getIsotopePattern(double fwhm, int charge, bool positive, int maxchangedatoms, bool writedescription);
 
 
 	/**
@@ -198,6 +199,14 @@ public:
 		\param is an input stream
 	*/ 
 	void load(ifstream& is);
+
+
+	/**
+		\brief Check if the object equals to another object.
+		\param secondformula object for comparison
+		\retval bool true if the objects are equals
+	*/
+	bool equals(cSummaryFormula& secondformula);
 
 };
 

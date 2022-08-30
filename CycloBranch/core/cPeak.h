@@ -220,6 +220,14 @@ struct cPeak {
 	*/ 
 	void load(ifstream& is);
 
+
+	/**
+		\brief Check if the object equals to another object.
+		\param secondpeak object for comparison
+		\retval bool true if the objects are equals
+	*/
+	bool equals(cPeak& secondpeak);
+
 };
 
 

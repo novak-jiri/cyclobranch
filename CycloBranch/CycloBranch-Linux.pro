@@ -4,9 +4,9 @@
 
 TEMPLATE = app
 TARGET = CycloBranch
-QT += core gui widgets printsupport svg
+QT += core gui widgets printsupport svg network concurrent
 INCLUDEPATH += . core gui parallel
-QMAKE_CXXFLAGS += -std=c++11 -DLINUX -m64
+QMAKE_CXXFLAGS += -std=c++17 -DLINUX -m64
 QMAKE_LIBS += -lboost_regex -lboost_iostreams -lxerces-c
 OBJECTS_DIR = build/
 MOC_DIR = moc/
@@ -39,20 +39,28 @@ HEADERS += core/cBrick.h \
            gui/cBranchedWidget.h \
            gui/cBricksDatabaseProxyModel.h \
            gui/cBricksDatabaseWidget.h \
+           gui/cCalibrationChart.h \
+           gui/cCalibrationChartProxyModel.h \
+           gui/cCalibrationChartScene.h \
            gui/cCheckBoxDelegate.h \
            gui/cChromatogramWindow.h \
            gui/cChromatogramWindowWidget.h \
            gui/cComboBoxDelegate.h \
            gui/cCyclicWidget.h \
+           gui/cDefineCalibrationWidget.h \
            gui/cDrawPeptideWidget.h \
            gui/cEventFilter.h \
            gui/cExportDialog.h \
            gui/cFindDialog.h \
+           gui/cFormulaPredictor.h \
            gui/cFragmentIonsListWidget.h \
            gui/cGraphWidget.h \
            gui/cHTMLDelegate.h \
            gui/cHTMLExportDialog.h \
            gui/cImageWindow.h \
+           gui/cImageWindowImportDialog.h \
+           gui/cImageWindowTabElectron.h \
+           gui/cImageWindowTabOptical.h \
            gui/cImageWindowWidget.h \
            gui/cLinearWidget.h \
            gui/cMainThread.h \
@@ -61,14 +69,19 @@ HEADERS += core/cBrick.h \
            gui/cModificationsProxyModel.h \
            gui/cModificationsWidget.h \
            gui/cMultipleButtonDelegate.h \
+           gui/cMultipleDatasetsTableProxyModel.h \
+           gui/cMultipleDatasetsTableWidget.h \
            gui/cNeutralLossesListWidget.h \
            gui/cParametersWidget.h \
+           gui/cPatternSimulatorSceneWidget.h \
+           gui/cPatternSimulatorWidget.h \
            gui/cPreferencesDialog.h \
            gui/cPreferencesIonTypeDialog.h \
            gui/cPreferencesTabDataProcessing.h \
            gui/cPreferencesTabDirectories.h \
            gui/cPreferencesTabIonTypes.h \
            gui/cPreferencesTabURLs.h \
+           gui/cPubChemSearchWidget.h \
            gui/cSequenceDatabaseProxyModel.h \
            gui/cSequenceDatabaseWidget.h \
            gui/cSpectrumDetailProxyModel.h \
@@ -77,8 +90,12 @@ HEADERS += core/cBrick.h \
            gui/cSummaryPeaksTableProxyModel.h \
            gui/cSummaryPeaksTableWidget.h \
            gui/cViewButtonDelegate.h \
+           parallel/cFormulaPredictorThread.h \
            parallel/cGraphReaderThread.h \
-           parallel/cSpectrumComparatorThread.h
+           parallel/cSpectrumAnalyzerThreadMS1.h \
+           parallel/cSpectrumComparatorThreadMS1.h \
+           parallel/cSpectrumComparatorThreadMS2.h \
+           parallel/cSpectrumGeneratorThreadMS1.h
 SOURCES += core/cBrick.cpp \
            core/cBricksDatabase.cpp \
            core/cCandidate.cpp \
@@ -105,20 +122,28 @@ SOURCES += core/cBrick.cpp \
            gui/cBranchedWidget.cpp \
            gui/cBricksDatabaseProxyModel.cpp \
            gui/cBricksDatabaseWidget.cpp \
+           gui/cCalibrationChart.cpp \
+           gui/cCalibrationChartProxyModel.cpp \
+           gui/cCalibrationChartScene.cpp \
            gui/cCheckBoxDelegate.cpp \
            gui/cChromatogramWindow.cpp \
            gui/cChromatogramWindowWidget.cpp \
            gui/cComboBoxDelegate.cpp \
            gui/cCyclicWidget.cpp \
+           gui/cDefineCalibrationWidget.cpp \
            gui/cDrawPeptideWidget.cpp \
            gui/cEventFilter.cpp \
            gui/cExportDialog.cpp \
            gui/cFindDialog.cpp \
+           gui/cFormulaPredictor.cpp \
            gui/cFragmentIonsListWidget.cpp \
            gui/cGraphWidget.cpp \
            gui/cHTMLDelegate.cpp \
            gui/cHTMLExportDialog.cpp \
            gui/cImageWindow.cpp \
+           gui/cImageWindowImportDialog.cpp \
+           gui/cImageWindowTabElectron.cpp \
+           gui/cImageWindowTabOptical.cpp \
            gui/cImageWindowWidget.cpp \
            gui/cLinearWidget.cpp \
            gui/cMainThread.cpp \
@@ -127,14 +152,19 @@ SOURCES += core/cBrick.cpp \
            gui/cModificationsProxyModel.cpp \
            gui/cModificationsWidget.cpp \
            gui/cMultipleButtonDelegate.cpp \
+           gui/cMultipleDatasetsTableProxyModel.cpp \
+           gui/cMultipleDatasetsTableWidget.cpp \
            gui/cNeutralLossesListWidget.cpp \
            gui/cParametersWidget.cpp \
+           gui/cPatternSimulatorSceneWidget.cpp \
+           gui/cPatternSimulatorWidget.cpp \
            gui/cPreferencesDialog.cpp \
            gui/cPreferencesIonTypeDialog.cpp \
            gui/cPreferencesTabDataProcessing.cpp \
            gui/cPreferencesTabDirectories.cpp \
            gui/cPreferencesTabIonTypes.cpp \
            gui/cPreferencesTabURLs.cpp \
+           gui/cPubChemSearchWidget.cpp \
            gui/cSequenceDatabaseProxyModel.cpp \
            gui/cSequenceDatabaseWidget.cpp \
            gui/cSpectrumDetailProxyModel.cpp \
@@ -143,6 +173,10 @@ SOURCES += core/cBrick.cpp \
            gui/cSummaryPeaksTableProxyModel.cpp \
            gui/cSummaryPeaksTableWidget.cpp \
            gui/cViewButtonDelegate.cpp \
+           parallel/cFormulaPredictorThread.cpp \
            parallel/cGraphReaderThread.cpp \
-           parallel/cSpectrumComparatorThread.cpp \
+           parallel/cSpectrumAnalyzerThreadMS1.cpp \
+           parallel/cSpectrumComparatorThreadMS1.cpp \
+           parallel/cSpectrumComparatorThreadMS2.cpp \
+           parallel/cSpectrumGeneratorThreadMS1.cpp \
            main.cpp

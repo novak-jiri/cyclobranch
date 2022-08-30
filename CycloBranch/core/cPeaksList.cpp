@@ -53,6 +53,7 @@ cPeaksList::cPeaksList(const cPeaksList& peakslist) {
 cPeaksList& cPeaksList::operator=(const cPeaksList& peakslist) {
 	peaks = peakslist.peaks;
 	rt = peakslist.rt;
+	rtunit = peakslist.rtunit;
 	x = peakslist.x;
 	y = peakslist.y;
 	title = peakslist.title;
@@ -63,6 +64,7 @@ cPeaksList& cPeaksList::operator=(const cPeaksList& peakslist) {
 void cPeaksList::clear() {
 	peaks.clear();
 	rt = 0;
+	rtunit = 1;
 	x = 0;
 	y = 0;
 	title = "";
@@ -226,7 +228,7 @@ void cPeaksList::storeToIBDStream(ofstream &ibdstream, bool use_64bit_float_mz_p
 }
 
 
-void cPeaksList::loadFromMGFStream(ifstream &stream) {
+void cPeaksList::loadFromMGFStream(ifstream &stream, int timeunit) {
 	string s, tmps;
 	cPeak p;
 	size_t pos;
@@ -255,6 +257,7 @@ void cPeaksList::loadFromMGFStream(ifstream &stream) {
 					tmps = tmps.substr(0, pos);
 				}
 				rt = atof(tmps.c_str());
+				rtunit = timeunit;
 			}
 		}
 	}
@@ -291,7 +294,7 @@ int cPeaksList::size() {
 }
 
 
-string cPeaksList::print(bool htmlterminatelines) {
+string cPeaksList::print(bool htmlterminatelines, bool printgroupid) {
 	string s = "";
 
 	for (int i = 0; i < size(); i++) {
@@ -310,6 +313,11 @@ string cPeaksList::print(bool htmlterminatelines) {
 		if (peaks[i].absoluteintensity > 0) {
 			s += " ";
 			s += to_string((unsigned long long)peaks[i].absoluteintensity);
+		}
+
+		if (printgroupid) {
+			s += " ";
+			s += to_string(peaks[i].groupid);
 		}
 
 		if (htmlterminatelines) {
@@ -775,6 +783,16 @@ double cPeaksList::getRetentionTime() {
 }
 
 
+void cPeaksList::setRetentionTimeUnit(int unit) {
+	rtunit = unit;
+}
+
+
+int cPeaksList::getRetentionTimeUnit() {
+	return rtunit;
+}
+
+
 void cPeaksList::setCoordinates(int x, int y) {
 	this->x = x;
 	this->y = y;
@@ -803,6 +821,8 @@ void cPeaksList::store(ofstream& os) {
 
 	os.write((char *)&rt, sizeof(double));
 
+	os.write((char *)&rtunit, sizeof(int));
+
 	os.write((char *)&x, sizeof(int));
 	os.write((char *)&y, sizeof(int));
 
@@ -810,7 +830,7 @@ void cPeaksList::store(ofstream& os) {
 }
 
 
-void cPeaksList::load(ifstream& is) {
+void cPeaksList::load(ifstream& is, int fileversionpart1, int fileversionpart2, int fileversionpart3) {
 	int size;
 
 	is.read((char *)&size, sizeof(int));
@@ -821,6 +841,13 @@ void cPeaksList::load(ifstream& is) {
 	}
 
 	is.read((char *)&rt, sizeof(double));
+
+	if (isCompatibleVersion(fileversionpart1, fileversionpart2, fileversionpart3, 2, 1, 12)) {
+		is.read((char *)&rtunit, sizeof(int));
+	}
+	else {
+		rtunit = 1;
+	}
 
 	is.read((char *)&x, sizeof(int));
 	is.read((char *)&y, sizeof(int));
@@ -937,5 +964,59 @@ void cPeaksList::markIsotopes() {
 			peaks[j].isotope = true;
 		}
 	}
+}
+
+
+bool cPeaksList::equals(cPeaksList& secondpeaklist) {
+	if (rt != secondpeaklist.rt) {
+		cout << "rt does not match" << endl;
+		return false;
+	}
+
+	if (rtunit != secondpeaklist.rtunit) {
+		cout << "rt unit does not match" << endl;
+		return false;
+	}
+
+	if (x != secondpeaklist.x) {
+		cout << "x does not match" << endl;
+		return false;
+	}
+
+	if (y != secondpeaklist.y) {
+		cout << "y does not match" << endl;
+		return false;
+	}
+
+	if (title.compare(secondpeaklist.title) != 0) {
+		cout << "title does not match" << endl;
+		return false;
+	}
+
+	if (peaks.size() != secondpeaklist.peaks.size()) {
+		cout << "peaks.size() does not match" << endl;
+		cout << "peaks.size(): " << peaks.size() << endl;
+		cout << "secondpeaklist.peaks.size(): " << secondpeaklist.peaks.size() << endl;
+		cout << "first peaklist:" << endl;
+		for (size_t i = 0; i < peaks.size(); i++) {
+			cout << peaks[i].mzratio << " " << peaks[i].absoluteintensity << " " << peaks[i].relativeintensity << endl;
+		}
+		cout << endl;
+		cout << "second peaklist:" << endl;
+		for (size_t i = 0; i < secondpeaklist.peaks.size(); i++) {
+			cout << secondpeaklist.peaks[i].mzratio << " " << secondpeaklist.peaks[i].absoluteintensity << " " << secondpeaklist.peaks[i].relativeintensity << endl;
+		}
+		cout << endl;
+		return false;
+	}
+
+	for (size_t i = 0; i < peaks.size(); i++) {
+		if (!peaks[i].equals(secondpeaklist.peaks[i])) {
+			cout << "peak " << i << " does not equal" << endl;
+			return false;
+		}
+	}
+
+	return true;
 }
 

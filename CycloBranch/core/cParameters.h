@@ -54,6 +54,27 @@ enum eScoreType {
 
 
 /**
+	\brief Check Senior's filtering rules.
+	\param combarray current combination of elements
+	\param valences vector of valences
+	\param maxcomponents maximum number of components in a graph
+	\retval bool true, if Senior's rules are ok
+*/
+bool checkSeniorRules(vector<int>& combarray, vector<int>& valences, int maxcomponents);
+
+
+/**
+	\brief Check advanced filtering rules.
+	\brief noratiocheck if true, N/O ratio check is enabled
+	\brief sumofmasses sum of masses
+	\brief countsofelements counts of elements
+	\brief namesofelelements names of elements
+	\retval bool true, if advanced filtering rules are NOT ok
+*/
+bool checkAdvancedFilteringRules(bool noratiocheck, double sumofmasses, vector<int>& countsofelements, vector<string>& namesofelements);
+
+
+/**
 	\brief The class storing parameters of the application.
 */
 class cParameters {
@@ -62,7 +83,7 @@ class cParameters {
 
 	void fixIntensities(cPeaksList& centroidspectrum, cPeaksList& profilespectrum);
 
-	bool checkSeniorRules(vector<int>& combarray, vector<int>& valences, int maxcomponents);
+	void pushLossItem(vector<neutralLoss>& lossitems, string lossstr);
 
 	//double getMassAndCounts(vector<int>& combarray, vector<int>& countsofelements, vector<double>& massesofelements);
 
@@ -80,12 +101,18 @@ public:
 		\brief The type of analyzed peptide.
     */
     ePeptideType peptidetype;
- 
+
 
 	/**
-		\brief A filename with a peak list.
+		\brief The filenames of peaklists.
     */
-    string peaklistfilename;
+    vector<string> peaklistfilenames;
+
+
+	/**
+		\brief Original input line with peaklist(s).
+	*/
+	string originalpeaklistfilenames;
 
 
 	/**
@@ -107,15 +134,21 @@ public:
 
 
 	/**
-		\brief A file format of peak list.
-    */
-	ePeakListFileFormat peaklistfileformat;
+		\brief Line spectra processing method (baf).
+	*/
+	int linebafprocessing;
 
 
 	/**
-		\brief A structure representing a series of peaklists.
+		\brief The file formats of peaklists.
     */
-	cPeakListSeries peaklistseries;
+	vector<ePeakListFileFormat> peaklistfileformats;
+
+
+	/**
+		\brief A structure representing a vector of series of peaklists.
+    */
+	vector<cPeakListSeries> peaklistseriesvector;
 
 
 	/**
@@ -185,9 +218,33 @@ public:
 
 
 	/**
+		\brief Minimum retention time.
+	*/
+	double minimumrt;
+
+
+	/**
+		\brief Maximum retention time.
+	*/
+	double maximumrt;
+
+
+	/**
 		\brief FWHM.
     */
     double fwhm;
+
+
+	/**
+		\brief Minimum ratio 54Fe/56Fe.
+	*/
+	double minratio54Fe56Fe;
+
+
+	/**
+		\brief Maximum ratio 54Fe/56Fe.
+	*/
+	double maxratio54Fe56Fe;
 
 
 	/**
@@ -263,6 +320,12 @@ public:
 
 
 	/**
+		\brief Maximum number of combined chemical elements.
+	*/
+	int maximumcombinedelements;
+
+
+	/**
 		\brief True when matches of peaks which do not have parent peaks are removed.
     */
     //bool clearhitswithoutparent;
@@ -314,6 +377,24 @@ public:
 		\brief Check N/O ratio.
 	*/
 	bool noratiocheck;
+
+
+	/**
+		\brief Calculate FDRs.
+	*/
+	bool calculatefdrs;
+
+
+	/**
+		\brief Minimum relative intensity of the most intense peak in an isotopic pattern.
+	*/
+	double minimumannotationintensityrelative;
+
+
+	/**
+		\brief Minimum absolute intensity of the most intense peak in an isotopic pattern.
+	*/
+	unsigned minimumannotationintensityabsolute;
 
 
 	/**
@@ -497,6 +578,18 @@ public:
 
 
 	/**
+		\brief A vector of all elements (without combinations).
+	*/
+	vector<neutralLoss> originalelementsdefinitions;
+
+
+	/**
+		\brief A vector of elements used when generating compounds (without combinations).
+	*/
+	vector<int> originalelementsfortheoreticalspectra;
+
+
+	/**
 		\brief A vector of peak descriptions.
 	*/
 	vector<string> peakidtodesc;
@@ -506,6 +599,12 @@ public:
 		\brief A vector of isotope formula descriptions.
 	*/
 	vector<string> isotopeformulaidtodesc;
+
+
+	/**
+		\brief An auxiliary map to store search results from PubChem in Compound Search mode.
+	*/
+	map<string, int> pchemresults;
 
 
 	/**
@@ -626,8 +725,11 @@ public:
 	/**
 		\brief Load the structure from an input stream.
 		\param is an input stream
-	*/ 
-	void load(ifstream& is);
+		\param fileversionpart1 first number of .res the file version
+		\param fileversionpart2 second number of .res the file version
+		\param fileversionpart3 third number of .res the file version
+	*/
+	void load(ifstream& is, int fileversionpart1, int fileversionpart2, int fileversionpart3);
 
 
 };

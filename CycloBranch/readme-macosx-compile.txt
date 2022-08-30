@@ -10,6 +10,7 @@ Tested on macOS Sierra (10.12):
 - install boost 1.64.0 (or higher) using "brew install boost"
 
 2) Execute the following commands in the directory where CycloBranch is unpacked:
+- open "images.qrc" in TextEdit and click File->Save
 - open "CycloBranch-MacOSX.pro" in TextEdit and click File->Save
 - type "/usr/local/opt/qt/bin/qmake"
 - type "make"

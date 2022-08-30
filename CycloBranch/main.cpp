@@ -18,6 +18,10 @@
 int main(int argc, char** argv) {
 
 	XMLPlatformUtils::Initialize();
+
+	#if QT_VERSION >= QT_VERSION_CHECK(5, 6, 0)
+		QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+	#endif
 	
 	QApplication app(argc, argv);
 	Q_INIT_RESOURCE(images);
@@ -39,7 +43,7 @@ int main(int argc, char** argv) {
 	QSplashScreen splash(pixmap);
 	if(!pixmap.isNull()) {
 		splash.show();
-		splash.showMessage(QObject::tr(QString("Please, cite us using any related paper. " + appname + " " + appversion + " is starting ...").toStdString().c_str()), Qt::AlignCenter | Qt::AlignBottom, Qt::black);
+		splash.showMessage(QObject::tr(QString(appname + " " + appversion + " is starting ...").toStdString().c_str()), Qt::AlignCenter | Qt::AlignBottom, Qt::black);
 		for (int i = 0; i < 50; i++) {
 			if (!splash.isVisible()) {
 				break;

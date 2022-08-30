@@ -146,7 +146,7 @@ int cDeNovoGraph::createGraph(bool& terminatecomputation) {
 	double unchargedprecursormass = charge(uncharge(parameters->precursormass, parameters->precursorcharge), (parameters->precursorcharge > 0)?1:-1);
 	double unchargedmz;
 	
-	sortedpeaklist = parameters->peaklistseries[parameters->scannumber - 1];
+	sortedpeaklist = parameters->peaklistseriesvector[0][parameters->scannumber - 1];
 	// insert the single charged precursor, if neccessary
 	sortedpeaklist.sortbyMass();
 	sortedpeaklist.cropMaximumMZRatio(unchargedprecursormass, parameters->precursormasserrortolerance);

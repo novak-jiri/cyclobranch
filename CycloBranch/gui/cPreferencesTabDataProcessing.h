@@ -15,6 +15,8 @@
 #include <QLabel>
 #include <QPushButton>
 #include <QComboBox>
+#include <QMessageBox>
+#include <QFileInfo>
 
 
 /**
@@ -62,8 +64,11 @@ private:
 	QWidget* gridlayoutwidget;
 	QGridLayout* gridlayout;
 
-	QLabel* labelbafprocessingmethod;
-	QComboBox* comboboxbafprocessingmethod;
+	QLabel* labellinebafprocessingmethod;
+	QComboBox* comboboxlinebafprocessingmethod;
+
+	QLabel* labelprofilebafprocessingmethod;
+	QComboBox* comboboxprofilebafprocessingmethod;
 
 	QLabel* labelrawdataprocessingmethod;
 	QComboBox* comboboxrawdataprocessingmethod;

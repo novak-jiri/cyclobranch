@@ -1,7 +1,363 @@
 #include "core/cParameters.h"
 
+#include <QFile>
+#include <QProcess>
+#include <QDir>
+
 #include "gui/cMainThread.h"
 #include "core/cSummaryFormula.h"
+
+
+bool checkSeniorRules(vector<int>& combarray, vector<int>& valences, int maxcomponents) {
+	int totalvalence = 0;
+	int i, size;
+
+	i = 0;
+	size = (int)combarray.size();
+	while ((i < size) && (combarray[i] > 0)) {
+		totalvalence += valences[combarray[i] - 1];
+		i++;
+	}
+
+	// SENIOR rule 1 - the sum of valences must be even
+	// SENIOR rule 3 - the sum of valences >= 2 * (atomscount - maximum number of allowed components in the graph); edges - nodes + components >= 0
+	if ((totalvalence % 2 == 1) || (totalvalence < 2 * (i - maxcomponents))) {
+		return false;
+	}
+
+	return true;
+}
+
+
+bool checkAdvancedFilteringRules(bool noratiocheck, double sumofmasses, vector<int>& countsofelements, vector<string>& namesofelements) {
+	int countH = 0;
+	int countC = 0;
+	int countO = 0;
+	int countN = 0;
+	int countS = 0;
+	int countP = 0;
+	int countF = 0;
+	int countCl = 0;
+	int countBr = 0;
+	int countSi = 0;
+
+	double elementsratio;
+
+	int size = (int)countsofelements.size();
+	for (int j = 0; j < size; j++) {
+		if (countsofelements[j] > 0) {
+			if (namesofelements[j].compare("H") == 0) {
+				countH = countsofelements[j];
+				continue;
+			}
+			if (namesofelements[j].compare("C") == 0) {
+				countC = countsofelements[j];
+				continue;
+			}
+			if (namesofelements[j].compare("O") == 0) {
+				countO = countsofelements[j];
+				continue;
+			}
+			if (namesofelements[j].compare("N") == 0) {
+				countN = countsofelements[j];
+				continue;
+			}
+			if (namesofelements[j].compare("S") == 0) {
+				countS = countsofelements[j];
+				continue;
+			}
+			if (namesofelements[j].compare("P") == 0) {
+				countP = countsofelements[j];
+				continue;
+			}
+			if (namesofelements[j].compare("F") == 0) {
+				countF = countsofelements[j];
+				continue;
+			}
+			if (namesofelements[j].compare("Cl") == 0) {
+				countCl = countsofelements[j];
+				continue;
+			}
+			if (namesofelements[j].compare("Br") == 0) {
+				countBr = countsofelements[j];
+				continue;
+			}
+			if (namesofelements[j].compare("Si") == 0) {
+				countSi = countsofelements[j];
+				continue;
+			}
+		}
+	}
+
+	if ((countH == 0) || (countC == 0)) {
+		return true;
+	}
+
+	if (noratiocheck) {
+		if (countN > countO) {
+			return true;
+		}
+	}
+
+	if (sumofmasses < 500.0) {
+
+		if (countC > 39) {
+			return true;
+		}
+		if (countH > 72) {
+			return true;
+		}
+		if (countN > 20) {
+			return true;
+		}
+		if (countO > 20) {
+			return true;
+		}
+		if (countP > 9) {
+			return true;
+		}
+		if (countS > 10) {
+			return true;
+		}
+		if (countF > 16) {
+			return true;
+		}
+		if (countCl > 10) {
+			return true;
+		}
+		if (countBr > 5) {
+			return true;
+		}
+		if (countSi > 8) {
+			return true;
+		}
+
+	}
+	else if (sumofmasses < 1000.0) {
+
+		if (countC > 78) {
+			return true;
+		}
+		if (countH > 126) {
+			return true;
+		}
+		if (countN > 25) {
+			return true;
+		}
+		if (countO > 27) {
+			return true;
+		}
+		if (countP > 9) {
+			return true;
+		}
+		if (countS > 14) {
+			return true;
+		}
+		if (countF > 34) {
+			return true;
+		}
+		if (countCl > 12) {
+			return true;
+		}
+		if (countBr > 8) {
+			return true;
+		}
+		if (countSi > 14) {
+			return true;
+		}
+
+	}
+	else if (sumofmasses < 2000.0) {
+
+		if (countC > 156) {
+			return true;
+		}
+		if (countH > 236) {
+			return true;
+		}
+		if (countN > 32) {
+			return true;
+		}
+		if (countO > 63) {
+			return true;
+		}
+		if (countP > 9) {
+			return true;
+		}
+		if (countS > 14) {
+			return true;
+		}
+		if (countF > 48) {
+			return true;
+		}
+		if (countCl > 12) {
+			return true;
+		}
+		if (countBr > 10) {
+			return true;
+		}
+		if (countSi > 15) {
+			return true;
+		}
+
+	}
+	else if (sumofmasses < 3000.0) {
+
+		if (countC > 162) {
+			return true;
+		}
+		if (countH > 208) {
+			return true;
+		}
+		if (countN > 48) {
+			return true;
+		}
+		if (countO > 78) {
+			return true;
+		}
+		if (countP > 9) {
+			return true;
+		}
+		if (countS > 14) {
+			return true;
+		}
+		if (countF > 48) {
+			return true;
+		}
+		if (countCl > 12) {
+			return true;
+		}
+		if (countBr > 10) {
+			return true;
+		}
+		if (countSi > 15) {
+			return true;
+		}
+
+	}
+
+	if ((countH > 0) && (countC >= 0)) {
+		if (countC == 0) {
+			return true;
+		}
+		elementsratio = ((double)(countH)) / ((double)(countC));
+		if ((elementsratio < 0.2) || (elementsratio > 3.1)) {
+			return true;
+		}
+	}
+
+	if ((countN > 0) && (countC >= 0)) {
+		if (countC == 0) {
+			return true;
+		}
+		elementsratio = ((double)(countN)) / ((double)(countC));
+		if (elementsratio > 1.3) {
+			return true;
+		}
+	}
+
+	if ((countO > 0) && (countC >= 0)) {
+		if (countC == 0) {
+			return true;
+		}
+		elementsratio = ((double)(countO)) / ((double)(countC));
+		if (elementsratio > 1.2) {
+			return true;
+		}
+	}
+
+	if ((countP > 0) && (countC >= 0)) {
+		if (countC == 0) {
+			return true;
+		}
+		elementsratio = ((double)(countP)) / ((double)(countC));
+		if (elementsratio > 0.3) {
+			return true;
+		}
+	}
+
+	if ((countS > 0) && (countC >= 0)) {
+		if (countC == 0) {
+			return true;
+		}
+		elementsratio = ((double)(countS)) / ((double)(countC));
+		if (elementsratio > 0.8) {
+			return true;
+		}
+	}
+
+	if ((countF > 0) && (countC >= 0)) {
+		if (countC == 0) {
+			return true;
+		}
+		elementsratio = ((double)(countF)) / ((double)(countC));
+		if (elementsratio > 1.5) {
+			return true;
+		}
+	}
+
+	if ((countCl > 0) && (countC >= 0)) {
+		if (countC == 0) {
+			return true;
+		}
+		elementsratio = ((double)(countCl)) / ((double)(countC));
+		if (elementsratio > 0.8) {
+			return true;
+		}
+	}
+
+	if ((countBr > 0) && (countC >= 0)) {
+		if (countC == 0) {
+			return true;
+		}
+		elementsratio = ((double)(countBr)) / ((double)(countC));
+		if (elementsratio > 0.8) {
+			return true;
+		}
+	}
+
+	if ((countSi > 0) && (countC >= 0)) {
+		if (countC == 0) {
+			return true;
+		}
+		elementsratio = ((double)(countSi)) / ((double)(countC));
+		if (elementsratio > 0.5) {
+			return true;
+		}
+	}
+
+	if ((countN > 1) && (countO > 1) && (countP > 1) && (countS > 1)) {
+		if ((countN >= 10) || (countO >= 20) || (countP >= 4) || (countS >= 3)) {
+			return true;
+		}
+	}
+
+	if ((countN > 3) && (countO > 3) && (countP > 3)) {
+		if ((countN >= 11) || (countO >= 22) || (countP >= 6)) {
+			return true;
+		}
+	}
+
+	if ((countO > 1) && (countP > 1) && (countS > 1)) {
+		if ((countO >= 14) || (countP >= 3) || (countS >= 3)) {
+			return true;
+		}
+	}
+
+	if ((countP > 1) && (countS > 1) && (countN > 1)) {
+		if ((countP >= 3) || (countS >= 3) || (countN >= 4)) {
+			return true;
+		}
+	}
+
+	if ((countN > 6) && (countO > 6) && (countS > 6)) {
+		if ((countN >= 19) || (countO >= 14) || (countS >= 8)) {
+			return true;
+		}
+	}
+
+	return false;
+}
 
 
 void cParameters::fixIntensities(cPeaksList& centroidspectrum, cPeaksList& profilespectrum) {
@@ -28,24 +384,24 @@ void cParameters::fixIntensities(cPeaksList& centroidspectrum, cPeaksList& profi
 }
 
 
-bool cParameters::checkSeniorRules(vector<int>& combarray, vector<int>& valences, int maxcomponents) {
-	int totalvalence = 0;
-	int i, size;
-
-	i = 0;
-	size = (int)combarray.size();
-	while ((i < size) && (combarray[i] > 0)) {
-		totalvalence += valences[combarray[i] - 1];
-		i++;
+void cParameters::pushLossItem(vector<neutralLoss>& lossitems, string lossstr) {
+	string shortstr;
+	size_t pos = lossstr.find(':');
+	if (pos == string::npos) {
+		shortstr = lossstr;
+	}
+	else {
+		shortstr = lossstr.substr(0, pos);
 	}
 
-	// SENIOR rule 1 - the sum of valences must be even
-	// SENIOR rule 3 - the sum of valences >= 2 * (atomscount - maximum number of allowed components in the graph); edges - nodes + components >= 0
-	if ((totalvalence % 2 == 1) || (totalvalence < 2 * (i - maxcomponents))) {
-		return false;
-	}
-
-	return true;
+	cSummaryFormula tmpformula;
+	neutralLoss lossitem;
+	
+	lossitem.summary = lossstr;
+	addStringFormulaToMap(shortstr, lossitem.summarymap);
+	tmpformula.setFormula(shortstr);
+	lossitem.massdifference = tmpformula.getMass();
+	lossitems.push_back(lossitem);
 }
 
 
@@ -87,12 +443,14 @@ void cParameters::clear() {
 	os = 0;
 	iondefinitions.recalculateFragments(false, false, s);
 	peptidetype = linear;
-	peaklistfilename = "";
+	peaklistfilenames.clear();
+	originalpeaklistfilenames.clear();
 	useprofiledata = false;
 	convertprofiledata = true;
 	profiledatafilename = "";
-	peaklistfileformat = txt;
-	peaklistseries.clear();
+	linebafprocessing = 0;
+	peaklistfileformats.clear();
+	peaklistseriesvector.clear();
 	scannumber = 1;
 	precursormass = 0;
 	precursoradduct = "";
@@ -104,7 +462,11 @@ void cParameters::clear() {
 	minimumabsoluteintensitythreshold = 0;
 	minimummz = 150;
 	maximummz = 0;
+	minimumrt = 0;
+	maximumrt = 0;
 	fwhm = 0.05;
+	minratio54Fe56Fe = 0.01;
+	maxratio54Fe56Fe = 0.1;
 	bricksdatabasefilename = "";
 	bricksdatabase.clear();
 	maximumbricksincombinationbegin = 1;
@@ -118,10 +480,14 @@ void cParameters::clear() {
 	mode = dereplication;
 	scoretype = number_of_matched_peaks;
 	maximumcombinedlosses = 2;
+	maximumcombinedelements = 200;
 	//clearhitswithoutparent = false;
 	basicformulacheck = true;
 	advancedformulacheck = true;
 	noratiocheck = true;
+	calculatefdrs = true;
+	minimumannotationintensityrelative = 0;
+	minimumannotationintensityabsolute = 0;
 	mzdifftolerance = 0;
 	intensitytolerance = 0;
 	reportunmatchedtheoreticalpeaks = false;
@@ -152,16 +518,12 @@ void cParameters::clear() {
 	ionsfortheoreticalspectraMS1.clear();
 	ionsfortheoreticalspectraMS2.clear();
 
-	neutrallossesdefinitions.clear();
-	neutralLoss loss;
 	cSummaryFormula tmpformula;
+	neutralLoss lossitem;
+
+	neutrallossesdefinitions.clear();
 	for (int i = 0; i < (int)defaultneutrallosses.getNeutralLosses().size(); i++) {
-		loss.clear();
-		loss.summary = defaultneutrallosses.getNeutralLosses()[i];
-		addStringFormulaToMap(loss.summary, loss.summarymap);
-		tmpformula.setFormula(loss.summary);
-		loss.massdifference = tmpformula.getMass();
-		neutrallossesdefinitions.push_back(loss);
+		pushLossItem(neutrallossesdefinitions, defaultneutrallosses.getNeutralLosses()[i]);
 	}
 	neutrallossesfortheoreticalspectra.clear();
 	numberofgeneratedneutrallosses = 0;
@@ -169,8 +531,24 @@ void cParameters::clear() {
 	originalneutrallossesdefinitions = neutrallossesdefinitions;
 	originalneutrallossesfortheoreticalspectra = neutrallossesfortheoreticalspectra;
 
+	originalelementsdefinitions.clear();
+	originalelementsfortheoreticalspectra.clear();
+
+	pushLossItem(originalelementsdefinitions, "H");
+	pushLossItem(originalelementsdefinitions, "C");
+	pushLossItem(originalelementsdefinitions, "O");
+	pushLossItem(originalelementsdefinitions, "N");
+	pushLossItem(originalelementsdefinitions, "S:1");
+	pushLossItem(originalelementsdefinitions, "P:1");
+
+	originalelementsfortheoreticalspectra.push_back(0);
+	originalelementsfortheoreticalspectra.push_back(1);
+	originalelementsfortheoreticalspectra.push_back(2);
+	originalelementsfortheoreticalspectra.push_back(3);
+
 	peakidtodesc.clear();
 	isotopeformulaidtodesc.clear();
+	pchemresults.clear();
 
 	defaultmaxx = 1;
 	defaultmaxy = 1;
@@ -196,6 +574,7 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 	string foldername;
 	string ibdfilename;
 	string mzmlname;
+	string linespectramgfname;
 
 	cPeaksList profilelist;
 	ifstream profilestream;
@@ -206,600 +585,768 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 	QTime time;
 	bool good;
 
-	if (peaklistfilename.empty()) {
+	if (peaklistfilenames.empty()) {
 		error = true;
-		errormessage = "A peaklist is not specified. Have you configured the engine (Search -> Settings...) ?\n";
+		errormessage = "A peaklist must be selected. Have you configured the engine (Search -> Settings...) ?\n";
 	}
+
+	peaklistseriesvector.clear();
+	peaklistseriesvector.resize(peaklistfilenames.size());
+	peaklistfileformats.resize(peaklistfilenames.size());
 
 	// peaklist check
 	if (!error) {
 
-		peaklistfileformat = txt;
-			
-		try {
+		for (int h = 0; h < (int)peaklistfilenames.size(); h++) {
 
-			rx = "\\.[mM][gG][fF]$";
-			// Mascot Generic Format
-			if (regex_search(peaklistfilename, rx)) {
-				peaklistfileformat = mgf;
-			}
-			
-			rx = "\\.[mM][zZ][mM][lL]$";
-			// mzML
-			if (regex_search(peaklistfilename, rx)) {
-				peaklistfileformat = mzML;
-			}
-			
-			rx = "\\.[mM][zZ][xX][mM][lL]$";
-			// mzXML
-			if (regex_search(peaklistfilename, rx)) {
-				peaklistfileformat = mzXML;
-			}
-			
-			#if OS_TYPE == WIN
-				rx = "\\.[bB][aA][fF]$";
-				// Bruker Analysis File
-				if (regex_search(peaklistfilename, rx)) {
-					peaklistfileformat = baf;
-				}
-
-				rx = "\\.[rR][aA][wW]$";
-				// Thermo RAW file
-				if (regex_search(peaklistfilename, rx)) {
-					peaklistfileformat = raw;
-				}
-
-				rx = "\\.[dD][aA][tT]$";
-				// dat file in Waters raw directory
-				if (regex_search(peaklistfilename, rx)) {
-					peaklistfileformat = dat;
-				}
-
-				rx = "\\.[mM][iI][sS]$";
-				// flexImaging File
-				if (regex_search(peaklistfilename, rx)) {
-					peaklistfileformat = mis;
-				}
-
-				rx = "ser$";
-				// apex File
-				if (regex_search(peaklistfilename, rx)) {
-					peaklistfileformat = ser;
-				}
-			#endif
-
-			rx = "\\.[iI][mM][zZ][mM][lL]$";
-			// imzML File
-			if (regex_search(peaklistfilename, rx)) {
-				peaklistfileformat = imzML;
+			if (terminatecomputation) {
+				error = true;
+				errormessage = "Aborted by user.\n";
+				break;
 			}
 
-		}
-		catch (regex_error& e) {
-			error = true;
-			errormessage = "cParameters::checkAndPrepare: regex_search failed, error no. " + to_string((int)e.code()) + "\n";
-		}
+			peaklistfileformats[h] = txt;
+			
+			try {
 
-		if (!error) {
-
-			switch (peaklistfileformat) {
-				case txt:
-					peakliststream.open(peaklistfilename);
-					break;
-				case mgf:
-					peakliststream.open(peaklistfilename);
-					break;
-				case mzXML:
-					*os << "Converting the file " + peaklistfilename + " to mzML ... ";
-				
-					#if OS_TYPE == UNX
-						s = installdir.toStdString() + "External/linux/any2mzml.sh " + peaklistfilename;
-						if (system(s.c_str()) != 0) {
-							error = true;
-							errormessage = "The file cannot be converted.\n";
-							errormessage += "Does the file '" + peaklistfilename + "' exist ?\n";
-							errormessage += "Is the directory with the file '" + peaklistfilename + "' writable ?\n";
-							errormessage += "Do you have FileConverter installed (OpenMS 2.x must be installed) ?\n";
-							errormessage += "Do you have 'any2mzml.sh' file located in '" + installdir.toStdString() + "External/linux' folder ?\n";
-							errormessage += "Is the file 'any2mzml.sh' executable (sudo chmod +x " + installdir.toStdString() + "External/linux/any2mzml.sh) ? \n";
-						}
-					#else
-						#if OS_TYPE == OSX
-							s = installdir.toStdString() + "External/macosx/any2mzml.sh " + peaklistfilename;
-							if (system(s.c_str()) != 0) {
-								error = true;
-								errormessage = "The file cannot be converted.\n";
-								errormessage += "Does the file '" + peaklistfilename + "' exist ?\n";
-								errormessage += "Is the directory with the file '" + peaklistfilename + "' writable ?\n";
-								errormessage += "Do you have FileConverter installed (OpenMS 2.x must be installed) ?\n";
-								errormessage += "Do you have 'any2mzml.sh' file located in '" + installdir.toStdString() + "External/macosx' folder ?\n";
-								errormessage += "Is the file 'any2mzml.sh' executable ? \n";
-							}
-						#else		
-							s = "External\\windows\\any2mzml.bat \"" + peaklistfilename + "\"";
-							if (system(s.c_str()) != 0) {
-								error = true;
-								errormessage = "The file cannot be converted.\n";
-								errormessage += "Does the file '" + peaklistfilename + "' exist ?\n";
-								errormessage += "Is the directory with the file '" + peaklistfilename + "' writable ?\n";
-								errormessage += "Do you have FileConverter installed (OpenMS 2.x must be installed) ?\n";
-								errormessage += "Do you have a path to FileConverter in your PATH variable (e.g., 'C:/Program Files/OpenMS-2.3.0/bin') ?\n";
-								errormessage += "Do you have 'any2mzml.bat' file located in the '" + appname.toStdString() + "/External/windows' folder ?\n";
-							}
-						#endif
-					#endif
-
-					if (!error) {
-						*os << "ok" << endl << endl;
-						mzmlname = peaklistfilename + ".mzML";
-						peakliststream.open(mzmlname);
+				rx = "\\.[mM][gG][fF]$";
+				// Mascot Generic Format
+				if (regex_search(peaklistfilenames[h], rx)) {
+					peaklistfileformats[h] = mgf;
+				}
+			
+				rx = "\\.[mM][zZ][mM][lL]$";
+				// mzML
+				if (regex_search(peaklistfilenames[h], rx)) {
+					peaklistfileformats[h] = mzML;
+				}
+			
+				rx = "\\.[mM][zZ][xX][mM][lL]$";
+				// mzXML
+				if (regex_search(peaklistfilenames[h], rx)) {
+					peaklistfileformats[h] = mzXML;
+				}
+			
+				#if OS_TYPE == WIN
+					rx = "\\.[bB][aA][fF]$";
+					// Bruker Analysis File
+					if (regex_search(peaklistfilenames[h], rx)) {
+						peaklistfileformats[h] = baf;
 					}
-					break;
-				case baf:
-					#if OS_TYPE == WIN
-						time.start();
 
-						*os << "Processing the file " + peaklistfilename + ":" << endl;
+					rx = "\\.[rR][aA][wW]$";
+					// Thermo RAW file
+					if (regex_search(peaklistfilenames[h], rx)) {
+						peaklistfileformats[h] = raw;
+					}
 
-						/*
-						s = "External\\windows\\baf2csv.bat \"" + peaklistfilename + "\"";
-						if (system(s.c_str()) != 0) {
-							error = true;
-							errormessage = "The file cannot be converted.\n";
-							errormessage += "Does the file '" + peaklistfilename + "' exist ?\n";
-							errormessage += "Do you have Bruker Daltonik's CompassXport installed ?\n";
-							errormessage += "Do you have path to the CompassXport.exe in your PATH variable ?\n";
-							errormessage += "Is the directory with the file '" + peaklistfilename + "' writable ?\n";
-							errormessage += "Do you have 'baf2csv.bat' file located in the 'External/windows' folder ?\n";
-						}
+					rx = "\\.[dD][aA][tT]$";
+					// dat file in Waters raw directory
+					if (regex_search(peaklistfilenames[h], rx)) {
+						peaklistfileformats[h] = dat;
+					}
 
-						if (!error) {
-							*os << "ok" << endl;
-							peakliststream.open(peaklistfilename + ".csv");
-						}
-						*/
+					rx = "\\.[mM][iI][sS]$";
+					// flexImaging File
+					if (regex_search(peaklistfilenames[h], rx)) {
+						peaklistfileformats[h] = mis;
+					}
 
-						mzmlname = peaklistfilename + ".mzML";
-						peakliststream.open(mzmlname);
-						good = peakliststream.good();
-						peakliststream.close();
+					rx = "ser$";
+					// apex File
+					if (regex_search(peaklistfilenames[h], rx)) {
+						peaklistfileformats[h] = ser;
+					}
+				#endif
 
-						if (good) {
-							*os << "The previously converted centroid spectra were found." << endl;
-							*os << "The following file was used: " << mzmlname << endl;
-						}
-						else {
-							*os << "centroid spectra ... ";
+				rx = "\\.[iI][mM][zZ][mM][lL]$";
+				// imzML File
+				if (regex_search(peaklistfilenames[h], rx)) {
+					peaklistfileformats[h] = imzML;
+				}
 
-							s = "External\\windows\\baf2mzml.bat \"" + peaklistfilename + "\"";
+			}
+			catch (regex_error& e) {
+				error = true;
+				errormessage = "cParameters::checkAndPrepare: regex_search failed, error no. " + to_string((int)e.code()) + "\n";
+			}
+
+			if (!error) {
+
+				QDir peaksdir;
+
+				switch (peaklistfileformats[h]) {
+					case txt:
+						peakliststream.open(peaklistfilenames[h]);
+						break;
+					case mgf:
+						peakliststream.open(peaklistfilenames[h]);
+						break;
+					case mzXML:
+						*os << "Converting the file " + peaklistfilenames[h] + " to mzML ... ";
+				
+						#if OS_TYPE == UNX
+							s = installdir.toStdString() + "External/linux/any2mzml.sh " + peaklistfilenames[h];
 							if (system(s.c_str()) != 0) {
 								error = true;
 								errormessage = "The file cannot be converted.\n";
-								errormessage += "Does the file '" + peaklistfilename + "' exist ?\n";
-								errormessage += "Do you have Bruker Daltonik's CompassXport installed ?\n";
-								errormessage += "Do you have path to the CompassXport.exe in your PATH variable ?\n";
-								errormessage += "Is the directory with the file '" + peaklistfilename + "' writable ?\n";
-								errormessage += "Do you have 'baf2mzml.bat' file located in the 'External/windows' folder ?\n";
+								errormessage += "Does the file '" + peaklistfilenames[h] + "' exist ?\n";
+								errormessage += "Is the directory with the file '" + peaklistfilenames[h] + "' writable ?\n";
+								errormessage += "Do you have FileConverter installed (OpenMS 2.x must be installed) ?\n";
+								errormessage += "Do you have 'any2mzml.sh' file located in '" + installdir.toStdString() + "External/linux' folder ?\n";
+								errormessage += "Is the file 'any2mzml.sh' executable (sudo chmod +x " + installdir.toStdString() + "External/linux/any2mzml.sh) ? \n";
 							}
-							if (!error) {
-								*os << "ok" << endl;
-							}
-						}
+						#else
+							#if OS_TYPE == OSX
+								s = installdir.toStdString() + "External/macosx/any2mzml.sh " + peaklistfilenames[h];
+								if (system(s.c_str()) != 0) {
+									error = true;
+									errormessage = "The file cannot be converted.\n";
+									errormessage += "Does the file '" + peaklistfilenames[h] + "' exist ?\n";
+									errormessage += "Is the directory with the file '" + peaklistfilenames[h] + "' writable ?\n";
+									errormessage += "Do you have FileConverter installed (OpenMS 2.x must be installed) ?\n";
+									errormessage += "Do you have 'any2mzml.sh' file located in '" + installdir.toStdString() + "External/macosx' folder ?\n";
+									errormessage += "Is the file 'any2mzml.sh' executable ? \n";
+								}
+							#else		
+								s = "External\\windows\\any2mzml.bat \"" + peaklistfilenames[h] + "\"";
+								if (system(s.c_str()) != 0) {
+									error = true;
+									errormessage = "The file cannot be converted.\n";
+									errormessage += "Does the file '" + peaklistfilenames[h] + "' exist ?\n";
+									errormessage += "Is the directory with the file '" + peaklistfilenames[h] + "' writable ?\n";
+									errormessage += "Do you have FileConverter installed (OpenMS 2.x must be installed) ?\n";
+									errormessage += "Do you have a path to FileConverter in your PATH variable (e.g., 'C:/Program Files/OpenMS-2.3.0/bin') ?\n";
+									errormessage += "Do you have 'any2mzml.bat' file located in the '" + appname.toStdString() + "/External/windows' folder ?\n";
+								}
+							#endif
+						#endif
 
 						if (!error) {
+							*os << "ok" << endl << endl;
+							mzmlname = peaklistfilenames[h] + ".mzML";
 							peakliststream.open(mzmlname);
 						}
+						break;
+					case baf:
+						#if OS_TYPE == WIN
+							time.start();
 
-						if (!error && useprofiledata && convertprofiledata) {
-							*os << "profile spectra ... ";
-							s = "External\\windows\\baf2profile.bat \"" + peaklistfilename + "\"";
+							*os << "Processing the file " + peaklistfilenames[h] + ":" << endl;
+
+							/*
+							s = "External\\windows\\baf2csv.bat \"" + peaklistfilenames[h] + "\"";
 							if (system(s.c_str()) != 0) {
 								error = true;
 								errormessage = "The file cannot be converted.\n";
-								errormessage += "Does the file '" + peaklistfilename + "' exist ?\n";
+								errormessage += "Does the file '" + peaklistfilenames[h] + "' exist ?\n";
 								errormessage += "Do you have Bruker Daltonik's CompassXport installed ?\n";
 								errormessage += "Do you have path to the CompassXport.exe in your PATH variable ?\n";
-								errormessage += "Is the directory with the file '" + peaklistfilename + "' writable ?\n";
-								errormessage += "Do you have 'baf2profile.bat' file located in the 'External/windows' folder ?\n";
+								errormessage += "Is the directory with the file '" + peaklistfilenames[h] + "' writable ?\n";
+								errormessage += "Do you have 'baf2csv.bat' file located in the 'External/windows' folder ?\n";
 							}
 
 							if (!error) {
 								*os << "ok" << endl;
+								peakliststream.open(peaklistfilenames[h] + ".csv");
 							}
-						}
+							*/
 
-						*os << endl;
+							if (linebafprocessing == 0) {
+								mzmlname = peaklistfilenames[h] + ".mzML";
+								peakliststream.open(mzmlname);
+								good = peakliststream.good();
+								peakliststream.close();
 
-						secs = time.elapsed() / 1000;
-						mins = (secs / 60) % 60;
-						hrs = (secs / 3600);
-						secs = secs % 60;
+								if (good) {
+									*os << "The previously converted centroid spectra were found." << endl;
+									*os << "The following file was used: " << mzmlname << endl;
+								}
+								else {
+									*os << "centroid spectra ... ";
 
-						*os << "The data conversion took: " << to_string(hrs) << " hrs, " << to_string(mins) << " min, " << to_string(secs) << " sec." << endl << endl;
-					#endif
-					break;
-				case raw:
-					#if OS_TYPE == WIN
-						*os << "Converting the file " + peaklistfilename + " ... ";
+									//s = "External\\windows\\baf2mzml.bat \"" + peaklistfilenames[h] + "\"";
+									//if (system(s.c_str()) != 0) {
+									//	error = true;
+									//	errormessage = "The file cannot be converted.\n";
+									//	errormessage += "Does the file '" + peaklistfilenames[h] + "' exist ?\n";
+									//	errormessage += "Do you have Bruker Daltonik's CompassXport installed ?\n";
+									//	errormessage += "Do you have path to the CompassXport.exe in your PATH variable ?\n";
+									//	errormessage += "Is the directory with the file '" + peaklistfilenames[h] + "' writable ?\n";
+									//	errormessage += "Do you have 'baf2mzml.bat' file located in the 'External/windows' folder ?\n";
+									//}
 
-						s = "External\\windows\\raw2mzmlpeaks.bat \"" + peaklistfilename + "\"";
-						if (system(s.c_str()) != 0) {
-							error = true;
-							errormessage = "The file cannot be converted.\n";
-							errormessage += "Is the file '" + peaklistfilename + "' opened elsewhere ?\n";
-							errormessage += "Does the file '" + peaklistfilename + "' exist ?\n";
-							errormessage += "Is the directory with the file '" + peaklistfilename + "' writable ?\n";
-							errormessage += "Do you have msconvert.exe installed (OpenMS 2.x including ProteoWizard must be installed) ?\n";
-							errormessage += "Do you have a path to msconvert.exe in your PATH variable (e.g., 'C:/Program Files/OpenMS-2.3.0/share/OpenMS/THIRDPARTY/pwiz-bin') ?\n";
-							errormessage += "Do you have 'raw2mzmlpeaks.bat' file located in the '" + appname.toStdString() + "/External/windows' folder ?\n";
-						}
+									QString command = "External\\windows\\baf2mzml.bat";
+									QString param = peaklistfilenames[h].c_str();
+									
+									QStringList params;
+									params << param;
+									
+									QProcess convert;
+									convert.start(command, params);
 
-						if (!error && useprofiledata) {
-							s = "External\\windows\\raw2mzml.bat \"" + peaklistfilename + "\"";
+									if (!convert.waitForStarted(-1)) {
+										error = true;
+									}
+							
+									if (!error) {
+										convert.closeWriteChannel();
+										if (!convert.waitForFinished(-1)) {
+											error = true;
+										}
+									}
+
+									if (!error) {
+										*os << "ok" << endl;
+									}
+									else {
+										errormessage = "The file cannot be converted.\n";
+										errormessage += "Does the file '" + peaklistfilenames[h] + "' exist ?\n";
+										errormessage += "Do you have Bruker Daltonik's CompassXport installed ?\n";
+										errormessage += "Do you have path to the CompassXport.exe in your PATH variable ?\n";
+										errormessage += "Is the directory with the file '" + peaklistfilenames[h] + "' writable ?\n";
+										errormessage += "Do you have 'baf2mzml.bat' file located in the 'External/windows' folder ?\n";									
+									}
+								}
+
+								if (!error) {
+									peakliststream.open(mzmlname);
+								}
+							}
+							else {
+								linespectramgfname = peaklistfilenames[h] + ".mgf";
+
+								peakliststream.open(linespectramgfname, ifstream::binary);
+								good = peakliststream.good();
+
+								string endstr;
+								if (good) {
+									peakliststream.seekg(0, ios::end);
+									unsigned long long spos = (unsigned long long)peakliststream.tellg();
+									if (spos > 12) {
+										spos -= 12;
+										peakliststream.seekg(spos, ios::beg);
+									}
+
+									char c;
+									while (peakliststream.good()) {
+										peakliststream.get(c);
+										endstr += c;
+									}
+								}
+
+								peakliststream.close();
+								peakliststream.clear();
+							
+								if (endstr.find("END IONS") != string::npos) {
+									*os << "The previously converted centroid spectra were found." << endl;
+									*os << "The following file was used: " << linespectramgfname << endl;
+								}
+								else {
+									*os << "centroid spectra ... ";
+
+									if (!QFile(peaklistfilenames[h].c_str()).exists()) {
+										error = true;
+										errormessage = "The file '" + peaklistfilenames[h] + "' does not exist.\n";
+									}
+									else {
+										//s = "External\\windows\\linespectrumreader.exe \"" + peaklistfilenames[h] + "\"";
+										//if (system(s.c_str()) != 0) {
+										//	error = true;
+										//	errormessage = "The file cannot be converted.\n";
+										//	errormessage += "Does the file '" + peaklistfilenames[h] + "' exist ?\n";
+										//	errormessage += "Do you have Bruker Daltonik's CompassXtract installed ?\n";
+										//	//errormessage += "Do you have path to the CompassXtract.exe in your PATH variable ?\n";
+										//	errormessage += "Is the directory with the file '" + peaklistfilenames[h] + "' writable ?\n";
+										//	errormessage += "Do you have 'linespectrumreader.exe' file located in the 'External/windows' folder ?\n";
+										//}
+
+										QString command = "External\\windows\\linespectrumreader.exe";
+										QString param = peaklistfilenames[h].c_str();
+
+										QStringList params;
+										params << param;
+
+										QProcess convert;
+										convert.start(command, params);
+
+										if (!convert.waitForStarted(-1)) {
+											error = true;
+										}
+
+										if (!error) {
+											convert.closeWriteChannel();
+											if (!convert.waitForFinished(-1)) {
+												error = true;
+											}
+										}
+
+										if (error) {
+											errormessage = "The file cannot be converted.\n";
+											errormessage += "Does the file '" + peaklistfilenames[h] + "' exist ?\n";
+											errormessage += "Do you have Bruker Daltonik's CompassXtract installed ?\n";
+											//errormessage += "Do you have path to the CompassXtract.exe in your PATH variable ?\n";
+											errormessage += "Is the directory with the file '" + peaklistfilenames[h] + "' writable ?\n";
+											errormessage += "Do you have 'linespectrumreader.exe' file located in the 'External/windows' folder ?\n";
+										}
+									}
+
+									if (!error) {
+										*os << "ok" << endl;
+									}
+								}
+
+								if (!error) {
+									peakliststream.open(linespectramgfname);
+								}
+							}
+
+							if (!error && useprofiledata && convertprofiledata) {
+								*os << "profile spectra ... ";
+
+								s = "External\\windows\\baf2profile.bat \"" + peaklistfilenames[h] + "\"";
+								if (system(s.c_str()) != 0) {
+									error = true;
+									errormessage = "The file cannot be converted.\n";
+									errormessage += "Does the file '" + peaklistfilenames[h] + "' exist ?\n";
+									errormessage += "Do you have Bruker Daltonik's CompassXport installed ?\n";
+									errormessage += "Do you have path to the CompassXport.exe in your PATH variable ?\n";
+									errormessage += "Is the directory with the file '" + peaklistfilenames[h] + "' writable ?\n";
+									errormessage += "Do you have 'baf2profile.bat' file located in the 'External/windows' folder ?\n";
+								}
+
+								if (!error) {
+									*os << "ok" << endl;
+								}
+							}
+
+							*os << endl;
+
+							secs = time.elapsed() / 1000;
+							mins = (secs / 60) % 60;
+							hrs = (secs / 3600);
+							secs = secs % 60;
+
+							*os << "The data conversion took: " << to_string(hrs) << " hrs, " << to_string(mins) << " min, " << to_string(secs) << " sec." << endl << endl;
+						#endif
+						break;
+					case raw:
+						#if OS_TYPE == WIN
+							*os << "Converting the file " + peaklistfilenames[h] + " ... ";
+
+							s = "External\\windows\\raw2mzmlpeaks.bat \"" + peaklistfilenames[h] + "\"";
 							if (system(s.c_str()) != 0) {
 								error = true;
 								errormessage = "The file cannot be converted.\n";
-								errormessage += "Is the file '" + peaklistfilename + "' opened elsewhere ?\n";
-								errormessage += "Does the file '" + peaklistfilename + "' exist ?\n";
-								errormessage += "Is the directory with the file '" + peaklistfilename + "' writable ?\n";
+								errormessage += "Is the file '" + peaklistfilenames[h] + "' opened elsewhere ?\n";
+								errormessage += "Does the file '" + peaklistfilenames[h] + "' exist ?\n";
+								errormessage += "Is the directory with the file '" + peaklistfilenames[h] + "' writable ?\n";
 								errormessage += "Do you have msconvert.exe installed (OpenMS 2.x including ProteoWizard must be installed) ?\n";
 								errormessage += "Do you have a path to msconvert.exe in your PATH variable (e.g., 'C:/Program Files/OpenMS-2.3.0/share/OpenMS/THIRDPARTY/pwiz-bin') ?\n";
-								errormessage += "Do you have 'raw2mzml.bat' file located in the '" + appname.toStdString() + "/External/windows' folder ?\n";
+								errormessage += "Do you have 'raw2mzmlpeaks.bat' file located in the '" + appname.toStdString() + "/External/windows' folder ?\n";
 							}
-						}
 
-						if (!error) {
-							*os << "ok" << endl << endl;
-							mzmlname = peaklistfilename.substr(0, peaklistfilename.rfind('.')) + "_converted.mzML";
-							peakliststream.open(mzmlname);
-						}
-					#endif
-					break;
-				case dat:
-					#if OS_TYPE == WIN
-						foldername = peaklistfilename.substr(0, peaklistfilename.rfind('/'));
-						peaksfoldername = foldername.substr(0, foldername.size() - 4) + "_PEAKS.raw";
+							if (!error && useprofiledata) {
+								s = "External\\windows\\raw2mzml.bat \"" + peaklistfilenames[h] + "\"";
+								if (system(s.c_str()) != 0) {
+									error = true;
+									errormessage = "The file cannot be converted.\n";
+									errormessage += "Is the file '" + peaklistfilenames[h] + "' opened elsewhere ?\n";
+									errormessage += "Does the file '" + peaklistfilenames[h] + "' exist ?\n";
+									errormessage += "Is the directory with the file '" + peaklistfilenames[h] + "' writable ?\n";
+									errormessage += "Do you have msconvert.exe installed (OpenMS 2.x including ProteoWizard must be installed) ?\n";
+									errormessage += "Do you have a path to msconvert.exe in your PATH variable (e.g., 'C:/Program Files/OpenMS-2.3.0/share/OpenMS/THIRDPARTY/pwiz-bin') ?\n";
+									errormessage += "Do you have 'raw2mzml.bat' file located in the '" + appname.toStdString() + "/External/windows' folder ?\n";
+								}
+							}
 
-						*os << "Generating centroid data folder from " + foldername + " ... ";
-						s = "External\\windows\\waters\\profile2peaks.exe \"" + foldername + "\"";
-						if (system(s.c_str()) != 0) {
-							error = true;
-							errormessage = "The raw data folder cannot be converted.\n";
-							errormessage += "Does the folder '" + foldername + "' exist ?\n";
-							errormessage += "Is the folder with the folder '" + foldername + "' writable ?\n";
-							errormessage += "Do you have 'profile2peaks.exe' file located in the 'External/windows/waters' folder ?\n";
-						}
-						else {
-							*os << "ok" << endl << endl;
-							*os << "Centroid data folder " + peaksfoldername + " successfully created." << endl << endl;
-						}
+							if (!error) {
+								*os << "ok" << endl << endl;
+								mzmlname = peaklistfilenames[h].substr(0, peaklistfilenames[h].rfind('.')) + "_converted.mzML";
+								peakliststream.open(mzmlname);
+							}
+						#endif
+						break;
+					case dat:
+						#if OS_TYPE == WIN
+							foldername = peaklistfilenames[h].substr(0, peaklistfilenames[h].rfind('/'));
+							peaksfoldername = foldername.substr(0, foldername.size() - 4) + "_PEAKS.raw";
 
-						if (!error) {
-							*os << "Converting profile data " + foldername + " ... ";
-							s = "External\\windows\\waters\\raw2mgf.exe \"" + foldername + "\"";
+							peaksdir.setPath(peaksfoldername.c_str());
+							if (!peaksdir.exists()) {
+								*os << "Generating centroid data folder from " + foldername + " ... ";
+								s = "External\\windows\\waters\\profile2peaks.exe \"" + foldername + "\"";
+								if (system(s.c_str()) != 0) {
+									error = true;
+									errormessage = "The raw data folder cannot be converted.\n";
+									errormessage += "Does the folder '" + foldername + "' exist ?\n";
+									errormessage += "Is the folder with the folder '" + foldername + "' writable ?\n";
+									errormessage += "Do you have 'profile2peaks.exe' file located in the 'External/windows/waters' folder ?\n";
+								}
+								else {
+									*os << "ok" << endl << endl;
+									*os << "Centroid data folder " + peaksfoldername + " successfully created." << endl << endl;
+								}
+							}
+							else {
+								*os << "Previously generated centroid data folder " + peaksfoldername + " has been found." << endl << endl;
+							}
+
+							if (!error) {
+								string tmpfilename = foldername.substr(0, foldername.rfind('.')) + ".mgf";
+								if (!QFile(tmpfilename.c_str()).exists()) {
+									*os << "Converting profile data " + foldername + " ... ";
+									s = "External\\windows\\waters\\raw2mgf.exe \"" + foldername + "\"";
+									if (system(s.c_str()) != 0) {
+										error = true;
+										errormessage = "The raw data folder cannot be converted.\n";
+										errormessage += "Does the folder '" + foldername + "' exist ?\n";
+										errormessage += "Is the folder with the folder '" + foldername + "' writable ?\n";
+										errormessage += "Do you have 'raw2mgf.exe' file located in the 'External/windows/waters' folder ?\n";
+									}
+									else {
+										*os << "ok" << endl << endl;
+									}
+								}
+								else {
+									*os << "Previously converted profile data file " + tmpfilename + " has been found." << endl << endl;
+								}
+							}
+
+							if (!error) {
+								string mgfname = peaksfoldername.substr(0, peaksfoldername.rfind('.')) + ".mgf";
+								if (!QFile(mgfname.c_str()).exists()) {
+									*os << "Converting centroid data " + peaksfoldername + " ... ";
+									s = "External\\windows\\waters\\raw2mgf.exe \"" + peaksfoldername + "\"";
+									if (system(s.c_str()) != 0) {
+										error = true;
+										errormessage = "The raw data folder cannot be converted.\n";
+										errormessage += "Does the folder '" + peaksfoldername + "' exist ?\n";
+										errormessage += "Is the folder with the folder '" + peaksfoldername + "' writable ?\n";
+										errormessage += "Do you have 'raw2mgf.exe' file located in the 'External/windows/waters' folder ?\n";
+									}
+									else {
+										*os << "ok" << endl << endl;
+									}
+								}
+								else {
+									*os << "Previously converted centroid data file " + mgfname + " has been found." << endl << endl;
+								}
+							}
+
+							if (!error) {
+								string mgfname = peaksfoldername.substr(0, peaksfoldername.rfind('.')) + ".mgf";
+								peakliststream.open(mgfname);
+							}
+						#endif
+						break;
+					case mis:
+						#if OS_TYPE == WIN
+							foldername = peaklistfilenames[h].substr(0, peaklistfilenames[h].rfind('.'));
+							*os << "Converting flexImaging data folder " + foldername + " ... ";
+							s = "External\\windows\\mis2csv.bat \"" + foldername + "\"";
 							if (system(s.c_str()) != 0) {
 								error = true;
-								errormessage = "The raw data folder cannot be converted.\n";
+								errormessage = "The folder cannot be converted.\n";
 								errormessage += "Does the folder '" + foldername + "' exist ?\n";
-								errormessage += "Is the folder with the folder '" + foldername + "' writable ?\n";
-								errormessage += "Do you have 'raw2mgf.exe' file located in the 'External/windows/waters' folder ?\n";
+								errormessage += "Do you have Bruker Daltonik's CompassXport installed ?\n";
+								errormessage += "Do you have path to the CompassXport.exe in your PATH variable ?\n";
+								errormessage += "Is the directory with the file '" + peaklistfilenames[h] + "' writable ?\n";
+								errormessage += "Do you have 'mis2csv.bat' file located in the 'External/windows' folder ?\n";
 							}
-							else {
-								*os << "ok" << endl << endl;
-							}
-						}
 
-						if (!error) {
-							*os << "Converting centroid data " + peaksfoldername + " ... ";
-							s = "External\\windows\\waters\\raw2mgf.exe \"" + peaksfoldername + "\"";
+							if (!error) {
+								*os << "ok" << endl << endl;
+								peakliststream.open(foldername + ".baf.csv");
+								spotliststream.open(foldername + ".baf.txt");
+							}
+						#endif
+						break;
+					case ser:
+						#if OS_TYPE == WIN
+							foldername = peaklistfilenames[h].substr(0, peaklistfilenames[h].length() - 4);
+							*os << "Converting apex data folder " + foldername + " ... ";
+							s = "External\\windows\\ser2csv.bat \"" + foldername + "\"";
 							if (system(s.c_str()) != 0) {
 								error = true;
-								errormessage = "The raw data folder cannot be converted.\n";
-								errormessage += "Does the folder '" + peaksfoldername + "' exist ?\n";
-								errormessage += "Is the folder with the folder '" + peaksfoldername + "' writable ?\n";
-								errormessage += "Do you have 'raw2mgf.exe' file located in the 'External/windows/waters' folder ?\n";
+								errormessage = "The folder cannot be converted.\n";
+								errormessage += "Does the folder '" + foldername + "' exist ?\n";
+								errormessage += "Do you have Bruker Daltonik's CompassXport installed ?\n";
+								errormessage += "Do you have path to the CompassXport.exe in your PATH variable ?\n";
+								errormessage += "Is the directory with the file '" + peaklistfilenames[h] + "' writable ?\n";
+								errormessage += "Do you have 'ser2csv.bat' file located in the 'External/windows' folder ?\n";
 							}
-							else {
+
+							if (!error) {
 								*os << "ok" << endl << endl;
+								peakliststream.open(foldername + ".csv");
+								titleliststream.open(foldername + ".txt");
 							}
-						}
+						#endif
+						break;
+					case mzML:
+						peakliststream.open(peaklistfilenames[h]);
+						break;
+					case imzML:
+						ibdfilename = peaklistfilenames[h].substr(0, (int)peaklistfilenames[h].size() - 5);
+						ibdfilename += "ibd";
+						peakliststream.open(ibdfilename, std::ifstream::binary);
+						break;
+					default:
+						break;
+				}
 
-						if (!error) {
-							string mgfname = peaksfoldername.substr(0, peaksfoldername.rfind('.')) + ".mgf";
-							peakliststream.open(mgfname);
-						}
-					#endif
-					break;
-				case mis:
-					#if OS_TYPE == WIN
-						foldername = peaklistfilename.substr(0, peaklistfilename.rfind('.'));
-						*os << "Converting flexImaging data folder " + foldername + " ... ";
-						s = "External\\windows\\mis2csv.bat \"" + foldername + "\"";
-						if (system(s.c_str()) != 0) {
-							error = true;
-							errormessage = "The folder cannot be converted.\n";
-							errormessage += "Does the folder '" + foldername + "' exist ?\n";
-							errormessage += "Do you have Bruker Daltonik's CompassXport installed ?\n";
-							errormessage += "Do you have path to the CompassXport.exe in your PATH variable ?\n";
-							errormessage += "Is the directory with the file '" + peaklistfilename + "' writable ?\n";
-							errormessage += "Do you have 'mis2csv.bat' file located in the 'External/windows' folder ?\n";
-						}
-
-						if (!error) {
-							*os << "ok" << endl << endl;
-							peakliststream.open(foldername + ".baf.csv");
-							spotliststream.open(foldername + ".baf.txt");
-						}
-					#endif
-					break;
-				case ser:
-					#if OS_TYPE == WIN
-						foldername = peaklistfilename.substr(0, peaklistfilename.length() - 4);
-						*os << "Converting apex data folder " + foldername + " ... ";
-						s = "External\\windows\\ser2csv.bat \"" + foldername + "\"";
-						if (system(s.c_str()) != 0) {
-							error = true;
-							errormessage = "The folder cannot be converted.\n";
-							errormessage += "Does the folder '" + foldername + "' exist ?\n";
-							errormessage += "Do you have Bruker Daltonik's CompassXport installed ?\n";
-							errormessage += "Do you have path to the CompassXport.exe in your PATH variable ?\n";
-							errormessage += "Is the directory with the file '" + peaklistfilename + "' writable ?\n";
-							errormessage += "Do you have 'ser2csv.bat' file located in the 'External/windows' folder ?\n";
-						}
-
-						if (!error) {
-							*os << "ok" << endl << endl;
-							peakliststream.open(foldername + ".csv");
-							titleliststream.open(foldername + ".txt");
-						}
-					#endif
-					break;
-				case mzML:
-					peakliststream.open(peaklistfilename);
-					break;
-				case imzML:
-					ibdfilename = peaklistfilename.substr(0, (int)peaklistfilename.size() - 5);
-					ibdfilename += "ibd";
-					peakliststream.open(ibdfilename, std::ifstream::binary);
-					break;
-				default:
-					break;
 			}
-
-		}
 			
 
-		if (!error) {
-			if (!peakliststream.good()) {
-				error = true;
-				if ((peaklistfileformat == mis) || (peaklistfileformat == ser) || (peaklistfileformat == dat)) {
-					errormessage = "Cannot open the folder '" + foldername + "'.";
+			if (!error) {
+				if (!peakliststream.good()) {
+					error = true;
+					if ((peaklistfileformats[h] == mis) || (peaklistfileformats[h] == ser) || (peaklistfileformats[h] == dat)) {
+						errormessage = "Cannot open the folder '" + foldername + "'.";
+					}
+					else {
+						errormessage = "Cannot open the file '" + peaklistfilenames[h] + "'.";
+						if (peaklistfileformats[h] == baf) {
+							if (linebafprocessing == 0) {
+								errormessage += "\n\nDo you have Bruker Daltonik's CompassXport installed ?\n";
+								errormessage += "Do you have path to the CompassXport.exe in your PATH variable ?\n";
+							}
+							else {
+								errormessage += "\n\nDoes the file '" + peaklistfilenames[h] + "' exist ?\n";
+								errormessage += "Do you have Bruker Daltonik's CompassXtract installed ?\n";
+								//errormessage += "Do you have path to the CompassXtract.exe in your PATH variable ?\n";
+								errormessage += "Is the directory with the file '" + peaklistfilenames[h] + "' writable ?\n";
+								errormessage += "Do you have 'linespectrumreader.exe' file located in the 'External/windows' folder ?\n";
+							}
+						}
+					}
 				}
 				else {
-					errormessage = "Cannot open the file '" + peaklistfilename + "'.";
-					if (peaklistfileformat == baf) {
-						errormessage += "\n\nDo you have Bruker Daltonik's CompassXport installed ?\n";
-						errormessage += "Do you have path to the CompassXport.exe in your PATH variable ?\n";
+					if (os && (peaklistfileformats[h] != mzML) && (peaklistfileformats[h] != mzXML) && (peaklistfileformats[h] != imzML) && (peaklistfileformats[h] != baf) && (peaklistfileformats[h] != raw) && (peaklistfileformats[h] != ser)) {
+						*os << "Loading the peaklist(s)... ";
 					}
-				}
-			}
-			else {
-				if (os && (peaklistfileformat != mzML) && (peaklistfileformat != mzXML) && (peaklistfileformat != imzML) && (peaklistfileformat != baf) && (peaklistfileformat != raw) && (peaklistfileformat != ser)) {
-					*os << "Loading the peaklist(s)... ";
-				}
-				switch (peaklistfileformat) {
-				case txt:
-					peaklistseries.loadFromPlainTextStream(peakliststream);
-					break;
-				case mzXML:
-					errtype = peaklistseries.loadFromMZMLStream(mzmlname, peakliststream, fwhm, mode, os, terminatecomputation);
-					if (errtype == -1) {
-						error = true;
-						errormessage = "Aborted by user.\n";
-					}
-					if (errtype == -2) {
-						error = true;
-						#if OS_TYPE == UNX
-							errormessage = "Raw data cannot be converted.\n";
-							errormessage += "Does the file '" + mzmlname + "' exist ?\n";
-							errormessage += "Is the directory with the file '" + mzmlname + "' writable ?\n";
-							errormessage += "Do you have enough space on your hard drive ?\n";
-							errormessage += "Do you have OpenMS 2.x installed ?\n";
-							errormessage += "Do you have 'raw2peaks.sh' file located in '" + installdir.toStdString() + "External/linux' folder ?\n";
-							errormessage += "Is the file 'raw2peaks.sh' executable (sudo chmod +x " + installdir.toStdString() + "External/linux/raw2peaks.sh) ? \n";
-						#else
-							#if OS_TYPE == OSX
-								errormessage = "Raw data cannot be converted.\n";
-								errormessage += "Does the file '" + mzmlname + "' exist ?\n";
-								errormessage += "Is the directory with the file '" + mzmlname + "' writable ?\n";
-								errormessage += "Do you have enough space on your hard drive ?\n";
-								errormessage += "Do you have OpenMS 2.x installed ?\n";
-								errormessage += "Do you have 'raw2peaks.sh' file located in '" + installdir.toStdString() + "External/macosx' folder ?\n";
-								errormessage += "Is the file 'raw2peaks.sh' executable (sudo chmod +x " + installdir.toStdString() + "External/macosx/raw2peaks.sh) ? \n";
-							#else		
-								errormessage = "Raw data cannot be converted.\n";
-								errormessage += "Does the file '" + mzmlname + "' exist ?\n";
-								errormessage += "Is the directory with the file '" + mzmlname + "' writable ?\n";
-								errormessage += "Do you have enough space on your hard drive ?\n";
-								errormessage += "Do you have OpenMS 2.x installed ?\n";
-								errormessage += "Do you have a path to OpenMS binaries folder in your PATH variable (e.g., 'C:/Program Files/OpenMS-2.3.0/bin') ?\n";
-								errormessage += "Do you have 'raw2peaks.bat' file located in the '" + appname.toStdString() + "/External/windows' folder ?\n";
-							#endif
-						#endif
-					}
-					break;
-				case mgf:
-					peaklistseries.loadFromMGFStream(peakliststream);
-					break;
-				case baf:
-					/*
-					#if OS_TYPE == WIN
-						peaklistseries.loadFromBAFStream(peakliststream);
-					#endif
-					*/
-					#if OS_TYPE == WIN
-						errtype = peaklistseries.loadFromMZMLStream(mzmlname, peakliststream, fwhm, mode, os, terminatecomputation);
-						if (errtype == -1) {
-							error = true;
-							errormessage = "Aborted by user.\n";
-						}
-					#endif
-					break;
-				case raw:
-					#if OS_TYPE == WIN
-						errtype = peaklistseries.loadFromMZMLStream(mzmlname, peakliststream, fwhm, mode, os, terminatecomputation);
-						if (errtype == -1) {
-							error = true;
-							errormessage = "Aborted by user.\n";
-						}
-						if (errtype == -2) {
-							error = true;
-							errormessage = "Raw data cannot be converted.\n";
-							errormessage += "Does the file '" + mzmlname + "' exist ?\n";
-							errormessage += "Is the directory with the file '" + mzmlname + "' writable ?\n";
-							errormessage += "Do you have enough space on your hard drive ?\n";
-							errormessage += "Do you have OpenMS 2.x installed ?\n";
-							errormessage += "Do you have a path to OpenMS binaries folder in your PATH variable (e.g., 'C:/Program Files/OpenMS-2.3.0/bin') ?\n";
-							errormessage += "Do you have 'raw2peaks.bat' file located in the '" + appname.toStdString() + "/External/windows' folder ?\n";
-						}
-					#endif
-					break;
-				case dat:
-					#if OS_TYPE == WIN
-						peaklistseries.loadFromMGFStream(peakliststream);
-
-						profilemgfname = foldername.substr(0, foldername.rfind('.')) + ".mgf";
-						profilestream.open(profilemgfname);
-
-						for (int i = 0; i < peaklistseries.size(); i++) {
-							profilelist.clear();
-							profilelist.loadFromMGFStream(profilestream);
-
-							if (peaklistseries[i].getTitle().compare(profilelist.getTitle()) != 0) {
+					switch (peaklistfileformats[h]) {
+						case txt:
+							peaklistseriesvector[h].loadFromPlainTextStream(peakliststream);
+							break;
+						case mzXML:
+							errtype = peaklistseriesvector[h].loadFromMZMLStream(mzmlname, peakliststream, fwhm, mode, os, terminatecomputation);
+							if (errtype == -1) {
 								error = true;
-								errormessage = "The number of spectra in " + foldername + " and " + peaksfoldername + " is different.\n";
-								break;
+								errormessage = "Aborted by user.\n";
 							}
-
-							fixIntensities(peaklistseries[i], profilelist);
-						}
-
-						profilestream.close();
-					#endif
-					break;
-				case mis:
-					#if OS_TYPE == WIN
-						peaklistseries.loadFromBAFStream(peakliststream);
-						peaklistseries.loadSpotList(spotliststream);
-						spotliststream.close();
-					#endif
-					break;
-				case ser:
-					#if OS_TYPE == WIN
-						errtype = peaklistseries.loadFromProfileApexStream(peaklistfilename, peakliststream, titleliststream, fwhm, os, terminatecomputation);
-						titleliststream.close();
-						if (errtype == -1) {
-							error = true;
-							errormessage = "Aborted by user.\n";
-						}
-						if (errtype == -2) {
-							error = true;
-							errormessage = "Raw data cannot be converted.\n";
-							errormessage += "Does the folder '" + peaklistfilename.substr(0, peaklistfilename.length() - 4) + "' exist ?\n";
-							errormessage += "Is the directory '" + peaklistfilename.substr(0, peaklistfilename.length() - 4) + "' writable ?\n";
-							errormessage += "Do you have enough space on your hard drive ?\n";
-							errormessage += "Do you have OpenMS 2.x installed ?\n";
-							errormessage += "Do you have a path to OpenMS binaries folder in your PATH variable (e.g., 'C:/Program Files/OpenMS-2.3.0/bin') ?\n";
-							errormessage += "Do you have 'raw2peaks.bat' file located in the '" + appname.toStdString() + "/External/windows' folder ?\n";
-						}
-					#endif
-					break;
-				case mzML:
-					errtype = peaklistseries.loadFromMZMLStream(peaklistfilename, peakliststream, fwhm, mode, os, terminatecomputation);
-					if (errtype == -1) {
-						error = true;
-						errormessage = "Aborted by user.\n";
-					}
-					if (errtype == -2) {
-						error = true;
-						#if OS_TYPE == UNX
-							errormessage = "Raw data cannot be converted.\n";
-							errormessage += "Does the file '" + peaklistfilename + "' exist ?\n";
-							errormessage += "Is the directory with the file '" + peaklistfilename + "' writable ?\n";
-							errormessage += "Do you have enough space on your hard drive ?\n";
-							errormessage += "Do you have OpenMS 2.x installed ?\n";
-							errormessage += "Do you have 'raw2peaks.sh' file located in '" + installdir.toStdString() + "External/linux' folder ?\n";
-							errormessage += "Is the file 'raw2peaks.sh' executable (sudo chmod +x " + installdir.toStdString() + "External/linux/raw2peaks.sh) ? \n";
-						#else
-							#if OS_TYPE == OSX
-								errormessage = "Raw data cannot be converted.\n";
-								errormessage += "Does the file '" + peaklistfilename + "' exist ?\n";
-								errormessage += "Is the directory with the file '" + peaklistfilename + "' writable ?\n";
-								errormessage += "Do you have enough space on your hard drive ?\n";
-								errormessage += "Do you have OpenMS 2.x installed ?\n";
-								errormessage += "Do you have 'raw2peaks.sh' file located in '" + installdir.toStdString() + "External/macosx' folder ?\n";
-								errormessage += "Is the file 'raw2peaks.sh' executable (sudo chmod +x " + installdir.toStdString() + "External/macosx/raw2peaks.sh) ? \n";
-							#else		
-								errormessage = "Raw data cannot be converted.\n";
-								errormessage += "Does the file '" + peaklistfilename + "' exist ?\n";
-								errormessage += "Is the directory with the file '" + peaklistfilename + "' writable ?\n";
-								errormessage += "Do you have enough space on your hard drive ?\n";
-								errormessage += "Do you have OpenMS 2.x installed ?\n";
-								errormessage += "Do you have a path to OpenMS binaries folder in your PATH variable (e.g., 'C:/Program Files/OpenMS-2.3.0/bin') ?\n";
-								errormessage += "Do you have 'raw2peaks.bat' file located in the '" + appname.toStdString() + "/External/windows' folder ?\n";
+							if (errtype == -2) {
+								error = true;
+								#if OS_TYPE == UNX
+									errormessage = "Raw data cannot be converted.\n";
+									errormessage += "Does the file '" + mzmlname + "' exist ?\n";
+									errormessage += "Is the directory with the file '" + mzmlname + "' writable ?\n";
+									errormessage += "Do you have enough space on your hard drive ?\n";
+									errormessage += "Do you have OpenMS 2.x installed ?\n";
+									errormessage += "Do you have 'raw2peaks.sh' file located in '" + installdir.toStdString() + "External/linux' folder ?\n";
+									errormessage += "Is the file 'raw2peaks.sh' executable (sudo chmod +x " + installdir.toStdString() + "External/linux/raw2peaks.sh) ? \n";
+								#else
+									#if OS_TYPE == OSX
+										errormessage = "Raw data cannot be converted.\n";
+										errormessage += "Does the file '" + mzmlname + "' exist ?\n";
+										errormessage += "Is the directory with the file '" + mzmlname + "' writable ?\n";
+										errormessage += "Do you have enough space on your hard drive ?\n";
+										errormessage += "Do you have OpenMS 2.x installed ?\n";
+										errormessage += "Do you have 'raw2peaks.sh' file located in '" + installdir.toStdString() + "External/macosx' folder ?\n";
+										errormessage += "Is the file 'raw2peaks.sh' executable (sudo chmod +x " + installdir.toStdString() + "External/macosx/raw2peaks.sh) ? \n";
+									#else		
+										errormessage = "Raw data cannot be converted.\n";
+										errormessage += "Does the file '" + mzmlname + "' exist ?\n";
+										errormessage += "Is the directory with the file '" + mzmlname + "' writable ?\n";
+										errormessage += "Do you have enough space on your hard drive ?\n";
+										errormessage += "Do you have OpenMS 2.x installed ?\n";
+										errormessage += "Do you have a path to OpenMS binaries folder in your PATH variable (e.g., 'C:/Program Files/OpenMS-2.3.0/bin') ?\n";
+										errormessage += "Do you have 'raw2peaks.bat' file located in the '" + appname.toStdString() + "/External/windows' folder ?\n";
+									#endif
+								#endif
+							}
+							break;
+						case mgf:
+							peaklistseriesvector[h].loadFromMGFStream(peakliststream, 0);
+							break;
+						case baf:
+							/*
+							#if OS_TYPE == WIN
+								peaklistseries.loadFromBAFStream(peakliststream);
 							#endif
-						#endif
-					}
-					break;
-				case imzML:
-					errtype = peaklistseries.loadFromIMZMLStream(peaklistfilename, peakliststream, fwhm, defaultmaxx, defaultmaxy, defaultpixelsizex, defaultpixelsizey, vendor, os, terminatecomputation);
-					if (errtype == -1) {
-						error = true;
-						errormessage = "Aborted by user.\n";
-					}
-					if (errtype == -2) {
-						error = true;
-						#if OS_TYPE == UNX
-							errormessage = "Raw data cannot be converted.\n";
-							errormessage += "Does the file '" + peaklistfilename + "' exist ?\n";
-							errormessage += "Is the directory with the file '" + peaklistfilename + "' writable ?\n";
-							errormessage += "Do you have enough space on your hard drive ?\n";
-							errormessage += "Do you have OpenMS 2.x installed ?\n";
-							errormessage += "Do you have 'raw2peaks.sh' file located in '" + installdir.toStdString() + "External/linux' folder ?\n";
-							errormessage += "Is the file 'raw2peaks.sh' executable (sudo chmod +x " + installdir.toStdString() + "External/linux/raw2peaks.sh) ? \n";
-						#else
-							#if OS_TYPE == OSX
-								errormessage = "Raw data cannot be converted.\n";
-								errormessage += "Does the file '" + peaklistfilename + "' exist ?\n";
-								errormessage += "Is the directory with the file '" + peaklistfilename + "' writable ?\n";
-								errormessage += "Do you have enough space on your hard drive ?\n";
-								errormessage += "Do you have OpenMS 2.x installed ?\n";
-								errormessage += "Do you have 'raw2peaks.sh' file located in '" + installdir.toStdString() + "External/macosx' folder ?\n";
-								errormessage += "Is the file 'raw2peaks.sh' executable (sudo chmod +x " + installdir.toStdString() + "External/macosx/raw2peaks.sh) ? \n";
-							#else		
-								errormessage = "Raw data cannot be converted.\n";
-								errormessage += "Does the file '" + peaklistfilename + "' exist ?\n";
-								errormessage += "Is the directory with the file '" + peaklistfilename + "' writable ?\n";
-								errormessage += "Do you have enough space on your hard drive ?\n";
-								errormessage += "Do you have OpenMS 2.x installed ?\n";
-								errormessage += "Do you have a path to OpenMS binaries folder in your PATH variable (e.g., 'C:/Program Files/OpenMS-2.3.0/bin') ?\n";
-								errormessage += "Do you have 'raw2peaks.bat' file located in the '" + appname.toStdString() + "/External/windows' folder ?\n";
+							*/
+							#if OS_TYPE == WIN
+								if (linebafprocessing == 0) {
+									errtype = peaklistseriesvector[h].loadFromMZMLStream(mzmlname, peakliststream, fwhm, mode, os, terminatecomputation);
+									if (errtype == -1) {
+										error = true;
+										errormessage = "Aborted by user.\n";
+									}
+								}
+								else {
+									peaklistseriesvector[h].loadFromMGFStream(peakliststream, 1);
+								}
 							#endif
-						#endif
+							break;
+						case raw:
+							#if OS_TYPE == WIN
+								errtype = peaklistseriesvector[h].loadFromMZMLStream(mzmlname, peakliststream, fwhm, mode, os, terminatecomputation);
+								if (errtype == -1) {
+									error = true;
+									errormessage = "Aborted by user.\n";
+								}
+								if (errtype == -2) {
+									error = true;
+									errormessage = "Raw data cannot be converted.\n";
+									errormessage += "Does the file '" + mzmlname + "' exist ?\n";
+									errormessage += "Is the directory with the file '" + mzmlname + "' writable ?\n";
+									errormessage += "Do you have enough space on your hard drive ?\n";
+									errormessage += "Do you have OpenMS 2.x installed ?\n";
+									errormessage += "Do you have a path to OpenMS binaries folder in your PATH variable (e.g., 'C:/Program Files/OpenMS-2.3.0/bin') ?\n";
+									errormessage += "Do you have 'raw2peaks.bat' file located in the '" + appname.toStdString() + "/External/windows' folder ?\n";
+								}
+							#endif
+							break;
+						case dat:
+							#if OS_TYPE == WIN
+								peaklistseriesvector[h].loadFromMGFStream(peakliststream, 1);
+
+								profilemgfname = foldername.substr(0, foldername.rfind('.')) + ".mgf";
+								profilestream.open(profilemgfname);
+
+								for (int i = 0; i < peaklistseriesvector[h].size(); i++) {
+									profilelist.clear();
+									profilelist.loadFromMGFStream(profilestream, 1);
+
+									if (peaklistseriesvector[h][i].getTitle().compare(profilelist.getTitle()) != 0) {
+										error = true;
+										errormessage = "The number of spectra in " + foldername + " and " + peaksfoldername + " is different.\n";
+										break;
+									}
+
+									fixIntensities(peaklistseriesvector[h][i], profilelist);
+								}
+
+								profilestream.close();
+							#endif
+							break;
+						case mis:
+							#if OS_TYPE == WIN
+								peaklistseriesvector[h].loadFromBAFStream(peakliststream);
+								peaklistseriesvector[h].loadSpotList(spotliststream);
+								spotliststream.close();
+							#endif
+							break;
+						case ser:
+							#if OS_TYPE == WIN
+								errtype = peaklistseriesvector[h].loadFromProfileApexStream(peaklistfilenames[h], peakliststream, titleliststream, fwhm, os, terminatecomputation);
+								titleliststream.close();
+								if (errtype == -1) {
+									error = true;
+									errormessage = "Aborted by user.\n";
+								}
+								if (errtype == -2) {
+									error = true;
+									errormessage = "Raw data cannot be converted.\n";
+									errormessage += "Does the folder '" + peaklistfilenames[h].substr(0, peaklistfilenames[h].length() - 4) + "' exist ?\n";
+									errormessage += "Is the directory '" + peaklistfilenames[h].substr(0, peaklistfilenames[h].length() - 4) + "' writable ?\n";
+									errormessage += "Do you have enough space on your hard drive ?\n";
+									errormessage += "Do you have OpenMS 2.x installed ?\n";
+									errormessage += "Do you have a path to OpenMS binaries folder in your PATH variable (e.g., 'C:/Program Files/OpenMS-2.3.0/bin') ?\n";
+									errormessage += "Do you have 'raw2peaks.bat' file located in the '" + appname.toStdString() + "/External/windows' folder ?\n";
+								}
+							#endif
+							break;
+						case mzML:
+							errtype = peaklistseriesvector[h].loadFromMZMLStream(peaklistfilenames[h], peakliststream, fwhm, mode, os, terminatecomputation);
+							if (errtype == -1) {
+								error = true;
+								errormessage = "Aborted by user.\n";
+							}
+							if (errtype == -2) {
+								error = true;
+								#if OS_TYPE == UNX
+									errormessage = "Raw data cannot be converted.\n";
+									errormessage += "Does the file '" + peaklistfilenames[h] + "' exist ?\n";
+									errormessage += "Is the directory with the file '" + peaklistfilenames[h] + "' writable ?\n";
+									errormessage += "Do you have enough space on your hard drive ?\n";
+									errormessage += "Do you have OpenMS 2.x installed ?\n";
+									errormessage += "Do you have 'raw2peaks.sh' file located in '" + installdir.toStdString() + "External/linux' folder ?\n";
+									errormessage += "Is the file 'raw2peaks.sh' executable (sudo chmod +x " + installdir.toStdString() + "External/linux/raw2peaks.sh) ? \n";
+								#else
+									#if OS_TYPE == OSX
+										errormessage = "Raw data cannot be converted.\n";
+										errormessage += "Does the file '" + peaklistfilenames[h] + "' exist ?\n";
+										errormessage += "Is the directory with the file '" + peaklistfilenames[h] + "' writable ?\n";
+										errormessage += "Do you have enough space on your hard drive ?\n";
+										errormessage += "Do you have OpenMS 2.x installed ?\n";
+										errormessage += "Do you have 'raw2peaks.sh' file located in '" + installdir.toStdString() + "External/macosx' folder ?\n";
+										errormessage += "Is the file 'raw2peaks.sh' executable (sudo chmod +x " + installdir.toStdString() + "External/macosx/raw2peaks.sh) ? \n";
+									#else		
+										errormessage = "Raw data cannot be converted.\n";
+										errormessage += "Does the file '" + peaklistfilenames[h] + "' exist ?\n";
+										errormessage += "Is the directory with the file '" + peaklistfilenames[h] + "' writable ?\n";
+										errormessage += "Do you have enough space on your hard drive ?\n";
+										errormessage += "Do you have OpenMS 2.x installed ?\n";
+										errormessage += "Do you have a path to OpenMS binaries folder in your PATH variable (e.g., 'C:/Program Files/OpenMS-2.3.0/bin') ?\n";
+										errormessage += "Do you have 'raw2peaks.bat' file located in the '" + appname.toStdString() + "/External/windows' folder ?\n";
+									#endif
+								#endif
+							}
+							break;
+						case imzML:
+							errtype = peaklistseriesvector[h].loadFromIMZMLStream(peaklistfilenames[h], peakliststream, fwhm, defaultmaxx, defaultmaxy, defaultpixelsizex, defaultpixelsizey, vendor, os, terminatecomputation);
+							if (errtype == -1) {
+								error = true;
+								errormessage = "Aborted by user.\n";
+							}
+							if (errtype == -2) {
+								error = true;
+								#if OS_TYPE == UNX
+									errormessage = "Raw data cannot be converted.\n";
+									errormessage += "Does the file '" + peaklistfilenames[h] + "' exist ?\n";
+									errormessage += "Is the directory with the file '" + peaklistfilenames[h] + "' writable ?\n";
+									errormessage += "Do you have enough space on your hard drive ?\n";
+									errormessage += "Do you have OpenMS 2.x installed ?\n";
+									errormessage += "Do you have 'raw2peaks.sh' file located in '" + installdir.toStdString() + "External/linux' folder ?\n";
+									errormessage += "Is the file 'raw2peaks.sh' executable (sudo chmod +x " + installdir.toStdString() + "External/linux/raw2peaks.sh) ? \n";
+								#else
+									#if OS_TYPE == OSX
+										errormessage = "Raw data cannot be converted.\n";
+										errormessage += "Does the file '" + peaklistfilenames[h] + "' exist ?\n";
+										errormessage += "Is the directory with the file '" + peaklistfilenames[h] + "' writable ?\n";
+										errormessage += "Do you have enough space on your hard drive ?\n";
+										errormessage += "Do you have OpenMS 2.x installed ?\n";
+										errormessage += "Do you have 'raw2peaks.sh' file located in '" + installdir.toStdString() + "External/macosx' folder ?\n";
+										errormessage += "Is the file 'raw2peaks.sh' executable (sudo chmod +x " + installdir.toStdString() + "External/macosx/raw2peaks.sh) ? \n";
+									#else		
+										errormessage = "Raw data cannot be converted.\n";
+										errormessage += "Does the file '" + peaklistfilenames[h] + "' exist ?\n";
+										errormessage += "Is the directory with the file '" + peaklistfilenames[h] + "' writable ?\n";
+										errormessage += "Do you have enough space on your hard drive ?\n";
+										errormessage += "Do you have OpenMS 2.x installed ?\n";
+										errormessage += "Do you have a path to OpenMS binaries folder in your PATH variable (e.g., 'C:/Program Files/OpenMS-2.3.0/bin') ?\n";
+										errormessage += "Do you have 'raw2peaks.bat' file located in the '" + appname.toStdString() + "/External/windows' folder ?\n";
+									#endif
+								#endif
+							}
+							if (errtype == -3) {
+								error = true;
+								errormessage = "Failed to load the imzML file, zlib compression is not supported. The spectra must be stored in the imzML file with the attribute \"no compression\".\n";
+							}
+							break;
+						default:
+							break;
 					}
-					if (errtype == -3) {
-						error = true;
-						errormessage = "Failed to load the imzML file, zlib compression is not supported. The spectra must be stored in the imzML file with the attribute \"no compression\".\n";
+					if (os && (peaklistfileformats[h] != mzML) && (peaklistfileformats[h] != mzXML) && (peaklistfileformats[h] != imzML) && (peaklistfileformats[h] != baf) && (peaklistfileformats[h] != raw) && (peaklistfileformats[h] != ser)) {
+						*os << "ok" << endl << endl;
 					}
-					break;
-				default:
-					break;
 				}
-				if (os && (peaklistfileformat != mzML) && (peaklistfileformat != mzXML) && (peaklistfileformat != imzML) && (peaklistfileformat != baf) && (peaklistfileformat != raw) && (peaklistfileformat != ser)) {
-					*os << "ok" << endl << endl;
-				}
+				peakliststream.close();
+
 			}
-			peakliststream.close();
+
 		}
 
 	}
@@ -924,7 +1471,7 @@ int cParameters::checkAndPrepare(bool& terminatecomputation) {
 			if (os) {
 				*os << "Loading the database of sequences... ";
 			}
-			sequencedatabase.loadFromPlainTextStream(sequencedatabasestream);
+			sequencedatabase.loadFromPlainTextStream(sequencedatabasestream, false);
 			if (os) {
 				*os << "ok" << endl << endl;
 			}
@@ -1153,7 +1700,10 @@ string cParameters::printToString() {
 	}
 	s += "\n";
 
-	s += "File: " + peaklistfilename + "\n";
+	s += "File(s): \n";
+	for (int i = 0; i < (int)peaklistfilenames.size(); i++) {
+		s += peaklistfilenames[i] + "\n";
+	}
 
 	s += "Use Profile Data: ";
 	s += useprofiledata ? "on" : "off";
@@ -1169,7 +1719,11 @@ string cParameters::printToString() {
 	s += "Minimum Threshold of Absolute Intensity: " + to_string(minimumabsoluteintensitythreshold) + "\n";
 	s += "Minimum m/z Ratio: " + to_string(minimummz) + "\n";
 	s += "Maximum m/z Ratio: " + to_string(maximummz) + "\n";
+	s += "Minimum Retention Time: " + to_string(minimumrt) + "\n";
+	s += "Maximum Retention Time: " + to_string(maximumrt) + "\n";
 	s += "FWHM: " + to_string(fwhm) + "\n";
+	s += "Minimum Ratio 54Fe/56Fe: " + to_string(minratio54Fe56Fe) + "\n";
+	s += "Maximum Ratio 54Fe/56Fe: " + to_string(maxratio54Fe56Fe) + "\n";
 	s += "Building Blocks Database File: " + bricksdatabasefilename + "\n";
 	s += "Maximum Number of Combined Blocks (start, middle, end): " + to_string(maximumbricksincombinationbegin) + ", " + to_string(maximumbricksincombinationmiddle) + ", " + to_string(maximumbricksincombinationend) + "\n";
 
@@ -1266,7 +1820,7 @@ string cParameters::printToString() {
 	}
 	s += "\n";
 
-	s += "Neutral Losses / Chemical Elements: ";
+	s += "Neutral Losses: ";
 	for (int i = 0; i < (int)originalneutrallossesfortheoreticalspectra.size(); i++) {
 		s += originalneutrallossesdefinitions[originalneutrallossesfortheoreticalspectra[i]].summary;
 		if (i < (int)originalneutrallossesfortheoreticalspectra.size() - 1) {
@@ -1275,7 +1829,18 @@ string cParameters::printToString() {
 	}
 	s += "\n";
 
-	s += "Maximum Number of Combined Neutral Losses/Elements: " + to_string(maximumcombinedlosses) + "\n";
+	s += "Maximum Number of Combined Losses: " + to_string(maximumcombinedlosses) + "\n";
+
+	s += "Chemical Elements: ";
+	for (int i = 0; i < (int)originalelementsfortheoreticalspectra.size(); i++) {
+		s += originalelementsdefinitions[originalelementsfortheoreticalspectra[i]].summary;
+		if (i < (int)originalelementsfortheoreticalspectra.size() - 1) {
+			s += ", ";
+		}
+	}
+	s += "\n";
+
+	s += "Maximum Number of Combined Elements: " + to_string(maximumcombinedelements) + "\n";
 
 	//s += "Remove Hits of Fragments without Hits of Parent Fragments: ";
 	//s += clearhitswithoutparent ? "on" : "off";
@@ -1306,6 +1871,13 @@ string cParameters::printToString() {
 	s += "N/O Ratio Check: ";
 	s += noratiocheck ? "on" : "off";
 	s += "\n";
+
+	s += "Calculate FDRs: ";
+	s += calculatefdrs ? "on" : "off";
+	s += "\n";
+
+	s += "Minimum Relative Intensity of Highest Peak in Isotopic Cluster: " + to_string(minimumannotationintensityrelative) + "\n";
+	s += "Minimum Absolute Intensity of Highest Peak in Isotopic Cluster: " + to_string(minimumannotationintensityabsolute) + "\n";
 
 	s += "Isotope m/z Tolerance: " + to_string(mzdifftolerance) + "\n";
 
@@ -1758,7 +2330,7 @@ int cParameters::generateCompounds(bool& terminatecomputation, string& errormess
 
 	errormessage = "";
 
-	if (maximumcombinedlosses == 0) {
+	if (maximumcombinedelements == 0) {
 		return 0;
 	}
 
@@ -1776,7 +2348,6 @@ int cParameters::generateCompounds(bool& terminatecomputation, string& errormess
 	vector<int> countsofelements;
 	vector<double> massesofelements;
 	vector<string> namesofelements;
-	double elementsratio;
 
 	int numberofbasicbricks = 0;
 
@@ -1790,25 +2361,18 @@ int cParameters::generateCompounds(bool& terminatecomputation, string& errormess
 	double minadd = 0;
 	//double maxadd = 0;
 
-	int countH;
-	int countC;
-	int countO;
-	int countN;
-	int countS;
-	int countP;
-	int countF;
-	int countCl;
-	int countBr;
-	int countSi;
+	bool lcms;
+	bool rtavailable;
 
-	bool lcms = (peaklistseries.size() > 1) && !((peaklistfileformat == mis) || (peaklistfileformat == imzML));
+	int kstart;
+	int kend;
 
 	if (os) {
 		*os << "Generating compounds... " << endl;
 	}
 
-	for (int i = 0; i < (int)originalneutrallossesfortheoreticalspectra.size(); i++) {
-		tmpstr = originalneutrallossesdefinitions[originalneutrallossesfortheoreticalspectra[i]].summary;
+	for (int i = 0; i < (int)originalelementsfortheoreticalspectra.size(); i++) {
+		tmpstr = originalelementsdefinitions[originalelementsfortheoreticalspectra[i]].summary;
 
 		if (tmpstr.rfind(':') != string::npos) {
 			tmpstr = tmpstr.substr(0, tmpstr.rfind(':'));
@@ -1817,7 +2381,7 @@ int cParameters::generateCompounds(bool& terminatecomputation, string& errormess
 		tmpformula.setFormula(tmpstr, false);
 
 		tmpbrick.clear();
-		tmpbrick.setName(originalneutrallossesdefinitions[originalneutrallossesfortheoreticalspectra[i]].summary);
+		tmpbrick.setName(originalelementsdefinitions[originalelementsfortheoreticalspectra[i]].summary);
 		tmpbrick.setComposition(to_string(numberofbasicbricks + 1), false);
 		tmpbrick.setMass(tmpformula.getMass());
 		tmpbrick.setSummary(tmpstr);
@@ -1927,7 +2491,7 @@ int cParameters::generateCompounds(bool& terminatecomputation, string& errormess
 	}
 
 	vector<int> combarray;
-	for (int i = 0; i < maximumcombinedlosses; i++) {
+	for (int i = 0; i < maximumcombinedelements; i++) {
 		combarray.push_back(0);
 	}
 
@@ -1944,9 +2508,12 @@ int cParameters::generateCompounds(bool& terminatecomputation, string& errormess
 		}
 	}
 
+	double unchargedmaximummz = charge(uncharge(maximummz, precursorcharge), (precursorcharge > 0) ? 1 : -1) - minadd;
+	//double unchargedmaximummz = maximummz - minadd;
+
 	//bool skipcombination;
-	//while (elementsbrickdatabase.nextCombinationFast(combarray, countsofelements, massesofelements, sumofmasses, numberofbasicbricks, maximumcombinedlosses, 0, maximummz)) {
-	while (elementsbrickdatabase.nextCombinationFastLimited(combarray, countsofelements, limitsofelements, massesofelements, sumofmasses, numberofbasicbricks, maximumcombinedlosses, 0, maximummz - minadd)) {
+	//while (elementsbrickdatabase.nextCombinationFast(combarray, countsofelements, massesofelements, sumofmasses, numberofbasicbricks, maximumcombinedelements, 0, maximummz)) {
+	while (elementsbrickdatabase.nextCombinationFastLimited(combarray, countsofelements, limitsofelements, massesofelements, sumofmasses, numberofbasicbricks, maximumcombinedelements, 0, unchargedmaximummz)) {
 		if (terminatecomputation) {
 			sequencedatabase.clear();
 			errormessage = "Aborted by user.";
@@ -2000,383 +2567,106 @@ int cParameters::generateCompounds(bool& terminatecomputation, string& errormess
 		}
 
 		if (advancedformulacheck) {
-
-			countH = 0;
-			countC = 0;
-			countO = 0;
-			countN = 0;
-			countS = 0;
-			countP = 0;
-			countF = 0;
-			countCl = 0;
-			countBr = 0;
-			countSi = 0;
-
-			size = (int)countsofelements.size();
-			for (int j = 0; j < size; j++) {
-				if (countsofelements[j] > 0) {
-					if (namesofelements[j].compare("H") == 0) {
-						countH = countsofelements[j];
-						continue;
-					}
-					if (namesofelements[j].compare("C") == 0) {
-						countC = countsofelements[j];
-						continue;
-					}
-					if (namesofelements[j].compare("O") == 0) {
-						countO = countsofelements[j];
-						continue;
-					}
-					if (namesofelements[j].compare("N") == 0) {
-						countN = countsofelements[j];
-						continue;
-					}
-					if (namesofelements[j].compare("S") == 0) {
-						countS = countsofelements[j];
-						continue;
-					}
-					if (namesofelements[j].compare("P") == 0) {
-						countP = countsofelements[j];
-						continue;
-					}
-					if (namesofelements[j].compare("F") == 0) {
-						countF = countsofelements[j];
-						continue;
-					}
-					if (namesofelements[j].compare("Cl") == 0) {
-						countCl = countsofelements[j];
-						continue;
-					}
-					if (namesofelements[j].compare("Br") == 0) {
-						countBr = countsofelements[j];
-						continue;
-					}
-					if (namesofelements[j].compare("Si") == 0) {
-						countSi = countsofelements[j];
-						continue;
-					}
-				}
-			}
-
-			if ((countH == 0) || (countC == 0)) {
+			if (checkAdvancedFilteringRules(noratiocheck, sumofmasses, countsofelements, namesofelements)) {
 				continue;
 			}
-
-			if (noratiocheck) {
-				if (countN > countO) {
-					continue;
-				}
-			}
-
-			if (sumofmasses < 500.0) {
-
-				if (countC > 39) {
-					continue;
-				}
-				if (countH > 72) {
-					continue;
-				}
-				if (countN > 20) {
-					continue;
-				}
-				if (countO > 20) {
-					continue;
-				}
-				if (countP > 9) {
-					continue;
-				}
-				if (countS > 10) {
-					continue;
-				}
-				if (countF > 16) {
-					continue;
-				}
-				if (countCl > 10) {
-					continue;
-				}
-				if (countBr > 5) {
-					continue;
-				}
-				if (countSi > 8) {
-					continue;
-				}
-
-			}
-			else if (sumofmasses < 1000.0) {
-
-				if (countC > 78) {
-					continue;
-				}
-				if (countH > 126) {
-					continue;
-				}
-				if (countN > 25) {
-					continue;
-				}
-				if (countO > 27) {
-					continue;
-				}
-				if (countP > 9) {
-					continue;
-				}
-				if (countS > 14) {
-					continue;
-				}
-				if (countF > 34) {
-					continue;
-				}
-				if (countCl > 12) {
-					continue;
-				}
-				if (countBr > 8) {
-					continue;
-				}
-				if (countSi > 14) {
-					continue;
-				}
-
-			}
-			else if (sumofmasses < 2000.0) {
-
-				if (countC > 156) {
-					continue;
-				}
-				if (countH > 236) {
-					continue;
-				}
-				if (countN > 32) {
-					continue;
-				}
-				if (countO > 63) {
-					continue;
-				}
-				if (countP > 9) {
-					continue;
-				}
-				if (countS > 14) {
-					continue;
-				}
-				if (countF > 48) {
-					continue;
-				}
-				if (countCl > 12) {
-					continue;
-				}
-				if (countBr > 10) {
-					continue;
-				}
-				if (countSi > 15) {
-					continue;
-				}
-
-			}
-			else if (sumofmasses < 3000.0) {
-
-				if (countC > 162) {
-					continue;
-				}
-				if (countH > 208) {
-					continue;
-				}
-				if (countN > 48) {
-					continue;
-				}
-				if (countO > 78) {
-					continue;
-				}
-				if (countP > 9) {
-					continue;
-				}
-				if (countS > 14) {
-					continue;
-				}
-				if (countF > 48) {
-					continue;
-				}
-				if (countCl > 12) {
-					continue;
-				}
-				if (countBr > 10) {
-					continue;
-				}
-				if (countSi > 15) {
-					continue;
-				}
-
-			}
-
-			if ((countH > 0) && (countC >= 0)) {
-				if (countC == 0) {
-					continue;
-				}
-				elementsratio = ((double)(countH)) / ((double)(countC));
-				if ((elementsratio < 0.2) || (elementsratio > 3.1)) {
-					continue;
-				}
-			}
-
-			if ((countN > 0) && (countC >= 0)) {
-				if (countC == 0) {
-					continue;
-				}
-				elementsratio = ((double)(countN)) / ((double)(countC));
-				if (elementsratio > 1.3) {
-					continue;
-				}
-			}
-
-			if ((countO > 0) && (countC >= 0)) {
-				if (countC == 0) {
-					continue;
-				}
-				elementsratio = ((double)(countO)) / ((double)(countC));
-				if (elementsratio > 1.2) {
-					continue;
-				}
-			}
-
-			if ((countP > 0) && (countC >= 0)) {
-				if (countC == 0) {
-					continue;
-				}
-				elementsratio = ((double)(countP)) / ((double)(countC));
-				if (elementsratio > 0.3) {
-					continue;
-				}
-			}
-
-			if ((countS > 0) && (countC >= 0)) {
-				if (countC == 0) {
-					continue;
-				}
-				elementsratio = ((double)(countS)) / ((double)(countC));
-				if (elementsratio > 0.8) {
-					continue;
-				}
-			}
-
-			if ((countF > 0) && (countC >= 0)) {
-				if (countC == 0) {
-					continue;
-				}
-				elementsratio = ((double)(countF)) / ((double)(countC));
-				if (elementsratio > 1.5) {
-					continue;
-				}
-			}
-
-			if ((countCl > 0) && (countC >= 0)) {
-				if (countC == 0) {
-					continue;
-				}
-				elementsratio = ((double)(countCl)) / ((double)(countC));
-				if (elementsratio > 0.8) {
-					continue;
-				}
-			}
-
-			if ((countBr > 0) && (countC >= 0)) {
-				if (countC == 0) {
-					continue;
-				}
-				elementsratio = ((double)(countBr)) / ((double)(countC));
-				if (elementsratio > 0.8) {
-					continue;
-				}
-			}
-
-			if ((countSi > 0) && (countC >= 0)) {
-				if (countC == 0) {
-					continue;
-				}
-				elementsratio = ((double)(countSi)) / ((double)(countC));
-				if (elementsratio > 0.5) {
-					continue;
-				}
-			}
-
-			if ((countN > 1) && (countO > 1) && (countP > 1) && (countS > 1)) {
-				if ((countN >= 10) || (countO >= 20) || (countP >= 4) || (countS >= 3)) {
-					continue;
-				}
-			}
-
-			if ((countN > 3) && (countO > 3) && (countP > 3)) {
-				if ((countN >= 11) || (countO >= 22) || (countP >= 6)) {
-					continue;
-				}
-			}
-
-			if ((countO > 1) && (countP > 1) && (countS > 1)) {
-				if ((countO >= 14) || (countP >= 3) || (countS >= 3)) {
-					continue;
-				}
-			}
-
-			if ((countP > 1) && (countS > 1) && (countN > 1)) {
-				if ((countP >= 3) || (countS >= 3) || (countN >= 4)) {
-					continue;
-				}
-			}
-
-			if ((countN > 6) && (countO > 6) && (countS > 6)) {
-				if ((countN >= 19) || (countO >= 14) || (countS >= 8)) {
-					continue;
-				}
-			}
-
 		}
 
 		compoundsgenerated++;
 
 		if (!reportunmatchedtheoreticalpeaks) {
 
-			compoundshint = 0;
+			for (int h = 0; h < (int)peaklistseriesvector.size(); h++) {
 
-			for (auto& it : ionsfortheoreticalspectraMS1) {
+				lcms = (peaklistseriesvector[h].size() > 1) && !((peaklistfileformats[h] == mis) || (peaklistfileformats[h] == imzML));
+				rtavailable = (peaklistseriesvector[h].size() > 1) && (peaklistseriesvector[h][peaklistseriesvector[h].size() - 1].getRetentionTime() > 0);
 
-				for (int j = 0; j < abs(precursorcharge); j++) {
+				compoundshint = 0;
 
-					tmpmzdifference = sumofmasses + it.massdifference;
-					if (precursorcharge > 0) {
-						tmpmzdifference += j * (H - e);
+				size = peaklistseriesvector[h].size();
+
+				kstart = 0;
+				kend = size;
+
+				if (lcms && rtavailable) {
+
+					if (minimumrt != 0) {
+						while (kstart < size) {
+							if (peaklistseriesvector[h][kstart].getRetentionTime() >= minimumrt) {
+								break;
+							}
+							kstart++;
+						}
+
+						if (kstart == size) {
+							kstart--;
+						}
 					}
-					else {
-						tmpmzdifference -= j * (H - e);
+
+					if (maximumrt != 0) {
+						while (kend >= 0) {
+							if (peaklistseriesvector[h][kend].getRetentionTime() <= maximumrt) {
+								break;
+							}
+							kend--;
+						}
+
+						if (kend == -1) {
+							kend++;
+						}
 					}
-					if (j > 0) {
-						tmpmzdifference /= (double)(j + 1);
-					}
 
-					featureshint = 0;
+				}
 
-					size = peaklistseries.size();
-					for (int k = 0; k < size; k++) {
+				for (auto& it : ionsfortheoreticalspectraMS1) {
 
-						if (searchHint(tmpmzdifference, peaklistseries[k], fragmentmasserrortolerance)) {
-							featureshint++;
+					for (int j = 0; j < abs(precursorcharge); j++) {
+
+						tmpmzdifference = sumofmasses + it.massdifference;
+						if (precursorcharge > 0) {
+							tmpmzdifference += j * (H - e);
 						}
 						else {
-							if (lcms) {
-								featureshint = 0;
-							}
+							tmpmzdifference -= j * (H - e);
+						}
+						if (j > 0) {
+							tmpmzdifference /= (double)(j + 1);
 						}
 
-						hintend = false;
-						if (lcms || (peaklistfileformat == imzML) || (peaklistfileformat == mis)) {
-							if (featureshint >= minimumfeaturesize) {
-								compoundshint++;
-								hintend = true;
+						featureshint = 0;
+
+						for (int k = kstart; k < kend; k++) {
+
+							if (searchHint(tmpmzdifference, peaklistseriesvector[h][k], fragmentmasserrortolerance)) {
+								featureshint++;
 							}
-						}
-						else {
-							if (featureshint > 0) {
-								compoundshint++;
-								hintend = true;
+							else {
+								if (lcms) {
+									featureshint = 0;
+								}
 							}
+
+							hintend = false;
+							if (lcms || (peaklistfileformats[h] == imzML) || (peaklistfileformats[h] == mis)) {
+								if (featureshint >= minimumfeaturesize) {
+									compoundshint++;
+									hintend = true;
+								}
+							}
+							else {
+								if (featureshint > 0) {
+									compoundshint++;
+									hintend = true;
+								}
+							}
+
+							if (hintend) {
+								break;
+							}
+
 						}
 
-						if (hintend) {
+						if (compoundshint >= minimumiontypes) {
 							break;
 						}
 
@@ -2453,14 +2743,32 @@ void cParameters::store(ofstream& os) {
 
 	os.write((char *)&peptidetype, sizeof(ePeptideType));
 
-	storeString(peaklistfilename, os);
-	os.write((char *)&peaklistfileformat, sizeof(ePeakListFileFormat));
-	peaklistseries.store(os);
+	size = (int)peaklistfilenames.size();
+	os.write((char *)&size, sizeof(int));
+	for (int i = 0; i < size; i++) {
+		storeString(peaklistfilenames[i], os);
+	}
+
+	storeString(originalpeaklistfilenames, os);
+
+	size = (int)peaklistfileformats.size();
+	os.write((char *)&size, sizeof(int));
+	for (int i = 0; i < size; i++) {
+		os.write((char *)&peaklistfileformats[i], sizeof(ePeakListFileFormat));
+	}
+
+	size = (int)peaklistseriesvector.size();
+	os.write((char *)&size, sizeof(int));
+	for (int i = 0; i < size; i++) {
+		peaklistseriesvector[i].store(os);
+	}
 
 	os.write((char *)&useprofiledata, sizeof(bool));
 	os.write((char *)&convertprofiledata, sizeof(bool));
 
 	storeString(profiledatafilename, os);
+
+	os.write((char *)&linebafprocessing, sizeof(int));
 
 	os.write((char *)&scannumber, sizeof(int));
 	os.write((char *)&precursormass, sizeof(double));
@@ -2475,7 +2783,12 @@ void cParameters::store(ofstream& os) {
 	os.write((char *)&minimumabsoluteintensitythreshold, sizeof(unsigned));
 	os.write((char *)&minimummz, sizeof(double));
 	os.write((char *)&maximummz, sizeof(double));
+	os.write((char *)&minimumrt, sizeof(double));
+	os.write((char *)&maximumrt, sizeof(double));
 	os.write((char *)&fwhm, sizeof(double));
+
+	os.write((char *)&minratio54Fe56Fe, sizeof(double));
+	os.write((char *)&maxratio54Fe56Fe, sizeof(double));
 
 	storeString(bricksdatabasefilename, os);
 	bricksdatabase.store(os);
@@ -2497,6 +2810,7 @@ void cParameters::store(ofstream& os) {
 	os.write((char *)&mode, sizeof(eModeType));
 	os.write((char *)&scoretype, sizeof(eScoreType));
 	os.write((char *)&maximumcombinedlosses, sizeof(int));
+	os.write((char *)&maximumcombinedelements, sizeof(int));
 	//os.write((char *)&clearhitswithoutparent, sizeof(bool));
 	os.write((char *)&reportunmatchedtheoreticalpeaks, sizeof(bool));
 	os.write((char *)&generateisotopepattern, sizeof(bool));
@@ -2506,6 +2820,9 @@ void cParameters::store(ofstream& os) {
 	os.write((char *)&basicformulacheck, sizeof(bool));
 	os.write((char *)&advancedformulacheck, sizeof(bool));
 	os.write((char *)&noratiocheck, sizeof(bool));
+	os.write((char *)&calculatefdrs, sizeof(bool));
+	os.write((char *)&minimumannotationintensityrelative, sizeof(double));
+	os.write((char *)&minimumannotationintensityabsolute, sizeof(unsigned));
 	os.write((char *)&mzdifftolerance, sizeof(double));
 	os.write((char *)&intensitytolerance, sizeof(double));
 	os.write((char *)&cyclicnterminus, sizeof(bool));
@@ -2540,7 +2857,7 @@ void cParameters::store(ofstream& os) {
 	size = (int)ionsfortheoreticalspectraMS1.size();
 	os.write((char *)&size, sizeof(int));
 	for (int i = 0; i < (int)ionsfortheoreticalspectraMS1.size(); i++) {
-		os.write((char *)&ionsfortheoreticalspectraMS1[i], sizeof(cIonType));
+		ionsfortheoreticalspectraMS1[i].store(os);
 	}
 
 	size = (int)ionsfortheoreticalspectraMS2.size();
@@ -2575,8 +2892,21 @@ void cParameters::store(ofstream& os) {
 
 	os.write((char *)&numberofgeneratedneutrallosses, sizeof(int));
 
+	size = (int)originalelementsdefinitions.size();
+	os.write((char *)&size, sizeof(int));
+	for (int i = 0; i < (int)originalelementsdefinitions.size(); i++) {
+		originalelementsdefinitions[i].store(os);
+	}
+
+	size = (int)originalelementsfortheoreticalspectra.size();
+	os.write((char *)&size, sizeof(int));
+	for (int i = 0; i < (int)originalelementsfortheoreticalspectra.size(); i++) {
+		os.write((char *)&originalelementsfortheoreticalspectra[i], sizeof(int));
+	}
+
 	storeStringVector(peakidtodesc, os);
 	storeStringVector(isotopeformulaidtodesc, os);
+	storeStringIntMap(pchemresults, os);
 
 	os.write((char *)&defaultmaxx, sizeof(int));
 	os.write((char *)&defaultmaxy, sizeof(int));
@@ -2586,7 +2916,7 @@ void cParameters::store(ofstream& os) {
 }
 
 
-void cParameters::load(ifstream& is) {
+void cParameters::load(ifstream& is, int fileversionpart1, int fileversionpart2, int fileversionpart3) {
 	int size;
 	string s;
 
@@ -2596,14 +2926,51 @@ void cParameters::load(ifstream& is) {
 
 	is.read((char *)&peptidetype, sizeof(ePeptideType));
 
-	loadString(peaklistfilename, is);
-	is.read((char *)&peaklistfileformat, sizeof(ePeakListFileFormat));
-	peaklistseries.load(is);
+	if (isCompatibleVersion(fileversionpart1, fileversionpart2, fileversionpart3, 2, 1, 0)) {
+		is.read((char *)&size, sizeof(int));
+		peaklistfilenames.resize(size);
+		for (int i = 0; i < size; i++) {
+			loadString(peaklistfilenames[i], is);
+		}
+
+		loadString(originalpeaklistfilenames, is);
+
+		is.read((char *)&size, sizeof(int));
+		peaklistfileformats.resize(size);
+		for (int i = 0; i < size; i++) {
+			is.read((char *)&peaklistfileformats[i], sizeof(ePeakListFileFormat));
+		}
+
+		is.read((char *)&size, sizeof(int));
+		peaklistseriesvector.resize(size);
+		for (int i = 0; i < size; i++) {
+			peaklistseriesvector[i].load(is, fileversionpart1, fileversionpart2, fileversionpart3);
+		}
+	}
+	else {
+		peaklistfilenames.resize(1);
+		loadString(peaklistfilenames[0], is);
+
+		originalpeaklistfilenames = peaklistfilenames[0];
+
+		peaklistfileformats.resize(1);
+		is.read((char *)&peaklistfileformats[0], sizeof(ePeakListFileFormat));
+
+		peaklistseriesvector.resize(1);
+		peaklistseriesvector[0].load(is, fileversionpart1, fileversionpart2, fileversionpart3);
+	}
 
 	is.read((char *)&useprofiledata, sizeof(bool));
 	is.read((char *)&convertprofiledata, sizeof(bool));
 
 	loadString(profiledatafilename, is);
+
+	if (isCompatibleVersion(fileversionpart1, fileversionpart2, fileversionpart3, 2, 0, 18)) {
+		is.read((char *)&linebafprocessing, sizeof(int));
+	}
+	else {
+		linebafprocessing = 0;
+	}
 
 	is.read((char *)&scannumber, sizeof(int));
 	is.read((char *)&precursormass, sizeof(double));
@@ -2618,7 +2985,26 @@ void cParameters::load(ifstream& is) {
 	is.read((char *)&minimumabsoluteintensitythreshold, sizeof(unsigned));
 	is.read((char *)&minimummz, sizeof(double));
 	is.read((char *)&maximummz, sizeof(double));
+
+	if (isCompatibleVersion(fileversionpart1, fileversionpart2, fileversionpart3, 2, 0, 29)) {
+		is.read((char *)&minimumrt, sizeof(double));
+		is.read((char *)&maximumrt, sizeof(double));
+	}
+	else {
+		minimumrt = 0;
+		maximumrt = 0;
+	}
+
 	is.read((char *)&fwhm, sizeof(double));
+
+	if (isCompatibleVersion(fileversionpart1, fileversionpart2, fileversionpart3, 2, 0, 37)) {
+		is.read((char *)&minratio54Fe56Fe, sizeof(double));
+		is.read((char *)&maxratio54Fe56Fe, sizeof(double));
+	}
+	else {
+		minratio54Fe56Fe = 0;
+		maxratio54Fe56Fe = 0.1;
+	}
 
 	loadString(bricksdatabasefilename, is);
 	bricksdatabase.load(is);
@@ -2640,6 +3026,19 @@ void cParameters::load(ifstream& is) {
 	is.read((char *)&mode, sizeof(eModeType));
 	is.read((char *)&scoretype, sizeof(eScoreType));
 	is.read((char *)&maximumcombinedlosses, sizeof(int));
+
+	if (isCompatibleVersion(fileversionpart1, fileversionpart2, fileversionpart3, 2, 0, 33)) {
+		is.read((char *)&maximumcombinedelements, sizeof(int));
+	}
+	else {
+		if (mode == compoundsearch) {
+			maximumcombinedelements = maximumcombinedlosses;
+		}
+		else {
+			maximumcombinedelements = 200;
+		}
+	}
+
 	//is.read((char *)&clearhitswithoutparent, sizeof(bool));
 	is.read((char *)&reportunmatchedtheoreticalpeaks, sizeof(bool));
 	is.read((char *)&generateisotopepattern, sizeof(bool));
@@ -2649,6 +3048,23 @@ void cParameters::load(ifstream& is) {
 	is.read((char *)&basicformulacheck, sizeof(bool));
 	is.read((char *)&advancedformulacheck, sizeof(bool));
 	is.read((char *)&noratiocheck, sizeof(bool));
+
+	if (isCompatibleVersion(fileversionpart1, fileversionpart2, fileversionpart3, 2, 0, 11)) {
+		is.read((char *)&calculatefdrs, sizeof(bool));
+	}
+	else {
+		calculatefdrs = true;
+	}
+
+	if (isCompatibleVersion(fileversionpart1, fileversionpart2, fileversionpart3, 2, 1, 1)) {
+		is.read((char *)&minimumannotationintensityrelative, sizeof(double));
+		is.read((char *)&minimumannotationintensityabsolute, sizeof(unsigned));
+	}
+	else {
+		minimumannotationintensityrelative = 0;
+		minimumannotationintensityabsolute = 0;
+	}
+
 	is.read((char *)&mzdifftolerance, sizeof(double));
 	is.read((char *)&intensitytolerance, sizeof(double));
 	is.read((char *)&cyclicnterminus, sizeof(bool));
@@ -2672,7 +3088,7 @@ void cParameters::load(ifstream& is) {
 	is.read((char *)&blindedges, sizeof(int));
 
 	loadString(sequencedatabasefilename, is);
-	sequencedatabase.load(is);
+	sequencedatabase.load(is, fileversionpart1, fileversionpart2, fileversionpart3);
 
 	is.read((char *)&size, sizeof(int));
 	fragmentionsfordenovograph.resize(size);
@@ -2683,7 +3099,13 @@ void cParameters::load(ifstream& is) {
 	is.read((char *)&size, sizeof(int));
 	ionsfortheoreticalspectraMS1.resize(size);
 	for (int i = 0; i < (int)ionsfortheoreticalspectraMS1.size(); i++) {
-		is.read((char *)&ionsfortheoreticalspectraMS1[i], sizeof(cIonType));
+		if (isCompatibleVersion(fileversionpart1, fileversionpart2, fileversionpart3, 2, 0, 23)) {
+			ionsfortheoreticalspectraMS1[i].load(is);
+		}
+		else {
+			// bug before version 2.0.23
+			is.read((char *)&ionsfortheoreticalspectraMS1[i], sizeof(cIonType));
+		}
 	}
 
 	is.read((char *)&size, sizeof(int));
@@ -2718,8 +3140,55 @@ void cParameters::load(ifstream& is) {
 
 	is.read((char *)&numberofgeneratedneutrallosses, sizeof(int));
 
+	if (isCompatibleVersion(fileversionpart1, fileversionpart2, fileversionpart3, 2, 0, 34)) {
+		is.read((char *)&size, sizeof(int));
+		originalelementsdefinitions.resize(size);
+		for (int i = 0; i < (int)originalelementsdefinitions.size(); i++) {
+			originalelementsdefinitions[i].load(is);
+		}
+
+		is.read((char *)&size, sizeof(int));
+		originalelementsfortheoreticalspectra.resize(size);
+		for (int i = 0; i < (int)originalelementsfortheoreticalspectra.size(); i++) {
+			is.read((char *)&originalelementsfortheoreticalspectra[i], sizeof(int));
+		}
+	}
+	else {
+		if (mode == compoundsearch) {
+			originalelementsdefinitions = originalneutrallossesdefinitions;
+			originalelementsfortheoreticalspectra = originalneutrallossesfortheoreticalspectra;
+
+			originalneutrallossesdefinitions.clear();
+			originalneutrallossesfortheoreticalspectra.clear();
+			maximumcombinedlosses = 0;
+		}
+		else {
+			originalelementsdefinitions.clear();
+			originalelementsfortheoreticalspectra.clear();
+
+			pushLossItem(originalelementsdefinitions, "H");
+			pushLossItem(originalelementsdefinitions, "C");
+			pushLossItem(originalelementsdefinitions, "O");
+			pushLossItem(originalelementsdefinitions, "N");
+			pushLossItem(originalelementsdefinitions, "S:1");
+			pushLossItem(originalelementsdefinitions, "P:1");
+
+			originalelementsfortheoreticalspectra.push_back(0);
+			originalelementsfortheoreticalspectra.push_back(1);
+			originalelementsfortheoreticalspectra.push_back(2);
+			originalelementsfortheoreticalspectra.push_back(3);
+		}
+	}
+
 	loadStringVector(peakidtodesc, is);
 	loadStringVector(isotopeformulaidtodesc, is);
+
+	if (isCompatibleVersion(fileversionpart1, fileversionpart2, fileversionpart3, 2, 0, 21)) {
+		loadStringIntMap(pchemresults, is);
+	}
+	else {
+		pchemresults.clear();
+	}
 
 	is.read((char *)&defaultmaxx, sizeof(int));
 	is.read((char *)&defaultmaxy, sizeof(int));

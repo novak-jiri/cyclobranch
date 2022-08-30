@@ -120,12 +120,13 @@ public:
 	/**
 		\brief Initialize the widget.
 		\param rowid id of a row
+		\param activefileid id of an active file
 		\param globalpreferences global preferences of the application
 		\param parameters a pointer to parameters
 		\param theoreticalspectrum a reference to a theoretical spectrum
 		\param parent pointer to a parent widget
 	*/ 
-	void initialize(int rowid, cGlobalPreferences* globalpreferences, cParameters* parameters, cTheoreticalSpectrum& theoreticalspectrum, QWidget* parent);
+	void initialize(int rowid, int activefileid, cGlobalPreferences* globalpreferences, cParameters* parameters, cTheoreticalSpectrum& theoreticalspectrum, QWidget* parent);
 
 
 	/**
@@ -168,8 +169,9 @@ public:
 		\param imzmlprofilemetadata imzml profile metadata
 		\param profilemz64precision true if 64 mz precision is used, false if 32 bit mz precision is used
 		\param profileintensity64precision true if 64 intensity precision is used, false if 32 bit intensity precision is used
+		\param usedefaultsize if true, the default size is used
 	*/
-	void prepareToShow(QAction* actionShowIsomers, cPeakListSeries* rawdata, vector<cImzMLItem>* imzmlprofilemetadata, bool profilemz64precision, bool profileintensity64precision);
+	void prepareToShow(QAction* actionShowIsomers, cPeakListSeries* rawdata, vector<cImzMLItem>* imzmlprofilemetadata, bool profilemz64precision, bool profileintensity64precision, bool usedefaultsize);
 	
 
 	/**
@@ -202,6 +204,104 @@ public:
 	set<string>& getLocalNeutralLosses();
 
 
+	/**
+		\brief Set the state of profile spectrum visualization.
+		\param enable state of profile spectrum visualization
+	*/
+	void setProfileSpectrumEnabled(bool enable);
+
+
+	/**
+		\brief Check if the profile spectrum visualization is enabled.
+		\retval bool true if the profile spectrum is enabled
+	*/
+	bool hasProfileSpectrumEnabled();
+
+
+	/**
+		\brief Set the state of absolute intensity mode.
+		\param enable state of absolute intensity mode
+	*/
+	void setAbsoluteIntensityEnabled(bool enable);
+
+
+	/**
+		\brief Check if the absolute intensity mode is enabled.
+		\retval bool true if the absolute intensity mode is enabled
+	*/
+	bool hasAbsoluteIntensityEnabled();
+
+
+	/**
+		\brief Set the state of hide matched peaks mode.
+		\param enable state of hide matched peaks mode
+	*/
+	void setHideMatchedPeaksEnabled(bool enable);
+
+
+	/**
+		\brief Check if the hide matched peaks mode is enabled.
+		\retval bool true if the hide matched peaks mode is enabled
+	*/
+	bool hasHideMatchedPeaksEnabled();
+
+
+	/**
+		\brief Set the state of hide unmatched peaks mode.
+		\param enable state of hide unmatched peaks mode
+	*/
+	void setHideUnmatchedPeaksEnabled(bool enable);
+
+
+	/**
+		\brief Check if the hide unmatched peaks mode is enabled.
+		\retval bool true if the hide unmatched peaks mode is enabled
+	*/
+	bool hasHideUnmatchedPeaksEnabled();
+
+
+	/**
+		\brief Set the state of hide scrambled peaks mode.
+		\param enable state of hide scrambled peaks mode
+	*/
+	void setHideScrambledPeaksEnabled(bool enable);
+
+
+	/**
+		\brief Check if the hide scrambled peaks mode is enabled.
+		\retval bool true if the hide scrambled peaks mode is enabled
+	*/
+	bool hasHideScrambledPeaksEnabled();
+
+
+	/**
+		\brief Set the state of hide peak labels mode.
+		\param enable state of hide peak labels mode
+	*/
+	void setHidePeakLabelsEnabled(bool enable);
+
+
+	/**
+		\brief Check if the hide peak labels mode is enabled.
+		\retval bool true if the hide peak labels mode is enabled
+	*/
+	bool hasHidePeakLabelsEnabled();
+
+
+	/**
+		\brief Set the state of mouse m/z selection tool.
+		\param enable state of mouse m/z selection tool
+	*/
+	void setMouseMzSelectionEnabled(bool enable);
+
+
+	/**
+		\brief Check if the mouse m/z selection tool is enabled.
+		\retval bool true if the mouse m/z selection tool is enabled
+	*/
+	bool hasMouseMzSelectionEnabled();
+
+
 protected:
 
 
@@ -210,6 +310,13 @@ protected:
 		\param event pointer to QKeyEvent
 	*/ 
 	void keyPressEvent(QKeyEvent *event);
+
+
+	/**
+		\brief Handle a move event.
+		\param event pointer to QMoveEvent
+	*/
+	void moveEvent(QMoveEvent *event);
 
 
 private:
@@ -319,7 +426,9 @@ private:
 
 	bool reportisomers;
 
-	void preparePeaksTable();
+	int activefileid;
+
+	void preparePeaksTable(QRect geometry);
 
 	string printHTMLTableCell(string text, bool red);	
 
@@ -340,6 +449,13 @@ signals:
 		\param state current state
 	*/
 	void rawDataStateChangedSignal(bool state);
+
+
+	/**
+		\brief The signal is emitted when the widget has been moved.
+		\param rowid rowid of the widget
+	*/
+	void lastActiveDetail(int rowid);
 
 
 private slots:

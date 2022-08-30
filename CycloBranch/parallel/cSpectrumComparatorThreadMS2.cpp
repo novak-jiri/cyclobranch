@@ -1,4 +1,4 @@
-#include "parallel/cSpectrumComparatorThread.h"
+#include "parallel/cSpectrumComparatorThreadMS2.h"
 
 #include "core/cTheoreticalSpectrumList.h"
 
@@ -184,7 +184,7 @@ bool compareWeightedRatioDesc(const cTheoreticalSpectrum& a, const cTheoreticalS
 }
 
 
-void cSpectrumComparatorThread::initialize(cCandidate& candidate, cPeaksList& peaklist, cBricksDatabase* bricksdatabasewithcombinations, cTheoreticalSpectrumList* theoreticalspectrumlist, cParameters* parameters, regex* rxsequencetag, regex* rxsearchedsequence, double currentworstscore, bool* terminatecomputation) {
+void cSpectrumComparatorThreadMS2::initialize(cCandidate& candidate, cPeaksList& peaklist, cBricksDatabase* bricksdatabasewithcombinations, cTheoreticalSpectrumList* theoreticalspectrumlist, cParameters* parameters, regex* rxsequencetag, regex* rxsearchedsequence, double currentworstscore, bool* terminatecomputation) {
 	this->candidate = candidate;
 	this->peaklist = peaklist;
 	this->theoreticalspectrumlist = theoreticalspectrumlist;
@@ -197,7 +197,7 @@ void cSpectrumComparatorThread::initialize(cCandidate& candidate, cPeaksList& pe
 }
 
 
-void cSpectrumComparatorThread::run() {
+void cSpectrumComparatorThreadMS2::run() {
 	cCandidateSet permutations;
 	double score;
 		

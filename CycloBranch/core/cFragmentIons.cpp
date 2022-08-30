@@ -1481,7 +1481,6 @@ cFragmentIonType &cFragmentIons::operator[](eFragmentIonType iontype) {
 
 
 void cFragmentIons::recalculateFragments(bool cyclicnterminus, bool cycliccterminus, string& precursoradduct) {
-
 	fragmentions.clear();
 
 	double nterminusshift = cyclicnterminus?-H2O:0;

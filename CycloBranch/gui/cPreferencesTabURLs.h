@@ -16,6 +16,7 @@
 #include <QLabel>
 #include <QLineEdit>
 #include <QPushButton>
+#include <QCheckBox>
 
 
 /**
@@ -64,10 +65,47 @@ private:
 	QGridLayout* gridlayout;
 
 	QLabel* labelurl1;
+	QLineEdit* lineeditname1;
 	QLineEdit* lineediturl1;
 
 	QLabel* labelurl2;
+	QLineEdit* lineeditname2;
 	QLineEdit* lineediturl2;
+
+	QLabel* labelurl3;
+	QLineEdit* lineeditname3;
+	QLineEdit* lineediturl3;
+
+	QLabel* labelurl4;
+	QLineEdit* lineeditname4;
+	QLineEdit* lineediturl4;
+
+	QLabel* labelurl5;
+	QLineEdit* lineeditname5;
+	QLineEdit* lineediturl5;
+
+	QLabel* labelurl6;
+	QLineEdit* lineeditname6;
+	QLineEdit* lineediturl6;
+
+	QLabel* labelurl7;
+	QLineEdit* lineeditname7;
+	QLineEdit* lineediturl7;
+
+	QLabel* labelurl8;
+	QLineEdit* lineeditname8;
+	QLineEdit* lineediturl8;
+
+	QLabel* labelurl9;
+	QLineEdit* lineeditname9;
+	QLineEdit* lineediturl9;
+
+	QLabel* labelurl10;
+	QLineEdit* lineeditname10;
+	QLineEdit* lineediturl10;
+
+	QLabel* labelviewbookmarks;
+	QCheckBox* checkboxviewbookmarks;
 
 	QWidget* hwidget;
 	QHBoxLayout* hlayout;

@@ -69,6 +69,32 @@ struct cIonType {
 		multiplier = 1;
 	}
 
+
+	/**
+		\brief Store the structure into an output stream.
+		\param os an output stream
+	*/
+	void store(ofstream& os) {
+		storeString(name, os);
+		storeString(formula, os);
+		os.write((char *)&massdifference, sizeof(double));
+		os.write((char *)&positive, sizeof(bool));
+		os.write((char *)&multiplier, sizeof(int));
+	}
+
+
+	/**
+		\brief Load the structure from an input stream.
+		\param is an input stream
+	*/
+	void load(ifstream& is) {
+		loadString(name, is);
+		loadString(formula, is);
+		is.read((char *)&massdifference, sizeof(double));
+		is.read((char *)&positive, sizeof(bool));
+		is.read((char *)&multiplier, sizeof(int));
+	}
+
 };
 
 
@@ -83,7 +109,9 @@ public:
 
 	vector<cIonType> customions;
 
-	int bafprocessingmethod;
+	int linebafprocessingmethod;
+	int profilebafprocessingmethod;
+
 	int rawdataprocessingmethod;
 
 	QString settingsdefaultdir;
@@ -99,8 +127,37 @@ public:
 	QString exporthtmldefaultdir;
 	QString exportimagedefaultdir;
 
+	QString bookmarkname1;
 	QString bookmarkurl1;
+
+	QString bookmarkname2;
 	QString bookmarkurl2;
+
+	QString bookmarkname3;
+	QString bookmarkurl3;
+
+	QString bookmarkname4;
+	QString bookmarkurl4;
+
+	QString bookmarkname5;
+	QString bookmarkurl5;
+
+	QString bookmarkname6;
+	QString bookmarkurl6;
+
+	QString bookmarkname7;
+	QString bookmarkurl7;
+
+	QString bookmarkname8;
+	QString bookmarkurl8;
+
+	QString bookmarkname9;
+	QString bookmarkurl9;
+
+	QString bookmarkname10;
+	QString bookmarkurl10;
+
+	bool viewbookmarks;
 
 
 	/**

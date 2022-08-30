@@ -221,6 +221,16 @@ int cMzML::parse(string& filename, vector<cPeaksList>& peaklists, int profilespe
 																			if (accession.compare("MS:1000016") == 0) {
 																				double rt = atof(getAttribute(currentElement6, "value").c_str());
 																				peaklist.setRetentionTime(rt);
+
+																				string rtunit = getAttribute(currentElement6, "unitAccession");
+																				if (rtunit.compare("UO:0000010") == 0) {
+																					// set second
+																					peaklist.setRetentionTimeUnit(0);
+																				}
+																				else {
+																					// set minute
+																					peaklist.setRetentionTimeUnit(1);
+																				}
 																			}
 
 
@@ -461,6 +471,8 @@ int cMzML::parse(string& filename, vector<cPeaksList>& peaklists, int profilespe
 														if ((profilespectrumid == -1) || (profilespectrumid == count)) {
 															cPeaksList emptypeaklist;
 															emptypeaklist.setTitle(title);
+															emptypeaklist.setRetentionTime(peaklist.getRetentionTime());
+															emptypeaklist.setRetentionTimeUnit(peaklist.getRetentionTimeUnit());
 															peaklists.push_back(emptypeaklist);
 														}
 

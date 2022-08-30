@@ -9,12 +9,12 @@ double cTheoreticalSpectrumList::getCurrentWorstScore() {
 }
 
 
-void cTheoreticalSpectrumList::computeNumbersOfCompletedSeries() {
-	for (int i = 0; i < (int)theoreticalspectra.size(); i++) {
-		for (int j = i + 1; j < (int)theoreticalspectra.size(); j++) {\
-			if (theoreticalspectra[i].getCandidate().hasEqualTPermutations(theoreticalspectra[j].getCandidate())) {
-				theoreticalspectra[i].setNumberOfCompletedSeries(theoreticalspectra[i].getNumberOfCompletedSeries() + 1);
-				theoreticalspectra[j].setNumberOfCompletedSeries(theoreticalspectra[j].getNumberOfCompletedSeries() + 1);
+void cTheoreticalSpectrumList::computeNumbersOfCompletedSeries(int fileid) {
+	for (int i = 0; i < (int)theoreticalspectra[fileid].size(); i++) {
+		for (int j = i + 1; j < (int)theoreticalspectra[fileid].size(); j++) {\
+			if (theoreticalspectra[fileid][i].getCandidate().hasEqualTPermutations(theoreticalspectra[fileid][j].getCandidate())) {
+				theoreticalspectra[fileid][i].setNumberOfCompletedSeries(theoreticalspectra[fileid][i].getNumberOfCompletedSeries() + 1);
+				theoreticalspectra[fileid][j].setNumberOfCompletedSeries(theoreticalspectra[fileid][j].getNumberOfCompletedSeries() + 1);
 			}
 		}
 	}
@@ -63,6 +63,11 @@ void cTheoreticalSpectrumList::clear() {
 }
 
 
+void cTheoreticalSpectrumList::clear(int fileid) {
+	theoreticalspectra[fileid].clear();
+}
+
+
 void cTheoreticalSpectrumList::initialize(cMainThread& os, cParameters& parameters, cDeNovoGraph* graph) {
 	this->os = &os;
 	this->parameters = &parameters;
@@ -70,8 +75,13 @@ void cTheoreticalSpectrumList::initialize(cMainThread& os, cParameters& paramete
 }
 
 
-void cTheoreticalSpectrumList::add(cTheoreticalSpectrum& theoreticalspectrum) {
-	theoreticalspectra.push_back(theoreticalspectrum);
+void cTheoreticalSpectrumList::add(int fileid, cTheoreticalSpectrum& theoreticalspectrum) {
+	theoreticalspectra[fileid].push_back(theoreticalspectrum);
+}
+
+
+cTheoreticalSpectrum& cTheoreticalSpectrumList::get(int fileid, int order) {
+	return theoreticalspectra[fileid][order];
 }
 
 
@@ -80,18 +90,28 @@ int cTheoreticalSpectrumList::size() {
 }
 
 
-cTheoreticalSpectrum& cTheoreticalSpectrumList::operator[](int position) {
-	return theoreticalspectra[position];
+int cTheoreticalSpectrumList::size(int fileid) {
+	return (int)theoreticalspectra[fileid].size();
 }
 
 
-int cTheoreticalSpectrumList::parallelCompareAndStore(cCandidateSet& candidates, bool& terminatecomputation) {
-	cPeaksList peaklist = parameters->peaklistseries[parameters->scannumber - 1];
+void cTheoreticalSpectrumList::resize(int size) {
+	theoreticalspectra.resize(size);
+}
+
+
+void cTheoreticalSpectrumList::resize(int fileid, int size) {
+	theoreticalspectra[fileid].resize(size);
+}
+
+
+int cTheoreticalSpectrumList::parallelCompareAndStore(int fileid, cCandidateSet& candidates, bool& terminatecomputation) {
+	cPeaksList peaklist = parameters->peaklistseriesvector[0][parameters->scannumber - 1];
 	peaklist.sortbyMass();
 	cCandidateSet permutations;
-	theoreticalspectra.clear();
+	theoreticalspectra[fileid].clear();
 	regex rxsequencetag, rxsearchedsequence;
-	cSpectrumComparatorThread* comparatorthread;
+	cSpectrumComparatorThreadMS2* comparatorthread;
 	string stmp;
 	
 	cBricksDatabase* bricksdb = 0;
@@ -181,7 +201,7 @@ int cTheoreticalSpectrumList::parallelCompareAndStore(cCandidateSet& candidates,
 			}
 
 			if ((QThreadPool::globalInstance()->activeThreadCount() < QThreadPool::globalInstance()->maxThreadCount()) && (size > 0)) {
-				comparatorthread = new cSpectrumComparatorThread();
+				comparatorthread = new cSpectrumComparatorThreadMS2();
 				candidates.lock();
 				auto x = candidates.getSet().begin();
 				comparatorthread->initialize((cCandidate&)(*x), peaklist, bricksdb, this, parameters, &rxsequencetag, &rxsearchedsequence, getCurrentWorstScore(), &terminatecomputation);
@@ -221,17 +241,17 @@ int cTheoreticalSpectrumList::parallelCompareAndStore(cCandidateSet& candidates,
 		}
 
 		// move the list to vector
-		theoreticalspectra.clear();
-		theoreticalspectra.insert(theoreticalspectra.end(), make_move_iterator(spectrumbuffer.begin()), make_move_iterator(spectrumbuffer.end()));
+		theoreticalspectra[fileid].clear();
+		theoreticalspectra[fileid].insert(theoreticalspectra[fileid].end(), make_move_iterator(spectrumbuffer.begin()), make_move_iterator(spectrumbuffer.end()));
 		spectrumbuffer.clear();
 
 	}
 	else {
 
 		cTheoreticalSpectrum t(parameters, (cCandidate &)(*candidates.getSet().begin()));
-		int cnt = parameters->peaklistseries.size();
+		int cnt = parameters->peaklistseriesvector[0].size();
 		for (int i = 0; i < cnt; i++) {
-			theoreticalspectra.push_back(t);
+			theoreticalspectra[fileid].push_back(t);
 		}
 
 	}
@@ -254,19 +274,19 @@ int cTheoreticalSpectrumList::parallelCompareAndStore(cCandidateSet& candidates,
 	// fill descriptions of peaks
 	cPeaksList unmatchedpeaksinmatchedpatterns;
 	cPeaksList tmppeaklist;
-	resultspectra.resize(theoreticalspectra.size());
-	for (int i = 0; i < (int)theoreticalspectra.size(); i++) {
+	resultspectra.resize(theoreticalspectra[fileid].size());
+	for (int i = 0; i < (int)theoreticalspectra[fileid].size(); i++) {
 
 		tsp.clear(false);
 		tsp.setParameters(parameters);
-		tsp.setCandidate(theoreticalspectra[i].getCandidate());
+		tsp.setCandidate(theoreticalspectra[fileid][i].getCandidate());
 
-		theoreticalspectra[i].clear(true);
+		theoreticalspectra[fileid][i].clear(true);
 
 		unmatchedpeaksinmatchedpatterns.clear();
 
 		if (parameters->mode == singlecomparison) {
-			tmppeaklist = parameters->peaklistseries[i];
+			tmppeaklist = parameters->peaklistseriesvector[0][i];
 			tmppeaklist.sortbyMass();
 		}
 		else {
@@ -330,8 +350,8 @@ int cTheoreticalSpectrumList::parallelCompareAndStore(cCandidateSet& candidates,
 	isotopepatterncache.clear();
 	isotopepatterncache.unlock();
 
-	theoreticalspectra.clear();
-	theoreticalspectra.insert(theoreticalspectra.end(), make_move_iterator(resultspectra.begin()), make_move_iterator(resultspectra.end()));
+	theoreticalspectra[fileid].clear();
+	theoreticalspectra[fileid].insert(theoreticalspectra[fileid].end(), make_move_iterator(resultspectra.begin()), make_move_iterator(resultspectra.end()));
 	resultspectra.clear();
 
 	//computeNumbersOfCompletedSeries();
@@ -339,35 +359,35 @@ int cTheoreticalSpectrumList::parallelCompareAndStore(cCandidateSet& candidates,
 	// sort peaks in theoretical spectra by mass and set real names of peptides
 	vector<string> paths;
 	string tmps;
-	for (int i = 0; i < (int)theoreticalspectra.size(); i++) {
-		theoreticalspectra[i].sortByMass();
+	for (int i = 0; i < (int)theoreticalspectra[fileid].size(); i++) {
+		theoreticalspectra[fileid][i].sortByMass();
 		if (parameters->peptidetype != other) {
-			theoreticalspectra[i].getCandidate().setRealPeptideName(*bricksdb, parameters->peptidetype);
-			theoreticalspectra[i].getCandidate().setAcronymPeptideNameWithHTMLReferences(*bricksdb, parameters->peptidetype);
-			theoreticalspectra[i].getCandidate().setAcronyms(*bricksdb);
+			theoreticalspectra[fileid][i].getCandidate().setRealPeptideName(*bricksdb, parameters->peptidetype);
+			theoreticalspectra[fileid][i].getCandidate().setAcronymPeptideNameWithHTMLReferences(*bricksdb, parameters->peptidetype);
+			theoreticalspectra[fileid][i].getCandidate().setAcronyms(*bricksdb);
 		}
 		if ((parameters->peptidetype == branched) || (parameters->peptidetype == branchcyclic)) {
-			theoreticalspectra[i].getCandidate().setBackboneAcronyms(*bricksdb);
-			theoreticalspectra[i].getCandidate().setBranchAcronyms(*bricksdb);
+			theoreticalspectra[fileid][i].getCandidate().setBackboneAcronyms(*bricksdb);
+			theoreticalspectra[fileid][i].getCandidate().setBranchAcronyms(*bricksdb);
 		}
 		if (parameters->mode == denovoengine) {
-			theoreticalspectra[i].getCandidate().setPath(*graph, parameters);
-			tmps = theoreticalspectra[i].getCandidate().getPathAsString();
+			theoreticalspectra[fileid][i].getCandidate().setPath(*graph, parameters);
+			tmps = theoreticalspectra[fileid][i].getCandidate().getPathAsString();
 			auto it = std::find(paths.begin(), paths.end(), tmps);
 			if (it == paths.end()) {
-				theoreticalspectra[i].setPathId((int)paths.size());
+				theoreticalspectra[fileid][i].setPathId((int)paths.size());
 				paths.push_back(tmps);
 			}
 			else {
-				theoreticalspectra[i].setPathId(it - paths.begin());
+				theoreticalspectra[fileid][i].setPathId(it - paths.begin());
 			}
 		}
 		// parameters must not be used by viewer, they are not stored/loaded
-		theoreticalspectra[i].setParameters(0);
+		theoreticalspectra[fileid][i].setParameters(0);
 	}
 
 	if ((parameters->mode == denovoengine) || (parameters->mode == databasesearch)) {
-		sortAndFitSize();
+		sortAndFitSize(fileid);
 	}
 		
 	// -1 = partial results, aborted by user
@@ -480,34 +500,34 @@ double cTheoreticalSpectrumList::updatekNNList(cTheoreticalSpectrum& theoretical
 }
 
 
-void cTheoreticalSpectrumList::sortAndFitSize() {
+void cTheoreticalSpectrumList::sortAndFitSize(int fileid) {
 
 	switch (parameters->scoretype) {
 		case number_of_matched_peaks:
-			sort(theoreticalspectra.begin(), theoreticalspectra.end(), compareNumberOfMatchedPeaksDesc);
+			sort(theoreticalspectra[fileid].begin(), theoreticalspectra[fileid].end(), compareNumberOfMatchedPeaksDesc);
 			break;
 		case sum_of_relative_intensities:
-			sort(theoreticalspectra.begin(), theoreticalspectra.end(), compareSumOfRelIntDesc);
+			sort(theoreticalspectra[fileid].begin(), theoreticalspectra[fileid].end(), compareSumOfRelIntDesc);
 			break;
 		case number_of_b_ions:
-			sort(theoreticalspectra.begin(), theoreticalspectra.end(), compareBandAllIonsDesc);
+			sort(theoreticalspectra[fileid].begin(), theoreticalspectra[fileid].end(), compareBandAllIonsDesc);
 			break;
 		case number_of_y_ions:
-			sort(theoreticalspectra.begin(), theoreticalspectra.end(), compareYandAllIonsDesc);
+			sort(theoreticalspectra[fileid].begin(), theoreticalspectra[fileid].end(), compareYandAllIonsDesc);
 			break;
 		case number_of_b_and_y_ions:
-			sort(theoreticalspectra.begin(), theoreticalspectra.end(), compareYBandAllIonsDesc);
+			sort(theoreticalspectra[fileid].begin(), theoreticalspectra[fileid].end(), compareYBandAllIonsDesc);
 			break;
 		case weighted_ratio_of_matched_peaks:
-			sort(theoreticalspectra.begin(), theoreticalspectra.end(), compareWeightedRatioDesc);
+			sort(theoreticalspectra[fileid].begin(), theoreticalspectra[fileid].end(), compareWeightedRatioDesc);
 			break;
 		default:
 			break;
 	}
 
 	// might be useful for databasesearch mode
-	if ((int)theoreticalspectra.size() > parameters->hitsreported) {
-		theoreticalspectra.resize(parameters->hitsreported);
+	if ((int)theoreticalspectra[fileid].size() > parameters->hitsreported) {
+		theoreticalspectra[fileid].resize(parameters->hitsreported);
 	}
 
 }

@@ -109,6 +109,7 @@ private:
 	QAction* actionRemoveSelectedRows;
 	QAction* actionSelectAll;
 	QAction* actionUnselectAll;
+	QAction* actionRemoveDuplicateRows;
 
 	QToolBar* toolbarHelp;
 	QAction* actionHTMLDocumentation;
@@ -200,6 +201,8 @@ private slots:
 	void showHTMLDocumentation();
 
 	void editItem(const QModelIndex& index);
+
+	void removeDuplicateRows();
 
 };
 

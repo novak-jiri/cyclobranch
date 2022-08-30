@@ -4,9 +4,916 @@
 cIsotopePatternCache isotopepatterncache;
 
 
-cMainThread::cMainThread(cParameters& parameters, cTheoreticalSpectrumList& theoreticalspectrumlist, bool enablelogwindow, bool enablestdout) {
+string cMainThread::getCurrentTime(QTime& time) {
+	int secs = time.elapsed() / 1000;
+	int mins = (secs / 60) % 60;
+	int hrs = (secs / 3600);
+	secs = secs % 60;
+
+	return to_string(hrs) + " hrs, " + to_string(mins) + " min, " + to_string(secs) + " sec";
+}
+
+
+void cMainThread::singleThreadMS1(cMainThread* os, QTime& time, cTheoreticalSpectrum* testspectrum, vector< vector< vector<int> > >* testhintsindexvector, cTheoreticalSpectrumList* testlistoftheoreticalspectra, vector< vector<cPeaksList> >* testunmatchedpeaksvector) {
+	if (testspectrum) {
+		*os << "===== running test - singleThreadMS1 =====" << endl;
+	}
+
+	*os << "Time elapsed: " << getCurrentTime(time) << "." << endl << endl;
+
+	*os << "Generating theoretical peaks... ";
+
+	listoftheoreticalspectra->clear();
+	listoftheoreticalspectra->resize((int)parameters.peaklistseriesvector.size());
+
+	for (int h = 0; h < (int)parameters.peaklistseriesvector.size(); h++) {
+		listoftheoreticalspectra->clear(h);
+	}
+
+	if (testspectrum && testunmatchedpeaksvector && testlistoftheoreticalspectra) {
+		testlistoftheoreticalspectra->clear();
+		testlistoftheoreticalspectra->resize((int)parameters.peaklistseriesvector.size());
+
+		for (int h = 0; h < (int)parameters.peaklistseriesvector.size(); h++) {
+			testlistoftheoreticalspectra->clear(h);
+		}
+
+		testunmatchedpeaksvector->resize((int)parameters.peaklistseriesvector.size());
+	}
+
+	cTheoreticalSpectrum ts;
+	ts.setParameters(&parameters);
+
+	if (parameters.generateisotopepattern) {
+		if (parameters.calculatefdrs) {
+			parameters.sequencedatabase.attachDecoys(terminatecomputation);
+		}
+
+		if (terminatecomputation) {
+			emitEndSignals();
+			return;
+		}
+
+		ts.generateFineMSSpectrum(0, (int)parameters.sequencedatabase.size(), terminatecomputation);
+	}
+	else {
+		ts.generateMSSpectrum(0, (int)parameters.sequencedatabase.size(), terminatecomputation, true);
+	}
+
+	if (terminatecomputation) {
+		emitEndSignals();
+		return;
+	}
+
+	unordered_map<string, int> tempmap;
+	parameters.peakidtodesc.clear();
+	parameters.isotopeformulaidtodesc.clear();
+
+	tempmap.clear();
+	ts.getTheoreticalPeaks()->reducePeakDescriptions(tempmap);
+	convertStringIntUnorderedMapToStringVector(tempmap, parameters.peakidtodesc);
+
+	//tempmap.clear();
+	//ts.getTheoreticalPeaks()->reduceIsotopeFormulaDescriptions(tempmap);
+	//convertStringIntUnorderedMapToStringVector(tempmap, parameters.isotopeformulaidtodesc);
+
+	*os << "ok" << endl;
+	*os << "Comparing theoretical peaks with the experimental peaklist(s)... " << endl;
+	*os << "Number of input files: " << parameters.peaklistseriesvector.size() << endl;
+
+	for (int h = 0; h < (int)parameters.peaklistseriesvector.size(); h++) {
+		*os << "Number of experimental peaklists in the file no. " << h + 1 << " : " << parameters.peaklistseriesvector[h].size() << endl;
+		for (int i = 0; i < parameters.peaklistseriesvector[h].size(); i++) {
+			if (terminatecomputation) {
+				emitEndSignals();
+				return;
+			}
+			parameters.peaklistseriesvector[h][i].sortbyMass();
+		}
+	}
+
+	*os << endl << "Time elapsed: " << getCurrentTime(time) << "." << endl << endl;
+
+	bool lcms;
+	bool rtavailable;
+	bool skipcomparison;
+
+	vector< vector< vector<int> > > hintsindexvector;
+	hintsindexvector.resize(parameters.peaklistseriesvector.size());
+
+	vector< vector<cPeaksList> > unmatchedpeaksvector;
+	unmatchedpeaksvector.resize(parameters.peaklistseriesvector.size());
+
+	for (int h = 0; h < (int)parameters.peaklistseriesvector.size(); h++) {
+
+		unmatchedpeaksvector[h].resize(parameters.peaklistseriesvector[h].size());
+
+		lcms = (parameters.peaklistseriesvector[h].size() > 1) && !((parameters.peaklistfileformats[h] == mis) || (parameters.peaklistfileformats[h] == imzML));
+		rtavailable = (parameters.peaklistseriesvector[h].size() > 1) && (parameters.peaklistseriesvector[h][parameters.peaklistseriesvector[h].size() - 1].getRetentionTime() > 0);
+
+		if (lcms || (parameters.peaklistfileformats[h] == mis) || (parameters.peaklistfileformats[h] == imzML)) {
+			*os << "Analyzing spectra in the file no. " << h + 1 << " : " << endl;
+
+			hintsindexvector[h].resize(ts.getNumberOfPeaks());
+
+			for (int i = 0; i < parameters.peaklistseriesvector[h].size(); i++) {
+				if ((i + 1) % 100 == 0) {
+					*os << i + 1 << " ";
+				}
+				if ((i + 1) % 2500 == 0) {
+					*os << endl;
+				}
+
+				if (terminatecomputation) {
+					emitEndSignals();
+					return;
+				}
+
+				skipcomparison = false;
+				if (lcms && rtavailable) {
+					if (parameters.minimumrt != 0) {
+						if (parameters.peaklistseriesvector[h][i].getRetentionTime() < parameters.minimumrt) {
+							skipcomparison = true;
+						}
+					}
+					if (parameters.maximumrt != 0) {
+						if (parameters.peaklistseriesvector[h][i].getRetentionTime() > parameters.maximumrt) {
+							skipcomparison = true;
+						}
+					}
+				}
+
+				cTheoreticalSpectrum tstmp;
+				tstmp.setParameters(&parameters);
+				tstmp.getHintsIndex(i, h, ts, unmatchedpeaksvector[h][i], hintsindexvector[h], lcms && rtavailable, skipcomparison);
+			}
+
+			for (auto& it : hintsindexvector[h]) {
+				sort(it.begin(), it.end());
+			}
+
+			*os << " ok" << endl;
+		}
+
+		*os << endl << "Time elapsed: " << getCurrentTime(time) << "." << endl << endl;
+
+		*os << "Processing the file no. " << h + 1 << " peaklist no. : " << endl;
+
+		for (int i = 0; i < parameters.peaklistseriesvector[h].size(); i++) {
+			if ((i + 1) % 100 == 0) {
+				*os << i + 1 << " ";
+			}
+			if ((i + 1) % 2500 == 0) {
+				*os << endl;
+			}
+
+			if (terminatecomputation) {
+				emitEndSignals();
+				return;
+			}
+
+			cTheoreticalSpectrum tstmp;
+			tstmp.setParameters(&parameters);
+
+			skipcomparison = false;
+			if (lcms && rtavailable) {
+				if (parameters.minimumrt != 0) {
+					if (parameters.peaklistseriesvector[h][i].getRetentionTime() < parameters.minimumrt) {
+						skipcomparison = true;
+					}
+				}
+				if (parameters.maximumrt != 0) {
+					if (parameters.peaklistseriesvector[h][i].getRetentionTime() > parameters.maximumrt) {
+						skipcomparison = true;
+					}
+				}
+			}
+
+			tstmp.compareMSSpectrum(i, h, ts, unmatchedpeaksvector[h][i], hintsindexvector[h], lcms && rtavailable, skipcomparison);
+			if ((parameters.peaklistfileformats[h] == mis) || (parameters.peaklistfileformats[h] == imzML)) {
+				if (!testspectrum) {
+					parameters.peaklistseriesvector[h][i].clear();
+				}
+			}
+
+			listoftheoreticalspectra->add(h, tstmp);
+		}
+
+		if (testspectrum && testunmatchedpeaksvector && testlistoftheoreticalspectra) {
+			for (int i = 0; i < listoftheoreticalspectra->size(h); i++) {
+				testlistoftheoreticalspectra->add(h, listoftheoreticalspectra->get(h, i));
+			}
+			(*testunmatchedpeaksvector)[h] = unmatchedpeaksvector[h];
+		}
+
+		if (!((parameters.peaklistfileformats[h] == mis) || (parameters.peaklistfileformats[h] == imzML))) {
+			for (int i = 0; i < parameters.peaklistseriesvector[h].size(); i++) {
+				if (terminatecomputation) {
+					emitEndSignals();
+					return;
+				}
+
+				if (!testspectrum) {
+					parameters.peaklistseriesvector[h][i].clear();
+				}
+			}
+		}
+
+		*os << " ok" << endl << "Total number of spectra in the file no. " << h + 1 << " : " << parameters.peaklistseriesvector[h].size() << endl;
+
+		if (parameters.calculatefdrs && parameters.generateisotopepattern) {
+
+			*os << endl << "Calculating FDRs... ";
+
+			vector<double> targetscoresvector;
+			vector<double> decoyscoresvector;
+			vector<double> allscoresvector;
+			vector<double> fdrs;
+			map<int, double> *targetscores;
+			map<int, double> *decoyscores;
+			map<int, int> numbersofmatchedenvelopes;
+			double minfdr;
+			int targetscoresvectorsize;
+
+			// calculate numbers of matched envelopes in single-pixel spectra
+			for (int i = 0; i < listoftheoreticalspectra->size(h); i++) {
+				targetscores = &(listoftheoreticalspectra->get(h, i).getTargetScores());
+				decoyscores = &(listoftheoreticalspectra->get(h, i).getDecoyScores());
+
+				for (auto& it : *targetscores) {
+					if (numbersofmatchedenvelopes.count(it.first) == 0) {
+						numbersofmatchedenvelopes.insert(make_pair(it.first, 1));
+					}
+					else {
+						numbersofmatchedenvelopes[it.first]++;
+					}
+				}
+
+				for (auto& it : *decoyscores) {
+					if (numbersofmatchedenvelopes.count(it.first) == 0) {
+						numbersofmatchedenvelopes.insert(make_pair(it.first, 1));
+					}
+					else {
+						numbersofmatchedenvelopes[it.first]++;
+					}
+				}
+			}
+
+			// divide scores by numbers of matched envelopes in all single-pixel spectra
+			for (int i = 0; i < listoftheoreticalspectra->size(h); i++) {
+				targetscores = &(listoftheoreticalspectra->get(h, i).getTargetScores());
+				decoyscores = &(listoftheoreticalspectra->get(h, i).getDecoyScores());
+
+				for (auto& it : *targetscores) {
+					//it.second /= sqrt((double)numbersofmatchedenvelopes[it.first]);
+					targetscoresvector.push_back(it.second);
+				}
+
+				for (auto& it : *decoyscores) {
+					//it.second /= sqrt((double)numbersofmatchedenvelopes[it.first]);
+					decoyscoresvector.push_back(it.second);
+				}
+			}
+
+			// calculate FDRs
+			sort(targetscoresvector.begin(), targetscoresvector.end());
+			sort(decoyscoresvector.begin(), decoyscoresvector.end());
+
+			allscoresvector = targetscoresvector;
+			allscoresvector.insert(allscoresvector.end(), decoyscoresvector.begin(), decoyscoresvector.end());
+			sort(allscoresvector.begin(), allscoresvector.end());
+
+			targetscoresvectorsize = (int)targetscoresvector.size();
+			fdrs.resize(targetscoresvectorsize);
+			for (int i = 0; i < targetscoresvectorsize; i++) {
+				fdrs[i] = (double)getNumberOfScoreHits(decoyscoresvector, targetscoresvector[i]) / (double)max(getNumberOfScoreHits(allscoresvector, targetscoresvector[i]), 1);
+			}
+
+			// calculate q-values
+			/*for (int i = targetscoresvectorsize - 1; i >= 0; i--) {
+				if ((i == targetscoresvectorsize - 1) || (fdrs[i] < minfdr)) {
+					minfdr = fdrs[i];
+				}
+				if (fdrs[i] > minfdr) {
+					fdrs[i] = minfdr;
+				}
+			}*/
+
+			for (int i = 0; i < listoftheoreticalspectra->size(h); i++) {
+				listoftheoreticalspectra->get(h, i).setFDRs(targetscoresvector, fdrs, unmatchedpeaksvector[h][i]);
+			}
+
+			*os << "ok" << endl;
+
+		}
+
+		for (int i = 0; i < listoftheoreticalspectra->size(h); i++) {
+			listoftheoreticalspectra->get(h, i).finalizeMSSpectrum(unmatchedpeaksvector[h][i], true);
+		}
+
+	}
+
+	if (testspectrum && testhintsindexvector && testlistoftheoreticalspectra && testunmatchedpeaksvector) {
+		*testspectrum = ts;
+		*testhintsindexvector = hintsindexvector;
+
+		//for (int h = 0; h < (int)parameters.peaklistseriesvector.size(); h++) {
+		//	for (int i = 0; i < listoftheoreticalspectra->size(h); i++) {
+		//		testlistoftheoreticalspectra->add(h, listoftheoreticalspectra->get(h, i));
+		//	}
+		//}
+
+		//*testunmatchedpeaksvector = unmatchedpeaksvector;
+
+		*os << "===== test ended =====" << endl << endl;
+	}
+
+}
+
+
+void cMainThread::multiThreadMS1(cMainThread* os, QTime& time, cTheoreticalSpectrum* testspectrum, vector< vector< vector<int> > >* testhintsindexvector, cTheoreticalSpectrumList* testlistoftheoreticalspectra, vector< vector<cPeaksList> >* testunmatchedpeaksvector) {
+	if (testspectrum) {
+		*os << "===== running test - multiThreadMS1 =====" << endl;
+	}
+
+	*os << "Time elapsed: " << getCurrentTime(time) << "." << endl << endl;
+
+	*os << "Generating theoretical peaks... ";
+
+	listoftheoreticalspectra->clear();
+	listoftheoreticalspectra->resize((int)parameters.peaklistseriesvector.size());
+
+	for (int h = 0; h < (int)parameters.peaklistseriesvector.size(); h++) {
+		listoftheoreticalspectra->clear(h);
+	}
+
+	if (testspectrum && testunmatchedpeaksvector && testlistoftheoreticalspectra) {
+		testlistoftheoreticalspectra->clear();
+		testlistoftheoreticalspectra->resize((int)parameters.peaklistseriesvector.size());
+
+		for (int h = 0; h < (int)parameters.peaklistseriesvector.size(); h++) {
+			testlistoftheoreticalspectra->clear(h);
+		}
+
+		testunmatchedpeaksvector->resize((int)parameters.peaklistseriesvector.size());
+	}
+
+	if (parameters.generateisotopepattern && parameters.calculatefdrs) {
+		parameters.sequencedatabase.attachDecoys(terminatecomputation);
+	}
+
+	vector<cTheoreticalSpectrum*> spectrumpool;
+
+	QThreadPool::globalInstance()->setMaxThreadCount(parameters.maximumnumberofthreads);
+
+	int sequencestart = 0;
+	int sequencestop = max(100, parameters.sequencedatabase.size() / (2 * parameters.maximumnumberofthreads));
+
+	int poolreserve = parameters.sequencedatabase.size() / sequencestop;
+	if (parameters.sequencedatabase.size() % sequencestop > 0) {
+		poolreserve++;
+	}
+
+	spectrumpool.reserve(poolreserve);
+
+	initParallelOutputState(poolreserve);
+
+	while (sequencestart < parameters.sequencedatabase.size()) {
+		if (terminatecomputation) {
+			break;
+		}
+
+		cSpectrumGeneratorThreadMS1* generatorthread = new cSpectrumGeneratorThreadMS1();
+		cTheoreticalSpectrum* poolitem = new cTheoreticalSpectrum();
+
+		generatorthread->initialize(this, &parameters, sequencestart, min(sequencestart + sequencestop, (int)parameters.sequencedatabase.size()), poolitem, &terminatecomputation);
+		spectrumpool.push_back(poolitem);
+
+		QThreadPool::globalInstance()->start(generatorthread);
+
+		sequencestart += sequencestop;
+	}
+
+	QThreadPool::globalInstance()->waitForDone();
+
+	if (terminatecomputation) {
+		for (auto& it : spectrumpool) {
+			delete it;
+		}
+		emitEndSignals();
+		return;
+	}
+
+	unordered_map<string, int> tempmap;
+	parameters.peakidtodesc.clear();
+	parameters.isotopeformulaidtodesc.clear();
+
+	tempmap.clear();
+
+	size_t spectrumpoolsize = spectrumpool.size();
+	int numberoftheoreticalpeaks = 0;
+	int lastgroupid = 0;
+	int thpeaksize;
+
+	for (size_t i = 0; i < spectrumpoolsize; i++) {
+		thpeaksize = spectrumpool[i]->getTheoreticalPeaks()->size();
+		
+		spectrumpool[i]->getTheoreticalPeaks()->reducePeakDescriptions(tempmap);
+		numberoftheoreticalpeaks += thpeaksize;
+
+		for (int j = 0; j < thpeaksize; j++) {
+			(*spectrumpool[i]->getTheoreticalPeaks())[j].groupid += lastgroupid;
+		}
+
+		if (thpeaksize > 0) {
+			lastgroupid = (*spectrumpool[i]->getTheoreticalPeaks())[thpeaksize - 1].groupid + 1;
+		}
+	}
+	convertStringIntUnorderedMapToStringVector(tempmap, parameters.peakidtodesc);
+
+	//tempmap.clear();
+
+	//for (size_t i = 0; i < spectrumpoolsize; i++) {
+	//	spectrumpool[i]->getTheoreticalPeaks()->reduceIsotopeFormulaDescriptions(tempmap);
+	//}
+	//convertStringIntUnorderedMapToStringVector(tempmap, parameters.isotopeformulaidtodesc);
+
+	*os << "ok" << endl;
+	*os << "Comparing theoretical peaks with the experimental peaklist(s)... " << endl;
+	*os << "Number of input files: " << parameters.peaklistseriesvector.size() << endl;
+
+	for (int h = 0; h < (int)parameters.peaklistseriesvector.size(); h++) {
+		*os << "Number of experimental peaklists in the file no. " << h + 1 << " : " << parameters.peaklistseriesvector[h].size() << endl;
+		for (int i = 0; i < parameters.peaklistseriesvector[h].size(); i++) {
+			if (terminatecomputation) {
+				for (auto& it : spectrumpool) {
+					delete it;
+				}
+				emitEndSignals();
+				return;
+			}
+
+			parameters.peaklistseriesvector[h][i].sortbyMass();
+		}
+	}
+
+	*os << endl << "Time elapsed: " << getCurrentTime(time) << "." << endl << endl;
+
+	bool lcms;
+
+	vector< vector< vector< vector<int> > > > hintsindexpoolvector;
+	hintsindexpoolvector.resize(parameters.peaklistseriesvector.size());
+
+	vector< vector< vector<int> > > hintsindexvector;
+	hintsindexvector.resize(parameters.peaklistseriesvector.size());
+
+	for (int h = 0; h < (int)parameters.peaklistseriesvector.size(); h++) {
+
+		hintsindexpoolvector[h].resize(spectrumpoolsize);
+
+		lcms = (parameters.peaklistseriesvector[h].size() > 1) && !((parameters.peaklistfileformats[h] == mis) || (parameters.peaklistfileformats[h] == imzML));
+
+		if (lcms || (parameters.peaklistfileformats[h] == mis) || (parameters.peaklistfileformats[h] == imzML)) {
+			*os << "Analyzing spectra in the file no. " << h + 1 << " ... ";
+
+			if (testspectrum && testhintsindexvector) {
+				hintsindexvector[h].resize(numberoftheoreticalpeaks);
+			}
+
+			initParallelOutputState((int)spectrumpoolsize);
+
+			for (size_t i = 0; i < spectrumpoolsize; i++) {
+				if (terminatecomputation) {
+					break;
+				}
+
+				cSpectrumAnalyzerThreadMS1* analyzerthread = new cSpectrumAnalyzerThreadMS1();
+				analyzerthread->initialize(this, &parameters, h, spectrumpool[i], &hintsindexpoolvector[h][i], &terminatecomputation);
+
+				QThreadPool::globalInstance()->start(analyzerthread);
+			}
+
+			QThreadPool::globalInstance()->waitForDone();
+
+			if (testspectrum && testhintsindexvector) {
+				serializeHintsIndexPool(hintsindexpoolvector[h], hintsindexvector[h]);
+			}
+
+			*os << "ok" << endl;
+		}
+
+	}
+
+	*os << endl << "Time elapsed: " << getCurrentTime(time) << "." << endl << endl;
+
+	if (terminatecomputation) {
+		for (auto& it : spectrumpool) {
+			delete it;
+		}
+		emitEndSignals();
+		return;
+	}
+
+	*os << "Processing the peaklist(s)... ";
+
+	vector< vector<cPeaksList> > unmatchedpeaksvector;
+	unmatchedpeaksvector.resize(parameters.peaklistseriesvector.size());
+
+	vector<cTheoreticalSpectrumList*> theoreticalspectrumlistpool;
+	vector< vector<cPeaksList> > unmatchedpeakspool;
+
+	for (int h = 0; h < (int)parameters.peaklistseriesvector.size(); h++) {
+		unmatchedpeaksvector[h].resize(parameters.peaklistseriesvector[h].size());
+
+		theoreticalspectrumlistpool.resize(spectrumpoolsize);
+		unmatchedpeakspool.resize(spectrumpoolsize);
+
+		initParallelOutputState((int)spectrumpoolsize);
+
+		for (size_t i = 0; i < spectrumpoolsize; i++) {
+			if (terminatecomputation) {
+				break;
+			}
+
+			theoreticalspectrumlistpool[i] = new cTheoreticalSpectrumList();
+
+			theoreticalspectrumlistpool[i]->clear();
+			theoreticalspectrumlistpool[i]->resize((int)parameters.peaklistseriesvector.size());
+
+			for (int j = 0; j < (int)parameters.peaklistseriesvector.size(); j++) {
+				theoreticalspectrumlistpool[i]->clear(j);
+			}
+
+			cSpectrumComparatorThreadMS1* comparatorthread = new cSpectrumComparatorThreadMS1();
+			comparatorthread->initialize(this, &parameters, h, spectrumpool[i], &hintsindexpoolvector[h][i], theoreticalspectrumlistpool[i], &unmatchedpeakspool[i], &terminatecomputation);
+
+			QThreadPool::globalInstance()->start(comparatorthread);
+		}
+
+		QThreadPool::globalInstance()->waitForDone();
+
+		serializeTheoreticalSpectrumListPool(h, theoreticalspectrumlistpool, *listoftheoreticalspectra);
+
+		for (auto& it : theoreticalspectrumlistpool) {
+			delete it;
+		}
+
+		serializeUnmatchedPeaksPool(h, unmatchedpeakspool, unmatchedpeaksvector);
+
+		unmatchedpeakspool.clear();
+
+		if (testspectrum && testunmatchedpeaksvector && testlistoftheoreticalspectra) {
+			for (int i = 0; i < listoftheoreticalspectra->size(h); i++) {
+				testlistoftheoreticalspectra->add(h, listoftheoreticalspectra->get(h, i));
+			}
+			(*testunmatchedpeaksvector)[h] = unmatchedpeaksvector[h];
+		}
+
+		for (int i = 0; i < parameters.peaklistseriesvector[h].size(); i++) {
+			if (terminatecomputation) {
+				for (auto& it : spectrumpool) {
+					delete it;
+				}
+				emitEndSignals();
+				return;
+			}
+
+			if (!testspectrum) {
+				parameters.peaklistseriesvector[h][i].clear();
+			}
+		}
+
+		*os << " ok" << endl << "Total number of spectra in the file no. " << h + 1 << " : " << parameters.peaklistseriesvector[h].size() << endl;
+
+		if (parameters.calculatefdrs && parameters.generateisotopepattern) {
+
+			*os << endl << "Calculating FDRs... ";
+
+			vector<double> targetscoresvector;
+			vector<double> decoyscoresvector;
+			vector<double> allscoresvector;
+			vector<double> fdrs;
+			map<int, double> *targetscores;
+			map<int, double> *decoyscores;
+			map<int, int> numbersofmatchedenvelopes;
+			double minfdr;
+			int targetscoresvectorsize;
+
+			// calculate numbers of matched envelopes in single-pixel spectra
+			for (int i = 0; i < listoftheoreticalspectra->size(h); i++) {
+				targetscores = &(listoftheoreticalspectra->get(h, i).getTargetScores());
+				decoyscores = &(listoftheoreticalspectra->get(h, i).getDecoyScores());
+
+				for (auto& it : *targetscores) {
+					if (numbersofmatchedenvelopes.count(it.first) == 0) {
+						numbersofmatchedenvelopes.insert(make_pair(it.first, 1));
+					}
+					else {
+						numbersofmatchedenvelopes[it.first]++;
+					}
+				}
+
+				for (auto& it : *decoyscores) {
+					if (numbersofmatchedenvelopes.count(it.first) == 0) {
+						numbersofmatchedenvelopes.insert(make_pair(it.first, 1));
+					}
+					else {
+						numbersofmatchedenvelopes[it.first]++;
+					}
+				}
+			}
+
+			// divide scores by numbers of matched envelopes in all single-pixel spectra
+			for (int i = 0; i < listoftheoreticalspectra->size(h); i++) {
+				targetscores = &(listoftheoreticalspectra->get(h, i).getTargetScores());
+				decoyscores = &(listoftheoreticalspectra->get(h, i).getDecoyScores());
+
+				for (auto& it : *targetscores) {
+					//it.second /= sqrt((double)numbersofmatchedenvelopes[it.first]);
+					targetscoresvector.push_back(it.second);
+				}
+
+				for (auto& it : *decoyscores) {
+					//it.second /= sqrt((double)numbersofmatchedenvelopes[it.first]);
+					decoyscoresvector.push_back(it.second);
+				}
+			}
+
+			// calculate FDRs
+			sort(targetscoresvector.begin(), targetscoresvector.end());
+			sort(decoyscoresvector.begin(), decoyscoresvector.end());
+
+			allscoresvector = targetscoresvector;
+			allscoresvector.insert(allscoresvector.end(), decoyscoresvector.begin(), decoyscoresvector.end());
+			sort(allscoresvector.begin(), allscoresvector.end());
+
+			targetscoresvectorsize = (int)targetscoresvector.size();
+			fdrs.resize(targetscoresvectorsize);
+			for (int i = 0; i < targetscoresvectorsize; i++) {
+				fdrs[i] = (double)getNumberOfScoreHits(decoyscoresvector, targetscoresvector[i]) / (double)max(getNumberOfScoreHits(allscoresvector, targetscoresvector[i]), 1);
+			}
+
+			// calculate q-values
+			/*for (int i = targetscoresvectorsize - 1; i >= 0; i--) {
+				if ((i == targetscoresvectorsize - 1) || (fdrs[i] < minfdr)) {
+					minfdr = fdrs[i];
+				}
+				if (fdrs[i] > minfdr) {
+					fdrs[i] = minfdr;
+				}
+			}*/
+
+			for (int i = 0; i < listoftheoreticalspectra->size(h); i++) {
+				listoftheoreticalspectra->get(h, i).setFDRs(targetscoresvector, fdrs, unmatchedpeaksvector[h][i]);
+			}
+
+			*os << "ok" << endl;
+
+		}
+
+		for (int i = 0; i < listoftheoreticalspectra->size(h); i++) {
+			listoftheoreticalspectra->get(h, i).finalizeMSSpectrum(unmatchedpeaksvector[h][i], true);
+		}
+
+	}
+
+	cTheoreticalSpectrum ts;
+
+	if (testspectrum) {
+		ts.setParameters(&parameters);
+		serializeSpectrumPool(spectrumpool, ts);
+	}
+
+	for (auto& it : spectrumpool) {
+		delete it;
+	}
+
+	if (testspectrum && testhintsindexvector && testlistoftheoreticalspectra && testunmatchedpeaksvector) {
+		*testspectrum = ts;
+		*testhintsindexvector = hintsindexvector;
+
+		//for (int h = 0; h < (int)parameters.peaklistseriesvector.size(); h++) {
+		//	for (int i = 0; i < listoftheoreticalspectra->size(h); i++) {
+		//		testlistoftheoreticalspectra->add(h, listoftheoreticalspectra->get(h, i));
+		//	}
+		//}
+
+		//*testunmatchedpeaksvector = unmatchedpeaksvector;
+
+		*os << "===== test ended =====" << endl << endl;
+	}
+}
+
+
+void cMainThread::initParallelOutputState(int size) {
+	paralleloutputstate = 0;
+	paralleloutputsize = size;
+}
+
+
+void cMainThread::serializeSpectrumPool(vector<cTheoreticalSpectrum*>& spectrumpool, cTheoreticalSpectrum& ts) {
+	size_t poolsize = spectrumpool.size();
+	for (size_t i = 0; i < poolsize; i++) {
+		ts.getTheoreticalPeaks()->attach(*spectrumpool[i]->getTheoreticalPeaks());
+	}
+
+	if (parameters.generateisotopepattern) {
+		int lastgroupid = 0;
+		int currentgroupid = 0;
+
+		for (int i = 0; i < ts.getTheoreticalPeaks()->size(); i++) {	
+			if (lastgroupid != (*ts.getTheoreticalPeaks())[i].groupid) {
+				currentgroupid++;
+			}
+
+			lastgroupid = (*ts.getTheoreticalPeaks())[i].groupid;
+			(*ts.getTheoreticalPeaks())[i].groupid = currentgroupid;
+		}
+	}
+}
+
+
+void cMainThread::serializeHintsIndexPool(vector< vector< vector<int> > >& hintsindexpool, vector< vector<int> >& hintsindex) {
+	hintsindex.clear();
+	size_t hintsindexpoolsize = hintsindexpool.size();
+	for (size_t i = 0; i < hintsindexpoolsize; i++) {
+		hintsindex.reserve(hintsindex.size() + hintsindexpool[i].size());
+		hintsindex.insert(hintsindex.end(), hintsindexpool[i].begin(), hintsindexpool[i].end());
+	}
+}
+
+
+void cMainThread::serializeUnmatchedPeaksPool(int peaklistseriesvectorid, vector< vector<cPeaksList> >& unmatchedpeakspool, vector< vector<cPeaksList> >& unmatchedpeaks) {
+	size_t unmatchedpeakspoolsize = unmatchedpeakspool.size();
+	for (size_t i = 0; i < unmatchedpeakspoolsize; i++) {
+		if (unmatchedpeaks[peaklistseriesvectorid].size() != unmatchedpeakspool[i].size()) {
+			unmatchedpeaks[peaklistseriesvectorid].clear();
+			unmatchedpeaks[peaklistseriesvectorid].resize(parameters.peaklistseriesvector[peaklistseriesvectorid].size());
+			return;
+		}
+		for (size_t j = 0; j < unmatchedpeakspool[i].size(); j++) {
+			unmatchedpeaks[peaklistseriesvectorid][j].attach(unmatchedpeakspool[i][j]);
+		}
+	}
+}
+
+
+void cMainThread::serializeTheoreticalSpectrumListPool(int peaklistseriesvectorid, vector<cTheoreticalSpectrumList*>& theoreticalspectrumlistpool, cTheoreticalSpectrumList& theoreticalspectrumlist) {
+	if (theoreticalspectrumlistpool.size() == 0) {
+		return;
+	}
+
+	for (int i = 0; i < theoreticalspectrumlistpool[0]->size(peaklistseriesvectorid); i++) {
+		theoreticalspectrumlist.add(peaklistseriesvectorid, theoreticalspectrumlistpool[0]->get(peaklistseriesvectorid, i));
+	}
+
+	for (int i = 1; i < theoreticalspectrumlistpool.size(); i++) {
+		for (int j = 0; j < theoreticalspectrumlistpool[i]->size(peaklistseriesvectorid); j++) {
+			theoreticalspectrumlist.get(peaklistseriesvectorid, j).attach(theoreticalspectrumlistpool[i]->get(peaklistseriesvectorid, j));
+		}
+	}
+}
+
+
+void cMainThread::printMatrix(cPeaksList& peaklist) {
+	unsigned roundedmz;
+	map<unsigned, unsigned> blocksmap;
+	multimap<unsigned, unsigned> blocksmultimap;
+
+	double precisionvalue = 1000.0;
+	int size = (int)peaklist.size();
+
+	string htmlfilename = parameters.peaklistfilenames[0];
+	if (htmlfilename.rfind('/') != string::npos) {
+		htmlfilename = htmlfilename.substr(0, htmlfilename.rfind('/')) + "_matrix.html";
+	}
+
+	ofstream html(htmlfilename);
+	html << "<html><head></head><body><p><table border=\"1\" cellpadding=\"0\" cellspacing=\"0\">";
+
+	html << "<tr><td></td>";
+	for (int i = 0; i < size; i++) {
+		html << "<td>" << peaklist[i].mzratio << "</td>";
+	}
+	html << "</tr>";
+
+	for (int i = 0; i < size; i++) {
+		html << "<tr>";
+
+		html << "<td>" << peaklist[i].mzratio << "</td>";
+
+		for (int j = 0; j < size; j++) {
+			html << "<td>";
+
+			if (i > j) {
+				roundedmz = round(fabs(peaklist[i].mzratio - peaklist[j].mzratio) * precisionvalue);
+				html << (double)roundedmz / precisionvalue;
+
+				if (blocksmap.count(roundedmz) == 0) {
+					blocksmap[roundedmz] = 1;
+				}
+				else {
+					blocksmap[roundedmz]++;
+				}
+			}
+
+			html << "</td>";
+		}
+		html << "</tr>";
+	}
+
+	html << "</table></p>";
+
+	html << "<p><table border=\"1\" cellpadding=\"0\" cellspacing=\"0\">";
+
+	for (auto& it : blocksmap) {
+		blocksmultimap.insert(make_pair(it.second, it.first));
+	}
+
+	html << "<tr><td>count</td><td>m/z difference</td><td>block</td></tr>";
+
+	cBricksDatabase blockdb;
+	ifstream blocksstream(parameters.bricksdatabasefilename);
+	string error;
+	blockdb.loadFromPlainTextStream(blocksstream, error, true, true);
+
+	for (auto it = blocksmultimap.rbegin(); it != blocksmultimap.rend(); ++it) {
+		html << "<tr>";
+		html << "<td>" << it->first << "</td>";
+		html << "<td>" << (double)it->second / precisionvalue << "</td>";
+		html << "<td>";
+		
+		for (int j = 0; j < blockdb.size(); j++) {
+			if (round(blockdb[j].getMass() * precisionvalue) == it->second) {
+				html << blockdb[j].getAcronymsAsString() << ", " << blockdb[j].getSummary() << "; ";
+			}
+		}
+
+		html << "</td>";
+		html << "</tr>";
+	}
+
+	html << "</table></p>";
+
+	html << "</body>";
+}
+
+
+void cMainThread::printIonEstimations(cPeaksList& peaklist) {
+	vector<string> testedions;
+	//testedions.push_back("deamidated b-ion");
+	testedions.push_back("dehydrated b-ion");
+	testedions.push_back("a-ion");
+	//testedions.push_back("deamidated a-ion");
+	//testedions.push_back("dehydrated a-ion");
+
+	vector<double> massshifts;
+	//massshifts.push_back(17.026549);
+	massshifts.push_back(18.01057);
+	massshifts.push_back(27.99492);
+	//massshifts.push_back(45.021464);
+	//massshifts.push_back(46.005479);
+
+	double adduct = 0;
+	adduct = 21.981946;
+
+	string htmlfilename = parameters.peaklistfilenames[0];
+	if (htmlfilename.rfind('/') != string::npos) {
+		htmlfilename = htmlfilename.substr(0, htmlfilename.rfind('/')) + "_estimations.html";
+	}
+
+	ofstream html(htmlfilename);
+	html << "<html><head></head><body><p><table border=\"1\" cellpadding=\"0\" cellspacing=\"0\">";
+
+	html << "<tr><td> </td>";
+	for (int i = 0; i < (int)testedions.size(); i++) {
+		html << "<td> " << testedions[i] << " (-" << massshifts[i] << ") </td>";
+	}
+	html << "</tr>";
+
+	for (int i = 0; i < peaklist.size(); i++) {
+		html << "<tr><td> ";
+		html << peaklist[i].mzratio - adduct;
+		html << " </td>";
+		for (int j = 0; j < (int)massshifts.size(); j++) {
+			html << "<td> ";
+			if (searchHint(peaklist[i].mzratio - massshifts[j], peaklist, parameters.fragmentmasserrortolerance)) {
+				html << peaklist[i].mzratio - massshifts[j] - adduct;
+			}
+			html << " </td>";
+		}
+		html << "</tr>";
+	}
+
+	html << "</table></p>";
+
+	html << "</body>";
+}
+
+
+cMainThread::cMainThread(cParameters& parameters, cTheoreticalSpectrumList& listoftheoreticalspectra, bool enablelogwindow, bool enablestdout) {
 	this->parameters = parameters;
-	this->theoreticalspectrumlist = &theoreticalspectrumlist;
+	this->listoftheoreticalspectra = &listoftheoreticalspectra;
 	this->enablelogwindow = enablelogwindow;
 	this->enablestdout = enablestdout;
 
@@ -69,6 +976,19 @@ cMainThread& cMainThread::operator<<(StandardEndLine manip) {
 }
 
 
+void cMainThread::addToParallelOutputState(int value) {
+	QMutexLocker ml(&mutex);
+	paralleloutputstate += value;
+
+	if (paralleloutputsize > 0) {
+		*this << endl << int((double)paralleloutputstate / (double)paralleloutputsize * 100.0) << "%";
+		if (paralleloutputsize == paralleloutputstate) {
+			*this << endl;
+		}
+	}
+}
+
+
 void cMainThread::run() {
 
 	if (parameters.mode != denovoengine) {
@@ -77,17 +997,18 @@ void cMainThread::run() {
 
 	cMainThread* os = this;
 	string errormessage;
+
+	int startscanno;
+	int endscanno;
 	
 	cCandidateSet candidates;
 	candidates.getSet().clear();
 
-	theoreticalspectrumlist->clear();
+	listoftheoreticalspectra->clear();
 
 	isotopepatterncache.lock();
 	isotopepatterncache.clear();
 	isotopepatterncache.unlock();
-
-	int hrs, mins, secs;
 
 	QTime time;
 	time.start();
@@ -134,59 +1055,78 @@ void cMainThread::run() {
 		}
 	}
 
-	if (parameters.peaklistseries.size() == 0) {
-		*os << "Error: no peaklist found. The format of peaklist is likely incorrect." << endl;
+	if (parameters.peaklistseriesvector.size() == 0) {
+		*os << "Error: no peaklist found. The format of a peaklist is likely incorrect." << endl;
 		emitEndSignals();
 		return;
 	}
 
-	if (((parameters.mode == denovoengine) || (parameters.mode == databasesearch)) && (parameters.scannumber > parameters.peaklistseries.size())) {
-		*os << "Number of spectra in the file: " << parameters.peaklistseries.size() << endl;
+	if ((parameters.mode == denovoengine) || (parameters.mode == singlecomparison) || (parameters.mode == databasesearch)) {
+		if (parameters.peaklistseriesvector.size() > 1) {
+			*os << "Error: multiple files cannot be processed in MS/MS mode." << endl;
+			emitEndSignals();
+			return;
+		}
+	}
+
+	for (auto& it : parameters.peaklistseriesvector) {
+		if (it.size() == 0) {
+			*os << "Error: no peaklist found. The format of a peaklist is likely incorrect." << endl;
+			emitEndSignals();
+			return;
+		}
+	}
+
+	if (((parameters.mode == denovoengine) || (parameters.mode == databasesearch)) && (parameters.scannumber > parameters.peaklistseriesvector[0].size())) {
+		*os << "Number of spectra in the file: " << parameters.peaklistseriesvector[0].size() << endl;
 		*os << "Error: no peaklist found (scan no. " << parameters.scannumber << ")." << endl;
 		emitEndSignals();
 		return;
 	}
 
-	int startscanno = ((parameters.mode == dereplication) || (parameters.mode == compoundsearch) || (parameters.mode == singlecomparison)) ? 0 : parameters.scannumber - 1;
-	int endscanno = ((parameters.mode == dereplication) || (parameters.mode == compoundsearch) || (parameters.mode == singlecomparison)) ? parameters.peaklistseries.size() : parameters.scannumber;
-	for (int i = startscanno; i < endscanno; i++) {
-		parameters.peaklistseries[i].sortbyMass();
+	for (int h = 0; h < (int)parameters.peaklistseriesvector.size(); h++) {
+		startscanno = ((parameters.mode == dereplication) || (parameters.mode == compoundsearch) || (parameters.mode == singlecomparison)) ? 0 : parameters.scannumber - 1;
+		endscanno = ((parameters.mode == dereplication) || (parameters.mode == compoundsearch) || (parameters.mode == singlecomparison)) ? parameters.peaklistseriesvector[h].size() : parameters.scannumber;
 
-		if (parameters.peaklistseries[i].normalizeIntenzity() == -1) {
-			if ((parameters.mode == dereplication) || (parameters.mode == compoundsearch) || (parameters.mode == singlecomparison)) {
-				*os << "Warning: the spectrum no. " << i + 1 << " is empty or the format of peaklist is incorrect." << endl;
+		for (int i = startscanno; i < endscanno; i++) {
+			parameters.peaklistseriesvector[h][i].sortbyMass();
+
+			if (parameters.peaklistseriesvector[h][i].normalizeIntenzity() == -1) {
+				if ((parameters.mode == dereplication) || (parameters.mode == compoundsearch) || (parameters.mode == singlecomparison)) {
+					*os << "Warning: the spectrum no. " << i + 1 << " in the file no. " << h + 1 << " is empty or the format of peaklist is incorrect." << endl;
+				}
+				else {
+					*os << "Number of spectra in the file: " << parameters.peaklistseriesvector[h].size() << endl;
+					*os << "Error: the spectrum no. " << i + 1 << " in the file no. " << h + 1 << " is empty or the format of peaklist is incorrect." << endl;
+					emitEndSignals();
+					return;
+				}
 			}
-			else {
-				*os << "Number of spectra in the file: " << parameters.peaklistseries.size() << endl;
-				*os << "Error: the spectrum no. " << i + 1 << " is empty or the format of peaklist is incorrect." << endl;
-				emitEndSignals();
-				return;
+
+			parameters.peaklistseriesvector[h][i].cropMinimumMZRatio(parameters.minimummz, parameters.fragmentmasserrortolerance);
+
+			if ((parameters.mode == denovoengine) || (parameters.mode == singlecomparison) || (parameters.mode == databasesearch)) {
+				parameters.peaklistseriesvector[h][i].cropMaximumMZRatio(charge(uncharge(parameters.precursormass, parameters.precursorcharge), (parameters.precursorcharge > 0) ? 1 : -1), parameters.precursormasserrortolerance);
 			}
-		}
 
-		parameters.peaklistseries[i].cropMinimumMZRatio(parameters.minimummz, parameters.fragmentmasserrortolerance);
-
-		if ((parameters.mode == denovoengine) || (parameters.mode == singlecomparison) || (parameters.mode == databasesearch)) {
-			parameters.peaklistseries[i].cropMaximumMZRatio(charge(uncharge(parameters.precursormass, parameters.precursorcharge), (parameters.precursorcharge > 0)?1:-1), parameters.precursormasserrortolerance);
-		}
-
-		if ((parameters.mode == dereplication) || (parameters.mode == compoundsearch)) {
-			if (parameters.maximummz > 0) {
-				parameters.peaklistseries[i].cropMaximumMZRatio(parameters.maximummz, parameters.fragmentmasserrortolerance);
+			if ((parameters.mode == dereplication) || (parameters.mode == compoundsearch)) {
+				if (parameters.maximummz > 0) {
+					parameters.peaklistseriesvector[h][i].cropMaximumMZRatio(parameters.maximummz, parameters.fragmentmasserrortolerance);
+				}
 			}
-		}
 
-		parameters.peaklistseries[i].cropAbsoluteIntenzity(parameters.minimumabsoluteintensitythreshold);
-		parameters.peaklistseries[i].cropRelativeIntenzity(parameters.minimumrelativeintensitythreshold);
+			parameters.peaklistseriesvector[h][i].cropAbsoluteIntenzity(parameters.minimumabsoluteintensitythreshold);
+			parameters.peaklistseriesvector[h][i].cropRelativeIntenzity(parameters.minimumrelativeintensitythreshold);
 
-		if ((parameters.mode == denovoengine) || (parameters.mode == databasesearch) || ((parameters.mode == singlecomparison) && (parameters.peaklistseries.size() == 1))) {
-			*os << "Number of spectra in the file: " << parameters.peaklistseries.size() << endl;
-			*os << "Processing spectrum no.: " << i + 1; 
-			if (parameters.peaklistseries[i].getTitle().size() > 0) {
-				*os << " (" << parameters.peaklistseries[i].getTitle() << "):";
+			if ((parameters.mode == denovoengine) || (parameters.mode == databasesearch) || ((parameters.mode == singlecomparison) && (parameters.peaklistseriesvector[h].size() == 1))) {
+				*os << "Number of spectra in the file: " << parameters.peaklistseriesvector[h].size() << endl;
+				*os << "Processing spectrum no.: " << i + 1;
+				if (parameters.peaklistseriesvector[h][i].getTitle().size() > 0) {
+					*os << " (" << parameters.peaklistseriesvector[h][i].getTitle() << "):";
+				}
+				*os << endl;
+				*os << parameters.peaklistseriesvector[h][i].print();
 			}
-			*os << endl;
-			*os << parameters.peaklistseries[i].print();
 		}
 	}
 
@@ -203,20 +1143,16 @@ void cMainThread::run() {
 		if (parameters.sequencedatabase.size() > compoundslimit) {
 			parameters.sequencedatabase.clear();
 			*os << "Error: The number of generated compounds exceeded the limit " + to_string(compoundslimit) + ". Please, adjust the settings to limit the number of compounds." << endl;
-
-			secs = time.elapsed() / 1000;
-			mins = (secs / 60) % 60;
-			hrs = (secs / 3600);
-			secs = secs % 60;
-
-			*os << "Execution time: " << to_string(hrs) << " hrs, " << to_string(mins) << " min, " << to_string(secs) << " sec." << endl << endl;
-
+			*os << "Execution time: " << getCurrentTime(time) << "." << endl << endl;
 			emitEndSignals();
 			return;
 		}
 	}
 
 	if ((parameters.mode == denovoengine) || (parameters.mode == singlecomparison) || (parameters.mode == databasesearch)) {
+		//printMatrix(parameters.peaklistseries[parameters.scannumber - 1]);
+		//printIonEstimations(parameters.peaklistseries[parameters.scannumber - 1]);
+
 		int startmodifid, endmodifid, middlemodifid;
 		
 		cSequence sequence;
@@ -482,233 +1418,169 @@ void cMainThread::run() {
 
 	// database search - MS mode
 	if ((parameters.mode == dereplication) || (parameters.mode == compoundsearch)) {
-		*os << "Generating theoretical peaks... ";
+		bool runtest = false;
 
-		theoreticalspectrumlist->initialize(*os, parameters, &graph);
-
-		cTheoreticalSpectrum ts;
-		ts.setParameters(&parameters);
-
-		if (parameters.generateisotopepattern) {
-			ts.generateFineMSSpectrum(terminatecomputation);
+		if (!runtest) {
+			if (parameters.maximumnumberofthreads > 1) {
+				multiThreadMS1(os, time);
+			}
+			else {
+				singleThreadMS1(os, time);
+			}
 		}
 		else {
-			ts.generateMSSpectrum(terminatecomputation, true);
-		}
+			cTheoreticalSpectrum* singletest = new cTheoreticalSpectrum();
+			cTheoreticalSpectrum* multitest = new cTheoreticalSpectrum();
 
-		if (terminatecomputation) {
-			emitEndSignals();
-			return;
-		}
+			vector<vector< vector<int> > > singlehintsindex;
+			vector<vector< vector<int> > > multihintsindex;
 
-		unordered_map<string, int> tempmap;
-		parameters.peakidtodesc.clear();
-		parameters.isotopeformulaidtodesc.clear();
+			cTheoreticalSpectrumList* singlelistoftheoreticalspectra = new cTheoreticalSpectrumList();
+			cTheoreticalSpectrumList* multilistoftheoreticalspectra = new cTheoreticalSpectrumList();
 
-		tempmap.clear();
-		ts.getTheoreticalPeaks()->reducePeakDescriptions(tempmap);
-		convertStringIntUnorderedMapToStringVector(tempmap, parameters.peakidtodesc);
+			vector<vector< cPeaksList > > singleunmatchedpeaks;
+			vector<vector< cPeaksList > > multiunmatchedpeaks;
 
-		//tempmap.clear();
-		//ts.getTheoreticalPeaks()->reduceIsotopeFormulaDescriptions(tempmap);
-		//convertStringIntUnorderedMapToStringVector(tempmap, parameters.isotopeformulaidtodesc);
+			cSequenceDatabase dbbackup = parameters.sequencedatabase;
+			singleThreadMS1(os, time, singletest, &singlehintsindex, singlelistoftheoreticalspectra, &singleunmatchedpeaks);
 
-		*os << "ok" << endl;
-		*os << "Comparing theoretical peaks with the experimental peaklist(s)... " << endl;
-		*os << "Number of experimental peaklists: " << parameters.peaklistseries.size() << endl;
+			parameters.sequencedatabase = dbbackup;
+			multiThreadMS1(os, time, multitest, &multihintsindex, multilistoftheoreticalspectra, &multiunmatchedpeaks);
 
-		vector<cPeaksList> unmatchedpeaks;
-		unmatchedpeaks.resize(parameters.peaklistseries.size());
-
-		for (int i = 0; i < parameters.peaklistseries.size(); i++) {
-			if (terminatecomputation) {
-				emitEndSignals();
-				return;
+			if (singletest->getTheoreticalPeaks()->equals(*multitest->getTheoreticalPeaks())) {
+				*os << endl << "theoretical peaks test ok - singleThreadMS1 vs. multiThreadMS1" << endl;
+			}
+			else {
+				*os << endl << "theoretical peakstest failed - singleThreadMS1 vs. multiThreadMS1" << endl;
 			}
 
-			parameters.peaklistseries[i].sortbyMass();
-		}
-
-		vector< vector<int> > hintsindex;
-		hintsindex.resize(ts.getNumberOfPeaks());
-
-		bool lcms = (parameters.peaklistseries.size() > 1) && !((parameters.peaklistfileformat == mis) || (parameters.peaklistfileformat == imzML));
-
-		if (lcms || (parameters.peaklistfileformat == mis) || (parameters.peaklistfileformat == imzML)) {
-			*os << "Analyzing spectra : " << endl;
-
-			for (int i = 0; i < parameters.peaklistseries.size(); i++) {
-				if ((i + 1) % 100 == 0) {
-					*os << i + 1 << " ";
-				}
-				if ((i + 1) % 2500 == 0) {
-					*os << endl;
-				}
-
-				if (terminatecomputation) {
-					emitEndSignals();
-					return;
-				}
-
-				cTheoreticalSpectrum tstmp;
-				tstmp.setParameters(&parameters);
-				tstmp.getHintsIndex(i, ts, unmatchedpeaks[i], hintsindex);
-
-				for (auto& it : hintsindex) {
-					sort(it.begin(), it.end());
-				}
-			}
-
-			*os << " ok" << endl;
-		}
-
-		*os << "Processing the peaklist no. : " << endl;
-
-		for (int i = 0; i < parameters.peaklistseries.size(); i++) {
-			if ((i + 1) % 100 == 0) {
-				*os << i + 1 << " ";
-			}
-			if ((i + 1) % 2500 == 0) {
-				*os << endl;
-			}
-
-			if (terminatecomputation) {
-				emitEndSignals();
-				return;
-			}
-
-			cTheoreticalSpectrum tstmp;
-			tstmp.setParameters(&parameters);
-			tstmp.compareMSSpectrum(i, ts, unmatchedpeaks[i], hintsindex);
-			if ((parameters.peaklistfileformat == mis) || (parameters.peaklistfileformat == imzML)) {
-				parameters.peaklistseries[i].clear();
-			}
-			theoreticalspectrumlist->add(tstmp);
-		}
-
-		if (!((parameters.peaklistfileformat == mis) || (parameters.peaklistfileformat == imzML))) {
-			for (int i = 0; i < parameters.peaklistseries.size(); i++) {
-				if (terminatecomputation) {
-					emitEndSignals();
-					return;
-				}
-
-				parameters.peaklistseries[i].clear();
-			}
-		}
-
-		*os << " ok" << endl << "Total number of spectra: " << parameters.peaklistseries.size() << endl;
-
-		if (parameters.generateisotopepattern)	{
-
-			*os << endl << "Calculating FDRs... ";
-
-			vector<double> targetscoresvector;
-			vector<double> decoyscoresvector;
-			vector<double> allscoresvector;
-			vector<double> fdrs;
-			map<int, double> *targetscores;
-			map<int, double> *decoyscores;
-			map<int, int> numbersofmatchedenvelopes;
-			double minfdr;
-			int targetscoresvectorsize;
-
-			// calculate numbers of matched envelopes in single-pixel spectra
-			for (int i = 0; i < (int)theoreticalspectrumlist->size(); i++) {
-				targetscores = &((*theoreticalspectrumlist)[i].getTargetScores());
-				decoyscores = &((*theoreticalspectrumlist)[i].getDecoyScores());
-
-				for (auto& it : *targetscores) {
-					if (numbersofmatchedenvelopes.count(it.first) == 0) {
-						numbersofmatchedenvelopes.insert(make_pair(it.first, 1));
+			bool hintsindextest = true;
+			if (singlehintsindex.size() == multihintsindex.size()) {
+				for (int i = 0; i < singlehintsindex.size(); i++) {
+					if (singlehintsindex[i].size() == multihintsindex[i].size()) {
+						for (int j = 0; j < singlehintsindex[i].size(); j++) {
+							if (singlehintsindex[i][j].size() == multihintsindex[i][j].size()) {
+								for (int k = 0; k < singlehintsindex[i][j].size(); k++) {
+									if (singlehintsindex[i][j][k] != multihintsindex[i][j][k]) {
+										*os << "hintsindex " << i << " " << j << " " << k << " failed" << endl;
+										hintsindextest = false;
+										break;
+									}
+								}
+								if (!hintsindextest) {
+									break;
+								}
+							}
+							else {
+								*os << "singlehintsindex[i][j].size() == multihintsindex[i][j].size()" << " failed";
+								hintsindextest = false;
+								break;
+							}
+						}
 					}
 					else {
-						numbersofmatchedenvelopes[it.first]++;
+						*os << "singlehintsindex[i].size() == multihintsindex[i].size()" << " failed";
+						hintsindextest = false;
+						break;
 					}
 				}
+			}
+			else {
+				*os << "singlehintsindex.size() == multihintsindex.size()" << " failed";
+				hintsindextest = false;
+			}
 
-				for (auto& it : *decoyscores) {
-					if (numbersofmatchedenvelopes.count(it.first) == 0) {
-						numbersofmatchedenvelopes.insert(make_pair(it.first, 1));
+			if (hintsindextest) {
+				*os << endl << "hintsindex test ok - singleThreadMS1 vs. multiThreadMS1" << endl;
+			}
+			else {
+				*os << endl << "hintsindex test failed - singleThreadMS1 vs. multiThreadMS1" << endl;
+			}
+
+			bool theoreticalspectrumlisttest = true;
+			if (singlelistoftheoreticalspectra->size() == multilistoftheoreticalspectra->size()) {
+				for (int i = 0; i < singlelistoftheoreticalspectra->size(); i++) {
+					if (singlelistoftheoreticalspectra->size(i) == multilistoftheoreticalspectra->size(i)) {
+						for (int j = 0; j < singlelistoftheoreticalspectra->size(i); j++) {
+							if (!singlelistoftheoreticalspectra->get(i, j).equals(multilistoftheoreticalspectra->get(i, j))) {
+								cout << "(theoreticalspectrumlist in " << i + 1 << " " << j + 1 << ")" << endl << endl;
+								theoreticalspectrumlisttest = false;
+
+								cout << singlelistoftheoreticalspectra->get(i, j).getTheoreticalPeaks()->print(false, true);
+								cout << multilistoftheoreticalspectra->get(i, j).getTheoreticalPeaks()->print(false, true);
+
+								break;
+							}
+						}
 					}
 					else {
-						numbersofmatchedenvelopes[it.first]++;
+						theoreticalspectrumlisttest = false;
+						break;
 					}
 				}
 			}
-
-			// divide scores by numbers of matched envelopes in all single-pixel spectra
-			for (int i = 0; i < (int)theoreticalspectrumlist->size(); i++) {
-				targetscores = &((*theoreticalspectrumlist)[i].getTargetScores());
-				decoyscores = &((*theoreticalspectrumlist)[i].getDecoyScores());
-
-				for (auto& it : *targetscores) {
-					//it.second /= sqrt((double)numbersofmatchedenvelopes[it.first]);
-					targetscoresvector.push_back(it.second);
-				}
-
-				for (auto& it : *decoyscores) {
-					//it.second /= sqrt((double)numbersofmatchedenvelopes[it.first]);
-					decoyscoresvector.push_back(it.second);
-				}
+			else {
+				theoreticalspectrumlisttest = false;
 			}
 
-			// calculate FDRs
-			sort(targetscoresvector.begin(), targetscoresvector.end());
-			sort(decoyscoresvector.begin(), decoyscoresvector.end());
-
-			allscoresvector = targetscoresvector;
-			allscoresvector.insert(allscoresvector.end(), decoyscoresvector.begin(), decoyscoresvector.end());
-			sort(allscoresvector.begin(), allscoresvector.end());
-
-			targetscoresvectorsize = (int)targetscoresvector.size();
-			fdrs.resize(targetscoresvectorsize);
-			for (int i = 0; i < targetscoresvectorsize; i++) {
-				fdrs[i] = (double)getNumberOfScoreHits(decoyscoresvector, targetscoresvector[i]) / (double)max(getNumberOfScoreHits(allscoresvector, targetscoresvector[i]), 1);
+			if (theoreticalspectrumlisttest) {
+				*os << endl << "theoreticalspectrumlisttest test ok - singleThreadMS1 vs. multiThreadMS1" << endl;
+			}
+			else {
+				*os << endl << "theoreticalspectrumlisttest test failed - singleThreadMS1 vs. multiThreadMS1" << endl;
 			}
 
-			// calculate q-values
-			/*for (int i = targetscoresvectorsize - 1; i >= 0; i--) {
-				if ((i == targetscoresvectorsize - 1) || (fdrs[i] < minfdr)) {
-					minfdr = fdrs[i];
+			bool unmatchedpeakstest = true;
+			if (singleunmatchedpeaks.size() == multiunmatchedpeaks.size()) {
+				for (int i = 0; i < singleunmatchedpeaks.size(); i++) {
+					if (singleunmatchedpeaks[i].size() == multiunmatchedpeaks[i].size()) {
+						for (int j = 0; j < singleunmatchedpeaks[i].size(); j++) {
+							if (!singleunmatchedpeaks[i][j].equals(multiunmatchedpeaks[i][j])) {
+								cout << "(unmatchedpeaks in " << i + 1 << " " << j + 1 << ")" << endl << endl;
+								unmatchedpeakstest = false;
+								break;
+							}
+						}
+					}
+					else {
+						unmatchedpeakstest = false;
+						break;
+					}
 				}
-				if (fdrs[i] > minfdr) {
-					fdrs[i] = minfdr;
-				}
-			}*/
-
-			for (int i = 0; i < (int)theoreticalspectrumlist->size(); i++) {
-				(*theoreticalspectrumlist)[i].setFDRs(targetscoresvector, fdrs, unmatchedpeaks[i]);
+			}
+			else {
+				unmatchedpeakstest = false;
 			}
 
-			*os << "ok" << endl;
+			if (unmatchedpeakstest) {
+				*os << endl << "unmatchedpeaks test ok - singleThreadMS1 vs. multiThreadMS1" << endl;
+			}
+			else {
+				*os << endl << "unmatchedpeaks test failed - singleThreadMS1 vs. multiThreadMS1" << endl;
+			}
 
+			delete singletest;
+			delete multitest;
+
+			delete singlelistoftheoreticalspectra;
+			delete multilistoftheoreticalspectra;
 		}
-
-		for (int i = 0; i < (int)theoreticalspectrumlist->size(); i++) {
-			(*theoreticalspectrumlist)[i].finalizeMSSpectrum(unmatchedpeaks[i], true);
-		}
-
 	}
 	
 
 	if ((parameters.mode == denovoengine) || (parameters.mode == singlecomparison) || (parameters.mode == databasesearch)) {	
 		*os << "Comparing theoretical spectra of candidates with the peak list... " << endl;
-		theoreticalspectrumlist->initialize(*os, parameters, &graph);
-		if (theoreticalspectrumlist->parallelCompareAndStore(candidates, terminatecomputation) == -1) {
+		listoftheoreticalspectra->initialize(*os, parameters, &graph);
+		listoftheoreticalspectra->resize(1);
+		if (listoftheoreticalspectra->parallelCompareAndStore(0, candidates, terminatecomputation) == -1) {
 			emitEndSignals();
 			return;
 		}
 		*os << " ok" << endl;
 	}
 
-	secs = time.elapsed() / 1000;
-	mins = (secs / 60) % 60;
-	hrs =  (secs / 3600);
-	secs = secs % 60;
-
 	*os << endl << appname.toStdString() << " successfully finished at " << time.currentTime().toString().toStdString();
-	*os << " (time elapsed: " << to_string(hrs) << " hrs, " << to_string(mins) << " min, " << to_string(secs) << " sec)." << endl;
+	*os << " (time elapsed: " << getCurrentTime(time) << ")." << endl;
 
 	*os << "====================================================================================================" << endl;
 

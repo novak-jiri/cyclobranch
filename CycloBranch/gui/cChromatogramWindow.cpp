@@ -2,9 +2,9 @@
 #include "gui/cEventFilter.h"
 
 
-cChromatogramWindow::cChromatogramWindow(cGlobalPreferences* globalpreferences, cTheoreticalSpectrumList& theoreticalspectrumlist, QWidget* parent) {
+cChromatogramWindow::cChromatogramWindow(cGlobalPreferences* globalpreferences, cTheoreticalSpectrumList& listoftheoreticalspectra, QWidget* parent) {
 	this->globalpreferences = globalpreferences;
-	this->theoreticalspectrumlist = &theoreticalspectrumlist;
+	this->listoftheoreticalspectra = &listoftheoreticalspectra;
 	this->parent = parent;
 
 	setWindowTitle("Chromatogram");
@@ -16,7 +16,7 @@ cChromatogramWindow::cChromatogramWindow(cGlobalPreferences* globalpreferences, 
 	menuView = new QMenu(tr("&View"), this);
 	menuHelp = new QMenu(tr("&Help"), this);
 
-	chromatogramwindowwidget = new cChromatogramWindowWidget(theoreticalspectrumlist, this);
+	chromatogramwindowwidget = new cChromatogramWindowWidget(listoftheoreticalspectra, this);
 	connect(chromatogramwindowwidget, SIGNAL(chromatogramWidgetDoubleClicked(int)), this, SLOT(chromatogramDoubleClickedSlot(int)));
 
 
@@ -82,12 +82,39 @@ cChromatogramWindow::cChromatogramWindow(cGlobalPreferences* globalpreferences, 
 	toolbarView->addAction(actionAbsoluteIntensity);
 	connect(actionAbsoluteIntensity, SIGNAL(toggled(bool)), chromatogramwindowwidget, SLOT(absoluteIntensityStateChanged(bool)));
 
+	actionRawData = new QAction(QIcon(":/images/icons/chromatography.png"), tr("&Profile Chromatogram"), this);
+	actionRawData->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_P));
+	actionRawData->setToolTip("Profile Chromatogram (Ctrl + P)");
+	actionRawData->setCheckable(true);
+	toolbarView->addAction(actionRawData);
+	connect(actionRawData, SIGNAL(toggled(bool)), chromatogramwindowwidget, SLOT(rawDataStateChanged(bool)));
+
+	peakshapelabel = new QLabel();
+	peakshapelabel->setText("Peak Shape: ");
+
+	comboboxpeakshape = new QComboBox();
+	comboboxpeakshape->setToolTip("Select chromatographic peak shape to be used for area and concentration calculations:\nGaussian = basic Gaussian function,\nex-Gaussian (tailing) = Exponentially Modified Gaussian for chromatographic peaks with tailing,\nex-Gaussian (fronting) = Exponentially Modified Gaussian for chromatographic peaks with fronting.");
+	comboboxpeakshape->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+	comboboxpeakshape->addItem("Gaussian");
+	comboboxpeakshape->addItem("ex-Gaussian (tailing)");
+	comboboxpeakshape->addItem("ex-Gaussian (fronting)");
+	connect(comboboxpeakshape, SIGNAL(currentIndexChanged(int)), chromatogramwindowwidget, SLOT(peakShapeChanged(int)));
+
+	peakshapehboxlayout = new QHBoxLayout();
+	peakshapehboxlayout->addWidget(peakshapelabel);
+	peakshapehboxlayout->addWidget(comboboxpeakshape);
+
+	peakshapewidget = new QWidget();
+	peakshapewidget->setLayout(peakshapehboxlayout);
+	toolbarView->addWidget(peakshapewidget);
+
 	toolbarView->addSeparator();
 
 	actionHideTIC = new QAction(QIcon(":/images/icons/81.png"), tr("Hide &TIC"), this);
 	actionHideTIC->setShortcut(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_T));
 	actionHideTIC->setToolTip("Hide TIC (Ctrl + Shift + T)");
 	actionHideTIC->setCheckable(true);
+	actionHideTIC->setChecked(true);
 	toolbarView->addAction(actionHideTIC);
 	connect(actionHideTIC, SIGNAL(toggled(bool)), chromatogramwindowwidget, SLOT(hideTIC(bool)));
 
@@ -113,6 +140,8 @@ cChromatogramWindow::cChromatogramWindow(cGlobalPreferences* globalpreferences, 
 	actionHTMLDocumentation->setToolTip("Show HTML Documentation (F1)");
 	toolbarHelp->addAction(actionHTMLDocumentation);
 	connect(actionHTMLDocumentation, SIGNAL(triggered()), this, SLOT(showHTMLDocumentation()));
+
+	addToolBarBreak();
 
 
 	toolbarTime = addToolBar(tr("Time and Spectrum ID"));
@@ -210,6 +239,7 @@ cChromatogramWindow::cChromatogramWindow(cGlobalPreferences* globalpreferences, 
 	menuView->addAction(actionMouseSelection);
 	menuView->addAction(actionRetentionTime);
 	menuView->addAction(actionAbsoluteIntensity);
+	menuView->addAction(actionRawData);
 	menuView->addSeparator();
 	menuView->addAction(actionHideTIC);
 	menuView->addAction(actionHideEIC);
@@ -234,6 +264,11 @@ cChromatogramWindow::cChromatogramWindow(cGlobalPreferences* globalpreferences, 
 
 cChromatogramWindow::~cChromatogramWindow() {
 	delete chromatogramwindowwidget;
+
+	delete peakshapelabel;
+	delete comboboxpeakshape;
+	delete peakshapehboxlayout;
+	delete peakshapewidget;
 
 	delete labelretentiontime;
 	delete minretentiontime;
@@ -261,6 +296,7 @@ cChromatogramWindow::~cChromatogramWindow() {
 	delete actionMouseSelection;
 	delete actionRetentionTime;
 	delete actionAbsoluteIntensity;
+	delete actionRawData;
 	delete actionHideTIC;
 	delete actionHideEIC;
 	delete actionHideLabels;
@@ -280,8 +316,18 @@ void cChromatogramWindow::closeEvent(QCloseEvent *event) {
 }
 
 
-void cChromatogramWindow::recalculateTICChromatogram() {
-	chromatogramwindowwidget->recalculateTICChromatogram();
+void cChromatogramWindow::recalculateTICChromatogram(int activefileid) {
+	chromatogramwindowwidget->recalculateTICChromatogram(activefileid);
+}
+
+
+void cChromatogramWindow::setAbsoluteIntensityEnabled(bool enabled) {
+	actionAbsoluteIntensity->setChecked(enabled);
+}
+
+
+void cChromatogramWindow::setPeakShape(int peakshape) {
+	comboboxpeakshape->setCurrentIndex(peakshape);
 }
 
 

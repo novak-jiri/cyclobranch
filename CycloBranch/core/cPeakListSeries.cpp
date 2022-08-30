@@ -160,7 +160,7 @@ int cPeakListSeries::loadFromProfileApexStream(string& filename, ifstream &strea
 	mgfifstream.open(mgfname);
 	while (mgfifstream.good() && ((int)temppeaklists.size() < oldpeaklistscount)) {
 		cPeaksList peaklist;
-		peaklist.loadFromMGFStream(mgfifstream);
+		peaklist.loadFromMGFStream(mgfifstream, 1);
 		temppeaklists.push_back(peaklist);
 	}
 	mgfifstream.close();
@@ -231,7 +231,7 @@ int cPeakListSeries::loadFromMZMLStream(string& mzmlfilename, ifstream &mzmlstre
 		mgfifstream.open(mgfname);
 		while (mgfifstream.good() && ((int)temppeaklists.size() < oldpeaklistscount)) {
 			cPeaksList peaklist;
-			peaklist.loadFromMGFStream(mgfifstream);
+			peaklist.loadFromMGFStream(mgfifstream, 1);
 			temppeaklists.push_back(peaklist);
 		}
 		mgfifstream.close();
@@ -243,6 +243,8 @@ int cPeakListSeries::loadFromMZMLStream(string& mzmlfilename, ifstream &mzmlstre
 
 		for (int i = 0; i < (int)temppeaklists.size(); i++) {
 			temppeaklists[i].setTitle(peaklists[i].getTitle());
+			temppeaklists[i].setRetentionTime(peaklists[i].getRetentionTime());
+			temppeaklists[i].setRetentionTimeUnit(peaklists[i].getRetentionTimeUnit());
 		}
 
 		peaklists = temppeaklists;
@@ -378,7 +380,7 @@ int cPeakListSeries::loadFromIMZMLStream(string& imzmlfilename, ifstream &ibdstr
 		mgfifstream.open(mgfname);
 		while (mgfifstream.good() && (peaklists.size() < imzml.getItems().size())) {
 			cPeaksList peaklist;
-			peaklist.loadFromMGFStream(mgfifstream);
+			peaklist.loadFromMGFStream(mgfifstream, 1);
 			peaklists.push_back(peaklist);
 		}
 		mgfifstream.close();
@@ -460,10 +462,10 @@ void cPeakListSeries::loadSpotList(ifstream &stream) {
 }
 
 
-void cPeakListSeries::loadFromMGFStream(ifstream &stream) {
+void cPeakListSeries::loadFromMGFStream(ifstream &stream, int timeunit) {
 	while (stream.good()) {
 		cPeaksList peaklist;
-		peaklist.loadFromMGFStream(stream);
+		peaklist.loadFromMGFStream(stream, timeunit);
 		if ((peaklist.size() > 0) || stream.good()) {
 			peaklists.push_back(peaklist);
 		}
@@ -488,14 +490,14 @@ void cPeakListSeries::store(ofstream& os) {
 }
 
 
-void cPeakListSeries::load(ifstream& is) {
+void cPeakListSeries::load(ifstream& is, int fileversionpart1, int fileversionpart2, int fileversionpart3) {
 	int size;
 
 	is.read((char *)&size, sizeof(int));
 	peaklists.resize(size);
 
 	for (int i = 0; i < size; i++) {
-		peaklists[i].load(is);
+		peaklists[i].load(is, fileversionpart1, fileversionpart2, fileversionpart3);
 	}
 }
 

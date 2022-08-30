@@ -4,19 +4,29 @@
 cPreferencesTabDataProcessing::cPreferencesTabDataProcessing(cGlobalPreferences& globalpreferences, QWidget *parent) : QWidget(parent) {
 	gridlayout = new QGridLayout();
 
-	labelbafprocessingmethod = new QLabel("BAF processing method : ");
-	comboboxbafprocessingmethod = new QComboBox();
-	comboboxbafprocessingmethod->addItem("CompassXport");
-	comboboxbafprocessingmethod->addItem("CompassXtract");
-	gridlayout->addWidget(labelbafprocessingmethod, 0, 0);
-	gridlayout->addWidget(comboboxbafprocessingmethod, 0, 1);
+	labellinebafprocessingmethod = new QLabel("Line Data Converter (*.baf) : ");
+	comboboxlinebafprocessingmethod = new QComboBox();
+	comboboxlinebafprocessingmethod->addItem("CompassXport");
+	comboboxlinebafprocessingmethod->addItem("CompassXtract");
+	comboboxlinebafprocessingmethod->setCurrentIndex(globalpreferences.linebafprocessingmethod);
+	gridlayout->addWidget(labellinebafprocessingmethod, 0, 0);
+	gridlayout->addWidget(comboboxlinebafprocessingmethod, 0, 1);
+
+	labelprofilebafprocessingmethod = new QLabel("Profile Data Converter (*.baf) : ");
+	comboboxprofilebafprocessingmethod = new QComboBox();
+	comboboxprofilebafprocessingmethod->addItem("CompassXport");
+	comboboxprofilebafprocessingmethod->addItem("CompassXtract");
+	comboboxprofilebafprocessingmethod->setCurrentIndex(globalpreferences.profilebafprocessingmethod);
+	gridlayout->addWidget(labelprofilebafprocessingmethod, 1, 0);
+	gridlayout->addWidget(comboboxprofilebafprocessingmethod, 1, 1);
 
 	labelrawdataprocessingmethod = new QLabel("Peak Picking (non-vendor's file formats) : ");
 	comboboxrawdataprocessingmethod = new QComboBox();
 	comboboxrawdataprocessingmethod->addItem("OpenMS");
-	comboboxrawdataprocessingmethod->addItem("Built-in");
-	gridlayout->addWidget(labelrawdataprocessingmethod, 1, 0);
-	gridlayout->addWidget(comboboxrawdataprocessingmethod, 1, 1);
+	comboboxrawdataprocessingmethod->addItem("Custom");
+	//comboboxrawdataprocessingmethod->setCurrentIndex(globalpreferences.rawdataprocessingmethod);
+	//gridlayout->addWidget(labelrawdataprocessingmethod, 2, 0);
+	//gridlayout->addWidget(comboboxrawdataprocessingmethod, 2, 1);
 
 	gridlayoutwidget = new QWidget();
 	gridlayoutwidget->setLayout(gridlayout);
@@ -40,20 +50,27 @@ cPreferencesTabDataProcessing::cPreferencesTabDataProcessing(cGlobalPreferences&
 
 
 void cPreferencesTabDataProcessing::setPreferences(cGlobalPreferences& globalpreferences) {
-	globalpreferences.bafprocessingmethod = comboboxbafprocessingmethod->currentIndex();
+	globalpreferences.linebafprocessingmethod = comboboxlinebafprocessingmethod->currentIndex();
+	globalpreferences.profilebafprocessingmethod = comboboxprofilebafprocessingmethod->currentIndex();
+
 	globalpreferences.rawdataprocessingmethod = comboboxrawdataprocessingmethod->currentIndex();
 }
 
 
 void cPreferencesTabDataProcessing::resetPreferences(cGlobalPreferences& globalpreferences) {
-	comboboxbafprocessingmethod->setCurrentIndex(globalpreferences.bafprocessingmethod);
+	comboboxlinebafprocessingmethod->setCurrentIndex(globalpreferences.linebafprocessingmethod);
+	comboboxprofilebafprocessingmethod->setCurrentIndex(globalpreferences.profilebafprocessingmethod);
+
 	comboboxrawdataprocessingmethod->setCurrentIndex(globalpreferences.rawdataprocessingmethod);
 }
 
 
 cPreferencesTabDataProcessing::~cPreferencesTabDataProcessing() {
-	delete labelbafprocessingmethod;
-	delete comboboxbafprocessingmethod;
+	delete labellinebafprocessingmethod;
+	delete comboboxlinebafprocessingmethod;
+
+	delete labelprofilebafprocessingmethod;
+	delete comboboxprofilebafprocessingmethod;
 
 	delete labelrawdataprocessingmethod;
 	delete comboboxrawdataprocessingmethod;
@@ -71,7 +88,10 @@ cPreferencesTabDataProcessing::~cPreferencesTabDataProcessing() {
 
 void cPreferencesTabDataProcessing::defaultButtonReleased() {
 	cGlobalPreferences gp;
-	comboboxbafprocessingmethod->setCurrentIndex(gp.bafprocessingmethod);
+
+	comboboxlinebafprocessingmethod->setCurrentIndex(gp.linebafprocessingmethod);
+	comboboxprofilebafprocessingmethod->setCurrentIndex(gp.profilebafprocessingmethod);
+
 	comboboxrawdataprocessingmethod->setCurrentIndex(gp.rawdataprocessingmethod);
 }
 

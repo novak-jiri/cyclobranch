@@ -16,6 +16,8 @@
 #include <QLineEdit>
 #include <QMenuBar>
 #include <QMenu>
+#include <QClipboard>
+#include <QApplication>
 
 
 cSequenceDatabaseWidget::cSequenceDatabaseWidget(cGlobalPreferences* globalpreferences, QWidget* parent) {
@@ -195,6 +197,12 @@ cSequenceDatabaseWidget::cSequenceDatabaseWidget(cGlobalPreferences* globalprefe
 	toolbarEdit->addAction(actionUnselectAll);
 	connect(actionUnselectAll, SIGNAL(triggered()), this, SLOT(unselectAll()));
 
+	actionRemoveDuplicateRows = new QAction(QIcon(":/images/icons/db_delete.png"), tr("Remove Dup&licate Rows"), this);
+	actionRemoveDuplicateRows->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_L));
+	actionRemoveDuplicateRows->setToolTip("Remove Duplicate Rows (Ctrl + L)");
+	toolbarEdit->addAction(actionRemoveDuplicateRows);
+	connect(actionRemoveDuplicateRows, SIGNAL(triggered()), this, SLOT(removeDuplicateRows()));
+
 	toolbarHelp = addToolBar(tr("Help"));
 
 	actionHTMLDocumentation = new QAction(QIcon(":/images/icons/3.png"), tr("&HTML Documentation"), this);
@@ -223,6 +231,8 @@ cSequenceDatabaseWidget::cSequenceDatabaseWidget(cGlobalPreferences* globalprefe
 	menuEdit->addSeparator();
 	menuEdit->addAction(actionSelectAll);
 	menuEdit->addAction(actionUnselectAll);
+	menuEdit->addSeparator();
+	menuEdit->addAction(actionRemoveDuplicateRows);
 
 	menuHelp->addAction(actionHTMLDocumentation);
 
@@ -288,6 +298,7 @@ cSequenceDatabaseWidget::~cSequenceDatabaseWidget() {
 	delete actionRemoveSelectedRows;
 	delete actionSelectAll;
 	delete actionUnselectAll;
+	delete actionRemoveDuplicateRows;
 	delete actionHTMLDocumentation;
 
 	delete menuFile;
@@ -514,6 +525,34 @@ void cSequenceDatabaseWidget::keyPressEvent(QKeyEvent *event) {
 		rowsfilterwholeword->setChecked(!rowsfilterwholeword->isChecked());
 	}
 
+	if ((event->modifiers() == Qt::ControlModifier) && (event->key() == Qt::Key_C)) {
+		QModelIndexList selectedindexes = database->selectionModel()->selectedIndexes();
+		QStandardItem* item;
+
+		QString selectedtext;
+		string itemtext;
+
+		int selectedcount = selectedindexes.count();
+		for (int i = 0; i < selectedcount; i++) {
+			if (i > 0) {
+				if (proxymodel->mapToSource(selectedindexes[i - 1]).row() != proxymodel->mapToSource(selectedindexes[i]).row()) {
+					selectedtext += "\n";
+				}
+				else {
+					selectedtext += "\t";
+				}
+			}
+
+			item = databasemodel->itemFromIndex(proxymodel->mapToSource(selectedindexes[i]));
+			if (item) {
+				itemtext = item->text().toStdString();
+				selectedtext += stripHTML(itemtext).c_str();
+			}
+		}
+		selectedtext += "\n";
+		QApplication::clipboard()->setText(selectedtext);
+	}
+
 	event->accept();
 }
 
@@ -560,7 +599,7 @@ void cSequenceDatabaseWidget::openDatabase() {
 			resetFilter();
 
 			sequences.clear();
-			sequences.loadFromPlainTextStream(inputstream);
+			sequences.loadFromPlainTextStream(inputstream, true);
 
 			QProgressDialog progress("Loading the Sequence Database...", "Cancel", 0, sequences.size(), this);
 			progress.setMinimumWidth(250);
@@ -568,6 +607,7 @@ void cSequenceDatabaseWidget::openDatabase() {
 			progress.installEventFilter(&filter);
 			progress.setMinimumDuration(0);
 			progress.setWindowModality(Qt::ApplicationModal);
+			progress.setValue(0);
 
 			database->setModel(0);
 			proxymodel->setSourceModel(0);
@@ -617,6 +657,13 @@ void cSequenceDatabaseWidget::openDatabase() {
 					pos = stmp.rfind('\"');
 					if (pos != string::npos) {
 						stmp = stmp.substr(0, pos);
+
+						// crop RT info
+						pos = stmp.rfind('@');
+						if (pos != string::npos) {
+							stmp = stmp.substr(0, pos);
+						}
+
 						databasemodel->item(i, 10)->setText(stmp.c_str());
 					}
 				}
@@ -681,6 +728,7 @@ bool cSequenceDatabaseWidget::saveDatabase() {
 		progress.installEventFilter(&filter);
 		progress.setMinimumDuration(0);
 		progress.setWindowModality(Qt::ApplicationModal);
+		progress.setValue(0);
 
 		// close an editor of a combobox
 		database->setDisabled(true);
@@ -743,7 +791,7 @@ bool cSequenceDatabaseWidget::saveDatabase() {
 			progress.setValue(i);
 		}
 
-		sequences.storeToPlainTextStream(outputstream);
+		sequences.storeToPlainTextStream(outputstream, true);
 
 		progress.setValue(progress.maximum());
 		
@@ -858,6 +906,13 @@ void cSequenceDatabaseWidget::itemChanged(QStandardItem* item) {
 			pos = stmp.rfind('\"');
 			if (pos != string::npos) {
 				stmp = stmp.substr(0, pos);
+
+				// crop RT info
+				pos = stmp.rfind('@');
+				if (pos != string::npos) {
+					stmp = stmp.substr(0, pos);
+				}
+
 				databasemodel->item(item->row(), 10)->setText(stmp.c_str());
 			}
 		}
@@ -939,7 +994,7 @@ void cSequenceDatabaseWidget::importDatabase() {
 			size_t pos;
 
 			cSequenceDatabase importedsequences;
-			importedsequences.loadFromPlainTextStream(inputstream);
+			importedsequences.loadFromPlainTextStream(inputstream, true);
 
 			QProgressDialog progress("Importing the Sequence Database...", "Cancel", 0, importedsequences.size(), this);
 			progress.setMinimumWidth(250);
@@ -947,6 +1002,7 @@ void cSequenceDatabaseWidget::importDatabase() {
 			progress.installEventFilter(&filter);
 			progress.setMinimumDuration(0);
 			progress.setWindowModality(Qt::ApplicationModal);
+			progress.setValue(0);
 
 			database->setModel(0);
 			proxymodel->setSourceModel(0);
@@ -997,6 +1053,13 @@ void cSequenceDatabaseWidget::importDatabase() {
 					pos = stmp.rfind('\"');
 					if (pos != string::npos) {
 						stmp = stmp.substr(0, pos);
+
+						// crop RT info
+						pos = stmp.rfind('@');
+						if (pos != string::npos) {
+							stmp = stmp.substr(0, pos);
+						}
+
 						databasemodel->item(i + originalrowcount, 10)->setText(stmp.c_str());
 					}
 				}
@@ -1075,5 +1138,51 @@ void cSequenceDatabaseWidget::editItem(const QModelIndex& index) {
 			database->edit(index);
 		}
 	}
+}
+
+
+void cSequenceDatabaseWidget::removeDuplicateRows() {
+	QMessageBox::StandardButton reply;
+	reply = QMessageBox::question(this, appname, "Remove duplicates ?", QMessageBox::Yes | QMessageBox::No);
+
+	if (reply == QMessageBox::No) {
+		return;
+	}
+
+	resetFilter();
+
+	set<string> seqset;
+	string seqhash;
+
+	int origcount = proxymodel->rowCount();
+
+	int i = 0;
+	while (i < proxymodel->rowCount()) {
+		seqhash.clear();
+		
+		for (int j = 1; j < proxymodel->columnCount() - 1; j++) {
+			if (j == 4) {
+				continue;
+			}
+
+			seqhash += proxymodel->index(i, j).data(Qt::DisplayRole).toString().toStdString() + ";";
+		}
+
+		if (seqset.count(seqhash) == 1) {
+			proxymodel->removeRow(i);
+			setDataModified(true);
+		}
+		else {
+			seqset.insert(seqhash);
+			i++;
+		}
+	}
+
+	QMessageBox msgBox;
+	QString msg = "Number of duplicate rows removed: ";
+	msg += QVariant(origcount - proxymodel->rowCount()).toString();
+	msg += ".";
+	msgBox.setText(msg);
+	msgBox.exec();
 }
 

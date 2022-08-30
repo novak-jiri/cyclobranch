@@ -11,6 +11,7 @@
 #include <QThread>
 #include <QThreadPool>
 #include <QTime>
+#include <QMutex>
 
 #include "core/utilities.h"
 #include "core/cParameters.h"
@@ -42,8 +43,33 @@ private:
 	bool graphreaderisworking;
 
 	cDeNovoGraph graph;
-	cTheoreticalSpectrumList* theoreticalspectrumlist;
+	cTheoreticalSpectrumList* listoftheoreticalspectra;
 	cParameters parameters;
+
+	QMutex mutex;
+
+	int paralleloutputstate;
+	int paralleloutputsize;
+
+	string getCurrentTime(QTime& time);
+
+	void singleThreadMS1(cMainThread* os, QTime& time, cTheoreticalSpectrum* testspectrum = 0, vector< vector< vector<int> > >* testhintsindexvector = 0, cTheoreticalSpectrumList* testlistoftheoreticalspectra = 0, vector< vector<cPeaksList> >* testunmatchedpeaksvector = 0);
+
+	void multiThreadMS1(cMainThread* os, QTime& time, cTheoreticalSpectrum* testspectrum = 0, vector< vector< vector<int> > >* testhintsindexvector = 0, cTheoreticalSpectrumList* testlistoftheoreticalspectra = 0, vector< vector<cPeaksList> >* testunmatchedpeaksvector = 0);
+
+	void initParallelOutputState(int size);
+
+	void serializeSpectrumPool(vector<cTheoreticalSpectrum*>& spectrumpool, cTheoreticalSpectrum& ts);
+
+	void serializeHintsIndexPool(vector< vector< vector<int> > >& hintsindexpool, vector< vector<int> >& hintsindex);
+
+	void serializeUnmatchedPeaksPool(int peaklistseriesvectorid, vector< vector<cPeaksList> >& unmatchedpeakspool, vector< vector<cPeaksList> >& unmatchedpeaks);
+
+	void serializeTheoreticalSpectrumListPool(int peaklistseriesvectorid, vector<cTheoreticalSpectrumList*>& theoreticalspectrumlistpool, cTheoreticalSpectrumList& theoreticalspectrumlist);
+
+	void printMatrix(cPeaksList& peaklist);
+
+	void printIonEstimations(cPeaksList& peaklist);
 
 
 public:
@@ -52,11 +78,11 @@ public:
 	/**
 		\brief The constructor.
 		\param parameters reference to input paramaters
-		\param theoreticalspectrumlist a list of theoretical spectra
+		\param listoftheoreticalspectra lists of theoretical spectra
 		\param enablelogwindow if true then messages are logged into the log window
 		\param enablestdout if true then messages are logged into the standard output
 	*/ 
-	cMainThread(cParameters& parameters, cTheoreticalSpectrumList& theoreticalspectrumlist, bool enablelogwindow = true, bool enablestdout = true);
+	cMainThread(cParameters& parameters, cTheoreticalSpectrumList& listoftheoreticalspectra, bool enablelogwindow = true, bool enablestdout = true);
 
 
 	/**
@@ -117,6 +143,13 @@ public:
 		\brief Define an operator << to take in std::endl.
 	*/ 
 	cMainThread& operator<<(StandardEndLine manip);
+
+
+	/**
+		\brief Add a value to the output state (for internal threads).
+		\param value value
+	*/
+	void addToParallelOutputState(int value);
 
 
 protected:

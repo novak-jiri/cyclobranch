@@ -336,22 +336,22 @@ int cImzML::parse(string& filename, int& defaultmaxx, int& defaultmaxy, int& def
 
 										// max count of pixel x
 										if (accession.compare("IMS:1000042") == 0) {
-											defaultmaxx = stoi(value);
+											defaultmaxx = QVariant(value.c_str()).toInt();
 										}
 
 										// max count of pixel y
 										if (accession.compare("IMS:1000043") == 0) {
-											defaultmaxy = stoi(value);
+											defaultmaxy = QVariant(value.c_str()).toInt();
 										}
 
 										// pixel size x
 										if (accession.compare("IMS:1000046") == 0) {
-											defaultpixelsizex = stoi(value);
+											defaultpixelsizex = QVariant(value.c_str()).toInt();
 										}
 
 										// pixel size y
 										if (accession.compare("IMS:1000047") == 0) {
-											defaultpixelsizey = stoi(value);
+											defaultpixelsizey = QVariant(value.c_str()).toInt();
 										}
 
 									}

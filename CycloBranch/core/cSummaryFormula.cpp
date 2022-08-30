@@ -139,22 +139,28 @@ void rechargeMap(int charge, map<string, int>& atoms) {
 }
 
 
-void cSummaryFormula::combineAtoms(cPeakListSeries& peaklistseries, int peaklistseriessize, vector<int>& peaklistseriessizes, cPeaksList& isotopeprofile, vector<int>& depthvector, int depth, double mass, double intensity, int charge, double minimumabsoluteintensity) {
+void cSummaryFormula::combineAtoms(cPeakListSeries& peaklistseries, int peaklistseriessize, vector<int>& peaklistseriessizes, cPeaksList& isotopeprofile, vector<int>& depthvector, int depth, double mass, double intensity, double charge, double minimumabsoluteintensity, double& localmaximumintensity, double minimumrelativeintensity) {
 	if (depth < peaklistseriessize) {
 		for (int i = 0; i < peaklistseriessizes[depth]; i++) {
 			depthvector[depth] = i;
-			combineAtoms(peaklistseries, peaklistseriessize, peaklistseriessizes, isotopeprofile, depthvector, depth + 1, mass + peaklistseries[depth][i].mzratio, intensity * peaklistseries[depth][i].absoluteintensity, charge, minimumabsoluteintensity);
+			combineAtoms(peaklistseries, peaklistseriessize, peaklistseriessizes, isotopeprofile, depthvector, depth + 1, mass + peaklistseries[depth][i].mzratio, intensity * peaklistseries[depth][i].absoluteintensity, charge, minimumabsoluteintensity, localmaximumintensity, minimumrelativeintensity);
 		}
 	}
 	else {
+		if (intensity > localmaximumintensity) {
+			localmaximumintensity = intensity;
+		}
+
 		if (intensity >= minimumabsoluteintensity) {
-			cPeak p;
-			p.mzratio = mass/(double)charge;
-			p.absoluteintensity = intensity;
-			for (int i = 0; i < peaklistseriessize; i++) {
-				p.description += peaklistseries[i][depthvector[i]].description;
+			if (intensity >= localmaximumintensity * minimumrelativeintensity) {
+				cPeak p;
+				p.mzratio = mass / charge;
+				p.absoluteintensity = intensity;
+				for (int i = 0; i < peaklistseriessize; i++) {
+					p.description += peaklistseries[i][depthvector[i]].description;
+				}
+				isotopeprofile.add(p);
 			}
-			isotopeprofile.add(p);
 		}
 	}
 }
@@ -514,7 +520,7 @@ double cSummaryFormula::getMass() {
 }
 
 
-cPeaksList cSummaryFormula::getIsotopePattern(double fwhm, int charge, bool positive, bool writedescription) {
+cPeaksList cSummaryFormula::getIsotopePattern(double fwhm, int charge, bool positive, int maxchangedatoms, bool writedescription) {
 	map<string, int> atoms;
 	addStringFormulaToMap(formula, atoms);
 
@@ -527,6 +533,8 @@ cPeaksList cSummaryFormula::getIsotopePattern(double fwhm, int charge, bool posi
 	
 	double mostintense;
 	int mostintenseid;
+
+	double basemass;
 
 	cPeakListSeries peaklistseries;
 	for (auto it = atoms.begin(); it != atoms.end(); ++it) {
@@ -541,7 +549,7 @@ cPeaksList cSummaryFormula::getIsotopePattern(double fwhm, int charge, bool posi
 		mostintenseid = 0;
 		bricksdatabase.clear();
 		bricksprobabilities.clear();
-		for (auto it2 = atomisotopes.begin(); it2 != atomisotopes.end(); ++it2) {
+		for (auto it2 = atomisotopes.rbegin(); it2 != atomisotopes.rend(); ++it2) {
 			brick.clear();
 			brick.setComposition(to_string(numberofbasicbricks + 1), false);
 			brick.setMass(it2->second.mass);
@@ -561,16 +569,17 @@ cPeaksList cSummaryFormula::getIsotopePattern(double fwhm, int charge, bool posi
 			numberofbasicbricks++;
 		}
 
-		maximumbricksincombination = min(5, atomcount);
+		maximumbricksincombination = min(maxchangedatoms, atomcount);
 
 		combarray.clear();
 		for (int i = 0; i < maximumbricksincombination; i++) {
 			combarray.push_back(1);
 		}
 
+		basemass = periodictablemap[atom] * (atomcount - maximumbricksincombination);
 		do {
 			cPeak peak;
-			peak.mzratio = bricksdatabase.getMassOfComposition(combarray, numberofbasicbricks) + periodictablemap[atom] * (atomcount - maximumbricksincombination);
+			peak.mzratio = bricksdatabase.getMassOfComposition(combarray, numberofbasicbricks) + basemass;
 			if (it->second < 0) {
 				peak.mzratio = -peak.mzratio;
 			}
@@ -596,14 +605,18 @@ cPeaksList cSummaryFormula::getIsotopePattern(double fwhm, int charge, bool posi
 	depthvector.resize(peaklistseriessize);
 
 	cPeaksList isotopeprofile;
-	combineAtoms(peaklistseries, peaklistseriessize, peaklistseriessizes, isotopeprofile, depthvector, 0, 0, 1, charge, 0.00001);
+	double localmaximumintensity = 0;
+	double relativeintensitythreshold = 0.1;
+
+	combineAtoms(peaklistseries, peaklistseriessize, peaklistseriessizes, isotopeprofile, depthvector, 0, 0, 1, (double)charge, 0.00001, localmaximumintensity, relativeintensitythreshold / 100.0);
+
 	isotopeprofile.normalizeIntenzity();
-	isotopeprofile.cropRelativeIntenzity(0.1);
+	isotopeprofile.cropRelativeIntenzity(relativeintensitythreshold);
 
 	cPeaksList reducedprofile;
 	reduceIsotopeProfile(isotopeprofile, reducedprofile, fwhm);
 	reducedprofile.normalizeIntenzity();
-	reducedprofile.cropRelativeIntenzity(0.1);
+	reducedprofile.cropRelativeIntenzity(relativeintensitythreshold);
 
 	return reducedprofile;
 }
@@ -618,5 +631,13 @@ void cSummaryFormula::store(ofstream& os) {
 void cSummaryFormula::load(ifstream& is) {
 	loadString(formula, is);
 	is.read((char *)&partial, sizeof(bool));
+}
+
+
+bool cSummaryFormula::equals(cSummaryFormula& secondformula) {
+	if ((partial == secondformula.partial) && (formula.compare(secondformula.formula) == 0)) {
+		return true;
+	}
+	return false;
 }
 

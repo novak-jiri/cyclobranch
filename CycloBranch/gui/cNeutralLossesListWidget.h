@@ -31,9 +31,11 @@ public:
 
 	/**
 		\brief The constructor.
+		\param showdefaultbutton if true, the default button is shown
+		\param showhconbutton if true, the HCON button is shown
 		\param parent pointer to a parent widget
 	*/ 
-	cNeutralLossesListWidget(QObject* parent);
+	cNeutralLossesListWidget(bool showdefaultbutton, bool showhconbutton, QObject* parent);
 
 
 	/**
@@ -58,6 +60,9 @@ public:
 
 private:
 	QObject* parent;
+
+	bool showdefaultbutton;
+	bool showhconbutton;
 
 	QListWidget* list;
 	QPushButton* selectallbutton;

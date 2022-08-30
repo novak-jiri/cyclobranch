@@ -71,6 +71,8 @@ class cPeaksList {
 
 	double rt;
 
+	int rtunit;
+
 	int x, y;
 
 	string title;
@@ -154,8 +156,9 @@ public:
 	/**
 		\brief Load the spectrum from a .mgf file.
 		\param stream source stream
-	*/ 
-	void loadFromMGFStream(ifstream &stream);
+		\param timeunit rt unit
+	*/
+	void loadFromMGFStream(ifstream &stream, int timeunit);
 
 
 	/**
@@ -167,10 +170,11 @@ public:
 
 	/**
 		\brief Print the spectrum.
-		\param htmlterminatelines true when html line endings must used
+		\param htmlterminatelines true if the html line endings should be used
+		\param printgroupid true if the groupid should be printed
 		\retval string string with a printed spectrum
 	*/ 
-	string print(bool htmlterminatelines = false);
+	string print(bool htmlterminatelines = false, bool printgroupid = false);
 
 
 	/**
@@ -388,6 +392,20 @@ public:
 
 
 	/**
+		\brief Set the retention time unit.
+		\param unit 0 == second, 1 == minute
+	*/
+	void setRetentionTimeUnit(int unit);
+
+
+	/**
+		\brief Get the retention time unit.
+		\retval int 0 == second, 1 == minute
+	*/
+	int getRetentionTimeUnit();
+
+
+	/**
 		\brief Set the coordinates.
 		\param x X coordinate
 		\param y Y coordinate
@@ -419,8 +437,11 @@ public:
 	/**
 		\brief Load the structure from an input stream.
 		\param is an input stream
+		\param fileversionpart1 first number of .res the file version
+		\param fileversionpart2 second number of .res the file version
+		\param fileversionpart3 third number of .res the file version
 	*/ 
-	void load(ifstream& is);
+	void load(ifstream& is, int fileversionpart1, int fileversionpart2, int fileversionpart3);
 
 
 	/**
@@ -468,6 +489,14 @@ public:
 		\brief Mark isotopic peaks in isotopic patterns.
 	*/
 	void markIsotopes();
+
+
+	/**
+		\brief Check if the object equals to another object.
+		\param secondpeaklist object for comparison
+		\retval bool true if the objects are equals
+	*/
+	bool equals(cPeaksList& secondpeaklist);
 
 };
 

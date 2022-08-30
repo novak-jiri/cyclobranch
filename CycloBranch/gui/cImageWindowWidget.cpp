@@ -27,7 +27,7 @@ cImageWindowWidget::cImageWindowWidget() {
 	absoluteintensity = false;
 
 	layersvector.clear();
-	activelayer = layer_compounds;
+	activelayer = 0;
 
 	xfrom = 0;
 	xto = 0;
@@ -61,6 +61,7 @@ cImageWindowWidget::cImageWindowWidget() {
 	currentheight = 1;
 
 	showselection = false;
+	keepaspectratio = false;
 
 	microscopynavigationcenterx = 0;
 	microscopynavigationcentery = 0;
@@ -92,26 +93,26 @@ cImageWindowWidget::~cImageWindowWidget() {
 
 
 void cImageWindowWidget::setOpticalImage(QImage* image) {
-	*layersvector[layer_optical_image].pixmap = QPixmap::fromImage(image->convertToFormat(QImage::Format_ARGB32_Premultiplied));
+	*layersvector[1].pixmap = QPixmap::fromImage(image->convertToFormat(QImage::Format_ARGB32_Premultiplied));
 	
 	currentscale = 1;
 	rulervalue = recalculateRulerValue(currentscale);
 
 	emit updateRuler(rulervalue);
 
-	layersvector[layer_optical_image].ispixmapdefined = true;
+	layersvector[1].ispixmapdefined = true;
 	redrawScene();
 }
 
 
 void cImageWindowWidget::setHistologyImage(QImage* histologyimage) {
-	*layersvector[layer_histology_image].pixmap = QPixmap::fromImage(histologyimage->convertToFormat(QImage::Format_ARGB32_Premultiplied));
-	layersvector[layer_histology_image].ispixmapdefined = true;
+	*layersvector[2].pixmap = QPixmap::fromImage(histologyimage->convertToFormat(QImage::Format_ARGB32_Premultiplied));
+	layersvector[2].ispixmapdefined = true;
 	redrawScene();
 }
 
 
-void cImageWindowWidget::setMicroscopyImage(eLayerType layer, QImage* microscopyimage) {
+void cImageWindowWidget::setMicroscopyImage(int layer, QImage* microscopyimage) {
 	*layersvector[layer].pixmap = QPixmap::fromImage(microscopyimage->convertToFormat(QImage::Format_ARGB32_Premultiplied));
 	layersvector[layer].ispixmapdefined = true;
 	redrawScene();
@@ -178,15 +179,17 @@ void cImageWindowWidget::setDefaultMaxXY(int defaultmaxx, int defaultmaxy, int d
 
 
 void cImageWindowWidget::setHistologyPosition(int x, int y, int width, int height, double angle) {
-	layersvector[layer_histology_image].x = x;
-	layersvector[layer_histology_image].y = y;
-	layersvector[layer_histology_image].width = width;
-	layersvector[layer_histology_image].height = height;
-	layersvector[layer_histology_image].angle = angle;
+	layersvector[2].x = x;
+	layersvector[2].y = y;
+	layersvector[2].width = width;
+	layersvector[2].height = height;
+	layersvector[2].angle = angle;
 }
 
 
-void cImageWindowWidget::setMicroscopyPosition(eLayerType layer, double x, double y, double width, double height, double angle) {
+void cImageWindowWidget::setMicroscopyPosition(int layer, bool flipx, bool flipy, double x, double y, double width, double height, double angle) {
+	layersvector[layer].fliphorizontally = flipx;
+	layersvector[layer].flipvertically = flipy;
 	layersvector[layer].x = x;
 	layersvector[layer].y = y;
 	layersvector[layer].width = width;
@@ -195,13 +198,13 @@ void cImageWindowWidget::setMicroscopyPosition(eLayerType layer, double x, doubl
 }
 
 
-void cImageWindowWidget::goToMicroscopyPosition(eLayerType layer) {
-	if (!layersvector[layer_optical_image].ispixmapdefined || !layersvector[layer].ispixmapdefined) {
+void cImageWindowWidget::goToMicroscopyPosition(int layer) {
+	if (!layersvector[1].ispixmapdefined || !layersvector[layer].ispixmapdefined) {
 		return;
 	}
 
-	horizontalScrollBar()->setValue(layersvector[layer].lastx);
-	verticalScrollBar()->setValue(layersvector[layer].lasty);
+	horizontalScrollBar()->setValue(max(0.0, layersvector[layer].lastx - 250.0));
+	verticalScrollBar()->setValue(max(0.0, layersvector[layer].lasty - 100.0));
 }
 
 
@@ -215,6 +218,39 @@ void cImageWindowWidget::setSelectedRegion(int xfrom, int xto, int yfrom, int yt
 
 void cImageWindowWidget::redraw() {
 	redrawScene();
+}
+
+
+void cImageWindowWidget::clearLayers() {
+	activelayer = 0;
+
+	size_t size = layersvector.size();
+	layersvector.clear();
+	layersvector.resize(size);
+}
+
+
+void cImageWindowWidget::clearLayer(int layer) {
+	if ((layer >= 0) && (layer < layersvector.size())) {
+		layersvector[layer].clear();
+	}
+}
+
+
+void cImageWindowWidget::setKeepAspectRatio(bool state) {
+	keepaspectratio = state;
+
+	// simulate mouseMoveEvent
+	if ((pressedx != -1) && (pressedy != -1)) {
+		if (layersvector[1].ispixmapdefined) {
+			updateSelectionGroup();
+		}
+	}
+}
+
+
+void cImageWindowWidget::setNavigationLayer(int layer, int navigation) {
+	layersvector[layer].navigationlayer = navigation;
 }
 
 
@@ -233,7 +269,7 @@ void cImageWindowWidget::wheelEvent(QWheelEvent *event) {
 void cImageWindowWidget::mousePressEvent(QMouseEvent *event) {
 	QGraphicsView::mousePressEvent(event);
 
-	if (layersvector[layer_optical_image].ispixmapdefined) {
+	if (layersvector[1].ispixmapdefined) {
 
 		if (event->button() == Qt::LeftButton) {
 			QPointF p = mapToScene(event->x(), event->y());
@@ -247,7 +283,7 @@ void cImageWindowWidget::mousePressEvent(QMouseEvent *event) {
 			int transformedy = currenty;
 			double tmpangle;
 
-			if ((activelayer == layer_histology_image) || ((activelayer >= layer_microscopy_navigation_image) && (activelayer < layer_end))) {
+			if (activelayer >= 2) {
 				QTransform transform;
 				tmpangle = prepareTransformation(selectionrect->rect(), transform, layersvector[activelayer].fliphorizontally, layersvector[activelayer].flipvertically, layersvector[activelayer].angle, true);
 				transform.map(currentx, currenty, &transformedx, &transformedy);
@@ -259,7 +295,7 @@ void cImageWindowWidget::mousePressEvent(QMouseEvent *event) {
 				if ((abs(transformedx - selectionrect->rect().x()) < 5) && (abs(transformedy - selectionrect->rect().y()) < 5)) {
 					setCursor(Qt::SizeFDiagCursor);
 					cursoractivity = cursoractivity_resize_top_left;
-					if ((activelayer == layer_histology_image) || ((activelayer >= layer_microscopy_navigation_image) && (activelayer < layer_end))) {
+					if (activelayer >= 2) {
 						if (rotatedimage) {
 							setCursor(Qt::SizeBDiagCursor);
 						}
@@ -268,7 +304,7 @@ void cImageWindowWidget::mousePressEvent(QMouseEvent *event) {
 				else if ((abs(transformedx - selectionrect->rect().x() - selectionrect->rect().width()) < 5) && (abs(transformedy - selectionrect->rect().y()) < 5)) {
 					setCursor(Qt::SizeBDiagCursor);
 					cursoractivity = cursoractivity_resize_top_right;
-					if ((activelayer == layer_histology_image) || ((activelayer >= layer_microscopy_navigation_image) && (activelayer < layer_end))) {
+					if (activelayer >= 2) {
 						if (rotatedimage) {
 							setCursor(Qt::SizeFDiagCursor);
 						}
@@ -277,7 +313,7 @@ void cImageWindowWidget::mousePressEvent(QMouseEvent *event) {
 				else if ((abs(transformedx - selectionrect->rect().x()) < 5) && (abs(transformedy - selectionrect->rect().y() - selectionrect->rect().height()) < 5)) {
 					setCursor(Qt::SizeBDiagCursor);
 					cursoractivity = cursoractivity_resize_bottom_left;
-					if ((activelayer == layer_histology_image) || ((activelayer >= layer_microscopy_navigation_image) && (activelayer < layer_end))) {
+					if (activelayer >= 2) {
 						if (rotatedimage) {
 							setCursor(Qt::SizeFDiagCursor);
 						}
@@ -286,7 +322,7 @@ void cImageWindowWidget::mousePressEvent(QMouseEvent *event) {
 				else if ((abs(transformedx - selectionrect->rect().x() - selectionrect->rect().width()) < 5) && (abs(transformedy - selectionrect->rect().y() - selectionrect->rect().height()) < 5)) {
 					setCursor(Qt::SizeFDiagCursor);
 					cursoractivity = cursoractivity_resize_bottom_right;
-					if ((activelayer == layer_histology_image) || ((activelayer >= layer_microscopy_navigation_image) && (activelayer < layer_end))) {
+					if (activelayer >= 2) {
 						if (rotatedimage) {
 							setCursor(Qt::SizeBDiagCursor);
 						}
@@ -295,7 +331,7 @@ void cImageWindowWidget::mousePressEvent(QMouseEvent *event) {
 				else if ((abs(transformedx - selectionrect->rect().x()) < 5) && (transformedy >= selectionrect->rect().y()) && (transformedy <= selectionrect->rect().y() + selectionrect->rect().height())) {
 					setCursor(Qt::SizeHorCursor);
 					cursoractivity = cursoractivity_resize_left;
-					if ((activelayer == layer_histology_image) || ((activelayer >= layer_microscopy_navigation_image) && (activelayer < layer_end))) {
+					if (activelayer >= 2) {
 						if (rotatedimage) {
 							setCursor(Qt::SizeVerCursor);
 						}
@@ -304,7 +340,7 @@ void cImageWindowWidget::mousePressEvent(QMouseEvent *event) {
 				else if ((abs(transformedx - selectionrect->rect().x() - selectionrect->rect().width()) < 5) && (transformedy >= selectionrect->rect().y()) && (transformedy <= selectionrect->rect().y() + selectionrect->rect().height())) {
 					setCursor(Qt::SizeHorCursor);
 					cursoractivity = cursoractivity_resize_right;
-					if ((activelayer == layer_histology_image) || ((activelayer >= layer_microscopy_navigation_image) && (activelayer < layer_end))) {
+					if (activelayer >= 2) {
 						if (rotatedimage) {
 							setCursor(Qt::SizeVerCursor);
 						}
@@ -313,7 +349,7 @@ void cImageWindowWidget::mousePressEvent(QMouseEvent *event) {
 				else if ((abs(transformedy - selectionrect->rect().y()) < 5) && (transformedx >= selectionrect->rect().x()) && (transformedx <= selectionrect->rect().x() + selectionrect->rect().width())) {
 					setCursor(Qt::SizeVerCursor);
 					cursoractivity = cursoractivity_resize_top;
-					if ((activelayer == layer_histology_image) || ((activelayer >= layer_microscopy_navigation_image) && (activelayer < layer_end))) {
+					if (activelayer >= 2) {
 						if (rotatedimage) {
 							setCursor(Qt::SizeHorCursor);
 						}
@@ -322,7 +358,7 @@ void cImageWindowWidget::mousePressEvent(QMouseEvent *event) {
 				else if ((abs(transformedy - selectionrect->rect().y() - selectionrect->rect().height()) < 5) && (transformedx >= selectionrect->rect().x()) && (transformedx <= selectionrect->rect().x() + selectionrect->rect().width())) {
 					setCursor(Qt::SizeVerCursor);
 					cursoractivity = cursoractivity_resize_bottom;
-					if ((activelayer == layer_histology_image) || ((activelayer >= layer_microscopy_navigation_image) && (activelayer < layer_end))) {
+					if (activelayer >= 2) {
 						if (rotatedimage) {
 							setCursor(Qt::SizeHorCursor);
 						}
@@ -377,7 +413,7 @@ void cImageWindowWidget::mousePressEvent(QMouseEvent *event) {
 void cImageWindowWidget::mouseMoveEvent(QMouseEvent *event) {
 	QGraphicsView::mouseMoveEvent(event);
 
-	if (layersvector[layer_optical_image].ispixmapdefined) {
+	if (layersvector[1].ispixmapdefined) {
 
 		QPointF p = mapToScene(event->x(), event->y());
 		currentx = (int)p.x();
@@ -394,13 +430,13 @@ void cImageWindowWidget::mouseMoveEvent(QMouseEvent *event) {
 void cImageWindowWidget::mouseReleaseEvent(QMouseEvent *event) {
 	QGraphicsView::mouseReleaseEvent(event);
 
-	if (layersvector[layer_optical_image].ispixmapdefined) {
+	if (layersvector[1].ispixmapdefined) {
 
 		int xmin, xmax, ymin, ymax;
 		qreal rx1, ry1, rx2, ry2;
 
 		// select region tool
-		if (activelayer == layer_compounds) {
+		if (activelayer == 0) {
 			if (pressedx == currentx) {
 				pressedx = -1;
 
@@ -440,7 +476,7 @@ void cImageWindowWidget::mouseReleaseEvent(QMouseEvent *event) {
 		}
 
 		// correlate image
-		if (activelayer == layer_optical_image) {
+		if (activelayer == 1) {
 			if (pressedx == currentx) {
 				pressedx = -1;
 
@@ -484,7 +520,7 @@ void cImageWindowWidget::mouseReleaseEvent(QMouseEvent *event) {
 		}
 
 		// set histology
-		if (activelayer == layer_histology_image) {
+		if (activelayer == 2) {
 			if (pressedx == currentx) {
 				pressedx = -1;
 
@@ -510,12 +546,12 @@ void cImageWindowWidget::mouseReleaseEvent(QMouseEvent *event) {
 
 				redrawScene();
 
-				emit updateHistologyPosition(x, y, width, height, layersvector[layer_histology_image].angle);
+				emit updateHistologyPosition(x, y, width, height, layersvector[2].angle);
 			}
 		}
 
 		// set microscopy
-		if ((activelayer >= layer_microscopy_navigation_image) && (activelayer < layer_end)) {
+		if (activelayer >= 3) {
 			if (pressedx == currentx) {
 				pressedx = -1;
 
@@ -559,7 +595,7 @@ void cImageWindowWidget::mouseReleaseEvent(QMouseEvent *event) {
 
 				redrawScene();
 
-				emit updateMicroscopyPosition(layersvector[activelayer].x, layersvector[activelayer].y, layersvector[activelayer].width, layersvector[activelayer].height, layersvector[activelayer].angle);				
+				emit updateMicroscopyPosition(layersvector[activelayer].fliphorizontally, layersvector[activelayer].flipvertically, layersvector[activelayer].x, layersvector[activelayer].y, layersvector[activelayer].width, layersvector[activelayer].height, layersvector[activelayer].angle);
 			}
 		}
 
@@ -647,15 +683,15 @@ void cImageWindowWidget::redrawScene() {
 	scene->addItem(selectionrect);
 	scene->addItem(selectionsimpletextitem);
 
-	if (!((int)layersvector.size() >= layer_optical_image + 1) || !layersvector[layer_optical_image].ispixmapdefined) {
-		scene->addText("Please, open an optical image.");
+	if (!((int)layersvector.size() >= 2) || !layersvector[1].ispixmapdefined) {
+		scene->addText("Please, open an optical image ('File->Open Image', CTRL + O) or load a previously saved configuration ('File->Load Layers', CTRL + L).");
 		return;
 	}
 
 	QRect rect_viewport(0, 0, viewport()->width(), viewport()->height());
 	QRectF rect_scene = mapToScene(rect_viewport).boundingRect();
 
-	QPixmap scaledpixmap = layersvector[layer_optical_image].pixmap->copy(rect_scene.x() / currentscale, rect_scene.y() / currentscale, rect_scene.width() / currentscale + 1, rect_scene.height() / currentscale + 1);
+	QPixmap scaledpixmap = layersvector[1].pixmap->copy(rect_scene.x() / currentscale, rect_scene.y() / currentscale, rect_scene.width() / currentscale + 1, rect_scene.height() / currentscale + 1);
 
 	if (scaledpixmap.isNull()) {
 		return;
@@ -672,36 +708,36 @@ void cImageWindowWidget::redrawScene() {
 		return;
 	}
 
-	currentwidth = layersvector[layer_optical_image].pixmap->width()*currentscale;
-	currentheight = layersvector[layer_optical_image].pixmap->height()*currentscale;
+	currentwidth = layersvector[1].pixmap->width()*currentscale;
+	currentheight = layersvector[1].pixmap->height()*currentscale;
 
-	if (((int)layersvector.size() >= layer_optical_image + 1) && layersvector[layer_optical_image].checked) {
+	if (((int)layersvector.size() >= 2) && layersvector[1].checked) {
 		QPixmap alphapixmap(scaledpixmap.size());
 		alphapixmap.fill(Qt::transparent);
 
 		QPainter painter(&alphapixmap);
-		painter.setOpacity((double)layersvector[layer_optical_image].alpha / 100.0);
+		painter.setOpacity((double)layersvector[1].alpha / 100.0);
 		painter.drawPixmap(0, 0, scaledpixmap);
 		painter.end();
 
 		QGraphicsPixmapItem* pixmapitem = scene->addPixmap(alphapixmap);
 		pixmapitem->setPos(rect_scene.x(), rect_scene.y());
-		pixmapitem->setZValue(layersvector[layer_optical_image].zvalue);
+		pixmapitem->setZValue(layersvector[1].zvalue);
 	}
 
-	if (((int)layersvector.size() >= layer_histology_image + 1) && layersvector[layer_histology_image].ispixmapdefined) {
-		if (layersvector[layer_histology_image].checked) {
-			if ((layersvector[layer_histology_image].width * currentscale > 1) && (layersvector[layer_histology_image].height * currentscale > 1)) {
+	if (((int)layersvector.size() >= 3) && layersvector[2].ispixmapdefined) {
+		if (layersvector[2].checked) {
+			if ((layersvector[2].width * currentscale > 1) && (layersvector[2].height * currentscale > 1)) {
 
-				QPixmap scaledhistologypixmap = layersvector[layer_histology_image].pixmap->scaled((int)layersvector[layer_histology_image].width, (int)layersvector[layer_histology_image].height);
+				QPixmap scaledhistologypixmap = layersvector[2].pixmap->scaled((int)layersvector[2].width, (int)layersvector[2].height);
 				
 				int historigcenterx = scaledhistologypixmap.rect().center().x();
 				int historigcentery = scaledhistologypixmap.rect().center().y();
 
 				QTransform transform;
 				transform.translate((qreal)historigcenterx, (qreal)historigcentery);
-				transform.scale(layersvector[layer_histology_image].flipvertically ? -1 : 1, layersvector[layer_histology_image].fliphorizontally ? -1 : 1);
-				transform.rotate(layersvector[layer_histology_image].angle);
+				transform.scale(layersvector[2].flipvertically ? -1 : 1, layersvector[2].fliphorizontally ? -1 : 1);
+				transform.rotate(layersvector[2].angle);
 				transform.translate(-(qreal)historigcenterx, -(qreal)historigcentery);
 				scaledhistologypixmap = scaledhistologypixmap.transformed(transform);
 
@@ -710,21 +746,21 @@ void cImageWindowWidget::redrawScene() {
 				int histnewwidth = scaledhistologypixmap.width();
 				int histnewheight = scaledhistologypixmap.height();
 
-				if (((qreal)(layersvector[layer_histology_image].x + histnewwidth + historigcenterx - histnewcenterx) * currentscale > rect_scene.x()) && ((qreal)(layersvector[layer_histology_image].y + histnewheight + historigcentery - histnewcentery) * currentscale > rect_scene.y())) {
-					scaledhistologypixmap = scaledhistologypixmap.copy(max(rect_scene.x() / currentscale - (qreal)(layersvector[layer_histology_image].x + historigcenterx - histnewcenterx), 0.0), max(rect_scene.y() / currentscale - (qreal)(layersvector[layer_histology_image].y + historigcentery - histnewcentery), 0.0), rect_scene.width() / currentscale + 1, rect_scene.height() / currentscale + 1);
+				if (((qreal)(layersvector[2].x + histnewwidth + historigcenterx - histnewcenterx) * currentscale > rect_scene.x()) && ((qreal)(layersvector[2].y + histnewheight + historigcentery - histnewcentery) * currentscale > rect_scene.y())) {
+					scaledhistologypixmap = scaledhistologypixmap.copy(max(rect_scene.x() / currentscale - (qreal)(layersvector[2].x + historigcenterx - histnewcenterx), 0.0), max(rect_scene.y() / currentscale - (qreal)(layersvector[2].y + historigcentery - histnewcentery), 0.0), rect_scene.width() / currentscale + 1, rect_scene.height() / currentscale + 1);
 					scaledhistologypixmap = scaledhistologypixmap.scaled(scaledhistologypixmap.width()*currentscale, scaledhistologypixmap.height()*currentscale);
 					
 					QPixmap alphapixmap(scaledhistologypixmap.size());
 					alphapixmap.fill(Qt::transparent);
 
 					QPainter painter(&alphapixmap);
-					painter.setOpacity((double)layersvector[layer_histology_image].alpha / 100.0);
+					painter.setOpacity((double)layersvector[2].alpha / 100.0);
 					painter.drawPixmap(0, 0, scaledhistologypixmap);
 					painter.end();
 
 					QGraphicsPixmapItem* pixmapitem = scene->addPixmap(alphapixmap);
-					pixmapitem->setPos(max(rect_scene.x(), (qreal)(layersvector[layer_histology_image].x + historigcenterx - histnewcenterx) * currentscale), max(rect_scene.y(), (qreal)(layersvector[layer_histology_image].y + historigcentery - histnewcentery) * currentscale));
-					pixmapitem->setZValue(layersvector[layer_histology_image].zvalue);
+					pixmapitem->setPos(max(rect_scene.x(), (qreal)(layersvector[2].x + historigcenterx - histnewcenterx) * currentscale), max(rect_scene.y(), (qreal)(layersvector[2].y + historigcentery - histnewcentery) * currentscale));
+					pixmapitem->setZValue(layersvector[2].zvalue);
 				}
 
 			}
@@ -734,10 +770,11 @@ void cImageWindowWidget::redrawScene() {
 	microscopynavigationcenterx = 0;
 	microscopynavigationcentery = 0;
 
-	for (int i = layer_microscopy_navigation_image; i < layer_end; i++) {
+	int size = (int)layersvector.size();
+	for (int i = 3; i < size; i++) {
 		if (((int)layersvector.size() >= i + 1) && layersvector[i].ispixmapdefined) {
-			if ((i == layer_microscopy_navigation_image) || (layersvector[i].checked)) {
-				drawMicroscopyImage((eLayerType)i, rect_scene, currentwidth, currentheight);
+			if ((i == 3) || (layersvector[i].checked)) {
+				drawMicroscopyImage(i, rect_scene, currentwidth, currentheight);
 			}
 		}
 	}
@@ -777,7 +814,7 @@ void cImageWindowWidget::redrawScene() {
 	stringstream scalemin;
 	stringstream scalemax;
 
-	if (((int)layersvector.size() >= layer_compounds + 1) && layersvector[layer_compounds].checked) {
+	if (((int)layersvector.size() >= 1) && layersvector[0].checked) {
 
 		if (maximumintensity > 0) {
 
@@ -833,7 +870,7 @@ void cImageWindowWidget::redrawScene() {
 				rectitem->setPen(Qt::NoPen);
 
 				QColor color;
-				double alpha = (double)layersvector[layer_compounds].alpha / 100.0;
+				double alpha = (double)layersvector[0].alpha / 100.0;
 
 				if (!absoluteintensity) {
 					color.setHslF(min(max((double)1 - (it->relativeintensity*(hue_max - hue_min) / maximumintensity + hue_min), 0.0), 1.0), 0.5, 0.5, alpha);
@@ -846,7 +883,7 @@ void cImageWindowWidget::redrawScene() {
 				string tooltip = it->description + "\nID: " + to_string(it->id) + "\nX: " + to_string(it->x) + "\nY: " + to_string(it->y) + "\nsum of rel. intensities: " + to_string(it->relativeintensity) + "%\nsum of abs. intensities: " + QVariant(cropDecimalsByteArray(it->absoluteintensity)).toString().toStdString();
 				rectitem->setToolTip(tooltip.c_str());
 
-				rectitem->setZValue(layersvector[layer_compounds].zvalue);
+				rectitem->setZValue(layersvector[0].zvalue);
 				scene->addItem(rectitem);
 			}
 
@@ -1007,8 +1044,11 @@ void cImageWindowWidget::redrawScene() {
 		rulerend->setZValue(1001);
 		scene->addItem(rulerend);
 
+		stringstream rulerstream;
+		rulerstream << std::fixed << std::setprecision(3) << rulervalue;
+
 		QString rulerhtml = "<span style='background-color:#FFFFFF;'>";
-		rulerhtml += to_string(rulervalue).c_str();
+		rulerhtml += rulerstream.str().c_str();
 		rulerhtml += " um</span>";
 
 		QGraphicsTextItem *rulertext = scene->addText("");
@@ -1024,7 +1064,7 @@ void cImageWindowWidget::redrawScene() {
 }
 
 
-void cImageWindowWidget::drawMicroscopyImage(eLayerType layer, QRectF& rect_scene, int currentwidth, int currentheight) {
+void cImageWindowWidget::drawMicroscopyImage(int layer, QRectF& rect_scene, int currentwidth, int currentheight) {
 
 	int micrometerswidth, micrometersheight;
 	switch (vendor) {
@@ -1051,7 +1091,7 @@ void cImageWindowWidget::drawMicroscopyImage(eLayerType layer, QRectF& rect_scen
 
 	QTransform transform;
 	transform.translate((qreal)microscopyorigcenterx, (qreal)microscopyorigcentery);
-	transform.scale(layersvector[layer].fliphorizontally ? -1 : 1, layersvector[layer].flipvertically ? -1 : 1);
+	transform.scale(layersvector[layer].flipvertically ? -1 : 1, layersvector[layer].fliphorizontally ? -1 : 1);
 	transform.rotate(layersvector[layer].angle);
 	transform.translate(-(qreal)microscopyorigcenterx, -(qreal)microscopyorigcentery);
 
@@ -1079,7 +1119,7 @@ void cImageWindowWidget::drawMicroscopyImage(eLayerType layer, QRectF& rect_scen
 	qreal scaledmicroscopycenterx = ((qreal)scaledmicroscopyx / microscopywidthratio + (qreal)microscopynewwidth / 2.0 + centershiftx) * microscopywidthratio;
 	qreal scaledmicroscopycentery = ((qreal)scaledmicroscopyy / microscopyheightratio + (qreal)microscopynewheight / 2.0 + centershifty) * microscopyheightratio;
 
-	if (layer == layer_microscopy_navigation_image) {
+	if (layer == 3) {
 		microscopynavigationcenterx = scaledmicroscopycenterx;
 		microscopynavigationcentery = scaledmicroscopycentery;
 
@@ -1095,6 +1135,9 @@ void cImageWindowWidget::drawMicroscopyImage(eLayerType layer, QRectF& rect_scen
 
 	QPointF oldcenterpoint(scaledmicroscopycenterx, scaledmicroscopycentery);
 	QPointF newcenterpoint = transformcenter.map(oldcenterpoint);
+	if (layersvector[layer].navigationlayer != 3) {
+		newcenterpoint = oldcenterpoint;
+	}
 	
 	centershiftx += (newcenterpoint.x() - scaledmicroscopycenterx) / microscopywidthratio;
 	centershifty += (newcenterpoint.y() - scaledmicroscopycentery) / microscopyheightratio;
@@ -1156,7 +1199,7 @@ void cImageWindowWidget::updateSelectionGroup() {
 
 		getRectanglePoints(rx1, ry1, rx2, ry2);
 
-		if (activelayer == layer_compounds) {
+		if (activelayer == 0) {
 			selectionrect->resetTransform();
 
 			selectionrect->setPen(QPen(Qt::green, 1, Qt::DashLine));
@@ -1179,7 +1222,7 @@ void cImageWindowWidget::updateSelectionGroup() {
 		}
 
 
-		if (activelayer == layer_optical_image) {
+		if (activelayer == 1) {
 			selectionrect->resetTransform();
 
 			selectionrect->setPen(QPen(Qt::green, 1, Qt::DashLine));
@@ -1204,7 +1247,7 @@ void cImageWindowWidget::updateSelectionGroup() {
 		}
 
 
-		if (activelayer == layer_histology_image) {
+		if (activelayer == 2) {
 			selectionrect->resetTransform();
 
 			selectionrect->setPen(QPen(Qt::green, 1, Qt::DashLine));
@@ -1226,20 +1269,24 @@ void cImageWindowWidget::updateSelectionGroup() {
 		}
 		
 
-		if ((activelayer >= layer_microscopy_navigation_image) && (activelayer < layer_end)) {
+		if (activelayer >= 3) {
 			selectionrect->resetTransform();
 
 			selectionrect->setPen(QPen(Qt::green, 1, Qt::DashLine));
 			selectionrect->setRect(QRectF(QPointF(rx1, ry1), QPointF(rx2, ry2)));
 
 			QTransform transform;
-			if ((activelayer > layer_microscopy_navigation_image) && (activelayer < layer_end)) {
+			if (activelayer > 3) {
 				QTransform transformcenter;
 				transformcenter.translate((qreal)microscopynavigationcenterx, (qreal)microscopynavigationcentery);
 				transformcenter.rotate(layersvector[activelayer].angle);
 				transformcenter.translate(-(qreal)microscopynavigationcenterx, -(qreal)microscopynavigationcentery);
 
 				QPointF newcenterpoint = transformcenter.map(selectionrect->rect().center());
+				if (layersvector[activelayer].navigationlayer != 3) {
+					newcenterpoint = selectionrect->rect().center();
+				}
+
 				transform.translate(newcenterpoint.x() - selectionrect->rect().center().x(), newcenterpoint.y() - selectionrect->rect().center().y());
 			}
 			transform.translate(selectionrect->rect().center().x(), selectionrect->rect().center().y());
@@ -1274,7 +1321,7 @@ void cImageWindowWidget::updateSelectionGroup() {
 		int transformedy = currenty;
 		double tmpangle;
 
-		if ((activelayer == layer_histology_image) || ((activelayer >= layer_microscopy_navigation_image) && (activelayer < layer_end))) {
+		if (activelayer >= 2) {
 			QTransform transform;
 			tmpangle = prepareTransformation(selectionrect->rect(), transform, testedfliphorizontally, testedflipvertically, testedangle, true);
 			transform.map(currentx, currenty, &transformedx, &transformedy);
@@ -1285,7 +1332,7 @@ void cImageWindowWidget::updateSelectionGroup() {
 
 			if ((abs(transformedx - selectionrect->rect().x()) < 5) && (abs(transformedy - selectionrect->rect().y()) < 5)) {
 				setCursor(Qt::SizeFDiagCursor);
-				if ((activelayer == layer_histology_image) || ((activelayer >= layer_microscopy_navigation_image) && (activelayer < layer_end))) {
+				if (activelayer >= 2) {
 					if (rotatedimage) {
 						setCursor(Qt::SizeBDiagCursor);
 					}
@@ -1293,7 +1340,7 @@ void cImageWindowWidget::updateSelectionGroup() {
 			}
 			else if ((abs(transformedx - selectionrect->rect().x() - selectionrect->rect().width()) < 5) && (abs(transformedy - selectionrect->rect().y()) < 5)) {
 				setCursor(Qt::SizeBDiagCursor);
-				if ((activelayer == layer_histology_image) || ((activelayer >= layer_microscopy_navigation_image) && (activelayer < layer_end))) {
+				if (activelayer >= 2) {
 					if (rotatedimage) {
 						setCursor(Qt::SizeFDiagCursor);
 					}
@@ -1301,7 +1348,7 @@ void cImageWindowWidget::updateSelectionGroup() {
 			}
 			else if ((abs(transformedx - selectionrect->rect().x()) < 5) && (abs(transformedy - selectionrect->rect().y() - selectionrect->rect().height()) < 5)) {
 				setCursor(Qt::SizeBDiagCursor);
-				if ((activelayer == layer_histology_image) || ((activelayer >= layer_microscopy_navigation_image) && (activelayer < layer_end))) {
+				if (activelayer >= 2) {
 					if (rotatedimage) {
 						setCursor(Qt::SizeFDiagCursor);
 					}
@@ -1309,7 +1356,7 @@ void cImageWindowWidget::updateSelectionGroup() {
 			}
 			else if ((abs(transformedx - selectionrect->rect().x() - selectionrect->rect().width()) < 5) && (abs(transformedy - selectionrect->rect().y() - selectionrect->rect().height()) < 5)) {
 				setCursor(Qt::SizeFDiagCursor);
-				if ((activelayer == layer_histology_image) || ((activelayer >= layer_microscopy_navigation_image) && (activelayer < layer_end))) {
+				if (activelayer >= 2) {
 					if (rotatedimage) {
 						setCursor(Qt::SizeBDiagCursor);
 					}
@@ -1317,7 +1364,7 @@ void cImageWindowWidget::updateSelectionGroup() {
 			}
 			else if ((abs(transformedx - selectionrect->rect().x()) < 5) && (transformedy >= selectionrect->rect().y()) && (transformedy <= selectionrect->rect().y() + selectionrect->rect().height())) {
 				setCursor(Qt::SizeHorCursor);
-				if ((activelayer == layer_histology_image) || ((activelayer >= layer_microscopy_navigation_image) && (activelayer < layer_end))) {
+				if (activelayer >= 2) {
 					if (rotatedimage) {
 						setCursor(Qt::SizeVerCursor);
 					}
@@ -1325,7 +1372,7 @@ void cImageWindowWidget::updateSelectionGroup() {
 			}
 			else if ((abs(transformedx - selectionrect->rect().x() - selectionrect->rect().width()) < 5) && (transformedy >= selectionrect->rect().y()) && (transformedy <= selectionrect->rect().y() + selectionrect->rect().height())) {
 				setCursor(Qt::SizeHorCursor);
-				if ((activelayer == layer_histology_image) || ((activelayer >= layer_microscopy_navigation_image) && (activelayer < layer_end))) {
+				if (activelayer >= 2) {
 					if (rotatedimage) {
 						setCursor(Qt::SizeVerCursor);
 					}
@@ -1333,7 +1380,7 @@ void cImageWindowWidget::updateSelectionGroup() {
 			}
 			else if ((abs(transformedy - selectionrect->rect().y()) < 5) && (transformedx >= selectionrect->rect().x()) && (transformedx <= selectionrect->rect().x() + selectionrect->rect().width())) {
 				setCursor(Qt::SizeVerCursor);
-				if ((activelayer == layer_histology_image) || ((activelayer >= layer_microscopy_navigation_image) && (activelayer < layer_end))) {
+				if (activelayer >= 2) {
 					if (rotatedimage) {
 						setCursor(Qt::SizeHorCursor);
 					}
@@ -1341,7 +1388,7 @@ void cImageWindowWidget::updateSelectionGroup() {
 			}
 			else if ((abs(transformedy - selectionrect->rect().y() - selectionrect->rect().height()) < 5) && (transformedx >= selectionrect->rect().x()) && (transformedx <= selectionrect->rect().x() + selectionrect->rect().width())) {
 				setCursor(Qt::SizeVerCursor);
-				if ((activelayer == layer_histology_image) || ((activelayer >= layer_microscopy_navigation_image) && (activelayer < layer_end))) {
+				if (activelayer >= 2) {
 					if (rotatedimage) {
 						setCursor(Qt::SizeHorCursor);
 					}
@@ -1359,7 +1406,7 @@ void cImageWindowWidget::updateSelectionGroup() {
 			setCursor(Qt::ArrowCursor);
 		}
 
-		if (activelayer == layer_compounds) {
+		if (activelayer == 0) {
 
 			if (vendor == bruker) {
 				xmin = currentx*(maxx + 1) / max(1, currentwidth) - leftshift;
@@ -1416,7 +1463,7 @@ void cImageWindowWidget::updateSelectionGroup() {
 		}
 
 
-		if (activelayer == layer_optical_image) {
+		if (activelayer == 1) {
 
 			if (vendor == bruker) {
 				rx1 = (double)leftshift * (double)currentwidth / (double)(maxx + 1);
@@ -1473,15 +1520,15 @@ void cImageWindowWidget::updateSelectionGroup() {
 		}
 
 
-		if (activelayer == layer_histology_image) {
+		if (activelayer == 2) {
 
 			int x = (double)currentx / currentscale;
 			int y = (double)currenty / currentscale;
 
-			rx1 = layersvector[layer_histology_image].x * currentscale;
-			ry1 = layersvector[layer_histology_image].y * currentscale;
-			rx2 = (layersvector[layer_histology_image].x + layersvector[layer_histology_image].width) * currentscale;
-			ry2 = (layersvector[layer_histology_image].y + layersvector[layer_histology_image].height) * currentscale;
+			rx1 = layersvector[2].x * currentscale;
+			ry1 = layersvector[2].y * currentscale;
+			rx2 = (layersvector[2].x + layersvector[2].width) * currentscale;
+			ry2 = (layersvector[2].y + layersvector[2].height) * currentscale;
 
 			//rx2 = min(rx2, (qreal)currentwidth);
 			//ry2 = min(ry2, (qreal)currentheight);
@@ -1518,7 +1565,7 @@ void cImageWindowWidget::updateSelectionGroup() {
 		}
 
 
-		if ((activelayer >= layer_microscopy_navigation_image) && (activelayer < layer_end)) {
+		if (activelayer >= 3) {
 
 			double x = (double)currentx * (double)micrometerswidth / (double)currentwidth;
 			double y = (double)currenty * (double)micrometersheight / (double)currentheight;
@@ -1534,13 +1581,17 @@ void cImageWindowWidget::updateSelectionGroup() {
 			selectionrect->setRect(QRectF(QPointF(rx1, ry1), QPointF(rx2, ry2)));
 
 			QTransform transform;
-			if ((activelayer > layer_microscopy_navigation_image) && (activelayer < layer_end)) {
+			if (activelayer > 3) {
 				QTransform transformcenter;
 				transformcenter.translate((qreal)microscopynavigationcenterx, (qreal)microscopynavigationcentery);
 				transformcenter.rotate(layersvector[activelayer].angle);
 				transformcenter.translate(-(qreal)microscopynavigationcenterx, -(qreal)microscopynavigationcentery);
 
 				QPointF newcenterpoint = transformcenter.map(selectionrect->rect().center());
+				if (layersvector[activelayer].navigationlayer != 3) {
+					newcenterpoint = selectionrect->rect().center();
+				}
+
 				transform.translate(newcenterpoint.x() - selectionrect->rect().center().x(), newcenterpoint.y() - selectionrect->rect().center().y());
 			}
 			transform.translate(selectionrect->rect().center().x(), selectionrect->rect().center().y());
@@ -1622,7 +1673,7 @@ void cImageWindowWidget::getRectanglePoints(qreal& rx1, qreal& ry1, qreal& rx2, 
 	bool testedfliphorizontally = layersvector[activelayer].fliphorizontally;
 	bool testedflipvertically = layersvector[activelayer].flipvertically;
 
-	if ((activelayer == layer_histology_image) || ((activelayer >= layer_microscopy_navigation_image) && (activelayer < layer_end))) {
+	if (activelayer >= 2) {
 		QTransform transform;
 		prepareTransformation(currentrect->rect(), transform, testedfliphorizontally, testedflipvertically, testedangle, true);
 		transform.map((qreal)currentx, (qreal)currenty, &untransformedcurrentx, &untransformedcurrenty);
@@ -1648,12 +1699,12 @@ void cImageWindowWidget::getRectanglePoints(qreal& rx1, qreal& ry1, qreal& rx2, 
 				ry2 = untransformedcurrenty;
 			}
 
-			if ((activelayer == layer_histology_image) || ((activelayer >= layer_microscopy_navigation_image) && (activelayer < layer_end))) {
+			if (activelayer >= 2) {
 				fixRectCenter(rx1, ry1, rx2, ry2, testedfliphorizontally, testedflipvertically, testedangle);
 			}
 			break;
 		case cursoractivity_move:
-			if ((activelayer > layer_microscopy_navigation_image) && (activelayer < layer_end)) {
+			if (activelayer > 3) {
 				if (((testedangle >= 90.0) && (testedangle <= 270.0)) || ((testedangle <= -90.0) && (testedangle >= -270.0))) {
 					rx1 = tmprx1 - untransformedcurrentx + untransformedpressedx;
 					ry1 = tmpry1 - untransformedcurrenty + untransformedpressedy;
@@ -1695,6 +1746,16 @@ void cImageWindowWidget::getRectanglePoints(qreal& rx1, qreal& ry1, qreal& rx2, 
 			ry1 = tmpry1;
 			rx2 = tmprx2;
 			ry2 = tmpry2;
+
+			if (keepaspectratio && (activelayer >= 2) && (tmprx1 != tmprx2)) {
+				ry2 = tmpry2 - (untransformedcurrentx - tmprx1) * (tmpry2 - tmpry1) / (tmprx2 - tmprx1);
+
+				if (ry2 < ry1) {
+					tmp = ry1;
+					ry1 = ry2;
+					ry2 = tmp;
+				}
+			}
 			
 			if (rx2 < rx1) {
 				tmp = rx1;
@@ -1702,7 +1763,7 @@ void cImageWindowWidget::getRectanglePoints(qreal& rx1, qreal& ry1, qreal& rx2, 
 				rx2 = tmp;
 			}
 
-			if ((activelayer == layer_histology_image) || ((activelayer >= layer_microscopy_navigation_image) && (activelayer < layer_end))) {
+			if (activelayer >= 2) {
 				fixRectCenter(rx1, ry1, rx2, ry2, testedfliphorizontally, testedflipvertically, testedangle);
 			}
 			break;
@@ -1712,13 +1773,23 @@ void cImageWindowWidget::getRectanglePoints(qreal& rx1, qreal& ry1, qreal& rx2, 
 			rx2 = untransformedcurrentx;
 			ry2 = tmpry2;
 
+			if (keepaspectratio && (activelayer >= 2) && (tmprx1 != tmprx2)) {
+				ry2 = tmpry2 + (untransformedcurrentx - tmprx2) * (tmpry2 - tmpry1) / (tmprx2 - tmprx1);
+
+				if (ry2 < ry1) {
+					tmp = ry1;
+					ry1 = ry2;
+					ry2 = tmp;
+				}
+			}
+
 			if (rx2 < rx1) {
 				tmp = rx1;
 				rx1 = rx2;
 				rx2 = tmp;
 			}
 
-			if ((activelayer == layer_histology_image) || ((activelayer >= layer_microscopy_navigation_image) && (activelayer < layer_end))) {
+			if (activelayer >= 2) {
 				fixRectCenter(rx1, ry1, rx2, ry2, testedfliphorizontally, testedflipvertically, testedangle);
 			}
 			break;
@@ -1728,13 +1799,23 @@ void cImageWindowWidget::getRectanglePoints(qreal& rx1, qreal& ry1, qreal& rx2, 
 			rx2 = tmprx2;
 			ry2 = tmpry2;
 
+			if (keepaspectratio && (activelayer >= 2) && (tmpry1 != tmpry2)) {
+				rx2 = tmprx2 - (untransformedcurrenty - tmpry1) * (tmprx2 - tmprx1) / (tmpry2 - tmpry1);
+
+				if (rx2 < rx1) {
+					tmp = rx1;
+					rx1 = rx2;
+					rx2 = tmp;
+				}
+			}
+
 			if (ry2 < ry1) {
 				tmp = ry1;
 				ry1 = ry2;
 				ry2 = tmp;
 			}
 
-			if ((activelayer == layer_histology_image) || ((activelayer >= layer_microscopy_navigation_image) && (activelayer < layer_end))) {
+			if (activelayer >= 2) {
 				fixRectCenter(rx1, ry1, rx2, ry2, testedfliphorizontally, testedflipvertically, testedangle);
 			}
 			break;
@@ -1744,13 +1825,23 @@ void cImageWindowWidget::getRectanglePoints(qreal& rx1, qreal& ry1, qreal& rx2, 
 			rx2 = tmprx2;
 			ry2 = untransformedcurrenty;
 
+			if (keepaspectratio && (activelayer >= 2) && (tmpry1 != tmpry2)) {
+				rx2 = tmprx2 + (untransformedcurrenty - tmpry2) * (tmprx2 - tmprx1) / (tmpry2 - tmpry1);
+
+				if (rx2 < rx1) {
+					tmp = rx1;
+					rx1 = rx2;
+					rx2 = tmp;
+				}
+			}
+
 			if (ry2 < ry1) {
 				tmp = ry1;
 				ry1 = ry2;
 				ry2 = tmp;
 			}
 
-			if ((activelayer == layer_histology_image) || ((activelayer >= layer_microscopy_navigation_image) && (activelayer < layer_end))) {
+			if (activelayer >= 2) {
 				fixRectCenter(rx1, ry1, rx2, ry2, testedfliphorizontally, testedflipvertically, testedangle);
 			}
 			break;
@@ -1760,6 +1851,10 @@ void cImageWindowWidget::getRectanglePoints(qreal& rx1, qreal& ry1, qreal& rx2, 
 			rx2 = tmprx2;
 			ry2 = tmpry2;
 
+			if (keepaspectratio && (activelayer >= 2) && (tmprx1 != tmprx2)) {
+				ry1 = tmpry1 + (untransformedcurrentx - tmprx1) * (tmpry2 - tmpry1) / (tmprx2 - tmprx1);
+			}
+
 			if (rx2 < rx1) {
 				tmp = rx1;
 				rx1 = rx2;
@@ -1772,7 +1867,7 @@ void cImageWindowWidget::getRectanglePoints(qreal& rx1, qreal& ry1, qreal& rx2, 
 				ry2 = tmp;
 			}
 
-			if ((activelayer == layer_histology_image) || ((activelayer >= layer_microscopy_navigation_image) && (activelayer < layer_end))) {
+			if (activelayer >= 2) {
 				fixRectCenter(rx1, ry1, rx2, ry2, testedfliphorizontally, testedflipvertically, testedangle);
 			}
 			break;
@@ -1782,6 +1877,10 @@ void cImageWindowWidget::getRectanglePoints(qreal& rx1, qreal& ry1, qreal& rx2, 
 			rx2 = untransformedcurrentx;
 			ry2 = tmpry2;
 
+			if (keepaspectratio && (activelayer >= 2) && (tmprx1 != tmprx2)) {
+				ry1 = tmpry1 - (untransformedcurrentx - tmprx2) * (tmpry2 - tmpry1) / (tmprx2 - tmprx1);
+			}
+
 			if (rx2 < rx1) {
 				tmp = rx1;
 				rx1 = rx2;
@@ -1794,7 +1893,7 @@ void cImageWindowWidget::getRectanglePoints(qreal& rx1, qreal& ry1, qreal& rx2, 
 				ry2 = tmp;
 			}
 
-			if ((activelayer == layer_histology_image) || ((activelayer >= layer_microscopy_navigation_image) && (activelayer < layer_end))) {
+			if (activelayer >= 2) {
 				fixRectCenter(rx1, ry1, rx2, ry2, testedfliphorizontally, testedflipvertically, testedangle);
 			}
 			break;
@@ -1804,6 +1903,10 @@ void cImageWindowWidget::getRectanglePoints(qreal& rx1, qreal& ry1, qreal& rx2, 
 			rx2 = tmprx2;
 			ry2 = untransformedcurrenty;
 
+			if (keepaspectratio && (activelayer >= 2) && (tmprx1 != tmprx2)) {
+				ry2 = tmpry2 - (untransformedcurrentx - tmprx1) * (tmpry2 - tmpry1) / (tmprx2 - tmprx1);
+			}
+
 			if (rx2 < rx1) {
 				tmp = rx1;
 				rx1 = rx2;
@@ -1816,7 +1919,7 @@ void cImageWindowWidget::getRectanglePoints(qreal& rx1, qreal& ry1, qreal& rx2, 
 				ry2 = tmp;
 			}
 
-			if ((activelayer == layer_histology_image) || ((activelayer >= layer_microscopy_navigation_image) && (activelayer < layer_end))) {
+			if (activelayer >= 2) {
 				fixRectCenter(rx1, ry1, rx2, ry2, testedfliphorizontally, testedflipvertically, testedangle);
 			}
 			break;
@@ -1826,6 +1929,10 @@ void cImageWindowWidget::getRectanglePoints(qreal& rx1, qreal& ry1, qreal& rx2, 
 			rx2 = untransformedcurrentx;
 			ry2 = untransformedcurrenty;
 
+			if (keepaspectratio && (activelayer >= 2) && (tmprx1 != tmprx2)) {
+				ry2 = tmpry2 + (untransformedcurrentx - tmprx2) * (tmpry2 - tmpry1) / (tmprx2 - tmprx1);
+			}
+
 			if (rx2 < rx1) {
 				tmp = rx1;
 				rx1 = rx2;
@@ -1838,7 +1945,7 @@ void cImageWindowWidget::getRectanglePoints(qreal& rx1, qreal& ry1, qreal& rx2, 
 				ry2 = tmp;
 			}
 
-			if ((activelayer == layer_histology_image) || ((activelayer >= layer_microscopy_navigation_image) && (activelayer < layer_end))) {
+			if (activelayer >= 2) {
 				fixRectCenter(rx1, ry1, rx2, ry2, testedfliphorizontally, testedflipvertically, testedangle);
 			}
 			break;
@@ -1872,13 +1979,17 @@ double cImageWindowWidget::prepareTransformation(QRectF rect, QTransform& transf
 
 	transform.reset();
 
-	if ((activelayer > layer_microscopy_navigation_image) && (activelayer < layer_end)) {
+	if (activelayer > 3) {
 		QTransform transformcenter;
 		transformcenter.translate((qreal)microscopynavigationcenterx, (qreal)microscopynavigationcentery);
 		transformcenter.rotate(-testedangle);
 		transformcenter.translate(-(qreal)microscopynavigationcenterx, -(qreal)microscopynavigationcentery);
 
 		QPointF newcenterpoint = transformcenter.map(rect.center());
+		if (layersvector[activelayer].navigationlayer != 3) {
+			newcenterpoint = rect.center();
+		}
+
 		if (flipaxes && (((testedangle >= 90.0) && (testedangle <= 270.0)) || ((testedangle <= -90.0) && (testedangle >= -270.0)))) {
 			transform.translate(rect.center().x() - newcenterpoint.x(), rect.center().y() - newcenterpoint.y());
 		}
@@ -1918,13 +2029,13 @@ double cImageWindowWidget::recalculateRulerValue(qreal currentscale) {
 
 	switch (vendor) {
 		case unknownvendor:
-			value = ((double)maxx*(double)pixelsizex) * (double)rulersize / ((double)layersvector[layer_optical_image].pixmap->width()*currentscale);
+			value = ((double)maxx*(double)pixelsizex) * (double)rulersize / ((double)layersvector[1].pixmap->width()*currentscale);
 			break;
 		case bruker:
-			value = ((double)(maxx + 1)*(double)pixelsizex) * (double)rulersize / ((double)layersvector[layer_optical_image].pixmap->width()*currentscale);
+			value = ((double)(maxx + 1)*(double)pixelsizex) * (double)rulersize / ((double)layersvector[1].pixmap->width()*currentscale);
 			break;
 		case waters:
-			value = ((double)maxx*(double)pixelsizex) * (double)rulersize / ((double)layersvector[layer_optical_image].pixmap->width()*currentscale);
+			value = ((double)maxx*(double)pixelsizex) * (double)rulersize / ((double)layersvector[1].pixmap->width()*currentscale);
 			break;
 		default:
 			break;
@@ -1955,13 +2066,13 @@ void cImageWindowWidget::setRulerValue(double value) {
 	rulervalue = value;
 	switch (vendor) {
 		case unknownvendor:
-			currentscale = ((double)maxx*(double)pixelsizex) * (double)rulersize / ((double)layersvector[layer_optical_image].pixmap->width()*rulervalue);
+			currentscale = ((double)maxx*(double)pixelsizex) * (double)rulersize / ((double)layersvector[1].pixmap->width()*rulervalue);
 			break;
 		case bruker:
-			currentscale = ((double)(maxx + 1)*(double)pixelsizex) * (double)rulersize / ((double)layersvector[layer_optical_image].pixmap->width()*rulervalue);
+			currentscale = ((double)(maxx + 1)*(double)pixelsizex) * (double)rulersize / ((double)layersvector[1].pixmap->width()*rulervalue);
 			break;
 		case waters:
-			currentscale = ((double)maxx*(double)pixelsizex) * (double)rulersize / ((double)layersvector[layer_optical_image].pixmap->width()*rulervalue);
+			currentscale = ((double)maxx*(double)pixelsizex) * (double)rulersize / ((double)layersvector[1].pixmap->width()*rulervalue);
 			break;
 		default:
 		break;
@@ -2005,7 +2116,7 @@ void cImageWindowWidget::colorScaleStateChanged(bool state) {
 }
 
 
-void cImageWindowWidget::changeLayer(int layerid, bool checked, int alpha, int zvalue) {
+void cImageWindowWidget::changeLayer(int layerid, bool checked, int alpha, int zvalue, bool redraw) {
 	if (layerid == (int)layersvector.size()) {
 		layerInfo layer;
 		layer.checked = checked;
@@ -2020,7 +2131,9 @@ void cImageWindowWidget::changeLayer(int layerid, bool checked, int alpha, int z
 		layersvector[layerid].zvalue = zvalue;
 	}
 
-	redrawScene();
+	if (redraw) {
+		redrawScene();
+	}
 }
 
 
@@ -2031,13 +2144,13 @@ void cImageWindowWidget::changeActiveLayer(int layerid) {
 
 
 void cImageWindowWidget::flipHistologyHorizontallyStateChanged(bool state) {
-	layersvector[layer_histology_image].fliphorizontally = state;
+	layersvector[2].fliphorizontally = state;
 	redrawScene();
 }
 
 
 void cImageWindowWidget::flipHistologyVerticallyStateChanged(bool state) {
-	layersvector[layer_histology_image].flipvertically = state;
+	layersvector[2].flipvertically = state;
 	redrawScene();
 }
 

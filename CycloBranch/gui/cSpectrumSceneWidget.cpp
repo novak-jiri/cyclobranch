@@ -60,6 +60,8 @@ cSpectrumSceneWidget::cSpectrumSceneWidget(QWidget* parent) {
 
 	maxmzoverhead = 5.0;
 
+	activefileid = 0;
+
 	scene = new QGraphicsScene(this);
 
 	zoomgroup = new QGraphicsItemGroup();
@@ -79,12 +81,13 @@ cSpectrumSceneWidget::~cSpectrumSceneWidget() {
 }
 
 
-void cSpectrumSceneWidget::initialize(cParameters* parameters, cTheoreticalSpectrum* theoreticalspectrum, cPeakListSeries* rawdata, int rowid) {
+void cSpectrumSceneWidget::initialize(cParameters* parameters, cTheoreticalSpectrum* theoreticalspectrum, cPeakListSeries* rawdata, int rowid, int activefileid) {
 	this->parameters = parameters;
 	this->theoreticalspectrum = theoreticalspectrum;
+	this->activefileid = activefileid;
 
 	if (parameters && parameters->useprofiledata) {
-		if ((parameters->peaklistfileformat == baf) || (parameters->peaklistfileformat == dat) || (parameters->peaklistfileformat == mzML) || (parameters->peaklistfileformat == raw) || (((parameters->mode == dereplication) || (parameters->mode == compoundsearch)) && (parameters->peaklistfileformat == imzML))) {
+		if ((parameters->peaklistfileformats[activefileid] == baf) || (parameters->peaklistfileformats[activefileid] == dat) || (parameters->peaklistfileformats[activefileid] == mzML) || (parameters->peaklistfileformats[activefileid] == raw) || (((parameters->mode == dereplication) || (parameters->mode == compoundsearch)) && (parameters->peaklistfileformats[activefileid] == imzML))) {
 			if ((rowid > 0) && (rowid <= rawdata->size())) {
 				this->rawdatapeaklist = &((*rawdata)[rowid - 1]);
 			}
@@ -460,6 +463,8 @@ void cSpectrumSceneWidget::redrawScene() {
 	cursorsimpletextitem->setVisible(false);
 	scene->addItem(cursorsimpletextitem);
 
+	// bug fix - mouseMoveEvent is not fired if any QGraphicsTextItem is not in the scene
+	scene->addText("");
 
 	// x axis
 	line = scene->addLine(leftmargin, h - bottommargin, w - rightmargin, h - bottommargin, QPen(Qt::black, 2, Qt::SolidLine));
@@ -890,7 +895,7 @@ void cSpectrumSceneWidget::redrawScene() {
 
 
 	// raw data (intersections with other objects are not tested)
-	if ((maxintensity > 0) && parameters->useprofiledata && ((parameters->peaklistfileformat == baf) || (parameters->peaklistfileformat == dat) || (parameters->peaklistfileformat == mzML) || (parameters->peaklistfileformat == raw) || (((parameters->mode == dereplication) || (parameters->mode == compoundsearch)) && (parameters->peaklistfileformat == imzML))) && rawdatastate && (rawdatapeaklist->size() > 0)) {
+	if ((maxintensity > 0) && parameters->useprofiledata && ((parameters->peaklistfileformats[activefileid] == baf) || (parameters->peaklistfileformats[activefileid] == dat) || (parameters->peaklistfileformats[activefileid] == mzML) || (parameters->peaklistfileformats[activefileid] == raw) || (((parameters->mode == dereplication) || (parameters->mode == compoundsearch)) && (parameters->peaklistfileformats[activefileid] == imzML))) && rawdatastate && (rawdatapeaklist->size() > 0)) {
 
 		QPainterPath rpath;
 		int rx, ry, lastrx, lastry;
@@ -1062,7 +1067,7 @@ double cSpectrumSceneWidget::getMaximumIntensity() {
 	double rawdatamaxintensity = 0;
 
 	// get the maximum intensity in the interval <minmzratio, maxmzratio>
-	if (parameters->useprofiledata && ((parameters->peaklistfileformat == baf) || (parameters->peaklistfileformat == dat) || (parameters->peaklistfileformat == mzML) || (parameters->peaklistfileformat == raw) || (((parameters->mode == dereplication) || (parameters->mode == compoundsearch)) && (parameters->peaklistfileformat == imzML))) && rawdatastate && (rawdatapeaklist->size() > 0)) {
+	if (parameters->useprofiledata && ((parameters->peaklistfileformats[activefileid] == baf) || (parameters->peaklistfileformats[activefileid] == dat) || (parameters->peaklistfileformats[activefileid] == mzML) || (parameters->peaklistfileformats[activefileid] == raw) || (((parameters->mode == dereplication) || (parameters->mode == compoundsearch)) && (parameters->peaklistfileformats[activefileid] == imzML))) && rawdatastate && (rawdatapeaklist->size() > 0)) {
 		if (absoluteintensity) {
 			maxintensity = theoreticalspectrum->getExperimentalSpectrum().getMaximumAbsoluteIntensityFromMZInterval(minmzratio, maxmzratio, false, false, other, false);
 		}

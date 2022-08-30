@@ -52,8 +52,12 @@ void cGlobalPreferences::loadSettings() {
 		customions.push_back(ion);
 	}
 
-	if (settings.contains("bafprocessingmethod")) {
-		bafprocessingmethod = settings.value("bafprocessingmethod").toInt();
+	if (settings.contains("linebafprocessingmethod")) {
+		linebafprocessingmethod = settings.value("linebafprocessingmethod").toInt();
+	}
+
+	if (settings.contains("profilebafprocessingmethod")) {
+		profilebafprocessingmethod = settings.value("profilebafprocessingmethod").toInt();
 	}
 
 	if (settings.contains("rawdataprocessingmethod")) {
@@ -108,13 +112,87 @@ void cGlobalPreferences::loadSettings() {
 		exportimagedefaultdir = settings.value("exportimagedefaultdir ").toString();
 	}
 
+	if (settings.contains("bookmarkname1")) {
+		bookmarkname1 = settings.value("bookmarkname1").toString();
+	}
+
 	if (settings.contains("bookmarkurl1")) {
 		bookmarkurl1 = settings.value("bookmarkurl1").toString();
+	}
+
+	if (settings.contains("bookmarkname2")) {
+		bookmarkname2 = settings.value("bookmarkname2").toString();
 	}
 
 	if (settings.contains("bookmarkurl2")) {
 		bookmarkurl2 = settings.value("bookmarkurl2").toString();
 	}
+
+	if (settings.contains("bookmarkname3")) {
+		bookmarkname3 = settings.value("bookmarkname3").toString();
+	}
+
+	if (settings.contains("bookmarkurl3")) {
+		bookmarkurl3 = settings.value("bookmarkurl3").toString();
+	}
+
+	if (settings.contains("bookmarkname4")) {
+		bookmarkname4 = settings.value("bookmarkname4").toString();
+	}
+
+	if (settings.contains("bookmarkurl4")) {
+		bookmarkurl4 = settings.value("bookmarkurl4").toString();
+	}
+
+	if (settings.contains("bookmarkname5")) {
+		bookmarkname5 = settings.value("bookmarkname5").toString();
+	}
+
+	if (settings.contains("bookmarkurl5")) {
+		bookmarkurl5 = settings.value("bookmarkurl5").toString();
+	}
+
+	if (settings.contains("bookmarkname6")) {
+		bookmarkname6 = settings.value("bookmarkname6").toString();
+	}
+
+	if (settings.contains("bookmarkurl6")) {
+		bookmarkurl6 = settings.value("bookmarkurl6").toString();
+	}
+
+	if (settings.contains("bookmarkname7")) {
+		bookmarkname7 = settings.value("bookmarkname7").toString();
+	}
+
+	if (settings.contains("bookmarkurl7")) {
+		bookmarkurl7 = settings.value("bookmarkurl7").toString();
+	}
+
+	if (settings.contains("bookmarkname8")) {
+		bookmarkname8 = settings.value("bookmarkname8").toString();
+	}
+
+	if (settings.contains("bookmarkurl8")) {
+		bookmarkurl8 = settings.value("bookmarkurl8").toString();
+	}
+
+	if (settings.contains("bookmarkname9")) {
+		bookmarkname9 = settings.value("bookmarkname9").toString();
+	}
+
+	if (settings.contains("bookmarkurl9")) {
+		bookmarkurl9 = settings.value("bookmarkurl9").toString();
+	}
+
+	if (settings.contains("bookmarkname10")) {
+		bookmarkname10 = settings.value("bookmarkname10").toString();
+	}
+
+	if (settings.contains("bookmarkurl10")) {
+		bookmarkurl10 = settings.value("bookmarkurl10").toString();
+	}
+
+	viewbookmarks = settings.value("viewbookmarks", 0).toInt() == 0 ? false : true;
 }
 
 
@@ -139,7 +217,9 @@ void cGlobalPreferences::saveSettings() {
 		settings.setValue(customionvalue, customions[i].multiplier);
 	}
 
-	settings.setValue("bafprocessingmethod", bafprocessingmethod);
+	settings.setValue("linebafprocessingmethod", linebafprocessingmethod);
+	settings.setValue("profilebafprocessingmethod", profilebafprocessingmethod);
+
 	settings.setValue("rawdataprocessingmethod", rawdataprocessingmethod);
 
 	settings.setValue("settingsdefaultdir", settingsdefaultdir);
@@ -155,8 +235,37 @@ void cGlobalPreferences::saveSettings() {
 	settings.setValue("exporthtmldefaultdir", exporthtmldefaultdir);
 	settings.setValue("exportimagedefaultdir", exportimagedefaultdir);
 
+	settings.setValue("bookmarkname1", bookmarkname1);
 	settings.setValue("bookmarkurl1", bookmarkurl1);
+
+	settings.setValue("bookmarkname2", bookmarkname2);
 	settings.setValue("bookmarkurl2", bookmarkurl2);
+
+	settings.setValue("bookmarkname3", bookmarkname3);
+	settings.setValue("bookmarkurl3", bookmarkurl3);
+
+	settings.setValue("bookmarkname4", bookmarkname4);
+	settings.setValue("bookmarkurl4", bookmarkurl4);
+
+	settings.setValue("bookmarkname5", bookmarkname5);
+	settings.setValue("bookmarkurl5", bookmarkurl5);
+
+	settings.setValue("bookmarkname6", bookmarkname6);
+	settings.setValue("bookmarkurl6", bookmarkurl6);
+
+	settings.setValue("bookmarkname7", bookmarkname7);
+	settings.setValue("bookmarkurl7", bookmarkurl7);
+
+	settings.setValue("bookmarkname8", bookmarkname8);
+	settings.setValue("bookmarkurl8", bookmarkurl8);
+
+	settings.setValue("bookmarkname9", bookmarkname9);
+	settings.setValue("bookmarkurl9", bookmarkurl9);
+
+	settings.setValue("bookmarkname10", bookmarkname10);
+	settings.setValue("bookmarkurl10", bookmarkurl10);
+
+	viewbookmarks ? settings.setValue("viewbookmarks", 1) : settings.setValue("viewbookmarks", 0);
 }
 
 
@@ -859,7 +968,9 @@ void cGlobalPreferences::setDefaultIonTypes() {
 
 
 void cGlobalPreferences::setDefaultDataProcessingMethods() {
-	bafprocessingmethod = 0;
+	linebafprocessingmethod = 0;
+	profilebafprocessingmethod = 0;
+
 	rawdataprocessingmethod = 0;
 }
 
@@ -896,7 +1007,36 @@ void cGlobalPreferences::setDefaultDirectories() {
 
 
 void cGlobalPreferences::setDefaultURLs() {
-	bookmarkurl1 = "https://bioinfo.lifl.fr/norine/";
-	bookmarkurl2 = "https://ms.biomed.cas.cz/bbdgnc/";
+	bookmarkname1 = appname;
+	bookmarkurl1 = "https://ms.biomed.cas.cz/cyclobranch/";
+
+	bookmarkname2 = "MassSpecBlocks";
+	bookmarkurl2 = "https://ms.biomed.cas.cz/msb/";
+
+	bookmarkname3 = "PubChem";
+	bookmarkurl3 = "https://pubchem.ncbi.nlm.nih.gov/";
+
+	bookmarkname4 = "ChemSpider";
+	bookmarkurl4 = "https://www.chemspider.com/";
+
+	bookmarkname5 = "ChEBI";
+	bookmarkurl5 = "https://www.ebi.ac.uk/chebi/";
+
+	bookmarkname6 = "Lipid Maps";
+	bookmarkurl6 = "https://lipidmaps.org/";
+
+	bookmarkname7 = "Reaxys";
+	bookmarkurl7 = "https://www.reaxys.com/";
+
+	bookmarkname8 = "Norine";
+	bookmarkurl8 = "https://bioinfo.lifl.fr/norine/";
+
+	bookmarkname9 = "";
+	bookmarkurl9 = "";
+
+	bookmarkname10 = "";
+	bookmarkurl10 = "";
+
+	viewbookmarks = false;
 }
 

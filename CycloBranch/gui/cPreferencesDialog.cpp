@@ -15,9 +15,11 @@ cPreferencesDialog::cPreferencesDialog(cGlobalPreferences& globalpreferences, QW
 
 	tabwidget = new QTabWidget();
 	tabwidget->addTab(tabiontypes, tr("Ion Types"));
-	//tabwidget->addTab(tabdataprocessing, tr("Data Processing"));
+	#if OS_TYPE == WIN
+		tabwidget->addTab(tabdataprocessing, tr("Data Processing"));
+	#endif
 	tabwidget->addTab(tabdirectories, tr("Directories"));
-	tabwidget->addTab(taburls, tr("URLs"));
+	tabwidget->addTab(taburls, tr("Bookmarks"));
 
 	buttonbox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
 

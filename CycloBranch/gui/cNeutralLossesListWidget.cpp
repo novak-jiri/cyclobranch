@@ -6,7 +6,9 @@
 #include <QVBoxLayout>
 
 
-cNeutralLossesListWidget::cNeutralLossesListWidget(QObject* parent) {
+cNeutralLossesListWidget::cNeutralLossesListWidget(bool showdefaultbutton, bool showhconbutton, QObject* parent) {
+	this->showdefaultbutton = showdefaultbutton;
+	this->showhconbutton = showhconbutton;
 	this->parent = parent;
 
 	vbox1 = new QVBoxLayout();
@@ -26,10 +28,14 @@ cNeutralLossesListWidget::cNeutralLossesListWidget(QObject* parent) {
 	addbutton->setToolTip("Add a new item.");
 	removebutton = new QPushButton("Remove");
 	removebutton->setToolTip("Remove selected items.");
-	defaultbutton = new QPushButton("Default");
-	defaultbutton->setToolTip("Set default items.");
-	hconbutton = new QPushButton("HCON");
-	hconbutton->setToolTip("Set the default chemical elements H, C, O, N, S, and P.");
+	if (showdefaultbutton) {
+		defaultbutton = new QPushButton("Default");
+		defaultbutton->setToolTip("Set a list of default neutral losses.");
+	}
+	if (showhconbutton) {
+		hconbutton = new QPushButton("HCON");
+		hconbutton->setToolTip("Set a list of default chemical elements (H, C, O, N, S, and P).");
+	}
 
 	vbox1->addWidget(list);
 	vbox1->addStretch(1);
@@ -38,8 +44,12 @@ cNeutralLossesListWidget::cNeutralLossesListWidget(QObject* parent) {
 	vbox2->addWidget(clearallbutton);
 	vbox2->addWidget(addbutton);
 	vbox2->addWidget(removebutton);
-	vbox2->addWidget(defaultbutton);
-	vbox2->addWidget(hconbutton);
+	if (showdefaultbutton) {
+		vbox2->addWidget(defaultbutton);
+	}
+	if (showhconbutton) {
+		vbox2->addWidget(hconbutton);
+	}
 	vbox2->addStretch(1);
 
 	hbox->setMargin(0);
@@ -50,12 +60,21 @@ cNeutralLossesListWidget::cNeutralLossesListWidget(QObject* parent) {
 	connect(clearallbutton, SIGNAL(released()), this, SLOT(clearAllItems()));
 	connect(addbutton, SIGNAL(released()), this, SLOT(addEmptyItem()));
 	connect(removebutton, SIGNAL(released()), this, SLOT(removeItem()));
-	connect(defaultbutton, SIGNAL(released()), this, SLOT(setDefaultItems()));
-	connect(hconbutton, SIGNAL(released()), this, SLOT(setHCON()));
+	if (showdefaultbutton) {
+		connect(defaultbutton, SIGNAL(released()), this, SLOT(setDefaultItems()));
+	}
+	if (showhconbutton) {
+		connect(hconbutton, SIGNAL(released()), this, SLOT(setHCON()));
+	}
 
 	setLayout(hbox);
 
-	setDefaultItems();
+	if (showdefaultbutton) {
+		setDefaultItems();
+	}
+	else {
+		setHCON();
+	}
 }
 
 
@@ -65,8 +84,12 @@ cNeutralLossesListWidget::~cNeutralLossesListWidget() {
 	delete clearallbutton;
 	delete addbutton;
 	delete removebutton;
-	delete defaultbutton;
-	delete hconbutton;
+	if (showdefaultbutton) {
+		delete defaultbutton;
+	}
+	if (showhconbutton) {
+		delete hconbutton;
+	}
 	
 	delete vbox1;
 	delete vbox2;
@@ -101,7 +124,12 @@ void cNeutralLossesListWidget::clearAllItems() {
 
 
 void cNeutralLossesListWidget::addEmptyItem() {
-	addItem("type a formula here");
+	if (showdefaultbutton) {
+		addItem("type a formula here");
+	}
+	else {
+		addItem("type an element here");
+	}
 	list->setCurrentRow(list->count() - 1); 
 	QListWidgetItem* item = list->item(list->count() - 1);
 	list->editItem(item);

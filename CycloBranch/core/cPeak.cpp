@@ -140,3 +140,139 @@ void cPeak::load(ifstream& is) {
 	is.read((char *)&orderid, sizeof(int));
 }
 
+
+bool cPeak::equals(cPeak& secondpeak) {
+	if (!formula.equals(secondpeak.formula)) {
+		cout << "formula does not match" << endl;
+		return false;
+	}
+
+	if (isotopeformula.compare(secondpeak.isotopeformula) != 0) {
+		cout << "isotopeformula does not match" << endl;
+		return false;
+	}
+
+	if (isotopeformulaid != secondpeak.isotopeformulaid) {
+		cout << "isotopeformulaid does not match" << endl;
+		return false;
+	}
+
+	if (!compareDoubles(mzratio, secondpeak.mzratio)) {
+		cout << mzratio << " " << secondpeak.mzratio << endl;
+		cout << "mzratio does not match" << endl;
+		return false;
+	}
+
+	if (!compareDoubles(relativeintensity, secondpeak.relativeintensity)) {
+		cout << "relativeintensity does not match" << endl;
+		return false;
+	}
+
+	if (!compareDoubles(absoluteintensity, secondpeak.absoluteintensity)) {
+		cout << "absoluteintensity does not match" << endl;
+		return false;
+	}
+
+	if (description.compare(secondpeak.description) != 0) {
+		cout << "description does not match" << endl;
+		return false;
+	}
+
+	if (descriptionid != secondpeak.descriptionid) {
+		cout << "descriptionid does not match" << endl;
+		return false;
+	}
+
+	if (!compareDoubles(matchedmz, secondpeak.matchedmz)) {
+		cout << "matchedmz does not match" << endl;
+		return false;
+	}
+
+	if (!compareDoubles(matchedrelativeintensity, secondpeak.matchedrelativeintensity)) {
+		cout << "matchedrelativeintensity does not match" << endl;
+		return false;
+	}
+
+	if (!compareDoubles(matchedabsoluteintensity, secondpeak.matchedabsoluteintensity)) {
+		cout << "matchedabsoluteintensity does not match" << endl;
+		return false;
+	}
+
+	if (!compareDoubles(matchedppm, secondpeak.matchedppm)) {
+		cout << "matchedppm does not match" << endl;
+		return false;
+	}
+
+	if (iontype != secondpeak.iontype) {
+		cout << "iontype does not match" << endl;
+		return false;
+	}
+
+	if (neutrallosstype != secondpeak.neutrallosstype) {
+		cout << "neutrallosstype does not match" << endl;
+		return false;
+	}
+
+	if (matched != secondpeak.matched) {
+		cout << "matched does not match" << endl;
+		return false;
+	}
+
+	if (matchedid != secondpeak.matchedid) {
+		cout << "matchedid does not match" << endl;
+		return false;
+	}
+
+	if (charge != secondpeak.charge) {
+		cout << "charge does not match" << endl;
+		return false;
+	}
+
+	if (rotationid != secondpeak.rotationid) {
+		cout << "rotationid does not match" << endl;
+		return false;
+	}
+
+	if (seriesid != secondpeak.seriesid) {
+		cout << "seriesid does not match" << endl;
+		return false;
+	}
+
+	if (groupid != secondpeak.groupid) {
+		cout << "groupid does not match" << endl;
+		return false;
+	}
+
+	if (compoundid != secondpeak.compoundid) {
+		cout << "compoundid does not match" << endl;
+		return false;
+	}
+
+	if (isotope != secondpeak.isotope) {
+		cout << "isotope does not match" << endl;
+		return false;
+	}
+
+	if (removeme != secondpeak.removeme) {
+		cout << "removeme does not match" << endl;
+		return false;
+	}
+
+	if (scrambled != secondpeak.scrambled) {
+		cout << "scrambled does not match" << endl;
+		return false;
+	}
+
+	if (decoy != secondpeak.decoy) {
+		cout << "decoy does not match" << endl;
+		return false;
+	}
+
+	if (orderid != secondpeak.orderid) {
+		cout << "orderid does not match" << endl;
+		return false;
+	}
+
+	return true;
+}
+

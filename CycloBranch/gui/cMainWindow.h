@@ -34,6 +34,9 @@
 #include "gui/cChromatogramWindow.h"
 #include "gui/cMainWindowProxyModel.h"
 #include "gui/cPreferencesDialog.h"
+#include "gui/cPatternSimulatorWidget.h"
+#include "gui/cFormulaPredictor.h"
+#include "gui/cMultipleDatasetsTableWidget.h"
 
 
 // forward declaration
@@ -80,15 +83,18 @@ private:
 	QMenu* menuFile;
 	QMenu* menuSearch;
 	QMenu* menuTools;
+	QMenu* menuBookmarks;
 	QMenu* menuView;
 	QMenu* menuHelp;
 	
 	QToolBar* toolbarFile;
 	QToolBar* toolbarSearch;
 	QToolBar* toolbarTools;
+	QToolBar* toolbarBookmarks;
 	QToolBar* toolbarView;
 	QToolBar* toolbarHelp;
-	QToolBar* toolbarFilter;
+	QToolBar* toolbarInputFilter;
+	QToolBar* toolbarRowsFilter;
 
 	QAction* actionOpenResults;
 	QAction* actionSaveResults;
@@ -105,15 +111,31 @@ private:
 	QAction *actionDrawPeptide;
 	QAction *actionBookMark1;
 	QAction *actionBookMark2;
+	QAction *actionBookMark3;
+	QAction *actionBookMark4;
+	QAction *actionBookMark5;
+	QAction *actionBookMark6;
+	QAction *actionBookMark7;
+	QAction *actionBookMark8;
+	QAction *actionBookMark9;
+	QAction *actionBookMark10;
 	QAction* actionShowIsomers;
 	QAction* actionGraph;
 	QAction* actionSummaryTableOfMatchedPeaks;
-	QAction* actionImageWindow;
+	QAction* actionMultipleDatasets;
 	QAction* actionChromatogramWindow;
+	QAction* actionImageWindow;
+	QAction* actionPatternSimulatorWindow;
+	QAction* actionFormulaPredictor;
 	QAction* actionLog;
 	QAction* actionHTMLDocumentation;
 	QAction* actionPDFManual;
 	QAction* actionAbout;
+
+	QWidget* inputfilterwidget;
+	QHBoxLayout* inputfilterhbox;
+	QComboBox* inputfiltercombobox;
+	QPushButton* inputfilterbutton;
 
 	QWidget* rowsfilterwidget;
 	QHBoxLayout* rowsfilterhbox;
@@ -133,7 +155,8 @@ private:
 	QStandardItemModel* resultsmodel;
 	cMainWindowProxyModel* resultsproxymodel;
 
-	cTheoreticalSpectrumList theoreticalspectrumlist;
+	cTheoreticalSpectrumList listoftheoreticalspectra;
+	cPeakListSeries eicchromatograms;
 	vector<cSpectrumDetailWidget> spectradetails;
 
 	cGlobalPreferences globalpreferences;
@@ -159,6 +182,9 @@ private:
 	cParametersWidget* parameterswidget;
 	cHTMLExportDialog* htmlexportdialog;
 	cPreferencesDialog* preferencesdialog;
+	cMultipleDatasetsTableWidget* multipledatasetswidget;
+	cPatternSimulatorWidget* patternsimulatorwidget;
+	cFormulaPredictor* formulapredictor;
 
 	int resultsbasecolumncount;
 	int resultsspecificcolumncount;
@@ -171,6 +197,21 @@ private:
 	QString lastdiropenresults;
 
 	bool summarytableisprepared;
+	bool multipledatasetsisprepared;
+
+	int lastactivedetail;
+
+	QRect othernormalgeometry;
+	bool otherismaximized;
+	bool otherprofilespectrum;
+	bool otherabsoluteintensity;
+	bool othermatchedpeaks;
+	bool otherunmatchedpeaks;
+	bool otherscrambledpeaks;
+	bool otherlabelspeaks;
+	bool othermzselection;
+
+	int activefileid;
 
 	bool quitapp;
 
@@ -183,6 +224,8 @@ private:
 	void deleteResults();
 
 	void applyGlobalPreferences();
+
+	void openDetail(int rowid);
 
 	
 private slots:
@@ -212,6 +255,12 @@ private slots:
 	void showGraph();
 
 	void showProperties();
+
+	void showMultipleDatasetsOverview();
+
+	void showPatternSimulatorWindow();
+
+	void showFormulaPredictor();
 
 	void run();
 
@@ -261,19 +310,45 @@ private slots:
 
 	void resetFilter();
 
+	void lastActiveDetailSlot(int rowid);
+
 	void gotoBookMark1();
 
 	void gotoBookMark2();
 
+	void gotoBookMark3();
+
+	void gotoBookMark4();
+
+	void gotoBookMark5();
+
+	void gotoBookMark6();
+
+	void gotoBookMark7();
+
+	void gotoBookMark8();
+
+	void gotoBookMark9();
+
+	void gotoBookMark10();
+
 	void summaryPeaksTableCancelled();
 
+	void multipleDatasetsTableCancelled();
+
 	void summaryPeaksTableRowDoubleClicked(int rowid, double experimentalmz);
+
+	void multipleDatasetsTableRowClicked(int datasetid, int spectrumid, int peakid, int datatypeview, int peakshape, string name, string iontype, string mzstr);
 
 	void updateSummaryPeaksTableFilterSlot(int xmin, int xmax, int ymin, int ymax);
 
 	void chromatogramDoubleClicked(int scanid);
 
 	void imageWindowDoubleClicked(int spectrumid);
+
+	void inputFilterButtonReleased();
+
+	void filterSummaryTableIfPrepared();
 
 	//void showContextMenu(const QPoint &pt);
 

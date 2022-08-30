@@ -20,9 +20,13 @@
 #include <QDoubleSpinBox>
 #include <QInputDialog>
 #include <QMessageBox>
+#include <QScrollArea>
+#include <QProgressDialog>
 #include "core/utilities.h"
 #include "core/cGlobalPreferences.h"
 #include "gui/cImageWindowWidget.h"
+#include "gui/cImageWindowImportDialog.h"
+#include "gui/cImageWindowTabOptical.h"
 
 
 // forward declaration
@@ -41,6 +45,42 @@ class QMenu;
 	\brief Paramaters of a microscopy layer.
 */
 struct microscopyLayerInfo {
+	/**
+		\brief Type (0 = FEI SEM, 1 = LEICA LIF).
+	*/
+	int type;
+
+
+	/**
+		\brief Index of navigation layer.
+	*/
+	int navigationlayer;
+
+
+	/**
+		\brief Source file name.
+	*/
+	QString sourcename;
+
+
+	/**
+		\brief Image name.
+	*/
+	QString imagename;
+
+
+	/**
+		\brief Flip horizontally.
+	*/
+	bool flipx;
+
+
+	/**
+		\brief Flip vertically.
+	*/
+	bool flipy;
+
+
 	/**
 		\brief X position.
 	*/
@@ -102,19 +142,29 @@ struct microscopyLayerInfo {
 
 
 	/**
+		\brief True if the image size has been reduced.
+	*/
+	bool reduced;
+
+
+	/**
+		\brief Noise threshold.
+	*/
+	int thresholdmin;
+
+
+	/**
+		\brief Signal threshold.
+	*/
+	int thresholdmax;
+
+
+	/**
 		\brief The constructor.
 	*/
 	microscopyLayerInfo() {
-		x = 0;
-		y = 0;
-		width = 0;
-		height = 0;
-		angle = 0;
-		defaultwidth = 0;
-		defaultheight = 0;
-		stagex = 0;
-		stagey = 0;
 		image = new QImage();
+		clear();
 	}
 
 
@@ -122,6 +172,12 @@ struct microscopyLayerInfo {
 		\brief The copy constructor.
 	*/
 	microscopyLayerInfo(const microscopyLayerInfo& layer) {
+		type = layer.type;
+		navigationlayer = layer.navigationlayer;
+		sourcename = layer.sourcename;
+		imagename = layer.imagename;
+		flipx = layer.flipx;
+		flipy = layer.flipy;
 		x = layer.x;
 		y = layer.y;
 		width = layer.width;
@@ -133,6 +189,9 @@ struct microscopyLayerInfo {
 		stagey = layer.stagey;
 		image = new QImage();
 		*image = *layer.image;
+		reduced = layer.reduced;
+		thresholdmin = layer.thresholdmin;
+		thresholdmax = layer.thresholdmax;
 	}
 
 	
@@ -141,6 +200,35 @@ struct microscopyLayerInfo {
 	*/
 	~microscopyLayerInfo() {
 		delete image;
+	}
+
+
+	/**
+		\brief Clear the structure.
+	*/
+	void clear() {
+		type = -1;
+		navigationlayer = 3;
+		sourcename.clear();
+		imagename.clear();
+		flipx = false;
+		flipy = false;
+		x = 0;
+		y = 0;
+		width = 0;
+		height = 0;
+		angle = 0;
+		defaultwidth = 0;
+		defaultheight = 0;
+		stagex = 0;
+		stagey = 0;
+
+		delete image;
+		image = new QImage();
+
+		reduced = false;
+		thresholdmin = 0;
+		thresholdmax = 255;
 	}
 };
 
@@ -177,14 +265,15 @@ public:
 
 
 	/**
-		\brief Set the default max count of pixel x/y values parsed from an imzML file.
+		\brief Set the filename and some default values parsed from the imzML file.
+		\param imzmlfilename name of imzML file
 		\param defaultmaxx max count of pixel x - parsed from imzML file
 		\param defaultmaxy max count of pixel y - parsed from imzML file
 		\param defaultpixelsizex pixel size x - parsed from imzML file
 		\param defaultpixelsizey pixel size y - parsed from imzML file
 		\param vendor vendor type
 	*/
-	void setDefaultMaxXY(int defaultmaxx, int defaultmaxy, int defaultpixelsizex, int defaultpixelsizey, eVendorType vendor);
+	void setDefaultValues(string imzmlfilename, int defaultmaxx, int defaultmaxy, int defaultpixelsizex, int defaultpixelsizey, eVendorType vendor);
 
 
 	/**
@@ -202,7 +291,11 @@ public:
 
 
 private:
+
+	QString editorname;
 	
+	cImageWindowImportDialog importdialog;
+
 	cGlobalPreferences* globalpreferences;
 	QWidget* parent;
 
@@ -212,8 +305,13 @@ private:
 	QMenu* menuHelp;
 	
 	QToolBar* toolbarFile;
+	QAction* actionLoadLayers;
+	QAction* actionSaveLayers;
+	QAction* actionSaveLayersAs;
 	QAction* actionOpenImage;
-	QAction* actionSaveImage;
+	QAction* actionImportDialog;
+	QAction* actionExportImage;
+	QAction* actionClearAll;
 	QAction* actionCloseWindow;
 
 	QToolBar* toolbarView;
@@ -225,6 +323,8 @@ private:
 	QAction* actionZoomReset;
 	QAction* actionFlipHistologyHorizontal;
 	QAction* actionFlipHistologyVertical;
+	QAction* actionFlipMicroscopyHorizontal;
+	QAction* actionFlipMicroscopyVertical;
 
 	QLabel* rulerLabel;
 	QDoubleSpinBox* rulerValue;
@@ -288,8 +388,12 @@ private:
 	QDoubleSpinBox* microscopyheight;
 	QLabel* microscopyanglelabel;
 	QDoubleSpinBox* microscopyangle;
+	QLabel* microscopynavigationlabel;
+	QComboBox* microscopynavigationcombobox;
 	QPushButton* microscopydefaultbutton;
 	QPushButton* microscopygobutton;
+	QPushButton* microscopyprevbutton;
+	QPushButton* microscopynextbutton;
 
 	QToolBar* toolbarHelp;
 	QAction* actionHTMLDocumentation;
@@ -297,11 +401,17 @@ private:
 	QImage* image;
 	QImage* histologyimage;
 
+	// layer == 0 - compounds
+	// layer == 1 - optical image
+	// layer == 2 - histology image
+	// layer == 3 - microscopy navigation image
+	// layer >= 4 - microscopy images
 	vector<microscopyLayerInfo> microscopylayers;
 
 	cImageWindowWidget* imagewindowwidget;
 	QGridLayout* layerslayout;
 	QWidget* layerswidget;
+	QScrollArea* layersscrollarea;
 	QSplitter* mainwidget;
 
 	int layerscount;
@@ -311,6 +421,12 @@ private:
 	QString lastdirhistologyimage;
 	QString lastdirmicroscopyimage;
 	QString lastdirexportimage;
+	QString lastdirlayersfile;
+
+	bool layersfileloaded;
+	bool saveascalled;
+
+	string imzmlfilename;
 
 	int defaultmaxx;
 	int defaultmaxy;
@@ -320,15 +436,38 @@ private:
 
 	eVendorType vendor;
 
+	bool redrawenabled;
+
 	void colorSpinBoxes(int layerid);
 
 	void openOpticalImage();
 
+	void reopenOpticalImage(QString filename);
+
 	void openHistologyImage();
 
-	bool parseMicroscopyImage(QString& filename, double& pixelwidth, double& pixelheight, int& resolutionx, int& resolutiony, double& stagex, double& stagey);
+	void reopenHistologyImage(QString filename);
 
-	void openMicroscopyImage(eLayerType layer, const QString &layername);
+	bool parseMicroscopyImage(QString& filename, double& pixelwidth, double& pixelheight, int& resolutionx, int& resolutiony, double& realwidth, double& stagex, double& stagey);
+
+	void openMicroscopyImage(int layer, const QString &layername);
+
+	void reopenMicroscopyImage(int layer, QString filename, bool reopen);
+
+	void clearLayers();
+
+	void updateMicroscopyNavigationCombobox(int numberofitems);
+
+	bool checkLoadedImage(QImage* image);
+
+	void readLifImageOptical(string filename, cLifMetadata& metadata, QImage& image, bool enableprogress);
+
+	void readLifImageFluorescence(string filename, cLifMetadata& metadata, QImage& image, int minthreshold, int maxthreshold, bool enableprogress);
+
+	void openLifImage(string liffilename, int layer, cLifMetadata& metadata, bool enableprogress);
+
+	void setNavigationLayer(int layer, int navigation);
+
 
 protected:
 
@@ -338,6 +477,13 @@ protected:
 		\param event pointer to QKeyEvent
 	*/ 
 	void keyPressEvent(QKeyEvent *event);
+
+
+	/**
+		\brief Handle a key release event.
+		\param event pointer to QKeyEvent
+	*/
+	void keyReleaseEvent(QKeyEvent *event);
 
 
 private slots:
@@ -352,7 +498,10 @@ private slots:
 	void imageTypeSelected(const QString &s);
 
 
-	void saveImage();
+	void openImportDialog();
+
+
+	void exportImage();
 
 
 	void setFilterOptionsSlot(vector<cCoordinateInfo> coordinates, bool operatortype, string columnname1, string comparatorname1, string filterstring1, string columnname2, string comparatorname2, string filterstring2, bool casesensitive, bool wholeword);
@@ -385,10 +534,19 @@ private slots:
 	void microscopyGoButtonReleased();
 
 
+	void microscopyPrevButtonReleased();
+
+
+	void microscopyNextButtonReleased();
+
+
 	void microscopyPositionChanged(double value);
 
 
 	void microscopyAngleChanged(double value);
+
+
+	void microscopyFlipStateChanged(bool state);
 
 
 	void showHTMLDocumentation();
@@ -421,13 +579,31 @@ private slots:
 	void updateHistologySlot(int x, int y, int width, int height, double angle);
 
 
-	void updateMicroscopySlot(double x, double y, double width, double height, double angle);
+	void updateMicroscopySlot(bool flipx, bool flipy, double x, double y, double width, double height, double angle);
 
 
 	void updateRulerSlot(double value);
 
 
 	void imageDoubleClickedSlot(int spectrumid);
+
+
+	void loadLayers();
+
+
+	void saveLayers();
+
+
+	void saveLayersAs();
+
+
+	void clearAllLayersSlot();
+
+
+	void microscopyNavigationChanged(int index);
+
+
+	void clearLayer();
 
 
 signals:
@@ -449,8 +625,9 @@ signals:
 		\param checked true if the layer was checked, false if the layer was unchecked
 		\param alpha transparency of the layer
 		\param zvalue z-value of the layer
+		\param redraw redraw scene
 	*/
-	void layerChanged(int layerid, bool checked, int alpha, int zvalue);
+	void layerChanged(int layerid, bool checked, int alpha, int zvalue, bool redraw);
 
 
 	/**
