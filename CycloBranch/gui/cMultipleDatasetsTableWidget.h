@@ -21,6 +21,7 @@
 #include <QComboBox>
 #include <QPushButton>
 #include <QLabel>
+#include <QSpinBox>
 #include <QDoubleSpinBox>
 #include <QHBoxLayout>
 
@@ -224,6 +225,13 @@ private:
 	QHBoxLayout* calibrationhboxlayout;
 	QWidget* calibrationwidget;
 
+	QLabel* columnsizelabel;
+	QSpinBox* columnsizespinbox;
+	QPushButton* columnsizesetbutton;
+	QPushButton* columnsizeresetbutton;
+	QHBoxLayout* columnsizehboxlayout;
+	QWidget* columnsizewidget;
+
 	QTableView* database;
 	QStandardItemModel* databasemodel;
 	cMultipleDatasetsTableProxyModel* proxymodel;
@@ -296,6 +304,12 @@ private slots:
 
 
 	void searchPubChem();
+
+
+	void setColumnSize();
+
+
+	void resetColumnSize();
 
 
 signals:

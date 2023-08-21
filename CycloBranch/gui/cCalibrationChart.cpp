@@ -20,7 +20,7 @@ cCalibrationChart::cCalibrationChart(cGlobalPreferences* globalpreferences, QWid
 	this->parent = parent;
 	this->globalpreferences = globalpreferences;
 
-	setWindowTitle("Calibration Curve");
+	setWindowTitle("Calibration Curve and Statistics");
 	setWindowIcon(QIcon(":/images/icons/features.png"));
 
 	vsplitter = new QSplitter();
@@ -91,55 +91,72 @@ cCalibrationChart::cCalibrationChart(cGlobalPreferences* globalpreferences, QWid
 	toolbarHelp->addAction(actionHTMLDocumentation);
 	connect(actionHTMLDocumentation, SIGNAL(triggered()), this, SLOT(showHTMLDocumentation()));
 
-	labelconcentration = new QLabel(tr("Concentration: "));
+	labelxvalue = new QLabel(tr("Range of X-values: "));
 
-	minconcentration = new QDoubleSpinBox();
-	minconcentration->setDecimals(6);
-	minconcentration->setRange(0, 1000000);
-	minconcentration->setSingleStep(1);
+	minxvalue = new QDoubleSpinBox();
+	minxvalue->setDecimals(6);
+	minxvalue->setRange(0, 1000000);
+	minxvalue->setSingleStep(1);
 
 	labelseparator = new QLabel(tr("-"));
 
-	maxconcentration = new QDoubleSpinBox();
-	maxconcentration->setDecimals(6);
-	maxconcentration->setRange(0, 1000000);
-	maxconcentration->setSingleStep(1);
+	maxxvalue = new QDoubleSpinBox();
+	maxxvalue->setDecimals(6);
+	maxxvalue->setRange(0, 1000000);
+	maxxvalue->setSingleStep(1);
 
-	setconcentrationinterval = new QPushButton("Set");
-	setconcentrationinterval->setMinimumWidth(75);
-	connect(setconcentrationinterval, SIGNAL(released()), this, SLOT(setConcentrationInterval()));
-	connect(this, SIGNAL(emitConcentrationInterval(double, double)), chartscene, SLOT(setConcentrationInterval(double, double)));
+	setxvalueinterval = new QPushButton("Set");
+	setxvalueinterval->setMinimumWidth(75);
+	connect(setxvalueinterval, SIGNAL(released()), this, SLOT(setXValueInterval()));
+	connect(this, SIGNAL(emitXValueInterval(double, double)), chartscene, SLOT(setXValueInterval(double, double)));
 
-	resetconcentrationinterval = new QPushButton("Reset");
-	resetconcentrationinterval->setMinimumWidth(75);
-	connect(resetconcentrationinterval, SIGNAL(released()), chartscene, SLOT(resetConcentrationInterval()));
-	connect(chartscene, SIGNAL(updateConcentrationInterval(double, double)), this, SLOT(updateConcentrationInterval(double, double)));
+	resetxvalueinterval = new QPushButton("Reset");
+	resetxvalueinterval->setMinimumWidth(75);
+	connect(resetxvalueinterval, SIGNAL(released()), chartscene, SLOT(resetXValueInterval()));
+	connect(chartscene, SIGNAL(updateXValueInterval(double, double)), this, SLOT(updateXValueInterval(double, double)));
 
-	hboxconcentration = new QHBoxLayout();
-	hboxconcentration->addWidget(labelconcentration);
-	hboxconcentration->addWidget(minconcentration);
-	hboxconcentration->addWidget(labelseparator);
-	hboxconcentration->addWidget(maxconcentration);
-	hboxconcentration->addSpacing(5);
-	hboxconcentration->addWidget(setconcentrationinterval);
-	hboxconcentration->addSpacing(5);
-	hboxconcentration->addWidget(resetconcentrationinterval);
+	labelgraphtype = new QLabel(tr("Graph Type: "));
 
-	widgetconcentration = new QWidget();
-	widgetconcentration->setLayout(hboxconcentration);
+	comboboxgraphtype = new QComboBox();
+	comboboxgraphtype->addItem("Calibration Curve");
+	comboboxgraphtype->addItem("Collection Time and Concentration");
+	connect(comboboxgraphtype, SIGNAL(currentIndexChanged(int)), this, SLOT(graphTypeChanged(int)));
 
-	toolbarConcentration = addToolBar(tr("Concentration"));
+	hboxgraphtype = new QHBoxLayout();
+	hboxgraphtype->addWidget(labelgraphtype);
+	hboxgraphtype->addWidget(comboboxgraphtype);
 
-	//actionMouseConcentrationSelection = new QAction(QIcon(":/images/icons/64.png"), tr("Mouse Concentration Selection Tool"), this);
-	//actionMouseConcentrationSelection->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_T));
-	//actionMouseConcentrationSelection->setToolTip("Mouse Concentration Selection Tool (Ctrl + T)");
-	//actionMouseConcentrationSelection->setCheckable(true);
-	//actionMouseConcentrationSelection->setChecked(true);
-	//actionMouseConcentrationSelection->setEnabled(true);
-	//toolbarConcentration->addAction(actionMouseConcentrationSelection);
-	//connect(actionMouseConcentrationSelection, SIGNAL(toggled(bool)), chartscene, SLOT(enableMouseConcentrationSelectionTool(bool)));
+	widgetgraphtype = new QWidget();
+	widgetgraphtype->setLayout(hboxgraphtype);
 
-	toolbarConcentration->addWidget(widgetconcentration);
+	hboxxvalue = new QHBoxLayout();
+	hboxxvalue->addWidget(labelxvalue);
+	hboxxvalue->addWidget(minxvalue);
+	hboxxvalue->addWidget(labelseparator);
+	hboxxvalue->addWidget(maxxvalue);
+	hboxxvalue->addSpacing(5);
+	hboxxvalue->addWidget(setxvalueinterval);
+	hboxxvalue->addSpacing(5);
+	hboxxvalue->addWidget(resetxvalueinterval);
+
+	widgetxvalue = new QWidget();
+	widgetxvalue->setLayout(hboxxvalue);
+
+	addToolBarBreak();
+
+	toolbarGraph = addToolBar(tr("Graph"));
+
+	//actionMouseXValueSelection = new QAction(QIcon(":/images/icons/64.png"), tr("Mouse X-value Selection Tool"), this);
+	//actionMouseXValueSelection->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_T));
+	//actionMouseXValueSelection->setToolTip("Mouse X-value Selection Tool (Ctrl + T)");
+	//actionMouseXValueSelection->setCheckable(true);
+	//actionMouseXValueSelection->setChecked(true);
+	//actionMouseXValueSelection->setEnabled(true);
+	//toolbarRange->addAction(actionMouseXValueSelection);
+	//connect(actionMouseXValueSelection, SIGNAL(toggled(bool)), chartscene, SLOT(enableMouseXValueSelectionTool(bool)));
+
+	toolbarGraph->addWidget(widgetgraphtype);
+	toolbarGraph->addWidget(widgetxvalue);
 
 	database = new QTableView(this);
 	databasemodel = new QStandardItemModel(0, 0, this);
@@ -186,21 +203,26 @@ cCalibrationChart::cCalibrationChart(cGlobalPreferences* globalpreferences, QWid
 
 	setMenuBar(menuBar);
 
-	resize(750, defaultwinsizey);
+	resize(900, defaultwinsizey);
 
 	//applyGlobalPreferences(globalpreferences);
 }
 
 
 cCalibrationChart::~cCalibrationChart() {
-	delete labelconcentration;
-	delete minconcentration;
+	delete labelgraphtype;
+	delete comboboxgraphtype;
+	delete hboxgraphtype;
+	delete widgetgraphtype;
+
+	delete labelxvalue;
+	delete minxvalue;
 	delete labelseparator;
-	delete maxconcentration;
-	delete setconcentrationinterval;
-	delete resetconcentrationinterval;
-	delete hboxconcentration;
-	delete widgetconcentration;
+	delete maxxvalue;
+	delete setxvalueinterval;
+	delete resetxvalueinterval;
+	delete hboxxvalue;
+	delete widgetxvalue;
 
 	delete chartscene;
 
@@ -217,7 +239,7 @@ cCalibrationChart::~cCalibrationChart() {
 	delete actionZoomOut;
 	delete actionZoomReset;
 	delete actionHideLabels;
-	//delete actionMouseConcentrationSelection;
+	//delete actionMouseXValueSelection;
 	delete actionHTMLDocumentation;
 
 	delete menuFile;
@@ -252,14 +274,14 @@ void cCalibrationChart::setLineParameters(int equationtype, double a, double b, 
 }
 
 
-void cCalibrationChart::setData(vector<double> xvalues, vector<double> yvalues, vector<double> sd, vector<int> datagroups) {
+void cCalibrationChart::setData(vector<double> xvalues, vector<double> yvalues, vector<double> sd, vector<string> datagroups, vector<int>& datatimevalues) {
 	if (chartscene) {
-		chartscene->setData(xvalues, yvalues, sd, datagroups);
+		chartscene->setData(xvalues, yvalues, sd, datagroups, datatimevalues);
 	}
 }
 
 
-void cCalibrationChart::createTable(double a, double b, vector<double>& calibrationxvalues, vector<double>& calibrationyvalues, vector<double>& calibrationsd, vector<int>& datagroups, vector<double>& dataxvalues, vector<double>& datayvalues, vector<double>& datasd) {
+void cCalibrationChart::createTable(double a, double b, vector<double>& calibrationxvalues, vector<double>& calibrationyvalues, vector<double>& calibrationsd, vector<string>& datagroups, vector<double>& dataxvalues, vector<double>& datayvalues, vector<double>& datasd, vector<int>& datatimevalues) {
 	int currentrow = 0;
 	int currentcolumn = 0;
 	size_t size;
@@ -288,6 +310,11 @@ void cCalibrationChart::createTable(double a, double b, vector<double>& calibrat
 
 	databasemodel->setHorizontalHeaderItem(currentcolumn, new QStandardItem());
 	databasemodel->horizontalHeaderItem(currentcolumn)->setText("Std. Dev. (y-axis)");
+	database->setItemDelegateForColumn(currentcolumn, new QItemDelegate());
+	currentcolumn++;
+
+	databasemodel->setHorizontalHeaderItem(currentcolumn, new QStandardItem());
+	databasemodel->horizontalHeaderItem(currentcolumn)->setText("Collection Time");
 	database->setItemDelegateForColumn(currentcolumn, new QItemDelegate());
 	currentcolumn++;
 
@@ -333,6 +360,9 @@ void cCalibrationChart::createTable(double a, double b, vector<double>& calibrat
 		databasemodel->setItem(currentrow, currentcolumn, new QStandardItem());
 		databasemodel->item(currentrow, currentcolumn)->setData(QVariant::fromValue(cropPrecisionToSixDecimalsByteArray(value)), Qt::DisplayRole);
 		currentcolumn++;
+
+		databasemodel->setItem(currentrow, currentcolumn, new QStandardItem());
+		currentcolumn++;
 	}
 
 	size = dataxvalues.size();
@@ -342,8 +372,7 @@ void cCalibrationChart::createTable(double a, double b, vector<double>& calibrat
 
 		currentcolumn = 0;
 
-		s = "Group ";
-		s += to_string(datagroups[i]);
+		s = datagroups[i];
 		databasemodel->setItem(currentrow, currentcolumn, new QStandardItem());
 		databasemodel->item(currentrow, currentcolumn)->setText(s.c_str());
 		currentcolumn++;
@@ -372,6 +401,10 @@ void cCalibrationChart::createTable(double a, double b, vector<double>& calibrat
 		databasemodel->setItem(currentrow, currentcolumn, new QStandardItem());
 		databasemodel->item(currentrow, currentcolumn)->setData(QVariant::fromValue(cropPrecisionToSixDecimalsByteArray(value)), Qt::DisplayRole);
 		currentcolumn++;
+
+		databasemodel->setItem(currentrow, currentcolumn, new QStandardItem());
+		databasemodel->item(currentrow, currentcolumn)->setData(QVariant::fromValue(datatimevalues[i]), Qt::DisplayRole);
+		currentcolumn++;
 	}
 
 	for (int i = 0; i < databasemodel->columnCount(); i++) {
@@ -392,8 +425,8 @@ void cCalibrationChart::deleteTable() {
 
 void cCalibrationChart::keyPressEvent(QKeyEvent *event) {
 	if ((event->key() == Qt::Key_Enter) || (event->key() == Qt::Key_Return)) {
-		if (minconcentration->hasFocus() || maxconcentration->hasFocus() || setconcentrationinterval->hasFocus()) {
-			setConcentrationInterval();
+		if (minxvalue->hasFocus() || maxxvalue->hasFocus() || setxvalueinterval->hasFocus()) {
+			setXValueInterval();
 		}
     }
 
@@ -499,14 +532,38 @@ void cCalibrationChart::exportToCsv() {
 }
 
 
-void cCalibrationChart::updateConcentrationInterval(double minconcentration, double maxconcentration) {
-	this->minconcentration->setValue(minconcentration);
-	this->maxconcentration->setValue(maxconcentration);
+void cCalibrationChart::updateXValueInterval(double minxvalue, double maxxvalue) {
+	this->minxvalue->setValue(minxvalue);
+	this->maxxvalue->setValue(maxxvalue);
 }
 
 
-void cCalibrationChart::setConcentrationInterval() {
-	emit emitConcentrationInterval(minconcentration->value(), maxconcentration->value());
+void cCalibrationChart::setXValueInterval() {
+	emit emitXValueInterval(minxvalue->value(), maxxvalue->value());
+}
+
+
+void cCalibrationChart::graphTypeChanged(int type) {
+	double value;
+
+	if (type == 0) {
+		value = chartscene->getMaximumConcentration();
+		if (value == 0) {
+			value = 1000;
+		}
+	}
+	else {
+		value = (double)chartscene->getMaximumCollectionTime();
+		if (value == 0) {
+			value = 240;
+		}
+	}
+
+	updateXValueInterval(0, value);
+
+	setXValueInterval();
+
+	chartscene->setGraphType(type);
 }
 
 

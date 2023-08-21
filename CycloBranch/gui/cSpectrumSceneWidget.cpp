@@ -429,7 +429,7 @@ void cSpectrumSceneWidget::redrawScene() {
 	double y;
 	qreal tx, ty, tw, th, sumh;
 
-	char tmpbuf[30];
+	char tmpbuf[500];
 	string s;
 
 	int xstep, ystep;
@@ -586,7 +586,12 @@ void cSpectrumSceneWidget::redrawScene() {
 			}
 
 			if ((parameters->mode == dereplication) || (parameters->mode == compoundsearch)) {
-				visiblepeaks[visiblepeakscount].description += parameters->peakidtodesc[thpeaks[*it].descriptionid].substr(0, parameters->peakidtodesc[thpeaks[*it].descriptionid].rfind(':'));
+				if (thpeaks[*it].descriptionid >= 0) {
+					visiblepeaks[visiblepeakscount].description += parameters->peakidtodesc[thpeaks[*it].descriptionid].substr(0, parameters->peakidtodesc[thpeaks[*it].descriptionid].rfind(':'));
+				}
+				else {
+					visiblepeaks[visiblepeakscount].description += thpeaks[*it].description.substr(0, thpeaks[*it].description.rfind(':'));
+				}
 			}
 			else {
 				visiblepeaks[visiblepeakscount].description += parameters->peakidtodesc[thpeaks[*it].descriptionid].substr(0, parameters->peakidtodesc[thpeaks[*it].descriptionid].find(':'));
@@ -625,7 +630,7 @@ void cSpectrumSceneWidget::redrawScene() {
 	string tmpvisibleneutralloss;
 	size_t tmpposition;
 	set<string> localneutrallosses = ((cSpectrumDetailWidget *)parent)->getLocalNeutralLosses();
-	for (int i = 0; i < (int)visiblepeaks.size(); i++) {
+	for (int i = 0; i < visiblepeaks.size(); i++) {
 
 		x = getXPositionFromMZRatio(visiblepeaks[i].mzratio, w);
 
@@ -840,36 +845,38 @@ void cSpectrumSceneWidget::redrawScene() {
 			line = scene->addLine(x, h - bottommargin - 2, x, h - bottommargin - std::max((int)y, 2), QPen(Qt::red, 2, Qt::SolidLine));
 			line->setZValue(2);
 			
-			hiddenitems.clear();
-			sumh = 0;
-			for (vector<string>::reverse_iterator rit = hits.rbegin(); rit != hits.rend(); ++rit) {
-				text = scene->addText("");
-				text->setDefaultTextColor(QColor(Qt::red));
-				text->setFont(myFont);
-				if ((parameters->mode == dereplication) || (parameters->mode == compoundsearch)) {
-					text->setTextInteractionFlags(Qt::TextBrowserInteraction);
-					text->setOpenExternalLinks(true);
-				}
-				text->setHtml(rit->c_str());
-				tw = text->boundingRect().width();
-				th = text->boundingRect().height();
-				sumh += th + 1;
-				tx = x - 2 - 4;
-				ty = h - bottommargin - std::max((int)y, 2) - sumh - 4;
-				text->setPos(tx, ty);
-				text->setZValue(2);
-
-				hiddenitems.append(text);
-				
-				if (scene->items(tx, ty, tw, th, Qt::IntersectsItemBoundingRect, Qt::AscendingOrder).size() > 1) {
-					for (int k = 0; k < (int)hiddenitems.size(); k++) {
-						scene->removeItem(hiddenitems[k]);
+			if (i < 100) {
+				hiddenitems.clear();
+				sumh = 0;
+				for (vector<string>::reverse_iterator rit = hits.rbegin(); rit != hits.rend(); ++rit) {
+					text = scene->addText("");
+					text->setDefaultTextColor(QColor(Qt::red));
+					text->setFont(myFont);
+					if ((parameters->mode == dereplication) || (parameters->mode == compoundsearch)) {
+						text->setTextInteractionFlags(Qt::TextBrowserInteraction);
+						text->setOpenExternalLinks(true);
 					}
-					break;
-				}
+					text->setHtml(rit->c_str());
+					tw = text->boundingRect().width();
+					th = text->boundingRect().height();
+					sumh += th + 1;
+					tx = x - 2 - 4;
+					ty = h - bottommargin - std::max((int)y, 2) - sumh - 4;
+					text->setPos(tx, ty);
+					text->setZValue(2);
 
-				if (hidelabels) {
-					break;
+					hiddenitems.append(text);
+
+					if (scene->items(tx, ty, tw, th, Qt::IntersectsItemBoundingRect, Qt::AscendingOrder).size() > 1) {
+						for (int k = 0; k < (int)hiddenitems.size(); k++) {
+							scene->removeItem(hiddenitems[k]);
+						}
+						break;
+					}
+
+					if (hidelabels) {
+						break;
+					}
 				}
 			}
 		}
@@ -877,17 +884,19 @@ void cSpectrumSceneWidget::redrawScene() {
 			line = scene->addLine(x, h - bottommargin - 2, x, h - bottommargin - std::max((int)y, 2), QPen(Qt::black, 2, Qt::SolidLine));
 			line->setZValue(1);
 
-			simpletext = scene->addSimpleText(hits[0].c_str(), myFont);
-			tw = simpletext->boundingRect().width();
-			th = simpletext->boundingRect().height();
-			tx = x - 2;
-			ty = h - bottommargin - std::max((int)y, 2) - th - 1 - 4;
-			simpletext->setPos(tx, ty);
-			simpletext->setBrush(Qt::black);
-			simpletext->setZValue(1);
-	
-			if (scene->items(tx, ty, tw, th, Qt::IntersectsItemBoundingRect, Qt::AscendingOrder).size() > 1) {
-				scene->removeItem(simpletext);
+			if (i < 100) {
+				simpletext = scene->addSimpleText(hits[0].c_str(), myFont);
+				tw = simpletext->boundingRect().width();
+				th = simpletext->boundingRect().height();
+				tx = x - 2;
+				ty = h - bottommargin - std::max((int)y, 2) - th - 1 - 4;
+				simpletext->setPos(tx, ty);
+				simpletext->setBrush(Qt::black);
+				simpletext->setZValue(1);
+
+				if (scene->items(tx, ty, tw, th, Qt::IntersectsItemBoundingRect, Qt::AscendingOrder).size() > 1) {
+					scene->removeItem(simpletext);
+				}
 			}
 		}
 

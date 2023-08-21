@@ -237,7 +237,7 @@ cMultipleDatasetsTableWidget::cMultipleDatasetsTableWidget(cGlobalPreferences* g
 	datatypelabel->setText("View: ");
 
 	comboboxdatatype = new QComboBox();
-	comboboxdatatype->setToolTip("Select data to be displayed.");
+	comboboxdatatype->setToolTip("Select the data to be displayed.");
 	comboboxdatatype->setSizeAdjustPolicy(QComboBox::AdjustToContents);
 	connect(comboboxdatatype, SIGNAL(currentIndexChanged(int)), this, SLOT(dataTypeViewChanged(int)));
 
@@ -324,6 +324,30 @@ cMultipleDatasetsTableWidget::cMultipleDatasetsTableWidget(cGlobalPreferences* g
 	calibrationwidget = new QWidget();
 	calibrationwidget->setLayout(calibrationhboxlayout);
 
+	columnsizelabel = new QLabel();
+	columnsizelabel->setText("Column size: ");
+
+	columnsizespinbox = new QSpinBox();
+	columnsizespinbox->setRange(10, 1000);
+	columnsizespinbox->setValue(200);
+	columnsizespinbox->setSingleStep(10);
+	columnsizespinbox->setToolTip("Define the column size.");
+
+	columnsizesetbutton = new QPushButton("Set");
+	connect(columnsizesetbutton, SIGNAL(released()), this, SLOT(setColumnSize()));
+
+	columnsizeresetbutton = new QPushButton("Reset");
+	connect(columnsizeresetbutton, SIGNAL(released()), this, SLOT(resetColumnSize()));
+
+	columnsizehboxlayout = new QHBoxLayout();
+	columnsizehboxlayout->addWidget(columnsizelabel);
+	columnsizehboxlayout->addWidget(columnsizespinbox);
+	columnsizehboxlayout->addWidget(columnsizesetbutton);
+	columnsizehboxlayout->addWidget(columnsizeresetbutton);
+
+	columnsizewidget = new QWidget();
+	columnsizewidget->setLayout(columnsizehboxlayout);
+
 	database = new QTableView(this);
 	databasemodel = new QStandardItemModel(0, 0, this);
 	proxymodel = new cMultipleDatasetsTableProxyModel(this);
@@ -336,6 +360,7 @@ cMultipleDatasetsTableWidget::cMultipleDatasetsTableWidget(cGlobalPreferences* g
 	database->setEditTriggers(QAbstractItemView::NoEditTriggers);
 	database->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
 	database->horizontalHeader()->setSectionsMovable(true);
+	database->horizontalHeader()->setDefaultAlignment(Qt::AlignCenter | (Qt::Alignment)Qt::TextWordWrap);
 	//database->verticalHeader()->setDefaultSectionSize(30);
 	connect(database, SIGNAL(clicked(const QModelIndex&)), this, SLOT(rowClicked(const QModelIndex&)));
 
@@ -381,6 +406,7 @@ cMultipleDatasetsTableWidget::cMultipleDatasetsTableWidget(cGlobalPreferences* g
 	toolbarView->addWidget(datatypewidget);
 	toolbarView->addWidget(peakshapewidget);
 	toolbarView->addWidget(standardwidget);
+	toolbarView->addWidget(columnsizewidget);
 
 	addToolBarBreak();
 
@@ -459,6 +485,13 @@ cMultipleDatasetsTableWidget::~cMultipleDatasetsTableWidget() {
 	delete calibrationhboxlayout;
 	delete calibrationwidget;
 
+	delete columnsizelabel;
+	delete columnsizespinbox;
+	delete columnsizesetbutton;
+	delete columnsizeresetbutton;
+	delete columnsizehboxlayout;
+	delete columnsizewidget;
+
 	delete pubchemsearchwidget;
 	delete definecalibrationwidget;
 	delete calibrationchartwidget;
@@ -527,6 +560,7 @@ bool cMultipleDatasetsTableWidget::prepareToShow(cParameters* parameters, cTheor
 			comboboxdatatype->addItem("Concentration - All Isotopes");
 			comboboxdatatype->addItem("Peak Area (Chromatogram) - Highest Peak");
 			comboboxdatatype->addItem("Concentration - Highest Peak");
+			comboboxdatatype->addItem("Retention Time");
 
 			standardlabel->show();
 			comboboxstandard->show();
@@ -976,6 +1010,9 @@ bool cMultipleDatasetsTableWidget::prepareToShow(cParameters* parameters, cTheor
 							value = -1;
 						}
 						break;
+					case 6:
+						value = listoftheoreticalspectra->get(i - systemcolumns, it.second[i - systemcolumns].first).getExperimentalSpectrum().getRetentionTime();
+						break;
 					default:
 						break;
 				}
@@ -1006,6 +1043,9 @@ bool cMultipleDatasetsTableWidget::prepareToShow(cParameters* parameters, cTheor
 						databasemodel->item(currentrow, currentcolumn)->setData(QVariant::fromValue(cropPrecisionToSixDecimalsByteArray(value)), Qt::DisplayRole);
 						break;
 					case 5:
+						databasemodel->item(currentrow, currentcolumn)->setData(QVariant::fromValue(cropPrecisionToSixDecimalsByteArray(value)), Qt::DisplayRole);
+						break;
+					case 6:
 						databasemodel->item(currentrow, currentcolumn)->setData(QVariant::fromValue(cropPrecisionToSixDecimalsByteArray(value)), Qt::DisplayRole);
 						break;
 					default:
@@ -1415,6 +1455,9 @@ void cMultipleDatasetsTableWidget::updateTable() {
 							value = -1;
 						}
 						break;
+					case 6:
+						value = listoftheoreticalspectra->get(i - systemcolumns, it.second[i - systemcolumns].first).getExperimentalSpectrum().getRetentionTime();
+						break;
 					default:
 						break;
 				}
@@ -1442,6 +1485,9 @@ void cMultipleDatasetsTableWidget::updateTable() {
 						databasemodel->item(currentrow, currentcolumn)->setData(QVariant::fromValue(cropPrecisionToSixDecimalsByteArray(value)), Qt::DisplayRole);
 						break;
 					case 5:
+						databasemodel->item(currentrow, currentcolumn)->setData(QVariant::fromValue(cropPrecisionToSixDecimalsByteArray(value)), Qt::DisplayRole);
+						break;
+					case 6:
 						databasemodel->item(currentrow, currentcolumn)->setData(QVariant::fromValue(cropPrecisionToSixDecimalsByteArray(value)), Qt::DisplayRole);
 						break;
 					default:
@@ -1926,8 +1972,9 @@ void cMultipleDatasetsTableWidget::calibrationViewButtonReleased() {
 void cMultipleDatasetsTableWidget::calibrationCurveRedefined() {
 	vector<int> usedvector;
 	vector<int> datatypes;
-	vector<int> groupsvector;
+	vector<string> groupsvector;
 	vector<double> concentrationsvector;
+	vector<int> timesvector;
 	vector<int> selectedionsvector;
 
 	int equationtype;
@@ -1937,7 +1984,7 @@ void cMultipleDatasetsTableWidget::calibrationCurveRedefined() {
 	int peakshapetype;
 	int standardtype;
 
-	definecalibrationwidget->getData(usedvector, datatypes, groupsvector, concentrationsvector, selectedionsvector, equationtype, manuala, manualb, eictype, peakshapetype, standardtype);
+	definecalibrationwidget->getData(usedvector, datatypes, groupsvector, concentrationsvector, timesvector, selectedionsvector, equationtype, manuala, manualb, eictype, peakshapetype, standardtype);
 
 	comboboxdatatype->blockSignals(true);
 	comboboxpeakshape->blockSignals(true);
@@ -2018,14 +2065,16 @@ void cMultipleDatasetsTableWidget::calibrationCurveRedefined() {
 	multimap<int, double> calibrationsubareas;
 	map<int, int> calibrationcounts;
 
-	map<int, double> dataareas;
-	multimap<int, double> datasubareas;
-	map<int, int> datacounts;
+	map<string, double> dataareas;
+	multimap<string, double> datasubareas;
+	map<string, int> datacounts;
+	map<string, int> datatimes;
 
 	double stdarea;
 	double cumarea;
 
 	int c, k;
+	string g;
 	
 	for (int i = systemcolumns; i < numberofdatasets + systemcolumns; i++) {
 
@@ -2092,6 +2141,7 @@ void cMultipleDatasetsTableWidget::calibrationCurveRedefined() {
 					case 1:
 					case 4:
 					case 5:
+					case 6:
 						getEICFromMultiMap(i - systemcolumns, identifieditemswithmultimap[it.first], eicchromatogram, true);
 						calculateGaussianParameters(eicchromatogram, rtimes[i - systemcolumns], rtimeunits[i - systemcolumns], true, true, nys, sigmas, as);
 
@@ -2157,39 +2207,42 @@ void cMultipleDatasetsTableWidget::calibrationCurveRedefined() {
 
 		if (datatypes[i - systemcolumns] == 0) {
 			
-			c = groupsvector[i - systemcolumns];
+			g = groupsvector[i - systemcolumns];
 
-			if (dataareas.count(c) == 0) {
+			if (dataareas.count(g) == 0) {
 				if (stdarea > 0) {
-					dataareas[c] = cumarea / stdarea;
+					dataareas[g] = cumarea / stdarea;
 				}
 				else {
-					dataareas[c] = cumarea;
+					dataareas[g] = cumarea;
 				}
 			}
 			else {
 				if (stdarea > 0) {
-					dataareas[c] += cumarea / stdarea;
+					dataareas[g] += cumarea / stdarea;
 				}
 				else {
-					dataareas[c] += cumarea;
+					dataareas[g] += cumarea;
 				}
 			}
 
 			if (stdarea > 0) {
-				datasubareas.insert(pair<int, double>(c, cumarea / stdarea));
+				datasubareas.insert(pair<string, double>(g, cumarea / stdarea));
 			}
 			else {
-				datasubareas.insert(pair<int, double>(c, cumarea));
+				datasubareas.insert(pair<string, double>(g, cumarea));
 			}
 
-			if (datacounts.count(c) == 0) {
-				datacounts[c] = 1;
+			if (datacounts.count(g) == 0) {
+				datacounts[g] = 1;
 			}
 			else {
-				datacounts[c] += 1;
+				datacounts[g] += 1;
 			}
 
+			if (datatimes.count(g) == 0) {
+				datatimes[g] = timesvector[i - systemcolumns];
+			}
 		}
 		else {
 			c = (int)(concentrationsvector[i - systemcolumns] * 1000.0);
@@ -2297,7 +2350,8 @@ void cMultipleDatasetsTableWidget::calibrationCurveRedefined() {
 	vector<double> dataxvalues;
 	vector<double> datayvalues;
 	vector<double> datasd;
-	vector<int> datagroups;
+	vector<string> datagroups;
+	vector<int> datatimevalues;
 
 	for (auto& it : dataareas) {
 		yvalue = it.second / (double)(datacounts[it.first]);
@@ -2338,11 +2392,12 @@ void cMultipleDatasetsTableWidget::calibrationCurveRedefined() {
 		}
 
 		datagroups.push_back(it.first);
+		datatimevalues.push_back(datatimes[it.first]);
 	}
 
-	calibrationchartwidget->setData(dataxvalues, datayvalues, datasd, datagroups);
+	calibrationchartwidget->setData(dataxvalues, datayvalues, datasd, datagroups, datatimevalues);
 
-	calibrationchartwidget->createTable(a, b, calibrationxvalues, calibrationyvalues, calibrationsd, datagroups, dataxvalues, datayvalues, datasd);
+	calibrationchartwidget->createTable(a, b, calibrationxvalues, calibrationyvalues, calibrationsd, datagroups, dataxvalues, datayvalues, datasd, datatimevalues);
 }
 
 
@@ -2889,3 +2944,18 @@ void cMultipleDatasetsTableWidget::searchPubChem() {
 		pubchemsearchwidget->showNormal();
 	}
 }
+
+
+void cMultipleDatasetsTableWidget::setColumnSize() {
+	for (int i = systemcolumns; i < databasemodel->columnCount(); i++) {
+		database->setColumnWidth(i, columnsizespinbox->value());
+	}
+}
+
+
+void cMultipleDatasetsTableWidget::resetColumnSize() {
+	for (int i = 0; i < databasemodel->columnCount(); i++) {
+		database->resizeColumnToContents(i);
+	}
+}
+

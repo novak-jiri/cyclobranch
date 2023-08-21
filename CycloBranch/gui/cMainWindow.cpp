@@ -383,6 +383,8 @@ cMainWindow::cMainWindow() {
 	connect(chromatogramwindow, SIGNAL(doubleClickedScanIDSignal(int)), this, SLOT(chromatogramDoubleClicked(int)));
 	connect(imagewindow, SIGNAL(doubleClickedSpectrumIDSignal(int)), this, SLOT(imageWindowDoubleClicked(int)));
 
+	connect(chromatogramwindow, SIGNAL(calculateAvgSpectrum(int, int)), this, SLOT(showAvgSpectrum(int, int)));
+
 	menuFile->addAction(actionOpenResults);
 	menuFile->addAction(actionSaveResults);
 	menuFile->addSeparator();
@@ -487,6 +489,7 @@ cMainWindow::cMainWindow() {
 	listoftheoreticalspectra.clear();
 	eicchromatograms.clear();
 	spectradetails.clear();
+	avgspectra.clear();
 
 	parameters.clear();
 	
@@ -495,7 +498,7 @@ cMainWindow::cMainWindow() {
 	profilemz64precision = false;
 	profileintensity64precision = false;
 
-	resultsbasecolumncount = 10;
+	resultsbasecolumncount = 11;
 	resultsspecificcolumncount = 0;
 	searchspecificcolumncount = 0;
 
@@ -505,7 +508,7 @@ cMainWindow::cMainWindow() {
 	multipledatasetsisprepared = false;
 
 	lastactivedetail = -1;
-
+	
 	othernormalgeometry = QRect();
 	otherismaximized = false;
 	otherprofilespectrum = false;
@@ -517,6 +520,11 @@ cMainWindow::cMainWindow() {
 	othermzselection = true;
 
 	activefileid = 0;
+
+	avgspectrumused = -1;
+	avgspectrumabsoluteintensityenabled = true;
+	avgspectrumgeometry = QRect();
+	avgspectrummaximized = false;
 
 	quitapp = false;
 }
@@ -690,6 +698,9 @@ void cMainWindow::reportSpectrum(int row, cTheoreticalSpectrum& theoreticalspect
 	string peptidesequence;
 	cSummaryFormula formula;
 
+	string scantitle;
+	scantitle.clear();
+
 	resultsmodel->setItem(row, 0, new QStandardItem());
 	resultsmodel->item(row, 0)->setText("");
 	
@@ -769,6 +780,9 @@ void cMainWindow::reportSpectrum(int row, cTheoreticalSpectrum& theoreticalspect
 		resultsmodel->setItem(row, 9 + searchspecificcolumncount + resultsspecificcolumncount, new QStandardItem());
 		resultsmodel->item(row, 9 + searchspecificcolumncount + resultsspecificcolumncount)->setData(QVariant::fromValue(cropPrecisionToSixDecimalsByteArray(theoreticalspectrum.getWeightedRatioOfMatchedPeaks() * 100)), Qt::DisplayRole);
 		
+		resultsmodel->setItem(row, 10 + searchspecificcolumncount + resultsspecificcolumncount, new QStandardItem());
+		resultsmodel->item(row, 10 + searchspecificcolumncount + resultsspecificcolumncount)->setData(QVariant::fromValue(cropPrecisionToSixDecimalsByteArray(theoreticalspectrum.getCosineSimilarity())), Qt::DisplayRole);
+
 		int index = resultsbasecolumncount + searchspecificcolumncount + resultsspecificcolumncount;
 		for (int i = 0; i < (int)parameters.ionsfortheoreticalspectraMS2.size(); i++) {
 			for (int j = -1; j < (int)parameters.neutrallossesfortheoreticalspectra.size(); j++) {
@@ -805,6 +819,7 @@ void cMainWindow::reportSpectrum(int row, cTheoreticalSpectrum& theoreticalspect
 
 		resultsmodel->setItem(row, mscol, new QStandardItem());
 		resultsmodel->item(row, mscol)->setText(theoreticalspectrum.getExperimentalSpectrum().getTitle().c_str());
+		scantitle = theoreticalspectrum.getExperimentalSpectrum().getTitle();
 		mscol++;
 
 		resultsmodel->setItem(row, mscol, new QStandardItem());
@@ -823,6 +838,10 @@ void cMainWindow::reportSpectrum(int row, cTheoreticalSpectrum& theoreticalspect
 		resultsmodel->item(row, mscol)->setData(QVariant::fromValue(cropPrecisionToSixDecimalsByteArray(theoreticalspectrum.getWeightedRatioOfMatchedPeaks() * 100)), Qt::DisplayRole);
 		mscol++;
 
+		//resultsmodel->setItem(row, mscol, new QStandardItem());
+		//resultsmodel->item(row, mscol)->setData(QVariant::fromValue(cropPrecisionToSixDecimalsByteArray(theoreticalspectrum.getCosineSimilarity())), Qt::DisplayRole);
+		//mscol++;
+
 		if ((parameters.peaklistfileformats[activefileid] == mis) || (parameters.peaklistfileformats[activefileid] == imzML)) {
 			resultsmodel->setItem(row, mscol, new QStandardItem());
 			resultsmodel->item(row, mscol)->setData(QVariant::fromValue(theoreticalspectrum.getExperimentalSpectrum().getCoordinateX()), Qt::DisplayRole);
@@ -834,9 +853,273 @@ void cMainWindow::reportSpectrum(int row, cTheoreticalSpectrum& theoreticalspect
 	}
 
 
-	spectradetails[row].initialize(row + 1, activefileid, &globalpreferences, &parameters, theoreticalspectrum, this);
+	spectradetails[row].initialize(row + 1, scantitle, activefileid, &globalpreferences, &parameters, theoreticalspectrum, this);
 
 	connect(&spectradetails[row], SIGNAL(lastActiveDetail(int)), this, SLOT(lastActiveDetailSlot(int)));
+}
+
+
+void cMainWindow::calculateAvgSpectrum(int minscan, int maxscan) {
+	int numberofspectra = maxscan - minscan + 1;
+	if (numberofspectra <= 0) {
+		return;
+	}
+
+	cPeaksList averagespectrum;
+	for (int i = minscan - 1; i < maxscan; i++) {
+		averagespectrum.attach(listoftheoreticalspectra.get(activefileid, i).getExperimentalSpectrum());
+	}
+
+	int asize = averagespectrum.size();
+
+	QProgressDialog progress("Calculating average spectrum...", /*"Cancel"*/0, 0, 3 * asize, this);
+	progress.setMinimumWidth(250);
+	cEventFilter filter;
+	progress.installEventFilter(&filter);
+	progress.setMinimumDuration(0);
+	progress.setWindowModality(Qt::ApplicationModal);
+	progress.setValue(0);
+
+	bool quadraticapproach = false;
+
+	if (quadraticapproach) {
+
+		averagespectrum.sortbyAbsoluteIntensityDesc();
+
+		// initialize clusters
+		vector<cPeaksList> clusters;
+		clusters.resize(averagespectrum.size());
+		for (int i = 0; i < asize; i++) {
+			clusters[i].add(averagespectrum[i]);
+
+			if (i % 100 == 0) {
+				progress.setValue(i);
+			}
+		}
+
+		// merge clusters
+		size_t csize = clusters.size();
+		for (int i = 0; i < csize; i++) {
+			if ((asize + i) % 100 == 0) {
+				progress.setValue(asize + i);
+			}
+
+			if (clusters[i].size() == 0) {
+				continue;
+			}
+			for (int j = i + 1; j < csize; j++) {
+				if (clusters[j].size() == 0) {
+					continue;
+				}
+				if (isInPpmMassErrorTolerance(clusters[i][0].mzratio, clusters[j][0].mzratio, parameters.fragmentmasserrortolerance)) {
+					clusters[i].add(clusters[j][0]);
+					clusters[j].clear();
+				}
+			}
+		}
+
+		// reduce peaks
+		averagespectrum.clear();
+		double relsum;
+		int isize;
+		for (int i = 0; i < csize; i++) {
+			if ((2 * asize + i) % 100 == 0) {
+				progress.setValue(2 * asize + i);
+			}
+
+			isize = clusters[i].size();
+
+			if (isize == 0) {
+				continue;
+			}
+
+			cPeak peak;
+			relsum = 0;
+
+			for (int j = 0; j < isize; j++) {
+				relsum += clusters[i][j].absoluteintensity;
+			}
+
+			for (int j = 0; j < isize; j++) {
+				peak.mzratio += clusters[i][j].mzratio*clusters[i][j].absoluteintensity;
+				peak.absoluteintensity += clusters[i][j].absoluteintensity;
+			}
+
+			peak.mzratio /= relsum;
+
+			averagespectrum.add(peak);
+		}
+
+	}
+	else {
+
+		// initialize clusters
+		vector<cPeaksList> clusters;
+		clusters.reserve(averagespectrum.size());
+
+		averagespectrum.sortbyMass();
+		averagespectrum.fillOrderIDs();
+
+		cPeaksList outer = averagespectrum;
+		outer.sortbyAbsoluteIntensityDesc();
+
+		cPeaksList tmplist;
+
+		int isize = outer.size();
+		int j;
+
+		// merge clusters
+		for (int i = 0; i < isize; i++) {		
+			if (averagespectrum[outer[i].orderid].orderid == -1) {
+				continue;
+			}
+
+			tmplist.clear();
+
+			tmplist.add(averagespectrum[outer[i].orderid]);
+			averagespectrum[outer[i].orderid].orderid = -1;
+
+			j = outer[i].orderid + 1;
+			while (j < isize) {
+				if (isInPpmMassErrorTolerance(averagespectrum[outer[i].orderid].mzratio, averagespectrum[j].mzratio, parameters.fragmentmasserrortolerance)) {
+					if (averagespectrum[j].orderid != -1) {
+						tmplist.add(averagespectrum[j]);
+						averagespectrum[j].orderid = -1;
+					}
+				}
+				else {
+					break;
+				}
+				j++;
+			}
+
+			j = outer[i].orderid - 1;
+			while (j >= 0) {
+				if (isInPpmMassErrorTolerance(averagespectrum[outer[i].orderid].mzratio, averagespectrum[j].mzratio, parameters.fragmentmasserrortolerance)) {
+					if (averagespectrum[j].orderid != -1) {
+						tmplist.add(averagespectrum[j]);
+						averagespectrum[j].orderid = -1;
+					}
+				}
+				else {
+					break;
+				}
+				j--;
+			}
+
+			clusters.push_back(tmplist);
+		}
+
+		progress.setValue(asize);
+
+		// reduce peaks
+		averagespectrum.clear();
+		double relsum;
+		int csize = (int)clusters.size();
+		for (int i = 0; i < csize; i++) {
+			isize = clusters[i].size();
+
+			if (isize == 0) {
+				continue;
+			}
+
+			cPeak peak;
+			relsum = 0;
+
+			for (int j = 0; j < isize; j++) {
+				relsum += clusters[i][j].absoluteintensity;
+			}
+
+			for (int j = 0; j < isize; j++) {
+				peak.mzratio += clusters[i][j].mzratio*clusters[i][j].absoluteintensity;
+				peak.absoluteintensity += clusters[i][j].absoluteintensity;
+			}
+
+			peak.mzratio /= relsum;
+
+			averagespectrum.add(peak);
+		}
+
+		progress.setValue(2 * asize);
+
+	}
+
+	averagespectrum.sortbyMass();
+	averagespectrum.normalizeIntenzity();
+
+	averagespectrum.cropRelativeIntenzity(parameters.minimumrelativeintensitythreshold);
+
+	QRect geometry;
+	bool usegeometry = false;
+	bool ismaximized = false;
+
+	if (avgspectra.size() > 0) {
+		geometry = avgspectra[0].normalGeometry();
+		usegeometry = true;
+		ismaximized = avgspectra[0].isMaximized();
+	}
+	else {
+		if (avgspectrumused >= 0) {
+			geometry = avgspectrumgeometry;
+			usegeometry = true;
+			ismaximized = avgspectrummaximized;
+		}
+	}
+
+	avgspectra.clear();
+	avgspectra.resize(1);
+
+	cTheoreticalSpectrum tsfull;
+	tsfull.setParameters(&parameters);
+
+	bool terminatecomputation = false;
+	if (parameters.generateisotopepattern) {
+		if (parameters.calculatefdrs) {
+			tsfull.generateFineMSSpectrum(0, parameters.sequencedatabase.size() / 2, terminatecomputation);
+		}
+		else {
+			tsfull.generateFineMSSpectrum(0, parameters.sequencedatabase.size(), terminatecomputation);
+		}
+	}
+	else {
+		tsfull.generateMSSpectrum(0, parameters.sequencedatabase.size(), terminatecomputation, true);
+	}
+
+	cTheoreticalSpectrum tsaverage;
+	cPeaksList unmatchedpeaksinmatchedpatterns;
+	tsaverage.setParameters(&parameters);
+	tsaverage.compareAverageMSSpectrum(averagespectrum, tsfull, unmatchedpeaksinmatchedpatterns);
+	tsaverage.finalizeMSSpectrum(unmatchedpeaksinmatchedpatterns, true);
+
+	string scantitle;
+	avgspectra[0].initialize(1, scantitle, activefileid, &globalpreferences, &parameters, tsaverage, this);
+	avgspectra[0].prepareToShow(actionShowIsomers, &rawdata, &imzmlprofilemetadata, profilemz64precision, profileintensity64precision, true);
+
+	string title = "Average Spectrum " + to_string(minscan) + " - " + to_string(maxscan);
+	avgspectra[0].setWindowTitle(title.c_str());
+	avgspectra[0].setAbsoluteIntensityEnabled(avgspectrumabsoluteintensityenabled);
+	avgspectra[0].disableProfileMode();
+
+	progress.setValue(3 * asize);
+
+	chromatogramwindow->activateWindow();
+
+	if (usegeometry) {
+		avgspectra[0].setGeometry(geometry);
+	}
+
+	if (ismaximized) {
+		avgspectra[0].showMaximized();
+	}
+	else {
+		avgspectra[0].showNormal();
+	}
+
+	connect(&avgspectra[0], SIGNAL(absoluteIntensityStateChangedSignal(bool)), this, SLOT(avgSpectrumAbsoluteIntensityStateChanged(bool)));
+
+	avgspectrumused = 0;
+	avgspectrummaximized = avgspectra[0].isMaximized();
+	avgspectrumgeometry = avgspectra[0].normalGeometry();
 }
 
 
@@ -1022,6 +1305,14 @@ void cMainWindow::run() {
 	listoftheoreticalspectra.clear();
 	eicchromatograms.clear();
 	spectradetails.clear();
+
+	if (avgspectra.size() > 0) {
+		avgspectrumused = 0;
+		avgspectrummaximized = avgspectra[0].isMaximized();
+		avgspectrumgeometry = avgspectra[0].normalGeometry();
+	}
+
+	avgspectra.clear();
 
 	parameters.clear();
 	
@@ -1393,7 +1684,6 @@ void cMainWindow::reportSpectra() {
 				resultsmodel->setHorizontalHeaderItem(7 + searchspecificcolumncount, new QStandardItem());
 				resultsmodel->horizontalHeaderItem(7 + searchspecificcolumncount)->setText("Right Terminal Modification");
 				results->setItemDelegateForColumn(7 + searchspecificcolumncount, new QItemDelegate());
-
 				break;
 			case other:
 				break;
@@ -1416,6 +1706,10 @@ void cMainWindow::reportSpectra() {
 		resultsmodel->setHorizontalHeaderItem(9 + searchspecificcolumncount + resultsspecificcolumncount, new QStandardItem());
 		resultsmodel->horizontalHeaderItem(9 + searchspecificcolumncount + resultsspecificcolumncount)->setText("Weighted Ratio of Matched Peaks [%]");
 		results->setItemDelegateForColumn(9 + searchspecificcolumncount + resultsspecificcolumncount, new QItemDelegate());
+
+		resultsmodel->setHorizontalHeaderItem(10 + searchspecificcolumncount + resultsspecificcolumncount, new QStandardItem());
+		resultsmodel->horizontalHeaderItem(10 + searchspecificcolumncount + resultsspecificcolumncount)->setText("Cosine Similarity");
+		results->setItemDelegateForColumn(10 + searchspecificcolumncount + resultsspecificcolumncount, new QItemDelegate());
 
 		string name;
 		int index = resultsbasecolumncount + searchspecificcolumncount + resultsspecificcolumncount;
@@ -1444,10 +1738,10 @@ void cMainWindow::reportSpectra() {
 
 	if ((parameters.mode == dereplication) || (parameters.mode == compoundsearch)) {
 		if ((parameters.peaklistfileformats[activefileid] == mis) || (parameters.peaklistfileformats[activefileid] == imzML)) {
-			resultsmodel->setColumnCount(9);
+			resultsmodel->setColumnCount(/*10*/9);
 		}
 		else {
-			resultsmodel->setColumnCount(8);
+			resultsmodel->setColumnCount(/*9*/8);
 		}
 
 		int mscol = 0;
@@ -1493,6 +1787,11 @@ void cMainWindow::reportSpectra() {
 		resultsmodel->horizontalHeaderItem(mscol)->setText("Weighted Ratio of Matched Peaks [%]");
 		results->setItemDelegateForColumn(mscol, new QItemDelegate());
 		mscol++;
+
+		//resultsmodel->setHorizontalHeaderItem(mscol, new QStandardItem());
+		//resultsmodel->horizontalHeaderItem(mscol)->setText("Cosine Similarity");
+		//results->setItemDelegateForColumn(mscol, new QItemDelegate());
+		//mscol++;
 
 		if ((parameters.peaklistfileformats[activefileid] == mis) || (parameters.peaklistfileformats[activefileid] == imzML)) {
 			resultsmodel->setHorizontalHeaderItem(mscol, new QStandardItem());
@@ -1582,6 +1881,14 @@ void cMainWindow::reportSpectra() {
 		//	break;
 		//}
 	}
+
+	if (avgspectra.size() > 0) {
+		avgspectrumused = 0;
+		avgspectrummaximized = avgspectra[0].isMaximized();
+		avgspectrumgeometry = avgspectra[0].normalGeometry();
+	}
+
+	avgspectra.clear();
 
 	resultsproxymodel->setSourceModel(resultsmodel);
 	results->setModel(resultsproxymodel);
@@ -2510,6 +2817,14 @@ void cMainWindow::openResultsFile() {
 			eicchromatograms.clear();
 			spectradetails.clear();
 
+			if (avgspectra.size() > 0) {
+				avgspectrumused = 0;
+				avgspectrummaximized = avgspectra[0].isMaximized();
+				avgspectrumgeometry = avgspectra[0].normalGeometry();
+			}
+
+			avgspectra.clear();
+
 			lastactivedetail = -1;
 
 			othernormalgeometry = QRect();
@@ -2883,6 +3198,14 @@ void cMainWindow::inputFilterButtonReleased() {
 
 		spectradetails.clear();
 
+		if (avgspectra.size() > 0) {
+			avgspectrumused = 0;
+			avgspectrummaximized = avgspectra[0].isMaximized();
+			avgspectrumgeometry = avgspectra[0].normalGeometry();
+		}
+
+		avgspectra.clear();
+
 		rawdata.clear();
 
 		activefileid = inputfiltercombobox->currentIndex();
@@ -2906,6 +3229,16 @@ void cMainWindow::filterSummaryTableIfPrepared() {
 	if (summarytableisprepared) {
 		summarytableofmatchedpeaks->filterTablerows();
 	}
+}
+
+
+void cMainWindow::showAvgSpectrum(int minscan, int maxscan) {
+	calculateAvgSpectrum(minscan, maxscan);
+}
+
+
+void cMainWindow::avgSpectrumAbsoluteIntensityStateChanged(bool state) {
+	avgspectrumabsoluteintensityenabled = state;
 }
 
 

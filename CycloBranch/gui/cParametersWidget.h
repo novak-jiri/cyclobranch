@@ -187,11 +187,57 @@ private:
 	QLabel* fwhmlabel;
 	QDoubleSpinBox* fwhm;
 
-	QLabel* ratio54Fe56Felabel;
+	QGroupBox* isotoperatiosgroupbox;
+	QGridLayout* isotoperatiosgridlayout;
+
+	QLabel* ratio54Fe56FeLabel;
+	QCheckBox* ratio54Fe56FeEnabled;
 	QDoubleSpinBox* minratio54Fe56Fe;
 	QDoubleSpinBox* maxratio54Fe56Fe;
-	QHBoxLayout* ratio54Fe56Felayout;
-	QWidget* ratio54Fe56Fewidget;
+	QHBoxLayout* ratio54Fe56FeLayout;
+	QWidget* ratio54Fe56FeWidget;
+
+	QLabel* ratio60Ni58NiLabel;
+	QCheckBox* ratio60Ni58NiEnabled;
+	QDoubleSpinBox* minratio60Ni58Ni;
+	QDoubleSpinBox* maxratio60Ni58Ni;
+	QHBoxLayout* ratio60Ni58NiLayout;
+	QWidget* ratio60Ni58NiWidget;
+
+	QLabel* ratio62Ni58NiLabel;
+	QCheckBox* ratio62Ni58NiEnabled;
+	QDoubleSpinBox* minratio62Ni58Ni;
+	QDoubleSpinBox* maxratio62Ni58Ni;
+	QHBoxLayout* ratio62Ni58NiLayout;
+	QWidget* ratio62Ni58NiWidget;
+
+	QLabel* ratio65Cu63CuLabel;
+	QCheckBox* ratio65Cu63CuEnabled;
+	QDoubleSpinBox* minratio65Cu63Cu;
+	QDoubleSpinBox* maxratio65Cu63Cu;
+	QHBoxLayout* ratio65Cu63CuLayout;
+	QWidget* ratio65Cu63CuWidget;
+
+	QLabel* ratio66Zn64ZnLabel;
+	QCheckBox* ratio66Zn64ZnEnabled;
+	QDoubleSpinBox* minratio66Zn64Zn;
+	QDoubleSpinBox* maxratio66Zn64Zn;
+	QHBoxLayout* ratio66Zn64ZnLayout;
+	QWidget* ratio66Zn64ZnWidget;
+
+	QLabel* ratio67Zn64ZnLabel;
+	QCheckBox* ratio67Zn64ZnEnabled;
+	QDoubleSpinBox* minratio67Zn64Zn;
+	QDoubleSpinBox* maxratio67Zn64Zn;
+	QHBoxLayout* ratio67Zn64ZnLayout;
+	QWidget* ratio67Zn64ZnWidget;
+
+	QLabel* ratio68Zn64ZnLabel;
+	QCheckBox* ratio68Zn64ZnEnabled;
+	QDoubleSpinBox* minratio68Zn64Zn;
+	QDoubleSpinBox* maxratio68Zn64Zn;
+	QHBoxLayout* ratio68Zn64ZnLayout;
+	QWidget* ratio68Zn64ZnWidget;
 
 	QGroupBox* brickdatabasegroupbox;
 	QGridLayout* brickdatabasegridlayout;

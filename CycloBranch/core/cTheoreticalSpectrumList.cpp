@@ -423,6 +423,9 @@ double cTheoreticalSpectrumList::updatekNNList(cTheoreticalSpectrum& theoretical
 		case weighted_ratio_of_matched_peaks:
 			comparatorfunction = &compareWeightedRatioDesc;
 			break;
+		case cosine_similarity:
+			comparatorfunction = &compareCosineSimilarityDesc;
+			break;
 		default:
 			break;
 	}
@@ -453,6 +456,9 @@ double cTheoreticalSpectrumList::updatekNNList(cTheoreticalSpectrum& theoretical
 			case weighted_ratio_of_matched_peaks:
 				currentscore = it1->getWeightedRatioOfMatchedPeaks();
 				break;
+			case cosine_similarity:
+				currentscore = it1->getCosineSimilarity();
+				break;			
 			default:
 				break;
 		}
@@ -491,6 +497,9 @@ double cTheoreticalSpectrumList::updatekNNList(cTheoreticalSpectrum& theoretical
 			case weighted_ratio_of_matched_peaks:
 				currentworstscore = prev(spectrumbuffer.end())->getWeightedRatioOfMatchedPeaks();
 				break;
+			case cosine_similarity:
+				currentworstscore = prev(spectrumbuffer.end())->getCosineSimilarity();
+				break;
 			default:
 				break;
 		}
@@ -520,6 +529,9 @@ void cTheoreticalSpectrumList::sortAndFitSize(int fileid) {
 			break;
 		case weighted_ratio_of_matched_peaks:
 			sort(theoreticalspectra[fileid].begin(), theoreticalspectra[fileid].end(), compareWeightedRatioDesc);
+			break;
+		case cosine_similarity:
+			sort(theoreticalspectra[fileid].begin(), theoreticalspectra[fileid].end(), compareCosineSimilarityDesc);
 			break;
 		default:
 			break;

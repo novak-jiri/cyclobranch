@@ -120,13 +120,14 @@ public:
 	/**
 		\brief Initialize the widget.
 		\param rowid id of a row
+		\param scantitle scan title
 		\param activefileid id of an active file
 		\param globalpreferences global preferences of the application
 		\param parameters a pointer to parameters
 		\param theoreticalspectrum a reference to a theoretical spectrum
 		\param parent pointer to a parent widget
 	*/ 
-	void initialize(int rowid, int activefileid, cGlobalPreferences* globalpreferences, cParameters* parameters, cTheoreticalSpectrum& theoreticalspectrum, QWidget* parent);
+	void initialize(int rowid, string scantitle, int activefileid, cGlobalPreferences* globalpreferences, cParameters* parameters, cTheoreticalSpectrum& theoreticalspectrum, QWidget* parent);
 
 
 	/**
@@ -216,6 +217,12 @@ public:
 		\retval bool true if the profile spectrum is enabled
 	*/
 	bool hasProfileSpectrumEnabled();
+
+
+	/**
+		\brief Permanently disable the visualization in profile mode.
+	*/
+	void disableProfileMode();
 
 
 	/**
@@ -408,6 +415,7 @@ private:
 	cTheoreticalSpectrum* theoreticalspectrum;
 	
 	int rowid;
+	string scantitle;
 	bool preparedToShow;
 
 	set<string> localneutralosses;
@@ -449,6 +457,13 @@ signals:
 		\param state current state
 	*/
 	void rawDataStateChangedSignal(bool state);
+
+
+	/**
+		\brief The signal is emitted when the absolute intensity state was changed.
+		\param state current state
+	*/
+	void absoluteIntensityStateChangedSignal(bool state);
 
 
 	/**
@@ -495,6 +510,9 @@ private slots:
 
 
 	void rawDataStateChanged(bool state);
+
+
+	void absoluteIntensityStateChanged(bool state);
 
 
 	void hideMatchedPeaks(bool hide);

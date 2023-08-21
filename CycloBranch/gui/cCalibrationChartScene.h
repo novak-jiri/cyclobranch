@@ -123,7 +123,7 @@ public:
 		\param b b 
 		\param xvalues x coordinates of points
 		\param yvalues y coordinates of points
-		\param sd standard deviation of y-values
+		\param sd standard deviation of y values
 	*/
 	void setLineParameters(int equationtype, double a, double b, vector<double> xvalues, vector<double> yvalues, vector<double> sd);
 
@@ -132,10 +132,32 @@ public:
 		\brief Set parameters of calibration curve.
 		\param datax x coordinates of data points
 		\param datay y coordinates of data points
-		\param datasd standard deviation of y-values
-		\param datagroups vector of group ids
+		\param datasd standard deviation of y values
+		\param datagroups vector of group names
+		\param datatimevalues data collection times corresponding the groups
 	*/
-	void setData(vector<double> datax, vector<double> datay, vector<double> datasd, vector<int> datagroups);
+	void setData(vector<double> datax, vector<double> datay, vector<double> datasd, vector<string> datagroups, vector<int> datatimevalues);
+
+
+	/**
+		\brief Set graph type.
+		\param type graph type
+	*/
+	void setGraphType(int type);
+
+
+	/**
+		\brief Get the maximum concentration.
+		\retval double maximum concentration
+	*/
+	double getMaximumConcentration();
+
+
+	/**
+		\brief Get the maximum collection time.
+		\retval int maximum value of collection time
+	*/
+	int getMaximumCollectionTime();
 
 
 protected:
@@ -197,6 +219,8 @@ private:
 
 	//cPeaksList isotopicpattern;
 
+	int graphtype;
+
 	qreal currentscale;
 	qreal factor;
 
@@ -213,8 +237,8 @@ private:
 	int currentx;
 	int currenty;
 
-	double minconcentration;
-	double maxconcentration;
+	double minxvalue;
+	double maxxvalue;
 
 	int topmargin;
 	int bottommargin;
@@ -222,7 +246,7 @@ private:
 	int rightmargin;
 
 	bool firstshow;
-	bool enablemouseconcentrationselection;
+	bool enablemousexvalueselection;
 
 	int equationtype;
 
@@ -238,21 +262,23 @@ private:
 	vector<double> datay;
 
 	vector<double> datasd;
-	vector<int> datagroups;
+	vector<string> datagroups;
+
+	vector<int> datatimevalues;
 
 	bool hidelabels;
 
 
-	double getConcentrationFromXPosition(int x, int w);
+	double getValueFromXPosition(int x, int w);
 
 
-	int getXPositionFromConcentration(double concentration, int w);
+	int getXPositionFromValue(double value, int w);
 
 
-	double getIntensityFromYPosition(int y, int h);
+	double getValueFromYPosition(int y, int h);
 
 
-	int getYPositionFromIntensity(double intensity, int h);
+	int getYPositionFromValue(double intensity, int h);
 
 
 	void redrawScene();
@@ -261,21 +287,21 @@ private:
 	void updateZoomGroup();
 
 
-	void calculateMinMaxConcentration();
+	void calculateMinMaxXValue();
 
 
-	double getMaximumIntensity();
+	double getMaximumYValue();
 
 
 signals:
 
 
 	/**
-		\brief The signal is emitted when the range of concentration has been changed.
-		\param minconcentration a minimum threshold of concentration
-		\param maxconcentration a maximum threshold of concentration
+		\brief The signal is emitted when the range of x value has been changed.
+		\param minxvalue a minimum threshold of x value
+		\param maxxvalue a maximum threshold of x value
 	*/ 
-	void updateConcentrationInterval(double minconcentration, double maxconcentration);
+	void updateXValueInterval(double minxvalue, double maxxvalue);
 
 
 private slots:
@@ -290,13 +316,13 @@ private slots:
 	void normalSize();
 
 
-	void setConcentrationInterval(double minconcentration, double maxconcentration);
+	void setXValueInterval(double minxvalue, double maxxvalue);
 
 
-	void resetConcentrationInterval();
+	void resetXValueInterval();
 
 
-	//void enableMouseConcentrationSelectionTool(bool enable);
+	//void enableMouseXValueSelectionTool(bool enable);
 
 };
 

@@ -433,7 +433,7 @@ void cPatternSimulatorSceneWidget::redrawScene() {
 	double y;
 	qreal tx, ty, tw, th, sumh;
 
-	char tmpbuf[30];
+	char tmpbuf[500];
 	string s;
 
 	int xstep, ystep;

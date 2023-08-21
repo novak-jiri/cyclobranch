@@ -142,6 +142,10 @@ void cTheoreticalSpectrum::searchForPeakPairs(cPeaksList& theoreticalpeaks, int 
 
 void cTheoreticalSpectrum::computeStatistics(bool writedescription) {
 	double sumofallintensities = 0;
+
+	double expsquare = 0;
+	double expsquarematched = 0;
+	double tmpsquare;
 	
 	experimentalpeaksmatched = 0;
 	scrambledpeaksmatched = 0;
@@ -154,12 +158,19 @@ void cTheoreticalSpectrum::computeStatistics(bool writedescription) {
 	for (int i = 0; i < (int)experimentalpeaks.size(); i++) {
 		sumofallintensities += experimentalpeaks[i].relativeintensity;
 
+		if (parameters && ((parameters->mode == denovoengine) || (parameters->mode == singlecomparison) || (parameters->mode == databasesearch))) {
+			tmpsquare = experimentalpeaks[i].relativeintensity / 100.0;
+			expsquare += tmpsquare * tmpsquare;
+		}
+
 		if (experimentalpeaks[i].matched > 0) {
 			experimentalpeaksmatched++;
 			
 			sumofrelativeintensities += experimentalpeaks[i].relativeintensity;
-			
+	
 			if (parameters && ((parameters->mode == denovoengine) || (parameters->mode == singlecomparison) || (parameters->mode == databasesearch))) {
+				expsquarematched += tmpsquare * tmpsquare;
+
 				if (!experimentalpeaks[i].scrambled) {
 					matchedions[experimentalpeaks[i].iontype][experimentalpeaks[i].neutrallosstype]++;
 				}
@@ -178,8 +189,20 @@ void cTheoreticalSpectrum::computeStatistics(bool writedescription) {
 	peakstested = experimentalpeaks.size();
 
 	weightedpeaksratio = 0;
+	cosinesimilarity = 0;
 	if (experimentalpeaks.size() > 0) {
 		experimentalpeaksmatchedratio = ((double)experimentalpeaksmatched) / ((double)experimentalpeaks.size());
+
+		if (parameters && ((parameters->mode == denovoengine) || (parameters->mode == singlecomparison) || (parameters->mode == databasesearch))) {
+			if ((expsquare > 0) && (expsquarematched > 0)) {
+				// the number of bins is defined by the number of experimental peaks
+				// theoretical intensities are the same as experimental intensities
+				cosinesimilarity = expsquarematched;
+				cosinesimilarity /= sqrt(expsquarematched);
+				cosinesimilarity /= sqrt(expsquare);
+			}
+		}
+
 		if (sumofallintensities > 0) {
 			weightedpeaksratio = sumofrelativeintensities / sumofallintensities;
 		}
@@ -722,23 +745,30 @@ void cTheoreticalSpectrum::generateScrambledIons(cBricksDatabase& bricksdatabase
 	scrambledsequences.clear();
 
 	int numberofbricks = (int)stringcomposition.size();
+
 	int stop = (1 << numberofbricks) - 1;
 
 	string subseq;
 	int brickscount;
+	int part;
 
 	// generate all possible combinations of blocks
 	for (int i = 1; i < stop; i++) {
 			subseq = "";
 			brickscount = 0;
+			part = i;
 			for (int j = 0; j < numberofbricks; j++) {
-				if ((i >> j) % 2 == 1) {
+				if (part == 0) {
+					break;
+				}
+				if (part % 2 == 1) {
 					if (brickscount > 0) {
 						subseq += "-";
 					}
 					subseq += stringcomposition[j];
 					brickscount++;
 				}
+				part = part >> 1;
 			}
 			if ((brickscount > 1) && (brickscount < numberofbricks - 1)) {
 				scrambledsequences.insert(subseq);
@@ -1276,6 +1306,7 @@ void cTheoreticalSpectrum::removeUnmatchedMetalIsotopes(cPeaksList& theoreticalp
 			continue;
 		}
 
+		// parent is not matched, remove current peak
 		if ((theoreticalpeaks[lastparent].matched == 0) && (theoreticalpeaks[i].matched > 0)) {
 			experimentalmatches[theoreticalpeaks[i].matchedid].erase(experimentalmatches[theoreticalpeaks[i].matchedid].find(i));
 			experimentalpeaks[theoreticalpeaks[i].matchedid].matched--;
@@ -1284,42 +1315,282 @@ void cTheoreticalSpectrum::removeUnmatchedMetalIsotopes(cPeaksList& theoreticalp
 			theoreticalpeaks[i].matchedid = -1;
 		}
 
-		if ((theoreticalpeaks[lastparent].matched > 0) && (theoreticalpeaks[i].matched == 0)) {
-			pos = parameters->peakidtodesc[theoreticalpeaks[i].descriptionid].find("54Fe");
-			if ((pos != string::npos) && (parameters->minratio54Fe56Fe > 0)) {
-				// remove 56Fe
-				experimentalmatches[theoreticalpeaks[lastparent].matchedid].erase(experimentalmatches[theoreticalpeaks[lastparent].matchedid].find(lastparent));
-				experimentalpeaks[theoreticalpeaks[lastparent].matchedid].matched--;
+		// parent peak matched, current peak unmatched; remove parent if minimum ratio is bigger than zero
+		if ((theoreticalpeaks[lastparent].matched > 0) && (theoreticalpeaks[i].matched == 0) && (theoreticalpeaks[i].descriptionid >= 0)) {
 
-				theoreticalpeaks[lastparent].matched--;
-				theoreticalpeaks[lastparent].matchedid = -1;
-			}
-		}
-
-		// to do
-		// other elements
-		// multiple Fe atoms in a molecule
-		// 54Fe vs. 56Fe m/z difference + charged variants
-		if ((theoreticalpeaks[lastparent].matched > 0) && (theoreticalpeaks[i].matched > 0)) {
-			pos = parameters->peakidtodesc[theoreticalpeaks[i].descriptionid].find("54Fe");
-			if ((pos != string::npos) && (experimentalpeaks[theoreticalpeaks[lastparent].matchedid].relativeintensity > 0)) {
-				ratio = experimentalpeaks[theoreticalpeaks[i].matchedid].relativeintensity / experimentalpeaks[theoreticalpeaks[lastparent].matchedid].relativeintensity;
-				if ((ratio < parameters->minratio54Fe56Fe) || (ratio > parameters->maxratio54Fe56Fe)) {
+			if (parameters->enableratio54Fe56Fe && (parameters->minratio54Fe56Fe > 0)) {
+				pos = parameters->peakidtodesc[theoreticalpeaks[i].descriptionid].find("54Fe");
+				if (pos != string::npos) {
 					// remove 56Fe
 					experimentalmatches[theoreticalpeaks[lastparent].matchedid].erase(experimentalmatches[theoreticalpeaks[lastparent].matchedid].find(lastparent));
 					experimentalpeaks[theoreticalpeaks[lastparent].matchedid].matched--;
 
 					theoreticalpeaks[lastparent].matched--;
 					theoreticalpeaks[lastparent].matchedid = -1;
-
-					// remove 54Fe
-					experimentalmatches[theoreticalpeaks[i].matchedid].erase(experimentalmatches[theoreticalpeaks[i].matchedid].find(i));
-					experimentalpeaks[theoreticalpeaks[i].matchedid].matched--;
-
-					theoreticalpeaks[i].matched--;
-					theoreticalpeaks[i].matchedid = -1;
 				}
 			}
+
+			if (parameters->enableratio60Ni58Ni && (parameters->minratio60Ni58Ni > 0)) {
+				pos = parameters->peakidtodesc[theoreticalpeaks[i].descriptionid].find("60Ni");
+				if (pos != string::npos) {
+					// remove 58Ni
+					experimentalmatches[theoreticalpeaks[lastparent].matchedid].erase(experimentalmatches[theoreticalpeaks[lastparent].matchedid].find(lastparent));
+					experimentalpeaks[theoreticalpeaks[lastparent].matchedid].matched--;
+
+					theoreticalpeaks[lastparent].matched--;
+					theoreticalpeaks[lastparent].matchedid = -1;
+				}
+			}
+
+			/*
+			if (parameters->enableratio62Ni58Ni && (parameters->minratio62Ni58Ni > 0)) {
+				pos = parameters->peakidtodesc[theoreticalpeaks[i].descriptionid].find("62Ni");
+				if (pos != string::npos) {
+					// remove 58Ni
+					experimentalmatches[theoreticalpeaks[lastparent].matchedid].erase(experimentalmatches[theoreticalpeaks[lastparent].matchedid].find(lastparent));
+					experimentalpeaks[theoreticalpeaks[lastparent].matchedid].matched--;
+
+					theoreticalpeaks[lastparent].matched--;
+					theoreticalpeaks[lastparent].matchedid = -1;
+				}
+			}
+			*/
+
+			if (parameters->enableratio65Cu63Cu && (parameters->minratio65Cu63Cu > 0)) {
+				pos = parameters->peakidtodesc[theoreticalpeaks[i].descriptionid].find("65Cu");
+				if (pos != string::npos) {
+					// remove 63Cu
+					experimentalmatches[theoreticalpeaks[lastparent].matchedid].erase(experimentalmatches[theoreticalpeaks[lastparent].matchedid].find(lastparent));
+					experimentalpeaks[theoreticalpeaks[lastparent].matchedid].matched--;
+
+					theoreticalpeaks[lastparent].matched--;
+					theoreticalpeaks[lastparent].matchedid = -1;
+				}
+			}
+
+			if (parameters->enableratio66Zn64Zn && (parameters->minratio66Zn64Zn > 0)) {
+				pos = parameters->peakidtodesc[theoreticalpeaks[i].descriptionid].find("66Zn");
+				if (pos != string::npos) {
+					// remove 64Zn
+					experimentalmatches[theoreticalpeaks[lastparent].matchedid].erase(experimentalmatches[theoreticalpeaks[lastparent].matchedid].find(lastparent));
+					experimentalpeaks[theoreticalpeaks[lastparent].matchedid].matched--;
+
+					theoreticalpeaks[lastparent].matched--;
+					theoreticalpeaks[lastparent].matchedid = -1;
+				}
+			}
+
+			/*
+			if (parameters->enableratio67Zn64Zn && (parameters->minratio67Zn64Zn > 0)) {
+				pos = parameters->peakidtodesc[theoreticalpeaks[i].descriptionid].find("67Zn");
+				if (pos != string::npos) {
+					// remove 64Zn
+					experimentalmatches[theoreticalpeaks[lastparent].matchedid].erase(experimentalmatches[theoreticalpeaks[lastparent].matchedid].find(lastparent));
+					experimentalpeaks[theoreticalpeaks[lastparent].matchedid].matched--;
+
+					theoreticalpeaks[lastparent].matched--;
+					theoreticalpeaks[lastparent].matchedid = -1;
+				}
+			}
+			*/
+
+			if (parameters->enableratio68Zn64Zn && (parameters->minratio68Zn64Zn > 0)) {
+				pos = parameters->peakidtodesc[theoreticalpeaks[i].descriptionid].find("68Zn");
+				if (pos != string::npos) {
+					// remove 64Zn
+					experimentalmatches[theoreticalpeaks[lastparent].matchedid].erase(experimentalmatches[theoreticalpeaks[lastparent].matchedid].find(lastparent));
+					experimentalpeaks[theoreticalpeaks[lastparent].matchedid].matched--;
+
+					theoreticalpeaks[lastparent].matched--;
+					theoreticalpeaks[lastparent].matchedid = -1;
+				}
+			}
+
+		}
+
+		// to do
+		// other elements
+		// multiple Fe atoms in a molecule
+		// 54Fe vs. 56Fe m/z difference (and Ni, Cu, Zn m/z differences) + charged variants
+		// parent peak matched, current peak matched; remove both if the isotope ratio does not match the tolerance
+		if ((theoreticalpeaks[lastparent].matched > 0) && (theoreticalpeaks[i].matched > 0) && (theoreticalpeaks[i].descriptionid >= 0)) {
+
+			if (parameters->enableratio54Fe56Fe) {
+				pos = parameters->peakidtodesc[theoreticalpeaks[i].descriptionid].find("54Fe");
+				if ((pos != string::npos) && (experimentalpeaks[theoreticalpeaks[lastparent].matchedid].relativeintensity > 0)) {
+					ratio = experimentalpeaks[theoreticalpeaks[i].matchedid].relativeintensity / experimentalpeaks[theoreticalpeaks[lastparent].matchedid].relativeintensity;
+					if ((ratio < parameters->minratio54Fe56Fe) || (ratio > parameters->maxratio54Fe56Fe)) {
+						// remove 56Fe
+						experimentalmatches[theoreticalpeaks[lastparent].matchedid].erase(experimentalmatches[theoreticalpeaks[lastparent].matchedid].find(lastparent));
+						experimentalpeaks[theoreticalpeaks[lastparent].matchedid].matched--;
+
+						theoreticalpeaks[lastparent].matched--;
+						theoreticalpeaks[lastparent].matchedid = -1;
+
+						// remove 54Fe
+						experimentalmatches[theoreticalpeaks[i].matchedid].erase(experimentalmatches[theoreticalpeaks[i].matchedid].find(i));
+						experimentalpeaks[theoreticalpeaks[i].matchedid].matched--;
+
+						theoreticalpeaks[i].matched--;
+						theoreticalpeaks[i].matchedid = -1;
+					}
+				}
+			}
+
+			if (parameters->enableratio60Ni58Ni) {
+				pos = parameters->peakidtodesc[theoreticalpeaks[i].descriptionid].find("60Ni");
+				if ((pos != string::npos) && (experimentalpeaks[theoreticalpeaks[lastparent].matchedid].relativeintensity > 0)) {
+					ratio = experimentalpeaks[theoreticalpeaks[i].matchedid].relativeintensity / experimentalpeaks[theoreticalpeaks[lastparent].matchedid].relativeintensity;
+					if ((ratio < parameters->minratio60Ni58Ni) || (ratio > parameters->maxratio60Ni58Ni)) {
+						// remove 58Ni
+						experimentalmatches[theoreticalpeaks[lastparent].matchedid].erase(experimentalmatches[theoreticalpeaks[lastparent].matchedid].find(lastparent));
+						experimentalpeaks[theoreticalpeaks[lastparent].matchedid].matched--;
+
+						theoreticalpeaks[lastparent].matched--;
+						theoreticalpeaks[lastparent].matchedid = -1;
+
+						// remove 60Ni
+						experimentalmatches[theoreticalpeaks[i].matchedid].erase(experimentalmatches[theoreticalpeaks[i].matchedid].find(i));
+						experimentalpeaks[theoreticalpeaks[i].matchedid].matched--;
+
+						theoreticalpeaks[i].matched--;
+						theoreticalpeaks[i].matchedid = -1;
+					}
+				}
+			}
+	
+			/*
+			if (parameters->enableratio62Ni58Ni) {
+				pos = parameters->peakidtodesc[theoreticalpeaks[i].descriptionid].find("62Ni");
+				if ((pos != string::npos) && (experimentalpeaks[theoreticalpeaks[lastparent].matchedid].relativeintensity > 0)) {
+					ratio = experimentalpeaks[theoreticalpeaks[i].matchedid].relativeintensity / experimentalpeaks[theoreticalpeaks[lastparent].matchedid].relativeintensity;
+					if ((ratio < parameters->minratio62Ni58Ni) || (ratio > parameters->maxratio62Ni58Ni)) {
+						// remove 58Ni
+						experimentalmatches[theoreticalpeaks[lastparent].matchedid].erase(experimentalmatches[theoreticalpeaks[lastparent].matchedid].find(lastparent));
+						experimentalpeaks[theoreticalpeaks[lastparent].matchedid].matched--;
+
+						theoreticalpeaks[lastparent].matched--;
+						theoreticalpeaks[lastparent].matchedid = -1;
+
+						// remove 62Ni
+						experimentalmatches[theoreticalpeaks[i].matchedid].erase(experimentalmatches[theoreticalpeaks[i].matchedid].find(i));
+						experimentalpeaks[theoreticalpeaks[i].matchedid].matched--;
+
+						theoreticalpeaks[i].matched--;
+						theoreticalpeaks[i].matchedid = -1;
+					}
+				}
+			}
+			*/
+
+			if (parameters->enableratio65Cu63Cu) {
+				pos = parameters->peakidtodesc[theoreticalpeaks[i].descriptionid].find("65Cu");
+				if ((pos != string::npos) && (experimentalpeaks[theoreticalpeaks[lastparent].matchedid].relativeintensity > 0)) {
+					ratio = experimentalpeaks[theoreticalpeaks[i].matchedid].relativeintensity / experimentalpeaks[theoreticalpeaks[lastparent].matchedid].relativeintensity;
+					if ((ratio < parameters->minratio65Cu63Cu) || (ratio > parameters->maxratio65Cu63Cu)) {
+						// remove 63Cu
+						experimentalmatches[theoreticalpeaks[lastparent].matchedid].erase(experimentalmatches[theoreticalpeaks[lastparent].matchedid].find(lastparent));
+						experimentalpeaks[theoreticalpeaks[lastparent].matchedid].matched--;
+
+						theoreticalpeaks[lastparent].matched--;
+						theoreticalpeaks[lastparent].matchedid = -1;
+
+						// remove 65Cu
+						experimentalmatches[theoreticalpeaks[i].matchedid].erase(experimentalmatches[theoreticalpeaks[i].matchedid].find(i));
+						experimentalpeaks[theoreticalpeaks[i].matchedid].matched--;
+
+						theoreticalpeaks[i].matched--;
+						theoreticalpeaks[i].matchedid = -1;
+					}
+				}
+			}
+
+			if (parameters->enableratio66Zn64Zn) {
+				pos = parameters->peakidtodesc[theoreticalpeaks[i].descriptionid].find("66Zn");
+				if ((pos != string::npos) && (experimentalpeaks[theoreticalpeaks[lastparent].matchedid].relativeintensity > 0)) {
+					ratio = experimentalpeaks[theoreticalpeaks[i].matchedid].relativeintensity / experimentalpeaks[theoreticalpeaks[lastparent].matchedid].relativeintensity;
+					if ((ratio < parameters->minratio66Zn64Zn) || (ratio > parameters->maxratio66Zn64Zn)) {
+						// remove 64Zn
+						experimentalmatches[theoreticalpeaks[lastparent].matchedid].erase(experimentalmatches[theoreticalpeaks[lastparent].matchedid].find(lastparent));
+						experimentalpeaks[theoreticalpeaks[lastparent].matchedid].matched--;
+
+						theoreticalpeaks[lastparent].matched--;
+						theoreticalpeaks[lastparent].matchedid = -1;
+
+						// remove 66Zn
+						experimentalmatches[theoreticalpeaks[i].matchedid].erase(experimentalmatches[theoreticalpeaks[i].matchedid].find(i));
+						experimentalpeaks[theoreticalpeaks[i].matchedid].matched--;
+
+						theoreticalpeaks[i].matched--;
+						theoreticalpeaks[i].matchedid = -1;
+					}
+				}
+			}
+
+			/*
+			if (parameters->enableratio67Zn64Zn) {
+				pos = parameters->peakidtodesc[theoreticalpeaks[i].descriptionid].find("67Zn");
+				if ((pos != string::npos) && (experimentalpeaks[theoreticalpeaks[lastparent].matchedid].relativeintensity > 0)) {
+					ratio = experimentalpeaks[theoreticalpeaks[i].matchedid].relativeintensity / experimentalpeaks[theoreticalpeaks[lastparent].matchedid].relativeintensity;
+					if ((ratio < parameters->minratio67Zn64Zn) || (ratio > parameters->maxratio67Zn64Zn)) {
+						// remove 64Zn
+						experimentalmatches[theoreticalpeaks[lastparent].matchedid].erase(experimentalmatches[theoreticalpeaks[lastparent].matchedid].find(lastparent));
+						experimentalpeaks[theoreticalpeaks[lastparent].matchedid].matched--;
+
+						theoreticalpeaks[lastparent].matched--;
+						theoreticalpeaks[lastparent].matchedid = -1;
+
+						// remove 67Zn
+						experimentalmatches[theoreticalpeaks[i].matchedid].erase(experimentalmatches[theoreticalpeaks[i].matchedid].find(i));
+						experimentalpeaks[theoreticalpeaks[i].matchedid].matched--;
+
+						theoreticalpeaks[i].matched--;
+						theoreticalpeaks[i].matchedid = -1;
+					}
+				}
+			}
+			*/
+
+			if (parameters->enableratio68Zn64Zn) {
+				pos = parameters->peakidtodesc[theoreticalpeaks[i].descriptionid].find("68Zn");
+				if ((pos != string::npos) && (experimentalpeaks[theoreticalpeaks[lastparent].matchedid].relativeintensity > 0)) {
+					ratio = experimentalpeaks[theoreticalpeaks[i].matchedid].relativeintensity / experimentalpeaks[theoreticalpeaks[lastparent].matchedid].relativeintensity;
+					if ((ratio < parameters->minratio68Zn64Zn) || (ratio > parameters->maxratio68Zn64Zn)) {
+						// remove 64Zn
+						experimentalmatches[theoreticalpeaks[lastparent].matchedid].erase(experimentalmatches[theoreticalpeaks[lastparent].matchedid].find(lastparent));
+						experimentalpeaks[theoreticalpeaks[lastparent].matchedid].matched--;
+
+						theoreticalpeaks[lastparent].matched--;
+						theoreticalpeaks[lastparent].matchedid = -1;
+
+						// remove 68Zn
+						experimentalmatches[theoreticalpeaks[i].matchedid].erase(experimentalmatches[theoreticalpeaks[i].matchedid].find(i));
+						experimentalpeaks[theoreticalpeaks[i].matchedid].matched--;
+
+						theoreticalpeaks[i].matched--;
+						theoreticalpeaks[i].matchedid = -1;
+					}
+				}
+			}
+
+		}
+
+	}
+
+	// second round is required if an element has multiple isotopes
+	for (int i = 0; i < theoreticalpeaksrealsize; i++) {
+		if (!theoreticalpeaks[i].isotope) {
+			lastparent = i;
+			continue;
+		}
+
+		// parent is not matched, remove current peak
+		if ((theoreticalpeaks[lastparent].matched == 0) && (theoreticalpeaks[i].matched > 0)) {
+			experimentalmatches[theoreticalpeaks[i].matchedid].erase(experimentalmatches[theoreticalpeaks[i].matchedid].find(i));
+			experimentalpeaks[theoreticalpeaks[i].matchedid].matched--;
+
+			theoreticalpeaks[i].matched--;
+			theoreticalpeaks[i].matchedid = -1;
 		}
 	}
 }
@@ -1855,10 +2126,21 @@ void cTheoreticalSpectrum::removeUnmatchedPatternsFineSpectra(cPeaksList& theore
 		maximumexperimentalintensity = experimentalpeaks[theoreticalpeaks[maximumintensityid].matchedid].relativeintensity;
 	}
 
-	langle = (int)parameters->peakidtodesc[theoreticalpeaks[start].descriptionid].rfind('(');
-	rangle = (int)parameters->peakidtodesc[theoreticalpeaks[start].descriptionid].rfind(')');
+	if (theoreticalpeaks[start].descriptionid >= 0) {
+		langle = (int)parameters->peakidtodesc[theoreticalpeaks[start].descriptionid].rfind('(');
+		rangle = (int)parameters->peakidtodesc[theoreticalpeaks[start].descriptionid].rfind(')');
+	}
+	else {
+		langle = (int)theoreticalpeaks[start].description.rfind('(');
+		rangle = (int)theoreticalpeaks[start].description.rfind(')');
+	}
 	if ((langle != string::npos) && (rangle != string::npos)) {
-		subdesc = parameters->peakidtodesc[theoreticalpeaks[start].descriptionid].substr(langle + 1, rangle - langle - 1);
+		if (theoreticalpeaks[start].descriptionid >= 0) {
+			subdesc = parameters->peakidtodesc[theoreticalpeaks[start].descriptionid].substr(langle + 1, rangle - langle - 1);
+		}
+		else {
+			subdesc = theoreticalpeaks[start].description.substr(langle + 1, rangle - langle - 1);
+		}
 		subdescsize = subdesc.size();
 
 		elempos = subdesc.find("Li");
@@ -1894,6 +2176,8 @@ void cTheoreticalSpectrum::removeUnmatchedPatternsFineSpectra(cPeaksList& theore
 		}
 
 		if (parameters->fwhm <= fwhmthreshold) {
+
+			// high-res
 
 			elempos = subdesc.find("Mg");
 			if (elempos != string::npos) {
@@ -1955,6 +2239,26 @@ void cTheoreticalSpectrum::removeUnmatchedPatternsFineSpectra(cPeaksList& theore
 			}
 
 		}
+		else {
+
+			// low-res
+
+			elempos = subdesc.find("Ni");
+			if (elempos != string::npos) {
+				hasNi = true;
+			}
+
+			elempos = subdesc.find("Cu");
+			if (elempos != string::npos) {
+				hasCu = true;
+			}
+
+			elempos = subdesc.find("Zn");
+			if (elempos != string::npos) {
+				hasZn = true;
+			}
+
+		}
 
 	}
 	
@@ -1976,39 +2280,41 @@ void cTheoreticalSpectrum::removeUnmatchedPatternsFineSpectra(cPeaksList& theore
 
 			// lithium
 			if (hasLi) {
-				if (checkIsotope(elementLi, isotopeLi6, Li6, Li7, 0.000001, 0.2, theoreticalpeaks, theoreticalpeaksrealsize, experimentalpeaks, start, stop, maximumintensityid, maximumexperimentalintensity)) {
+				if (checkIsotopeHighRes(elementLi, isotopeLi6, Li6, Li7, 0.000001, 0.2, theoreticalpeaks, theoreticalpeaksrealsize, experimentalpeaks, start, stop, maximumintensityid, maximumexperimentalintensity)) {
 					cleargroup = true;
 				}
 			}
 
 			// boron 
 			if (hasB) {
-				if (checkIsotope(elementB, isotopeB10, B10, B11, 0.000001, 0.3, theoreticalpeaks, theoreticalpeaksrealsize, experimentalpeaks, start, stop, maximumintensityid, maximumexperimentalintensity)) {
+				if (checkIsotopeHighRes(elementB, isotopeB10, B10, B11, 0.000001, 0.3, theoreticalpeaks, theoreticalpeaksrealsize, experimentalpeaks, start, stop, maximumintensityid, maximumexperimentalintensity)) {
 					cleargroup = true;
 				}
 			}
 
 			// titanium (part 1)
 			if (hasTi) {
-				if (checkIsotope(elementTi, isotopeTi46, Ti46, Ti48, 0.000001, 0.2, theoreticalpeaks, theoreticalpeaksrealsize, experimentalpeaks, start, stop, maximumintensityid, maximumexperimentalintensity)) {
+				if (checkIsotopeHighRes(elementTi, isotopeTi46, Ti46, Ti48, 0.000001, 0.2, theoreticalpeaks, theoreticalpeaksrealsize, experimentalpeaks, start, stop, maximumintensityid, maximumexperimentalintensity)) {
 					cleargroup = true;
 				}
-				if (checkIsotope(elementTi, isotopeTi47, Ti47, Ti48, 0.000001, 0.2, theoreticalpeaks, theoreticalpeaksrealsize, experimentalpeaks, start, stop, maximumintensityid, maximumexperimentalintensity)) {
+				if (checkIsotopeHighRes(elementTi, isotopeTi47, Ti47, Ti48, 0.000001, 0.2, theoreticalpeaks, theoreticalpeaksrealsize, experimentalpeaks, start, stop, maximumintensityid, maximumexperimentalintensity)) {
 					cleargroup = true;
 				}
 			}
 
 			// chromium (part 1)
 			if (hasCr) {
-				if (checkIsotope(elementCr, isotopeCr50, Cr50, Cr52, 0.000001, 0.1, theoreticalpeaks, theoreticalpeaksrealsize, experimentalpeaks, start, stop, maximumintensityid, maximumexperimentalintensity)) {
+				if (checkIsotopeHighRes(elementCr, isotopeCr50, Cr50, Cr52, 0.000001, 0.1, theoreticalpeaks, theoreticalpeaksrealsize, experimentalpeaks, start, stop, maximumintensityid, maximumexperimentalintensity)) {
 					cleargroup = true;
 				}
 			}
 
 			// iron
 			if (hasFe) {
-				if (checkIsotope(elementFe, isotopeFe54, Fe54, Fe56, parameters->minratio54Fe56Fe, parameters->maxratio54Fe56Fe, theoreticalpeaks, theoreticalpeaksrealsize, experimentalpeaks, start, stop, maximumintensityid, maximumexperimentalintensity)) {
-					cleargroup = true;
+				if (parameters->enableratio54Fe56Fe) {
+					if (checkIsotopeHighRes(elementFe, isotopeFe54, Fe54, Fe56, parameters->minratio54Fe56Fe, parameters->maxratio54Fe56Fe, theoreticalpeaks, theoreticalpeaksrealsize, experimentalpeaks, start, stop, maximumintensityid, maximumexperimentalintensity)) {
+						cleargroup = true;
+					}
 				}
 			}
 
@@ -2016,96 +2322,161 @@ void cTheoreticalSpectrum::removeUnmatchedPatternsFineSpectra(cPeaksList& theore
 
 				// magnesium
 				if (hasMg) {
-					if (checkIsotope(elementMg, isotopeMg25, Mg25, Mg24, 0.000001, 0.2, theoreticalpeaks, theoreticalpeaksrealsize, experimentalpeaks, start, stop, maximumintensityid, maximumexperimentalintensity)) {
+					if (checkIsotopeHighRes(elementMg, isotopeMg25, Mg25, Mg24, 0.000001, 0.2, theoreticalpeaks, theoreticalpeaksrealsize, experimentalpeaks, start, stop, maximumintensityid, maximumexperimentalintensity)) {
 						cleargroup = true;
 					}
-					if (checkIsotope(elementMg, isotopeMg26, Mg26, Mg24, 0.000001, 0.2, theoreticalpeaks, theoreticalpeaksrealsize, experimentalpeaks, start, stop, maximumintensityid, maximumexperimentalintensity)) {
+					if (checkIsotopeHighRes(elementMg, isotopeMg26, Mg26, Mg24, 0.000001, 0.2, theoreticalpeaks, theoreticalpeaksrealsize, experimentalpeaks, start, stop, maximumintensityid, maximumexperimentalintensity)) {
 						cleargroup = true;
 					}
 				}
 
 				// silicon
 				if (hasSi) {
-					if (checkIsotope(elementSi, isotopeSi29, Si29, Si28, 0.000001, 0.1, theoreticalpeaks, theoreticalpeaksrealsize, experimentalpeaks, start, stop, maximumintensityid, maximumexperimentalintensity)) {
+					if (checkIsotopeHighRes(elementSi, isotopeSi29, Si29, Si28, 0.000001, 0.1, theoreticalpeaks, theoreticalpeaksrealsize, experimentalpeaks, start, stop, maximumintensityid, maximumexperimentalintensity)) {
 						cleargroup = true;
 					}
-					if (checkIsotope(elementSi, isotopeSi30, Si30, Si28, 0.000001, 0.1, theoreticalpeaks, theoreticalpeaksrealsize, experimentalpeaks, start, stop, maximumintensityid, maximumexperimentalintensity)) {
+					if (checkIsotopeHighRes(elementSi, isotopeSi30, Si30, Si28, 0.000001, 0.1, theoreticalpeaks, theoreticalpeaksrealsize, experimentalpeaks, start, stop, maximumintensityid, maximumexperimentalintensity)) {
 						cleargroup = true;
 					}
 				}
 
 				// sulfur
 				if (hasS) {
-					if (checkIsotope(elementS, isotopeS34, S34, S32, 0.000001, 0.1, theoreticalpeaks, theoreticalpeaksrealsize, experimentalpeaks, start, stop, maximumintensityid, maximumexperimentalintensity)) {
+					if (checkIsotopeHighRes(elementS, isotopeS34, S34, S32, 0.000001, 0.1, theoreticalpeaks, theoreticalpeaksrealsize, experimentalpeaks, start, stop, maximumintensityid, maximumexperimentalintensity)) {
 						cleargroup = true;
 					}
 				}
 
 				// chlorine
 				if (hasCl) {
-					if (checkIsotope(elementCl, isotopeCl37, Cl37, Cl35, 0.000001, 0.4, theoreticalpeaks, theoreticalpeaksrealsize, experimentalpeaks, start, stop, maximumintensityid, maximumexperimentalintensity)) {
+					if (checkIsotopeHighRes(elementCl, isotopeCl37, Cl37, Cl35, 0.000001, 0.4, theoreticalpeaks, theoreticalpeaksrealsize, experimentalpeaks, start, stop, maximumintensityid, maximumexperimentalintensity)) {
 						cleargroup = true;
 					}
 				}
 
 				// potassium
 				if (hasK) {
-					if (checkIsotope(elementK, isotopeK41, K41, K39, 0.000001, 0.1, theoreticalpeaks, theoreticalpeaksrealsize, experimentalpeaks, start, stop, maximumintensityid, maximumexperimentalintensity)) {
+					if (checkIsotopeHighRes(elementK, isotopeK41, K41, K39, 0.000001, 0.1, theoreticalpeaks, theoreticalpeaksrealsize, experimentalpeaks, start, stop, maximumintensityid, maximumexperimentalintensity)) {
 						cleargroup = true;
 					}
 				}
 
 				// titanium (part 2)
 				if (hasTi) {
-					if (checkIsotope(elementTi, isotopeTi49, Ti49, Ti48, 0.000001, 0.1, theoreticalpeaks, theoreticalpeaksrealsize, experimentalpeaks, start, stop, maximumintensityid, maximumexperimentalintensity)) {
+					if (checkIsotopeHighRes(elementTi, isotopeTi49, Ti49, Ti48, 0.000001, 0.1, theoreticalpeaks, theoreticalpeaksrealsize, experimentalpeaks, start, stop, maximumintensityid, maximumexperimentalintensity)) {
 						cleargroup = true;
 					}
-					if (checkIsotope(elementTi, isotopeTi50, Ti50, Ti48, 0.000001, 0.1, theoreticalpeaks, theoreticalpeaksrealsize, experimentalpeaks, start, stop, maximumintensityid, maximumexperimentalintensity)) {
+					if (checkIsotopeHighRes(elementTi, isotopeTi50, Ti50, Ti48, 0.000001, 0.1, theoreticalpeaks, theoreticalpeaksrealsize, experimentalpeaks, start, stop, maximumintensityid, maximumexperimentalintensity)) {
 						cleargroup = true;
 					}
 				}
 
 				// chromium (part 2)
 				if (hasCr) {
-					if (checkIsotope(elementCr, isotopeCr53, Cr53, Cr52, 0.000001, 0.2, theoreticalpeaks, theoreticalpeaksrealsize, experimentalpeaks, start, stop, maximumintensityid, maximumexperimentalintensity)) {
+					if (checkIsotopeHighRes(elementCr, isotopeCr53, Cr53, Cr52, 0.000001, 0.2, theoreticalpeaks, theoreticalpeaksrealsize, experimentalpeaks, start, stop, maximumintensityid, maximumexperimentalintensity)) {
 						cleargroup = true;
 					}
 				}
 
 				// nickel
 				if (hasNi) {
-					if (checkIsotope(elementNi, isotopeNi60, Ni60, Ni58, 0.000001, 0.5, theoreticalpeaks, theoreticalpeaksrealsize, experimentalpeaks, start, stop, maximumintensityid, maximumexperimentalintensity)) {
-						cleargroup = true;
+					if (parameters->enableratio60Ni58Ni) {
+						if (checkIsotopeHighRes(elementNi, isotopeNi60, Ni60, Ni58, parameters->minratio60Ni58Ni, parameters->maxratio60Ni58Ni, theoreticalpeaks, theoreticalpeaksrealsize, experimentalpeaks, start, stop, maximumintensityid, maximumexperimentalintensity)) {
+							cleargroup = true;
+						}
 					}
-					if (checkIsotope(elementNi, isotopeNi62, Ni62, Ni58, 0.000001, 0.1, theoreticalpeaks, theoreticalpeaksrealsize, experimentalpeaks, start, stop, maximumintensityid, maximumexperimentalintensity)) {
-						cleargroup = true;
+					/*
+					if (parameters->enableratio62Ni58Ni) {
+						if (checkIsotopeHighRes(elementNi, isotopeNi62, Ni62, Ni58, parameters->minratio62Ni58Ni, parameters->maxratio62Ni58Ni, theoreticalpeaks, theoreticalpeaksrealsize, experimentalpeaks, start, stop, maximumintensityid, maximumexperimentalintensity)) {
+							cleargroup = true;
+						}
 					}
+					*/
 				}
 
 				// copper
 				if (hasCu) {
-					if (checkIsotope(elementCu, isotopeCu65, Cu65, Cu63, 0.000001, 0.6, theoreticalpeaks, theoreticalpeaksrealsize, experimentalpeaks, start, stop, maximumintensityid, maximumexperimentalintensity)) {
-						cleargroup = true;
+					if (parameters->enableratio65Cu63Cu) {
+						if (checkIsotopeHighRes(elementCu, isotopeCu65, Cu65, Cu63, parameters->minratio65Cu63Cu, parameters->maxratio65Cu63Cu, theoreticalpeaks, theoreticalpeaksrealsize, experimentalpeaks, start, stop, maximumintensityid, maximumexperimentalintensity)) {
+							cleargroup = true;
+						}
 					}
 				}
 
 				// zinc
 				if (hasZn) {
-					if (checkIsotope(elementZn, isotopeZn66, Zn66, Zn64, 0.000001, 0.7, theoreticalpeaks, theoreticalpeaksrealsize, experimentalpeaks, start, stop, maximumintensityid, maximumexperimentalintensity)) {
-						cleargroup = true;
+					if (parameters->enableratio66Zn64Zn) {
+						if (checkIsotopeHighRes(elementZn, isotopeZn66, Zn66, Zn64, parameters->minratio66Zn64Zn, parameters->maxratio66Zn64Zn, theoreticalpeaks, theoreticalpeaksrealsize, experimentalpeaks, start, stop, maximumintensityid, maximumexperimentalintensity)) {
+							cleargroup = true;
+						}
 					}
-					if (checkIsotope(elementZn, isotopeZn67, Zn67, Zn64, 0.000001, 0.2, theoreticalpeaks, theoreticalpeaksrealsize, experimentalpeaks, start, stop, maximumintensityid, maximumexperimentalintensity)) {
-						cleargroup = true;
+					/*
+					if (parameters->enableratio67Zn64Zn) {
+						if (checkIsotopeHighRes(elementZn, isotopeZn67, Zn67, Zn64, parameters->minratio67Zn64Zn, parameters->maxratio67Zn64Zn, theoreticalpeaks, theoreticalpeaksrealsize, experimentalpeaks, start, stop, maximumintensityid, maximumexperimentalintensity)) {
+							cleargroup = true;
+						}
 					}
-					if (checkIsotope(elementZn, isotopeZn68, Zn68, Zn64, 0.000001, 0.5, theoreticalpeaks, theoreticalpeaksrealsize, experimentalpeaks, start, stop, maximumintensityid, maximumexperimentalintensity)) {
-						cleargroup = true;
+					*/
+					if (parameters->enableratio68Zn64Zn) {
+						if (checkIsotopeHighRes(elementZn, isotopeZn68, Zn68, Zn64, parameters->minratio68Zn64Zn, parameters->maxratio68Zn64Zn, theoreticalpeaks, theoreticalpeaksrealsize, experimentalpeaks, start, stop, maximumintensityid, maximumexperimentalintensity)) {
+							cleargroup = true;
+						}
 					}
 				}
 
 				// gallium
 				if (hasGa) {
-					if (checkIsotope(elementGa, isotopeGa71, Ga71, Ga69, 0.000001, 0.8, theoreticalpeaks, theoreticalpeaksrealsize, experimentalpeaks, start, stop, maximumintensityid, maximumexperimentalintensity)) {
+					if (checkIsotopeHighRes(elementGa, isotopeGa71, Ga71, Ga69, 0.000001, 0.8, theoreticalpeaks, theoreticalpeaksrealsize, experimentalpeaks, start, stop, maximumintensityid, maximumexperimentalintensity)) {
 						cleargroup = true;
+					}
+				}
+
+			}
+			else {
+
+				// nickel
+				if (hasNi) {
+					if (parameters->enableratio60Ni58Ni) {
+						if (checkIsotopeLowRes(elementNi, isotopeNi60, Ni60, Ni58, parameters->minratio60Ni58Ni, parameters->maxratio60Ni58Ni, theoreticalpeaks, theoreticalpeaksrealsize, experimentalpeaks, start, stop, maximumintensityid, maximumexperimentalintensity)) {
+							cleargroup = true;
+						}
+					}
+					/*
+					if (parameters->enableratio62Ni58Ni) {
+						if (checkIsotopeLowRes(elementNi, isotopeNi62, Ni62, Ni58, parameters->minratio62Ni58Ni, parameters->maxratio62Ni58Ni, theoreticalpeaks, theoreticalpeaksrealsize, experimentalpeaks, start, stop, maximumintensityid, maximumexperimentalintensity)) {
+							cleargroup = true;
+						}
+					}
+					*/
+				}
+
+				// copper
+				if (hasCu) {
+					if (parameters->enableratio65Cu63Cu) {
+						if (checkIsotopeLowRes(elementCu, isotopeCu65, Cu65, Cu63, parameters->minratio65Cu63Cu, parameters->maxratio65Cu63Cu, theoreticalpeaks, theoreticalpeaksrealsize, experimentalpeaks, start, stop, maximumintensityid, maximumexperimentalintensity)) {
+							cleargroup = true;
+						}
+					}
+				}
+
+				// zinc
+				if (hasZn) {
+					if (parameters->enableratio66Zn64Zn) {
+						if (checkIsotopeLowRes(elementZn, isotopeZn66, Zn66, Zn64, parameters->minratio66Zn64Zn, parameters->maxratio66Zn64Zn, theoreticalpeaks, theoreticalpeaksrealsize, experimentalpeaks, start, stop, maximumintensityid, maximumexperimentalintensity)) {
+							cleargroup = true;
+						}
+					}
+					/*
+					if (parameters->enableratio67Zn64Zn) {
+						if (checkIsotopeLowRes(elementZn, isotopeZn67, Zn67, Zn64, parameters->minratio67Zn64Zn, parameters->maxratio67Zn64Zn, theoreticalpeaks, theoreticalpeaksrealsize, experimentalpeaks, start, stop, maximumintensityid, maximumexperimentalintensity)) {
+							cleargroup = true;
+						}
+					}
+					*/
+					if (parameters->enableratio68Zn64Zn) {
+						if (checkIsotopeLowRes(elementZn, isotopeZn68, Zn68, Zn64, parameters->minratio68Zn64Zn, parameters->maxratio68Zn64Zn, theoreticalpeaks, theoreticalpeaksrealsize, experimentalpeaks, start, stop, maximumintensityid, maximumexperimentalintensity)) {
+							cleargroup = true;
+						}
 					}
 				}
 
@@ -2149,10 +2520,22 @@ void cTheoreticalSpectrum::removeUnmatchedPatternsFineSpectra(cPeaksList& theore
 				maximumexperimentalintensity = experimentalpeaks[theoreticalpeaks[i].matchedid].relativeintensity;
 			}
 
-			langle = (int)parameters->peakidtodesc[theoreticalpeaks[start].descriptionid].rfind('(');
-			rangle = (int)parameters->peakidtodesc[theoreticalpeaks[start].descriptionid].rfind(')');
+			if (theoreticalpeaks[start].descriptionid >= 0) {
+				langle = (int)parameters->peakidtodesc[theoreticalpeaks[start].descriptionid].rfind('(');
+				rangle = (int)parameters->peakidtodesc[theoreticalpeaks[start].descriptionid].rfind(')');
+			}
+			else {
+				langle = (int)theoreticalpeaks[start].description.rfind('(');
+				rangle = (int)theoreticalpeaks[start].description.rfind(')');
+
+			}
 			if ((langle != string::npos) && (rangle != string::npos)) {
-				subdesc = parameters->peakidtodesc[theoreticalpeaks[start].descriptionid].substr(langle + 1, rangle - langle - 1);
+				if (theoreticalpeaks[start].descriptionid >= 0) {
+					subdesc = parameters->peakidtodesc[theoreticalpeaks[start].descriptionid].substr(langle + 1, rangle - langle - 1);
+				}
+				else {
+					subdesc = theoreticalpeaks[start].description.substr(langle + 1, rangle - langle - 1);
+				}
 				subdescsize = subdesc.size();
 
 				elempos = subdesc.find("Li");
@@ -2188,6 +2571,8 @@ void cTheoreticalSpectrum::removeUnmatchedPatternsFineSpectra(cPeaksList& theore
 				}
 
 				if (parameters->fwhm <= fwhmthreshold) {
+
+					// high-res
 
 					elempos = subdesc.find("Mg");
 					if (elempos != string::npos) {
@@ -2246,6 +2631,26 @@ void cTheoreticalSpectrum::removeUnmatchedPatternsFineSpectra(cPeaksList& theore
 					elempos = subdesc.find("Ga");
 					if (elempos != string::npos) {
 						hasGa = true;
+					}
+
+				}
+				else {
+
+					// low-res
+
+					elempos = subdesc.find("Ni");
+					if (elempos != string::npos) {
+						hasNi = true;
+					}
+
+					elempos = subdesc.find("Cu");
+					if (elempos != string::npos) {
+						hasCu = true;
+					}
+
+					elempos = subdesc.find("Zn");
+					if (elempos != string::npos) {
+						hasZn = true;
 					}
 
 				}
@@ -2988,7 +3393,7 @@ void cTheoreticalSpectrum::fillExperimentalAnnotationsAndRemoveUnmatchedTheoreti
 }
 
 
-bool cTheoreticalSpectrum::checkIsotope(string& elementstring, string& isotopestring, double isotopemass1, double isotopemass2, double minintensityratio, double maxintensityratio, cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks, int start, int stop, int maximumintensityid, double maximumexperimentalintensity) {
+bool cTheoreticalSpectrum::checkIsotopeHighRes(string& elementstring, string& isotopestring, double isotopemass1, double isotopemass2, double minintensityratio, double maxintensityratio, cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks, int start, int stop, int maximumintensityid, double maximumexperimentalintensity) {
 	bool notdetected = false;
 	int isotopeposition = -1;
 	double intensitymultiplier = 1.0;
@@ -3001,12 +3406,24 @@ bool cTheoreticalSpectrum::checkIsotope(string& elementstring, string& isotopest
 				if (theoreticalpeaks[i].matched > 0) {
 					mzdiff = fabs(uncharge(theoreticalpeaks[i].mzratio, theoreticalpeaks[i].charge) - uncharge(theoreticalpeaks[maximumintensityid].mzratio, theoreticalpeaks[maximumintensityid].charge) - isotopemass1 + isotopemass2);
 					if (mzdiff < 0.1) {
-						if (parameters->peakidtodesc[theoreticalpeaks[i].descriptionid].find('%') == string::npos) {
-							pos = parameters->peakidtodesc[theoreticalpeaks[i].descriptionid].rfind(isotopestring);
-							if (pos != string::npos) {
-								intensitymultiplier = getIntensityMultiplier(theoreticalpeaks, i, elementstring, pos);
-								isotopeposition = i;
-								break;
+						if (theoreticalpeaks[i].descriptionid >= 0) {
+							if (parameters->peakidtodesc[theoreticalpeaks[i].descriptionid].find('%') == string::npos) {
+								pos = parameters->peakidtodesc[theoreticalpeaks[i].descriptionid].rfind(isotopestring);
+								if (pos != string::npos) {
+									intensitymultiplier = getIntensityMultiplier(theoreticalpeaks, i, elementstring, pos);
+									isotopeposition = i;
+									break;
+								}
+							}
+						}
+						else {
+							if (theoreticalpeaks[i].description.find('%') == string::npos) {
+								pos = theoreticalpeaks[i].description.rfind(isotopestring);
+								if (pos != string::npos) {
+									intensitymultiplier = getIntensityMultiplier(theoreticalpeaks, i, elementstring, pos);
+									isotopeposition = i;
+									break;
+								}
 							}
 						}
 					}
@@ -3042,14 +3459,96 @@ bool cTheoreticalSpectrum::checkIsotope(string& elementstring, string& isotopest
 }
 
 
+bool cTheoreticalSpectrum::checkIsotopeLowRes(string& elementstring, string& isotopestring, double isotopemass1, double isotopemass2, double minintensityratio, double maxintensityratio, cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks, int start, int stop, int maximumintensityid, double maximumexperimentalintensity) {
+	bool notdetected = false;
+	int isotopeposition = -1;
+	double intensitymultiplier = 1.0;
+	double mzdiff;
+	size_t pos;
+
+	if (theoreticalpeaks[maximumintensityid].matched > 0) {
+		if (maximumexperimentalintensity >= parameters->minimumrelativeintensitythreshold) {
+			for (int i = start; i <= stop; i++) {
+				if (theoreticalpeaks[i].matched > 0) {
+					mzdiff = fabs(uncharge(theoreticalpeaks[i].mzratio, theoreticalpeaks[i].charge) - uncharge(theoreticalpeaks[maximumintensityid].mzratio, theoreticalpeaks[maximumintensityid].charge) - isotopemass1 + isotopemass2);
+					if (mzdiff < 0.2) {
+						if (theoreticalpeaks[i].descriptionid >= 0) {
+							//if (parameters->peakidtodesc[theoreticalpeaks[i].descriptionid].find('%') == string::npos) {
+								pos = parameters->peakidtodesc[theoreticalpeaks[i].descriptionid].rfind(isotopestring);
+								if (pos != string::npos) {
+									//intensitymultiplier = getIntensityMultiplier(theoreticalpeaks, i, elementstring, pos);
+									isotopeposition = i;
+									break;
+								}
+							//}
+						}
+						else {
+							//if (theoreticalpeaks[i].description.find('%') == string::npos) {
+								pos = theoreticalpeaks[i].description.rfind(isotopestring);
+								if (pos != string::npos) {
+									//intensitymultiplier = getIntensityMultiplier(theoreticalpeaks, i, elementstring, pos);
+									isotopeposition = i;
+									break;
+								}
+							//}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	if (isotopeposition == -1) {
+		if (minintensityratio > 0) {
+			notdetected = true;
+		}
+	}
+	else {
+		if ((theoreticalpeaks[isotopeposition].matched > 0) && (theoreticalpeaks[maximumintensityid].matched > 0)) {
+			if (maximumexperimentalintensity >= parameters->minimumrelativeintensitythreshold) {
+				if (theoreticalpeaks[isotopeposition].relativeintensity*maximumexperimentalintensity / 100.0 >= parameters->minimumrelativeintensitythreshold) {
+					if (experimentalpeaks[theoreticalpeaks[isotopeposition].matchedid].relativeintensity > maxintensityratio * intensitymultiplier * maximumexperimentalintensity) {
+						notdetected = true;
+					}
+					if (experimentalpeaks[theoreticalpeaks[isotopeposition].matchedid].relativeintensity < minintensityratio * intensitymultiplier * maximumexperimentalintensity) {
+						notdetected = true;
+					}
+				}
+				else {
+					notdetected = true;
+				}
+			}
+		}
+	}
+
+	return notdetected;
+}
+
+
 double cTheoreticalSpectrum::getIntensityMultiplier(cPeaksList& theoreticalpeaks, int peakid, string& elementstring, size_t startpos) {
-	size_t pos = parameters->peakidtodesc[theoreticalpeaks[peakid].descriptionid].find(elementstring, startpos);
+	size_t pos;
+	
+	if (theoreticalpeaks[peakid].descriptionid >= 0) {
+		pos = parameters->peakidtodesc[theoreticalpeaks[peakid].descriptionid].find(elementstring, startpos);
+	}
+	else {
+		pos = theoreticalpeaks[peakid].description.find(elementstring, startpos);
+	}
+
 	if (pos == string::npos) {
 		// one occurrence
 		return 1.0;
 	}
 
-	string shortstr = parameters->peakidtodesc[theoreticalpeaks[peakid].descriptionid].substr(pos + elementstring.size());
+	string shortstr;
+	
+	if (theoreticalpeaks[peakid].descriptionid >= 0) {
+		shortstr = parameters->peakidtodesc[theoreticalpeaks[peakid].descriptionid].substr(pos + elementstring.size());
+	}
+	else {
+		shortstr = theoreticalpeaks[peakid].description.substr(pos + elementstring.size());
+	}
+
 	if ((shortstr.size() > 0) && (shortstr[0] == ' ')) {
 		// two occurrences
 		return 2.0;
@@ -3094,6 +3593,7 @@ void cTheoreticalSpectrum::clear(bool clearpeaklist) {
 	peakstested = 0;
 	experimentalpeaksmatchedratio = 0;
 	weightedpeaksratio = 0;
+	cosinesimilarity = 0;
 	unmatchedexperimentalpeakscount = 0;
 	coveragebyseries = "";
 	valid = false;
@@ -4772,6 +5272,115 @@ void cTheoreticalSpectrum::compareMSSpectrum(int id, int peaklistseriesvectorid,
 }
 
 
+void cTheoreticalSpectrum::compareAverageMSSpectrum(cPeaksList& averagespectrum, cTheoreticalSpectrum& tsfull, cPeaksList& unmatchedpeaksinmatchedpatterns) {
+	experimentalpeaks = averagespectrum;
+
+	cPeaksList* tsfullpeaklist = tsfull.getTheoreticalPeaks();
+
+	experimentalmatches.clear();
+
+	searchForPeakPairs(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks, parameters->fragmentmasserrortolerance);
+
+	if (parameters->generateisotopepattern) {
+		if ((parameters->minimumannotationintensityrelative > parameters->minimumrelativeintensitythreshold) || (parameters->minimumannotationintensityabsolute > parameters->minimumabsoluteintensitythreshold)) {
+			removePatternsUnderAnnotationThreshold(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks);
+		}
+		if (parameters->minimumpatternsize > 1) {
+			removeUnmatchedPatternsFineSpectra(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks);
+		}
+		if (parameters->intensitytolerance > 0) {
+			removeUnmatchedPatternsByIntensityRatio(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks);
+		}
+		if (parameters->mzdifftolerance > 0) {
+			removeUnmatchedPatternsByMZDifference(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks);
+		}
+	}
+	else {
+		if ((parameters->minimumannotationintensityrelative > parameters->minimumrelativeintensitythreshold) || (parameters->minimumannotationintensityabsolute > parameters->minimumabsoluteintensitythreshold)) {
+			removePeaksUnderAnnotationThreshold(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks);
+		}
+	}
+
+	// pre-cleaning (relative intensity threshold, minimumpatternsize)
+	if (parameters->generateisotopepattern) {
+		if (parameters->minimumiontypes > 1) {
+			removeUnmatchedIsotopePatterns(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks, unmatchedpeaksinmatchedpatterns, false);
+		}
+	}
+
+	// mark isotopes
+	if (parameters->generateisotopepattern) {
+		if (parameters->minimumiontypes > 1) {
+			tsfullpeaklist->markIsotopes();
+		}
+	}
+
+	if (parameters->minimumiontypes > 1) {
+		removeUnmatchedCompounds(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks, parameters->minimumiontypes);
+	}
+
+	// clear marks of isotopes
+	if (parameters->generateisotopepattern) {
+		if (parameters->minimumiontypes > 1) {
+			tsfullpeaklist->setIsotopeFlags(false);
+		}
+	}
+
+	// clear matched isotopes of unmatched monoisotopic peaks
+	unmatchedpeaksinmatchedpatterns.clear();
+	if (parameters->generateisotopepattern) {
+		removeUnmatchedIsotopePatterns(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks, unmatchedpeaksinmatchedpatterns, true);
+	}
+	else {
+		removeUnmatchedMetalIsotopes(*tsfullpeaklist, tsfull.getNumberOfPeaks(), experimentalpeaks);
+	}
+
+	if (parameters->reportunmatchedtheoreticalpeaks && !parameters->generateisotopepattern) {
+		theoreticalpeaks = *tsfullpeaklist;
+
+		// fill annotations of experimental peaks
+		for (int i = 0; i < (int)experimentalpeaks.size(); i++) {
+			for (auto it = experimentalmatches[i].begin(); it != experimentalmatches[i].end(); ++it) {
+				theoreticalpeaks[*it].matchedmz = experimentalpeaks[i].mzratio;
+				theoreticalpeaks[*it].matchedrelativeintensity = experimentalpeaks[i].relativeintensity;
+				theoreticalpeaks[*it].matchedabsoluteintensity = experimentalpeaks[i].absoluteintensity;
+				theoreticalpeaks[*it].matchedppm = ppmError(experimentalpeaks[i].mzratio, theoreticalpeaks[*it].mzratio);
+
+				(*tsfullpeaklist)[*it].matched = 0;
+				(*tsfullpeaklist)[*it].matchedid = -1;
+			}
+		}
+	}
+	else {
+		theoreticalpeaks.clear();
+		vector<set<int> > updatedexperimentalmatches;
+		updatedexperimentalmatches.resize(experimentalmatches.size());
+
+		// fill annotations of experimental peaks and remove unmatched theoretical peaks
+		for (int i = 0; i < (int)experimentalpeaks.size(); i++) {
+			for (auto it = experimentalmatches[i].begin(); it != experimentalmatches[i].end(); ++it) {
+				updatedexperimentalmatches[i].insert((int)theoreticalpeaks.size());
+
+				cPeak matchedpeak;
+				matchedpeak = (*tsfullpeaklist)[*it];
+
+				matchedpeak.matchedmz = experimentalpeaks[i].mzratio;
+				matchedpeak.matchedrelativeintensity = experimentalpeaks[i].relativeintensity;
+				matchedpeak.matchedabsoluteintensity = experimentalpeaks[i].absoluteintensity;
+				matchedpeak.matchedppm = ppmError(experimentalpeaks[i].mzratio, matchedpeak.mzratio);
+				theoreticalpeaks.add(matchedpeak);
+
+				(*tsfullpeaklist)[*it].matched = 0;
+				(*tsfullpeaklist)[*it].matchedid = -1;
+			}
+			experimentalpeaks[i].matched = (int)updatedexperimentalmatches[i].size();
+		}
+
+		experimentalmatches = updatedexperimentalmatches;
+	}
+}
+
+
 void cTheoreticalSpectrum::finalizeMSSpectrum(cPeaksList& unmatchedpeaksinmatchedpatterns, bool writedescription) {
 	if (parameters->generateisotopepattern) {
 		theoreticalpeaks.attach(unmatchedpeaksinmatchedpatterns);
@@ -4881,6 +5490,11 @@ double cTheoreticalSpectrum::getRatioOfMatchedPeaks() {
 
 double cTheoreticalSpectrum::getWeightedRatioOfMatchedPeaks() const {
 	return weightedpeaksratio;
+}
+
+
+double cTheoreticalSpectrum::getCosineSimilarity() const {
+	return cosinesimilarity;
 }
 
 
@@ -5455,6 +6069,14 @@ cPeaksList& cTheoreticalSpectrum::getExperimentalSpectrum() {
 }
 
 
+void cTheoreticalSpectrum::setExperimentalSpectrum(cPeaksList& experimentalspectrum) {
+	experimentalpeaks = experimentalspectrum;
+	
+	experimentalmatches.clear();
+	experimentalmatches.resize(experimentalpeaks.size());
+}
+
+
 set<int>& cTheoreticalSpectrum::getExperimentalMatches(int peakid) {
 	return experimentalmatches[peakid];
 }
@@ -5761,6 +6383,7 @@ void cTheoreticalSpectrum::store(ofstream& os) {
 	os.write((char *)&peakstested, sizeof(int));
 	os.write((char *)&experimentalpeaksmatchedratio, sizeof(double));
 	os.write((char *)&weightedpeaksratio, sizeof(double));
+	os.write((char *)&cosinesimilarity, sizeof(double));
 
 	os.write((char *)&unmatchedexperimentalpeakscount, sizeof(int));
 	storeString(coveragebyseries, os);
@@ -5844,6 +6467,13 @@ void cTheoreticalSpectrum::load(ifstream& is, int fileversionpart1, int filevers
 	is.read((char *)&peakstested, sizeof(int));
 	is.read((char *)&experimentalpeaksmatchedratio, sizeof(double));
 	is.read((char *)&weightedpeaksratio, sizeof(double));
+
+	if (isCompatibleVersion(fileversionpart1, fileversionpart2, fileversionpart3, 2, 1, 22)) {
+		is.read((char *)&cosinesimilarity, sizeof(double));
+	}
+	else {
+		cosinesimilarity = 0;
+	}
 
 	is.read((char *)&unmatchedexperimentalpeakscount, sizeof(int));
 	loadString(coveragebyseries, is);
@@ -5929,6 +6559,11 @@ bool cTheoreticalSpectrum::equals(cTheoreticalSpectrum& secondtheoreticalspectru
 
 	if (!compareDoubles(weightedpeaksratio, secondtheoreticalspectrum.weightedpeaksratio)) {
 		cout << "weightedpeaksratio does not match" << endl;
+		return false;
+	}
+
+	if (!compareDoubles(cosinesimilarity, secondtheoreticalspectrum.cosinesimilarity)) {
+		cout << "cosinesimilarity does not match" << endl;
 		return false;
 	}
 

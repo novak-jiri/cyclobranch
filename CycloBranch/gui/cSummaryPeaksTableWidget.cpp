@@ -44,9 +44,20 @@ void addEICPeak(cParameters* parameters, cPeaksList& eicchromatogram, cTheoretic
 		if (theoreticalspectrum[i].matched > 0) {
 			matcheditem.clear();
 
-			pos = parameters->peakidtodesc[theoreticalspectrum[i].descriptionid].find("</a>");
+			if (theoreticalspectrum[i].descriptionid >= 0) {
+				pos = parameters->peakidtodesc[theoreticalspectrum[i].descriptionid].find("</a>");
+			}
+			else {
+				pos = theoreticalspectrum[i].description.find("</a>");
+			}
+
 			if (pos != string::npos) {
-				matcheditem = parameters->peakidtodesc[theoreticalspectrum[i].descriptionid].substr(0, pos + 4);
+				if (theoreticalspectrum[i].descriptionid >= 0) {
+					matcheditem = parameters->peakidtodesc[theoreticalspectrum[i].descriptionid].substr(0, pos + 4);
+				}
+				else {
+					matcheditem = theoreticalspectrum[i].description.substr(0, pos + 4);
+				}
 			}
 
 			if (!matcheditem.empty()) {
@@ -976,7 +987,7 @@ void cSummaryPeaksTableWidget::filterTablerows() {
 
 
 void cSummaryPeaksTableWidget::filterCompound(string name, string iontype, int datatypeview, string mzstr) {
-	if ((datatypeview == 0) || (datatypeview == 1) || (datatypeview == 4) || (datatypeview == 5)) {
+	if ((datatypeview == 0) || (datatypeview == 1) || (datatypeview == 4) || (datatypeview == 5) || (datatypeview == 6)) {
 		rowsfiltercombobox1->setCurrentText("Theoretical m/z");
 		rowsfiltercomparatorcombobox1->setCurrentText("=");
 		rowsfilterline1->setText(mzstr.c_str());
@@ -1026,14 +1037,35 @@ void cSummaryPeaksTableWidget::addCoordinateInfo(int spectrumindex, vector<cCoor
 		if (theoreticalspectrum[i].matched > 0) {
 			matcheditem.clear();
 
-			pos1 = parameters->peakidtodesc[theoreticalspectrum[i].descriptionid].find('<');
-			if (pos1 != string::npos) {
-				matcheditem = parameters->peakidtodesc[theoreticalspectrum[i].descriptionid].substr(0, pos1 - 1);
+			if (theoreticalspectrum[i].descriptionid >= 0) {
+				pos1 = parameters->peakidtodesc[theoreticalspectrum[i].descriptionid].find('<');
+			}
+			else {
+				pos1 = theoreticalspectrum[i].description.find('<');
+			}
 
-				pos1 = parameters->peakidtodesc[theoreticalspectrum[i].descriptionid].rfind("</a>");
-				pos2 = parameters->peakidtodesc[theoreticalspectrum[i].descriptionid].find('>');
+			if (pos1 != string::npos) {
+
+				if (theoreticalspectrum[i].descriptionid >= 0) {
+					matcheditem = parameters->peakidtodesc[theoreticalspectrum[i].descriptionid].substr(0, pos1 - 1);
+					pos1 = parameters->peakidtodesc[theoreticalspectrum[i].descriptionid].rfind("</a>");
+					pos2 = parameters->peakidtodesc[theoreticalspectrum[i].descriptionid].find('>');
+				}
+				else {
+					matcheditem = theoreticalspectrum[i].description.substr(0, pos1 - 1);
+					pos1 = theoreticalspectrum[i].description.rfind("</a>");
+					pos2 = theoreticalspectrum[i].description.find('>');
+				}
+
 				if ((pos1 != string::npos) && (pos2 != string::npos)) {
-					tmpstr = parameters->peakidtodesc[theoreticalspectrum[i].descriptionid].substr(pos2 + 1, pos1 - pos2 - 1);
+
+					if (theoreticalspectrum[i].descriptionid >= 0) {
+						tmpstr = parameters->peakidtodesc[theoreticalspectrum[i].descriptionid].substr(pos2 + 1, pos1 - pos2 - 1);
+					}
+					else {
+						tmpstr = theoreticalspectrum[i].description.substr(pos2 + 1, pos1 - pos2 - 1);
+					}
+					
 					if (tmpstr.size() > 40) {
 						matcheditem += tmpstr.substr(0, 37) + "...";
 					}

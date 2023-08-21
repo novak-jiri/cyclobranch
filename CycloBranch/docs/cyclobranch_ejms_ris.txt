@@ -1,0 +1,14 @@
+TY  - JOUR
+TI  - Quantitation of Small Molecules from Liquid Chromatography-Mass Spectrometric Accurate Mass Datasets using CycloBranch
+T2  - Eur. J. Mass Spectrom.
+VL  - 29
+IS  - 2
+SP  - 102-110
+PY  - 2023
+AU  - Novak,Jiri
+AU  - Schug,Kevin A.
+AU  - Havlicek,Vladimir
+N1  - 
+DB  - 
+DO  - 10.1177/14690667231164766
+ER  - 

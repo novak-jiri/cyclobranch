@@ -79,6 +79,15 @@ bool compareWeightedRatioDesc(const cTheoreticalSpectrum& a, const cTheoreticalS
 
 
 /**
+	\brief Compare scores of two theoretical spectra (cosine similarity).
+	\param a first theoretical spectrum
+	\param b second theoretical spectrum
+	\retval bool true if the score of \a a is greater than the score of \a b
+*/
+bool compareCosineSimilarityDesc(const cTheoreticalSpectrum& a, const cTheoreticalSpectrum& b);
+
+
+/**
 	\brief The class representing a thread for comparison of a theoretical spectrum with a peak list (MS2 level).
 */
 class cSpectrumComparatorThreadMS2 : public QObject, public QRunnable {

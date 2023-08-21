@@ -11,10 +11,12 @@ A tool for mass spectrometry data analysis.
     * imaging mass spectra (MSI)
     * tandem mass spectra (MS/MS)
   * main features
-    * MS, LC-MC, MSI
+    * MS, LC-MS, MSI
       * dereplication / database search
       * prediction of elemental compositions of unknown compounds
       * fine isotopic structure
+    * LC-MS
+      * quantitation of small molecules
     * MSI
       * pixel-by-pixel analysis of imaging mass spectra (imzML)
       * fusion of imzML files with optical and histology images
@@ -56,8 +58,10 @@ A tool for mass spectrometry data analysis.
 https://ms.biomed.cas.cz/cyclobranch/
   
 ## References and More Information
+  * quantitation of small molecules in LC-MS data
+    * Novak J. et al. Quantitation of Small Molecules from Liquid Chromatography-Mass Spectrometric Accurate Mass Datasets using CycloBranch. *Eur. J. Mass Spectrom.*, 29(2):102-110, 2023. DOI: [10.1177/14690667231164766](https://doi.org/10.1177/14690667231164766)
   * molecular formula annotations
-    * Novak J. et al. CycloBranch 2: Molecular Formula Annotations Applied to imzML Data Sets in Bimodal Fusion and LC-MS Data Files. *Anal. Chem.*, 92(10):6844–6849, 2020. DOI: [10.1021/acs.analchem.0c00170](https://doi.org/10.1021/acs.analchem.0c00170) 
+    * Novak J. et al. CycloBranch 2: Molecular Formula Annotations Applied to imzML Data Sets in Bimodal Fusion and LC-MS Data Files. *Anal. Chem.*, 92(10):6844â€“6849, 2020. DOI: [10.1021/acs.analchem.0c00170](https://doi.org/10.1021/acs.analchem.0c00170) 
   * configuration of the tool for different use cases
     * Pluhacek T. et al. Analysis of Microbial Siderophores by Mass Spectrometry. In Sanjoy K. Bhattacharya (ed.), *Metabolomics: Methods and Protocols*, Methods in Molecular Biology, 1996:131-153, Springer, 2019. DOI: [10.1007/978-1-4939-9488-5_12](https://doi.org/10.1007/978-1-4939-9488-5_12)
   * isotopic fine structure

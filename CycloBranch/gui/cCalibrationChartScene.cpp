@@ -98,14 +98,17 @@ cCalibrationChartScene::cCalibrationChartScene(QWidget* parent) {
 	calledbyresizeevent = false;
 	oldwidth.clear();
 	oldheight.clear();
+
+	graphtype = 0;
+
 	currentscale = 1;
 	factor = 0.2;
 	pressedx = -1;
 	pressedy = -1;
 	currentx = 0;
 	currenty = 0;
-	minconcentration = 0;
-	maxconcentration = 0;
+	minxvalue = 0;
+	maxxvalue = 0;
 
 	topmargin = 0;
 	bottommargin = 0;
@@ -113,7 +116,7 @@ cCalibrationChartScene::cCalibrationChartScene(QWidget* parent) {
 	rightmargin = 0;
 
 	firstshow = true;
-	enablemouseconcentrationselection = true;
+	enablemousexvalueselection = true;
 
 	equationtype = 0;
 
@@ -130,6 +133,8 @@ cCalibrationChartScene::cCalibrationChartScene(QWidget* parent) {
 
 	datasd.clear();
 	datagroups.clear();
+
+	datatimevalues.clear();
 
 	hidelabels = false;
 
@@ -153,9 +158,24 @@ cCalibrationChartScene::~cCalibrationChartScene() {
 
 
 void cCalibrationChartScene::initialize() {
-	minconcentration = 0;
-	maxconcentration = 1000;
-	emit updateConcentrationInterval(minconcentration, maxconcentration);
+	if (graphtype == 0) {
+		minxvalue = 0;
+
+		maxxvalue = getMaximumConcentration();
+		if (maxxvalue == 0) {
+			maxxvalue = 1000;
+		}
+	}
+	else {
+		minxvalue = 0;
+
+		maxxvalue = (double)getMaximumCollectionTime();
+		if (maxxvalue == 0) {
+			maxxvalue = 240;
+		}
+	}
+
+	emit updateXValueInterval(minxvalue, maxxvalue);
 
 	setScene(scene);
 
@@ -173,6 +193,8 @@ void cCalibrationChartScene::initialize() {
 
 	datasd.clear();
 	datagroups.clear();
+
+	datatimevalues.clear();
 
 	redrawScene();
 }
@@ -270,14 +292,66 @@ void cCalibrationChartScene::setLineParameters(int equationtype, double a, doubl
 }
 
 
-void cCalibrationChartScene::setData(vector<double> datax, vector<double> datay, vector<double> datasd, vector<int> datagroups) {
+void cCalibrationChartScene::setData(vector<double> datax, vector<double> datay, vector<double> datasd, vector<string> datagroups, vector<int> datatimevalues) {
 	this->datax = datax;
 	this->datay = datay;
 
 	this->datasd = datasd;
 	this->datagroups = datagroups;
 
+	this->datatimevalues = datatimevalues;
+
+	if (graphtype == 0) {
+		minxvalue = 0;
+
+		maxxvalue = getMaximumConcentration();
+		if (maxxvalue == 0) {
+			maxxvalue = 1000;
+		}
+	}
+	else {
+		minxvalue = 0;
+
+		maxxvalue = (double)getMaximumCollectionTime();
+		if (maxxvalue == 0) {
+			maxxvalue = 240;
+		}
+	}
+
 	redrawScene();
+}
+
+
+void cCalibrationChartScene::setGraphType(int type) {
+	graphtype = type;
+	redrawScene();
+}
+
+
+double cCalibrationChartScene::getMaximumConcentration() {
+	double value = 0;
+	for (auto it : xvalues) {
+		if (it > value) {
+			value = it;
+		}
+	}
+	for (auto it : datax) {
+		if (it > value) {
+			value = it;
+		}
+	}
+	return value;
+}
+
+
+int cCalibrationChartScene::getMaximumCollectionTime() {
+	int value = 0;
+	for (auto it : datatimevalues) {
+		if (it > value) {
+			value = it;
+		}
+	}
+	return value;
 }
 
 
@@ -285,24 +359,24 @@ void cCalibrationChartScene::wheelEvent(QWheelEvent *event) {
 	double part, newmin, newmax;
 
 	if (event->delta() > 0) {
-		part = fabs(maxconcentration - minconcentration) / 10.0;
-		newmin = minconcentration + part;
-		newmax = maxconcentration - part;
+		part = fabs(maxxvalue - minxvalue) / 10.0;
+		newmin = minxvalue + part;
+		newmax = maxxvalue - part;
 	}
 	else {
-		part = fabs(maxconcentration - minconcentration) / 8.0;
-		newmin = max(minconcentration - part, 0.0);
-		newmax = min(maxconcentration + part, 1000000.0);
+		part = fabs(maxxvalue - minxvalue) / 8.0;
+		newmin = max(minxvalue - part, 0.0);
+		newmax = min(maxxvalue + part, 1000000.0);
 	}
 
 	if (newmin < newmax) {
-		minconcentration = newmin;
-		maxconcentration = newmax;
-		emit updateConcentrationInterval(minconcentration, maxconcentration);
+		minxvalue = newmin;
+		maxxvalue = newmax;
+		emit updateXValueInterval(minxvalue, maxxvalue);
 		redrawScene();
 		viewport()->update();
 	}
-	
+
 	event->accept();
 }
 
@@ -316,9 +390,9 @@ void cCalibrationChartScene::mouseMoveEvent(QMouseEvent *event) {
 	curpos.setX(p.x() + 15);
 	curpos.setY(p.y() - 2);
 
-	double concentration = getConcentrationFromXPosition((int)p.x(), origwidth);
-	double intensity = getIntensityFromYPosition((int)p.y(), origheight);
-	QString curtext = "x: " + QString::number(concentration) + ", y: " + QString::number(intensity);
+	double xval = getValueFromXPosition((int)p.x(), origwidth);
+	double yval = getValueFromYPosition((int)p.y(), origheight);
+	QString curtext = "x: " + QString::number(xval) + ", y: " + QString::number(yval);
 
 	cursorsimpletextitem->setPos(curpos);
 	cursorsimpletextitem->setText(curtext);
@@ -329,13 +403,13 @@ void cCalibrationChartScene::mouseMoveEvent(QMouseEvent *event) {
 		currentx = (int)p.x();
 		currenty = (int)p.y();
 
-		if (enablemouseconcentrationselection) {
+		if (enablemousexvalueselection) {
 			updateZoomGroup();
 		}
 		else {
-			calculateMinMaxConcentration();
+			calculateMinMaxXValue();
 
-			emit updateConcentrationInterval(minconcentration, maxconcentration);
+			emit updateXValueInterval(minxvalue, maxxvalue);
 
 			pressedx = currentx;
 			pressedy = currenty;
@@ -367,9 +441,9 @@ void cCalibrationChartScene::mouseReleaseEvent(QMouseEvent *event) {
 	}
     
 	if ((event->button() == Qt::LeftButton) && (pressedx != -1) && (pressedy != -1)) {
-		calculateMinMaxConcentration();
+		calculateMinMaxXValue();
 
-		emit updateConcentrationInterval(minconcentration, maxconcentration);
+		emit updateXValueInterval(minxvalue, maxxvalue);
 
 		pressedx = -1;
 		pressedy = -1;
@@ -383,9 +457,9 @@ void cCalibrationChartScene::mouseReleaseEvent(QMouseEvent *event) {
 	curpos.setX(p.x() + 15);
 	curpos.setY(p.y() - 2);
 
-	double concentration = getConcentrationFromXPosition((int)p.x(), origwidth);
-	double intensity = getIntensityFromYPosition((int)p.y(), origheight);
-	QString curtext = "x: " + QString::number(concentration) + ", y: " + QString::number(intensity);
+	double xval = getValueFromXPosition((int)p.x(), origwidth);
+	double yval = getValueFromYPosition((int)p.y(), origheight);
+	QString curtext = "x: " + QString::number(xval) + ", y: " + QString::number(yval);
 
 	cursorsimpletextitem->setPos(curpos);
 	cursorsimpletextitem->setText(curtext);
@@ -414,7 +488,7 @@ void cCalibrationChartScene::mousePressEvent(QMouseEvent *event) {
 		currentx = pressedx;
 		currenty = pressedy;
 
-		if (enablemouseconcentrationselection) {
+		if (enablemousexvalueselection) {
 			updateZoomGroup();
 		}
 	}
@@ -426,12 +500,12 @@ void cCalibrationChartScene::mousePressEvent(QMouseEvent *event) {
 		redrawScene();
 	}
 
-	//if (enablemouseconcentrationselection) {
+	//if (enablemousexvalueselection) {
 		if (event->button() == Qt::MiddleButton) {
 			pressedx = -1;
 			pressedy = -1;
 
-			resetConcentrationInterval();
+			resetXValueInterval();
 
 			redrawScene();
 		}
@@ -467,30 +541,30 @@ void cCalibrationChartScene::resizeEvent(QResizeEvent *event) {
 }
 
 
-double cCalibrationChartScene::getConcentrationFromXPosition(int x, int w) {
-	double concentration = (double)(x - leftmargin) / (double)(w - leftmargin - rightmargin) * (maxconcentration - minconcentration) + minconcentration;
-	return max(0.0, concentration);
+double cCalibrationChartScene::getValueFromXPosition(int x, int w) {
+	double value = (double)(x - leftmargin) / (double)(w - leftmargin - rightmargin) * (maxxvalue - minxvalue) + minxvalue;
+	return max(0.0, value);
 }
 
 
-int cCalibrationChartScene::getXPositionFromConcentration(double concentration, int w) {
-	double val = concentration - minconcentration;
-	val /= maxconcentration - minconcentration;
+int cCalibrationChartScene::getXPositionFromValue(double value, int w) {
+	double val = value - minxvalue;
+	val /= maxxvalue - minxvalue;
 	val *= double(w - leftmargin - rightmargin);
 	return (int)val + leftmargin;
 }
 
 
-double cCalibrationChartScene::getIntensityFromYPosition(int y, int h) {
-	double maximumintensity = getMaximumIntensity();
+double cCalibrationChartScene::getValueFromYPosition(int y, int h) {
+	double maximumintensity = getMaximumYValue();
 	double intensity = (double)(y - topmargin) / (double)(h - topmargin - bottommargin) * maximumintensity;
 	intensity = maximumintensity - intensity;
 	return max(0.0, intensity);
 }
 
 
-int cCalibrationChartScene::getYPositionFromIntensity(double intensity, int h) {
-	double maximumintensity = getMaximumIntensity();
+int cCalibrationChartScene::getYPositionFromValue(double intensity, int h) {
+	double maximumintensity = getMaximumYValue();
 	double val = maximumintensity - intensity;
 	val /= maximumintensity;
 	val *= double(h - topmargin - bottommargin);
@@ -514,7 +588,7 @@ void cCalibrationChartScene::redrawScene() {
 
 	QList<QGraphicsItem *> usedtextitems;
 		
-	double maxintensity = getMaximumIntensity();
+	double maxyvalue = getMaximumYValue();
 
 	scene->removeItem(zoomgroup);
 	scene->removeItem(cursorsimpletextitem);
@@ -539,24 +613,24 @@ void cCalibrationChartScene::redrawScene() {
 	for (int i = 0; i < rulergranularity; i++) {
 		line = scene->addLine(leftmargin + xstep * i, h - bottommargin, leftmargin + xstep * i, h - bottommargin + 10, QPen(Qt::black, 2, Qt::SolidLine));
 		line->setZValue(1);
-	}	
+	}
 	line = scene->addLine(w - rightmargin, h - bottommargin, w - rightmargin, h - bottommargin + 10, QPen(Qt::black, 2, Qt::SolidLine));
 	line->setZValue(1);
 
-	simpletext = scene->addSimpleText(QString::number(minconcentration), myFont);
+	simpletext = scene->addSimpleText(QString::number(minxvalue), myFont);
 	simpletext->setPos(QPointF(leftmargin - simpletext->boundingRect().width() / 2, h - bottommargin + 12));
 	simpletext->setZValue(1);
 
-	if (maxconcentration - minconcentration > 0.01) {
+	if (maxxvalue - minxvalue > 0.01) {
 		xstep = (w - leftmargin - rightmargin) / rulergranularity;
 		for (int i = 1; i < rulergranularity; i++) {
-			simpletext = scene->addSimpleText(QString::number(minconcentration + (maxconcentration - minconcentration) / (double)rulergranularity * (double)i), myFont);
+			simpletext = scene->addSimpleText(QString::number(minxvalue + (maxxvalue - minxvalue) / (double)rulergranularity * (double)i), myFont);
 			simpletext->setPos(QPointF(leftmargin + xstep * i - simpletext->boundingRect().width() / 2, h - bottommargin + 12));
 			simpletext->setZValue(1);
 		}
 	}
 
-	simpletext = scene->addSimpleText(QString::number(maxconcentration), myFont);
+	simpletext = scene->addSimpleText(QString::number(maxxvalue), myFont);
 	simpletext->setPos(QPointF(w - rightmargin - simpletext->boundingRect().width() / 2, h - bottommargin + 12));
 	simpletext->setZValue(1);
 
@@ -564,7 +638,7 @@ void cCalibrationChartScene::redrawScene() {
 	// y axis
 	line = scene->addLine(leftmargin, h - bottommargin, leftmargin, h - bottommargin - std::max(h - topmargin - bottommargin, 0), QPen(Qt::black, 2, Qt::SolidLine));
 	line->setZValue(1);
-	
+
 	// y axis ruler
 	ystep = (h - topmargin - bottommargin) / rulergranularity;
 	for (int i = 0; i < rulergranularity; i++) {
@@ -579,189 +653,264 @@ void cCalibrationChartScene::redrawScene() {
 	simpletext->setZValue(1);
 
 	ystep = (h - topmargin - bottommargin) / rulergranularity;
-	if (maxintensity > 0) {
+	if (maxyvalue > 0) {
 		for (int i = 1; i < rulergranularity; i++) {
-			simpletext = scene->addSimpleText(QString::number(maxintensity / (double)rulergranularity * (double)i), myFont);
+			simpletext = scene->addSimpleText(QString::number(maxyvalue / (double)rulergranularity * (double)i), myFont);
 			simpletext->setPos(QPointF(leftmargin - 15 - simpletext->boundingRect().width(), h - bottommargin - simpletext->boundingRect().height() / 2 - ystep * i));
 			simpletext->setZValue(1);
 		}
 	}
 
-	if (maxintensity > 0) {
-		simpletext = scene->addSimpleText(QString::number(maxintensity), myFont);
+	if (maxyvalue > 0) {
+		simpletext = scene->addSimpleText(QString::number(maxyvalue), myFont);
 		simpletext->setPos(QPointF(leftmargin - 15 - simpletext->boundingRect().width(), h - bottommargin - std::max(h - topmargin - bottommargin, 0) - simpletext->boundingRect().height() / 2));
 		simpletext->setZValue(1);
 	}
 
-	QPainterPath rpath;
-	const int step = 1;
-
-	int xmin = getXPositionFromConcentration(minconcentration, w);
-	int xmax = getXPositionFromConcentration(maxconcentration, w);
-	int xval, yval, tmpyval1, tmpyval2;
-
-	for (int i = xmin; i < xmax; i += step) {
-		yval = getYPositionFromIntensity(a * getConcentrationFromXPosition(i, w) + b, h);
-
-		if (rpath.elementCount() == 0) {
-			if (yval <= h - bottommargin) {
-				rpath.moveTo(i, yval);
-			}
-		}
-		else {
-			if (yval >= topmargin) {
-				rpath.lineTo(i, yval);
-			}
-		}
-	}
-
-	scene->addPath(rpath, QPen(Qt::red, 2, Qt::SolidLine));
-
-	for (int i = 0; i < (int)xvalues.size(); i++) {
-		xval = getXPositionFromConcentration(xvalues[i], w);
-		yval = getYPositionFromIntensity(yvalues[i], h);
-
-		if ((xval >= xmin) && (xval <= xmax) && (yval >= topmargin) && (yval <= h - bottommargin)) {
-			tmpyval1 = getYPositionFromIntensity(min(getMaximumIntensity(), yvalues[i] + sd[i]), h);
-			tmpyval2 = max(topmargin, tmpyval1);
-			scene->addLine(xval, yval, xval, tmpyval2, QPen(Qt::gray, 2, Qt::SolidLine));
-
-			if (tmpyval1 > topmargin) {
-				scene->addLine(xval - 2, tmpyval2, xval + 2, tmpyval2, QPen(Qt::gray, 2, Qt::SolidLine));
-			}
-
-			tmpyval1 = getYPositionFromIntensity(min(getMaximumIntensity(), yvalues[i] - sd[i]), h);
-			tmpyval2 = min(h - bottommargin, tmpyval1);
-			scene->addLine(xval, yval, xval, tmpyval2, QPen(Qt::gray, 2, Qt::SolidLine));
-
-			if (tmpyval1 < h - bottommargin) {
-				scene->addLine(xval - 2, tmpyval2, xval + 2, tmpyval2, QPen(Qt::gray, 2, Qt::SolidLine));
-			}
-
-			scene->addEllipse(QRectF(xval - 4, yval - 4, 8, 8), QPen(Qt::blue, 1, Qt::SolidLine), QBrush(Qt::blue));
-		}
-	}
-
-	for (int i = 0; i < (int)datax.size(); i++) {
-		xval = getXPositionFromConcentration(datax[i], w);
-		yval = getYPositionFromIntensity(datay[i], h);
-
-		if ((xval >= xmin) && (xval <= xmax) && (yval >= topmargin) && (yval <= h - bottommargin)) {
-			tmpyval1 = getYPositionFromIntensity(min(getMaximumIntensity(), datay[i] + datasd[i]), h);
-			tmpyval2 = max(topmargin, tmpyval1);
-			scene->addLine(xval, yval, xval, tmpyval2, QPen(Qt::gray, 2, Qt::SolidLine));
-
-			if (tmpyval1 > topmargin) {
-				scene->addLine(xval - 2, tmpyval2, xval + 2, tmpyval2, QPen(Qt::gray, 2, Qt::SolidLine));
-			}
-
-			tmpyval1 = getYPositionFromIntensity(min(getMaximumIntensity(), datay[i] - datasd[i]), h);
-			tmpyval2 = min(h - bottommargin, tmpyval1);
-			scene->addLine(xval, yval, xval, tmpyval2, QPen(Qt::gray, 2, Qt::SolidLine));
-
-			if (tmpyval1 < h - bottommargin) {
-				scene->addLine(xval - 2, tmpyval2, xval + 2, tmpyval2, QPen(Qt::gray, 2, Qt::SolidLine));
-			}
-
-			scene->addEllipse(QRectF(xval - 4, yval - 4, 8, 8), QPen(Qt::green, 1, Qt::SolidLine), QBrush(Qt::green));
-		}
-	}
-
 	string graphlabel;
-	if (!hidelabels) {
-		graphlabel = "y = " + to_string(a) + "x";
-		if (b != 0) {
-			if (b > 0) {
-				graphlabel += " + " + to_string(b);
+
+	// calibration curve
+	if (graphtype == 0) {
+
+		QPainterPath rpath;
+		const int step = 1;
+
+		int xmin = getXPositionFromValue(minxvalue, w);
+		int xmax = getXPositionFromValue(maxxvalue, w);
+		int xval, yval, tmpyval1, tmpyval2;
+
+		for (int i = xmin; i < xmax; i += step) {
+			yval = getYPositionFromValue(a * getValueFromXPosition(i, w) + b, h);
+
+			if (rpath.elementCount() == 0) {
+				if (yval <= h - bottommargin) {
+					rpath.moveTo(i, yval);
+				}
 			}
 			else {
-				graphlabel += " - " + to_string(fabs(b));
+				if (yval >= topmargin) {
+					rpath.lineTo(i, yval);
+				}
 			}
 		}
-	}
 
-	htmltext = scene->addText("", myFont);
-	htmltext->setHtml(graphlabel.c_str());
-	htmltext->setPos(QPointF(leftmargin + 10, topmargin));
-	htmltext->setZValue(1);
+		scene->addPath(rpath, QPen(Qt::red, 2, Qt::SolidLine));
 
-	int linespace = 16;
+		for (int i = 0; i < (int)xvalues.size(); i++) {
+			xval = getXPositionFromValue(xvalues[i], w);
+			yval = getYPositionFromValue(yvalues[i], h);
 
-	if (!xvalues.empty() && (equationtype < 2)) {
+			if ((xval >= xmin) && (xval <= xmax) && (yval >= topmargin) && (yval <= h - bottommargin)) {
+				tmpyval1 = getYPositionFromValue(min(getMaximumYValue(), yvalues[i] + sd[i]), h);
+				tmpyval2 = max(topmargin, tmpyval1);
+				scene->addLine(xval, yval, xval, tmpyval2, QPen(Qt::gray, 2, Qt::SolidLine));
+
+				if (tmpyval1 > topmargin) {
+					scene->addLine(xval - 2, tmpyval2, xval + 2, tmpyval2, QPen(Qt::gray, 2, Qt::SolidLine));
+				}
+
+				tmpyval1 = getYPositionFromValue(min(getMaximumYValue(), yvalues[i] - sd[i]), h);
+				tmpyval2 = min(h - bottommargin, tmpyval1);
+				scene->addLine(xval, yval, xval, tmpyval2, QPen(Qt::gray, 2, Qt::SolidLine));
+
+				if (tmpyval1 < h - bottommargin) {
+					scene->addLine(xval - 2, tmpyval2, xval + 2, tmpyval2, QPen(Qt::gray, 2, Qt::SolidLine));
+				}
+
+				scene->addEllipse(QRectF(xval - 4, yval - 4, 8, 8), QPen(Qt::blue, 1, Qt::SolidLine), QBrush(Qt::blue));
+			}
+		}
+
+		for (int i = 0; i < (int)datax.size(); i++) {
+			xval = getXPositionFromValue(datax[i], w);
+			yval = getYPositionFromValue(datay[i], h);
+
+			if ((xval >= xmin) && (xval <= xmax) && (yval >= topmargin) && (yval <= h - bottommargin)) {
+				tmpyval1 = getYPositionFromValue(min(getMaximumYValue(), datay[i] + datasd[i]), h);
+				tmpyval2 = max(topmargin, tmpyval1);
+				scene->addLine(xval, yval, xval, tmpyval2, QPen(Qt::gray, 2, Qt::SolidLine));
+
+				if (tmpyval1 > topmargin) {
+					scene->addLine(xval - 2, tmpyval2, xval + 2, tmpyval2, QPen(Qt::gray, 2, Qt::SolidLine));
+				}
+
+				tmpyval1 = getYPositionFromValue(min(getMaximumYValue(), datay[i] - datasd[i]), h);
+				tmpyval2 = min(h - bottommargin, tmpyval1);
+				scene->addLine(xval, yval, xval, tmpyval2, QPen(Qt::gray, 2, Qt::SolidLine));
+
+				if (tmpyval1 < h - bottommargin) {
+					scene->addLine(xval - 2, tmpyval2, xval + 2, tmpyval2, QPen(Qt::gray, 2, Qt::SolidLine));
+				}
+
+				scene->addEllipse(QRectF(xval - 4, yval - 4, 8, 8), QPen(Qt::green, 1, Qt::SolidLine), QBrush(Qt::green));
+			}
+		}
+
 		if (!hidelabels) {
-			graphlabel = "R<sup>2</sup> = " + to_string(calculateR2Value(a, b, xvalues, yvalues));
-
-			htmltext = scene->addText("", myFont);
-			htmltext->setHtml(graphlabel.c_str());
-			htmltext->setPos(QPointF(leftmargin + 10, topmargin + linespace));
-			htmltext->setZValue(1);
-
-			graphlabel = "LOD = " + to_string(calculateLOD(a, xvalues, yvalues));
-
-			htmltext = scene->addText("", myFont);
-			htmltext->setHtml(graphlabel.c_str());
-			htmltext->setPos(QPointF(leftmargin + 10, topmargin + 3 * linespace));
-			htmltext->setZValue(1);
-
-			graphlabel = "LOQ = " + to_string(calculateLOQ(a, xvalues, yvalues));
-
-			htmltext = scene->addText("", myFont);
-			htmltext->setHtml(graphlabel.c_str());
-			htmltext->setPos(QPointF(leftmargin + 10, topmargin + 4 * linespace));
-			htmltext->setZValue(1);
+			graphlabel = "y = " + to_string(a) + "x";
+			if (b != 0) {
+				if (b > 0) {
+					graphlabel += " + " + to_string(b);
+				}
+				else {
+					graphlabel += " - " + to_string(fabs(b));
+				}
+			}
 		}
+
+		htmltext = scene->addText("", myFont);
+		htmltext->setHtml(graphlabel.c_str());
+		htmltext->setPos(QPointF(leftmargin + 10, topmargin));
+		htmltext->setZValue(1);
+
+		int linespace = 16;
+
+		if (!xvalues.empty() && (equationtype < 2)) {
+			if (!hidelabels) {
+				graphlabel = "R<sup>2</sup> = " + to_string(calculateR2Value(a, b, xvalues, yvalues));
+
+				htmltext = scene->addText("", myFont);
+				htmltext->setHtml(graphlabel.c_str());
+				htmltext->setPos(QPointF(leftmargin + 10, topmargin + linespace));
+				htmltext->setZValue(1);
+
+				graphlabel = "LOD = " + to_string(calculateLOD(a, xvalues, yvalues));
+
+				htmltext = scene->addText("", myFont);
+				htmltext->setHtml(graphlabel.c_str());
+				htmltext->setPos(QPointF(leftmargin + 10, topmargin + 3 * linespace));
+				htmltext->setZValue(1);
+
+				graphlabel = "LOQ = " + to_string(calculateLOQ(a, xvalues, yvalues));
+
+				htmltext = scene->addText("", myFont);
+				htmltext->setHtml(graphlabel.c_str());
+				htmltext->setPos(QPointF(leftmargin + 10, topmargin + 4 * linespace));
+				htmltext->setZValue(1);
+			}
+		}
+
+		if (!hidelabels) {
+
+			usedtextitems.clear();
+
+			for (int i = (int)xvalues.size() - 1; i >= 0; i--) {
+				xval = getXPositionFromValue(xvalues[i], w);
+				yval = getYPositionFromValue(yvalues[i], h);
+
+				if ((xval >= xmin) && (xval <= xmax) && (yval >= topmargin) && (yval <= h - bottommargin)) {
+					graphlabel = "Calib. " + to_string(xvalues[i]);
+					simpletext = scene->addSimpleText(graphlabel.c_str(), myFont);
+					simpletext->setPos(QPointF(xval + 10, yval - 5));
+					simpletext->setZValue(1);
+
+					for (auto& it : usedtextitems) {
+						if (simpletext->collidesWithItem(it, Qt::IntersectsItemBoundingRect)) {
+							scene->removeItem(simpletext);
+							simpletext = 0;
+							break;
+						}
+					}
+
+					if (simpletext) {
+						usedtextitems.append(simpletext);
+					}
+				}
+			}
+
+			for (int i = (int)datax.size() - 1; i >= 0; i--) {
+				xval = getXPositionFromValue(datax[i], w);
+				yval = getYPositionFromValue(datay[i], h);
+
+				if ((xval >= xmin) && (xval <= xmax) && (yval >= topmargin) && (yval <= h - bottommargin)) {
+					graphlabel = datagroups[i];
+					simpletext = scene->addSimpleText(graphlabel.c_str(), myFont);
+					simpletext->setPos(QPointF(xval + 10, yval - 5));
+					simpletext->setZValue(1);
+
+					for (auto& it : usedtextitems) {
+						if (simpletext->collidesWithItem(it, Qt::IntersectsItemBoundingRect)) {
+							scene->removeItem(simpletext);
+							simpletext = 0;
+							break;
+						}
+					}
+
+					if (simpletext) {
+						usedtextitems.append(simpletext);
+					}
+				}
+			}
+
+		}
+
 	}
+	// collection time and concentration
+	else {
 
-	if (!hidelabels) {
+		int xmin = getXPositionFromValue(minxvalue, w);
+		int xmax = getXPositionFromValue(maxxvalue, w);
+		int xval, yval, tmpyval1, tmpyval2;
+		double xsd;
 
-		usedtextitems.clear();
-
-		for (int i = (int)xvalues.size() - 1; i >= 0; i--) {
-			xval = getXPositionFromConcentration(xvalues[i], w);
-			yval = getYPositionFromIntensity(yvalues[i], h);
+		for (int i = 0; i < (int)datax.size(); i++) {
+			xval = getXPositionFromValue(datatimevalues[i], w);
+			yval = getYPositionFromValue(datax[i], h);
 
 			if ((xval >= xmin) && (xval <= xmax) && (yval >= topmargin) && (yval <= h - bottommargin)) {
-				graphlabel = "Calib. " + to_string(xvalues[i]);
-				simpletext = scene->addSimpleText(graphlabel.c_str(), myFont);
-				simpletext->setPos(QPointF(xval + 10, yval - 5));
-				simpletext->setZValue(1);
-
-				for (auto& it : usedtextitems) {
-					if (simpletext->collidesWithItem(it, Qt::IntersectsItemBoundingRect)) {
-						scene->removeItem(simpletext);
-						simpletext = 0;
-						break;
-					}
+				xsd = 0;
+				if (a != 0) {
+					xsd = (datasd[i] - b) / a;
 				}
 
-				if (simpletext) {
-					usedtextitems.append(simpletext);
+				tmpyval1 = getYPositionFromValue(min(getMaximumYValue(), datax[i] + xsd), h);
+				tmpyval2 = max(topmargin, tmpyval1);
+				scene->addLine(xval, yval, xval, tmpyval2, QPen(Qt::gray, 2, Qt::SolidLine));
+
+				if (tmpyval1 > topmargin) {
+					scene->addLine(xval - 2, tmpyval2, xval + 2, tmpyval2, QPen(Qt::gray, 2, Qt::SolidLine));
 				}
+
+				tmpyval1 = getYPositionFromValue(min(getMaximumYValue(), datax[i] - xsd), h);
+				tmpyval2 = min(h - bottommargin, tmpyval1);
+				scene->addLine(xval, yval, xval, tmpyval2, QPen(Qt::gray, 2, Qt::SolidLine));
+
+				if (tmpyval1 < h - bottommargin) {
+					scene->addLine(xval - 2, tmpyval2, xval + 2, tmpyval2, QPen(Qt::gray, 2, Qt::SolidLine));
+				}
+
+				scene->addEllipse(QRectF(xval - 4, yval - 4, 8, 8), QPen(Qt::green, 1, Qt::SolidLine), QBrush(Qt::green));
 			}
 		}
 
-		for (int i = (int)datax.size() - 1; i >= 0; i--) {
-			xval = getXPositionFromConcentration(datax[i], w);
-			yval = getYPositionFromIntensity(datay[i], h);
+		if (!hidelabels) {
 
-			if ((xval >= xmin) && (xval <= xmax) && (yval >= topmargin) && (yval <= h - bottommargin)) {
-				graphlabel = "Group " + to_string(datagroups[i]);
-				simpletext = scene->addSimpleText(graphlabel.c_str(), myFont);
-				simpletext->setPos(QPointF(xval + 10, yval - 5));
-				simpletext->setZValue(1);
+			usedtextitems.clear();
 
-				for (auto& it : usedtextitems) {
-					if (simpletext->collidesWithItem(it, Qt::IntersectsItemBoundingRect)) {
-						scene->removeItem(simpletext);
-						simpletext = 0;
-						break;
+			for (int i = (int)datax.size() - 1; i >= 0; i--) {
+				xval = getXPositionFromValue(datatimevalues[i], w);
+				yval = getYPositionFromValue(datax[i], h);
+
+				if ((xval >= xmin) && (xval <= xmax) && (yval >= topmargin) && (yval <= h - bottommargin)) {
+					graphlabel = datagroups[i];
+					simpletext = scene->addSimpleText(graphlabel.c_str(), myFont);
+					simpletext->setPos(QPointF(xval + 10, yval - 5));
+					simpletext->setZValue(1);
+
+					for (auto& it : usedtextitems) {
+						if (simpletext->collidesWithItem(it, Qt::IntersectsItemBoundingRect)) {
+							scene->removeItem(simpletext);
+							simpletext = 0;
+							break;
+						}
+					}
+
+					if (simpletext) {
+						usedtextitems.append(simpletext);
 					}
 				}
-
-				if (simpletext) {
-					usedtextitems.append(simpletext);
-				}
 			}
+
 		}
 
 	}
@@ -840,11 +989,11 @@ void cCalibrationChartScene::updateZoomGroup() {
 	zoomrect->setRect(QRectF(QPointF(rx1, ry1), QPointF(rx2, ry2)));
 		
 	QString qstr = "x: ";
-	qstr += QString::number(getConcentrationFromXPosition((pressedx < currentx)?pressedx:currentx, origwidth));
+	qstr += QString::number(getValueFromXPosition((pressedx < currentx)?pressedx:currentx, origwidth));
 	qstr += "-";
-	qstr += QString::number(getConcentrationFromXPosition((pressedx < currentx)?currentx:pressedx, origwidth));
+	qstr += QString::number(getValueFromXPosition((pressedx < currentx)?currentx:pressedx, origwidth));
 	qstr += "\ndiff: ";
-	qstr += QString::number(getConcentrationFromXPosition((pressedx < currentx)?currentx:pressedx, origwidth) - getConcentrationFromXPosition((pressedx < currentx)?pressedx:currentx, origwidth));
+	qstr += QString::number(getValueFromXPosition((pressedx < currentx)?currentx:pressedx, origwidth) - getValueFromXPosition((pressedx < currentx)?pressedx:currentx, origwidth));
 		
 	zoomsimpletextitem->setFont(myFont);
 	zoomsimpletextitem->setText(qstr);
@@ -854,7 +1003,7 @@ void cCalibrationChartScene::updateZoomGroup() {
 }
 
 
-void cCalibrationChartScene::calculateMinMaxConcentration() {
+void cCalibrationChartScene::calculateMinMaxXValue() {
 	if (pressedx < leftmargin) {
 		pressedx = leftmargin;
 	}
@@ -871,28 +1020,48 @@ void cCalibrationChartScene::calculateMinMaxConcentration() {
 		currentx = origwidth - rightmargin;
 	}
 
-	double tmpminconcentration = getConcentrationFromXPosition((pressedx < currentx) ? pressedx : currentx, origwidth);
-	double tmpmaxconcentration = getConcentrationFromXPosition((pressedx < currentx) ? currentx : pressedx, origwidth);
+	double tmpminvalue = getValueFromXPosition((pressedx < currentx) ? pressedx : currentx, origwidth);
+	double tmpmaxvalue = getValueFromXPosition((pressedx < currentx) ? currentx : pressedx, origwidth);
 
-	if (enablemouseconcentrationselection) {
-		minconcentration = tmpminconcentration;
-		maxconcentration = tmpmaxconcentration;
+	if (enablemousexvalueselection) {
+		minxvalue = tmpminvalue;
+		maxxvalue = tmpmaxvalue;
 	}
 	else {
 		if (pressedx > currentx) {
-			minconcentration = min(minconcentration + tmpmaxconcentration - tmpminconcentration, 1000000.0);
-			maxconcentration = min(maxconcentration + tmpmaxconcentration - tmpminconcentration, 1000000.0);
+			minxvalue = min(minxvalue + tmpmaxvalue - tmpminvalue, 1000000.0);
+			maxxvalue = min(maxxvalue + tmpmaxvalue - tmpminvalue, 1000000.0);
 		}
 		else {
-			minconcentration = max(0.0, minconcentration - tmpmaxconcentration + tmpminconcentration);
-			maxconcentration = max(0.0, maxconcentration - tmpmaxconcentration + tmpminconcentration);
+			minxvalue = max(0.0, minxvalue - tmpmaxvalue + tmpminvalue);
+			maxxvalue = max(0.0, maxxvalue - tmpmaxvalue + tmpminvalue);
 		}
 	}
 }
 
 
-double cCalibrationChartScene::getMaximumIntensity() {
-	return a * maxconcentration + b;
+double cCalibrationChartScene::getMaximumYValue() {
+	double maxyvalue;
+	double xsd;
+
+	if (graphtype == 0) {
+		return a * maxxvalue + b;
+	}
+	else {
+		maxyvalue = 0;
+		for (size_t i = 0; i < datax.size(); i++) {
+			xsd = 0;
+			if (a != 0) {
+				xsd = (datasd[i] - b) / a;
+			}
+
+			if ((datax[i] + xsd > maxyvalue) && (datatimevalues[i] >= minxvalue) && (datatimevalues[i] <= maxxvalue)) {
+				maxyvalue = datax[i] + xsd + 5;
+			}
+		}
+	}
+
+	return maxyvalue;
 }
 
 
@@ -923,33 +1092,45 @@ void cCalibrationChartScene::normalSize() {
 }
 
 
-void cCalibrationChartScene::setConcentrationInterval(double minconcentration, double maxconcentration) {
-	if (maxconcentration < minconcentration) {
-		double tmp = maxconcentration;
-		maxconcentration = minconcentration;
-		minconcentration = tmp;
+void cCalibrationChartScene::setXValueInterval(double minxvalue, double maxxvalue) {
+	if (maxxvalue < minxvalue) {
+		double tmp = maxxvalue;
+		maxxvalue = minxvalue;
+		minxvalue = tmp;
 	}
 
-	this->minconcentration = std::max(0.0, minconcentration);
-	this->maxconcentration = std::min(maxconcentration, 1000000.0);
-	emit updateConcentrationInterval(this->minconcentration, this->maxconcentration);
+	this->minxvalue = std::max(0.0, minxvalue);
+	this->maxxvalue = std::min(maxxvalue, 1000000.0);
+	emit updateXValueInterval(this->minxvalue, this->maxxvalue);
 
 	redrawScene();
 	viewport()->update();
 }
 
 
-void cCalibrationChartScene::resetConcentrationInterval() {
-	minconcentration = 0;
-	maxconcentration = 1000;
-	emit updateConcentrationInterval(minconcentration, maxconcentration);
+void cCalibrationChartScene::resetXValueInterval() {
+	minxvalue = 0;
+	if (graphtype == 0) {
+		maxxvalue = getMaximumConcentration();
+		if (maxxvalue == 0) {
+			maxxvalue = 1000;
+		}
+	}
+	else {
+		maxxvalue = (double)getMaximumCollectionTime();
+		if (maxxvalue == 0) {
+			maxxvalue = 240;
+		}
+	}
+
+	emit updateXValueInterval(minxvalue, maxxvalue);
 
 	redrawScene();
 }
 
 
-//void cCalibrationChartScene::enableMouseConcentrationSelectionTool(bool enable) {
-//	enablemouseconcentrationselection = enable;
+//void cCalibrationChartScene::enableMouseXValueSelectionTool(bool enable) {
+//	enablemousexvalueselection = enable;
 //	pressedx = -1;
 //	pressedy = -1;
 //

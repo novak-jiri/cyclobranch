@@ -31,12 +31,14 @@ cDefineCalibrationWidget::cDefineCalibrationWidget() {
 	datatypelabel = new QLabel("Data Type: ");
 	grouplabel = new QLabel("Group: ");
 	concentrationlabel = new QLabel("Concentration: ");
+	timelabel = new QLabel("Time: ");
 
 	filelistwidget->setLayout(gridlayout);
 
 	compoundslabel = new QLabel("Ion Types: ");
 	compoundslist = new QListWidget();
 	compoundslist->setSelectionMode(QAbstractItemView::MultiSelection);
+	compoundslist->setMinimumHeight(250);
 	compoundslayout = new QVBoxLayout();
 	compoundswidget = new QWidget();
 
@@ -135,6 +137,7 @@ cDefineCalibrationWidget::cDefineCalibrationWidget() {
 	internaldatatypesvector.clear();
 	internalgroupsvector.clear();
 	internalconcentrationsvector.clear();
+	internaltimesvector.clear();
 
 	internalcompounds.clear();
 	internalselectedionsvector.clear();
@@ -154,6 +157,7 @@ cDefineCalibrationWidget::~cDefineCalibrationWidget() {
 	delete datatypelabel;
 	delete grouplabel;
 	delete concentrationlabel;
+	delete timelabel;
 
 	for (auto& it : checkboxes) {
 		delete it;
@@ -167,11 +171,15 @@ cDefineCalibrationWidget::~cDefineCalibrationWidget() {
 		delete it;
 	}
 
-	for (auto& it : spinboxes) {
+	for (auto& it : groupnames) {
 		delete it;
 	}
 
 	for (auto& it : doublespinboxes) {
+		delete it;
+	}
+
+	for (auto& it : timespinboxes) {
 		delete it;
 	}
 
@@ -216,8 +224,9 @@ void cDefineCalibrationWidget::store(ofstream& os) {
 	storeIntVector(internalusedvector, os);
 	storeStringVector(internalfilenames, os);
 	storeIntVector(internaldatatypesvector, os);
-	storeIntVector(internalgroupsvector, os);
+	storeStringVector(internalgroupsvector, os);
 	storeDoubleVector(internalconcentrationsvector, os);
+	storeIntVector(internaltimesvector, os);
 
 	storeStringVector(internalcompounds, os);
 	storeIntVector(internalselectedionsvector, os);
@@ -238,7 +247,19 @@ void cDefineCalibrationWidget::load(ifstream& is, int fileversionpart1, int file
 
 	if (isCompatibleVersion(fileversionpart1, fileversionpart2, fileversionpart3, 2, 1, 18)) {
 		loadIntVector(internaldatatypesvector, is);
-		loadIntVector(internalgroupsvector, is);
+
+		if (isCompatibleVersion(fileversionpart1, fileversionpart2, fileversionpart3, 2, 1, 27)) {
+			loadStringVector(internalgroupsvector, is);
+		}
+		else {
+			vector<int> tmpgroupsvector;
+			loadIntVector(tmpgroupsvector, is);
+
+			internalgroupsvector.clear();
+			for (auto it : tmpgroupsvector) {
+				internalgroupsvector.push_back(to_string(it));
+			}
+		}
 	}
 	else {
 		internaldatatypesvector.clear();
@@ -253,6 +274,14 @@ void cDefineCalibrationWidget::load(ifstream& is, int fileversionpart1, int file
 	}
 
 	loadDoubleVector(internalconcentrationsvector, is);
+
+	if (isCompatibleVersion(fileversionpart1, fileversionpart2, fileversionpart3, 2, 1, 25)) {
+		loadIntVector(internaltimesvector, is);
+	}
+	else {
+		internaltimesvector.clear();
+		internaltimesvector.resize(internalusedvector.size(), 0);
+	}
 
 	loadStringVector(internalcompounds, is);
 	loadIntVector(internalselectedionsvector, is);
@@ -287,6 +316,7 @@ void cDefineCalibrationWidget::prepareWidget(vector<string>& filenames, vector<s
 	delete datatypelabel;
 	delete grouplabel;
 	delete concentrationlabel;
+	delete timelabel;
 
 	for (auto& it : checkboxes) {
 		delete it;
@@ -300,7 +330,7 @@ void cDefineCalibrationWidget::prepareWidget(vector<string>& filenames, vector<s
 		delete it;
 	}
 
-	for (auto& it : spinboxes) {
+	for (auto& it : groupnames) {
 		delete it;
 	}
 
@@ -308,22 +338,35 @@ void cDefineCalibrationWidget::prepareWidget(vector<string>& filenames, vector<s
 		delete it;
 	}
 
+	for (auto& it : timespinboxes) {
+		delete it;
+	}
+
 	checkboxes.clear();
 	lineedits.clear();
 	comboboxes.clear();
-	spinboxes.clear();
+	groupnames.clear();
 	doublespinboxes.clear();
+	timespinboxes.clear();
 
 	delete gridlayout;
 
-	bool load = compareStringVectors(internalfilenames, filenames) && compareStringVectors(internalcompounds, compounds) && (filenames.size() == internalusedvector.size()) && (filenames.size() == internaldatatypesvector.size()) && (filenames.size() == internalgroupsvector.size()) && (filenames.size() == internalconcentrationsvector.size()) && (compounds.size() == internalselectedionsvector.size());
+	bool loadfiles = compareStringVectors(internalfilenames, filenames) &&
+		(filenames.size() == internalusedvector.size()) &&
+		(filenames.size() == internaldatatypesvector.size()) &&
+		(filenames.size() == internalgroupsvector.size()) &&
+		(filenames.size() == internalconcentrationsvector.size()) &&
+		(filenames.size() == internaltimesvector.size());
 
-	if (!load) {
+	bool loadcompounds = compareStringVectors(internalcompounds, compounds) && (compounds.size() == internalselectedionsvector.size());
+
+	if (!loadfiles) {
 		internalusedvector.clear();
 		internalfilenames = filenames;
 		internaldatatypesvector.clear();
 		internalgroupsvector.clear();
 		internalconcentrationsvector.clear();
+		internaltimesvector.clear();
 
 		internalcompounds = compounds;
 		internalselectedionsvector.clear();
@@ -335,6 +378,14 @@ void cDefineCalibrationWidget::prepareWidget(vector<string>& filenames, vector<s
 		internalpeakshape = 0;
 		internalstandard = 0;
 	}
+	else {
+		if (!loadcompounds) {
+			internalcompounds = compounds;
+			internalselectedionsvector.clear();
+
+			internalstandard = 0;
+		}
+	}
 
 	gridlayout = new QGridLayout();
 	filelistwidget->setLayout(gridlayout);
@@ -342,14 +393,16 @@ void cDefineCalibrationWidget::prepareWidget(vector<string>& filenames, vector<s
 	uselabel = new QLabel("Use: ");
 	filelabel = new QLabel("Filename: ");
 	datatypelabel = new QLabel("Data Type: ");
-	grouplabel = new QLabel("Group: ");
+	grouplabel = new QLabel("Group Name: ");
 	concentrationlabel = new QLabel("Concentration: ");
+	timelabel = new QLabel("Collection Time: ");
 
 	gridlayout->addWidget(uselabel, 0, 0, 1, 1);
 	gridlayout->addWidget(filelabel, 0, 1, 1, 10);
 	gridlayout->addWidget(datatypelabel, 0, 11, 1, 2);
-	gridlayout->addWidget(grouplabel, 0, 13, 1, 1);
-	gridlayout->addWidget(concentrationlabel, 0, 14, 1, 1);
+	gridlayout->addWidget(grouplabel, 0, 13, 1, 10);
+	gridlayout->addWidget(concentrationlabel, 0, 23, 1, 1);
+	gridlayout->addWidget(timelabel, 0, 24, 1, 1);
 
 	int size = (int)filenames.size();
 	for (int i = 0; i < size; i++) {
@@ -369,12 +422,10 @@ void cDefineCalibrationWidget::prepareWidget(vector<string>& filenames, vector<s
 
 		connect(combobox, SIGNAL(currentIndexChanged(int)), this, SLOT(dataTypeChanged(int)));
 
-		QSpinBox* spinbox = new QSpinBox();
-		spinbox->setToolTip("Enter a number. Items with the same number form a group of technical replicates and the results are averaged.");
-		spinbox->setRange(0, 1000000);
-		spinbox->setSingleStep(1);
-		spinboxes.push_back(spinbox);
-		spinbox->setValue((int)spinboxes.size());
+		QLineEdit* groupname = new QLineEdit();
+		groupname->setText(QVariant(i + 1).toString());
+		groupname->setToolTip("Enter a group name. Rows with the same group name form a group of technical replicates and the results are averaged.");
+		groupnames.push_back(groupname);
 
 		QDoubleSpinBox* doublespinbox = new QDoubleSpinBox();
 		doublespinbox->setToolTip("Enter the concentration of compound in corresponding dataset. Units are dataset dependent. Multiple datasets can have the same value (results are averaged).");
@@ -383,25 +434,35 @@ void cDefineCalibrationWidget::prepareWidget(vector<string>& filenames, vector<s
 		doublespinbox->setSingleStep(1);
 		doublespinboxes.push_back(doublespinbox);
 
+		QSpinBox* timespinbox = new QSpinBox();
+		timespinbox->setToolTip("Enter a number representing time. Items with the same number form a group of technical replicates and the results are averaged.");
+		timespinbox->setRange(0, 1000000000);
+		timespinbox->setSingleStep(1);
+		timespinboxes.push_back(timespinbox);
+		timespinbox->setValue(0);
+
 		doublespinbox->setDisabled(true);
 
 		gridlayout->addWidget(checkbox, i + 1, 0, 1, 1);
 		gridlayout->addWidget(lineedit, i + 1, 1, 1, 10);
 		gridlayout->addWidget(combobox, i + 1, 11, 1, 2);
-		gridlayout->addWidget(spinbox, i + 1, 13, 1, 1);
-		gridlayout->addWidget(doublespinbox, i + 1, 14, 1, 1);
+		gridlayout->addWidget(groupname, i + 1, 13, 1, 10);
+		gridlayout->addWidget(doublespinbox, i + 1, 23, 1, 1);
+		gridlayout->addWidget(timespinbox, i + 1, 24, 1, 1);
 
-		if (load) {
+		if (loadfiles) {
 			checkbox->setChecked(internalusedvector[i]);
 			combobox->setCurrentIndex(internaldatatypesvector[i]);
-			spinbox->setValue(internalgroupsvector[i]);
+			groupname->setText(internalgroupsvector[i].c_str());
 			doublespinbox->setValue(internalconcentrationsvector[i]);
+			timespinbox->setValue(internaltimesvector[i]);
 		}
 		else {
 			internalusedvector.push_back(checkbox->isChecked());
 			internaldatatypesvector.push_back(combobox->currentIndex());
-			internalgroupsvector.push_back(spinbox->value());
+			internalgroupsvector.push_back(groupname->text().toStdString());
 			internalconcentrationsvector.push_back(doublespinbox->value());
+			internaltimesvector.push_back(timespinbox->value());
 		}
 	}
 
@@ -414,7 +475,7 @@ void cDefineCalibrationWidget::prepareWidget(vector<string>& filenames, vector<s
 	for (int i = 0; i < size; i++) {
 		compoundslist->addItem(compounds[i].c_str());
 
-		if (load) {
+		if (loadfiles && loadcompounds) {
 			compoundslist->item(i)->setSelected(internalselectedionsvector[i]);
 		}
 		else {
@@ -433,11 +494,12 @@ void cDefineCalibrationWidget::prepareWidget(vector<string>& filenames, vector<s
 }
 
 
-void cDefineCalibrationWidget::getData(vector<int>& usedvector, vector<int>& datatypesvector, vector<int>& groupsvector, vector<double>& concentrationsvector, vector<int>& selectedionsvector, int& equationtype, double& manuala, double& manualb, int& eictype, int& peakshape, int& standard) {
+void cDefineCalibrationWidget::getData(vector<int>& usedvector, vector<int>& datatypesvector, vector<string>& groupsvector, vector<double>& concentrationsvector, vector<int>& timesvector, vector<int>& selectedionsvector, int& equationtype, double& manuala, double& manualb, int& eictype, int& peakshape, int& standard) {
 	usedvector = internalusedvector;
 	datatypesvector = internaldatatypesvector;
 	groupsvector = internalgroupsvector;
 	concentrationsvector = internalconcentrationsvector;
+	timesvector = internaltimesvector;
 	selectedionsvector = internalselectedionsvector;
 
 	equationtype = internalequationtype;
@@ -470,6 +532,10 @@ void cDefineCalibrationWidget::okButtonReleased() {
 	int firstvalue = -1;
 	bool allzeros = true;
 	int size;
+	string groupname;
+	int timeval;
+
+	map<string, int> grouptime;
 
 	if (equationcombobox->currentIndex() < 2) {
 
@@ -509,6 +575,39 @@ void cDefineCalibrationWidget::okButtonReleased() {
 
 	}
 
+	size = (int)checkboxes.size();
+	for (int i = 0; i < size; i++) {
+		if (checkboxes[i]->isChecked() && (comboboxes[i]->currentIndex() == 0)) {
+			groupname = groupnames[i]->text().toStdString();
+			timeval = timespinboxes[i]->value();
+
+			if (groupname.empty()) {
+				QMessageBox msgBox;
+				QString errstr = "The group name in the row no. ";
+				errstr += QVariant(i + 1).toString();
+				errstr += " cannot be empty !";
+				msgBox.setText(errstr);
+				msgBox.exec();
+				return;
+			}
+
+			if (grouptime.count(groupname) == 0) {
+				grouptime[groupname] = timeval;
+			}
+			else {
+				if (grouptime[groupname] != timeval) {
+					QMessageBox msgBox;
+					QString errstr = "The data files in the group ";
+					errstr += groupname.c_str();
+					errstr += " must have the same collection time value !";
+					msgBox.setText(errstr);
+					msgBox.exec();
+					return;
+				}
+			}
+		}
+	}
+
 	allzeros = true;
 
 	size = (int)compoundslist->count();
@@ -532,14 +631,16 @@ void cDefineCalibrationWidget::okButtonReleased() {
 	internaldatatypesvector.clear();
 	internalgroupsvector.clear();
 	internalconcentrationsvector.clear();
+	internaltimesvector.clear();
 	
 	size = (int)lineedits.size();
 	for (int i = 0; i < size; i++) {
 		internalusedvector.push_back(checkboxes[i]->isChecked());
 		internalfilenames.push_back(lineedits[i]->text().toStdString());
 		internaldatatypesvector.push_back(comboboxes[i]->currentIndex());
-		internalgroupsvector.push_back(spinboxes[i]->value());
+		internalgroupsvector.push_back(groupnames[i]->text().toStdString());
 		internalconcentrationsvector.push_back(doublespinboxes[i]->value());
+		internaltimesvector.push_back(timespinboxes[i]->value());
 	}
 
 	internalcompounds.clear();
@@ -570,8 +671,9 @@ void cDefineCalibrationWidget::cancelButtonReleased() {
 		checkboxes[i]->setChecked(internalusedvector[i]);
 		lineedits[i]->setText(internalfilenames[i].c_str());
 		comboboxes[i]->setCurrentIndex(internaldatatypesvector[i]);
-		spinboxes[i]->setValue(internalgroupsvector[i]);
+		groupnames[i]->setText(internalgroupsvector[i].c_str());
 		doublespinboxes[i]->setValue(internalconcentrationsvector[i]);
+		timespinboxes[i]->setValue(internaltimesvector[i]);
 	}
 
 	compoundslist->clear();
@@ -607,13 +709,15 @@ void cDefineCalibrationWidget::dataTypeChanged(int index) {
 	}
 
 	if (index == 0) {
-		spinboxes[row]->setDisabled(false);
+		groupnames[row]->setDisabled(false);
 		doublespinboxes[row]->setDisabled(true);
+		timespinboxes[row]->setDisabled(false);
 	}
 
 	if (index == 1) {
-		spinboxes[row]->setDisabled(true);
+		groupnames[row]->setDisabled(true);
 		doublespinboxes[row]->setDisabled(false);
+		timespinboxes[row]->setDisabled(true);
 	}
 }
 

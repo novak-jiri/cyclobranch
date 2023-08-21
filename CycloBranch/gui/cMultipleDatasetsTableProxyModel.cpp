@@ -18,6 +18,16 @@ bool cMultipleDatasetsTableProxyModel::lessThan(const QModelIndex &left, const Q
 		return (sortOrder() == Qt::AscendingOrder) ? true : false;
 	}
 
+	if (leftData.type() != rightData.type()) {
+		if (leftData.type() == QVariant::String) {
+			return (sortOrder() == Qt::AscendingOrder) ? false : true;
+		}
+
+		if (rightData.type() == QVariant::String) {
+			return (sortOrder() == Qt::AscendingOrder) ? true : false;
+		}
+	}
+
 	if (leftData.type() == QVariant::ByteArray) {
 		return leftData.toDouble() < rightData.toDouble();
 	}

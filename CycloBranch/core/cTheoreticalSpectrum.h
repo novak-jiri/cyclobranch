@@ -116,6 +116,7 @@ class cTheoreticalSpectrum {
 	int peakstested;
 	double experimentalpeaksmatchedratio;
 	double weightedpeaksratio;
+	double cosinesimilarity;
 	int unmatchedexperimentalpeakscount;
 	string coveragebyseries;
 	bool valid;
@@ -232,7 +233,10 @@ class cTheoreticalSpectrum {
 	void fillExperimentalAnnotationsAndRemoveUnmatchedTheoreticalPeaks(int& theoreticalpeaksrealsize, ePeptideType peptidetype, cPeaksList& unmatchedpeaksinmatchedpatterns, bool reportunmatchedtheoreticalpeaks, bool writedescription);
 
 	// check the existence of an isotope
-	bool checkIsotope(string& elementstring, string& isotopestring, double isotopemass1, double isotopemass2, double minintensityratio, double maxintensityratio, cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks, int start, int stop, int maximumintensityid, double maximumexperimentalintensity);
+	bool checkIsotopeHighRes(string& elementstring, string& isotopestring, double isotopemass1, double isotopemass2, double minintensityratio, double maxintensityratio, cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks, int start, int stop, int maximumintensityid, double maximumexperimentalintensity);
+
+	// check the existence of an isotope
+	bool checkIsotopeLowRes(string& elementstring, string& isotopestring, double isotopemass1, double isotopemass2, double minintensityratio, double maxintensityratio, cPeaksList& theoreticalpeaks, int theoreticalpeaksrealsize, cPeaksList& experimentalpeaks, int start, int stop, int maximumintensityid, double maximumexperimentalintensity);
 
 	// get intensity multiplier
 	double getIntensityMultiplier(cPeaksList& theoreticalpeaks, int peakid, string& elementstring, size_t startpos);
@@ -424,6 +428,16 @@ public:
 
 
 	/**
+		\brief Compare theoretical peaks with an average spectrum.
+		\param averagespectrum average experimental spectrum
+		\param tsfull theoretical spectrum with descriptions of peaks
+		\param unmatchedpeaksinmatchedpatterns unmatched peaks in matched isotope patterns
+	*/
+	void compareAverageMSSpectrum(cPeaksList& averagespectrum, cTheoreticalSpectrum& tsfull, cPeaksList& unmatchedpeaksinmatchedpatterns);
+
+
+
+	/**
 		\brief Finalize MS spectrum after comparison.
 		\param unmatchedpeaksinmatchedpatterns unmatched peaks in matched isotope patterns
 		\param writedescription if true then string descriptions of fragment ions are generated
@@ -487,6 +501,13 @@ public:
 		\retval double weighted ratio of matched peaks
 	*/
 	double getWeightedRatioOfMatchedPeaks() const;
+
+
+	/**
+		\brief Get cosine similarity.
+		\retval double cosine similarity
+	*/
+	double getCosineSimilarity() const;
 
 
 	/**
@@ -565,6 +586,13 @@ public:
 		\retval cPeaksList reference to an experimental spectrum
 	*/ 
 	cPeaksList& getExperimentalSpectrum();
+
+
+	/**
+		\brief Set the experimental spectrum.
+		\param experimentalspectrum an experimental spectrum
+	*/
+	void setExperimentalSpectrum(cPeaksList& experimentalspectrum);
 
 
 	/**

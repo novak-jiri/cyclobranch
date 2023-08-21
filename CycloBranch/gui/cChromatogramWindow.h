@@ -135,6 +135,7 @@ private:
 	QSpinBox* maxscanid;
 	QPushButton* setscanidinterval;
 	QPushButton* resetscanidinterval;
+	QPushButton* sumofspectra;
 
 	QToolBar* toolbarHelp;
 	QAction* actionHTMLDocumentation;
@@ -180,6 +181,14 @@ signals:
 	void doubleClickedScanIDSignal(int scanid);
 
 
+	/**
+		\brief The signal is emitted if the average spectrum is calculated.
+		\param minid minimum scan id
+		\param maxid maximum scan id
+	*/
+	void calculateAvgSpectrum(int minid, int maxid);
+
+
 private slots:
 
 
@@ -208,6 +217,9 @@ private slots:
 
 
 	void chromatogramDoubleClickedSlot(int scanid);
+
+
+	void showAvgSpectrum();
 
 };
 

@@ -158,6 +158,7 @@ private:
 	cTheoreticalSpectrumList listoftheoreticalspectra;
 	cPeakListSeries eicchromatograms;
 	vector<cSpectrumDetailWidget> spectradetails;
+	vector<cSpectrumDetailWidget> avgspectra;
 
 	cGlobalPreferences globalpreferences;
 	cParameters parameters;
@@ -213,6 +214,11 @@ private:
 
 	int activefileid;
 
+	int avgspectrumused;
+	bool avgspectrumabsoluteintensityenabled;
+	QRect avgspectrumgeometry;
+	bool avgspectrummaximized;
+
 	bool quitapp;
 
 	void closeEvent(QCloseEvent *event);
@@ -226,6 +232,8 @@ private:
 	void applyGlobalPreferences();
 
 	void openDetail(int rowid);
+
+	void calculateAvgSpectrum(int minscan, int maxscan);
 
 	
 private slots:
@@ -349,6 +357,10 @@ private slots:
 	void inputFilterButtonReleased();
 
 	void filterSummaryTableIfPrepared();
+
+	void showAvgSpectrum(int minscan, int maxscan);
+
+	void avgSpectrumAbsoluteIntensityStateChanged(bool state);
 
 	//void showContextMenu(const QPoint &pt);
 

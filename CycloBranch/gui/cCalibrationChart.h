@@ -82,7 +82,7 @@ public:
 		\param b b
 		\param xvalues x coordinates of points
 		\param yvalues y coordinates of points
-		\param sd standard deviation of y-values
+		\param sd standard deviation of y values
 	*/
 	void setLineParameters(int equationtype, double a, double b, vector<double> xvalues, vector<double> yvalues, vector<double> sd);
 
@@ -91,10 +91,11 @@ public:
 		\brief Set data points.
 		\param xvalues x coordinates of points
 		\param yvalues y coordinates of points
-		\param sd standard deviation of y-values
-		\param datagroups vector of group ids
+		\param sd standard deviation of y values
+		\param datagroups vector of group names
+		\param datatimevalues data collection times corresponding the groups
 	*/
-	void setData(vector<double> xvalues, vector<double> yvalues, vector<double> sd, vector<int> datagroups);
+	void setData(vector<double> xvalues, vector<double> yvalues, vector<double> sd, vector<string> datagroups, vector<int>& datatimevalues);
 
 
 	/**
@@ -103,13 +104,14 @@ public:
 		\param b b
 		\param calibrationxvalues x coordinates of calibration points
 		\param calibrationyvalues y coordinates of calibration points
-		\param calibrationsd standard deviation of y-values of calibration points
-		\param datagroups ids of groups of data points
+		\param calibrationsd standard deviation of y values of calibration points
+		\param datagroups names of groups of data points
 		\param dataxvalues x coordinates of data points
 		\param datayvalues y coordinates of data points
-		\param datasd standard deviation of y-values of data points
+		\param datasd standard deviation of y values of data points
+		\param datatimevalues data collection times corresponding the groups
 	*/
-	void createTable(double a, double b, vector<double>& calibrationxvalues, vector<double>& calibrationyvalues, vector<double>& calibrationsd, vector<int>& datagroups, vector<double>& dataxvalues, vector<double>& datayvalues, vector<double>& datasd);
+	void createTable(double a, double b, vector<double>& calibrationxvalues, vector<double>& calibrationyvalues, vector<double>& calibrationsd, vector<string>& datagroups, vector<double>& dataxvalues, vector<double>& datayvalues, vector<double>& datasd, vector<int>& datatimevalues);
 
 
 	/**
@@ -141,7 +143,7 @@ private:
 	QToolBar* toolbarFile;
 	QToolBar* toolbarView;
 	QToolBar* toolbarHelp;
-	QToolBar* toolbarConcentration;
+	QToolBar* toolbarGraph;
 
 	QAction* actionExportCSV;
 	QAction* actionExportSpectrum;
@@ -150,17 +152,22 @@ private:
 	QAction* actionZoomOut;
 	QAction* actionZoomReset;
 	QAction* actionHideLabels;
-	//QAction* actionMouseConcentrationSelection;
+	//QAction* actionMouseXValueSelection;
 	QAction* actionHTMLDocumentation;
 
-	QWidget* widgetconcentration;
-	QHBoxLayout* hboxconcentration;
-	QLabel* labelconcentration;
-	QDoubleSpinBox* minconcentration;
+	QWidget* widgetgraphtype;
+	QHBoxLayout* hboxgraphtype;
+	QLabel* labelgraphtype;
+	QComboBox* comboboxgraphtype;
+
+	QWidget* widgetxvalue;
+	QHBoxLayout* hboxxvalue;
+	QLabel* labelxvalue;
+	QDoubleSpinBox* minxvalue;
 	QLabel* labelseparator;
-	QDoubleSpinBox* maxconcentration;
-	QPushButton* setconcentrationinterval;
-	QPushButton* resetconcentrationinterval;
+	QDoubleSpinBox* maxxvalue;
+	QPushButton* setxvalueinterval;
+	QPushButton* resetxvalueinterval;
 
 	cCalibrationChartScene* chartscene;
 
@@ -176,11 +183,11 @@ signals:
 
 
 	/**
-		\brief The signal is emitted when the range of concentration is changed.
-		\param minconcentration a minimum threshold of concentration
-		\param maxconcentration a maximum threshold of concentration
+		\brief The signal is emitted when the range of x value is changed.
+		\param minxvalue a minimum threshold of x value
+		\param maxxvalue a maximum threshold of x value
 	*/ 
-	void emitConcentrationInterval(double minconcentration, double maxconcentration);
+	void emitXValueInterval(double minxvalue, double maxxvalue);
 
 
 private slots:
@@ -189,10 +196,13 @@ private slots:
 	void exportToCsv();
 
 
-	void updateConcentrationInterval(double minconcentration, double maxconcentration);
+	void updateXValueInterval(double minxvalue, double maxxvalue);
 
 
-	void setConcentrationInterval();
+	void setXValueInterval();
+
+
+	void graphTypeChanged(int type);
 
 
 	void exportScene();

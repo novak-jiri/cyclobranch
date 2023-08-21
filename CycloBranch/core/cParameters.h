@@ -9,6 +9,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <set>
 #include "core/utilities.h"
 #include "core/cGlobalPreferences.h"
 #include "core/cPeakListSeries.h"
@@ -49,7 +50,8 @@ enum eScoreType {
 	number_of_b_ions = 2,
 	number_of_y_ions = 3,
 	number_of_b_and_y_ions = 4,
-	weighted_ratio_of_matched_peaks = 5
+	weighted_ratio_of_matched_peaks = 5,
+	cosine_similarity = 6
 };
 
 
@@ -236,6 +238,12 @@ public:
 
 
 	/**
+		\brief Enable 54Fe/56Fe ratio.
+	*/
+	bool enableratio54Fe56Fe;
+
+
+	/**
 		\brief Minimum ratio 54Fe/56Fe.
 	*/
 	double minratio54Fe56Fe;
@@ -245,6 +253,114 @@ public:
 		\brief Maximum ratio 54Fe/56Fe.
 	*/
 	double maxratio54Fe56Fe;
+
+
+	/**
+		\brief Enable 60Ni/58Ni ratio.
+	*/
+	bool enableratio60Ni58Ni;
+
+
+	/**
+		\brief Minimum ratio 60Ni/58Ni.
+	*/
+	double minratio60Ni58Ni;
+
+
+	/**
+		\brief Maximum ratio 60Ni/58Ni.
+	*/
+	double maxratio60Ni58Ni;
+
+
+	/**
+		\brief Enable 62Ni/58Ni ratio.
+	*/
+	bool enableratio62Ni58Ni;
+
+
+	/**
+		\brief Minimum ratio 62Ni/58Ni.
+	*/
+	double minratio62Ni58Ni;
+
+
+	/**
+		\brief Maximum ratio 62Ni/58Ni.
+	*/
+	double maxratio62Ni58Ni;
+
+
+	/**
+		\brief Enable 65Cu/63Cu ratio.
+	*/
+	bool enableratio65Cu63Cu;
+
+
+	/**
+		\brief Minimum ratio 65Cu/63Cu.
+	*/
+	double minratio65Cu63Cu;
+
+
+	/**
+		\brief Maximum ratio 65Cu/63Cu.
+	*/
+	double maxratio65Cu63Cu;
+
+
+	/**
+		\brief Enable 66Zn/64Zn ratio.
+	*/
+	bool enableratio66Zn64Zn;
+
+
+	/**
+		\brief Minimum ratio 66Zn/64Zn.
+	*/
+	double minratio66Zn64Zn;
+
+
+	/**
+		\brief Maximum ratio 66Zn/64Zn.
+	*/
+	double maxratio66Zn64Zn;
+
+
+	/**
+		\brief Enable 67Zn/64Zn ratio.
+	*/
+	bool enableratio67Zn64Zn;
+
+
+	/**
+		\brief Minimum ratio 67Zn/64Zn.
+	*/
+	double minratio67Zn64Zn;
+
+
+	/**
+		\brief Maximum ratio 67Zn/64Zn.
+	*/
+	double maxratio67Zn64Zn;
+
+
+	/**
+		\brief Enable 68Zn/64Zn ratio.
+	*/
+	bool enableratio68Zn64Zn;
+
+
+	/**
+		\brief Minimum ratio 68Zn/64Zn.
+	*/
+	double minratio68Zn64Zn;
+
+
+	/**
+		\brief Maximum ratio 68Zn/64Zn.
+	*/
+	double maxratio68Zn64Zn;
 
 
 	/**
@@ -738,7 +854,43 @@ public:
 /**
 	\brief Register cParameters by Qt.
 */
-Q_DECLARE_METATYPE(cParameters);  
+Q_DECLARE_METATYPE(cParameters);
+
+
+/**
+	\brief An auxiliary structure for search hints.
+*/
+struct hintStructure {
+
+	/**
+		\brief m/z value.
+	*/
+	double mz;
+
+
+	/**
+		\brief Spectrum ID.
+	*/
+	int id;
+
+};
+
+
+/**
+	\brief An auxiliary comparator for search hints.
+*/
+bool compareHints(const hintStructure& a, const hintStructure& b);
+
+
+
+/**
+	\brief Get IDs of spectra in which the theoretical m/z ratio can be found.
+	\param mzratio theoretical m/z ratio
+	\param experimentalpeaks a sorted vector of hint structures
+	\param fragmentmasserrortolerance m/z error tolerance
+	\param hintset output set of spectra IDs
+*/
+void searchHintForDeNovo(double mzratio, vector<hintStructure>& experimentalpeaks, double fragmentmasserrortolerance, set<int>& hintset);
 
 
 #endif

@@ -1,0 +1,10 @@
+@ARTICLE{CycloBranch-EJMS-2023,
+author={Novak, Jiri and Schug, Kevin A. and Havlicek, Vladimir},
+title={Quantitation of Small Molecules from Liquid Chromatography-Mass Spectrometric Accurate Mass Datasets using CycloBranch},
+journal={Eur. J. Mass Spectrom.},
+volume={29},
+number={2},
+year={2023},
+pages={102--110},
+doi={10.1177/14690667231164766}
+}

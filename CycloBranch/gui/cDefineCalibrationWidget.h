@@ -89,8 +89,9 @@ public:
 		\brief Get data from dialog.
 		\param usedvector vector of used items
 		\param datatypesvector vector of sample types
-		\param groupsvector vector of groups of technical replicates
+		\param groupsvector vector of groups of names of technical replicates
 		\param concentrationsvector vector of concentrations
+		\param timesvector vector of time values
 		\param selectedionsvector vector of selected ions
 		\param equationtype type of linear equation (y = a*x, y = a*x + b or manual mode)
 		\param manuala the parameter 'a' in manual mode
@@ -99,7 +100,7 @@ public:
 		\param peakshape shape of chromatographic peak
 		\param standard compound standard
 	*/
-	void getData(vector<int>& usedvector, vector<int>& datatypesvector, vector<int>& groupsvector, vector<double>& concentrationsvector, vector<int>& selectedionsvector, int& equationtype, double& manuala, double& manualb, int& eictype, int& peakshape, int& standard);
+	void getData(vector<int>& usedvector, vector<int>& datatypesvector, vector<string>& groupsvector, vector<double>& concentrationsvector, vector<int>& timesvector, vector<int>& selectedionsvector, int& equationtype, double& manuala, double& manualb, int& eictype, int& peakshape, int& standard);
 
 
 private:
@@ -118,12 +119,14 @@ private:
 	QLabel* grouplabel;
 	QLabel* datatypelabel;
 	QLabel* concentrationlabel;
+	QLabel* timelabel;
 
 	vector<QCheckBox*> checkboxes;
 	vector<QLineEdit*> lineedits;
 	vector<QComboBox*> comboboxes;
-	vector<QSpinBox*> spinboxes;
+	vector<QLineEdit*> groupnames;
 	vector<QDoubleSpinBox*> doublespinboxes;
+	vector<QSpinBox*> timespinboxes;
 
 	QLabel* compoundslabel;
 	QListWidget* compoundslist;
@@ -148,8 +151,9 @@ private:
 	vector<int> internalusedvector;
 	vector<string> internalfilenames;
 	vector<int> internaldatatypesvector;
-	vector<int> internalgroupsvector;
+	vector<string> internalgroupsvector;
 	vector<double> internalconcentrationsvector;
+	vector<int> internaltimesvector;
 
 	vector<string> internalcompounds;
 	vector<int> internalselectedionsvector;

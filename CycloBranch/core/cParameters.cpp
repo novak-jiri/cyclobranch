@@ -465,8 +465,35 @@ void cParameters::clear() {
 	minimumrt = 0;
 	maximumrt = 0;
 	fwhm = 0.05;
+
+	enableratio54Fe56Fe = true;
 	minratio54Fe56Fe = 0.01;
 	maxratio54Fe56Fe = 0.1;
+
+	enableratio60Ni58Ni = true;
+	minratio60Ni58Ni = 0;
+	maxratio60Ni58Ni = 0.5;
+
+	enableratio62Ni58Ni = true;
+	minratio62Ni58Ni = 0;
+	maxratio62Ni58Ni = 0.1;
+
+	enableratio65Cu63Cu = true;
+	minratio65Cu63Cu = 0;
+	maxratio65Cu63Cu = 0.6;
+
+	enableratio66Zn64Zn = true;
+	minratio66Zn64Zn = 0;
+	maxratio66Zn64Zn = 0.7;
+
+	enableratio67Zn64Zn = true;
+	minratio67Zn64Zn = 0;
+	maxratio67Zn64Zn = 0.2;
+
+	enableratio68Zn64Zn = true;
+	minratio68Zn64Zn = 0;
+	maxratio68Zn64Zn = 0.5;
+
 	bricksdatabasefilename = "";
 	bricksdatabase.clear();
 	maximumbricksincombinationbegin = 1;
@@ -1722,8 +1749,56 @@ string cParameters::printToString() {
 	s += "Minimum Retention Time: " + to_string(minimumrt) + "\n";
 	s += "Maximum Retention Time: " + to_string(maximumrt) + "\n";
 	s += "FWHM: " + to_string(fwhm) + "\n";
+
+	s += "Enable Ratio 54Fe/56Fe: ";
+	s += enableratio54Fe56Fe ? "on" : "off";
+	s += "\n";
+
 	s += "Minimum Ratio 54Fe/56Fe: " + to_string(minratio54Fe56Fe) + "\n";
 	s += "Maximum Ratio 54Fe/56Fe: " + to_string(maxratio54Fe56Fe) + "\n";
+
+	s += "Enable Ratio 60Ni/58Ni: ";
+	s += enableratio60Ni58Ni ? "on" : "off";
+	s += "\n";
+
+	s += "Minimum Ratio 60Ni/58Ni: " + to_string(minratio60Ni58Ni) + "\n";
+	s += "Maximum Ratio 60Ni/58Ni: " + to_string(maxratio60Ni58Ni) + "\n";
+
+	//s += "Enable Ratio 62Ni/58Ni: ";
+	//s += enableratio62Ni58Ni ? "on" : "off";
+	//s += "\n";
+
+	//s += "Minimum Ratio 62Ni/58Ni: " + to_string(minratio62Ni58Ni) + "\n";
+	//s += "Maximum Ratio 62Ni/58Ni: " + to_string(maxratio62Ni58Ni) + "\n";
+	
+	s += "Enable Ratio 65Cu/63Cu: ";
+	s += enableratio65Cu63Cu ? "on" : "off";
+	s += "\n";
+
+	s += "Minimum Ratio 65Cu/63Cu: " + to_string(minratio65Cu63Cu) + "\n";
+	s += "Maximum Ratio 65Cu/63Cu: " + to_string(maxratio65Cu63Cu) + "\n";
+
+	s += "Enable Ratio 66Zn/64Zn: ";
+	s += enableratio66Zn64Zn ? "on" : "off";
+	s += "\n";
+
+	s += "Minimum Ratio 66Zn/64Zn: " + to_string(minratio66Zn64Zn) + "\n";
+	s += "Maximum Ratio 66Zn/64Zn: " + to_string(maxratio66Zn64Zn) + "\n";
+
+	//s += "Enable Ratio 67Zn/64Zn: ";
+	//s += enableratio67Zn64Zn ? "on" : "off";
+	//s += "\n";
+
+	//s += "Minimum Ratio 67Zn/64Zn: " + to_string(minratio67Zn64Zn) + "\n";
+	//s += "Maximum Ratio 67Zn/64Zn: " + to_string(maxratio67Zn64Zn) + "\n";
+
+	s += "Enable Ratio 68Zn/64Zn: ";
+	s += enableratio68Zn64Zn ? "on" : "off";
+	s += "\n";
+
+	s += "Minimum Ratio 68Zn/64Zn: " + to_string(minratio68Zn64Zn) + "\n";
+	s += "Maximum Ratio 68Zn/64Zn: " + to_string(maxratio68Zn64Zn) + "\n";
+
 	s += "Building Blocks Database File: " + bricksdatabasefilename + "\n";
 	s += "Maximum Number of Combined Blocks (start, middle, end): " + to_string(maximumbricksincombinationbegin) + ", " + to_string(maximumbricksincombinationmiddle) + ", " + to_string(maximumbricksincombinationend) + "\n";
 
@@ -1791,6 +1866,9 @@ string cParameters::printToString() {
 			break;
 		case weighted_ratio_of_matched_peaks:
 			s += "Weighted Ratio of Matched Peaks";
+			break;
+		case cosine_similarity:
+			s += "Cosine Similarity";
 			break;
 		default:
 			s += "undefined";
@@ -2508,6 +2586,86 @@ int cParameters::generateCompounds(bool& terminatecomputation, string& errormess
 		}
 	}
 
+	size_t ionssize = ionsfortheoreticalspectraMS1.size();
+
+	vector<bool> ionsfortheoreticalspectraMS1hasFe;
+	vector<bool> ionsfortheoreticalspectraMS1hasNi;
+	vector<bool> ionsfortheoreticalspectraMS1hasCu;
+	vector<bool> ionsfortheoreticalspectraMS1hasZn;
+
+	ionsfortheoreticalspectraMS1hasFe.resize(ionssize, false);
+	ionsfortheoreticalspectraMS1hasNi.resize(ionssize, false);
+	ionsfortheoreticalspectraMS1hasCu.resize(ionssize, false);
+	ionsfortheoreticalspectraMS1hasZn.resize(ionssize, false);
+
+	for (size_t i = 0; i < ionssize; i++) {
+		if (ionsfortheoreticalspectraMS1[i].formula.find("Fe") != string::npos) {
+			ionsfortheoreticalspectraMS1hasFe[i] = true;
+		}
+
+		if (ionsfortheoreticalspectraMS1[i].formula.find("Ni") != string::npos) {
+			ionsfortheoreticalspectraMS1hasNi[i] = true;
+		}
+
+		if (ionsfortheoreticalspectraMS1[i].formula.find("Cu") != string::npos) {
+			ionsfortheoreticalspectraMS1hasCu[i] = true;
+		}
+
+		if (ionsfortheoreticalspectraMS1[i].formula.find("Zn") != string::npos) {
+			ionsfortheoreticalspectraMS1hasZn[i] = true;
+		}
+
+		//cout << ionsfortheoreticalspectraMS1[i].formula << " " << ionsfortheoreticalspectraMS1hasFe[i] << " " << ionsfortheoreticalspectraMS1hasNi[i] << " " << ionsfortheoreticalspectraMS1hasCu[i] << " " << ionsfortheoreticalspectraMS1hasZn[i] << endl;
+	}
+
+	vector<vector<hintStructure> > hintsvector;
+	hintsvector.resize(peaklistseriesvector.size());
+
+	vector<size_t> hintsvectorsizes;
+	hintsvectorsizes.resize(peaklistseriesvector.size(), 0);
+
+	int hsize;
+	int ksize;
+	int isize;
+
+	hintStructure hs;
+	if (!reportunmatchedtheoreticalpeaks) {
+		hsize = (int)peaklistseriesvector.size();
+		for (size_t h = 0; h < hsize; h++) {
+			ksize = peaklistseriesvector[h].size();
+			for (int k = 0; k < ksize; k++) {
+				hintsvectorsizes[h] += peaklistseriesvector[h][k].size();
+			}
+			hintsvector[h].resize(hintsvectorsizes[h]);
+		}
+
+		int j;
+		hsize = (int)peaklistseriesvector.size();
+		for (int h = 0; h < hsize; h++) {
+			j = 0;
+			ksize = peaklistseriesvector[h].size();
+			for (int k = 0; k < ksize; k++) {
+				isize = peaklistseriesvector[h][k].size();
+				for (int i = 0; i < isize; i++) {
+					hs.mz = peaklistseriesvector[h][k][i].mzratio;
+					hs.id = k;
+					hintsvector[h][j] = hs;
+					j++;
+				}
+			}
+			sort(hintsvector[h].begin(), hintsvector[h].end(), compareHints);
+		}
+	}
+
+	bool shint;
+
+	set<int> hintset;
+	set<int> hintsetFe54;
+	set<int> hintsetNi60;
+	set<int> hintsetCu65;
+	set<int> hintsetZn66;
+	set<int> hintsetZn68;
+
 	double unchargedmaximummz = charge(uncharge(maximummz, precursorcharge), (precursorcharge > 0) ? 1 : -1) - minadd;
 	//double unchargedmaximummz = maximummz - minadd;
 
@@ -2618,11 +2776,11 @@ int cParameters::generateCompounds(bool& terminatecomputation, string& errormess
 
 				}
 
-				for (auto& it : ionsfortheoreticalspectraMS1) {
+				for (size_t i = 0; i < ionssize; i++) {
 
 					for (int j = 0; j < abs(precursorcharge); j++) {
 
-						tmpmzdifference = sumofmasses + it.massdifference;
+						tmpmzdifference = sumofmasses + ionsfortheoreticalspectraMS1[i].massdifference;
 						if (precursorcharge > 0) {
 							tmpmzdifference += j * (H - e);
 						}
@@ -2635,9 +2793,60 @@ int cParameters::generateCompounds(bool& terminatecomputation, string& errormess
 
 						featureshint = 0;
 
+						hintset.clear();
+						hintsetFe54.clear();
+						hintsetNi60.clear();
+						hintsetCu65.clear();
+						hintsetZn66.clear();
+						hintsetZn68.clear();
+
+						searchHintForDeNovo(tmpmzdifference, hintsvector[h], fragmentmasserrortolerance, hintset);
+
+						if (ionsfortheoreticalspectraMS1hasFe[i] && enableratio54Fe56Fe && (minratio54Fe56Fe > 0) && (minimumpatternsize > 1)) {
+							searchHintForDeNovo(tmpmzdifference - (Fe56 - Fe54) / (double)(j + 1), hintsvector[h], fragmentmasserrortolerance, hintsetFe54);
+						}
+
+						if (ionsfortheoreticalspectraMS1hasNi[i] && enableratio60Ni58Ni && (minratio60Ni58Ni > 0) && (minimumpatternsize > 1)) {
+							searchHintForDeNovo(tmpmzdifference + (Ni60 - Ni58) / (double)(j + 1), hintsvector[h], fragmentmasserrortolerance, hintsetNi60);
+						}
+
+						if (ionsfortheoreticalspectraMS1hasCu[i] && enableratio65Cu63Cu && (minratio65Cu63Cu > 0) && (minimumpatternsize > 1)) {
+							searchHintForDeNovo(tmpmzdifference + (Cu65 - Cu63) / (double)(j + 1), hintsvector[h], fragmentmasserrortolerance, hintsetCu65);
+						}
+
+						if (ionsfortheoreticalspectraMS1hasZn[i] && enableratio66Zn64Zn && (minratio66Zn64Zn > 0) && (minimumpatternsize > 1)) {
+							searchHintForDeNovo(tmpmzdifference + (Zn66 - Zn64) / (double)(j + 1), hintsvector[h], fragmentmasserrortolerance, hintsetZn66);
+
+							if (enableratio68Zn64Zn && (minratio68Zn64Zn > 0) && (minimumpatternsize > 2)) {
+								searchHintForDeNovo(tmpmzdifference + (Zn68 - Zn64) / (double)(j + 1), hintsvector[h], fragmentmasserrortolerance, hintsetZn68);
+							}
+						}
+
 						for (int k = kstart; k < kend; k++) {
 
-							if (searchHint(tmpmzdifference, peaklistseriesvector[h][k], fragmentmasserrortolerance)) {
+							shint = (bool)hintset.count(k);
+
+							if (shint && ionsfortheoreticalspectraMS1hasFe[i] && enableratio54Fe56Fe && (minratio54Fe56Fe > 0) && (minimumpatternsize > 1)) {
+								shint = (bool)hintsetFe54.count(k);
+							}
+
+							if (shint && ionsfortheoreticalspectraMS1hasNi[i] && enableratio60Ni58Ni && (minratio60Ni58Ni > 0) && (minimumpatternsize > 1)) {
+								shint = (bool)hintsetNi60.count(k);
+							}
+
+							if (shint && ionsfortheoreticalspectraMS1hasCu[i] && enableratio65Cu63Cu && (minratio65Cu63Cu > 0) && (minimumpatternsize > 1)) {
+								shint = (bool)hintsetCu65.count(k);
+							}
+
+							if (shint && ionsfortheoreticalspectraMS1hasZn[i] && enableratio66Zn64Zn && (minratio66Zn64Zn > 0) && (minimumpatternsize > 1)) {
+								shint = (bool)hintsetZn66.count(k);
+
+								if (shint && enableratio68Zn64Zn && (minratio68Zn64Zn > 0) && (minimumpatternsize > 2)) {
+									shint = (bool)hintsetZn68.count(k);
+								}
+							}
+
+							if (shint) {
 								featureshint++;
 							}
 							else {
@@ -2787,8 +2996,34 @@ void cParameters::store(ofstream& os) {
 	os.write((char *)&maximumrt, sizeof(double));
 	os.write((char *)&fwhm, sizeof(double));
 
+	os.write((char *)&enableratio54Fe56Fe, sizeof(bool));
+	os.write((char *)&enableratio60Ni58Ni, sizeof(bool));
+	os.write((char *)&enableratio62Ni58Ni, sizeof(bool));
+	os.write((char *)&enableratio65Cu63Cu, sizeof(bool));
+	os.write((char *)&enableratio66Zn64Zn, sizeof(bool));
+	os.write((char *)&enableratio67Zn64Zn, sizeof(bool));
+	os.write((char *)&enableratio68Zn64Zn, sizeof(bool));
+
 	os.write((char *)&minratio54Fe56Fe, sizeof(double));
 	os.write((char *)&maxratio54Fe56Fe, sizeof(double));
+
+	os.write((char *)&minratio60Ni58Ni, sizeof(double));
+	os.write((char *)&maxratio60Ni58Ni, sizeof(double));
+
+	os.write((char *)&minratio62Ni58Ni, sizeof(double));
+	os.write((char *)&maxratio62Ni58Ni, sizeof(double));
+
+	os.write((char *)&minratio65Cu63Cu, sizeof(double));
+	os.write((char *)&maxratio65Cu63Cu, sizeof(double));
+
+	os.write((char *)&minratio66Zn64Zn, sizeof(double));
+	os.write((char *)&maxratio66Zn64Zn, sizeof(double));
+
+	os.write((char *)&minratio67Zn64Zn, sizeof(double));
+	os.write((char *)&maxratio67Zn64Zn, sizeof(double));
+
+	os.write((char *)&minratio68Zn64Zn, sizeof(double));
+	os.write((char *)&maxratio68Zn64Zn, sizeof(double));
 
 	storeString(bricksdatabasefilename, os);
 	bricksdatabase.store(os);
@@ -2997,6 +3232,25 @@ void cParameters::load(ifstream& is, int fileversionpart1, int fileversionpart2,
 
 	is.read((char *)&fwhm, sizeof(double));
 
+	if (isCompatibleVersion(fileversionpart1, fileversionpart2, fileversionpart3, 2, 1, 34)) {
+		is.read((char *)&enableratio54Fe56Fe, sizeof(bool));
+		is.read((char *)&enableratio60Ni58Ni, sizeof(bool));
+		is.read((char *)&enableratio62Ni58Ni, sizeof(bool));
+		is.read((char *)&enableratio65Cu63Cu, sizeof(bool));
+		is.read((char *)&enableratio66Zn64Zn, sizeof(bool));
+		is.read((char *)&enableratio67Zn64Zn, sizeof(bool));
+		is.read((char *)&enableratio68Zn64Zn, sizeof(bool));
+	}
+	else {
+		enableratio54Fe56Fe = true;
+		enableratio60Ni58Ni = true;
+		enableratio62Ni58Ni = true;
+		enableratio65Cu63Cu = true;
+		enableratio66Zn64Zn = true;
+		enableratio67Zn64Zn = true;
+		enableratio68Zn64Zn = true;
+	}
+
 	if (isCompatibleVersion(fileversionpart1, fileversionpart2, fileversionpart3, 2, 0, 37)) {
 		is.read((char *)&minratio54Fe56Fe, sizeof(double));
 		is.read((char *)&maxratio54Fe56Fe, sizeof(double));
@@ -3004,6 +3258,45 @@ void cParameters::load(ifstream& is, int fileversionpart1, int fileversionpart2,
 	else {
 		minratio54Fe56Fe = 0;
 		maxratio54Fe56Fe = 0.1;
+	}
+
+	if (isCompatibleVersion(fileversionpart1, fileversionpart2, fileversionpart3, 2, 1, 33)) {
+		is.read((char *)&minratio60Ni58Ni, sizeof(double));
+		is.read((char *)&maxratio60Ni58Ni, sizeof(double));
+
+		is.read((char *)&minratio62Ni58Ni, sizeof(double));
+		is.read((char *)&maxratio62Ni58Ni, sizeof(double));
+
+		is.read((char *)&minratio65Cu63Cu, sizeof(double));
+		is.read((char *)&maxratio65Cu63Cu, sizeof(double));
+
+		is.read((char *)&minratio66Zn64Zn, sizeof(double));
+		is.read((char *)&maxratio66Zn64Zn, sizeof(double));
+
+		is.read((char *)&minratio67Zn64Zn, sizeof(double));
+		is.read((char *)&maxratio67Zn64Zn, sizeof(double));
+
+		is.read((char *)&minratio68Zn64Zn, sizeof(double));
+		is.read((char *)&maxratio68Zn64Zn, sizeof(double));
+	}
+	else {
+		minratio60Ni58Ni = 0;
+		maxratio60Ni58Ni = 0.5;
+
+		minratio62Ni58Ni = 0;
+		maxratio62Ni58Ni = 0.1;
+
+		minratio65Cu63Cu = 0;
+		maxratio65Cu63Cu = 0.6;
+
+		minratio66Zn64Zn = 0;
+		maxratio66Zn64Zn = 0.7;
+
+		minratio67Zn64Zn = 0;
+		maxratio67Zn64Zn = 0.2;
+
+		minratio68Zn64Zn = 0;
+		maxratio68Zn64Zn = 0.5;
 	}
 
 	loadString(bricksdatabasefilename, is);
@@ -3195,5 +3488,45 @@ void cParameters::load(ifstream& is, int fileversionpart1, int fileversionpart2,
 	is.read((char *)&defaultpixelsizex, sizeof(int));
 	is.read((char *)&defaultpixelsizey, sizeof(int));
 	is.read((char *)&vendor, sizeof(eVendorType));
+}
+
+
+bool compareHints(const hintStructure& a, const hintStructure& b) {
+	return a.mz < b.mz;
+}
+
+
+void searchHintForDeNovo(double mzratio, vector<hintStructure>& experimentalpeaks, double fragmentmasserrortolerance, set<int>& hintset) {
+	int left, right, middle, tmp;
+	int experimentalpeakssize = (int)experimentalpeaks.size();
+
+	left = 0;
+	right = experimentalpeakssize - 1;
+	while (left <= right) {
+		middle = (left + right) / 2;
+		if (isInPpmMassErrorTolerance(experimentalpeaks[middle].mz, mzratio, fragmentmasserrortolerance)) {
+			hintset.insert(experimentalpeaks[middle].id);
+
+			tmp = middle - 1;
+			while ((tmp >= 0) && isInPpmMassErrorTolerance(experimentalpeaks[tmp].mz, mzratio, fragmentmasserrortolerance)) {
+				hintset.insert(experimentalpeaks[tmp].id);
+				tmp--;
+			}
+
+			tmp = middle + 1;
+			while ((tmp < experimentalpeakssize) && isInPpmMassErrorTolerance(experimentalpeaks[tmp].mz, mzratio, fragmentmasserrortolerance)) {
+				hintset.insert(experimentalpeaks[tmp].id);
+				tmp++;
+			}
+
+			return;			
+		}
+		if (mzratio < experimentalpeaks[middle].mz) {
+			right = middle - 1;
+		}
+		else {
+			left = middle + 1;
+		}
+	}
 }
 

@@ -285,8 +285,18 @@ cParametersWidget::cParametersWidget(cGlobalPreferences* globalpreferences, QWid
 	experimentalspectragridlayout->addWidget(fwhmlabel, 12, 0);
 	experimentalspectragridlayout->addWidget(fwhm, 12, 1);
 
+	experimentalspectragroupbox = new QGroupBox("Experimental Spectrum/Spectra");
+	experimentalspectragroupbox->setLayout(experimentalspectragridlayout);
+
+
+	isotoperatiosgridlayout = new QGridLayout();
+
+	int isotoperow = 0;
+
+	ratio54Fe56FeEnabled = new QCheckBox();
+
 	minratio54Fe56Fe = new QDoubleSpinBox();
-	minratio54Fe56Fe->setToolTip("Enter the minimum intensity ratio of 54Fe/56Fe.");
+	minratio54Fe56Fe->setToolTip("Enter the minimum ratio of 54Fe/56Fe intensities.\nUse 0 if the presence of 54Fe in the spectrum is NOT mandatory.");
 	minratio54Fe56Fe->setDecimals(3);
 	minratio54Fe56Fe->setRange(0, 1);
 	minratio54Fe56Fe->setSingleStep(0.01);
@@ -294,26 +304,221 @@ cParametersWidget::cParametersWidget(cGlobalPreferences* globalpreferences, QWid
 	minratio54Fe56Fe->setPrefix("minimum: ");
 
 	maxratio54Fe56Fe = new QDoubleSpinBox();
-	maxratio54Fe56Fe->setToolTip("Enter the maximum intensity ratio of 54Fe/56Fe.");
+	maxratio54Fe56Fe->setToolTip("Enter the maximum ratio of 54Fe/56Fe intensities.\nThe default value is 0.1.");
 	maxratio54Fe56Fe->setDecimals(3);
 	maxratio54Fe56Fe->setRange(0, 1);
 	maxratio54Fe56Fe->setSingleStep(0.01);
 	maxratio54Fe56Fe->setValue(0.1);
 	maxratio54Fe56Fe->setPrefix("maximum: ");
 
-	ratio54Fe56Felayout = new QHBoxLayout();
-	ratio54Fe56Felayout->addWidget(minratio54Fe56Fe);
-	ratio54Fe56Felayout->addWidget(maxratio54Fe56Fe);
-	ratio54Fe56Felayout->setMargin(0);
-	ratio54Fe56Fewidget = new QWidget();
-	ratio54Fe56Fewidget->setLayout(ratio54Fe56Felayout);
-	ratio54Fe56Fewidget->setFixedWidth(leftdefaultwidth);
-	ratio54Fe56Felabel = new QLabel("54Fe/56Fe Ratio:");
-	experimentalspectragridlayout->addWidget(ratio54Fe56Felabel, 13, 0);
-	experimentalspectragridlayout->addWidget(ratio54Fe56Fewidget, 13, 1);
+	ratio54Fe56FeLayout = new QHBoxLayout();
+	ratio54Fe56FeLayout->addWidget(ratio54Fe56FeEnabled);
+	ratio54Fe56FeLayout->addWidget(minratio54Fe56Fe, 10);
+	ratio54Fe56FeLayout->addWidget(maxratio54Fe56Fe, 10);
+	ratio54Fe56FeLayout->setMargin(0);
+	ratio54Fe56FeWidget = new QWidget();
+	ratio54Fe56FeWidget->setLayout(ratio54Fe56FeLayout);
+	ratio54Fe56FeWidget->setFixedWidth(leftdefaultwidth);
+	ratio54Fe56FeLabel = new QLabel("54Fe/56Fe Ratio:");
 
-	experimentalspectragroupbox = new QGroupBox("Experimental Spectrum/Spectra");
-	experimentalspectragroupbox->setLayout(experimentalspectragridlayout);
+	isotoperatiosgridlayout->addWidget(ratio54Fe56FeLabel, isotoperow, 0);
+	isotoperatiosgridlayout->addWidget(ratio54Fe56FeWidget, isotoperow, 1);
+	isotoperow++;
+
+	ratio60Ni58NiEnabled = new QCheckBox();
+
+	minratio60Ni58Ni = new QDoubleSpinBox();
+	minratio60Ni58Ni->setToolTip("Enter the minimum ratio of 60Ni/58Ni intensities.\nUse 0 if the presence of 60Ni in the spectrum is NOT mandatory.");
+	minratio60Ni58Ni->setDecimals(3);
+	minratio60Ni58Ni->setRange(0, 1);
+	minratio60Ni58Ni->setSingleStep(0.01);
+	minratio60Ni58Ni->setValue(0);
+	minratio60Ni58Ni->setPrefix("minimum: ");
+	
+	maxratio60Ni58Ni = new QDoubleSpinBox();
+	maxratio60Ni58Ni->setToolTip("Enter the maximum ratio of 60Ni/58Ni intensities.\nThe default value is 0.5 (for FWHM <= 0.001 only).");
+	maxratio60Ni58Ni->setDecimals(3);
+	maxratio60Ni58Ni->setRange(0, 1);
+	maxratio60Ni58Ni->setSingleStep(0.01);
+	maxratio60Ni58Ni->setValue(0.5);
+	maxratio60Ni58Ni->setPrefix("maximum: ");
+
+	ratio60Ni58NiLayout = new QHBoxLayout();
+	ratio60Ni58NiLayout->addWidget(ratio60Ni58NiEnabled);
+	ratio60Ni58NiLayout->addWidget(minratio60Ni58Ni, 10);
+	ratio60Ni58NiLayout->addWidget(maxratio60Ni58Ni, 10);
+	ratio60Ni58NiLayout->setMargin(0);
+	ratio60Ni58NiWidget = new QWidget();
+	ratio60Ni58NiWidget->setLayout(ratio60Ni58NiLayout);
+	ratio60Ni58NiWidget->setFixedWidth(leftdefaultwidth);
+	ratio60Ni58NiLabel = new QLabel("60Ni/58Ni Ratio:");
+	
+	isotoperatiosgridlayout->addWidget(ratio60Ni58NiLabel, isotoperow, 0);
+	isotoperatiosgridlayout->addWidget(ratio60Ni58NiWidget, isotoperow, 1);
+	isotoperow++;
+
+	ratio62Ni58NiEnabled = new QCheckBox();
+
+	minratio62Ni58Ni = new QDoubleSpinBox();
+	minratio62Ni58Ni->setToolTip("Enter the minimum ratio of 62Ni/58Ni intensities.\nUse 0 if the presence of 62Ni in the spectrum is NOT mandatory.");
+	minratio62Ni58Ni->setDecimals(3);
+	minratio62Ni58Ni->setRange(0, 1);
+	minratio62Ni58Ni->setSingleStep(0.01);
+	minratio62Ni58Ni->setValue(0);
+	minratio62Ni58Ni->setPrefix("minimum: ");
+
+	maxratio62Ni58Ni = new QDoubleSpinBox();
+	maxratio62Ni58Ni->setToolTip("Enter the maximum ratio of 62Ni/58Ni intensities.\nThe default value is 0.1 (for FWHM <= 0.001 only).");
+	maxratio62Ni58Ni->setDecimals(3);
+	maxratio62Ni58Ni->setRange(0, 1);
+	maxratio62Ni58Ni->setSingleStep(0.01);
+	maxratio62Ni58Ni->setValue(0.1);
+	maxratio62Ni58Ni->setPrefix("maximum: ");
+
+	ratio62Ni58NiLayout = new QHBoxLayout();
+	ratio62Ni58NiLayout->addWidget(ratio62Ni58NiEnabled);
+	ratio62Ni58NiLayout->addWidget(minratio62Ni58Ni, 10);
+	ratio62Ni58NiLayout->addWidget(maxratio62Ni58Ni, 10);
+	ratio62Ni58NiLayout->setMargin(0);
+	ratio62Ni58NiWidget = new QWidget();
+	ratio62Ni58NiWidget->setLayout(ratio62Ni58NiLayout);
+	ratio62Ni58NiWidget->setFixedWidth(leftdefaultwidth);
+	ratio62Ni58NiLabel = new QLabel("62Ni/58Ni Ratio:");
+
+	//isotoperatiosgridlayout->addWidget(ratio62Ni58NiLabel, isotoperow, 0);
+	//isotoperatiosgridlayout->addWidget(ratio62Ni58NiWidget, isotoperow, 1);
+	//isotoperow++;
+
+	ratio65Cu63CuEnabled = new QCheckBox();
+
+	minratio65Cu63Cu = new QDoubleSpinBox();
+	minratio65Cu63Cu->setToolTip("Enter the minimum ratio of 65Cu/63Cu intensities.\nUse 0 if the presence of 65Cu in the spectrum is NOT mandatory.");
+	minratio65Cu63Cu->setDecimals(3);
+	minratio65Cu63Cu->setRange(0, 1);
+	minratio65Cu63Cu->setSingleStep(0.01);
+	minratio65Cu63Cu->setValue(0);
+	minratio65Cu63Cu->setPrefix("minimum: ");
+	
+	maxratio65Cu63Cu = new QDoubleSpinBox();
+	maxratio65Cu63Cu->setToolTip("Enter the maximum ratio of 65Cu/63Cu intensities.\nThe default value is 0.6 (for FWHM <= 0.001 only).");
+	maxratio65Cu63Cu->setDecimals(3);
+	maxratio65Cu63Cu->setRange(0, 1);
+	maxratio65Cu63Cu->setSingleStep(0.01);
+	maxratio65Cu63Cu->setValue(0.6);
+	maxratio65Cu63Cu->setPrefix("maximum: ");
+
+	ratio65Cu63CuLayout = new QHBoxLayout();
+	ratio65Cu63CuLayout->addWidget(ratio65Cu63CuEnabled);
+	ratio65Cu63CuLayout->addWidget(minratio65Cu63Cu, 10);
+	ratio65Cu63CuLayout->addWidget(maxratio65Cu63Cu, 10);
+	ratio65Cu63CuLayout->setMargin(0);
+	ratio65Cu63CuWidget = new QWidget();
+	ratio65Cu63CuWidget->setLayout(ratio65Cu63CuLayout);
+	ratio65Cu63CuWidget->setFixedWidth(leftdefaultwidth);
+	ratio65Cu63CuLabel = new QLabel("65Cu/63Cu Ratio:");
+
+	isotoperatiosgridlayout->addWidget(ratio65Cu63CuLabel, isotoperow, 0);
+	isotoperatiosgridlayout->addWidget(ratio65Cu63CuWidget, isotoperow, 1);
+	isotoperow++;
+
+	ratio66Zn64ZnEnabled = new QCheckBox();
+
+	minratio66Zn64Zn = new QDoubleSpinBox();
+	minratio66Zn64Zn->setToolTip("Enter the minimum ratio of 66Zn/64Zn intensities.\nUse 0 if the presence of 66Zn in the spectrum is NOT mandatory.");
+	minratio66Zn64Zn->setDecimals(3);
+	minratio66Zn64Zn->setRange(0, 1);
+	minratio66Zn64Zn->setSingleStep(0.01);
+	minratio66Zn64Zn->setValue(0);
+	minratio66Zn64Zn->setPrefix("minimum: ");
+
+	maxratio66Zn64Zn = new QDoubleSpinBox();
+	maxratio66Zn64Zn->setToolTip("Enter the maximum ratio of 66Zn/64Zn intensities.\nThe default value is 0.7 (for FWHM <= 0.001 only).");
+	maxratio66Zn64Zn->setDecimals(3);
+	maxratio66Zn64Zn->setRange(0, 1);
+	maxratio66Zn64Zn->setSingleStep(0.01);
+	maxratio66Zn64Zn->setValue(0.7);
+	maxratio66Zn64Zn->setPrefix("maximum: ");
+
+	ratio66Zn64ZnLayout = new QHBoxLayout();
+	ratio66Zn64ZnLayout->addWidget(ratio66Zn64ZnEnabled);
+	ratio66Zn64ZnLayout->addWidget(minratio66Zn64Zn, 10);
+	ratio66Zn64ZnLayout->addWidget(maxratio66Zn64Zn, 10);
+	ratio66Zn64ZnLayout->setMargin(0);
+	ratio66Zn64ZnWidget = new QWidget();
+	ratio66Zn64ZnWidget->setLayout(ratio66Zn64ZnLayout);
+	ratio66Zn64ZnWidget->setFixedWidth(leftdefaultwidth);
+	ratio66Zn64ZnLabel = new QLabel("66Zn/64Zn Ratio:");
+
+	isotoperatiosgridlayout->addWidget(ratio66Zn64ZnLabel, isotoperow, 0);
+	isotoperatiosgridlayout->addWidget(ratio66Zn64ZnWidget, isotoperow, 1);
+	isotoperow++;
+
+	ratio67Zn64ZnEnabled = new QCheckBox();
+
+	minratio67Zn64Zn = new QDoubleSpinBox();
+	minratio67Zn64Zn->setToolTip("Enter the minimum ratio of 67Zn/64Zn intensities.\nUse 0 if the presence of 67Zn in the spectrum is NOT mandatory.");
+	minratio67Zn64Zn->setDecimals(3);
+	minratio67Zn64Zn->setRange(0, 1);
+	minratio67Zn64Zn->setSingleStep(0.01);
+	minratio67Zn64Zn->setValue(0);
+	minratio67Zn64Zn->setPrefix("minimum: ");
+
+	maxratio67Zn64Zn = new QDoubleSpinBox();
+	maxratio67Zn64Zn->setToolTip("Enter the maximum ratio of 67Zn/64Zn intensities.\nThe default value is 0.2 (for FWHM <= 0.001 only).");
+	maxratio67Zn64Zn->setDecimals(3);
+	maxratio67Zn64Zn->setRange(0, 1);
+	maxratio67Zn64Zn->setSingleStep(0.01);
+	maxratio67Zn64Zn->setValue(0.2);
+	maxratio67Zn64Zn->setPrefix("maximum: ");
+
+	ratio67Zn64ZnLayout = new QHBoxLayout();
+	ratio67Zn64ZnLayout->addWidget(ratio67Zn64ZnEnabled);
+	ratio67Zn64ZnLayout->addWidget(minratio67Zn64Zn, 10);
+	ratio67Zn64ZnLayout->addWidget(maxratio67Zn64Zn, 10);
+	ratio67Zn64ZnLayout->setMargin(0);
+	ratio67Zn64ZnWidget = new QWidget();
+	ratio67Zn64ZnWidget->setLayout(ratio67Zn64ZnLayout);
+	ratio67Zn64ZnWidget->setFixedWidth(leftdefaultwidth);
+	ratio67Zn64ZnLabel = new QLabel("67Zn/64Zn Ratio:");
+
+	//isotoperatiosgridlayout->addWidget(ratio67Zn64ZnLabel, isotoperow, 0);
+	//isotoperatiosgridlayout->addWidget(ratio67Zn64ZnWidget, isotoperow, 1);
+	//isotoperow++;
+
+	ratio68Zn64ZnEnabled = new QCheckBox();
+	
+	minratio68Zn64Zn = new QDoubleSpinBox();
+	minratio68Zn64Zn->setToolTip("Enter the minimum ratio of 68Zn/64Zn intensities.\nUse 0 if the presence of 68Zn in the spectrum is NOT mandatory.");
+	minratio68Zn64Zn->setDecimals(3);
+	minratio68Zn64Zn->setRange(0, 1);
+	minratio68Zn64Zn->setSingleStep(0.01);
+	minratio68Zn64Zn->setValue(0);
+	minratio68Zn64Zn->setPrefix("minimum: ");
+
+	maxratio68Zn64Zn = new QDoubleSpinBox();
+	maxratio68Zn64Zn->setToolTip("Enter the maximum ratio of 68Zn/64Zn intensities.\nThe default value is 0.5 (for FWHM <= 0.001 only).");
+	maxratio68Zn64Zn->setDecimals(3);
+	maxratio68Zn64Zn->setRange(0, 1);
+	maxratio68Zn64Zn->setSingleStep(0.01);
+	maxratio68Zn64Zn->setValue(0.5);
+	maxratio68Zn64Zn->setPrefix("maximum: ");
+
+	ratio68Zn64ZnLayout = new QHBoxLayout();
+	ratio68Zn64ZnLayout->addWidget(ratio68Zn64ZnEnabled);
+	ratio68Zn64ZnLayout->addWidget(minratio68Zn64Zn, 10);
+	ratio68Zn64ZnLayout->addWidget(maxratio68Zn64Zn, 10);
+	ratio68Zn64ZnLayout->setMargin(0);
+	ratio68Zn64ZnWidget = new QWidget();
+	ratio68Zn64ZnWidget->setLayout(ratio68Zn64ZnLayout);
+	ratio68Zn64ZnWidget->setFixedWidth(leftdefaultwidth);
+	ratio68Zn64ZnLabel = new QLabel("68Zn/64Zn Ratio:");
+
+	isotoperatiosgridlayout->addWidget(ratio68Zn64ZnLabel, isotoperow, 0);
+	isotoperatiosgridlayout->addWidget(ratio68Zn64ZnWidget, isotoperow, 1);
+	isotoperow++;
+
+	isotoperatiosgroupbox = new QGroupBox("Isotope Ratios");
+	isotoperatiosgroupbox->setLayout(isotoperatiosgridlayout);
 
 
 	brickdatabasegridlayout = new QGridLayout();
@@ -480,6 +685,7 @@ cParametersWidget::cParametersWidget(cGlobalPreferences* globalpreferences, QWid
 	scoretype->addItem(tr("Number of y-ions"));
 	scoretype->addItem(tr("Number of b-ions and y-ions"));
 	scoretype->addItem(tr("Weighted Ratio of Matched Peaks"));
+	scoretype->addItem(tr("Cosine Similarity"));
 	scoretype->setFixedWidth(rightdefaultwidth);
 	scoretypelabel = new QLabel("Score Type:");
 	theoreticalspectragridlayout->addWidget(scoretypelabel, 1, 0);
@@ -724,6 +930,7 @@ cParametersWidget::cParametersWidget(cGlobalPreferences* globalpreferences, QWid
 	vlayout1 = new QVBoxLayout();
 	vlayout1->addWidget(searchgroupbox);
 	vlayout1->addWidget(experimentalspectragroupbox);
+	vlayout1->addWidget(isotoperatiosgroupbox);
 	vlayout1->addWidget(brickdatabasegroupbox);
 	vlayout1->addWidget(miscgroupbox);
 	if (hideunusedparameters) {
@@ -838,13 +1045,61 @@ cParametersWidget::~cParametersWidget() {
 	delete rtwidget;
 	delete fwhmlabel;
 	delete fwhm;
-	delete ratio54Fe56Felabel;
-	delete minratio54Fe56Fe;
-	delete maxratio54Fe56Fe;
-	delete ratio54Fe56Felayout;
-	delete ratio54Fe56Fewidget;
+
 	delete experimentalspectragridlayout;
 	delete experimentalspectragroupbox;
+
+	delete ratio54Fe56FeLabel;
+	delete ratio54Fe56FeEnabled;
+	delete minratio54Fe56Fe;
+	delete maxratio54Fe56Fe;
+	delete ratio54Fe56FeLayout;
+	delete ratio54Fe56FeWidget;
+
+	delete ratio60Ni58NiLabel;
+	delete ratio60Ni58NiEnabled;
+	delete minratio60Ni58Ni;
+	delete maxratio60Ni58Ni;
+	delete ratio60Ni58NiLayout;
+	delete ratio60Ni58NiWidget;
+
+	delete ratio62Ni58NiLabel;
+	delete ratio62Ni58NiEnabled;
+	delete minratio62Ni58Ni;
+	delete maxratio62Ni58Ni;
+	delete ratio62Ni58NiLayout;
+	delete ratio62Ni58NiWidget;
+
+	delete ratio65Cu63CuLabel;
+	delete ratio65Cu63CuEnabled;
+	delete minratio65Cu63Cu;
+	delete maxratio65Cu63Cu;
+	delete ratio65Cu63CuLayout;
+	delete ratio65Cu63CuWidget;
+
+	delete ratio66Zn64ZnLabel;
+	delete ratio66Zn64ZnEnabled;
+	delete minratio66Zn64Zn;
+	delete maxratio66Zn64Zn;
+	delete ratio66Zn64ZnLayout;
+	delete ratio66Zn64ZnWidget;
+
+	delete ratio67Zn64ZnLabel;
+	delete ratio67Zn64ZnEnabled;
+	delete minratio67Zn64Zn;
+	delete maxratio67Zn64Zn;
+	delete ratio67Zn64ZnLayout;
+	delete ratio67Zn64ZnWidget;
+
+	delete ratio68Zn64ZnLabel;
+	delete ratio68Zn64ZnEnabled;
+	delete minratio68Zn64Zn;
+	delete maxratio68Zn64Zn;
+	delete ratio68Zn64ZnLayout;
+	delete ratio68Zn64ZnWidget;
+
+	delete isotoperatiosgridlayout;
+	delete isotoperatiosgroupbox;
 
 	delete brickdatabaselabel;
 	delete brickdatabaseline;
@@ -1097,8 +1352,41 @@ void cParametersWidget::loadSettings() {
 		minimumrt->setValue(settings.value("minimumrt", 0).toDouble());
 		maximumrt->setValue(settings.value("maximumrt", 0).toDouble());
 		fwhm->setValue(settings.value("fwhm", 0.05).toDouble());
+
+		settings.value("enableratio54Fe56Fe", 1).toInt() == 0 ? ratio54Fe56FeEnabled->setChecked(false) : ratio54Fe56FeEnabled->setChecked(true);
+
 		minratio54Fe56Fe->setValue(settings.value("minratio54Fe56Fe", 0.01).toDouble());
 		maxratio54Fe56Fe->setValue(settings.value("maxratio54Fe56Fe", 0.1).toDouble());
+
+		settings.value("enableratio60Ni58Ni", 1).toInt() == 0 ? ratio60Ni58NiEnabled->setChecked(false) : ratio60Ni58NiEnabled->setChecked(true);
+
+		minratio60Ni58Ni->setValue(settings.value("minratio60Ni58Ni", 0).toDouble());
+		maxratio60Ni58Ni->setValue(settings.value("maxratio60Ni58Ni", 0.5).toDouble());
+
+		settings.value("enableratio62Ni58Ni", 1).toInt() == 0 ? ratio62Ni58NiEnabled->setChecked(false) : ratio62Ni58NiEnabled->setChecked(true);
+
+		minratio62Ni58Ni->setValue(settings.value("minratio62Ni58Ni", 0).toDouble());
+		maxratio62Ni58Ni->setValue(settings.value("maxratio62Ni58Ni", 0.1).toDouble());
+
+		settings.value("enableratio65Cu63Cu", 1).toInt() == 0 ? ratio65Cu63CuEnabled->setChecked(false) : ratio65Cu63CuEnabled->setChecked(true);
+
+		minratio65Cu63Cu->setValue(settings.value("minratio65Cu63Cu", 0).toDouble());
+		maxratio65Cu63Cu->setValue(settings.value("maxratio65Cu63Cu", 0.6).toDouble());
+
+		settings.value("enableratio66Zn64Zn", 1).toInt() == 0 ? ratio66Zn64ZnEnabled->setChecked(false) : ratio66Zn64ZnEnabled->setChecked(true);
+
+		minratio66Zn64Zn->setValue(settings.value("minratio66Zn64Zn", 0).toDouble());
+		maxratio66Zn64Zn->setValue(settings.value("maxratio66Zn64Zn", 0.7).toDouble());
+
+		settings.value("enableratio67Zn64Zn", 1).toInt() == 0 ? ratio67Zn64ZnEnabled->setChecked(false) : ratio67Zn64ZnEnabled->setChecked(true);
+
+		minratio67Zn64Zn->setValue(settings.value("minratio67Zn64Zn", 0).toDouble());
+		maxratio67Zn64Zn->setValue(settings.value("maxratio67Zn64Zn", 0.2).toDouble());
+
+		settings.value("enableratio68Zn64Zn", 1).toInt() == 0 ? ratio68Zn64ZnEnabled->setChecked(false) : ratio68Zn64ZnEnabled->setChecked(true);
+
+		minratio68Zn64Zn->setValue(settings.value("minratio68Zn64Zn", 0).toDouble());
+		maxratio68Zn64Zn->setValue(settings.value("maxratio68Zn64Zn", 0.5).toDouble());
 
 		brickdatabaseline->setText(settings.value("brickdatabase", "").toString());
 		maximumbricksincombinationbegin->setValue(settings.value("maximumbricksincombinationbegin", 1).toInt());
@@ -1117,7 +1405,7 @@ void cParametersWidget::loadSettings() {
 
 		sequencedatabaseline->setText(settings.value("sequencedatabase", "").toString());
 		scoretype->setCurrentIndex(settings.value("scoretype", (int)number_of_matched_peaks).toInt());
-		if ((scoretype->currentIndex() < (int)number_of_matched_peaks) || (scoretype->currentIndex() > (int)number_of_b_and_y_ions)) {
+		if ((scoretype->currentIndex() < (int)number_of_matched_peaks) || (scoretype->currentIndex() > (int)cosine_similarity)) {
 			scoretype->setCurrentIndex((int)number_of_matched_peaks);
 		}
 		hitsreported->setValue(settings.value("hitsreported", 100).toInt());
@@ -1254,8 +1542,41 @@ void cParametersWidget::saveSettings() {
 	settings.setValue("minimumrt", minimumrt->value());
 	settings.setValue("maximumrt", maximumrt->value());
 	settings.setValue("fwhm", fwhm->value());
+
+	ratio54Fe56FeEnabled->isChecked() ? settings.setValue("enableratio54Fe56Fe", 1) : settings.setValue("enableratio54Fe56Fe", 0);
+
 	settings.setValue("minratio54Fe56Fe", minratio54Fe56Fe->value());
 	settings.setValue("maxratio54Fe56Fe", maxratio54Fe56Fe->value());
+
+	ratio60Ni58NiEnabled->isChecked() ? settings.setValue("enableratio60Ni58Ni", 1) : settings.setValue("enableratio60Ni58Ni", 0);
+
+	settings.setValue("minratio60Ni58Ni", minratio60Ni58Ni->value());
+	settings.setValue("maxratio60Ni58Ni", maxratio60Ni58Ni->value());
+
+	ratio62Ni58NiEnabled->isChecked() ? settings.setValue("enableratio62Ni58Ni", 1) : settings.setValue("enableratio62Ni58Ni", 0);
+
+	settings.setValue("minratio62Ni58Ni", minratio62Ni58Ni->value());
+	settings.setValue("maxratio62Ni58Ni", maxratio62Ni58Ni->value());
+
+	ratio65Cu63CuEnabled->isChecked() ? settings.setValue("enableratio65Cu63Cu", 1) : settings.setValue("enableratio65Cu63Cu", 0);
+
+	settings.setValue("minratio65Cu63Cu", minratio65Cu63Cu->value());
+	settings.setValue("maxratio65Cu63Cu", maxratio65Cu63Cu->value());
+
+	ratio66Zn64ZnEnabled->isChecked() ? settings.setValue("enableratio66Zn64Zn", 1) : settings.setValue("enableratio66Zn64Zn", 0);
+
+	settings.setValue("minratio66Zn64Zn", minratio66Zn64Zn->value());
+	settings.setValue("maxratio66Zn64Zn", maxratio66Zn64Zn->value());
+
+	ratio67Zn64ZnEnabled->isChecked() ? settings.setValue("enableratio67Zn64Zn", 1) : settings.setValue("enableratio67Zn64Zn", 0);
+
+	settings.setValue("minratio67Zn64Zn", minratio67Zn64Zn->value());
+	settings.setValue("maxratio67Zn64Zn", maxratio67Zn64Zn->value());
+
+	ratio68Zn64ZnEnabled->isChecked() ? settings.setValue("enableratio68Zn64Zn", 1) : settings.setValue("enableratio68Zn64Zn", 0);
+
+	settings.setValue("minratio68Zn64Zn", minratio68Zn64Zn->value());
+	settings.setValue("maxratio68Zn64Zn", maxratio68Zn64Zn->value());
 
 	settings.setValue("brickdatabase", brickdatabaseline->text());
 	settings.setValue("maximumbricksincombinationbegin", maximumbricksincombinationbegin->value());
@@ -1610,8 +1931,50 @@ bool cParametersWidget::updateParameters() {
 			}
 		}
 
-		if (minratio54Fe56Fe->value() >= maxratio54Fe56Fe->value()) {
+		if (ratio54Fe56FeEnabled->isChecked() && (minratio54Fe56Fe->value() >= maxratio54Fe56Fe->value())) {
 			errstr = "The minimum ratio 54Fe/56Fe must be lower than the maximum ratio of 54Fe/56Fe !";
+			msgBox.setText(errstr);
+			msgBox.exec();
+			return false;
+		}
+
+		if (ratio60Ni58NiEnabled->isChecked() && (minratio60Ni58Ni->value() >= maxratio60Ni58Ni->value())) {
+			errstr = "The minimum ratio 60Ni/58Ni must be lower than the maximum ratio of 60Ni/58Ni !";
+			msgBox.setText(errstr);
+			msgBox.exec();
+			return false;
+		}
+
+		if (ratio62Ni58NiEnabled->isChecked() && (minratio62Ni58Ni->value() >= maxratio62Ni58Ni->value())) {
+			errstr = "The minimum ratio 62Ni/58Ni must be lower than the maximum ratio of 62Ni/58Ni !";
+			msgBox.setText(errstr);
+			msgBox.exec();
+			return false;
+		}
+
+		if (ratio65Cu63CuEnabled->isChecked() && (minratio65Cu63Cu->value() >= maxratio65Cu63Cu->value())) {
+			errstr = "The minimum ratio 65Cu/63Cu must be lower than the maximum ratio of 65Cu/63Cu !";
+			msgBox.setText(errstr);
+			msgBox.exec();
+			return false;
+		}
+
+		if (ratio66Zn64ZnEnabled->isChecked() && (minratio66Zn64Zn->value() >= maxratio66Zn64Zn->value())) {
+			errstr = "The minimum ratio 66Zn/64Zn must be lower than the maximum ratio of 66Zn/64Zn !";
+			msgBox.setText(errstr);
+			msgBox.exec();
+			return false;
+		}
+
+		if (ratio67Zn64ZnEnabled->isChecked() && (minratio67Zn64Zn->value() >= maxratio67Zn64Zn->value())) {
+			errstr = "The minimum ratio 67Zn/64Zn must be lower than the maximum ratio of 67Zn/64Zn !";
+			msgBox.setText(errstr);
+			msgBox.exec();
+			return false;
+		}
+
+		if (ratio68Zn64ZnEnabled->isChecked() && (minratio68Zn64Zn->value() >= maxratio68Zn64Zn->value())) {
+			errstr = "The minimum ratio 68Zn/64Zn must be lower than the maximum ratio of 68Zn/64Zn !";
 			msgBox.setText(errstr);
 			msgBox.exec();
 			return false;
@@ -1746,8 +2109,41 @@ bool cParametersWidget::updateParameters() {
 	parameters.minimumrt = minimumrt->value();
 	parameters.maximumrt = maximumrt->value();
 	parameters.fwhm = fwhm->value();
+
+	parameters.enableratio54Fe56Fe = ratio54Fe56FeEnabled->isChecked();
+
 	parameters.minratio54Fe56Fe = minratio54Fe56Fe->value();
 	parameters.maxratio54Fe56Fe = maxratio54Fe56Fe->value();
+
+	parameters.enableratio60Ni58Ni = ratio60Ni58NiEnabled->isChecked();
+
+	parameters.minratio60Ni58Ni = minratio60Ni58Ni->value();
+	parameters.maxratio60Ni58Ni = maxratio60Ni58Ni->value();
+
+	parameters.enableratio62Ni58Ni = ratio62Ni58NiEnabled->isChecked();
+
+	parameters.minratio62Ni58Ni = minratio62Ni58Ni->value();
+	parameters.maxratio62Ni58Ni = maxratio62Ni58Ni->value();
+
+	parameters.enableratio65Cu63Cu = ratio65Cu63CuEnabled->isChecked();
+
+	parameters.minratio65Cu63Cu = minratio65Cu63Cu->value();
+	parameters.maxratio65Cu63Cu = maxratio65Cu63Cu->value();
+
+	parameters.enableratio66Zn64Zn = ratio66Zn64ZnEnabled->isChecked();
+
+	parameters.minratio66Zn64Zn = minratio66Zn64Zn->value();
+	parameters.maxratio66Zn64Zn = maxratio66Zn64Zn->value();
+
+	parameters.enableratio67Zn64Zn = ratio67Zn64ZnEnabled->isChecked();
+
+	parameters.minratio67Zn64Zn = minratio67Zn64Zn->value();
+	parameters.maxratio67Zn64Zn = maxratio67Zn64Zn->value();
+
+	parameters.enableratio68Zn64Zn = ratio68Zn64ZnEnabled->isChecked();
+
+	parameters.minratio68Zn64Zn = minratio68Zn64Zn->value();
+	parameters.maxratio68Zn64Zn = maxratio68Zn64Zn->value();
 
 	parameters.bricksdatabasefilename = brickdatabaseline->text().toStdString();
 	parameters.maximumbricksincombinationbegin = maximumbricksincombinationbegin->value();
@@ -1912,8 +2308,41 @@ void cParametersWidget::restoreParameters() {
 	minimumrt->setValue(parameters.minimumrt);
 	maximumrt->setValue(parameters.maximumrt);
 	fwhm->setValue(parameters.fwhm);
+
+	ratio54Fe56FeEnabled->setChecked(parameters.enableratio54Fe56Fe);
+
 	minratio54Fe56Fe->setValue(parameters.minratio54Fe56Fe);
 	maxratio54Fe56Fe->setValue(parameters.maxratio54Fe56Fe);
+
+	ratio60Ni58NiEnabled->setChecked(parameters.enableratio60Ni58Ni);
+
+	minratio60Ni58Ni->setValue(parameters.minratio60Ni58Ni);
+	maxratio60Ni58Ni->setValue(parameters.maxratio60Ni58Ni);
+
+	ratio62Ni58NiEnabled->setChecked(parameters.enableratio62Ni58Ni);
+
+	minratio62Ni58Ni->setValue(parameters.minratio62Ni58Ni);
+	maxratio62Ni58Ni->setValue(parameters.maxratio62Ni58Ni);
+
+	ratio65Cu63CuEnabled->setChecked(parameters.enableratio65Cu63Cu);
+
+	minratio65Cu63Cu->setValue(parameters.minratio65Cu63Cu);
+	maxratio65Cu63Cu->setValue(parameters.maxratio65Cu63Cu);
+
+	ratio66Zn64ZnEnabled->setChecked(parameters.enableratio66Zn64Zn);
+
+	minratio66Zn64Zn->setValue(parameters.minratio66Zn64Zn);
+	maxratio66Zn64Zn->setValue(parameters.maxratio66Zn64Zn);
+
+	ratio67Zn64ZnEnabled->setChecked(parameters.enableratio67Zn64Zn);
+
+	minratio67Zn64Zn->setValue(parameters.minratio67Zn64Zn);
+	maxratio67Zn64Zn->setValue(parameters.maxratio67Zn64Zn);
+
+	ratio68Zn64ZnEnabled->setChecked(parameters.enableratio68Zn64Zn);
+
+	minratio68Zn64Zn->setValue(parameters.minratio68Zn64Zn);
+	maxratio68Zn64Zn->setValue(parameters.maxratio68Zn64Zn);
 
 	brickdatabaseline->setText(parameters.bricksdatabasefilename.c_str());
 	maximumbricksincombinationbegin->setValue(parameters.maximumbricksincombinationbegin);
@@ -2238,8 +2667,35 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 			minimumrt->setDisabled(true);
 			maximumrt->setDisabled(true);
 			fwhm->setDisabled(false);
+
+			ratio54Fe56FeEnabled->setDisabled(true);
 			minratio54Fe56Fe->setDisabled(true);
 			maxratio54Fe56Fe->setDisabled(true);
+
+			ratio60Ni58NiEnabled->setDisabled(true);
+			minratio60Ni58Ni->setDisabled(true);
+			maxratio60Ni58Ni->setDisabled(true);
+
+			ratio62Ni58NiEnabled->setDisabled(true);
+			minratio62Ni58Ni->setDisabled(true);
+			maxratio62Ni58Ni->setDisabled(true);
+
+			ratio65Cu63CuEnabled->setDisabled(true);
+			minratio65Cu63Cu->setDisabled(true);
+			maxratio65Cu63Cu->setDisabled(true);
+
+			ratio66Zn64ZnEnabled->setDisabled(true);
+			minratio66Zn64Zn->setDisabled(true);
+			maxratio66Zn64Zn->setDisabled(true);
+
+			ratio67Zn64ZnEnabled->setDisabled(true);
+			minratio67Zn64Zn->setDisabled(true);
+			maxratio67Zn64Zn->setDisabled(true);
+
+			ratio68Zn64ZnEnabled->setDisabled(true);
+			minratio68Zn64Zn->setDisabled(true);
+			maxratio68Zn64Zn->setDisabled(true);
+
 			brickdatabaseline->setDisabled(false);
 			brickdatabasebutton->setDisabled(false);
 			maximumbricksincombinationbegin->setDisabled(false);
@@ -2304,9 +2760,40 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 				minimumrt->setHidden(true);
 				maximumrt->setHidden(true);
 
-				ratio54Fe56Felabel->setHidden(true);
-				minratio54Fe56Fe->setHidden(true);
-				maxratio54Fe56Fe->setHidden(true);
+				//ratio54Fe56FeLabel->setHidden(true);
+				//ratio54Fe56FeEnabled->setHidden(true);
+				//minratio54Fe56Fe->setHidden(true);
+				//maxratio54Fe56Fe->setHidden(true);
+
+				//ratio60Ni58NiLabel->setHidden(true);
+				//ratio60Ni58NiEnabled->setHidden(true);
+				//minratio60Ni58Ni->setHidden(true);
+				//maxratio60Ni58Ni->setHidden(true);
+
+				//ratio62Ni58NiLabel->setHidden(true);
+				//ratio62Ni58NiEnabled->setHidden(true);
+				//minratio62Ni58Ni->setHidden(true);
+				//maxratio62Ni58Ni->setHidden(true);
+
+				//ratio65Cu63CuLabel->setHidden(true);
+				//ratio65Cu63CuEnabled->setHidden(true);
+				//minratio65Cu63Cu->setHidden(true);
+				//maxratio65Cu63Cu->setHidden(true);
+
+				//ratio66Zn64ZnLabel->setHidden(true);
+				//ratio66Zn64ZnEnabled->setHidden(true);
+				//minratio66Zn64Zn->setHidden(true);
+				//maxratio66Zn64Zn->setHidden(true);
+
+				//ratio67Zn64ZnLabel->setHidden(true);
+				//ratio67Zn64ZnEnabled->setHidden(true);
+				//minratio67Zn64Zn->setHidden(true);
+				//maxratio67Zn64Zn->setHidden(true);
+
+				//ratio68Zn64ZnLabel->setHidden(true);
+				//ratio68Zn64ZnEnabled->setHidden(true);
+				//minratio68Zn64Zn->setHidden(true);
+				//maxratio68Zn64Zn->setHidden(true);
 
 				maximumbricksincombinatiolabel->setHidden(false);
 				maximumbricksincombinationbegin->setHidden(false);
@@ -2369,6 +2856,7 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 				intensitytolerancelabel->setHidden(true);
 				intensitytolerance->setHidden(true);
 
+				isotoperatiosgroupbox->setHidden(true);
 				brickdatabasegroupbox->setHidden(false);
 				miscgroupbox->setHidden(false);
 				searchedsequencegroupbox->setHidden(false);
@@ -2387,8 +2875,35 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 			minimumrt->setDisabled(true);
 			maximumrt->setDisabled(true);
 			fwhm->setDisabled(false);
+
+			ratio54Fe56FeEnabled->setDisabled(true);
 			minratio54Fe56Fe->setDisabled(true);
 			maxratio54Fe56Fe->setDisabled(true);
+
+			ratio60Ni58NiEnabled->setDisabled(true);
+			minratio60Ni58Ni->setDisabled(true);
+			maxratio60Ni58Ni->setDisabled(true);
+
+			ratio62Ni58NiEnabled->setDisabled(true);
+			minratio62Ni58Ni->setDisabled(true);
+			maxratio62Ni58Ni->setDisabled(true);
+
+			ratio65Cu63CuEnabled->setDisabled(true);
+			minratio65Cu63Cu->setDisabled(true);
+			maxratio65Cu63Cu->setDisabled(true);
+
+			ratio66Zn64ZnEnabled->setDisabled(true);
+			minratio66Zn64Zn->setDisabled(true);
+			maxratio66Zn64Zn->setDisabled(true);
+
+			ratio67Zn64ZnEnabled->setDisabled(true);
+			minratio67Zn64Zn->setDisabled(true);
+			maxratio67Zn64Zn->setDisabled(true);
+
+			ratio68Zn64ZnEnabled->setDisabled(true);
+			minratio68Zn64Zn->setDisabled(true);
+			maxratio68Zn64Zn->setDisabled(true);
+
 			brickdatabaseline->setDisabled(false);
 			brickdatabasebutton->setDisabled(false);
 			maximumbricksincombinationbegin->setDisabled(true);
@@ -2453,9 +2968,40 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 				minimumrt->setHidden(true);
 				maximumrt->setHidden(true);
 
-				ratio54Fe56Felabel->setHidden(true);
-				minratio54Fe56Fe->setHidden(true);
-				maxratio54Fe56Fe->setHidden(true);
+				//ratio54Fe56FeLabel->setHidden(true);
+				//ratio54Fe56FeEnabled->setHidden(true);
+				//minratio54Fe56Fe->setHidden(true);
+				//maxratio54Fe56Fe->setHidden(true);
+
+				//ratio60Ni58NiLabel->setHidden(true);
+				//ratio60Ni58NiEnabled->setHidden(true);
+				//minratio60Ni58Ni->setHidden(true);
+				//maxratio60Ni58Ni->setHidden(true);
+
+				//ratio62Ni58NiLabel->setHidden(true);
+				//ratio62Ni58NiEnabled->setHidden(true);
+				//minratio62Ni58Ni->setHidden(true);
+				//maxratio62Ni58Ni->setHidden(true);
+
+				//ratio65Cu63CuLabel->setHidden(true);
+				//ratio65Cu63CuEnabled->setHidden(true);
+				//minratio65Cu63Cu->setHidden(true);
+				//maxratio65Cu63Cu->setHidden(true);
+
+				//ratio66Zn64ZnLabel->setHidden(true);
+				//ratio66Zn64ZnEnabled->setHidden(true);
+				//minratio66Zn64Zn->setHidden(true);
+				//maxratio66Zn64Zn->setHidden(true);
+
+				//ratio67Zn64ZnLabel->setHidden(true);
+				//ratio67Zn64ZnEnabled->setHidden(true);
+				//minratio67Zn64Zn->setHidden(true);
+				//maxratio67Zn64Zn->setHidden(true);
+
+				//ratio68Zn64ZnLabel->setHidden(true);
+				//ratio68Zn64ZnEnabled->setHidden(true);
+				//minratio68Zn64Zn->setHidden(true);
+				//maxratio68Zn64Zn->setHidden(true);
 
 				maximumbricksincombinatiolabel->setHidden(true);
 				maximumbricksincombinationbegin->setHidden(true);
@@ -2518,6 +3064,7 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 				intensitytolerancelabel->setHidden(true);
 				intensitytolerance->setHidden(true);
 
+				isotoperatiosgroupbox->setHidden(true);
 				brickdatabasegroupbox->setHidden(false);
 				miscgroupbox->setHidden(false);
 				searchedsequencegroupbox->setHidden(false);
@@ -2536,8 +3083,35 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 			minimumrt->setDisabled(true);
 			maximumrt->setDisabled(true);
 			fwhm->setDisabled(false);
+
+			ratio54Fe56FeEnabled->setDisabled(true);
 			minratio54Fe56Fe->setDisabled(true);
 			maxratio54Fe56Fe->setDisabled(true);
+
+			ratio60Ni58NiEnabled->setDisabled(true);
+			minratio60Ni58Ni->setDisabled(true);
+			maxratio60Ni58Ni->setDisabled(true);
+
+			ratio62Ni58NiEnabled->setDisabled(true);
+			minratio62Ni58Ni->setDisabled(true);
+			maxratio62Ni58Ni->setDisabled(true);
+
+			ratio65Cu63CuEnabled->setDisabled(true);
+			minratio65Cu63Cu->setDisabled(true);
+			maxratio65Cu63Cu->setDisabled(true);
+
+			ratio66Zn64ZnEnabled->setDisabled(true);
+			minratio66Zn64Zn->setDisabled(true);
+			maxratio66Zn64Zn->setDisabled(true);
+
+			ratio67Zn64ZnEnabled->setDisabled(true);
+			minratio67Zn64Zn->setDisabled(true);
+			maxratio67Zn64Zn->setDisabled(true);
+
+			ratio68Zn64ZnEnabled->setDisabled(true);
+			minratio68Zn64Zn->setDisabled(true);
+			maxratio68Zn64Zn->setDisabled(true);
+
 			brickdatabaseline->setDisabled(false);
 			brickdatabasebutton->setDisabled(false);
 			maximumbricksincombinationbegin->setDisabled(true);
@@ -2602,9 +3176,40 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 				minimumrt->setHidden(true);
 				maximumrt->setHidden(true);
 
-				ratio54Fe56Felabel->setHidden(true);
-				minratio54Fe56Fe->setHidden(true);
-				maxratio54Fe56Fe->setHidden(true);
+				//ratio54Fe56FeLabel->setHidden(true);
+				//ratio54Fe56FeEnabled->setHidden(true);
+				//minratio54Fe56Fe->setHidden(true);
+				//maxratio54Fe56Fe->setHidden(true);
+
+				//ratio60Ni58NiLabel->setHidden(true);
+				//ratio60Ni58NiEnabled->setHidden(true);
+				//minratio60Ni58Ni->setHidden(true);
+				//maxratio60Ni58Ni->setHidden(true);
+
+				//ratio62Ni58NiLabel->setHidden(true);
+				//ratio62Ni58NiEnabled->setHidden(true);
+				//minratio62Ni58Ni->setHidden(true);
+				//maxratio62Ni58Ni->setHidden(true);
+
+				//ratio65Cu63CuLabel->setHidden(true);
+				//ratio65Cu63CuEnabled->setHidden(true);
+				//minratio65Cu63Cu->setHidden(true);
+				//maxratio65Cu63Cu->setHidden(true);
+
+				//ratio66Zn64ZnLabel->setHidden(true);
+				//ratio66Zn64ZnEnabled->setHidden(true);
+				//minratio66Zn64Zn->setHidden(true);
+				//maxratio66Zn64Zn->setHidden(true);
+
+				//ratio67Zn64ZnLabel->setHidden(true);
+				//ratio67Zn64ZnEnabled->setHidden(true);
+				//minratio67Zn64Zn->setHidden(true);
+				//maxratio67Zn64Zn->setHidden(true);
+
+				//ratio68Zn64ZnLabel->setHidden(true);
+				//ratio68Zn64ZnEnabled->setHidden(true);
+				//minratio68Zn64Zn->setHidden(true);
+				//maxratio68Zn64Zn->setHidden(true);
 
 				maximumbricksincombinatiolabel->setHidden(true);
 				maximumbricksincombinationbegin->setHidden(true);
@@ -2667,6 +3272,7 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 				intensitytolerancelabel->setHidden(true);
 				intensitytolerance->setHidden(true);
 
+				isotoperatiosgroupbox->setHidden(true);
 				brickdatabasegroupbox->setHidden(false);
 				miscgroupbox->setHidden(false);
 				searchedsequencegroupbox->setHidden(false);
@@ -2685,8 +3291,35 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 			minimumrt->setDisabled(false);
 			maximumrt->setDisabled(false);
 			fwhm->setDisabled(false);
+
+			ratio54Fe56FeEnabled->setDisabled(false);
 			minratio54Fe56Fe->setDisabled(false);
 			maxratio54Fe56Fe->setDisabled(false);
+
+			ratio60Ni58NiEnabled->setDisabled(false);
+			minratio60Ni58Ni->setDisabled(false);
+			maxratio60Ni58Ni->setDisabled(false);
+
+			ratio62Ni58NiEnabled->setDisabled(false);
+			minratio62Ni58Ni->setDisabled(false);
+			maxratio62Ni58Ni->setDisabled(false);
+
+			ratio65Cu63CuEnabled->setDisabled(false);
+			minratio65Cu63Cu->setDisabled(false);
+			maxratio65Cu63Cu->setDisabled(false);
+
+			ratio66Zn64ZnEnabled->setDisabled(false);
+			minratio66Zn64Zn->setDisabled(false);
+			maxratio66Zn64Zn->setDisabled(false);
+
+			ratio67Zn64ZnEnabled->setDisabled(false);
+			minratio67Zn64Zn->setDisabled(false);
+			maxratio67Zn64Zn->setDisabled(false);
+
+			ratio68Zn64ZnEnabled->setDisabled(false);
+			minratio68Zn64Zn->setDisabled(false);
+			maxratio68Zn64Zn->setDisabled(false);
+
 			brickdatabaseline->setDisabled(true);
 			brickdatabasebutton->setDisabled(true);
 			maximumbricksincombinationbegin->setDisabled(true);
@@ -2769,9 +3402,40 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 				minimumrt->setHidden(false);
 				maximumrt->setHidden(false);
 
-				ratio54Fe56Felabel->setHidden(false);
-				minratio54Fe56Fe->setHidden(false);
-				maxratio54Fe56Fe->setHidden(false);
+				//ratio54Fe56FeLabel->setHidden(false);
+				//ratio54Fe56FeEnabled->setHidden(false);
+				//minratio54Fe56Fe->setHidden(false);
+				//maxratio54Fe56Fe->setHidden(false);
+
+				//ratio60Ni58NiLabel->setHidden(false);
+				//ratio60Ni58NiEnabled->setHidden(false);
+				//minratio60Ni58Ni->setHidden(false);
+				//maxratio60Ni58Ni->setHidden(false);
+
+				//ratio62Ni58NiLabel->setHidden(false);
+				//ratio62Ni58NiEnabled->setHidden(false);
+				//minratio62Ni58Ni->setHidden(false);
+				//maxratio62Ni58Ni->setHidden(false);
+
+				//ratio65Cu63CuLabel->setHidden(false);
+				//ratio65Cu63CuEnabled->setHidden(false);
+				//minratio65Cu63Cu->setHidden(false);
+				//maxratio65Cu63Cu->setHidden(false);
+
+				//ratio66Zn64ZnLabel->setHidden(false);
+				//ratio66Zn64ZnEnabled->setHidden(false);
+				//minratio66Zn64Zn->setHidden(false);
+				//maxratio66Zn64Zn->setHidden(false);
+
+				//ratio67Zn64ZnLabel->setHidden(false);
+				//ratio67Zn64ZnEnabled->setHidden(false);
+				//minratio67Zn64Zn->setHidden(false);
+				//maxratio67Zn64Zn->setHidden(false);
+
+				//ratio68Zn64ZnLabel->setHidden(false);
+				//ratio68Zn64ZnEnabled->setHidden(false);
+				//minratio68Zn64Zn->setHidden(false);
+				//maxratio68Zn64Zn->setHidden(false);
 
 				maximumbricksincombinatiolabel->setHidden(true);
 				maximumbricksincombinationbegin->setHidden(true);
@@ -2834,6 +3498,7 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 				intensitytolerancelabel->setHidden(false);
 				intensitytolerance->setHidden(false);
 
+				isotoperatiosgroupbox->setHidden(false);
 				brickdatabasegroupbox->setHidden(true);
 				miscgroupbox->setHidden(true);
 				searchedsequencegroupbox->setHidden(true);
@@ -2852,8 +3517,35 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 			minimumrt->setDisabled(false);
 			maximumrt->setDisabled(false);
 			fwhm->setDisabled(false);
+
+			ratio54Fe56FeEnabled->setDisabled(false);
 			minratio54Fe56Fe->setDisabled(false);
 			maxratio54Fe56Fe->setDisabled(false);
+
+			ratio60Ni58NiEnabled->setDisabled(false);
+			minratio60Ni58Ni->setDisabled(false);
+			maxratio60Ni58Ni->setDisabled(false);
+
+			ratio62Ni58NiEnabled->setDisabled(false);
+			minratio62Ni58Ni->setDisabled(false);
+			maxratio62Ni58Ni->setDisabled(false);
+
+			ratio65Cu63CuEnabled->setDisabled(false);
+			minratio65Cu63Cu->setDisabled(false);
+			maxratio65Cu63Cu->setDisabled(false);
+
+			ratio66Zn64ZnEnabled->setDisabled(false);
+			minratio66Zn64Zn->setDisabled(false);
+			maxratio66Zn64Zn->setDisabled(false);
+
+			ratio67Zn64ZnEnabled->setDisabled(false);
+			minratio67Zn64Zn->setDisabled(false);
+			maxratio67Zn64Zn->setDisabled(false);
+
+			ratio68Zn64ZnEnabled->setDisabled(false);
+			minratio68Zn64Zn->setDisabled(false);
+			maxratio68Zn64Zn->setDisabled(false);
+
 			brickdatabaseline->setDisabled(true);
 			brickdatabasebutton->setDisabled(true);
 			maximumbricksincombinationbegin->setDisabled(true);
@@ -2936,9 +3628,40 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 				minimumrt->setHidden(false);
 				maximumrt->setHidden(false);
 
-				ratio54Fe56Felabel->setHidden(false);
-				minratio54Fe56Fe->setHidden(false);
-				maxratio54Fe56Fe->setHidden(false);
+				//ratio54Fe56FeLabel->setHidden(false);
+				//ratio54Fe56FeEnabled->setHidden(false);
+				//minratio54Fe56Fe->setHidden(false);
+				//maxratio54Fe56Fe->setHidden(false);
+
+				//ratio60Ni58NiLabel->setHidden(false);
+				//ratio60Ni58NiEnabled->setHidden(false);
+				//minratio60Ni58Ni->setHidden(false);
+				//maxratio60Ni58Ni->setHidden(false);
+
+				//ratio62Ni58NiLabel->setHidden(false);
+				//ratio62Ni58NiEnabled->setHidden(false);
+				//minratio62Ni58Ni->setHidden(false);
+				//maxratio62Ni58Ni->setHidden(false);
+
+				//ratio65Cu63CuLabel->setHidden(false);
+				//ratio65Cu63CuEnabled->setHidden(false);
+				//minratio65Cu63Cu->setHidden(false);
+				//maxratio65Cu63Cu->setHidden(false);
+
+				//ratio66Zn64ZnLabel->setHidden(false);
+				//ratio66Zn64ZnEnabled->setHidden(false);
+				//minratio66Zn64Zn->setHidden(false);
+				//maxratio66Zn64Zn->setHidden(false);
+
+				//ratio67Zn64ZnLabel->setHidden(false);
+				//ratio67Zn64ZnEnabled->setHidden(false);
+				//minratio67Zn64Zn->setHidden(false);
+				//maxratio67Zn64Zn->setHidden(false);
+
+				//ratio68Zn64ZnLabel->setHidden(false);
+				//ratio68Zn64ZnEnabled->setHidden(false);
+				//minratio68Zn64Zn->setHidden(false);
+				//maxratio68Zn64Zn->setHidden(false);
 
 				maximumbricksincombinatiolabel->setHidden(true);
 				maximumbricksincombinationbegin->setHidden(true);
@@ -3001,6 +3724,7 @@ void cParametersWidget::updateSettingsWhenModeChanged(int index) {
 				intensitytolerancelabel->setHidden(false);
 				intensitytolerance->setHidden(false);
 
+				isotoperatiosgroupbox->setHidden(false);
 				brickdatabasegroupbox->setHidden(true);
 				miscgroupbox->setHidden(true);
 				searchedsequencegroupbox->setHidden(true);

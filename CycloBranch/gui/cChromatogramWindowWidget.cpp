@@ -1392,6 +1392,16 @@ void cChromatogramWindowWidget::redrawScene() {
 
 	int w = origwidth;
 	int h = origheight;
+
+	int numberofchromatograms = 1;
+
+	vector<int> hvec;
+	int hstep = 50;
+	int hvalue = (h - hstep * (numberofchromatograms - 1)) / numberofchromatograms;
+	for (int i = 0; i < numberofchromatograms; i++) {
+		hvec.push_back(hvalue * (i + 1) + hstep * i);
+	}
+
 	int rulergranularity = 10;
 
 	QFont myFont("Arial", 8);
@@ -1417,65 +1427,7 @@ void cChromatogramWindowWidget::redrawScene() {
 		fronting = true;
 	}
 
-	if (!hidetic) {
-		if (absoluteintensity) {
-			maxintensitytic = ticchromatogram.getMaximumAbsoluteIntensityFromMZInterval((double)minscan, (double)maxscan, false, false, other, false);
-		}
-		else {
-			maxintensitytic = ticchromatogram.getMaximumRelativeIntensityFromMZInterval((double)minscan, (double)maxscan, false, false, other, false);
-		}
-	}
-
-	if (!hideeic) {
-		if (absoluteintensity) {
-			maxintensityeic = localeic.getMaximumAbsoluteIntensityFromMZInterval((double)minscan, (double)maxscan, false, false, other, false);
-		}
-		else {
-			maxintensityeic = localeic.getMaximumRelativeIntensityFromMZInterval((double)minscan, (double)maxscan, false, false, other, false);
-		}
-	}
-
-	double maxintensity = max(maxintensitytic, maxintensityeic);
-
-	if (rawdatastate && !hideeic && (maxscan > minscan - 1)) {
-		size_t eicsize = localeic.size();
-		for (int i = 0; i < eicsize; i++) {
-			if ((localeic[i].mzratio < (double)minscan) || (localeic[i].mzratio > (double)maxscan)) {
-				localeic[i].absoluteintensity = 0;
-				localeic[i].relativeintensity = 0;
-			}
-		}
-
-		calculateGaussianParameters(localeic, rtimes, 1, absoluteintensity, false, nys, sigmas, as);
-
-		double newmaxintensity = maxintensity;
-		for (int i = 0; i < (int)nys.size(); i++) {
-			if (as[i] / maxintensity > 2 * maxintensity) {
-				nys[i] = 0;
-				sigmas[i] = 0;
-				as[i] = 0;
-			}
-
-			if (as[i] > newmaxintensity) {
-				newmaxintensity = as[i];
-			}
-		}
-
-		if (absoluteintensity) {
-			maxintensity = max(maxintensity, newmaxintensity);
-		}
-		else {
-			if ((newmaxintensity > maxintensity) && (newmaxintensity > 0)) {
-				for (int i = 0; i < localeic.size(); i++) {
-					localeic[i].relativeintensity = localeic[i].relativeintensity * maxintensity / newmaxintensity;
-				}
-
-				for (int i = 0; i < (int)as.size(); i++) {
-					as[i] = as[i] * maxintensity / newmaxintensity;
-				}
-			}
-		}
-	}
+	double maxintensity;
 
 	scene->removeItem(zoomgroup);
 	scene->clear();
@@ -1494,310 +1446,351 @@ void cChromatogramWindowWidget::redrawScene() {
 	zoomgroup->setVisible(false);
 	scene->addItem(zoomgroup);
 
-	// x axis
-	scene->addLine(leftmargin, h - bottommargin, w - rightmargin, h - bottommargin, QPen(Qt::black, 2, Qt::SolidLine));
+	for (int hv = 0; hv < numberofchromatograms; hv++) {
 
-	// x axis ruler
-	xstep = (w - leftmargin - rightmargin) / rulergranularity;
-	for (int i = 0; i < rulergranularity; i++) {
-		scene->addLine(leftmargin + xstep * i, h - bottommargin, leftmargin + xstep * i, h - bottommargin + 10, QPen(Qt::black, 2, Qt::SolidLine));
-	}
-	scene->addLine(w - rightmargin, h - bottommargin, w - rightmargin, h - bottommargin + 10, QPen(Qt::black, 2, Qt::SolidLine));
-
-	printscan = minscan - 1;
-	if (retentiontime) {
-		if (printscan - 1 >= 0) {
-			simpletext = scene->addSimpleText(QString::number(rtimes[printscan - 1]), myFont);
+		if (!hidetic) {
+			if (absoluteintensity) {
+				maxintensitytic = ticchromatogram.getMaximumAbsoluteIntensityFromMZInterval((double)minscan, (double)maxscan, false, false, other, false);
+			}
+			else {
+				maxintensitytic = ticchromatogram.getMaximumRelativeIntensityFromMZInterval((double)minscan, (double)maxscan, false, false, other, false);
+			}
 		}
-		else {
-			simpletext = scene->addSimpleText(QString::number(0), myFont);
-		}
-	}
-	else {
-		simpletext = scene->addSimpleText(QString::number(printscan), myFont);
-	}
-	simpletext->setPos(QPointF(leftmargin - simpletext->boundingRect().width() / 2, h - bottommargin + 12));
 
-	if (maxscan - minscan > rulergranularity) {
+		if (!hideeic) {
+			if (absoluteintensity) {
+				maxintensityeic = localeic.getMaximumAbsoluteIntensityFromMZInterval((double)minscan, (double)maxscan, false, false, other, false);
+			}
+			else {
+				maxintensityeic = localeic.getMaximumRelativeIntensityFromMZInterval((double)minscan, (double)maxscan, false, false, other, false);
+			}
+		}
+
+		maxintensity = max(maxintensitytic, maxintensityeic);
+
+		if (rawdatastate && !hideeic && (maxscan > minscan - 1)) {
+			size_t eicsize = localeic.size();
+			for (int i = 0; i < eicsize; i++) {
+				if ((localeic[i].mzratio < (double)minscan) || (localeic[i].mzratio > (double)maxscan)) {
+					localeic[i].absoluteintensity = 0;
+					localeic[i].relativeintensity = 0;
+				}
+			}
+
+			calculateGaussianParameters(localeic, rtimes, 1, absoluteintensity, false, nys, sigmas, as);
+
+			double newmaxintensity = maxintensity;
+			for (int i = 0; i < (int)nys.size(); i++) {
+				if (as[i] / maxintensity > 2 * maxintensity) {
+					nys[i] = 0;
+					sigmas[i] = 0;
+					as[i] = 0;
+				}
+
+				if (as[i] > newmaxintensity) {
+					newmaxintensity = as[i];
+				}
+			}
+
+			if (absoluteintensity) {
+				maxintensity = max(maxintensity, newmaxintensity);
+			}
+			else {
+				if ((newmaxintensity > maxintensity) && (newmaxintensity > 0)) {
+					for (int i = 0; i < localeic.size(); i++) {
+						localeic[i].relativeintensity = localeic[i].relativeintensity * maxintensity / newmaxintensity;
+					}
+
+					for (int i = 0; i < (int)as.size(); i++) {
+						as[i] = as[i] * maxintensity / newmaxintensity;
+					}
+				}
+			}
+		}
+
+		// x axis
+		scene->addLine(leftmargin, hvec[hv] - bottommargin, w - rightmargin, hvec[hv] - bottommargin, QPen(Qt::black, 2, Qt::SolidLine));
+
+		// x axis ruler
 		xstep = (w - leftmargin - rightmargin) / rulergranularity;
-		for (int i = 1; i < rulergranularity; i++) {
-			printscan = (double)minscan + (double)(maxscan - minscan) / (double)rulergranularity * (double)i;
-			if (retentiontime) {
-				if (printscan - 1 >= 0) {
-					simpletext = scene->addSimpleText(QString::number(rtimes[printscan - 1]), myFont);
-				}
-				else {
-					simpletext = scene->addSimpleText(QString::number(0), myFont);
-				}
+		for (int i = 0; i < rulergranularity; i++) {
+			scene->addLine(leftmargin + xstep * i, hvec[hv] - bottommargin, leftmargin + xstep * i, hvec[hv] - bottommargin + 10, QPen(Qt::black, 2, Qt::SolidLine));
+		}
+		scene->addLine(w - rightmargin, hvec[hv] - bottommargin, w - rightmargin, hvec[hv] - bottommargin + 10, QPen(Qt::black, 2, Qt::SolidLine));
+
+		printscan = minscan - 1;
+		if (retentiontime) {
+			if (printscan - 1 >= 0) {
+				simpletext = scene->addSimpleText(QString::number(rtimes[printscan - 1]), myFont);
 			}
 			else {
-				simpletext = scene->addSimpleText(QString::number(printscan), myFont);
+				simpletext = scene->addSimpleText(QString::number(0), myFont);
 			}
-			simpletext->setPos(QPointF(leftmargin + xstep * i - simpletext->boundingRect().width() / 2, h - bottommargin + 12));
-		}
-	}
-
-	printscan = maxscan;
-	if (retentiontime) {
-		if (printscan - 1 >= 0) {
-			simpletext = scene->addSimpleText(QString::number(rtimes[printscan - 1]), myFont);
 		}
 		else {
+			simpletext = scene->addSimpleText(QString::number(printscan), myFont);
+		}
+		simpletext->setPos(QPointF(leftmargin - simpletext->boundingRect().width() / 2, hvec[hv] - bottommargin + 12));
+
+		if (maxscan - minscan > rulergranularity) {
+			xstep = (w - leftmargin - rightmargin) / rulergranularity;
+			for (int i = 1; i < rulergranularity; i++) {
+				printscan = (double)minscan + (double)(maxscan - minscan) / (double)rulergranularity * (double)i;
+				if (retentiontime) {
+					if (printscan - 1 >= 0) {
+						simpletext = scene->addSimpleText(QString::number(rtimes[printscan - 1]), myFont);
+					}
+					else {
+						simpletext = scene->addSimpleText(QString::number(0), myFont);
+					}
+				}
+				else {
+					simpletext = scene->addSimpleText(QString::number(printscan), myFont);
+				}
+				simpletext->setPos(QPointF(leftmargin + xstep * i - simpletext->boundingRect().width() / 2, hvec[hv] - bottommargin + 12));
+			}
+		}
+
+		printscan = maxscan;
+		if (retentiontime) {
+			if (printscan - 1 >= 0) {
+				simpletext = scene->addSimpleText(QString::number(rtimes[printscan - 1]), myFont);
+			}
+			else {
+				simpletext = scene->addSimpleText(QString::number(0), myFont);
+			}
+		}
+		else {
+			simpletext = scene->addSimpleText(QString::number(printscan), myFont);
+		}
+		simpletext->setPos(QPointF(w - rightmargin - simpletext->boundingRect().width() / 2, hvec[hv] - bottommargin + 12));
+
+		// y axis
+		if (hv > 0) {
+			scene->addLine(leftmargin, hvec[hv] - bottommargin, leftmargin, hvec[hv - 1] + hstep - bottommargin, QPen(Qt::black, 2, Qt::SolidLine));
+		}
+		else {
+			scene->addLine(leftmargin, hvec[hv] - bottommargin, leftmargin, hvec[hv] - bottommargin - std::max(hvec[hv] - topmargin - bottommargin, 0), QPen(Qt::black, 2, Qt::SolidLine));
+		}
+
+		// y axis ruler
+		if (hv > 0) {
+			ystep = (hvec[hv] - hvec[hv - 1] - hstep - topmargin - bottommargin) / rulergranularity;
+		}
+		else {
+			ystep = (hvec[hv] - topmargin - bottommargin) / rulergranularity;
+		}
+		for (int i = 0; i < rulergranularity; i++) {
+			scene->addLine(leftmargin - 10, hvec[hv] - bottommargin - ystep * i, leftmargin, hvec[hv] - bottommargin - ystep * i, QPen(Qt::black, 2, Qt::SolidLine));
+		}
+
+		if (hv > 0) {
+			scene->addLine(leftmargin - 10, hvec[hv - 1] + hstep - bottommargin, leftmargin, hvec[hv - 1] + hstep - bottommargin, QPen(Qt::black, 2, Qt::SolidLine));
+		}
+		else {
+			scene->addLine(leftmargin - 10, hvec[hv] - bottommargin - std::max(hvec[hv] - topmargin - bottommargin, 0), leftmargin, hvec[hv] - bottommargin - std::max(hvec[hv] - topmargin - bottommargin, 0), QPen(Qt::black, 2, Qt::SolidLine));
+		}
+
+		if (absoluteintensity) {
 			simpletext = scene->addSimpleText(QString::number(0), myFont);
 		}
-	}
-	else {
-		simpletext = scene->addSimpleText(QString::number(printscan), myFont);
-	}
-	simpletext->setPos(QPointF(w - rightmargin - simpletext->boundingRect().width() / 2, h - bottommargin + 12));
+		else {
+			simpletext = scene->addSimpleText(QString::number(0) + " %", myFont);
+		}
+		simpletext->setPos(QPointF(leftmargin - 15 - simpletext->boundingRect().width(), hvec[hv] - bottommargin - simpletext->boundingRect().height() / 2));
 
-	// y axis
-	scene->addLine(leftmargin, h - bottommargin, leftmargin, h - bottommargin - std::max(h - topmargin - bottommargin, 0), QPen(Qt::black, 2, Qt::SolidLine));
-
-	// y axis ruler
-	ystep = (h - topmargin - bottommargin) / rulergranularity;
-	for (int i = 0; i < rulergranularity; i++) {
-		scene->addLine(leftmargin - 10, h - bottommargin - ystep * i, leftmargin, h - bottommargin - ystep * i, QPen(Qt::black, 2, Qt::SolidLine));
-	}
-	scene->addLine(leftmargin - 10, h - bottommargin - std::max(h - topmargin - bottommargin, 0), leftmargin, h - bottommargin - std::max(h - topmargin - bottommargin, 0), QPen(Qt::black, 2, Qt::SolidLine));
-
-	if (absoluteintensity) {
-		simpletext = scene->addSimpleText(QString::number(0), myFont);
-	}
-	else {
-		simpletext = scene->addSimpleText(QString::number(0) + " %", myFont);
-	}
-	simpletext->setPos(QPointF(leftmargin - 15 - simpletext->boundingRect().width(), h - bottommargin - simpletext->boundingRect().height() / 2));
-
-	ystep = (h - topmargin - bottommargin) / rulergranularity;
-	if (absoluteintensity) {
-		if (maxintensity > rulergranularity) {
-			for (int i = 1; i < rulergranularity; i++) {
-				simpletext = scene->addSimpleText(QString::number((unsigned long long)maxintensity / (unsigned long long)rulergranularity * (unsigned long long)i), myFont);
-				simpletext->setPos(QPointF(leftmargin - 15 - simpletext->boundingRect().width(), h - bottommargin - simpletext->boundingRect().height() / 2 - ystep * i));
+		if (hv > 0) {
+			ystep = (hvec[hv] - hvec[hv - 1] - hstep - topmargin - bottommargin) / rulergranularity;
+		}
+		else {
+			ystep = (hvec[hv] - topmargin - bottommargin) / rulergranularity;
+		}
+		if (absoluteintensity) {
+			if (maxintensity > rulergranularity) {
+				for (int i = 1; i < rulergranularity; i++) {
+					simpletext = scene->addSimpleText(QString::number((unsigned long long)maxintensity / (unsigned long long)rulergranularity * (unsigned long long)i), myFont);
+					simpletext->setPos(QPointF(leftmargin - 15 - simpletext->boundingRect().width(), hvec[hv] - bottommargin - simpletext->boundingRect().height() / 2 - ystep * i));
+				}
 			}
 		}
-	}
-	else {
-		if (maxintensity > 0) {
-			for (int i = 1; i < rulergranularity; i++) {
-				simpletext = scene->addSimpleText(QString::number(maxintensity / (double)rulergranularity * (double)i) + " %", myFont);
-				simpletext->setPos(QPointF(leftmargin - 15 - simpletext->boundingRect().width(), h - bottommargin - simpletext->boundingRect().height() / 2 - ystep * i));
+		else {
+			if (maxintensity > 0) {
+				for (int i = 1; i < rulergranularity; i++) {
+					simpletext = scene->addSimpleText(QString::number(maxintensity / (double)rulergranularity * (double)i) + " %", myFont);
+					simpletext->setPos(QPointF(leftmargin - 15 - simpletext->boundingRect().width(), hvec[hv] - bottommargin - simpletext->boundingRect().height() / 2 - ystep * i));
+				}
 			}
 		}
-	}
 
-	if (absoluteintensity) {
-		simpletext = scene->addSimpleText(QString::number((unsigned long long)maxintensity), myFont);
-	}
-	else {
-		simpletext = scene->addSimpleText(QString::number(maxintensity) + " %", myFont);
-	}
-	simpletext->setPos(QPointF(leftmargin - 15 - simpletext->boundingRect().width(), h - bottommargin - std::max(h - topmargin - bottommargin, 0) - simpletext->boundingRect().height() / 2));
-
-	// TIC peaks
-	if (!hidetic) {
-
-		for (int i = 0; i < ticchromatogram.size(); i++) {
-
-			if ((ticchromatogram[i].mzratio < (double)minscan) || (ticchromatogram[i].mzratio > (double)maxscan)) {
-				continue;
-			}
-
-			x = getXPositionFromScanID((int)ticchromatogram[i].mzratio, w);
-
-			printintensity = true;
-			if (absoluteintensity) {
-				y = ticchromatogram[i].absoluteintensity / maxintensity * (h - topmargin - bottommargin);
-				if (ticchromatogram[i].absoluteintensity == 0) {
-					printintensity = false;
-				}
-			}
-			else {
-				y = ticchromatogram[i].relativeintensity / maxintensity * (h - topmargin - bottommargin);
-				if (ticchromatogram[i].relativeintensity == 0) {
-					printintensity = false;
-				}
-			}
-
-			if (printintensity) {
-				line = scene->addLine(x, h - bottommargin - 2, x, h - bottommargin - std::max((int)y, 2), QPen(Qt::black, 2, Qt::SolidLine));
-				peakscount++;
-			}
-
+		if (absoluteintensity) {
+			simpletext = scene->addSimpleText(QString::number((unsigned long long)maxintensity), myFont);
+		}
+		else {
+			simpletext = scene->addSimpleText(QString::number(maxintensity) + " %", myFont);
+		}
+		if (hv > 0) {
+			simpletext->setPos(QPointF(leftmargin - 15 - simpletext->boundingRect().width(), hvec[hv - 1] + hstep - bottommargin - simpletext->boundingRect().height() / 2));
+		}
+		else {
+			simpletext->setPos(QPointF(leftmargin - 15 - simpletext->boundingRect().width(), hvec[hv] - bottommargin - std::max(hvec[hv] - topmargin - bottommargin, 0) - simpletext->boundingRect().height() / 2));
 		}
 
-	}
+		// TIC peaks
+		if (!hidetic) {
 
-	// EIC peaks
-	if (!hideeic) {
+			for (int i = 0; i < ticchromatogram.size(); i++) {
 
-		for (int i = 0; i < localeic.size(); i++) {
-
-			if ((localeic[i].mzratio < (double)minscan) || (localeic[i].mzratio > (double)maxscan)) {
-				continue;
-			}
-
-			x = getXPositionFromScanID((int)localeic[i].mzratio, w);
-
-			printintensity = true;
-			if (absoluteintensity) {
-				y = localeic[i].absoluteintensity / maxintensity * (h - topmargin - bottommargin);
-				if (localeic[i].absoluteintensity == 0) {
-					printintensity = false;
-				}
-			}
-			else {
-				y = localeic[i].relativeintensity / maxintensity * (h - topmargin - bottommargin);
-				if (localeic[i].relativeintensity == 0) {
-					printintensity = false;
-				}
-			}
-
-			if (printintensity) {
-				line = scene->addLine(x, h - bottommargin - 2, x, h - bottommargin - std::max((int)y, 2), QPen(Qt::red, 2, Qt::SolidLine));
-				line->setZValue(1);
-				peakscount++;
-			}
-
-		}
-
-	}
-
-	// TIC descriptions
-	if (!hidetic && (peakscount < 500)) {
-
-		for (int i = 0; i < ticchromatogram.size(); i++) {
-
-			if ((ticchromatogram[i].mzratio < (double)minscan) || (ticchromatogram[i].mzratio > (double)maxscan)) {
-				continue;
-			}
-
-			x = getXPositionFromScanID((int)ticchromatogram[i].mzratio, w);
-
-			printintensity = true;
-			if (absoluteintensity) {
-				y = ticchromatogram[i].absoluteintensity / maxintensity * (h - topmargin - bottommargin);
-				if (ticchromatogram[i].absoluteintensity == 0) {
-					printintensity = false;
-				}
-			}
-			else {
-				y = ticchromatogram[i].relativeintensity / maxintensity * (h - topmargin - bottommargin);
-				if (ticchromatogram[i].relativeintensity == 0) {
-					printintensity = false;
-				}
-			}
-
-			if (printintensity) {
-			
-				if (retentiontime) {
-					simpletext = scene->addSimpleText(QString::number(rtimes[i]) + " ", myFont);
-				}
-				else {
-					simpletext = scene->addSimpleText(QString::number((int)ticchromatogram[i].mzratio) + " ", myFont);
-				}
-				tx = x - 2;
-				ty = h - bottommargin - std::max((int)y, 2) - simpletext->boundingRect().height() - 1 - 4;
-				simpletext->setPos(tx, ty);
-				simpletext->setBrush(Qt::black);
-
-				if (scene->collidingItems(simpletext, Qt::IntersectsItemBoundingRect).size() > 0) {
-					scene->removeItem(simpletext);
+				if ((ticchromatogram[i].mzratio < (double)minscan) || (ticchromatogram[i].mzratio > (double)maxscan)) {
+					continue;
 				}
 
-			}
+				x = getXPositionFromScanID((int)ticchromatogram[i].mzratio, w);
 
-		}
-
-	}
-
-	// EIC descriptions
-	if (!hideeic && (peakscount < 500)) {
-
-		for (int i = 0; i < localeic.size(); i++) {
-
-			if ((localeic[i].mzratio < (double)minscan) || (localeic[i].mzratio >(double)maxscan)) {
-				continue;
-			}
-
-			x = getXPositionFromScanID((int)localeic[i].mzratio, w);
-
-			printintensity = true;
-			if (absoluteintensity) {
-				y = localeic[i].absoluteintensity / maxintensity * (h - topmargin - bottommargin);
-				if (localeic[i].absoluteintensity == 0) {
-					printintensity = false;
-				}
-			}
-			else {
-				y = localeic[i].relativeintensity / maxintensity * (h - topmargin - bottommargin);
-				if (localeic[i].relativeintensity == 0) {
-					printintensity = false;
-				}
-			}
-
-			if (printintensity) {
-
-				QList<QGraphicsItem *> hiddenitems;
-				qreal tx, ty, tw, th, sumh;
-
-				vector<string> hits;
-				string tmplong;
-				string tmpshort;
-				size_t pos;
-				
-				hits.clear();
-
-				if (!hidelabels) {
-					tmplong = localeic[i].description.c_str();
-					pos = tmplong.find("<br/>");
-					while (pos != string::npos) {
-						tmpshort = tmplong.substr(0, pos);
-						hits.push_back(tmpshort);
-						tmplong = tmplong.substr(pos + 5);
-						pos = tmplong.find("<br/>");
-					}
-					if (tmplong.size() > 0) {
-						hits.push_back(tmplong);
-					}
-					sort(hits.rbegin(), hits.rend());
-				}
-
-				if (retentiontime) {
-					tmpshort = QString::number(rtimes[i]).toStdString();
-				}
-				else {
-					tmpshort = QString::number((int)localeic[i].mzratio).toStdString();
-				}
-
-				hits.push_back(tmpshort);
-
-				hiddenitems.clear();
-				sumh = 0;
-				for (vector<string>::reverse_iterator rit = hits.rbegin(); rit != hits.rend(); ++rit) {
-					text = scene->addText("");
-					text->setDefaultTextColor(QColor(Qt::red));
-					text->setFont(myFont);
-					text->setTextInteractionFlags(Qt::TextBrowserInteraction);
-					text->setOpenExternalLinks(true);
-					text->setHtml(rit->c_str());
-
-					tw = text->boundingRect().width();
-					th = text->boundingRect().height();
-					sumh += th + 1;
-					tx = x - 2 - 4;
-					ty = h - bottommargin - std::max((int)y, 2) - sumh - 4;
-					text->setPos(tx, ty);
-					text->setZValue(2);
-
-					hiddenitems.append(text);
-
-					if (scene->items(tx, ty, tw, th, Qt::IntersectsItemBoundingRect, Qt::AscendingOrder).size() > 1) {
-						for (int k = 0; k < (int)hiddenitems.size(); k++) {
-							scene->removeItem(hiddenitems[k]);
+				printintensity = true;
+				if (hv > 0) {
+					if (absoluteintensity) {
+						y = ticchromatogram[i].absoluteintensity / maxintensity * (hvec[hv] - hvec[hv - 1] - hstep - topmargin - bottommargin);
+						if (ticchromatogram[i].absoluteintensity == 0) {
+							printintensity = false;
 						}
-						break;
+					}
+					else {
+						y = ticchromatogram[i].relativeintensity / maxintensity * (hvec[hv] - hvec[hv - 1] - hstep - topmargin - bottommargin);
+						if (ticchromatogram[i].relativeintensity == 0) {
+							printintensity = false;
+						}
+					}
+				}
+				else {
+					if (absoluteintensity) {
+						y = ticchromatogram[i].absoluteintensity / maxintensity * (hvec[hv] - topmargin - bottommargin);
+						if (ticchromatogram[i].absoluteintensity == 0) {
+							printintensity = false;
+						}
+					}
+					else {
+						y = ticchromatogram[i].relativeintensity / maxintensity * (hvec[hv] - topmargin - bottommargin);
+						if (ticchromatogram[i].relativeintensity == 0) {
+							printintensity = false;
+						}
+					}
+				}
+
+				if (printintensity) {
+					line = scene->addLine(x, hvec[hv] - bottommargin - 2, x, hvec[hv] - bottommargin - std::max((int)y, 2), QPen(Qt::black, 2, Qt::SolidLine));
+					peakscount++;
+				}
+			}
+
+		}
+
+		// EIC peaks
+		if (!hideeic) {
+
+			for (int i = 0; i < localeic.size(); i++) {
+
+				if ((localeic[i].mzratio < (double)minscan) || (localeic[i].mzratio > (double)maxscan)) {
+					continue;
+				}
+
+				x = getXPositionFromScanID((int)localeic[i].mzratio, w);
+
+				printintensity = true;
+				if (hv > 0) {
+					if (absoluteintensity) {
+						y = localeic[i].absoluteintensity / maxintensity * (hvec[hv] - hvec[hv - 1] - hstep - topmargin - bottommargin);
+						if (localeic[i].absoluteintensity == 0) {
+							printintensity = false;
+						}
+					}
+					else {
+						y = localeic[i].relativeintensity / maxintensity * (hvec[hv] - hvec[hv - 1] - hstep - topmargin - bottommargin);
+						if (localeic[i].relativeintensity == 0) {
+							printintensity = false;
+						}
+					}
+				}
+				else {
+					if (absoluteintensity) {
+						y = localeic[i].absoluteintensity / maxintensity * (hvec[hv] - topmargin - bottommargin);
+						if (localeic[i].absoluteintensity == 0) {
+							printintensity = false;
+						}
+					}
+					else {
+						y = localeic[i].relativeintensity / maxintensity * (hvec[hv] - topmargin - bottommargin);
+						if (localeic[i].relativeintensity == 0) {
+							printintensity = false;
+						}
+					}
+				}
+				
+				if (printintensity) {
+					line = scene->addLine(x, hvec[hv] - bottommargin - 2, x, hvec[hv] - bottommargin - std::max((int)y, 2), QPen(Qt::red, 2, Qt::SolidLine));
+					line->setZValue(1);
+					peakscount++;
+				}
+
+			}
+
+		}
+
+		// TIC descriptions
+		if (!hidetic && (peakscount < 500)) {
+
+			for (int i = 0; i < ticchromatogram.size(); i++) {
+
+				if ((ticchromatogram[i].mzratio < (double)minscan) || (ticchromatogram[i].mzratio > (double)maxscan)) {
+					continue;
+				}
+
+				x = getXPositionFromScanID((int)ticchromatogram[i].mzratio, w);
+
+				printintensity = true;
+				if (hv > 0) {
+					if (absoluteintensity) {
+						y = ticchromatogram[i].absoluteintensity / maxintensity * (hvec[hv] - hvec[hv - 1] - hstep - topmargin - bottommargin);
+						if (ticchromatogram[i].absoluteintensity == 0) {
+							printintensity = false;
+						}
+					}
+					else {
+						y = ticchromatogram[i].relativeintensity / maxintensity * (hvec[hv] - hvec[hv - 1] - hstep - topmargin - bottommargin);
+						if (ticchromatogram[i].relativeintensity == 0) {
+							printintensity = false;
+						}
+					}
+				}
+				else {
+					if (absoluteintensity) {
+						y = ticchromatogram[i].absoluteintensity / maxintensity * (hvec[hv] - topmargin - bottommargin);
+						if (ticchromatogram[i].absoluteintensity == 0) {
+							printintensity = false;
+						}
+					}
+					else {
+						y = ticchromatogram[i].relativeintensity / maxintensity * (hvec[hv] - topmargin - bottommargin);
+						if (ticchromatogram[i].relativeintensity == 0) {
+							printintensity = false;
+						}
+					}			
+				}
+
+				if (printintensity) {
+
+					if (retentiontime) {
+						simpletext = scene->addSimpleText(QString::number(rtimes[i]) + " ", myFont);
+					}
+					else {
+						simpletext = scene->addSimpleText(QString::number((int)ticchromatogram[i].mzratio) + " ", myFont);
+					}
+					tx = x - 2;
+					ty = hvec[hv] - bottommargin - std::max((int)y, 2) - simpletext->boundingRect().height() - 1 - 4;
+					simpletext->setPos(tx, ty);
+					simpletext->setBrush(Qt::black);
+
+					if (scene->collidingItems(simpletext, Qt::IntersectsItemBoundingRect).size() > 0) {
+						scene->removeItem(simpletext);
 					}
 
 				}
@@ -1806,115 +1799,238 @@ void cChromatogramWindowWidget::redrawScene() {
 
 		}
 
-	}
+		// EIC descriptions
+		if (!hideeic && (peakscount < 500)) {
 
-	// estimate chromatographic profile peaks
-	if (rawdatastate && !hideeic && (maxscan > minscan - 1)) {
+			for (int i = 0; i < localeic.size(); i++) {
 
-		double ynorm = (double)(h - topmargin - bottommargin);
-
-		if (peakshape > 0) {
-			calculateExponentialParameters(localeic, rtimes, 1, absoluteintensity, false, fronting, ynorm, bases, taus);
-		}
-
-		for (int i = 0; i < (int)nys.size(); i++) {
-			nys[i] = nys[i] - ((double)minscan - 1.0);
-			nys[i] /= (double)maxscan - ((double)minscan - 1.0);
-			nys[i] *= (double)(w - leftmargin - rightmargin);
-			nys[i] += leftmargin;
-
-			sigmas[i] /= (double)maxscan - ((double)minscan - 1.0);
-			sigmas[i] *= (double)(w - leftmargin - rightmargin);
-
-			as[i] /= maxintensity;
-			as[i] *= (double)(h - topmargin - bottommargin);
-
-			if (peakshape > 0) {
-				taus[i] /= (double)maxscan - ((double)minscan - 1.0);
-				taus[i] *= (double)(w - leftmargin - rightmargin);
-			}
-		}
-
-		const int step = 1;
-
-		int xmin = getXPositionFromScanID(minscan - 1.0, w);
-		int xmax = getXPositionFromScanID(maxscan, w);
-
-		double relint;
-		int yval;
-
-		QPainterPath rpath;
-
-		if (peakshape == 0) {
-			for (int i = xmin; i < xmax; i += step) {
-				relint = 0;
-
-				for (int j = 0; j < (int)as.size(); j++) {
-					relint += computeGaussFunction((double)i, as[j], nys[j], sigmas[j]);
+				if ((localeic[i].mzratio < (double)minscan) || (localeic[i].mzratio > (double)maxscan)) {
+					continue;
 				}
 
-				yval = h - topmargin - bottommargin - (int)relint;
+				x = getXPositionFromScanID((int)localeic[i].mzratio, w);
 
-				if (i == xmin) {
-					rpath.moveTo(i, yval);
+				printintensity = true;
+				if (hv > 0) {
+					if (absoluteintensity) {
+						y = localeic[i].absoluteintensity / maxintensity * (hvec[hv] - hvec[hv - 1] - hstep - topmargin - bottommargin);
+						if (localeic[i].absoluteintensity == 0) {
+							printintensity = false;
+						}
+					}
+					else {
+						y = localeic[i].relativeintensity / maxintensity * (hvec[hv] - hvec[hv - 1] - hstep - topmargin - bottommargin);
+						if (localeic[i].relativeintensity == 0) {
+							printintensity = false;
+						}
+					}
 				}
 				else {
-					rpath.lineTo(i, yval);
+					if (absoluteintensity) {
+						y = localeic[i].absoluteintensity / maxintensity * (hvec[hv] - topmargin - bottommargin);
+						if (localeic[i].absoluteintensity == 0) {
+							printintensity = false;
+						}
+					}
+					else {
+						y = localeic[i].relativeintensity / maxintensity * (hvec[hv] - topmargin - bottommargin);
+						if (localeic[i].relativeintensity == 0) {
+							printintensity = false;
+						}
+					}
+				}
+
+				if (printintensity) {
+
+					QList<QGraphicsItem *> hiddenitems;
+					qreal tx, ty, tw, th, sumh;
+
+					vector<string> hits;
+					string tmplong;
+					string tmpshort;
+					size_t pos;
+
+					hits.clear();
+
+					if (!hidelabels) {
+						tmplong = localeic[i].description.c_str();
+						pos = tmplong.find("<br/>");
+						while (pos != string::npos) {
+							tmpshort = tmplong.substr(0, pos);
+							hits.push_back(tmpshort);
+							tmplong = tmplong.substr(pos + 5);
+							pos = tmplong.find("<br/>");
+						}
+						if (tmplong.size() > 0) {
+							hits.push_back(tmplong);
+						}
+						sort(hits.rbegin(), hits.rend());
+					}
+
+					if (retentiontime) {
+						tmpshort = QString::number(rtimes[i]).toStdString();
+					}
+					else {
+						tmpshort = QString::number((int)localeic[i].mzratio).toStdString();
+					}
+
+					hits.push_back(tmpshort);
+
+					hiddenitems.clear();
+					sumh = 0;
+					for (vector<string>::reverse_iterator rit = hits.rbegin(); rit != hits.rend(); ++rit) {
+						text = scene->addText("");
+						text->setDefaultTextColor(QColor(Qt::red));
+						text->setFont(myFont);
+						text->setTextInteractionFlags(Qt::TextBrowserInteraction);
+						text->setOpenExternalLinks(true);
+						text->setHtml(rit->c_str());
+
+						tw = text->boundingRect().width();
+						th = text->boundingRect().height();
+						sumh += th + 1;
+						tx = x - 2 - 4;
+						ty = hvec[hv] - bottommargin - std::max((int)y, 2) - sumh - 4;
+						text->setPos(tx, ty);
+						text->setZValue(2);
+
+						hiddenitems.append(text);
+
+						if (scene->items(tx, ty, tw, th, Qt::IntersectsItemBoundingRect, Qt::AscendingOrder).size() > 1) {
+							for (int k = 0; k < (int)hiddenitems.size(); k++) {
+								scene->removeItem(hiddenitems[k]);
+							}
+							break;
+						}
+
+					}
+
+				}
+
+			}
+
+		}
+
+		// estimate chromatographic profile peaks
+		if (rawdatastate && !hideeic && (maxscan > minscan - 1)) {
+
+			double ynorm;
+			if (hv > 0) {
+				ynorm = (double)(hvec[hv] - hvec[hv - 1] - hstep - topmargin - bottommargin);
+			}
+			else {
+				ynorm = (double)(hvec[hv] - topmargin - bottommargin);
+			}
+
+			if (peakshape > 0) {
+				calculateExponentialParameters(localeic, rtimes, 1, absoluteintensity, false, fronting, ynorm, bases, taus);
+			}
+
+			for (int i = 0; i < (int)nys.size(); i++) {
+				nys[i] = nys[i] - ((double)minscan - 1.0);
+				nys[i] /= (double)maxscan - ((double)minscan - 1.0);
+				nys[i] *= (double)(w - leftmargin - rightmargin);
+				nys[i] += leftmargin;
+
+				sigmas[i] /= (double)maxscan - ((double)minscan - 1.0);
+				sigmas[i] *= (double)(w - leftmargin - rightmargin);
+
+				as[i] /= maxintensity;
+				if (hv > 0) {
+					as[i] *= (double)(hvec[hv] - hvec[hv - 1] - hstep - topmargin - bottommargin);
+				}
+				else {
+					as[i] *= (double)(hvec[hv] - topmargin - bottommargin);
+				}
+
+				if (peakshape > 0) {
+					taus[i] /= (double)maxscan - ((double)minscan - 1.0);
+					taus[i] *= (double)(w - leftmargin - rightmargin);
 				}
 			}
 
-			scene->addPath(rpath, QPen(Qt::gray, 1, Qt::SolidLine));
-		}
+			const int step = 1;
 
-		if (as.size() == taus.size()) {
+			int xmin = getXPositionFromScanID(minscan - 1.0, w);
+			int xmax = getXPositionFromScanID(maxscan, w);
 
-			QPainterPath rpath2;
+			double relint;
+			int yval;
 
-			if (peakshape > 0) {
+			QPainterPath rpath;
+
+			if (peakshape == 0) {
 				for (int i = xmin; i < xmax; i += step) {
 					relint = 0;
 
 					for (int j = 0; j < (int)as.size(); j++) {
-						relint += computeExponentiallyModifiedGaussFunction((double)i, as[j], nys[j], sigmas[j], taus[j], fronting);
+						relint += computeGaussFunction((double)i, as[j], nys[j], sigmas[j]);
 					}
 
-					yval = h - topmargin - bottommargin - (int)relint;
+					yval = hvec[hv] - topmargin - bottommargin - (int)relint;
 
 					if (i == xmin) {
-						rpath2.moveTo(i, yval);
+						rpath.moveTo(i, yval);
 					}
 					else {
-						rpath2.lineTo(i, yval);
+						rpath.lineTo(i, yval);
 					}
 				}
 
-				scene->addPath(rpath2, QPen(Qt::gray, 1, Qt::SolidLine));
+				scene->addPath(rpath, QPen(Qt::gray, 1, Qt::SolidLine));
 			}
 
-			//if (taus.size() == bases.size()) {
+			if (as.size() == taus.size()) {
 
-			//	QPainterPath rpath3;
+				QPainterPath rpath2;
 
-			//	for (int i = xmin; i < xmax; i += step) {
-			//		relint = 0;
+				if (peakshape > 0) {
+					for (int i = xmin; i < xmax; i += step) {
+						relint = 0;
 
-			//		for (int j = 0; j < (int)taus.size(); j++) {
-			//			relint += ynorm * taus[j] * computeExponentialFunction((double)i /** log(bases[j])*/, econst, taus[j], fronting);
-			//		}
+						for (int j = 0; j < (int)as.size(); j++) {
+							relint += computeExponentiallyModifiedGaussFunction((double)i, as[j], nys[j], sigmas[j], taus[j], fronting);
+						}
 
-			//		yval = h - topmargin - bottommargin - (int)relint;
+						yval = hvec[hv] - topmargin - bottommargin - (int)relint;
+						
+						if (i == xmin) {
+							rpath2.moveTo(i, yval);
+						}
+						else {
+							rpath2.lineTo(i, yval);
+						}
+					}
 
-			//		if (i == xmin) {
-			//			rpath3.moveTo(i, yval);
-			//		}
-			//		else {
-			//			rpath3.lineTo(i, yval);
-			//		}
-			//	}
+					scene->addPath(rpath2, QPen(Qt::gray, 1, Qt::SolidLine));
+				}
 
-			//	scene->addPath(rpath3, QPen(Qt::blue, 1, Qt::SolidLine));
+				//if (taus.size() == bases.size()) {
 
-			//}
+				//	QPainterPath rpath3;
+
+				//	for (int i = xmin; i < xmax; i += step) {
+				//		relint = 0;
+
+				//		for (int j = 0; j < (int)taus.size(); j++) {
+				//			relint += ynorm * taus[j] * computeExponentialFunction((double)i /** log(bases[j])*/, econst, taus[j], fronting);
+				//		}
+
+				//		yval = hvec[hv] - topmargin - bottommargin - (int)relint;
+
+				//		if (i == xmin) {
+				//			rpath3.moveTo(i, yval);
+				//		}
+				//		else {
+				//			rpath3.lineTo(i, yval);
+				//		}
+				//	}
+
+				//	scene->addPath(rpath3, QPen(Qt::blue, 1, Qt::SolidLine));
+
+				//}
+
+			}
 
 		}
 

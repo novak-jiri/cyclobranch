@@ -42,9 +42,14 @@ cAboutWidget::cAboutWidget(QWidget* parent) {
 	citations += "Jiri Novak, Anton Skriba, Jakub Zapal, Marek Kuzma, Vladimir Havlicek:<br/>";
 	citations += "CycloBranch: an Open Tool for Fine Isotope Structures in Conventional and Product Ion Mass Spectra,<br/>";
 	citations += "<i>J. Mass Spectrom.</i>, vol. 53, no. 11, pp. 1097-1103, 2018. DOI: <a href=\"https://doi.org/10.1002/jms.4285\">10.1002/jms.4285</a>.<br/>";
-	citations += "Download citation: [ <a href=\"https://ms.biomed.cas.cz/cyclobranch/docs/cyclobranch_jms_ris.txt\"><b>ris</b></a> ], [ <a href=\"https://ms.biomed.cas.cz/cyclobranch/docs/cyclobranch_jms_bib.txt\"><b>bib</b></a> ]<br/><hr/><br/>";
+	citations += "Download citation: [ <a href=\"https://ms.biomed.cas.cz/cyclobranch/docs/cyclobranch_jms_ris.txt\"><b>ris</b></a> ], [ <a href=\"https://ms.biomed.cas.cz/cyclobranch/docs/cyclobranch_jms_bib.txt\"><b>bib</b></a> ]<br/><br/>";
 
-	QString developers = "Developers:<br/><br/>Jiri Novak<br/>Laboratory of Molecular Structure Characterization<br/>Institute of Microbiology<br/>Czech Academy of Sciences<br/>Videnska 1083<br/>142 20 Prague<br/>Czech Republic<br/><a href=\"mailto:jiri.novak@biomed.cas.cz\">jiri.novak@biomed.cas.cz</a><br/><br/>(C) 2013 - 2022<br/><hr/><br/>";
+	citations += "Jiri Novak, Kevin A. Schug, Vladimir Havlicek:<br/>";
+	citations += "Quantitation of Small Molecules from Liquid Chromatography-Mass Spectrometric Accurate Mass Datasets using CycloBranch,<br/>";
+	citations += "<i>Eur. J. Mass Spectrom.</i>, vol. 29, no. 2, pp. 102-110, 2023. DOI: <a href=\"https://doi.org/10.1177/14690667231164766\">10.1177/14690667231164766</a>.<br/>";
+	citations += "Download citation: [ <a href=\"https://ms.biomed.cas.cz/cyclobranch/docs/cyclobranch_ejms_ris.txt\"><b>ris</b></a> ], [ <a href=\"https://ms.biomed.cas.cz/cyclobranch/docs/cyclobranch_ejms_bib.txt\"><b>bib</b></a> ]<br/><hr/><br/>";
+
+	QString developers = "Developers:<br/><br/>Jiri Novak<br/>Laboratory of Molecular Structure Characterization<br/>Institute of Microbiology<br/>Czech Academy of Sciences<br/>Videnska 1083<br/>142 20 Prague<br/>Czech Republic<br/><a href=\"mailto:jiri.novak@biomed.cas.cz\">jiri.novak@biomed.cas.cz</a><br/><br/>(C) 2013 - 2023<br/><hr/><br/>";
 
 	QString license = "License:<br/><br/> This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.<br/><br/>";
 	license += "This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.<br/><br/>";

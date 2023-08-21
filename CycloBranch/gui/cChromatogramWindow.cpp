@@ -212,6 +212,10 @@ cChromatogramWindow::cChromatogramWindow(cGlobalPreferences* globalpreferences, 
 	connect(resetscanidinterval, SIGNAL(released()), chromatogramwindowwidget, SLOT(resetScanIDInterval()));
 	connect(chromatogramwindowwidget, SIGNAL(updateScanIDInterval(int, int)), this, SLOT(updateScanIDInterval(int, int)));
 
+	sumofspectra = new QPushButton(" Average Spectrum ");
+	sumofspectra->setMinimumWidth(100);
+	connect(sumofspectra, SIGNAL(released()), this, SLOT(showAvgSpectrum()));
+
 	hboxscanid = new QHBoxLayout();
 	hboxscanid->addWidget(labelscanid);
 	hboxscanid->addWidget(minscanid);
@@ -221,6 +225,8 @@ cChromatogramWindow::cChromatogramWindow(cGlobalPreferences* globalpreferences, 
 	hboxscanid->addWidget(setscanidinterval);
 	hboxscanid->addSpacing(5);
 	hboxscanid->addWidget(resetscanidinterval);
+	hboxscanid->addSpacing(5);
+	hboxscanid->addWidget(sumofspectra);
 
 	widgetscanid = new QWidget();
 	widgetscanid->setLayout(hboxscanid);
@@ -285,6 +291,7 @@ cChromatogramWindow::~cChromatogramWindow() {
 	delete maxscanid;
 	delete setscanidinterval;
 	delete resetscanidinterval;
+	delete sumofspectra;
 	delete hboxscanid;
 	delete widgetscanid;
 
@@ -453,3 +460,8 @@ void cChromatogramWindow::chromatogramDoubleClickedSlot(int scanid) {
 	emit doubleClickedScanIDSignal(scanid);
 }
 
+
+void cChromatogramWindow::showAvgSpectrum() {
+	setScanIDInterval();
+	emit calculateAvgSpectrum(minscanid->value(), maxscanid->value());
+}

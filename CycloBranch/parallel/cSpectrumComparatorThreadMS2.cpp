@@ -184,6 +184,28 @@ bool compareWeightedRatioDesc(const cTheoreticalSpectrum& a, const cTheoreticalS
 }
 
 
+bool compareCosineSimilarityDesc(const cTheoreticalSpectrum& a, const cTheoreticalSpectrum& b) {
+	if (a.getCosineSimilarity() > b.getCosineSimilarity()) {
+		return true;
+	}
+	if (a.getCosineSimilarity() < b.getCosineSimilarity()) {
+		return false;
+	}
+
+	if (a.getPathId() < b.getPathId()) {
+		return true;
+	}
+	if (a.getPathId() > b.getPathId()) {
+		return false;
+	}
+
+	vector<nodeEdge> v1 = ((cTheoreticalSpectrum&)a).getCandidate().getPath();
+	vector<nodeEdge> v2 = ((cTheoreticalSpectrum&)b).getCandidate().getPath();
+
+	return comparePaths(v1, v2);
+}
+
+
 void cSpectrumComparatorThreadMS2::initialize(cCandidate& candidate, cPeaksList& peaklist, cBricksDatabase* bricksdatabasewithcombinations, cTheoreticalSpectrumList* theoreticalspectrumlist, cParameters* parameters, regex* rxsequencetag, regex* rxsearchedsequence, double currentworstscore, bool* terminatecomputation) {
 	this->candidate = candidate;
 	this->peaklist = peaklist;
@@ -286,6 +308,9 @@ void cSpectrumComparatorThreadMS2::run() {
 				break;
 			case weighted_ratio_of_matched_peaks:
 				score = tsp.getWeightedRatioOfMatchedPeaks();
+				break;
+			case cosine_similarity:
+				score = tsp.getCosineSimilarity();
 				break;
 			default:
 				break;

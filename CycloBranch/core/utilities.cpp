@@ -4,7 +4,7 @@
 
 
 QString appname = "CycloBranch";
-QString appversion = "v. 2.1.21 (64-bit)";
+QString appversion = "v. 2.1.35 (64-bit)";
 
 QString lastcompatibleappversion = "v. 2.0.8 (64-bit)";
 
@@ -404,7 +404,7 @@ string getStringFromPeptideType(ePeptideType peptidetype) {
 
 
 double cropPrecisionToSixDecimals(double value) {
-	char buffer[50];
+	char buffer[500];
 	double val;
 	sprintf_s(buffer, "%.6f\0", value);
 	sscanf_s(buffer, "%lf", &val);
@@ -413,7 +413,7 @@ double cropPrecisionToSixDecimals(double value) {
 
 
 QByteArray cropDecimalsByteArray(double value) {
-	char buffer[50];
+	char buffer[500];
 	sprintf_s(buffer, "%.0f\0", value);
 	QByteArray bytearray = buffer;
 	return bytearray;
@@ -421,7 +421,7 @@ QByteArray cropDecimalsByteArray(double value) {
 
 
 QByteArray cropPrecisionToSixDecimalsByteArray(double value) {
-	char buffer[50];
+	char buffer[500];
 	sprintf_s(buffer, "%.6f\0", value);
 	QByteArray bytearray = buffer;
 	return bytearray;

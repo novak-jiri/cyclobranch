@@ -968,8 +968,8 @@ void cGlobalPreferences::setDefaultIonTypes() {
 
 
 void cGlobalPreferences::setDefaultDataProcessingMethods() {
-	linebafprocessingmethod = 0;
-	profilebafprocessingmethod = 0;
+	linebafprocessingmethod = 1;
+	profilebafprocessingmethod = 1;
 
 	rawdataprocessingmethod = 0;
 }

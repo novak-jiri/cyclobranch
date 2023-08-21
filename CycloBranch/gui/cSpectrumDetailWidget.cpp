@@ -32,6 +32,7 @@ cSpectrumDetailWidget::cSpectrumDetailWidget() {
 	profileintensity64precision = false;
 
 	rowid = 0;
+	scantitle.clear();
 	preparedToShow = false;
 	localneutralosses.clear();
 	theoreticalspectrum = new cTheoreticalSpectrum();
@@ -58,7 +59,7 @@ cSpectrumDetailWidget& cSpectrumDetailWidget::operator=(const cSpectrumDetailWid
 	theoreticalspectrum = new cTheoreticalSpectrum();
 
 	if (parameters && sd.theoreticalspectrum) {
-		initialize(sd.rowid, sd.activefileid, globalpreferences, parameters, *sd.theoreticalspectrum, sd.parent);
+		initialize(sd.rowid, sd.scantitle, sd.activefileid, globalpreferences, parameters, *sd.theoreticalspectrum, sd.parent);
 	}
 
 	if (parameters && sd.preparedToShow) {
@@ -71,8 +72,9 @@ cSpectrumDetailWidget& cSpectrumDetailWidget::operator=(const cSpectrumDetailWid
 }
 
 
-void cSpectrumDetailWidget::initialize(int rowid, int activefileid, cGlobalPreferences* globalpreferences, cParameters* parameters, cTheoreticalSpectrum& theoreticalspectrum, QWidget* parent) {
+void cSpectrumDetailWidget::initialize(int rowid, string scantitle, int activefileid, cGlobalPreferences* globalpreferences, cParameters* parameters, cTheoreticalSpectrum& theoreticalspectrum, QWidget* parent) {
 	this->rowid = rowid;
+	this->scantitle = scantitle;
 	this->activefileid = activefileid;
 	this->globalpreferences = globalpreferences;
 	this->parameters = parameters;
@@ -840,6 +842,7 @@ void cSpectrumDetailWidget::prepareToShow(QAction* actionShowIsomers, cPeakListS
 		actionAbsoluteIntensity->setCheckable(true);
 		toolbarView->addAction(actionAbsoluteIntensity);
 		connect(actionAbsoluteIntensity, SIGNAL(toggled(bool)), spectrumscene, SLOT(absoluteIntensityStateChanged(bool)));
+		connect(actionAbsoluteIntensity, SIGNAL(toggled(bool)), this, SLOT(absoluteIntensityStateChanged(bool)));
 
 		actionRawData = new QAction(QIcon(":/images/icons/chromatography.png"), tr("&Profile Spectrum"), this);
 		actionRawData->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_P));
@@ -1421,6 +1424,11 @@ bool cSpectrumDetailWidget::hasProfileSpectrumEnabled() {
 }
 
 
+void cSpectrumDetailWidget::disableProfileMode() {
+	actionRawData->setEnabled(false);
+}
+
+
 void cSpectrumDetailWidget::setAbsoluteIntensityEnabled(bool enable) {
 	actionAbsoluteIntensity->setChecked(enable);
 }
@@ -1742,12 +1750,22 @@ void cSpectrumDetailWidget::preparePeaksTable(QRect geometry) {
 				if (parameters->generateisotopepattern && parameters->calculatefdrs) {
 					peakstablemodel->setItem(i, currentcolumn, new QStandardItem());
 					peakstablemodel->item(i, currentcolumn)->setForeground(brush);
-					peakstablemodel->item(i, currentcolumn)->setData(QVariant::fromValue(cropPrecisionToSixDecimalsByteArray(theoreticalspectrum->getTargetPatternScore(peak->groupid))), Qt::DisplayRole);
+					if (theoreticalspectrum->getTargetPatternScore(peak->groupid) != DBL_MAX) {
+						peakstablemodel->item(i, currentcolumn)->setData(QVariant::fromValue(cropPrecisionToSixDecimalsByteArray(theoreticalspectrum->getTargetPatternScore(peak->groupid))), Qt::DisplayRole);
+					}
+					else {
+						peakstablemodel->item(i, currentcolumn)->setText("N/A");
+					}
 					currentcolumn++;
 
 					peakstablemodel->setItem(i, currentcolumn, new QStandardItem());
 					peakstablemodel->item(i, currentcolumn)->setForeground(brush);
-					peakstablemodel->item(i, currentcolumn)->setData(QVariant::fromValue(cropPrecisionToSixDecimalsByteArray(theoreticalspectrum->getTargetPatternFDR(peak->groupid))), Qt::DisplayRole);
+					if (theoreticalspectrum->getTargetPatternFDR(peak->groupid) != DBL_MAX) {
+						peakstablemodel->item(i, currentcolumn)->setData(QVariant::fromValue(cropPrecisionToSixDecimalsByteArray(theoreticalspectrum->getTargetPatternFDR(peak->groupid))), Qt::DisplayRole);
+					}
+					else {
+						peakstablemodel->item(i, currentcolumn)->setText("N/A");
+					}
 					currentcolumn++;
 				}
 			}
@@ -2392,7 +2410,13 @@ void cSpectrumDetailWidget::rawDataStateChanged(bool state) {
 				fileid = parameters->scannumber;
 			}
 			else {
-				fileid = rowid;
+				size_t scanpos = scantitle.find("scan=");
+				if (scanpos != string::npos) {
+					fileid = QVariant(scantitle.substr(scanpos + 5).c_str()).toInt();
+				}
+				else {
+					fileid = rowid;
+				}
 			}
 			targetid = rowid - 1;
 
@@ -2734,6 +2758,11 @@ void cSpectrumDetailWidget::rawDataStateChanged(bool state) {
 	}
 
 	progress.setValue(maximum);
+}
+
+
+void cSpectrumDetailWidget::absoluteIntensityStateChanged(bool state) {
+	emit absoluteIntensityStateChangedSignal(actionAbsoluteIntensity->isChecked());
 }
 
 
